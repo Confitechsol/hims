@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::create('complaint_type', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+             $table->string('complaint_type', 100)->index(); // complaint_type varchar(100) NOT NULL
+            $table->mediumText('description')->nullable(); // description mediumtext NULL
+            $table->timestamp('created_at')->useCurrent()->useCurrentOnUpdate(); 
         });
     }
 
