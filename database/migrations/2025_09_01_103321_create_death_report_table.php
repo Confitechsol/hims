@@ -14,6 +14,28 @@ return new class extends Migration
         Schema::create('death_report', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->unsignedBigInteger('patient_id')->nullable()->index();
+            // INT(11), NULL, indexed
+
+            $table->unsignedBigInteger('case_reference_id')->nullable()->index();
+            // INT(11), NULL, indexed
+
+            $table->text('attachment');
+            // TEXT, NOT NULL
+
+            $table->text('attachment_name')->nullable();
+            // TEXT, NULL
+
+            $table->dateTime('death_date');
+            // DATETIME, NOT NULL
+
+            $table->string('guardian_name', 200);
+            // VARCHAR(200), NOT NULL
+
+            $table->text('death_report')->nullable();
+            // TEXT, NULL
+
+            $table->string('is_active', 10);
             $table->timestamps();
         });
     }
