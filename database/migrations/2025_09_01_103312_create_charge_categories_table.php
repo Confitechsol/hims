@@ -13,11 +13,12 @@ return new class extends Migration
     {
         Schema::create('charge_categories', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('charge_type_id')->nullable()->index(); // charge_type_id
-            $table->string('name', 200)->index(); // name
-            $table->mediumText('description')->nullable(); // description
-            $table->string('short_code', 30)->nullable(); // short_code
-            $table->string('is_default', 10); // is_default
+            $table->string('hospital_id', 8);
+            $table->unsignedBigInteger('charge_type_id')->nullable()->index();               // charge_type_id
+            $table->string('name', 200)->index();                                            // name
+            $table->mediumText('description')->nullable();                                   // description
+            $table->string('short_code', 30)->nullable();                                    // short_code
+            $table->string('is_default', 10);                                                // is_default
             $table->timestamp('created_at')->nullable()->useCurrent()->useCurrentOnUpdate(); // created_at
 
         });

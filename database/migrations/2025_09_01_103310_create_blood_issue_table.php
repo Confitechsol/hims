@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('blood_issue', function (Blueprint $table) {
             $table->id();
-             $table->unsignedBigInteger('patient_id');
+            $table->string('hospital_id', 8);
+            $table->unsignedBigInteger('patient_id');
             $table->unsignedBigInteger('case_reference_id')->nullable();
             $table->unsignedBigInteger('blood_donor_cycle_id')->nullable();
             $table->dateTime('date_of_issue')->nullable();

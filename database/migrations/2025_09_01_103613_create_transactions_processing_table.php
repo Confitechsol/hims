@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('transactions_processing', function (Blueprint $table) {
             $table->id();
+            $table->string('hospital_id', 8);
             $table->timestamps();
         });
     }
