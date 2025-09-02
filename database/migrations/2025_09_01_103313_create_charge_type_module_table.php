@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('charge_type_module', function (Blueprint $table) {
             $table->id();
-             $table->unsignedBigInteger('charge_type_master_id')->nullable()->index(); // charge_type_master_id
-            $table->string('module_shortcode', 50)->nullable(); // module_shortcode
-            $table->timestamp('created_at')->useCurrent(); // created_at with default current_timestamp
+            $table->string('hospital_id', 8);
+            $table->unsignedBigInteger('charge_type_master_id')->nullable()->index(); // charge_type_master_id
+            $table->string('module_shortcode', 50)->nullable();                       // module_shortcode
+            $table->timestamp('created_at')->useCurrent();                            // created_at with default current_timestamp
 
         });
     }

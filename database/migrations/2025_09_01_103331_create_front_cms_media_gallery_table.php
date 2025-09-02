@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('front_cms_media_gallery', function (Blueprint $table) {
             $table->id();
+            $table->string('hospital_id', 8);
             $table->timestamps();
         });
     }

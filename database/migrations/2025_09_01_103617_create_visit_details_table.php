@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('visit_details', function (Blueprint $table) {
             $table->id();
+            $table->string('hospital_id', 8);
             $table->timestamps();
         });
     }

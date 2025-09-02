@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('bed_group', function (Blueprint $table) {
             $table->id();
-             $table->string('name', 200)->index();
+            $table->string('hospital_id', 8);
+            $table->string('name', 200)->index();
             $table->string('color', 50)->default('#f4f4f4')->index();
             $table->text('description');
             $table->integer('floor');

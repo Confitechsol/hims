@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('bill', function (Blueprint $table) {
             $table->id();
-             $table->unsignedBigInteger('case_id')->index(); // references cases table
+            $table->string('hospital_id', 8);
+            $table->unsignedBigInteger('case_id')->index(); // references cases table
             $table->mediumText('attachment')->nullable();
             $table->mediumText('attachment_name')->nullable();
             $table->float('amount', 10, 2)->nullable();
@@ -22,7 +23,7 @@ return new class extends Migration
             $table->date('cheque_date')->nullable();
             $table->dateTime('payment_date')->nullable();
             $table->mediumText('note')->nullable();
-            $table->unsignedBigInteger('received_by')->nullable(); 
+            $table->unsignedBigInteger('received_by')->nullable();
             $table->timestamps();
         });
     }

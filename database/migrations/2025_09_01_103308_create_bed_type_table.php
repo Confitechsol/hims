@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('bed_type', function (Blueprint $table) {
-            
+
             $table->id(); // id INT AUTO_INCREMENT PRIMARY KEY
+            $table->string('hospital_id', 8);
             $table->string('name', 100)->index();
             $table->timestamps();
         });
