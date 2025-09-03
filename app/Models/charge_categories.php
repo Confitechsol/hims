@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class ChargeCategory extends Model
+{
+    use HasFactory;
+
+    protected $table = 'charge_categories';
+
+    protected $fillable = [
+        'hospital_id',
+        'charge_type_id',
+        'name',
+        'description',
+        'short_code',
+        'is_default',
+    ];
+
+    public $timestamps = false; // only created_at exists (no updated_at)
+
+    protected $casts = [
+        'charge_type_id' => 'integer',
+        'created_at' => 'datetime',
+    ];
+}
