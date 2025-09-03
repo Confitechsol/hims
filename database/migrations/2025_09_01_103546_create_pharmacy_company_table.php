@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('pharmacy_company', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
-            $table->timestamps();
+            $table->string('company_name', 255)->index(); // NOT NULL
+
+            $table->timestamp('created_at')->useCurrent();
         });
     }
 

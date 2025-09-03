@@ -14,7 +14,15 @@ return new class extends Migration
         Schema::create('permission_group', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
-            $table->timestamps();
+             $table->string('name', 100)->nullable()->index();
+            $table->string('short_code', 100)->index();
+
+            $table->integer('is_active')->default(0);
+            $table->integer('system'); // no default given in your schema
+
+            $table->decimal('sort_order', 10, 2);
+
+            $table->timestamp('created_at')->useCurrent()->useCurrentOnUpdate();
         });
     }
 
