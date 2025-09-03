@@ -14,7 +14,16 @@ return new class extends Migration
         Schema::create('pathology_parameter', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('parameter_name', 100)->index();
+            $table->string('test_value', 100)->index();
+            $table->string('reference_range', 100)->index();
+            $table->string('range_from', 500)->nullable()->index();
+            $table->string('range_to', 500)->nullable()->index();
+            $table->string('gender', 100)->index();
+            $table->unsignedBigInteger('unit')->nullable()->index();
+            $table->text('description')->nullable();
             $table->timestamps();
+            $table->foreign('unit')->references('id')->on('unit')->onDelete('set null');
         });
     }
 

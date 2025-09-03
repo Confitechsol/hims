@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('pathology_category', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('category_name', 100)->index();
             $table->timestamps();
         });
     }

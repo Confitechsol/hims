@@ -14,6 +14,9 @@ return new class extends Migration
         Schema::create('operation_category', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+
+            $table->string('category', 250)->index();
+            $table->string('is_active', 10);
             $table->timestamps();
         });
     }

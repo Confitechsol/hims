@@ -14,7 +14,15 @@ return new class extends Migration
         Schema::create('item', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->unsignedBigInteger('item_category_id')->nullable()->index();
+            $table->string('name', 255)->index();
+            $table->string('unit', 200);
+            $table->text('item_photo')->nullable();
+            $table->text('description')->nullable();
+            $table->integer('quantity')->index();
+            $table->date('date')->nullable()->index();
             $table->timestamps();
+            $table->foreign('item_category_id')->references('id')->on('item_category')->onDelete('cascade');
         });
     }
 

@@ -14,6 +14,9 @@ return new class extends Migration
         Schema::create('notification_roles', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->unsignedBigInteger('send_notification_id')->nullable()->index(); // foreign key candidate
+            $table->unsignedBigInteger('role_id')->nullable()->index();              // foreign key candidate
+            $table->integer('is_active')->default(0);
             $table->timestamps();
         });
     }

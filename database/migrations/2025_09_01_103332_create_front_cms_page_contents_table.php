@@ -14,6 +14,9 @@ return new class extends Migration
         Schema::create('front_cms_page_contents', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->unsignedBigInteger('page_id')->nullable()->index();
+
+            $table->string('content_type', 50)->nullable();
             $table->timestamps();
         });
     }

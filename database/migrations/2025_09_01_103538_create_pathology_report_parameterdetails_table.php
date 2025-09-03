@@ -14,7 +14,12 @@ return new class extends Migration
         Schema::create('pathology_report_parameterdetails', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->unsignedBigInteger('pathology_report_id')->nullable()->index();
+            $table->unsignedBigInteger('pathology_parameterdetail_id')->nullable()->index();
+            $table->string('pathology_report_value', 200);
             $table->timestamps();
+            $table->foreign('pathology_report_id')->references('id')->on('pathology_report')->onDelete('cascade');
+            $table->foreign('pathology_parameterdetail_id')->references('id')->on('pathology_parameter_details')->onDelete('cascade');
         });
     }
 

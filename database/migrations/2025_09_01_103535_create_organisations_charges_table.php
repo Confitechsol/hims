@@ -14,7 +14,12 @@ return new class extends Migration
         Schema::create('organisations_charges', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->unsignedBigInteger('org_id')->nullable()->index();
+            $table->unsignedBigInteger('charge_id')->nullable()->index();
+            $table->float('org_charge', 10, 2);
             $table->timestamps();
+            $table->foreign('org_id')->references('id')->on('organisation')->onDelete('cascade');
+            $table->foreign('charge_id')->references('id')->on('charges')->onDelete('cascade');
         });
     }
 

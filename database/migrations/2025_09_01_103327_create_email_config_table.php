@@ -14,6 +14,21 @@ return new class extends Migration
         Schema::create('email_config', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('email_type', 100)->nullable();
+
+            $table->string('smtp_server', 100)->nullable();
+
+            $table->string('smtp_port', 100)->nullable();
+
+            $table->string('smtp_username', 100)->nullable();
+
+            $table->string('smtp_password', 100)->nullable();
+
+            $table->string('ssl_tls', 100)->nullable();
+
+            $table->string('smtp_auth', 10);
+
+            $table->string('is_active', 10)->default('no');
             $table->timestamps();
         });
     }

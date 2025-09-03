@@ -14,6 +14,31 @@ return new class extends Migration
         Schema::create('front_cms_media_gallery', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('image', 300)->nullable();
+            // VARCHAR(300), NULL
+
+            $table->string('thumb_path', 300)->nullable();
+            // VARCHAR(300), NULL
+
+            $table->string('dir_path', 300)->nullable();
+            // VARCHAR(300), NULL
+
+            $table->string('img_name', 300)->nullable();
+            // VARCHAR(300), NULL
+
+            $table->string('thumb_name', 300)->nullable();
+            // VARCHAR(300), NULL
+
+            $table->string('file_type', 100);
+            // VARCHAR(100), NOT NULL
+
+            $table->string('file_size', 100);
+            // VARCHAR(100), NOT NULL
+
+            $table->mediumText('vid_url')->nullable();
+            // MEDIUMTEXT, NULL
+
+            $table->string('vid_title', 250);
             $table->timestamps();
         });
     }
