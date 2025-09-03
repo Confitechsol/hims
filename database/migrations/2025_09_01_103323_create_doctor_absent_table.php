@@ -14,7 +14,13 @@ return new class extends Migration
         Schema::create('doctor_absent', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->unsignedBigInteger('staff_id')->nullable()->index();
+            // INT(11), NULL, indexed
+
+            $table->date('date')->index();
             $table->timestamps();
+
+            $table->foreign('staff_id')->references('id')->on('staff')->onDelete('set null');
         });
     }
 

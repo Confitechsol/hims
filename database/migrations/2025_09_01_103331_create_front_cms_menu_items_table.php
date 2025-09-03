@@ -14,6 +14,29 @@ return new class extends Migration
         Schema::create('front_cms_menu_items', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->unsignedBigInteger('menu_id')->nullable();
+
+            $table->string('menu', 100)->nullable();
+
+            $table->unsignedBigInteger('page_id');
+
+            $table->unsignedBigInteger('parent_id');
+
+            $table->mediumText('ext_url')->nullable();
+
+            $table->integer('open_new_tab')->default(0)->nullable();
+
+            $table->mediumText('ext_url_link')->nullable();
+
+            $table->string('slug', 200)->nullable();
+
+            $table->integer('weight')->nullable();
+
+            $table->integer('publish')->default(0);
+
+            $table->mediumText('description')->nullable();
+
+            $table->string('is_active', 10)->default('no')->nullable();
             $table->timestamps();
         });
     }

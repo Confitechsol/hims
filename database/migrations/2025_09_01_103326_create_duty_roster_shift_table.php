@@ -14,6 +14,15 @@ return new class extends Migration
         Schema::create('duty_roster_shift', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('shift_name', 255)->index();
+
+            $table->time('shift_start')->index();
+
+            $table->time('shift_end')->index();
+
+            $table->time('shift_hour')->index();
+
+            $table->integer('is_active')->default(1);
             $table->timestamps();
         });
     }

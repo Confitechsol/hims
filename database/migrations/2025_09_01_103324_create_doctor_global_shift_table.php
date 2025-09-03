@@ -14,7 +14,12 @@ return new class extends Migration
         Schema::create('doctor_global_shift', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->unsignedBigInteger('staff_id')->nullable()->index();
+
+            $table->unsignedBigInteger('global_shift_id')->nullable()->index();
             $table->timestamps();
+            $table->foreign('staff_id')->references('id')->on('staff')->onDelete('set null');
+            $table->foreign('global_shift_id')->references('id')->on('global_shift')->onDelete('set null');
         });
     }
 

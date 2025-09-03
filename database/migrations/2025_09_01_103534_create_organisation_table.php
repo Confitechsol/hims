@@ -14,6 +14,12 @@ return new class extends Migration
         Schema::create('organisation', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('organisation_name', 200)->index();
+            $table->string('code', 50)->index();
+            $table->string('contact_no', 20)->index();
+            $table->string('address', 300)->index();
+            $table->string('contact_person_name', 200)->index();
+            $table->string('contact_person_phone', 20)->index();
             $table->timestamps();
         });
     }

@@ -14,7 +14,18 @@ return new class extends Migration
         Schema::create('logs', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->text('message')->nullable();
+            $table->unsignedBigInteger('record_id'); // NOT NULL
+            $table->unsignedBigInteger('user_id')->nullable()->index();
+
+            $table->string('action', 50);
+            $table->string('ip_address', 50);
+            $table->string('platform', 50);
+            $table->string('agent', 50);
+
+            $table->timestamp('time')->useCurrent()->useCurrentOnUpdate();
             $table->timestamps();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

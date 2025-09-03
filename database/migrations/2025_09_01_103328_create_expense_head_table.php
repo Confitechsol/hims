@@ -14,6 +14,13 @@ return new class extends Migration
         Schema::create('expense_head', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('exp_category', 50)->nullable()->index();
+
+            $table->text('description')->nullable();
+
+            $table->string('is_active', 10)->default('yes')->nullable();
+
+            $table->string('is_deleted', 10)->default('no')->nullable();
             $table->timestamps();
         });
     }

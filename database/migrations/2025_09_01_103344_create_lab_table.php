@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('lab', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('lab_name', 100)->nullable()->index();
             $table->timestamps();
         });
     }

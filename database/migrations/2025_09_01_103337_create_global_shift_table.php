@@ -14,6 +14,9 @@ return new class extends Migration
         Schema::create('global_shift', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('name', 250)->index();
+            $table->time('start_time')->index();
+            $table->time('end_time')->index();
             $table->timestamps();
         });
     }
