@@ -14,7 +14,10 @@ return new class extends Migration
         Schema::create('staff_designation', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
-            $table->timestamps();
+            $table->string('designation', 200);
+            $table->string('is_active', 10);
+
+            $table->timestamp('created_at')->useCurrent();
         });
     }
 

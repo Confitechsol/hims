@@ -14,7 +14,15 @@ return new class extends Migration
         Schema::create('users_authentication', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
-            $table->timestamps();
+            $table->unsignedBigInteger('users_id')->nullable(); // users_id int(11) nullable
+            $table->string('token', 200); // token varchar(200)
+            $table->dateTime('expired_at'); // expired_at datetime
+
+            $table->timestamp('created_at')
+                  ->useCurrent()
+                  ->useCurrentOnUpdate(); // created_at auto timestamp
+
+            $table->dateTime('updated_at');
         });
     }
 

@@ -14,7 +14,16 @@ return new class extends Migration
         Schema::create('staff_attendence_schedules', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
-            $table->timestamps();
+                        $table->unsignedBigInteger('staff_attendence_type_id')->nullable();
+            $table->unsignedBigInteger('role_id')->nullable();
+
+            $table->time('entry_time_from')->nullable();
+            $table->time('entry_time_to')->nullable();
+            $table->time('total_institute_hour')->nullable();
+
+            $table->integer('is_active')->default(0);
+
+            $table->timestamp('created_at')->useCurrent()->nullable();
         });
     }
 

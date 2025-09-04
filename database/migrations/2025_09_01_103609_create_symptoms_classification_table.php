@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('symptoms_classification', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
-            $table->timestamps();
+            $table->string('symptoms_type', 100)->index(); // symptoms_type
+            $table->timestamp('created_at')->useCurrent()->useCurrentOnUpdate();
         });
     }
 
