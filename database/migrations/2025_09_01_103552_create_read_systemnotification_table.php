@@ -14,7 +14,12 @@ return new class extends Migration
         Schema::create('read_systemnotification', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->unsignedBigInteger('notification_id')->nullable()->index();
+            $table->unsignedBigInteger('receiver_id')->nullable()->index();
+            $table->string('is_active', 10)->default('yes');
             $table->timestamps();
+            // $table->foreign('notification_id')->references('id')->on('notifications')->onDelete('cascade');
+            $table->foreign('receiver_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

@@ -14,7 +14,11 @@ return new class extends Migration
         Schema::create('radiology_report_parameterdetails', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->unsignedBigInteger('radiology_report_id')->nullable()->index();
+            $table->unsignedBigInteger('radiology_parameterdetail_id')->nullable()->index();
             $table->timestamps();
+            $table->foreign('radiology_report_id')->references('id')->on('radiology_report')->onDelete('set null');
+            $table->foreign('radiology_parameterdetail_id')->references('id')->on('radiology_parameterdetails')->onDelete('set null');
         });
     }
 

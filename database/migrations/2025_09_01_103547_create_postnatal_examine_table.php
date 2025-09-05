@@ -14,7 +14,13 @@ return new class extends Migration
         Schema::create('postnatal_examine', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->unsignedBigInteger('patient_id')->index();
+            $table->dateTime('labor_time')->index();
+            $table->dateTime('delivery_time')->index();
+            $table->text('routine_question');
+            $table->text('general_remark');
             $table->timestamps();
+            $table->foreign('patient_id')->references('id')->on('patients')->onDelete('cascade');
         });
     }
 
