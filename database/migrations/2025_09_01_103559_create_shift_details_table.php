@@ -14,7 +14,12 @@ return new class extends Migration
         Schema::create('shift_details', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->unsignedBigInteger('staff_id')->nullable()->index();
+            $table->unsignedInteger('consult_duration')->nullable();
+            $table->unsignedBigInteger('charge_id')->nullable()->index();
             $table->timestamps();
+            $table->foreign('staff_id')->references('id')->on('staff')->onDelete('cascade');
+            $table->foreign('charge_id')->references('id')->on('charges')->onDelete('cascade');
         });
     }
 

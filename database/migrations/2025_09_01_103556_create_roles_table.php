@@ -14,6 +14,11 @@ return new class extends Migration
         Schema::create('roles', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('name', 100)->nullable()->index();
+            $table->string('slug', 150)->nullable();
+            $table->integer('is_active')->default(0)->nullable();
+            $table->integer('is_system')->default(0);
+            $table->integer('is_superadmin')->default(0);
             $table->timestamps();
         });
     }

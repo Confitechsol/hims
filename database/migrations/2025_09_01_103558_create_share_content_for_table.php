@@ -14,6 +14,10 @@ return new class extends Migration
         Schema::create('share_content_for', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('group_id', 20)->nullable();
+            $table->unsignedBigInteger('patient_id')->nullable()->index();
+            $table->unsignedBigInteger('staff_id')->nullable()->index();
+            $table->unsignedBigInteger('share_content_id')->nullable()->index();
             $table->timestamps();
         });
     }
