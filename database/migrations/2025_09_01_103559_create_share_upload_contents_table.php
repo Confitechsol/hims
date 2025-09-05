@@ -14,7 +14,11 @@ return new class extends Migration
         Schema::create('share_upload_contents', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->unsignedBigInteger('upload_content_id')->nullable()->index();
+            $table->unsignedBigInteger('share_content_id')->nullable()->index();
             $table->timestamps();
+            $table->foreign('upload_content_id')->references('id')->on('upload_contents')->onDelete('cascade');
+            $table->foreign('share_content_id')->references('id')->on('share_contents')->onDelete('cascade');
         });
     }
 

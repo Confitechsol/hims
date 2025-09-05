@@ -14,6 +14,9 @@ return new class extends Migration
         Schema::create('referral_type', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('name', 100)->index();
+            $table->string('prefixes_type', 100)->index();
+            $table->integer('is_active')->default(1);
             $table->timestamps();
         });
     }

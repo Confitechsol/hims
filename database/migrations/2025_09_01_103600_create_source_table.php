@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('source', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('source', 100);
+            $table->mediumText('description')->nullable();
             $table->timestamps();
         });
     }
