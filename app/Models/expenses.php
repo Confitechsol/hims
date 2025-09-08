@@ -25,9 +25,7 @@ class Expense extends Model
         'generated_by',
     ];
 
-    /**
-     * Relationships
-     */
+    
 
     // Each expense belongs to an expense head
     public function expenseHead()
