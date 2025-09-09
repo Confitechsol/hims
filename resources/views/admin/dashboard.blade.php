@@ -1,8 +1,8 @@
 @extends('layouts.adminLayout')
 
 @section('content')
-        
-        
+
+
         <!-- ========================
 			Start Page Content
 		========================= -->
