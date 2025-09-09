@@ -8,8 +8,7 @@
     <meta name="theme-color" content="#424242" />
 
     <title>{{ $title_name ?? 'Hospital Name Title' }}</title>
-    <link href="{{ asset('uploads/hospital_content/logo/' . ($logoresult['mini_logo'] ?? 'default.png')) }}"
-        rel="shortcut icon" type="image/x-icon">
+    <link href="{{ asset('assets/images/favlogo.png') }}" rel="shortcut icon" type="image/x-icon">
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,100,300,500">
     <link rel="stylesheet" href="{{ asset('assets/usertemplate/assets/bootstrap/css/bootstrap.min.css') }}">
@@ -17,6 +16,7 @@
     <link rel="stylesheet" href="{{ asset('assets/usertemplate/assets/css/form-elements.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/usertemplate/assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/usertemplate/assets/css/jquery.mCustomScrollbar.min.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 
     <style>
         /* Keep your inline CSS as-is (unchanged) */
@@ -42,7 +42,7 @@
                             </div>
 
                             <div class="form-bottom">
-                                <h3 class="font-white">User Login</h3>
+                                <h3 class="font-white mb-3">User Login</h3>
                                 {{-- <h3 class="font-white">{{ __('user_login') }}</h3> --}}
 
                                 @if (isset($error_message))
@@ -94,16 +94,19 @@
                                         </div>
                                     @endif
 
-                                    <button type="submit" class="btn">{{ __('sign_in') }}</button>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <button type="submit" class="btn login-btn">Sign In</button>
+
+                                        <p>
+                                            <a href="{{ route('ufPassword') }}" class="forgot fs-4">
+                                                <i class="fa fa-key"></i> Forget Password
+                                                {{-- <i class="fa fa-key"></i> {{ __('forgot_password') }} --}}
+                                            </a>
+                                        </p>
+                                    </div>
                                 </form>
 
                                 <br>
-                                <p>
-                                    <a href="{{ url('site/ufpassword') }}" class="forgot">
-                                        <i class="fa fa-key"></i> Forget Password
-                                        {{-- <i class="fa fa-key"></i> {{ __('forgot_password') }} --}}
-                                    </a>
-                                </p>
                             </div>
                         </div>
                     </div>

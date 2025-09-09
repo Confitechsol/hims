@@ -16,3 +16,12 @@ Route::get('/appointments', [AppointmentsController::class, 'index'])->name('app
 Route::get('/userlogin', function () {
     return view('home.userlogin');
 })->name('userLogin');
+
+Route::get('/ufpassword', function () {
+    return view('home.ufpassword');
+})->name('ufPassword');
+
+// Admin Routes
+Route::get('/login', function () {
+    return view('admin.login');
+})->name('login');
