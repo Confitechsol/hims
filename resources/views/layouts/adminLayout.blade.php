@@ -345,11 +345,18 @@
 
                             <!-- Item-->
                             <div class="pt-2 mt-2 border-top">
-                                <a href="login.html" class="dropdown-item text-danger">
+                                <form action="{{ route('logout') }}" method="POST" class="dropdown-item text-danger"
+                                    style="cursor: pointer">
+                                    @csrf
+                                    <button type="submit" class="btn w-100 justify-content-start p-0">
+                                        <i class="ti ti-logout me-1 fs-17 align-middle text-danger fw-bold"></i>
+                                        <span class="align-middle text-danger fw-bold">Log Out</span>
+                                    </button>
+                                </form>
+                                {{-- <a href="{{ route('logout') }}" class="dropdown-item text-danger">
                                     <i class="ti ti-logout me-1 fs-17 align-middle"></i>
-                                    <span class="align-middle">Log
-                                        Out</span>
-                                </a>
+                                    <span class="align-middle">Log Out</span>
+                                </a> --}}
                             </div>
                         </div>
                     </div>

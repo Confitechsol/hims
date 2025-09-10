@@ -119,7 +119,7 @@
                                 @endif
 
                                 {{-- Login Form --}}
-                                <form action="#" method="POST" class="login-form">
+                                <form action="{{ route('login') }}" method="POST" class="login-form">
                                     @csrf
                                     <div class="form-group">
                                         <input type="text" name="username" placeholder="Username"
