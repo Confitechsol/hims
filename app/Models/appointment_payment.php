@@ -13,6 +13,7 @@ class AppointmentPayment extends Model
     protected $table = 'appointment_payment';
 
     protected $fillable = [
+        'hospital_id',
         'appointment_id',
         'charge_id',
         'standard_amount',

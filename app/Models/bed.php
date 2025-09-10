@@ -15,6 +15,7 @@ class Bed extends Model
     public $timestamps = false; // since only created_at exists and no updated_at
 
     protected $fillable = [
+        'hospital_id',
         'name',
         'bed_type_id',
         'bed_group_id',

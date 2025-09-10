@@ -13,6 +13,7 @@ class BedType extends Model
     protected $table = 'bed_type';
 
     protected $fillable = [
+        'hospital_id',
         'name',
     ];
 

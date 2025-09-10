@@ -13,6 +13,7 @@ class BirthReport extends Model
     protected $table = 'birth_report';
 
     protected $fillable = [
+        'hospital_id',
         'child_name',
         'child_pic',
         'gender',

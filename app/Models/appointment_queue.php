@@ -13,6 +13,7 @@ class AppointmentQueue extends Model
     protected $table = 'appointment_queue';
 
     protected $fillable = [
+        'hospital_id',
         'appointment_id',
         'staff_id',
         'position',

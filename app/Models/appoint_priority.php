@@ -12,6 +12,7 @@ class AppointPriority extends Model
     protected $table = 'appoint_priority';
 
     protected $fillable = [
+        'hospital_id',
         'appoint_priority',
     ];
 

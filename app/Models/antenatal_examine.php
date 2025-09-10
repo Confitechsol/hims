@@ -13,6 +13,7 @@ class AntenatalExamine extends Model
     protected $table = 'antenatal_examine';
 
     protected $fillable = [
+        'hospital_id',
         'primary_examine_id',
         'visit_details_id',
         'ipdid',
