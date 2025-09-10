@@ -13,6 +13,7 @@ class AmbulanceCall extends Model
     protected $table = 'ambulance_call';
 
     protected $fillable = [
+        'hospital_id',
         'patient_id',
         'case_reference_id',
         'vehicle_id',
