@@ -100,7 +100,8 @@
                     <!-- Settings -->
                     <div class="header-item">
                         <div class="dropdown me-2">
-                            <a href="profile-settings.html" class="btn topbar-link"><i class="ti ti-settings-2"></i></a>
+                            <a href="{{ route('profile') }}" class="btn topbar-link"><i
+                                    class="ti ti-settings-2"></i></a>
                         </div>
                     </div>
                     <!-- Settings -->
@@ -316,7 +317,7 @@
                             </div>
 
                             <!-- Item-->
-                            <a href="profile-settings.html" class="dropdown-item">
+                            <a href="{{ route('profile') }}" class="dropdown-item">
                                 <i class="ti ti-user-circle me-1 align-middle"></i>
                                 <span class="align-middle">Profile
                                     Settings</span>

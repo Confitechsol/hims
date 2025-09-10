@@ -32,5 +32,8 @@ Route::middleware(['admin'])->group(function () {
         return view('admin.dashboard');
     })->name('dashboard');
 
-    Route::post('logout', [LoginController::class, 'logout'])->name('logout');
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+    Route::get('/profile', function () {
+        return view('admin.setup.profile');
+    })->name('profile');
 });
