@@ -100,7 +100,8 @@
                     <!-- Settings -->
                     <div class="header-item">
                         <div class="dropdown me-2">
-                            <a href="profile-settings.html" class="btn topbar-link"><i class="ti ti-settings-2"></i></a>
+                            <a href="{{ route('profile') }}" class="btn topbar-link"><i
+                                    class="ti ti-settings-2"></i></a>
                         </div>
                     </div>
                     <!-- Settings -->
@@ -316,7 +317,7 @@
                             </div>
 
                             <!-- Item-->
-                            <a href="profile-settings.html" class="dropdown-item">
+                            <a href="{{ route('profile') }}" class="dropdown-item">
                                 <i class="ti ti-user-circle me-1 align-middle"></i>
                                 <span class="align-middle">Profile
                                     Settings</span>
@@ -345,11 +346,18 @@
 
                             <!-- Item-->
                             <div class="pt-2 mt-2 border-top">
-                                <a href="login.html" class="dropdown-item text-danger">
+                                <form action="{{ route('logout') }}" method="POST" class="dropdown-item text-danger"
+                                    style="cursor: pointer">
+                                    @csrf
+                                    <button type="submit" class="btn w-100 justify-content-start p-0">
+                                        <i class="ti ti-logout me-1 fs-17 align-middle text-danger fw-bold"></i>
+                                        <span class="align-middle text-danger fw-bold">Log Out</span>
+                                    </button>
+                                </form>
+                                {{-- <a href="{{ route('logout') }}" class="dropdown-item text-danger">
                                     <i class="ti ti-logout me-1 fs-17 align-middle"></i>
-                                    <span class="align-middle">Log
-                                        Out</span>
-                                </a>
+                                    <span class="align-middle">Log Out</span>
+                                </a> --}}
                             </div>
                         </div>
                     </div>

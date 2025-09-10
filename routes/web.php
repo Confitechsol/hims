@@ -1,15 +1,12 @@
 <?php
 
 use App\Http\Controllers\AppointmentsController;
+use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('home.homeScreen');
 })->name('dashboard');
-
-Route::get('/dashboard', function () {
-    return view('admin.dashboard');
-})->name('admin-dashboard');
 
 Route::get('/doctors', function () {
     return view('home.doctors');
@@ -26,6 +23,17 @@ Route::get('/ufpassword', function () {
 })->name('ufPassword');
 
 // Admin Routes
-Route::get('/login', function () {
-    return view('admin.login');
-})->name('login');
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+
+Route::post('/login', [LoginController::class, 'login'])->name('login');
+
+Route::middleware(['admin'])->group(function () {
+    Route::get('/dashboard', function () {
+        return view('admin.dashboard');
+    })->name('dashboard');
+
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+    Route::get('/profile', function () {
+        return view('admin.setup.profile');
+    })->name('profile');
+});

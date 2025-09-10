@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -11,16 +10,23 @@ class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
-
+    protected $table      = 'users';
+    protected $primaryKey = 'id';
     /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
     protected $fillable = [
-        'name',
-        'email',
+        'hospital_id',
+        'user_id',
+        'username',
         'password',
+        'childs',
+        'role',
+        'verification_code',
+        'is_active',
+        'created_at',
     ];
 
     /**
@@ -42,7 +48,8 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password'          => 'hashed',
+            'childs'            => 'array',
         ];
     }
 }

@@ -450,7 +450,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="profile.html">
+                                <a href="{{ route('profile') }}">
                                     <i class="ti ti-user-circle"></i><span>Profile</span>
                                 </a>
                             </li>
@@ -599,7 +599,7 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="profile-settings.html">Profile</a></li>
+                                    <li><a href="{{ route('profile') }}">Profile</a></li>
                                     <li><a href="security-settings.html">Security</a></li>
                                     <li><a href="notifications-settings.html">Notifications</a></li>
                                     <li><a href="integrations-settings.html">Integrations</a></li>
