@@ -23,7 +23,7 @@ return new class extends Migration
             $table->integer('duty_roster_total_day');
             $table->timestamps();
 
-            $table->foreign('duty_roster_shift_id')->references('id')->on('duty_roster_shift')->onDelete('cascade');
+            //$table->foreign('duty_roster_shift_id')->references('id')->on('duty_roster_shift')->onDelete('cascade');
         });
     }
 

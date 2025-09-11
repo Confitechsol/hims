@@ -18,8 +18,8 @@ return new class extends Migration
 
             $table->unsignedBigInteger('global_shift_id')->nullable()->index();
             $table->timestamps();
-            $table->foreign('staff_id')->references('id')->on('staff')->onDelete('set null');
-            $table->foreign('global_shift_id')->references('id')->on('global_shift')->onDelete('set null');
+           // $table->foreign('staff_id')->references('id')->on('staff')->onDelete('set null');
+           // $table->foreign('global_shift_id')->references('id')->on('global_shift')->onDelete('set null');
         });
     }
 

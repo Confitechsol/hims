@@ -20,7 +20,7 @@ return new class extends Migration
             $table->date('date')->index();
             $table->timestamps();
 
-            $table->foreign('staff_id')->references('id')->on('staff')->onDelete('set null');
+            //$table->foreign('staff_id')->references('id')->on('staff')->onDelete('set null');
         });
     }
 
