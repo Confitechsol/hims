@@ -33,21 +33,24 @@ class LoginController extends Controller
             'password' => 'required|string',
         ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
+        
+        //dd( $validator);
+        // if ($validator->fails()) {
+        //     return redirect()->back()->withErrors($validator)->withInput();
+        // }
+        
         // ✅ Attempt login
         $credentials = [
             'email'    => $request->username,
             'password' => $request->password,
         ];
-
+        //dd( $credentials);
+        
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             $user = Auth::user();
             $role = Role::find($user->role);
-
+           // dd( $user);
             return $role && $role->name === 'Admin'
                 ? redirect()->intended('/dashboard')
                 : redirect()->intended('/');
@@ -90,7 +93,8 @@ class LoginController extends Controller
 
             // return redirect()->route('admin.dashboard');
         }
-
+       
+        
         // ❌ Invalid login
         return redirect()->back()->with('error_message', 'Invalid username or password.');
     }
