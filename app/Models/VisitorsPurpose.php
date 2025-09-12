@@ -25,8 +25,7 @@ class VisitorsPurpose extends Model
     ];
 
     /**
-     * Example relationship: a visitor may have a purpose
-     * If you want, you can link it with VisitorBook table via purpose
+     * Example relationship: 
      */
     public function visitorBooks()
     {
