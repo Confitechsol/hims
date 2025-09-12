@@ -34,7 +34,7 @@ return new class extends Migration
             // Foreign key to hospitals
             $table->foreign('hospital_id')
                   ->references('id')
-                  ->on('hospitals')
+                  ->on('hospital')
                   ->onDelete('cascade'); // delete branches if hospital deleted
             $table->timestamps();
         });

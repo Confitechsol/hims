@@ -3,9 +3,11 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
 {
@@ -23,12 +25,11 @@ class LoginController extends Controller
 
         return view('admin.login');
     }
-
-    public function login(Request $request)
+   public function login(Request $request)
     {
         // ✅ Validation
         $validator = Validator::make($request->all(), [
-            'username' => 'required|string',
+            'email' => 'required|string',
             'password' => 'required|string',
         ]);
 
@@ -93,6 +94,8 @@ class LoginController extends Controller
         // ❌ Invalid login
         return redirect()->back()->with('error_message', 'Invalid username or password.');
     }
+
+
 
     public function logout(Request $request)
     {
