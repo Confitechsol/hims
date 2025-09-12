@@ -26,10 +26,10 @@ return new class extends Migration
 
             $table->unsignedBigInteger('duty_roster_list_id')->index();
             $table->timestamps();
-            $table->foreign('floor_id')->references('id')->on('floor')->onDelete('set null');
-            $table->foreign('department_id')->references('id')->on('department')->onDelete('set null');
-            $table->foreign('staff_id')->references('id')->on('staff')->onDelete('cascade');
-            $table->foreign('duty_roster_list_id')->references('id')->on('duty_roster_list')->onDelete('cascade');
+           // $table->foreign('floor_id')->references('id')->on('floor')->onDelete('set null');
+           // $table->foreign('department_id')->references('id')->on('department')->onDelete('set null');
+           // $table->foreign('staff_id')->references('id')->on('staff')->onDelete('cascade');
+           // $table->foreign('duty_roster_list_id')->references('id')->on('duty_roster_list')->onDelete('cascade');
         });
     }
 

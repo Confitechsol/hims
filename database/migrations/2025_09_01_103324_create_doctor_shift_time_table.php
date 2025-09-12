@@ -25,8 +25,8 @@ return new class extends Migration
             $table->time('end_time')->nullable();
             $table->timestamps();
 
-            $table->foreign('staff_id')->references('id')->on('staff')->onDelete('set null');
-            $table->foreign('doctor_global_shift_id')->references('id')->on('doctor_global_shift')->onDelete('set null');
+           // $table->foreign('staff_id')->references('id')->on('staff')->onDelete('set null');
+           // $table->foreign('doctor_global_shift_id')->references('id')->on('doctor_global_shift')->onDelete('set null');
         });
     }
 

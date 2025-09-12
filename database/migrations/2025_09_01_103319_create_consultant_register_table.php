@@ -25,7 +25,7 @@ return new class extends Migration
             $table->integer('cons_doctor')->unsigned()->nullable()->index();
 
             $table->timestamps();
-            $table->foreign('ipd_id')->references('id')->on('ipd_details')->onDelete('cascade');
+           // $table->foreign('ipd_id')->references('id')->on('ipd_details')->onDelete('cascade');
             // $table->foreign('cons_doctor')->references('id')->on('doctors')->onDelete('set null');
 
         });

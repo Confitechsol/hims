@@ -59,10 +59,11 @@ return new class extends Migration
             $table->text('note')->nullable();
             $table->timestamps();
 
-            $table->foreign('case_reference_id')->references('id')->on('case_references')->onDelete('set null');
-            $table->foreign('opd_details_id')->references('id')->on('opd_details')->onDelete('set null');
-            $table->foreign('ipd_details_id')->references('id')->on('ipd_details')->onDelete('set null');
-            $table->foreign('discharge_by')->references('id')->on('users')->onDelete('set null');
+            //$table->foreign('case_reference_id')->references('id')->on('case_references')->onDelete('set null');
+            //$table->foreign('opd_details_id')->references('id')->on('opd_details')->onDelete('set null');
+            //$table->foreign('ipd_details_id')->references('id')->on('ipd_details')->onDelete('set null');
+            //
+            // $table->foreign('discharge_by')->references('id')->on('users')->onDelete('set null');
         });
     }
 
