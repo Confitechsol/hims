@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AppointmentsController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -33,7 +34,7 @@ Route::middleware(['admin'])->group(function () {
     })->name('dashboard');
 
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-    Route::get('/profile', function () {
-        return view('admin.setup.profile');
-    })->name('profile');
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    Route::post('/profile/store', [ProfileController::class, 'store'])->name('profile.store');
+    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
