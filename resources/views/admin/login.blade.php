@@ -10,10 +10,20 @@
     <title>{{ $title_name ?? 'Hospital Name Title' }}</title>
 
     <!-- FavIcon -->
-    <link href="{{ asset('assets/images/favlogo.png') }}" rel="shortcut icon" type="image/x-icon">
+    <link href="{{ asset('assets/images/favicon.ico') }}" rel="shortcut icon" type="image/x-icon">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!-- CSS -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,100,300,500">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('assets/usertemplate/assets/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/usertemplate/assets/font-awesome/css/font-awesome.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/usertemplate/assets/css/form-elements.css') }}">
@@ -23,20 +33,34 @@
 
     @extends('layouts.cdns')
     <style>
+        body {
+            font-family: "Inter", sans-serif !important;
+        }
+
         .col-md-offset-3 {
             margin-left: 29%;
         }
 
+        .login-form .form-group label {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
         .loginbg {
-            background: #ffffff00;
+            /* background: #ffffff00;
             max-height: 480px;
             box-shadow: 0px 0px 20px 6px rgba(62, 57, 107, 0.2);
             border-radius: 4px;
-            backdrop-filter: blur(3px);
+            backdrop-filter: blur(3px); */
+            background: none;
+            max-height: 480px;
+            box-shadow: none;
+            border-radius: 0;
+            backdrop-filter: none;
         }
 
         .login_back {
-            background-image: url("{{ asset('uploads/hospital_content/logo/background.png') }}");
+            background-image: url("{{ asset('/assets/images/auth-bg.jpg') }}");
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center;
@@ -54,10 +78,18 @@
             background: #fbc02d;
         }
 
+        .form-bottom {
+            background: #fff;
+            padding-top: 20px;
+            border: 1px solid #e7e8eb;
+            box-shadow: 0px 7px 12px rgba(0, 0, 0, 0.29);
+            backdrop-filter: blur(5px);
+        }
+
         .form-bottom form button.btn {
-            width: 25%;
-            float: right;
-            background: #dc0f52;
+            width: 100%;
+            background: linear-gradient(90deg, #750096 0%, #CB6CE6 100%);
+            font-weight: 500;
         }
 
         .form-top-right {
@@ -67,16 +99,61 @@
         }
 
         .form-top-left {
-            float: left;
-            width: 30%;
+            float: none;
+            width: 35%;
+            margin: auto;
+            padding-bottom: 20px;
         }
 
         a.forgot {
             color: #dc0f52;
+            font-size: 13px !important;
         }
 
         a:hover.forgot {
             text-decoration: underline;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        textarea,
+        textarea.form-control {
+            background: #fff;
+            font-size: 13px;
+            padding: 8px 8px 8px 40px;
+        }
+
+        input[type="text"] {
+            background-image: url(./assets/images/user_img.png);
+            background-size: 16px;
+            background-repeat: no-repeat;
+            background-position: 10px center;
+        }
+        
+        input[type="password"] {
+            background-image: url(./assets/images/pass_img.png);
+            background-size: 16px;
+            background-repeat: no-repeat;
+            background-position: 10px center;
+        }
+
+        .form-bottom h3 {
+            text-align: center;
+            font-size: 20px !important;
+            font-weight: 700;
+
+        }
+
+        .form-bottom .sign_title {
+            color: #999999;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .forgot_box {
+            display: block;
+            margin-left: auto;
+            width: fit-content;
         }
 
         @media (max-width: 767px) {
@@ -98,17 +175,15 @@
                     @endphp
 
                     <div class="col-lg-5 col-sm-5 form-box {{ $offset }}">
-                        <div class="loginbg" style="box-shadow: 0px 7px 12px rgba(0, 0, 0, 0.29)">
-                            <div class="form-top justify-content-between align-items-center">
+                        <div class="loginbg">
+                            <div class="form-top">
                                 <div class="form-top-left">
-                                    <img src="{{ asset('assets/images/favlogo.png') }}" alt="Logo">
-                                </div>
-                                <div class="form-top-right">
-                                    <i class="fa fa-key"></i>
+                                    <img src="{{ asset('assets/img/logo.png') }}" alt="Logo">
                                 </div>
                             </div>
                             <div class="form-bottom">
-                                <h3 class="bolds text-white fs-2 mb-3">Admin Login</h3>
+                                <h3 class="bolds fs-2 mb-3">Sign In</h3>
+                                <p class="sign_title">Please enter below details to access the dashboard</p>
 
                                 {{-- Error Messages --}}
                                 @if (session('error_message'))
@@ -122,15 +197,16 @@
                                 <form action="{{ route('login') }}" method="POST" class="login-form">
                                     @csrf
                                     <div class="form-group">
-                                        <input type="text" name="username" placeholder="Username"
-                                            value="{{ old('username') }}" class="form-username form-control"
-                                            id="email">
+                                        <label class="form-label">Username</label>
+                                        <input type="text" name="username" placeholder="Enter Your Username"
+                                            value="{{ old('username') }}" class="form-username form-control" id="email">
                                         @error('username')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
                                     </div>
                                     <div class="form-group">
-                                        <input type="password" name="password" placeholder="Password"
+                                        <label class="form-label">Password</label>
+                                        <input type="password" name="password" placeholder="Enter Your Password"
                                             class="form-password form-control" id="password">
                                         @error('password')
                                             <span class="text-danger">{{ $message }}</span>
@@ -145,9 +221,8 @@
                                                     onclick="refreshCaptcha()" style="cursor:pointer;"></span>
                                             </div>
                                             <div class='col-md-6'>
-                                                <input type="text" name="captcha"
-                                                    placeholder="{{ __('Enter Captcha') }}" class="form-control"
-                                                    id="captcha">
+                                                <input type="text" name="captcha" placeholder="{{ __('Enter Captcha') }}"
+                                                    class="form-control" id="captcha">
                                                 @error('captcha')
                                                     <span class="text-danger">{{ $message }}</span>
                                                 @enderror
@@ -155,9 +230,9 @@
                                         </div>
                                     @endif
 
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <button type="submit" class="btn">Sign In</button>
-                                        <p>
+                                    <div class="">
+                                        <button type="submit" class="btn">LogIn</button>
+                                        <p class="forgot_box">
                                             <a href="#" class="forgot fs-4">
                                                 <i class="fa fa-key"></i>Forgot Password?
                                             </a>
@@ -212,7 +287,7 @@
     <script src="{{ asset('assets/usertemplate/assets/js/jquery.mousewheel.min.js') }}"></script>
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $.backstretch([
                 "{{ asset('assets/usertemplate/assets/img/backgrounds/background.png') }}"
             ], {
@@ -220,12 +295,12 @@
                 fade: 750
             });
 
-            $('.login-form input').on('focus', function() {
+            $('.login-form input').on('focus', function () {
                 $(this).removeClass('input-error');
             });
 
-            $('.login-form').on('submit', function(e) {
-                $(this).find('input').each(function() {
+            $('.login-form').on('submit', function (e) {
+                $(this).find('input').each(function () {
                     if ($(this).val().trim() === "") {
                         e.preventDefault();
                         $(this).addClass('input-error');
@@ -241,7 +316,7 @@
                 data: {
                     _token: "{{ csrf_token() }}"
                 },
-                success: function(captcha) {
+                success: function (captcha) {
                     $("#captcha_image").html(captcha);
                 }
             });
