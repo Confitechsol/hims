@@ -13,19 +13,23 @@
                     </div>
 
                     <div class="card-body">
-                        <form id="settings_form" method="POST" action="#">
-                            @csrf
+    <form id="settings_form" 
+          method="POST" 
+          action="{{ isset($branch) && $branch->exists ? route('profile.update') : route('profile.store') }}" 
+          enctype="multipart/form-data">
+        @csrf
+
 
                             {{-- Hospital Name & Code --}}
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Hospital Name <span
                                             class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" value="My Hospital">
+                                    <input type="text" class="form-control" name="hospital_name" value="{{ $branch->name ?? 'My Hospital' }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Hospital Code</label>
-                                    <input type="text" class="form-control" value="HSP001">
+                                    <input type="text" class="form-control" name="hospital_code" value="{{ $branch->branch_id ?? 'HSP001' }}">
                                 </div>
                             </div>
                             <br>
@@ -59,18 +63,18 @@
                             {{-- Address --}}
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Address <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" value="123 Main Street, City">
+                                <input type="text" class="form-control" name="address" value="{{ $branch->address ?? '123 Main Street, City' }}">
                             </div>
 
                             {{-- Phone & Email --}}
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Phone <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" value="+91 9876543210">
+                                    <input type="text" class="form-control" name="phone" value="{{ $branch->phone ?? '+91 9876543210' }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Email <span class="text-danger">*</span></label>
-                                    <input type="email" class="form-control" value="info@hospital.com">
+                                    <input type="email" class="form-control" name="email" value="{{ $branch->email ?? 'info@hospital.com' }}">
                                 </div>
                             </div>
 
@@ -80,19 +84,21 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Hospital Logo</label><br>
-                                    <img src="{{ asset('uploads/hospital_content/logo/images.png') }}"
-                                        class="img-thumbnail me-2" style="height:40px;">
-                                    <button type="button" class="btn btn-sm btn-outline-primary">
-                                        <i class="fa fa-edit me-1"></i> Change Logo
-                                    </button>
+                                    @if(isset($branch) && $branch->image)
+                                        <img src="{{ asset('storage/' . $branch->image) }}" class="img-thumbnail me-2" style="height:40px;">
+                                    @else
+                                        <img src="{{ asset('uploads/hospital_content/logo/images.png') }}" class="img-thumbnail me-2" style="height:40px;">
+                                    @endif
+                                    <input type="file" class="form-control" name="hospital_logo" accept="image/*">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Small Logo</label><br>
-                                    <img src="{{ asset('uploads/hospital_content/logo/images.png') }}"
-                                        class="img-thumbnail me-2" style="height:40px;">
-                                    <button type="button" class="btn btn-sm btn-outline-primary">
-                                        <i class="fa fa-edit me-1"></i> Change Small Logo
-                                    </button>
+                                    @if(isset($branch) && $branch->mini_logo)
+                                        <img src="{{ asset('storage/' . $branch->mini_logo) }}" class="img-thumbnail me-2" style="height:40px;">
+                                    @else
+                                        <img src="{{ asset('uploads/hospital_content/logo/images.png') }}" class="img-thumbnail me-2" style="height:40px;">
+                                    @endif
+                                    <input type="file" class="form-control" name="small_logo" accept="image/*">
                                 </div>
                             </div>
 
@@ -101,10 +107,10 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Select Language</label>
-                                    <select class="form-select">
-                                        <option selected>English</option>
-                                        <option>Hindi</option>
-                                        <option>Bengali</option>
+                                    <select class="form-select" name="language">
+                                        <option value="English" {{ ($branch->languages ?? 'English') == 'English' ? 'selected' : '' }}>English</option>
+                                        <option value="Hindi" {{ ($branch->languages ?? 'English') == 'Hindi' ? 'selected' : '' }}>Hindi</option>
+                                        <option value="Bengali" {{ ($branch->languages ?? 'English') == 'Bengali' ? 'selected' : '' }}>Bengali</option>
                                     </select>
                                 </div>
                             </div>
@@ -114,24 +120,24 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Date Format</label>
-                                    <select class="form-select">
-                                        <option selected>DD-MM-YYYY</option>
-                                        <option>MM-DD-YYYY</option>
+                                    <select class="form-select" name="date_format">
+                                        <option value="DD-MM-YYYY" {{ ($branch->date_format ?? 'DD-MM-YYYY') == 'DD-MM-YYYY' ? 'selected' : '' }}>DD-MM-YYYY</option>
+                                        <option value="MM-DD-YYYY" {{ ($branch->date_format ?? 'DD-MM-YYYY') == 'MM-DD-YYYY' ? 'selected' : '' }}>MM-DD-YYYY</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Time Zone</label>
-                                    <select class="form-select">
-                                        <option selected>Asia/Kolkata</option>
-                                        <option>UTC</option>
+                                    <select class="form-select" name="time_zone">
+                                        <option value="Asia/Kolkata" {{ ($branch->timezone ?? 'Asia/Kolkata') == 'Asia/Kolkata' ? 'selected' : '' }}>Asia/Kolkata</option>
+                                        <option value="UTC" {{ ($branch->timezone ?? 'Asia/Kolkata') == 'UTC' ? 'selected' : '' }}>UTC</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Time Format</label>
-                                <select class="form-select">
-                                    <option selected>24-hour</option>
-                                    <option>12-hour</option>
+                                <select class="form-select" name="time_format">
+                                    <option value="24-hour" {{ ($branch->time_format ?? '24-hour') == '24-hour' ? 'selected' : '' }}>24-hour</option>
+                                    <option value="12-hour" {{ ($branch->time_format ?? '24-hour') == '12-hour' ? 'selected' : '' }}>12-hour</option>
                                 </select>
                             </div>
                             <hr>
@@ -141,9 +147,12 @@
     <!-- Currency Dropdown -->
     <div class="col-md-6">
         <div class="form-group row">
+    <!-- Currency Dropdown -->
+    <div class="col-md-6">
+        <div class="form-group row">
             <label class="col-sm-4">Currency<small class="req"> *</small></label>
             <div class="col-sm-8">
-                <select id="currency" name="sch_currency" class="form-control" autocomplete="off">
+                <select id="currency" name="currency" class="form-control" autocomplete="off">
                     <option value="">Select</option>
                     <option value="AED">AED</option>
                     <option value="AFN">AFN</option>
@@ -335,7 +344,7 @@
         <div class="form-group row">
             <label class="col-sm-4">Currency Symbol<small class="req"> *</small></label>
             <div class="col-sm-8">
-                <input id="currency_symbol" name="sch_currency_symbol" type="text" class="form-control" value="INR">
+                <input id="currency_symbol" name="currency_symbol" type="text" class="form-control" value="INR">
                 <span class="text-danger"></span>
             </div>
         </div>
