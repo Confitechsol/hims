@@ -47,7 +47,7 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/roles', [RolesController::class, 'index'])->name('roles');
     Route::post('/roles/store', [RolesController::class, 'store'])->name('roles.store');
     Route::get('/permissions', function () {
-        return view('admin.setup.permissions');
+        return view(view: 'admin.setup.permissions');
     })->name('permissions');
     Route::get('/languages', function () {
         return view('admin.setup.languages');
