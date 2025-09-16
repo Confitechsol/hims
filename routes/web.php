@@ -58,4 +58,7 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/modules/update', [PermissionController::class, 'update'])->name('permissions.update');
     Route::get('/roles/{role}/permissions', [PermissionController::class, 'permissions'])->name('permissions');
 
+    Route::get('/patient', function () {
+        return view('admin.setup.patient');
+    })->name('patient');
 });
