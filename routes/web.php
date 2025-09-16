@@ -2,6 +2,10 @@
 
 use App\Http\Controllers\AppointmentsController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\PrefixesController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RolesController;
+use App\Http\Controllers\PermissionController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\DatabaseController;
@@ -36,9 +40,9 @@ Route::middleware(['admin'])->group(function () {
     })->name('dashboard');
 
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-    Route::get('/profile', function () {
-        return view('admin.setup.profile');
-    })->name('profile');
+    // Route::get('/profile', function () {
+    //     return view('admin.setup.profile');
+    // })->name('profile');
 
     Route::get('/email-setting', [EmailController::class,'index'])->name('email-setting');
     Route::post('/email-setting',[EmailController::class,'saveSetting'])->name('email-setting-save');
@@ -52,4 +56,28 @@ Route::delete('/database/backups/delete/{filename}', [DatabaseController::class,
 // Route::post('/database/restore', [DatabaseController::class, 'restore'])->name('database.restore');
 // Route::get('/database/backup', [DatabaseController::class, 'backup'])->name('database.backup'); // optional link
 Route::get('/patients', [PatientController::class, 'index'])->name('patients');
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    Route::post('/profile/store', [ProfileController::class, 'store'])->name('profile.store');
+    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/prefix', [PrefixesController::class, 'index'])->name('prefix');
+    Route::post('/prefix/store', [PrefixesController::class, 'store'])->name('prefix.store');
+    Route::put('/prefixes/update', [PrefixesController::class, 'update'])->name('prefixes.update');
+
+    Route::get('/roles', [RolesController::class, 'index'])->name('roles');
+    Route::post('/roles/store', [RolesController::class, 'store'])->name('roles.store');
+
+    Route::get('/languages', function () {
+        return view('admin.setup.languages');
+    })->name('languages');
+
+    
+    Route::get('/modules', [PermissionController::class, 'modules'])->name('permissions.modules');
+    Route::post('/permissions/toggle', [PermissionController::class, 'toggle'])
+    ->name('permissions.toggle');
+    Route::post('/modules/update', [PermissionController::class, 'update'])->name('permissions.update');
+    Route::get('/roles/{role}/permissions', [PermissionController::class, 'permissions'])->name('permissions');
+
+    Route::get('/patient', function () {
+        return view('admin.setup.patient');
+    })->name('patient');
 });

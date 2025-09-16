@@ -31,12 +31,11 @@ return new class extends Migration
 
             $table->timestamps();
 
-            // Foreign key to hospitals
+            // Foreign key to hospital
             $table->foreign('hospital_id')
                   ->references('id')
-                  ->on('hospital')
-                  ->onDelete('cascade'); // delete branches if hospital deleted
-            $table->timestamps();
+                  ->on('hospital')   // 
+                  ->onDelete('cascade');
         });
     }
 
