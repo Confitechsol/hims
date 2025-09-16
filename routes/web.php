@@ -39,5 +39,8 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('/prefix', function () {
         return view('admin.setup.prefix');
-    })->name('dashboard');
+    })->name('prefix');
+    Route::get('/role', function () {
+        return view('admin.setup.role');
+    })->name('role');
 });
