@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PrefixesController;
 use App\Http\Controllers\RolesController;
+use App\Http\Controllers\PermissionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -48,4 +49,13 @@ Route::middleware(['admin'])->group(function () {
    Route::get('/permissions', function () {
         return view('admin.setup.permissions');
     })->name('permissions');
+    // Route::get('/modules', function () {
+    //     return view('admin.setup.modules');
+    // })->name('modules');
+    
+    Route::get('/modules', [PermissionController::class, 'index'])->name('permissions.modules');
+    Route::post('/permissions/toggle', [PermissionController::class, 'toggle'])
+    ->name('permissions.toggle');
+    Route::post('/modules/update', [PermissionController::class, 'update'])->name('permissions.update');
+
 });
