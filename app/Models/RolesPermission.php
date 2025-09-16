@@ -38,4 +38,5 @@ class RolesPermission extends Model
     {
         return $this->belongsTo(PermissionCategory::class, 'perm_cat_id');
     }
+   
 }

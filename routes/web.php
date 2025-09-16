@@ -46,19 +46,16 @@ Route::middleware(['admin'])->group(function () {
 
     Route::get('/roles', [RolesController::class, 'index'])->name('roles');
     Route::post('/roles/store', [RolesController::class, 'store'])->name('roles.store');
-    Route::get('/permissions', function () {
-        return view(view: 'admin.setup.permissions');
-    })->name('permissions');
+
     Route::get('/languages', function () {
         return view('admin.setup.languages');
     })->name('languages');
-    // Route::get('/modules', function () {
-    //     return view('admin.setup.modules');
-    // })->name('modules');
+
     
-    Route::get('/modules', [PermissionController::class, 'index'])->name('permissions.modules');
+    Route::get('/modules', [PermissionController::class, 'modules'])->name('permissions.modules');
     Route::post('/permissions/toggle', [PermissionController::class, 'toggle'])
     ->name('permissions.toggle');
     Route::post('/modules/update', [PermissionController::class, 'update'])->name('permissions.update');
+    Route::get('/roles/{role}/permissions', [PermissionController::class, 'permissions'])->name('permissions');
 
 });
