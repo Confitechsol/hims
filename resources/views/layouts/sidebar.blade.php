@@ -106,7 +106,7 @@
                                             Dashboard</a></li>
                                 </ul>
                             </li>
-                            <li class="submenu">
+                            <!-- <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-apps"></i><span>Applications</span>
                                     <span class="menu-arrow"></span>
@@ -167,7 +167,7 @@
                                             Width</a></li>
                                     <li><a href="layout-rtl.html">RTL</a></li>
                                 </ul>
-                            </li>
+                            </li> -->
                         </ul>
                     </li>
                     <li class="menu-title"><span>Clinic</span></li>
@@ -195,10 +195,14 @@
                                 </a>
                                 <ul>
                                     <li><a href="patients.html">Patients</a></li>
-                                    <li><a href="patient-details.html">Patient
-                                            Details</a></li>
                                     <li><a href="create-patient.html">Create
                                             Patient</a></li>
+                                    <li><a href="patient-details.html">OPD Patient
+                                            Details</a></li>
+                                    <li><a href="patient-details.html">IPD Patient
+                                            Details</a></li>
+
+
                                 </ul>
                             </li>
                             <li class="submenu">
@@ -214,11 +218,36 @@
                                 </ul>
                             </li>
                             <li>
-                                <a href="locations.html">
-                                    <i class="ti ti-map-pin"></i><span>Locations</span>
+                                <a href="#">
+                                    <i class="ti ti-map-pin"></i><span>Pharmacy</span>
                                 </a>
                             </li>
                             <li>
+                                <a href="#">
+                                    <i class="ti ti-map-pin"></i><span>Pathology</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="ti ti-map-pin"></i><span>Radiology</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="ti ti-map-pin"></i><span>Blood Bank</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="ti ti-map-pin"></i><span>Ambulance Call</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="ti ti-map-pin"></i><span>Front Office</span>
+                                </a>
+                            </li>
+                            <!-- <li>
                                 <a href="services.html">
                                     <i class="ti ti-user-cog"></i><span>Services</span>
                                 </a>
@@ -227,8 +256,8 @@
                                 <a href="specializations.html">
                                     <i class="ti ti-user-shield"></i><span>Specializations</span>
                                 </a>
-                            </li>
-                            <li>
+                            </li> -->
+                            <!-- <li>
                                 <a href="assets.html">
                                     <i class="ti ti-asset"></i><span>Assets</span>
                                 </a>
@@ -242,7 +271,7 @@
                                 <a href="messages.html">
                                     <i class="ti ti-messages"></i><span>Messages</span>
                                 </a>
-                            </li>
+                            </li> -->
                         </ul>
                     </li>
                     <li class="menu-title"><span>HRM</span></li>
@@ -370,7 +399,7 @@
                         </ul>
                     </li>
                     <li class="menu-title"><span>Content</span></li>
-                    <li>
+                    <!-- <li>
                         <ul>
                             <li>
                                 <a href="pages.html">
@@ -414,8 +443,8 @@
                                 </a>
                             </li>
                         </ul>
-                    </li>
-                    <li class="menu-title"><span>Support</span></li>
+                    </li> -->
+                    <!-- <li class="menu-title"><span>Support</span></li> -->
                     <li>
                         <ul>
                             <li>
@@ -622,10 +651,10 @@
                                 <ul>
                                     <li><a href="organization-settings.html">Organization</a></li>
                                     <li><a href="localization-settings.html">Localization</a></li>
-                                    <li><a href="prefixes-settings.html">Prefixes</a></li>
+                                    <li><a href="{{ route('prefix') }}">Prefixes</a></li>
                                     <li><a href="seo-setup-settings.html">SEO
                                             Setup</a></li>
-                                    <li><a href="language-settings.html">Language</a></li>
+                                    <li><a href="{{ route('languages') }}">Language</a></li>
                                     <li><a href="maintenance-mode-settings.html">Maintenance
                                             Mode</a></li>
                                     <li><a href="login-and-register-settings.html">Login
@@ -722,7 +751,7 @@
                             </li>
                         </ul>
                     </li>
-                    <li class="menu-title"><span>UI
+                    <!-- <li class="menu-title"><span>UI
                             Interface</span></li>
                     <li>
                         <ul>
@@ -938,10 +967,10 @@
                                 </ul>
                             </li>
                         </ul>
-                    </li>
+                    </li> -->
                 </ul>
             </div>
-            <div class="sidebar-footer border-top mt-3">
+            <!-- <div class="sidebar-footer border-top mt-3">
                 <div class="trial-item mt-0 p-3 text-center">
                     <div class="trial-item-icon rounded-4 mb-3 p-2 text-center shadow-sm d-inline-flex">
                         <img src="assets/img/icons/sidebar-icon.svg" alt="img">
@@ -954,7 +983,7 @@
                     </div>
                     <a href="javascript:void(0);" class="close-icon shadow-sm"><i class="ti ti-x"></i></a>
                 </div>
-            </div>
+            </div> -->
         </div>
 
     </div>

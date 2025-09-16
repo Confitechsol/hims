@@ -1707,6 +1707,10 @@ Author URL: https://themeforest.net/user/dreamstechnologies
   -webkit-transition: all 0.2s ease;
   -ms-transition: all 0.2s ease;
   transition: all 0.2s ease;
+  min-height: calc(100vh - 56px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 @media (max-width: 991.98px) {
