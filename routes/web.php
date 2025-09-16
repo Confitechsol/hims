@@ -2,8 +2,8 @@
 
 use App\Http\Controllers\AppointmentsController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PrefixesController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\PermissionController;
 use Illuminate\Support\Facades\Route;
@@ -46,9 +46,12 @@ Route::middleware(['admin'])->group(function () {
 
     Route::get('/roles', [RolesController::class, 'index'])->name('roles');
     Route::post('/roles/store', [RolesController::class, 'store'])->name('roles.store');
-   Route::get('/permissions', function () {
+    Route::get('/permissions', function () {
         return view('admin.setup.permissions');
     })->name('permissions');
+    Route::get('/languages', function () {
+        return view('admin.setup.languages');
+    })->name('languages');
     // Route::get('/modules', function () {
     //     return view('admin.setup.modules');
     // })->name('modules');

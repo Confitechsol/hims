@@ -1,14 +1,13 @@
 {{-- resources/views/settings.blade.php --}}
 @extends('layouts.adminLayout')
 @section('content')
-    <div class="page-wrapper">
-        <div class="row justify-content-center">
-            {{-- Settings Form --}}
-            <div class="col-md-11">
-                <div class="card shadow-sm border-0 mt-4">
-                    <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                        <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Prefix Settings</h5>
-                    </div>
+    <div class="row justify-content-center">
+        {{-- Settings Form --}}
+        <div class="col-md-11">
+            <div class="card shadow-sm border-0 mt-4">
+                <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                    <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Prefix Settings</h5>
+                </div>
 
                     <div class="card-body">
                         <form id="#" method="POST"
@@ -19,7 +18,7 @@
                                 @method('PUT')
                             @endif
 
-                            
+
                             <div class="row mb-3 gy-3">
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">IPD No <span
