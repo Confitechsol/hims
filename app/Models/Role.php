@@ -14,6 +14,7 @@ class Role extends Model
 
     // Table name
     protected $table = 'roles';
+    public $timestamps = false;  
 
     // Mass assignable attributes
     protected $fillable = [
