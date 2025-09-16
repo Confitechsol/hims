@@ -51,4 +51,7 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/languages', function () {
         return view('admin.setup.languages');
     })->name('languages');
+    Route::get('/patient', function () {
+        return view('admin.setup.patient');
+    })->name('patient');
 });
