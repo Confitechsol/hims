@@ -43,4 +43,7 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/role', function () {
         return view('admin.setup.role');
     })->name('role');
+    Route::get('/languages', function () {
+        return view('admin.setup.languages');
+    })->name('languages');
 });

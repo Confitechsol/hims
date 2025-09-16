@@ -201,8 +201,8 @@
                                             Details</a></li>
                                     <li><a href="patient-details.html">IPD Patient
                                             Details</a></li>
-                                    
-                                            
+
+
                                 </ul>
                             </li>
                             <li class="submenu">
@@ -643,10 +643,10 @@
                                 <ul>
                                     <li><a href="organization-settings.html">Organization</a></li>
                                     <li><a href="localization-settings.html">Localization</a></li>
-                                    <li><a href="prefixes-settings.html">Prefixes</a></li>
+                                    <li><a href="{{ route('prefix') }}">Prefixes</a></li>
                                     <li><a href="seo-setup-settings.html">SEO
                                             Setup</a></li>
-                                    <li><a href="language-settings.html">Language</a></li>
+                                    <li><a href="{{ route('languages') }}">Language</a></li>
                                     <li><a href="maintenance-mode-settings.html">Maintenance
                                             Mode</a></li>
                                     <li><a href="login-and-register-settings.html">Login

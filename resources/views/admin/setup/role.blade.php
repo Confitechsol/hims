@@ -1,7 +1,7 @@
 {{-- resources/views/settings.blade.php --}}
 @extends('layouts.adminLayout')
 @section('content')
-    <div class="page-wrapper">
+
         <div class="row justify-content-center">
             {{-- Settings Form --}}
             <div class="col-md-11">
@@ -31,7 +31,7 @@
                                                         <i class="ti ti-search"></i>
                                                     </span>
                                                     <input type="text" class="form-control shadow-sm" placeholder="Search">
-                                                
+
                                                 </div>
                                                 <div class="text-end d-flex">
                                                     <a href="javascript:void(0);"
@@ -84,9 +84,9 @@
                                                             <td>
                                                                 <h6 class="mb-0 fs-14 fw-semibold"> Admin</h6>
                                                             </td>
-                                                          
+
                                                             <td>System</td>
-                                                         
+
                                                             <td>
                                                                 <a href="javascript: void(0);" class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
                                                                    <i class="ti ti-user-circle" data-bs-toggle="tooltip" title="Assign Permission"></i></a>
@@ -116,7 +116,7 @@
                 </div>
             </div>
         </div>
-    </div>
+
 
     <!-- Bootstrap 5 JS bundle (includes Popper) -->
 
