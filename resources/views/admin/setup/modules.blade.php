@@ -2,7 +2,7 @@
 @extends('layouts.adminLayout')
 @section('content')
         
-<div class="page-wrapper">
+
     <div class="row justify-content-center">
         <div class="col-md-11">
             <div class="card shadow-sm border-0 mt-4">
@@ -105,7 +105,7 @@
             </div>
         </div>
     </div>
-</div>
+
 
 
         <!-- ========================
