@@ -11,108 +11,127 @@
                     </div>
 
                     <div class="card-body">
-                        <form id="settings_form" method="POST"
-                            action="{{ isset($branch) && $branch->exists ? route('profile.update') : route('profile.store') }}"
+                        <form id="#" method="POST"
+                            action="{{ isset($prefixes) ? route('prefixes.update') : route('prefixes.store') }}"
                             enctype="multipart/form-data">
                             @csrf
+                            @if(isset($prefixes))
+                                @method('PUT')
+                            @endif
 
-                            {{-- Hospital Name & Code --}}
+                            
                             <div class="row mb-3 gy-3">
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">IPD No <span
                                             class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="ipd_number"
-                                        value="{{ $branch->name ?? 'Enter IPD No' }}">
+                                    <input type="hidden" name="fields[0][type]" value="ipd_no">
+                                    <input type="text" class="form-control" name="fields[0][prefix]"
+                                        value="{{ old('fields.0.prefix', $prefixes['ipd_no'] ?? '') }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">OPD No <span
                                             class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="opd_number"
-                                        value="{{ $branch->name ?? 'Enter OPD No' }}">
+                                            <input type="hidden" name="fields[1][type]" value="opd_no">
+                                    <input type="text" class="form-control" name="fields[1][prefix]"
+                                        value="{{ old('fields.1.prefix', $prefixes['opd_no'] ?? '') }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">IPD Prescription <span
                                             class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="ipd_pre"
-                                        value="{{ $branch->name ?? 'Enter IPD Prescription' }}">
+                                            <input type="hidden" name="fields[2][type]" value="ipd_pre">
+                                    <input type="text" class="form-control" name="fields[2][prefix]"
+                                        value="{{ old('fields.2.prefix', $prefixes['ipd_pre'] ?? '') }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">OPD Prescription <span
                                             class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="OPD_pre"
-                                        value="{{ $branch->name ?? 'Enter OPD Prescription' }}">
+                                            <input type="hidden" name="fields[3][type]" value="opd_pre">
+                                    <input type="text" class="form-control" name="fields[3][prefix]"
+                                        value="{{ old('fields.3.prefix', $prefixes['opd_pre'] ?? '') }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Appointment <span
                                             class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="appointment"
-                                        value="{{ $branch->name ?? 'Enter Appointment' }}">
+                                            <input type="hidden" name="fields[4][type]" value="appointment">
+                                    <input type="text" class="form-control" name="fields[4][prefix]"
+                                        value="{{ old('fields.4.prefix', $prefixes['appointment'] ?? '') }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Pharmacy Bill <span
                                             class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="pharm_bill"
-                                        value="{{ $branch->name ?? 'Enter Pharmacy Bill' }}">
+                                            <input type="hidden" name="fields[5][type]" value="pharm_bill">
+                                    <input type="text" class="form-control" name="fields[5][prefix]"
+                                        value="{{ old('fields.5.prefix', $prefixes['pharm_bill'] ?? '') }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Operation Reference No<span
                                             class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="operation_ref_no"
-                                        value="{{ $branch->name ?? 'Enter Operation Reference No' }}">
+                                            <input type="hidden" name="fields[6][type]" value="operation_ref_no">
+                                    <input type="text" class="form-control" name="fields[6][prefix]"
+                                        value="{{ old('fields.6.prefix', $prefixes['operation_ref_no'] ?? '') }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Blood Bank Bill<span
                                             class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="blood_bank_no"
-                                        value="{{ $branch->name ?? 'Enter Blood Bank Bill' }}">
+                                            <input type="hidden" name="fields[7][type]" value="blood_bank_no">
+                                    <input type="text" class="form-control" name="fields[7][prefix]"
+                                        value="{{ old('fields.7.prefix', $prefixes['blood_bank_no'] ?? '') }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Ambulance Call Bill<span
                                             class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="ambulance_call_bill"
-                                        value="{{ $branch->name ?? 'Enter Ambulance Call Bill' }}">
+                                            <input type="hidden" name="fields[8][type]" value="ambulance_call_bill">
+                                    <input type="text" class="form-control" name="fields[8][prefix]"
+                                        value="{{ old('fields.8.prefix', $prefixes['ambulance_call_bill'] ?? '') }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Radiology Bill<span
                                             class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="radiology_bill"
-                                        value="{{ $branch->name ?? 'Enter Radiology Bill' }}">
+                                            <input type="hidden" name="fields[9][type]" value="radiology_bill">
+                                    <input type="text" class="form-control" name="fields[9][prefix]"
+                                        value="{{ old('fields.9.prefix', $prefixes['radiology_bill'] ?? '') }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Pathology Bill<span
                                             class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="pathology_bill"
-                                        value="{{ $branch->name ?? 'Enter Pathology Bill' }}">
+                                            <input type="hidden" name="fields[10][type]" value="pathology_bill">
+                                    <input type="text" class="form-control" name="fields[10][prefix]"
+                                        value="{{ old('fields.10.prefix', $prefixes['pathology_bill'] ?? '') }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">OPD Checkup Id<span
                                             class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="opd_checkup_id"
-                                        value="{{ $branch->name ?? 'Enter OPD Checkup Id' }}">
+                                            <input type="hidden" name="fields[11][type]" value="opd_checkup_id">
+                                    <input type="text" class="form-control" name="fields[11][prefix]"
+                                        value="{{ old('fields.11.prefix', $prefixes['opd_checkup_id'] ?? '') }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Pharmacy Purchase No<span
                                             class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="pharmacy_purchase_no"
-                                        value="{{ $branch->name ?? 'Enter Pharmacy Purchase No' }}">
+                                            <input type="hidden" name="fields[12][type]" value="pharmacy_purchase_no">
+                                    <input type="text" class="form-control" name="fields[12][prefix]"
+                                        value="{{ old('fields.12.prefix', $prefixes['pharmacy_purchase_no'] ?? '') }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Transaction ID<span
                                             class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="transaction_id"
-                                        value="{{ $branch->name ?? 'Enter Transaction ID' }}">
+                                            <input type="hidden" name="fields[13][type]" value="transaction_id">
+                                    <input type="text" class="form-control" name="fields[13][prefix]"
+                                        value="{{ old('fields.13.prefix', $prefixes['transaction_id'] ?? '') }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Birth Record Reference No<span
                                             class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="birth_rec_ref_no"
-                                        value="{{ $branch->name ?? 'Enter Birth Record Reference No' }}">
+                                            <input type="hidden" name="fields[14][type]" value="birth_rec_ref_no">
+                                    <input type="text" class="form-control" name="fields[14][prefix]"
+                                        value="{{ old('fields.14.prefix', $prefixes['birth_rec_ref_no'] ?? '') }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Death Record Reference No<span
                                             class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="death_rec_ref_no"
-                                        value="{{ $branch->name ?? 'Enter Death Record Reference No' }}">
+                                            <input type="hidden" name="fields[15][type]" value="death_rec_ref_no">
+                                    <input type="text" class="form-control" name="fields[15][prefix]"
+                                        value="{{ old('fields.15.prefix', $prefixes['death_rec_ref_no'] ?? '') }}">
                                 </div>
                             </div>
                             <hr>

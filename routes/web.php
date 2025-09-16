@@ -3,6 +3,7 @@
 use App\Http\Controllers\AppointmentsController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PrefixesController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -37,9 +38,9 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::post('/profile/store', [ProfileController::class, 'store'])->name('profile.store');
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::get('/prefix', function () {
-        return view('admin.setup.prefix');
-    })->name('prefix');
+     Route::get('/prefix', [PrefixesController::class, 'index'])->name('prefix');
+    Route::post('/prefix/store', [PrefixesController::class, 'store'])->name('prefix.store');
+    Route::put('prefixes/update', [PrefixesController::class, 'update'])->name('prefixes.update');
     Route::get('/role', function () {
         return view('admin.setup.role');
     })->name('role');

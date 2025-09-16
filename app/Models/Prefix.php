@@ -10,8 +10,12 @@ class Prefix extends Model
     use HasFactory;
 
     protected $table = 'prefixes';
+    public $timestamps = false;  
 
     protected $fillable = [
         'hospital_id',
+        'type',
+        'prefix',
+
     ];
 }
