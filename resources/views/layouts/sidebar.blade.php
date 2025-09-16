@@ -130,7 +130,7 @@
                                     </li>
                                     <li><a href="calendar.html">Calendar</a></li>
                                     <li><a href="contacts.html">Contacts</a></li>
-                                    <li><a href="email.html">Email</a></li>
+                                    <li><a href="{{route('email-setting')}}">Email</a></li>
                                     <li class="submenu submenu-two">
                                         <a href="#">Invoices<span class="menu-arrow inside-submenu"></span></a>
                                         <ul>
@@ -194,7 +194,7 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="patients.html">Patients</a></li>
+                                    <li><a href="{{route('patients')}}">Patients</a></li>
                                     <li><a href="patient-details.html">Patient
                                             Details</a></li>
                                     <li><a href="create-patient.html">Create

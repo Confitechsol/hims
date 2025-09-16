@@ -21,7 +21,11 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
     <!-- Favicon -->
     @extends('layouts.admincdns')
-
+<style>
+    .settings-wrapper .card .card-body label:has(input:checked) .card{
+  border: 2px solid #CB6CE6;
+} 
+</style>
 </head>
 
 <body>
