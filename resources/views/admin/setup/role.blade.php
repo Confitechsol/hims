@@ -11,10 +11,7 @@
                     </div>
 
                     <div class="card-body">
-                        <form id="settings_form" method="POST"
-                            action="{{ isset($branch) && $branch->exists ? route('profile.update') : route('profile.store') }}"
-                            enctype="multipart/form-data">
-                            @csrf
+                      
 
                             {{-- Hospital Name & Code --}}
                             <div class="row">
@@ -52,17 +49,19 @@
                                                                     data-bs-dismiss="modal" aria-label="Close"></button>
                                                             </div>
                                                             <div class="modal-body">
-                                                                <form>
+                                                                <form action="{{ route('roles.store')  }}" method="POST">
+                                                                    @csrf
                                                                     <div class="mb-3">
                                                                         <label for="roleName" class="form-label">Role
                                                                             Name</label>
-                                                                        <input id="roleName" class="form-control" />
+                                                                        <input id="name" name= "name" class="form-control" />
                                                                     </div>
-                                                                </form>
+                                                                
                                                             </div>
                                                             <div class="modal-footer">
-                                                                <button class="btn btn-primary">Save Role</button>
+                                                                <button type="submit" class="btn btn-primary">Save Role</button>
                                                             </div>
+                                                            </form>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -105,13 +104,13 @@
                                 </div> <!-- end col -->
 
                             </div>
-                            <hr>
-                            <div class="mt-4 text-end">
+                            <!-- <hr> -->
+                            <!-- <div class="mt-4 text-end">
                                 <button type="submit" class="btn btn-primary px-4">
                                     <i class="fa fa-save me-1"></i> Save Settings
                                 </button>
-                            </div>
-                        </form>
+                            </div> -->
+                        
                     </div>
                 </div>
             </div>
