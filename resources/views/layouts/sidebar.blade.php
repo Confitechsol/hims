@@ -629,9 +629,17 @@
                                 </a>
                                 <ul>
                                     <li><a href="{{ route('profile') }}">Profile</a></li>
-                                    <li><a href="security-settings.html">Security</a></li>
-                                    <li><a href="notifications-settings.html">Notifications</a></li>
-                                    <li><a href="integrations-settings.html">Integrations</a></li>
+                                    <!--<li><a href="security-settings.html">Security</a></li>
+                                    //<li><a href="notifications-settings.html">Notifications</a></li>
+                                    <li><a href="integrations-settings.html">Integrations</a></li>-->
+                                    <li><a href="integrations-settings.html">General Settings</a></li>
+                                    <li><a href="integrations-settings.html">Email Settings</a></li>
+                                    <li><a href="integrations-settings.html">Prefix Settings</a></li>
+                                    <li><a href="integrations-settings.html">Roles Permissions</a></li>
+                                    <li><a href="integrations-settings.html">Backup/Restore</a></li>
+                                    <li><a href="integrations-settings.html">Languages</a></li>
+                                    <li><a href="integrations-settings.html">Users</a></li>
+                                    <li><a href="integrations-settings.html">Modules</a></li>
                                 </ul>
                             </li>
                             <li class="submenu">
