@@ -77,10 +77,13 @@ Route::get('/patients', [PatientController::class, 'index'])->name('patients');
     Route::post('/modules/update', [PermissionController::class, 'update'])->name('permissions.update');
     Route::get('/roles/{role}/permissions', [PermissionController::class, 'permissions'])->name('permissions');
 
-    Route::get('/patient', function () {
+    Route::get('/patients', function () {
         return view('admin.setup.patient');
-    })->name('patient');
+    })->name('patients');
     Route::get('/charges', function () {
         return view('admin.setup.charges');
     })->name('charges');
+    Route::get('/import', function () {
+        return view('admin.setup.import_patient');
+    })->name('import');
 });

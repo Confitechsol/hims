@@ -249,34 +249,65 @@
                                         <table class="table mb-0">
                                             <thead>
                                                 <tr>
-                                                    <th>#</th>
-                                                    <th>Role</th>
-                                                    <th>Type</th>
+                                                    <th><input type="checkbox" name="checkbox" id="checkbox" >
+                                                        #</th>
+                                                    <th>Patient Name</th>
+                                                    <th>Age</th>
+                                                    <th>Gender</th>
+                                                    <th>Phone</th>
+                                                    <th>Guardian Name</th>
+                                                    <th>Address</th>
+                                                    <th>Dead</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <th scope="row">1</th>
+                                                    <th scope="row">
+                                                        <input type="checkbox" name="checkbox" id="checkbox" >
+                                                    </th>
                                                     <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold"> Admin</h6>
+                                                        <h6 class="mb-0 fs-14 fw-semibold"> Sayan P</h6>
                                                     </td>
 
-                                                    <td>System</td>
+                                                    <td>24 Year 4 Month 3 Days</td>
+                                                    <td>Male</td>
+                                                    <td>8617284931</td>
+                                                    <td></td>
+                                                    <td>Bhadreswar</td>
+                                                    <td>No</td>
 
                                                     <td>
                                                         <a href="javascript: void(0);"
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-user-circle" data-bs-toggle="tooltip"
+                                                            <i class="ti ti-menu" data-bs-toggle="tooltip"
                                                                 title="Assign Permission"></i></a>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="row">
+                                                        <input type="checkbox" name="checkbox" id="checkbox" >
+                                                    </th>
+                                                    <td>
+                                                        <h6 class="mb-0 fs-14 fw-semibold"> Bimal</h6>
+                                                    </td>
+
+                                                    <td>15 Year 4 Month 8 Days</td>
+                                                    <td>Male</td>
+                                                    <td>7044094367</td>
+                                                    <td>Das	</td>
+                                                    <td>xXzXzXzX</td>
+                                                    <td>No</td>
+
+                                                    <td>
                                                         <a href="javascript: void(0);"
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                            <i class="ti ti-pencil" data-bs-toggle="tooltip"
-                                                                title="Edit"></i></a>
+                                                            <i class="ti ti-dots-vertical" data-bs-toggle="tooltip"
+                                                                title="Assign Permission"></i></a>
                                                         <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash" data-bs-toggle="tooltip"
-                                                                title="Delete"></i></a>
+                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+                                                            <i class="ti ti-menu" data-bs-toggle="tooltip"
+                                                                title="Assign Permission"></i></a>
                                                     </td>
                                                 </tr>
                                             </tbody>
