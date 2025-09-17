@@ -88,4 +88,7 @@ Route::post('/roles/permissions/save', [PermissionController::class, 'savePermis
     Route::get('/import', function () {
         return view('admin.setup.import_patient');
     })->name('import');
+    Route::get('/disable', function () {
+        return view('admin.setup.disable_patient');
+    })->name('disable');
 });
