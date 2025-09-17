@@ -80,4 +80,7 @@ Route::get('/patients', [PatientController::class, 'index'])->name('patients');
     Route::get('/patient', function () {
         return view('admin.setup.patient');
     })->name('patient');
+    Route::get('/charges', function () {
+        return view('admin.setup.charges');
+    })->name('charges');
 });
