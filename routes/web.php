@@ -82,4 +82,7 @@ Route::post('/roles/permissions/save', [PermissionController::class, 'savePermis
     Route::get('/patient', function () {
         return view('admin.setup.patient');
     })->name('patient');
+    Route::get('/charges', function () {
+        return view('admin.setup.charges');
+    })->name('charges');
 });
