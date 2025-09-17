@@ -245,11 +245,17 @@
 
                                     </div>
 
+                                    <div class="text-end">
+                                        <a href="javascript:void(0);" class="btn btn-danger text-white ms-2 fs-13 btn-md"
+                                            data-bs-toggle="modal" data-bs-target="#add_patient"><i
+                                                class="ti ti-trash me-1"></i>Delete Selected</a>
+                                    </div>
+
                                     <div class="table-responsive">
                                         <table class="table mb-0">
                                             <thead>
                                                 <tr>
-                                                    <th><input type="checkbox" name="checkbox" id="checkbox" >
+                                                    <th><input type="checkbox" name="checkbox" id="checkbox">
                                                         #</th>
                                                     <th>Patient Name</th>
                                                     <th>Age</th>
@@ -264,7 +270,7 @@
                                             <tbody>
                                                 <tr>
                                                     <th scope="row">
-                                                        <input type="checkbox" name="checkbox" id="checkbox" >
+                                                        <input type="checkbox" name="checkbox" id="checkbox">
                                                     </th>
                                                     <td>
                                                         <h6 class="mb-0 fs-14 fw-semibold"> Sayan P</h6>
@@ -286,7 +292,7 @@
                                                 </tr>
                                                 <tr>
                                                     <th scope="row">
-                                                        <input type="checkbox" name="checkbox" id="checkbox" >
+                                                        <input type="checkbox" name="checkbox" id="checkbox">
                                                     </th>
                                                     <td>
                                                         <h6 class="mb-0 fs-14 fw-semibold"> Bimal</h6>
@@ -295,7 +301,7 @@
                                                     <td>15 Year 4 Month 8 Days</td>
                                                     <td>Male</td>
                                                     <td>7044094367</td>
-                                                    <td>Das	</td>
+                                                    <td>Das </td>
                                                     <td>xXzXzXzX</td>
                                                     <td>No</td>
 
