@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\BedController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -80,4 +81,6 @@ Route::get('/patients', [PatientController::class, 'index'])->name('patients');
     Route::get('/patient', function () {
         return view('admin.setup.patient');
     })->name('patient');
+    Route::post('/patient/store', [PatientController::class, 'store'])->name('patient-store');
+    Route::get('/bed', [BedController::class, 'index'])->name('bed');
 });

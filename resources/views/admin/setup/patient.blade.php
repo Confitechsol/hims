@@ -52,174 +52,262 @@
                                                                 aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <form action="{{ route('roles.store')  }}" method="POST">
+                                                            <form action="{{ route('patient-store')  }}" method="POST">
                                                                 @csrf
-                                                                <div class="row gy-3">
-                                                                    <div class="col-md-6">
-                                                                        <label for="" class="form-label">
-                                                                            Name</label>
-                                                                        <input type="text" id="name" name="name"
-                                                                            class="form-control" />
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <label for="" class="form-label">
-                                                                            Guardian Name</label>
-                                                                        <input type="text" id="guardian_name"
-                                                                            name="guardian_name" class="form-control" />
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <div class="row">
-                                                                            <div class="col-md-3">
-                                                                                <label for=""
-                                                                                    class="form-label">Gender</label>
-                                                                                <select class="form-control">
-                                                                                    <option value="">Select</option>
-                                                                                    <option value="Male">Male</option>
-                                                                                    <option value="Female">Female</option>
-                                                                                </select>
-                                                                            </div>
-                                                                            <div class="col-md-4">
-                                                                                <label for="" class="form-label">Date of
-                                                                                    Birth</label>
-                                                                                <input type="date" id="birth_date"
-                                                                                    name="birth_date"
-                                                                                    class="form-control" />
-                                                                            </div>
-                                                                            <div class="col-sm-5">
-                                                                                <label for="" class="form-label">Age
-                                                                                    (yy-mm-dd) </label><small class="req">
-                                                                                    *</small>
-                                                                                <div style="clear: both;overflow: hidden;">
-                                                                                    <input type="text" placeholder="YY"
-                                                                                        name="age[year]" id="age_year"
-                                                                                        value=""
-                                                                                        class="form-control patient_age_year"
-                                                                                        style="width: 30%; float: left;"
-                                                                                        autocomplete="off">
+                                                                @if ($errors->any())
+        <div class="alert alert-danger">
+            <strong>There were some problems with your input:</strong>
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-                                                                                    <input type="text" id="age_month"
-                                                                                        placeholder="MM" name="age[month]"
-                                                                                        value=""
-                                                                                        class="form-control patient_age_month"
-                                                                                        style="width: 36%;float: left; margin-left: 4px;"
-                                                                                        autocomplete="off">
-                                                                                    <input type="text" id="age_day"
-                                                                                        placeholder="DD" name="age[day]"
-                                                                                        value=""
-                                                                                        class="form-control patient_age_day"
-                                                                                        style="width: 26%;float: left; margin-left: 4px;"
-                                                                                        autocomplete="off">
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <div class="row">
-                                                                            <div class="col-md-3">
-                                                                                <label for="" class="form-label">Blood
-                                                                                    Group</label>
-                                                                                <select name="blood_group"
-                                                                                    class="form-control" autocomplete="off">
-                                                                                    <option value="">Select</option>
-                                                                                    <option value="1">O+</option>
-                                                                                    <option value="2">A+</option>
-                                                                                    <option value="3">B+</option>
-                                                                                    <option value="4">AB+</option>
-                                                                                    <option value="5">O-</option>
-                                                                                    <option value="6">AB-</option>
-                                                                                </select>
-                                                                            </div>
-                                                                            <div class="col-md-3">
-                                                                                <label for="" class="form-label">Marital
-                                                                                    Status</label>
-                                                                                <select name="marital_status"
-                                                                                    class="form-control">
-                                                                                    <option value="">Select</option>
-                                                                                    <option value="Single">Single</option>
-                                                                                    <option value="Married">Married</option>
-                                                                                    <option value="Widowed">Widowed</option>
-                                                                                    <option value="Separated">Separated
-                                                                                    </option>
-                                                                                    <option value="Not Specified">Not
-                                                                                        Specified
-                                                                                    </option>
-                                                                                </select>
-                                                                            </div>
-                                                                            <div class="col-md-6">
-                                                                                <label for="" class="form-label">Patient
-                                                                                    Photo</label>
-                                                                                <input class="filestyle form-control"
-                                                                                    type="file" name="file" id="file"
-                                                                                    size="20" data-height="26"
-                                                                                    autocomplete="off">
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <div class="row">
-                                                                            <div class="col-md-6">
-                                                                                <label for=""
-                                                                                    class="form-label">Phone</label>
-                                                                                <input type="tel" id="phone" name="phone"
-                                                                                    class="form-control" />
-                                                                            </div>
-                                                                            <div class="col-md-6">
-                                                                                <label for=""
-                                                                                    class="form-label">Email</label>
-                                                                                <input type="mail" id="email" name="email"
-                                                                                    class="form-control" />
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <label for="" class="form-label">Address</label>
-                                                                        <input type="address" id="address" name="address"
-                                                                            class="form-control" />
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <label for="" class="form-label">Remarks</label>
-                                                                        <input type="text" id="remarks" name="remarks"
-                                                                            class="form-control" />
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <label for="" class="form-label">Any Known
-                                                                            Allergies</label>
-                                                                        <input type="text" id="allergies" name="allergies"
-                                                                            class="form-control" />
-                                                                    </div>
-                                                                    <div class="col-md-4">
-                                                                        <label for="" class="form-label">TPA</label>
-                                                                        <select class="form-control">
-                                                                            <option value="">Select</option>
-                                                                            <option value="5">MedoLogi TPA Pvt. Ltd.
-                                                                            </option>
-                                                                            <option value="4">Vidal Health TPA </option>
-                                                                            <option value="3">Paramount Health Services
-                                                                            </option>
-                                                                            <option value="2">Raksha TPA Pvt. Ltd. </option>
-                                                                            <option value="1">MediAssist TPA Pvt. Ltd.
-                                                                            </option>
-                                                                        </select>
-                                                                    </div>
-                                                                    <div class="col-md-4">
-                                                                        <label for="" class="form-label">TPA ID</label>
-                                                                        <input type="text" id="tpa_id" name="tpa_id"
-                                                                            class="form-control" />
-                                                                    </div>
-                                                                    <div class="col-md-4">
-                                                                        <label for="" class="form-label">TPA
-                                                                            Validity</label>
-                                                                        <input type="text" id="tpa_validity"
-                                                                            name="tpa_validity" class="form-control" />
-                                                                    </div>
-                                                                    <div class="col-md-4">
-                                                                        <label for="" class="form-label">National
-                                                                            Identification Number</label>
-                                                                        <input type="text" id="national_id_number"
-                                                                            name="national_id_number"
-                                                                            class="form-control" />
-                                                                    </div>
-                                                                </div>
+    <div class="row gy-3">
+
+        {{-- Name --}}
+        <div class="col-md-6">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" id="name" name="name"
+                class="form-control @error('name') is-invalid @enderror"
+                value="{{ old('name') }}" />
+            @error('name')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+        {{-- Guardian Name --}}
+        <div class="col-md-6">
+            <label for="guardian_name" class="form-label">Guardian Name</label>
+            <input type="text" id="guardian_name" name="guardian_name"
+                class="form-control @error('guardian_name') is-invalid @enderror"
+                value="{{ old('guardian_name') }}" />
+            @error('guardian_name')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+        {{-- Gender + DOB + Age --}}
+        <div class="col-md-6">
+            <div class="row">
+
+                {{-- Gender --}}
+                <div class="col-md-3">
+                    <label for="gender" class="form-label">Gender</label>
+                    <select name="gender" class="form-control @error('gender') is-invalid @enderror">
+                        <option value="">Select</option>
+                        <option value="Male" {{ old('gender') == 'Male' ? 'selected' : '' }}>Male</option>
+                        <option value="Female" {{ old('gender') == 'Female' ? 'selected' : '' }}>Female</option>
+                    </select>
+                    @error('gender')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- DOB --}}
+                <div class="col-md-4">
+                    <label for="birth_date" class="form-label">Date of Birth</label>
+                    <input type="date" id="birth_date" name="birth_date"
+                        class="form-control @error('birth_date') is-invalid @enderror"
+                        value="{{ old('birth_date') }}" />
+                    @error('birth_date')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- Age --}}
+                <div class="col-sm-5">
+                    <label class="form-label">Age (yy-mm-dd)</label>
+                    <div style="clear: both; overflow: hidden;">
+                        <input type="text" name="age[year]" id="age_year" placeholder="YY"
+                            value="{{ old('age.year') }}"
+                            class="form-control patient_age_year @error('age.year') is-invalid @enderror"
+                            style="width: 30%; float: left;" />
+                        <input type="text" name="age[month]" id="age_month" placeholder="MM"
+                            value="{{ old('age.month') }}"
+                            class="form-control patient_age_month @error('age.month') is-invalid @enderror"
+                            style="width: 36%; float: left; margin-left: 4px;" />
+                        <input type="text" name="age[day]" id="age_day" placeholder="DD"
+                            value="{{ old('age.day') }}"
+                            class="form-control patient_age_day @error('age.day') is-invalid @enderror"
+                            style="width: 26%; float: left; margin-left: 4px;" />
+                    </div>
+                    @error('age.year')
+                        <div class="invalid-feedback d-block">Year: {{ $message }}</div>
+                    @enderror
+                    @error('age.month')
+                        <div class="invalid-feedback d-block">Month: {{ $message }}</div>
+                    @enderror
+                    @error('age.day')
+                        <div class="invalid-feedback d-block">Day: {{ $message }}</div>
+                    @enderror
+                </div>
+
+            </div>
+        </div>
+
+        {{-- Blood Group + Marital Status + Photo --}}
+        <div class="col-md-6">
+            <div class="row">
+
+                {{-- Blood Group --}}
+                <div class="col-md-3">
+                    <label for="blood_group" class="form-label">Blood Group</label>
+                    <select name="blood_group" class="form-control @error('blood_group') is-invalid @enderror">
+                        <option value="">Select</option>
+                        <option value="1" {{ old('blood_group') == '1' ? 'selected' : '' }}>O+</option>
+                        <option value="2" {{ old('blood_group') == '2' ? 'selected' : '' }}>A+</option>
+                        <option value="3" {{ old('blood_group') == '3' ? 'selected' : '' }}>B+</option>
+                        <option value="4" {{ old('blood_group') == '4' ? 'selected' : '' }}>AB+</option>
+                        <option value="5" {{ old('blood_group') == '5' ? 'selected' : '' }}>O-</option>
+                        <option value="6" {{ old('blood_group') == '6' ? 'selected' : '' }}>AB-</option>
+                    </select>
+                    @error('blood_group')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- Marital Status --}}
+                <div class="col-md-3">
+                    <label for="marital_status" class="form-label">Marital Status</label>
+                    <select name="marital_status" class="form-control @error('marital_status') is-invalid @enderror">
+                        <option value="">Select</option>
+                        <option value="Single" {{ old('marital_status') == 'Single' ? 'selected' : '' }}>Single</option>
+                        <option value="Married" {{ old('marital_status') == 'Married' ? 'selected' : '' }}>Married</option>
+                        <option value="Widowed" {{ old('marital_status') == 'Widowed' ? 'selected' : '' }}>Widowed</option>
+                        <option value="Separated" {{ old('marital_status') == 'Separated' ? 'selected' : '' }}>Separated</option>
+                        <option value="Not Specified" {{ old('marital_status') == 'Not Specified' ? 'selected' : '' }}>Not Specified</option>
+                    </select>
+                    @error('marital_status')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- Patient Photo --}}
+                <div class="col-md-6">
+                    <label for="file" class="form-label">Patient Photo</label>
+                    <input class="form-control @error('file') is-invalid @enderror"
+                        type="file" name="file" id="file" />
+                    @error('file')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+            </div>
+        </div>
+
+        {{-- Phone + Email --}}
+        <div class="col-md-6">
+            <div class="row">
+
+                <div class="col-md-6">
+                    <label for="phone" class="form-label">Phone</label>
+                    <input type="tel" id="phone" name="phone"
+                        class="form-control @error('phone') is-invalid @enderror"
+                        value="{{ old('phone') }}" />
+                    @error('phone')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="col-md-6">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" id="email" name="email"
+                        class="form-control @error('email') is-invalid @enderror"
+                        value="{{ old('email') }}" />
+                    @error('email')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+            </div>
+        </div>
+
+        {{-- Address --}}
+        <div class="col-md-6">
+            <label for="address" class="form-label">Address</label>
+            <input type="text" id="address" name="address"
+                class="form-control @error('address') is-invalid @enderror"
+                value="{{ old('address') }}" />
+            @error('address')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+        {{-- Remarks --}}
+        <div class="col-md-6">
+            <label for="remarks" class="form-label">Remarks</label>
+            <input type="text" id="remarks" name="remarks"
+                class="form-control @error('remarks') is-invalid @enderror"
+                value="{{ old('remarks') }}" />
+            @error('remarks')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+        {{-- Allergies --}}
+        <div class="col-md-6">
+            <label for="allergies" class="form-label">Any Known Allergies</label>
+            <input type="text" id="allergies" name="allergies"
+                class="form-control @error('allergies') is-invalid @enderror"
+                value="{{ old('allergies') }}" />
+            @error('allergies')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+        {{-- TPA --}}
+        <div class="col-md-4">
+            <label for="tpa" class="form-label">TPA</label>
+            <select name="tpa" class="form-control @error('tpa') is-invalid @enderror">
+                <option value="">Select</option>
+                <option value="5" {{ old('tpa') == '5' ? 'selected' : '' }}>MedoLogi TPA Pvt. Ltd.</option>
+                <option value="4" {{ old('tpa') == '4' ? 'selected' : '' }}>Vidal Health TPA</option>
+                <option value="3" {{ old('tpa') == '3' ? 'selected' : '' }}>Paramount Health Services</option>
+                <option value="2" {{ old('tpa') == '2' ? 'selected' : '' }}>Raksha TPA Pvt. Ltd.</option>
+                <option value="1" {{ old('tpa') == '1' ? 'selected' : '' }}>MediAssist TPA Pvt. Ltd.</option>
+            </select>
+            @error('tpa')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+        {{-- TPA ID --}}
+        <div class="col-md-4">
+            <label for="tpa_id" class="form-label">TPA ID</label>
+            <input type="text" id="tpa_id" name="tpa_id"
+                class="form-control @error('tpa_id') is-invalid @enderror"
+                value="{{ old('tpa_id') }}" />
+            @error('tpa_id')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+        {{-- TPA Validity --}}
+        <div class="col-md-4">
+            <label for="tpa_validity" class="form-label">TPA Validity</label>
+            <input type="text" id="tpa_validity" name="tpa_validity"
+                class="form-control @error('tpa_validity') is-invalid @enderror"
+                value="{{ old('tpa_validity') }}" />
+            @error('tpa_validity')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+        {{-- National ID --}}
+        <div class="col-md-4">
+            <label for="national_id_number" class="form-label">National Identification Number</label>
+            <input type="text" id="national_id_number" name="national_id_number"
+                class="form-control @error('national_id_number') is-invalid @enderror"
+                value="{{ old('national_id_number') }}" />
+            @error('national_id_number')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+    </div>
 
                                                         </div>
                                                         <div class="modal-footer">
@@ -294,6 +382,12 @@
         </div>
     </div>
 
-
-
+    @if ($errors->any())
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let myModal = new bootstrap.Modal(document.getElementById('add_patient'));
+            myModal.show();
+        });
+    </script>
+@endif
 @endsection
