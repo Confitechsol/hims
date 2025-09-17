@@ -178,7 +178,7 @@
                                 <div class="tab-content" id="permissionTabsContent">
                                     <div class="row">
                                         <div class="col-md-6">`
-                                            <div class="header_txt">
+                                            <div class="header_txt pb-2">
                                                 <h6>Header Image(2230px X 300px)</h6>
                                             </div>
                                             <div class="header_file">
@@ -194,7 +194,7 @@
                                             </div>
                                         </div>
                                         <div class="col-md-6">`
-                                            <div class="footer_txt">
+                                            <div class="footer_txt pb-2">
                                                 <h6>Footer Content</h6>
                                             </div>
                                             <div class="editor-wrap">
