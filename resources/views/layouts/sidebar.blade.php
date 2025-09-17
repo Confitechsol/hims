@@ -130,7 +130,7 @@
                                     </li>
                                     <li><a href="calendar.html">Calendar</a></li>
                                     <li><a href="contacts.html">Contacts</a></li>
-                                    <li><a href="email.html">Email</a></li>
+                                    <li><a href="{{route('email-setting')}}">Email</a></li>
                                     <li class="submenu submenu-two">
                                         <a href="#">Invoices<span class="menu-arrow inside-submenu"></span></a>
                                         <ul>
@@ -194,7 +194,9 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="patients.html">Patients</a></li>
+                                    <li><a href="{{route('patients')}}">Patients</a></li>
+                                    <li><a href="patient-details.html">Patient
+                                            Details</a></li>
                                     <li><a href="create-patient.html">Create
                                             Patient</a></li>
                                     <li><a href="patient-details.html">OPD Patient
@@ -629,9 +631,17 @@
                                 </a>
                                 <ul>
                                     <li><a href="{{ route('profile') }}">Profile</a></li>
-                                    <li><a href="security-settings.html">Security</a></li>
-                                    <li><a href="notifications-settings.html">Notifications</a></li>
-                                    <li><a href="integrations-settings.html">Integrations</a></li>
+                                    <!--<li><a href="security-settings.html">Security</a></li>
+                                    //<li><a href="notifications-settings.html">Notifications</a></li>
+                                    <li><a href="integrations-settings.html">Integrations</a></li>-->
+                                    <li><a href="integrations-settings.html">General Settings</a></li>
+                                    <li><a href="integrations-settings.html">Email Settings</a></li>
+                                    <li><a href="integrations-settings.html">Prefix Settings</a></li>
+                                    <li><a href="integrations-settings.html">Roles Permissions</a></li>
+                                    <li><a href="integrations-settings.html">Backup/Restore</a></li>
+                                    <li><a href="integrations-settings.html">Languages</a></li>
+                                    <li><a href="integrations-settings.html">Users</a></li>
+                                    <li><a href="integrations-settings.html">Modules</a></li>
                                 </ul>
                             </li>
                             <li class="submenu">

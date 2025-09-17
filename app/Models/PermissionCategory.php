@@ -40,4 +40,10 @@ class PermissionCategory extends Model
     {
         return $this->belongsTo(PermissionGroup::class, 'perm_group_id');
     }
+
+    public function rolePermissions()
+    {
+        return $this->hasMany(RolesPermission::class, 'perm_cat_id');
+    }
+
 }
