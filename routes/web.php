@@ -66,7 +66,8 @@ Route::get('/patients', [PatientController::class, 'index'])->name('patients');
 
     Route::get('/roles', [RolesController::class, 'index'])->name('roles');
     Route::post('/roles/store', [RolesController::class, 'store'])->name('roles.store');
-
+    Route::get('/roles/edit', [RolesController::class, 'edit'])->name('roles.edit');
+    Route::post('/roles/destroy', [RolesController::class, 'destroy'])->name('roles.destroy');
     Route::get('/languages', function () {
         return view('admin.setup.languages');
     })->name('languages');
@@ -77,10 +78,20 @@ Route::get('/patients', [PatientController::class, 'index'])->name('patients');
     ->name('permissions.toggle');
     Route::post('/modules/update', [PermissionController::class, 'update'])->name('permissions.update');
     Route::get('/roles/{role}/permissions', [PermissionController::class, 'permissions'])->name('permissions');
+Route::post('/roles/permissions/save', [PermissionController::class, 'savePermissions'])->name('roles.permissions.save');
 
-    Route::get('/patient', function () {
+    Route::get('/patients', function () {
         return view('admin.setup.patient');
-    })->name('patient');
+    })->name('patients');
     Route::post('/patient/store', [PatientController::class, 'store'])->name('patient-store');
     Route::get('/bed', [BedController::class, 'index'])->name('bed');
+    Route::get('/charges', function () {
+        return view('admin.setup.charges');
+    })->name('charges');
+    Route::get('/import', function () {
+        return view('admin.setup.import_patient');
+    })->name('import');
+    Route::get('/disable', function () {
+        return view('admin.setup.disable_patient');
+    })->name('disable');
 });
