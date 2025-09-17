@@ -133,12 +133,10 @@
                                                     <td>
                                                         <a href="javascript: void(0);"
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil" data-bs-toggle="tooltip"
-                                                                title="Assign Permission"></i></a>
+                                                            <i class="ti ti-pencil"></i></a>
                                                         <a href="javascript: void(0);"
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash" data-bs-toggle="tooltip"
-                                                                title="Assign Permission"></i></a>
+                                                            <i class="ti ti-trash"></i></a>
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -151,12 +149,10 @@
                                                     <td>
                                                         <a href="javascript: void(0);"
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil" data-bs-toggle="tooltip"
-                                                                title="Assign Permission"></i></a>
+                                                            <i class="ti ti-pencil"></i></a>
                                                         <a href="javascript: void(0);"
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash" data-bs-toggle="tooltip"
-                                                                title="Assign Permission"></i></a>
+                                                            <i class="ti ti-trash"></i></a>
                                                     </td>
                                                 </tr>
                                             </tbody>
