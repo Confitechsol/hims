@@ -91,4 +91,7 @@ Route::post('/roles/permissions/save', [PermissionController::class, 'savePermis
     Route::get('/disable', function () {
         return view('admin.setup.disable_patient');
     })->name('disable');
+    Route::get('/appointment', function () {
+        return view('admin.setup.appointment_head_foot');
+    })->name('appointment');
 });
