@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\AppointmentsController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\PrefixesController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\RolesController;
+use App\Http\Controllers\Setup\LanguagesController;
+use App\Http\Controllers\Setup\PrefixesController;
+use App\Http\Controllers\Setup\ProfileController;
+use App\Http\Controllers\Setup\RolesController;
+use App\Http\Controllers\Setup\UsersController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -48,7 +50,11 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/permissions', function () {
         return view('admin.setup.permissions');
     })->name('permissions');
-    Route::get('/languages', function () {
-        return view('admin.setup.languages');
-    })->name('languages');
+    Route::get('/languages', [LanguagesController::class, 'index'])->name('languages');
+    Route::post('/languages/create', [LanguagesController::class, 'store'])->name('languages.store');
+    Route::post('/languages/updateStatus/{id}', [LanguagesController::class, 'updateStatus'])->name('languages.updateStatus');
+    Route::post('/languages/updateRtl/{id}', [LanguagesController::class, 'updateRtl'])->name('languages.updateRtl');
+    Route::get('/languages/search', [LanguagesController::class, 'search'])->name('languages.search');
+
+    Route::get('/users', [UsersController::class, 'index'])->name('users');
 });

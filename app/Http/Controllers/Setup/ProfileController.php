@@ -1,9 +1,9 @@
 <?php
+namespace App\Http\Controllers\Setup;
 
-namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use App\Models\HospitalBranch;
+use Illuminate\Http\Request;
 
 class ProfileController extends Controller
 {
@@ -22,21 +22,21 @@ class ProfileController extends Controller
     public function update(Request $request)
     {
         $branch = HospitalBranch::first();
-        if (!$branch) {
-            $branch = new HospitalBranch();
+        if (! $branch) {
+            $branch              = new HospitalBranch();
             $branch->hospital_id = 1; // default hospital id
         }
 
         // Assign request data to model
-        $branch->name = $request->hospital_name;
-        $branch->branch_id = $request->hospital_code;
-        $branch->address = $request->address;
-        $branch->phone = $request->phone;
-        $branch->email = $request->email;
-        $branch->timezone = $request->time_zone;
-        $branch->currency = $request->currency;
+        $branch->name            = $request->hospital_name;
+        $branch->branch_id       = $request->hospital_code;
+        $branch->address         = $request->address;
+        $branch->phone           = $request->phone;
+        $branch->email           = $request->email;
+        $branch->timezone        = $request->time_zone;
+        $branch->currency        = $request->currency;
         $branch->currency_symbol = $request->currency_symbol;
-        $branch->credit_limit = $request->credit_limit;
+        $branch->credit_limit    = $request->credit_limit;
 
         // Handle logos
         if ($request->hasFile('hospital_logo')) {
@@ -59,17 +59,17 @@ class ProfileController extends Controller
      */
     public function store(Request $request)
     {
-        $branch = new HospitalBranch();
-        $branch->hospital_id = 1; // default hospital id
-        $branch->name = $request->hospital_name;
-        $branch->branch_id = $request->hospital_code;
-        $branch->address = $request->address;
-        $branch->phone = $request->phone;
-        $branch->email = $request->email;
-        $branch->timezone = $request->time_zone;
-        $branch->currency = $request->currency;
+        $branch                  = new HospitalBranch();
+        $branch->hospital_id     = 1; // default hospital id
+        $branch->name            = $request->hospital_name;
+        $branch->branch_id       = $request->hospital_code;
+        $branch->address         = $request->address;
+        $branch->phone           = $request->phone;
+        $branch->email           = $request->email;
+        $branch->timezone        = $request->time_zone;
+        $branch->currency        = $request->currency;
         $branch->currency_symbol = $request->currency_symbol;
-        $branch->credit_limit = $request->credit_limit;
+        $branch->credit_limit    = $request->credit_limit;
 
         if ($request->hasFile('hospital_logo')) {
             $branch->image = $request->file('hospital_logo')->store('hospital_content/logo', 'public');
