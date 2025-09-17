@@ -75,98 +75,55 @@
 
                 <!-- Tab Content -->
                 <div class="card-body px-0 mx-3">
-                    <div class="tab-content" id="permissionTabsContent">
-                        @foreach($permissionGroups as $index => $group)
-                            <div class="tab-pane fade {{ $index == 0 ? 'show active' : '' }}" 
-                                 id="{{ $group->short_code }}" 
-                                 role="tabpanel" 
-                                 aria-labelledby="{{ $group->short_code }}-tab">
-                                
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <h6 class="fw-bold mb-0">{{ $group->name }} Permissions</h6>
-                                    <div class="form-check form-check-md">
-                                        <input class="form-check-input select-all" type="checkbox" data-group="{{ $group->id }}">
-                                        <label>Allow All</label>
-                                    </div>
-                                </div>
+                    <form id="permissionsForm" method="POST" action="{{ route('roles.permissions.save') }}">
+    @csrf
+    <input type="hidden" name="role_id" value="{{ $roleId }}">
 
-                                <div class="table-responsive border">
-                                    <table class="table table-nowrap">
-                                        <thead class="thead-light">
-                                            <tr>
-                                                <th>Feature</th>
-                                                <th>View</th>
-                                                <th>Add</th>
-                                                <th>Edit</th>
-                                                <th>Delete</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($group->categories as $category)
-                                                @php
-                                                    $permissions = $category->rolePermissions->first();
-                                                @endphp
-                                                <tr>
-                                                    <td>{{ $category->name }}</td>
+    <div class="tab-content" id="permissionTabsContent">
+        @foreach($permissionGroups as $index => $group)
+            <div class="tab-pane fade {{ $index == 0 ? 'show active' : '' }}" 
+                 id="{{ $group->short_code }}" 
+                 role="tabpanel" 
+                 aria-labelledby="{{ $group->short_code }}-tab">
 
-                                                    {{-- View --}}
-                                                    <td>
-                                                        <div class="form-check form-check-md">
-                                                            <input class="form-check-input permission-checkbox" type="checkbox"
-                                                                data-role="{{ $roleId }}"
-                                                                data-category="{{ $category->id }}"
-                                                                data-type="view"
-                                                                {{ $permissions && $permissions->view ? 'checked' : '' }}>
-                                                        </div>
-                                                    </td>
+                <div class="table-responsive border">
+                    <table class="table table-nowrap">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Feature</th>
+                                <th>View</th>
+                                <th>Add</th>
+                                <th>Edit</th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($group->categories as $category)
+                                @php $permissions = $category->rolePermissions->first(); @endphp
+                                <tr>
+                                    <td>{{ $category->name }}</td>
+                                    <td><input type="checkbox" name="permissions[{{ $category->id }}][]" value="can_view" {{ $permissions && $permissions->can_view ? 'checked' : '' }}></td>
+                                    <td><input type="checkbox" name="permissions[{{ $category->id }}][]" value="can_add" {{ $permissions && $permissions->can_add ? 'checked' : '' }}></td>
+                                    <td><input type="checkbox" name="permissions[{{ $category->id }}][]" value="can_edit" {{ $permissions && $permissions->can_edit ? 'checked' : '' }}></td>
+                                    <td><input type="checkbox" name="permissions[{{ $category->id }}][]" value="can_delete" {{ $permissions && $permissions->can_delete ? 'checked' : '' }}></td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
 
-                                                    {{-- Add --}}
-                                                    <td>
-                                                        <div class="form-check form-check-md">
-                                                            <input class="form-check-input permission-checkbox" type="checkbox"
-                                                                data-role="{{ $roleId }}"
-                                                                data-category="{{ $category->id }}"
-                                                                data-type="add"
-                                                                {{ $permissions && $permissions->add ? 'checked' : '' }}>
-                                                        </div>
-                                                    </td>
+            </div>
+        @endforeach
+    </div>
 
-                                                    {{-- Edit --}}
-                                                    <td>
-                                                        <div class="form-check form-check-md">
-                                                            <input class="form-check-input permission-checkbox" type="checkbox"
-                                                                data-role="{{ $roleId }}"
-                                                                data-category="{{ $category->id }}"
-                                                                data-type="edit"
-                                                                {{ $permissions && $permissions->edit ? 'checked' : '' }}>
-                                                        </div>
-                                                    </td>
+    <div class="mt-4 text-end">
+        <button type="submit" class="btn btn-primary px-4">
+            <i class="fa fa-save me-1"></i> Save
+        </button>
+    </div>
+</form>
 
-                                                    {{-- Delete --}}
-                                                    <td>
-                                                        <div class="form-check form-check-md">
-                                                            <input class="form-check-input permission-checkbox" type="checkbox"
-                                                                data-role="{{ $roleId }}"
-                                                                data-category="{{ $category->id }}"
-                                                                data-type="delete"
-                                                                {{ $permissions && $permissions->delete ? 'checked' : '' }}>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
 
-                                <div class="mt-4 text-end">
-                                    <button type="submit" class="btn btn-primary px-4">
-                                        <i class="fa fa-save me-1"></i> Save
-                                    </button>
-                                </div>
-
-                            </div>
-                        @endforeach
-                    </div>
                 </div>
                 <!-- End Tab Content -->
 
@@ -183,6 +140,7 @@
     <!-- End Content -->
 
 {{-- Optional JS for "Select All" functionality --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.select-all').forEach(function(checkbox) {
@@ -209,6 +167,49 @@
             })
         })
     });
+</script>
+<script>
+document.getElementById("permissionsForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    let form = this;
+    let formData = new FormData(form);
+
+    fetch(form.action, {
+        method: "POST",
+        body: formData,
+        headers: {
+            "X-Requested-With": "XMLHttpRequest",
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Saved!',
+                text: data.message,
+                timer: 2000,
+                showConfirmButton: false
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Something went wrong while saving.'
+            });
+        }
+    })
+    .catch(error => {
+        console.error(error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Server Error',
+            text: 'Unable to save permissions. Please try again later.'
+        });
+    });
+});
+
 </script>
 
 @endsection

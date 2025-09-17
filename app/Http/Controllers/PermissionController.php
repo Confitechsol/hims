@@ -46,6 +46,32 @@ public function permissions(Role $role)
         'roleId' => $role->id,
     ]);
 }
+public function savePermissions(Request $request)
+{
+    $roleId = $request->role_id;
+    $permissions = $request->permissions; // array from checkboxes
+
+    foreach ($permissions as $permCatId => $types) {
+        RolesPermission::updateOrCreate(
+            [
+                'role_id' => $roleId,
+                'perm_cat_id' => $permCatId,
+                'hospital_id' => auth()->user()->hospital_id ?? null,
+            ],
+            [
+                'can_view'   => in_array('can_view', $types),
+                'can_add'    => in_array('can_add', $types),
+                'can_edit'   => in_array('can_edit', $types),
+                'can_delete' => in_array('can_delete', $types),
+            ]
+        );
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Permissions saved successfully.'
+    ]);
+}
 
 
 

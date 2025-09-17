@@ -11,10 +11,12 @@ class RolesPermission extends Model
 
     // Table name
     protected $table = 'roles_permissions';
+    public $timestamps = false;
 
     // Mass assignable attributes
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'role_id',
         'perm_cat_id',
         'can_view',

@@ -78,23 +78,43 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr>
-                                                            <th scope="row">1</th>
-                                                            <td>
-                                                                <h6 class="mb-0 fs-14 fw-semibold"> Admin</h6>
-                                                            </td>
+                                                         @foreach($roles as $index => $role)
+                <tr>
+                    <th scope="row">{{ $index + 1 }}</th>
+                    <td>
+                        <h6 class="mb-0 fs-14 fw-semibold">{{ $role->name }}</h6>
+                    </td>
+                    <td>{{ $role->type ?? 'N/A' }}</td>
+                    <td>
+                        <a href="{{ route('permissions', $role->id) }}" 
+                           class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                           data-bs-toggle="tooltip" 
+                           title="Assign Permission">
+                            <i class="ti ti-user-circle"></i>
+                        </a>
+                        <a href="{{ route('roles.edit', $role->id) }}" 
+                           class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
+                           data-bs-toggle="tooltip" 
+                           title="Edit">
+                            <i class="ti ti-pencil"></i>
+                        </a>
+                        <a href="javascript:void(0);" 
+                           class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
+                           data-bs-toggle="tooltip" 
+                           title="Delete"
+                           onclick="if(confirm('Are you sure you want to delete this role?')) { document.getElementById('delete-role-{{ $role->id }}').submit(); }">
+                            <i class="ti ti-trash"></i>
+                        </a>
 
-                                                            <td>System</td>
-
-                                                            <td>
-                                                                <a href="javascript: void(0);" class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                                   <i class="ti ti-user-circle" data-bs-toggle="tooltip" title="Assign Permission"></i></a>
-                                                                <a href="javascript: void(0);" class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                    <i class="ti ti-pencil"  data-bs-toggle="tooltip" title="Edit"></i></a>
-                                                                <a href="javascript: void(0);" class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                    <i class="ti ti-trash"  data-bs-toggle="tooltip" title="Delete"></i></a>
-                                                            </td>
-                                                        </tr>
+                        <form id="delete-role-{{ $role->id }}" 
+                              action="{{ route('roles.destroy', $role->id) }}" 
+                              method="POST" style="display: none;">
+                            @csrf
+                            @method('DELETE')
+                        </form>
+                    </td>
+                </tr>
+            @endforeach
                                                     </tbody>
                                                 </table>
                                             </div>
