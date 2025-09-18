@@ -108,4 +108,7 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/operation-category', function () {
         return view('admin.setup.operation_category');
     })->name('operation-category');
+    Route::get('/charge-category', function () {
+        return view('admin.setup.charge_category');
+    })->name('charge-category');
 });
