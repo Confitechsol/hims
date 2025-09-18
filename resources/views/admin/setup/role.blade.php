@@ -33,11 +33,11 @@
                                                 <div class="text-end d-flex">
                                                     <a href="javascript:void(0);"
                                                         class="btn btn-primary text-white ms-2 fs-13 btn-md"
-                                                        data-bs-toggle="modal" data-bs-target="#add_specialization"><i
+                                                        data-bs-toggle="modal" data-bs-target="#roleModal"><i
                                                             class="ti ti-plus me-1"></i>Create Role</a>
                                                 </div>
                                                 <!-- Modal -->
-                                                <div class="modal fade" id="add_specialization" tabindex="-1"
+                                                <!-- <div class="modal fade" id="add_specialization" tabindex="-1"
                                                     aria-labelledby="addSpecializationLabel" aria-hidden="true">
                                                     <div class="modal-dialog modal-dialog-centered">
                                                         <div class="modal-content">
@@ -64,7 +64,33 @@
                                                             </form>
                                                         </div>
                                                     </div>
+                                                </div> -->
+                                                <!-- Role Modal -->
+                                                <div class="modal fade" id="roleModal" tabindex="-1" aria-labelledby="roleModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header rounded-0"
+                                                                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                                                <h5 class="modal-title" id="roleModalLabel">Create Role</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <form id="roleForm" method="POST" action="{{ route('roles.store') }}">
+                                                                    @csrf
+                                                                    <input type="hidden" name="_method" id="roleFormMethod" value="POST">
+                                                                    <div class="mb-3">
+                                                                        <label for="roleName" class="form-label">Role Name</label>
+                                                                        <input id="roleName" name="name" class="form-control" required />
+                                                                    </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="submit" class="btn btn-primary">Save Role</button>
+                                                            </div>
+                                                                </form>
+                                                        </div>
+                                                    </div>
                                                 </div>
+
                                             </div>
 
                                             <div class="table-responsive">
@@ -79,42 +105,46 @@
                                                     </thead>
                                                     <tbody>
                                                          @foreach($roles as $index => $role)
-                <tr>
-                    <th scope="row">{{ $index + 1 }}</th>
-                    <td>
-                        <h6 class="mb-0 fs-14 fw-semibold">{{ $role->name }}</h6>
-                    </td>
-                    <td>{{ $role->type ?? 'N/A' }}</td>
-                    <td>
-                        <a href="{{ route('permissions', $role->id) }}" 
-                           class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
-                           data-bs-toggle="tooltip" 
-                           title="Assign Permission">
-                            <i class="ti ti-user-circle"></i>
-                        </a>
-                        <a href="{{ route('roles.edit', $role->id) }}" 
-                           class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
-                           data-bs-toggle="tooltip" 
-                           title="Edit">
-                            <i class="ti ti-pencil"></i>
-                        </a>
-                        <a href="javascript:void(0);" 
-                           class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
-                           data-bs-toggle="tooltip" 
-                           title="Delete"
-                           onclick="if(confirm('Are you sure you want to delete this role?')) { document.getElementById('delete-role-{{ $role->id }}').submit(); }">
-                            <i class="ti ti-trash"></i>
-                        </a>
+                                                            <tr>
+                                                                <th scope="row">{{ $index + 1 }}</th>
+                                                                <td>
+                                                                    <h6 class="mb-0 fs-14 fw-semibold">{{ $role->name }}</h6>
+                                                                </td>
+                                                                <td>{{ $role->type ?? 'N/A' }}</td>
+                                                                <td>
+                                                                    <a href="{{ route('permissions', $role->id) }}" 
+                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                                    data-bs-toggle="tooltip" 
+                                                                    title="Assign Permission">
+                                                                        <i class="ti ti-user-circle"></i>
+                                                                    </a>
+                                                                    <!-- <a href="javascript:void(0);" onclick="openEditRoleModal({{ $role->id }}, '{{ $role->name }}')" 
+                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
+                                                                    data-bs-toggle="tooltip" 
+                                                                    title="Edit">
+                                                                        <i class="ti ti-pencil"></i>
+                                                                    </a> -->
+                                                                    <a href="javascript:void(0);" class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
+                                                                        data-role-id="{{ $role->id }}" data-role-name="{{ $role->name }}" onclick="openRoleModal(this)">
+                                                                        <i class="ti ti-pencil"></i>
+                                                                    </a>
+                                                                    <a href="javascript:void(0);" 
+                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
+                                                                    data-bs-toggle="tooltip" 
+                                                                    title="Delete"
+                                                                    onclick="if(confirm('Are you sure you want to delete this role?')) { document.getElementById('delete-role-{{ $role->id }}').submit(); }">
+                                                                        <i class="ti ti-trash"></i>
+                                                                    </a>
 
-                        <form id="delete-role-{{ $role->id }}" 
-                              action="{{ route('roles.destroy', $role->id) }}" 
-                              method="POST" style="display: none;">
-                            @csrf
-                            @method('DELETE')
-                        </form>
-                    </td>
-                </tr>
-            @endforeach
+                                                                    <form id="delete-role-{{ $role->id }}" 
+                                                                        action="{{ route('roles.destroy', $role->id) }}" 
+                                                                        method="POST" style="display: none;">
+                                                                        @csrf
+                                                                        @method('DELETE')
+                                                                    </form>
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -138,6 +168,45 @@
 
 
     <!-- Bootstrap 5 JS bundle (includes Popper) -->
+<script>
+function openRoleModal(element) {
+    const roleId = element.getAttribute('data-role-id');
+    const roleName = element.getAttribute('data-role-name');
+    
+    const modalTitle = document.getElementById('roleModalLabel');
+    const form = document.getElementById('roleForm');
+    const nameInput = document.getElementById('roleName');
 
+    if (roleId) {
+        // Edit mode
+        modalTitle.innerText = "Edit Role";
+        // form.action = `hims/public/roles/${roleId}`; // Update route
+        form.action = "{{ url('roles') }}/update/" + roleId;
+        nameInput.value = roleName;
+
+        // Add PUT method spoof
+        let methodInput = form.querySelector('input[name="_method"]');
+        if (!methodInput) {
+            methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = '_method';
+            form.appendChild(methodInput);
+        }
+        methodInput.value = 'PUT';
+    } else {
+        // Create mode
+        modalTitle.innerText = "Create Role";
+        form.action = "{{ route('roles.store') }}";
+        nameInput.value = "";
+        const methodInput = form.querySelector('input[name="_method"]');
+        if (methodInput) methodInput.remove();
+    }
+
+    // Show modal
+    const roleModal = new bootstrap.Modal(document.getElementById('roleModal'));
+    roleModal.show();
+}
+
+</script>
 
 @endsection

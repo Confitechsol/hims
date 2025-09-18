@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\FrontOfficeController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -65,8 +66,8 @@ Route::get('/patients', [PatientController::class, 'index'])->name('patients');
 
     Route::get('/roles', [RolesController::class, 'index'])->name('roles');
     Route::post('/roles/store', [RolesController::class, 'store'])->name('roles.store');
-    Route::get('/roles/edit', [RolesController::class, 'edit'])->name('roles.edit');
-    Route::post('/roles/destroy', [RolesController::class, 'destroy'])->name('roles.destroy');
+    Route::put('/roles/update/{id}', [RolesController::class, 'update'])->name('roles.update');
+    Route::delete('/roles/destroy/{id}', [RolesController::class, 'destroy'])->name('roles.destroy');
     Route::get('/languages', function () {
         return view('admin.setup.languages');
     })->name('languages');
@@ -85,4 +86,16 @@ Route::post('/roles/permissions/save', [PermissionController::class, 'savePermis
     Route::get('/charges', function () {
         return view('admin.setup.charges');
     })->name('charges');
+    Route::get('/visitorspurpose', [FrontOfficeController::class, 'purposes'])->name('visitorspurpose');
+    Route::post('/visitorspurpose/store', [FrontOfficeController::class, 'storePurpose'])->name('purposes.store');
+    Route::put('/visitorspurpose/update/{id}', [FrontOfficeController::class, 'updatePurpose'])->name('purposes.update');
+    Route::delete('/visitorspurpose/destroy/{id}', [FrontOfficeController::class, 'destroyPurpose'])->name('purposes.destroy');
+    Route::get('/complaintType', [FrontOfficeController::class, 'complaintTypes'])->name('complaintTypes');
+    Route::post('/complaintType/store', [FrontOfficeController::class, 'storeComplaint'])->name('complaint-types.store');
+    Route::put('/complaintType/update/{id}', [FrontOfficeController::class, 'updateComplaint'])->name('complaint-types.update');
+    Route::delete('/complaintType/destroy/{id}', [FrontOfficeController::class, 'destroyComplaint'])->name('complaint-types.destroy');
+    Route::get('/sources', [FrontOfficeController::class, 'sources'])->name('sources');
+    Route::post('/sources/store', [FrontOfficeController::class, 'storeSources'])->name('sources.store');
+    Route::put('/sources/update/{id}', [FrontOfficeController::class, 'updateSources'])->name('sources.update');
+    Route::delete('/sources/destroy/{id}', [FrontOfficeController::class, 'destroySources'])->name('sources.destroy');
 });
