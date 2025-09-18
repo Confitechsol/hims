@@ -543,7 +543,7 @@
 
                                             <div class="col-sm-4">
                                                 <label class="form-label fw-bold">Branch Currency</label>
-                                                <select id="currency" name="branch_currency" class="form-control" autocomplete="off">
+                                                <select name="branch_currency[]" class="form-control" autocomplete="off">
                                                     <option value="">Select</option>
                                                     <option value="AED">AED</option>
                                                     <option value="AFN">AFN</option>
@@ -729,14 +729,14 @@
                             
                                             <div class="col-md-4">
                                                 <label class="form-label fw-bold">Branch Currency Symbol</label>
-                                                <input id="branch_currency_symbol" name="branch_currency_symbol" type="text" class="form-control"
+                                                <input name="branch_currency_symbol[]" type="text" class="form-control"
                                                     value="INR">
                                                 <span class="text-danger"></span>
                                             </div>
-                            
+
                                             <div class="col-sm-4">
                                                 <label class="form-label fw-bold">Branch Credit Limit</label>
-                                                <input id="branch_credit_limit" name="branch_credit_limit" type="text" class="form-control"
+                                                <input name="branch_credit_limit[]" type="text" class="form-control"
                                                     value="20000">
                                                 <span class="text-danger"></span>
                                             </div>

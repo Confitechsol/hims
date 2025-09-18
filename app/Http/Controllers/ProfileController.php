@@ -38,16 +38,13 @@ class ProfileController extends Controller
         $hospital->time_format = $request->time_format;
         $hospital->timezone = $request->time_zone;
         $hospital->mobile_api_url = $request->api_url;
+        $hospital->currency = $request->currency;
+        $hospital->currency_symbol = $request->currency_symbol;
+        $hospital->credit_limit = $request->credit_limit;
 
-        if ($request->hasFile('hospital_logo')) {
-            $hospital->image = $request->file('hospital_logo')->store('hospital_content/logo', 'public');
-        }
-        if ($request->hasFile('small_logo')) {
-            $hospital->mini_logo = $request->file('small_logo')->store('hospital_content/logo', 'public');
-        }
-        if ($request->hasFile('mobile_app_logo')) {
-            $hospital->mobile_app_logo = $request->file('mobile_app_logo')->store('hospital_content/logo', 'public');
-        }
+        $hospital->image = $request->hasFile('hospital_logo') ? $request->file('hospital_logo')->store('hospital_content/logo', 'public') : '';
+        $hospital->mini_logo = $request->hasFile('small_logo') ? $request->file('small_logo')->store('hospital_content/logo', 'public') : '';
+        $hospital->mobile_app_logo = $request->hasFile('mobile_app_logo') ? $request->file('mobile_app_logo')->store('hospital_content/logo', 'public') : '';
 
         $hospital->save();
 
@@ -59,15 +56,15 @@ class ProfileController extends Controller
                 if (!$existing) {
                     $branch = new HospitalBranch();
                     $branch->hospital_id = $hospital->id;
-                    $branch->branch_id = $branchId;
-                    $branch->name = $request->branch_name[$index] ?? '';
-                    $branch->address = $request->branch_address[$index] ?? '';
-                    $branch->phone = $request->branch_phone[$index] ?? '';
-                    $branch->email = $request->branch_email[$index] ?? '';
-                    $branch->currency = $request->currency;
-                    $branch->currency_symbol = $request->currency_symbol;
-                    $branch->credit_limit = $request->credit_limit;
-                    $branch->save();
+                $branch->branch_id = $branchId;
+                $branch->name = $request->branch_name[$index] ?? '';
+                $branch->address = $request->branch_address[$index] ?? '';
+                $branch->phone = $request->branch_phone[$index] ?? '';
+                $branch->email = $request->branch_email[$index] ?? '';
+                $branch->branch_currency = $request->branch_currency[$index] ?? '';
+                $branch->branch_currency_symbol = $request->branch_currency_symbol[$index] ?? '';
+                $branch->branch_credit_limit = $request->branch_credit_limit[$index] ?? '';
+                $branch->save();
                 }
             }
         }
@@ -81,7 +78,10 @@ class ProfileController extends Controller
     public function store(Request $request)
     {
         // Save to Hospital
-        $hospital = new Hospital();
+        $hospital = Hospital::first();
+        if (!$hospital) {
+            $hospital = new Hospital();
+        }
         $hospital->name = $request->hospital_name;
         $hospital->hospital_id = $request->hospital_code; // assuming hospital_id is the code
         $hospital->address = $request->address;
@@ -92,16 +92,13 @@ class ProfileController extends Controller
         $hospital->time_format = $request->time_format;
         $hospital->timezone = $request->time_zone;
         $hospital->mobile_api_url = $request->api_url;
+        $hospital->currency = $request->currency;
+        $hospital->currency_symbol = $request->currency_symbol;
+        $hospital->credit_limit = $request->credit_limit;
 
-        if ($request->hasFile('hospital_logo')) {
-            $hospital->image = $request->file('hospital_logo')->store('hospital_content/logo', 'public');
-        }
-        if ($request->hasFile('small_logo')) {
-            $hospital->mini_logo = $request->file('small_logo')->store('hospital_content/logo', 'public');
-        }
-        if ($request->hasFile('mobile_app_logo')) {
-            $hospital->mobile_app_logo = $request->file('mobile_app_logo')->store('hospital_content/logo', 'public');
-        }
+        $hospital->image = $request->hasFile('hospital_logo') ? $request->file('hospital_logo')->store('hospital_content/logo', 'public') : '';
+        $hospital->mini_logo = $request->hasFile('small_logo') ? $request->file('small_logo')->store('hospital_content/logo', 'public') : '';
+        //$hospital->mobile_app_logo = $request->hasFile('mobile_app_logo') ? $request->file('mobile_app_logo')->store('hospital_content/logo', 'public') : '';
 
         $hospital->save();
 
@@ -115,9 +112,9 @@ class ProfileController extends Controller
                 $branch->address = $request->branch_address[$index] ?? '';
                 $branch->phone = $request->branch_phone[$index] ?? '';
                 $branch->email = $request->branch_email[$index] ?? '';
-                $branch->currency = $request->currency;
-                $branch->currency_symbol = $request->currency_symbol;
-                $branch->credit_limit = $request->credit_limit;
+                $branch->branch_currency = $request->branch_currency[$index] ?? '';
+                $branch->branch_currency_symbol = $request->branch_currency_symbol[$index] ?? '';
+                $branch->branch_credit_limit = $request->branch_credit_limit[$index] ?? '';
                 $branch->save();
             }
         }
