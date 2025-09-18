@@ -18,6 +18,7 @@ class VisitorsPurpose extends Model
         'visitors_purpose',
         'description',
         'created_at',
+        'updated_at',
     ];
 
     protected $casts = [

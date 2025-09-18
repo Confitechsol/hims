@@ -7,7 +7,7 @@
         <div class="col-md-11">
             <div class="card shadow-sm border-0 mt-4">
                 <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                    <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Operation List</h5>
+                    <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Dosage Interval List</h5>
                 </div>
 
                 <div class="card-body">
@@ -34,63 +34,56 @@
                                             <div class="text-end d-flex">
                                                 <a href="javascript:void(0);"
                                                     class="btn btn-primary text-white ms-2 fs-13 btn-md"
-                                                    data-bs-toggle="modal" data-bs-target="#add_operation"><i
-                                                        class="ti ti-plus me-1"></i>
-                                                    Add Operation</a>
+                                                    data-bs-toggle="modal" data-bs-target="#add_dosage_interval"><i
+                                                        class="ti ti-plus me-1"></i>Add Dosage Interval</a>
                                             </div>
                                             <!-- Modal -->
-                                            <div class="modal fade" id="add_operation" tabindex="-1" aria-hidden="true">
+                                            <div class="modal fade" id="add_dosage_interval" tabindex="-1"
+                                                aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered">
                                                     <div class="modal-content">
                                                         <div class="modal-header rounded-0"
                                                             style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                                            <h5 class="modal-title" id="addSpecializationLabel">Add Operation
+                                                            <h5 class="modal-title" id="addSpecializationLabel">Add Dosage Interval
                                                             </h5>
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                                 aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <form action="{{ route('operations.store') }}" method="POST">
+                                                            <form action="" method="POST">
                                                                 @csrf
 
-                                                                <div id="operationFields">
-                                                                    <div class="row gy-3 operation-row mb-2">
+                                                                <div id="dosage_interval_fields">
+                                                                    <div class="row gy-3 dosage-interval-row mb-2">
+
                                                                         <!-- Operation Name -->
-                                                                        <div class="col-md-5">
-                                                                            <label class="form-label">Operation Name</label>
-                                                                            <input type="text" name="operation_name[]" class="form-control" />
+                                                                        <div class="col-md-11">
+                                                                            <label for="interval" class="form-label">Interval <span
+                                                                                    class="text-danger">*</span></label>
+                                                                            <input type="text" name="interval" id="interval"
+                                                                                class="form-control" />
                                                                         </div>
 
-                                                                        <!-- Category -->
-                                                                        <div class="col-md-6">
-                                                                            <label class="form-label">Category</label>
-                                                                            <select class="form-control" name="category[]">
-                                                                                <option value="">Select</option>
-                                                                                @foreach($categories as $category)
-                                                                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                                                                @endforeach
-                                                                            </select>
-                                                                        </div>
-
-                                                                        <!-- Remove -->
                                                                         <div class="col-md-1 d-flex align-items-end">
-                                                                            <button type="button" class="btn btn-danger remove-btn" style="display:none;">
-                                                                                <i class="ti ti-trash"></i>
-                                                                            </button>
+                                                                            <button type="button"
+                                                                                class="btn btn-danger remove-btn"
+                                                                                style="display:none;"><i
+                                                                                    class="ti ti-trash"></i></button>
                                                                         </div>
                                                                     </div>
                                                                 </div>
 
-                                                                <!-- Add Button -->
+                                                                <!-- Add button -->
                                                                 <div class="mt-3">
-                                                                    <button type="button" id="addBtn" class="btn btn-primary">Add</button>
+                                                                    <button type="button" id="addBtn"
+                                                                        class="btn btn-primary">Add</button>
                                                                 </div>
-                                                            </div>
-                                                                <div class="modal-footer">
-                                                                    <button type="submit" class="btn btn-primary">Save</button>
-                                                                </div>
-                                                            </form>
 
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="submit" class="btn btn-primary">Save</button>
+                                                        </div>
+                                                        </form>
                                                     </div>
                                                 </div>
                                             </div>
@@ -103,17 +96,14 @@
                                             <thead>
                                                 <tr>
                                                     <th>Name</th>
-                                                    <th>Category </th>
-                                                    <th>Action</th>
+                                                    <th style="width: 200px;">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
                                                     <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Adenoidectomy</h6>
+                                                        <h6 class="mb-0 fs-14 fw-semibold">Twice daily (morning and night)</h6>
                                                     </td>
-
-                                                    <td>ENT Surgery</td>
 
                                                     <td>
                                                         <a href="javascript: void(0);"
@@ -126,10 +116,50 @@
                                                 </tr>
                                                 <tr>
                                                     <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Burn Debridement</h6>
+                                                        <h6 class="mb-0 fs-14 fw-semibold">Twice daily with meals (morning and evening)	</h6>
                                                     </td>
 
-                                                    <td>Plastic & Reconstructive Surgery</td>
+                                                    <td>
+                                                        <a href="javascript: void(0);"
+                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+                                                            <i class="ti ti-pencil"></i></a>
+                                                        <a href="javascript: void(0);"
+                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                            <i class="ti ti-trash"></i></a>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <h6 class="mb-0 fs-14 fw-semibold">Once daily (preferably at night)	</h6>
+                                                    </td>
+
+                                                    <td>
+                                                        <a href="javascript: void(0);"
+                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+                                                            <i class="ti ti-pencil"></i></a>
+                                                        <a href="javascript: void(0);"
+                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                            <i class="ti ti-trash"></i></a>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <h6 class="mb-0 fs-14 fw-semibold">Apply 1–2 times daily on affected area</h6>
+                                                    </td>
+
+                                                    <td>
+                                                        <a href="javascript: void(0);"
+                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+                                                            <i class="ti ti-pencil"></i></a>
+                                                        <a href="javascript: void(0);"
+                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                            <i class="ti ti-trash"></i></a>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <h6 class="mb-0 fs-14 fw-semibold">Once daily before breakfast</h6>
+                                                    </td>
 
                                                     <td>
                                                         <a href="javascript: void(0);"
@@ -157,11 +187,11 @@
 
     <script>
         const addBtn = document.getElementById("addBtn");
-        const operationFields = document.getElementById("operationFields");
+        const operationFields = document.getElementById("dosage_interval_fields");
 
         addBtn.addEventListener("click", function () {
             // Clone the first row
-            let firstRow = operationFields.querySelector(".operation-row");
+            let firstRow = operationFields.querySelector(".dosage-interval-row");
             let newRow = firstRow.cloneNode(true);
 
             // Clear input values

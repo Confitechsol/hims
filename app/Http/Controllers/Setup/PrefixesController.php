@@ -1,6 +1,5 @@
 <?php
 namespace App\Http\Controllers\Setup;
-
 use App\Http\Controllers\Controller;
 use App\Models\Prefix;
 use Illuminate\Http\Request;

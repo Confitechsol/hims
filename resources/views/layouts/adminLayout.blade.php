@@ -17,18 +17,113 @@
     <!-- keywords -->
     <meta name="keywords"
         content="Creative, modern, clean, bootstrap responsive, html5, css3, portfolio, blog, studio, templates, multipurpose, one page, corporate, start-up, studio, branding, designer, freelancer, carousel, parallax, photography, studio, masonry, grid, faq">
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="assets/images/favicon.ico" type="image/x-icon">
+
+    <!-- style css -->
+     <link rel="stylesheet" href="assets/css/custom.css">
+
     <!-- Page Title -->
     <title>{{ config('app.name', 'Laravel') }}</title>
-    <!-- Favicon -->
+
     @extends('layouts.admincdns')
-<style>
-    .settings-wrapper .card .card-body label:has(input:checked) .card{
-  border: 2px solid #CB6CE6;
-} 
-</style>
+    <style>
+        .settings-wrapper .card .card-body label:has(input:checked) .card {
+            border: 2px solid #CB6CE6;
+        }
+
+        /*=============================
+           loader start
+ ==============================*/
+        .loader {
+            position: fixed;
+            width: 100%;
+            overflow: hidden;
+            height: 100vh;
+            z-index: 9999;
+            background: white
+        }
+
+        .indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            -webkit-transform: translate(-50%, -50%) scale(4);
+            -ms-transform: translate(-50%, -50%) scale(4);
+            transform: translate(-50%, -50%) scale(4);
+        }
+
+        .indicator svg polyline {
+            fill: none;
+            stroke-width: 0.5;
+            -webkit-transform: scale(2);
+            -ms-transform: scale(2);
+            transform: scale(2);
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .indicator svg polyline#back {
+            stroke: #cc6ce679;
+        }
+
+        .indicator svg polyline#front {
+            stroke: #750096;
+            stroke-dasharray: 12, 36;
+            stroke-dashoffset: 48;
+            -webkit-animation: dash 1s linear infinite;
+            animation: dash 1s linear infinite;
+        }
+
+        .cta {
+            position: fixed;
+            bottom: 20px;
+            right: 30px;
+            color: #222;
+            font-weight: bold;
+        }
+
+        @-webkit-keyframes dash {
+            62.5% {
+                opacity: 0;
+            }
+
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        @keyframes dash {
+            62.5% {
+                opacity: 0;
+            }
+
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+
+
+        /*=============================
+           loader ends
+ ==============================*/
+    </style>
 </head>
 
 <body>
+
+    <!-- loader start-->
+    <div class="loader">
+        <div class="indicator">
+            <svg width="30px" height="24px">
+                <polyline id="back" points="1 6 4 6 6 11 10 1 12 6 15 6"></polyline>
+                <polyline id="front" points="1 6 4 6 6 11 10 1 12 6 15 6"></polyline>
+            </svg>
+        </div>
+    </div>
+    <!-- loader ends-->
+
     <div class="main-wrapper">
 
         <!-- Topbar Start -->
@@ -301,8 +396,7 @@
                     <div class="dropdown profile-dropdown d-flex align-items-center justify-content-center">
                         <a href="javascript:void(0);"
                             class="topbar-link dropdown-toggle drop-arrow-none position-relative"
-                            data-bs-toggle="dropdown" data-bs-offset="0,22" aria-haspopup="false"
-                            aria-expanded="false">
+                            data-bs-toggle="dropdown" data-bs-offset="0,22" aria-haspopup="false" aria-expanded="false">
                             <img src="assets/img/users/user-01.jpg" width="32" class="rounded-circle d-flex"
                                 alt="user-image">
                             <span class="online text-success"><i
@@ -311,8 +405,8 @@
                         <div class="dropdown-menu dropdown-menu-end dropdown-menu-md p-2">
 
                             <div class="d-flex align-items-center bg-light rounded-3 p-2 mb-2">
-                                <img src="assets/img/users/user-01.jpg" class="rounded-circle" width="42"
-                                    height="42" alt>
+                                <img src="assets/img/users/user-01.jpg" class="rounded-circle" width="42" height="42"
+                                    alt>
                                 <div class="ms-2">
                                     <p class="fw-medium text-dark mb-0">Jimmy
                                         Anderson</p>
@@ -412,14 +506,23 @@
         button.classList.toggle('active');
     }
 </script>
-{{-- <script src="{{ asset('assets/js/jquery-3.7.1.min.js') }}"  type="e56d8e3ed6c4bef649884303-text/javascript"></script> --}}
+{{--
+<script src="{{ asset('assets/js/jquery-3.7.1.min.js') }}" type="e56d8e3ed6c4bef649884303-text/javascript"></script>
+--}}
 
 <!-- Plugin Js -->
-{{-- <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}" type="e56d8e3ed6c4bef649884303-text/javascript"></script> --}}
-{{-- <script src="{{ asset('assets/plugins/simplebar/simplebar.min.js') }}" type="e56d8e3ed6c4bef649884303-text/javascript"></script> --}}
-{{-- <script src="{{ asset('assets/js/moment.min.js') }}"></script> --}}
-{{-- <script src="{{ asset('assets/plugins/daterangepicker/daterangepicker.js') }}"></script> --}}
-{{-- <script src="{{ asset('assets/js/bootstrap-datetimepicker.min.js') }}"></script> --}}
+{{--
+<script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}" type="e56d8e3ed6c4bef649884303-text/javascript"></script>
+--}}
+{{--
+<script src="{{ asset('assets/plugins/simplebar/simplebar.min.js') }}"
+    type="e56d8e3ed6c4bef649884303-text/javascript"></script> --}}
+{{--
+<script src="{{ asset('assets/js/moment.min.js') }}"></script> --}}
+{{--
+<script src="{{ asset('assets/plugins/daterangepicker/daterangepicker.js') }}"></script> --}}
+{{--
+<script src="{{ asset('assets/js/bootstrap-datetimepicker.min.js') }}"></script> --}}
 
 
 </html>

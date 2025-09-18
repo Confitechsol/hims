@@ -9,9 +9,10 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\Setup\LanguagesController;
 use App\Http\Controllers\Setup\PrefixesController;
 use App\Http\Controllers\Setup\ProfileController;
-use App\Http\Controllers\Setup\RolesController;
+use App\Http\Controllers\RolesController;
 use App\Http\Controllers\Setup\UsersController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\FrontOfficeController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -55,7 +56,7 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/database/backups', [DatabaseController::class, 'listBackups'])->name('database.backups');
     Route::get('/database/backups/download/{filename}', [DatabaseController::class, 'download'])->name('database.download');
     Route::delete('/database/backups/delete/{filename}', [DatabaseController::class, 'delete'])->name('database.delete');
-// Route::post('/database/restore', [DatabaseController::class, 'restore'])->name('database.restore');
+    // Route::post('/database/restore', [DatabaseController::class, 'restore'])->name('database.restore');
 // Route::get('/database/backup', [DatabaseController::class, 'backup'])->name('database.backup'); // optional link
     Route::get('/patients', [PatientController::class, 'index'])->name('patients');
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
@@ -67,8 +68,8 @@ Route::middleware(['admin'])->group(function () {
 
     Route::get('/roles', [RolesController::class, 'index'])->name('roles');
     Route::post('/roles/store', [RolesController::class, 'store'])->name('roles.store');
-    Route::get('/roles/edit', [RolesController::class, 'edit'])->name('roles.edit');
-    Route::post('/roles/destroy', [RolesController::class, 'destroy'])->name('roles.destroy');
+    Route::put('/roles/update/{id}', [RolesController::class, 'update'])->name('roles.update');
+    Route::delete('/roles/destroy/{id}', [RolesController::class, 'destroy'])->name('roles.destroy');
     Route::get('/languages', function () {
         return view('admin.setup.languages');
     })->name('languages');
@@ -108,4 +109,48 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/operation-category', function () {
         return view('admin.setup.operation_category');
     })->name('operation-category');
+    Route::get('/charge-category', function () {
+        return view('admin.setup.charge_category');
+    })->name('charge-category');
+    Route::get('/charge-type', function () {
+        return view('admin.setup.charge_type');
+    })->name('charge-type');
+    Route::get('/tax-category', function () {
+        return view('admin.setup.tax_category');
+    })->name('tax-category');
+    Route::get('/unit-type', function () {
+        return view('admin.setup.unit_type');
+    })->name('unit-type');
+    Route::get('/medicine-category', function () {
+        return view('admin.setup.medicine_category');
+    })->name('medicine-category');
+    Route::get('/supplier', function () {
+        return view('admin.setup.supplier');
+    })->name('supplier');
+    Route::get('/medicine-dosage', function () {
+        return view('admin.setup.medicine_dosage');
+    })->name('medicine-dosage');
+
+    Route::get('/purpose', [FrontOfficeController::class, 'purposes'])->name('purpose');
+    Route::post('/purpose/store', [FrontOfficeController::class, 'storePurpose'])->name('purposes.store');
+    Route::put('/purpose/update/{id}', [FrontOfficeController::class, 'updatePurpose'])->name('purposes.update');
+    Route::delete('/purpose/destroy/{id}', [FrontOfficeController::class, 'destroyPurpose'])->name('purposes.destroy');
+
+    Route::get('/complaint', [FrontOfficeController::class, 'complaintTypes'])->name('complaint');
+    Route::post('/complaint/store', [FrontOfficeController::class, 'storeComplaint'])->name('complaint-types.store');
+    Route::put('/complaintType/update/{id}', [FrontOfficeController::class, 'updateComplaint'])->name('complaint.update');
+    Route::delete('/complaint/destroy/{id}', [FrontOfficeController::class, 'destroyComplaint'])->name('complaint-types.destroy');
+
+    Route::get('/sources', [FrontOfficeController::class, 'sources'])->name('sources');
+    Route::post('/sources/store', [FrontOfficeController::class, 'storeSources'])->name('sources.store');
+    Route::put('/sources/update/{id}', [FrontOfficeController::class, 'updateSources'])->name('sources.update');
+    Route::delete('/sources/destroy/{id}', [FrontOfficeController::class, 'destroySources'])->name('sources.destroy');
+
 });
+
+Route::get('/dosage-interval', function () {
+    return view('admin.setup.dosage_interval');
+})->name('dosage-interval');
+Route::get('/dosage-duration', function () {
+    return view('admin.setup.dosage_duration');
+})->name('dosage-duration');

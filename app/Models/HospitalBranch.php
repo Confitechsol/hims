@@ -24,9 +24,9 @@ class HospitalBranch extends Model
         'image',
         'mini_logo',
         'is_active',
-        'currency',
-        'currency_symbol',
-        'credit_limit',
+        'branch_currency',
+        'branch_currency_symbol',
+        'branch_credit_limit',
     ];
 
     public function hospital()
