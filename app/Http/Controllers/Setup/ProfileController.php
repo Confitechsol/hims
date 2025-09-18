@@ -1,10 +1,10 @@
 <?php
+namespace App\Http\Controllers\Setup;
 
-namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use App\Models\Hospital;
 use App\Models\HospitalBranch;
+use Illuminate\Http\Request;
 
 class ProfileController extends Controller
 {
@@ -23,20 +23,20 @@ class ProfileController extends Controller
     public function update(Request $request)
     {
         $hospital = Hospital::first();
-        if (!$hospital) {
+        if (! $hospital) {
             $hospital = new Hospital();
         }
 
         // Update Hospital
-        $hospital->name = $request->hospital_name;
-        $hospital->hospital_id = $request->hospital_code;
-        $hospital->address = $request->address;
-        $hospital->phone = $request->phone;
-        $hospital->email = $request->email;
-        $hospital->languages = $request->language;
-        $hospital->date_format = $request->date_format;
-        $hospital->time_format = $request->time_format;
-        $hospital->timezone = $request->time_zone;
+        $hospital->name           = $request->hospital_name;
+        $hospital->hospital_id    = $request->hospital_code;
+        $hospital->address        = $request->address;
+        $hospital->phone          = $request->phone;
+        $hospital->email          = $request->email;
+        $hospital->languages      = $request->language;
+        $hospital->date_format    = $request->date_format;
+        $hospital->time_format    = $request->time_format;
+        $hospital->timezone       = $request->time_zone;
         $hospital->mobile_api_url = $request->api_url;
         $hospital->currency = $request->currency;
         $hospital->currency_symbol = $request->currency_symbol;
@@ -53,6 +53,7 @@ class ProfileController extends Controller
             foreach ($request->branch_id as $index => $branchId) {
                 // Check if branch_id already exists to avoid duplicates
                 $existing = HospitalBranch::where('branch_id', $branchId)->first();
+<<<<<<< HEAD:app/Http/Controllers/ProfileController.php
                 if (!$existing) {
                     $branch = new HospitalBranch();
                     $branch->hospital_id = $hospital->id;
@@ -65,6 +66,20 @@ class ProfileController extends Controller
                 $branch->branch_currency_symbol = $request->branch_currency_symbol[$index] ?? '';
                 $branch->branch_credit_limit = $request->branch_credit_limit[$index] ?? '';
                 $branch->save();
+=======
+                if (! $existing) {
+                    $branch                  = new HospitalBranch();
+                    $branch->hospital_id     = $hospital->id;
+                    $branch->branch_id       = $branchId;
+                    $branch->name            = $request->branch_name[$index] ?? '';
+                    $branch->address         = $request->branch_address[$index] ?? '';
+                    $branch->phone           = $request->branch_phone[$index] ?? '';
+                    $branch->email           = $request->branch_email[$index] ?? '';
+                    $branch->currency        = $request->currency;
+                    $branch->currency_symbol = $request->currency_symbol;
+                    $branch->credit_limit    = $request->credit_limit;
+                    $branch->save();
+>>>>>>> 57509815d16216e32478b31096a5ab9f9457630a:app/Http/Controllers/Setup/ProfileController.php
                 }
             }
         }
@@ -78,6 +93,7 @@ class ProfileController extends Controller
     public function store(Request $request)
     {
         // Save to Hospital
+<<<<<<< HEAD:app/Http/Controllers/ProfileController.php
         $hospital = Hospital::first();
         if (!$hospital) {
             $hospital = new Hospital();
@@ -91,6 +107,18 @@ class ProfileController extends Controller
         $hospital->date_format = $request->date_format;
         $hospital->time_format = $request->time_format;
         $hospital->timezone = $request->time_zone;
+=======
+        $hospital                 = new Hospital();
+        $hospital->name           = $request->hospital_name;
+        $hospital->hospital_id    = $request->hospital_code; // assuming hospital_id is the code
+        $hospital->address        = $request->address;
+        $hospital->phone          = $request->phone;
+        $hospital->email          = $request->email;
+        $hospital->languages      = $request->language;
+        $hospital->date_format    = $request->date_format;
+        $hospital->time_format    = $request->time_format;
+        $hospital->timezone       = $request->time_zone;
+>>>>>>> 57509815d16216e32478b31096a5ab9f9457630a:app/Http/Controllers/Setup/ProfileController.php
         $hospital->mobile_api_url = $request->api_url;
         $hospital->currency = $request->currency;
         $hospital->currency_symbol = $request->currency_symbol;
@@ -105,6 +133,7 @@ class ProfileController extends Controller
         // Save branches
         if ($request->has('branch_id') && is_array($request->branch_id)) {
             foreach ($request->branch_id as $index => $branchId) {
+<<<<<<< HEAD:app/Http/Controllers/ProfileController.php
                 $branch = new HospitalBranch();
                 $branch->hospital_id = $hospital->id;
                 $branch->branch_id = $branchId;
@@ -115,6 +144,18 @@ class ProfileController extends Controller
                 $branch->branch_currency = $request->branch_currency[$index] ?? '';
                 $branch->branch_currency_symbol = $request->branch_currency_symbol[$index] ?? '';
                 $branch->branch_credit_limit = $request->branch_credit_limit[$index] ?? '';
+=======
+                $branch                  = new HospitalBranch();
+                $branch->hospital_id     = $hospital->id;
+                $branch->branch_id       = $branchId;
+                $branch->name            = $request->branch_name[$index] ?? '';
+                $branch->address         = $request->branch_address[$index] ?? '';
+                $branch->phone           = $request->branch_phone[$index] ?? '';
+                $branch->email           = $request->branch_email[$index] ?? '';
+                $branch->currency        = $request->currency;
+                $branch->currency_symbol = $request->currency_symbol;
+                $branch->credit_limit    = $request->credit_limit;
+>>>>>>> 57509815d16216e32478b31096a5ab9f9457630a:app/Http/Controllers/Setup/ProfileController.php
                 $branch->save();
             }
         }

@@ -1,9 +1,9 @@
 <?php
+namespace App\Http\Controllers\Setup;
 
-namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use App\Models\Role;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class RolesController extends Controller
@@ -12,8 +12,8 @@ class RolesController extends Controller
     {
         // Fetch all roles for the current hospital (optional filtering by branch)
         $roles = Role::where('hospital_id', auth()->user()->hospital_id)
-                     ->orderBy('id', 'desc')
-                     ->get();
+            ->orderBy('id', 'desc')
+            ->get();
 
         return view('admin.setup.role', compact('roles'));
     }
@@ -36,5 +36,5 @@ class RolesController extends Controller
 
         return redirect()->back()->with('success', 'Role created successfully!');
     }
-    
+
 }
