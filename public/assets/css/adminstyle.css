@@ -5042,6 +5042,7 @@ fieldset:disabled .btn {
   transition: all 0.4s ease-out;
 }
 
+
 .btn-primary:hover,
 .btn-primary:active,
 .btn-primary.active,
@@ -6548,6 +6549,10 @@ Author URL: https://themeforest.net/user/dreamstechnologies
 
 .bg-primary {
   background-color: rgba(var(--primary-rgb), var(--bg-opacity, 1)) !important;
+}
+.bg-primary{
+  color:white;
+  background-color: #CB6CE6 !important;
 }
 
 .bg-secondary:not([class*=bg-opacity-]) {
