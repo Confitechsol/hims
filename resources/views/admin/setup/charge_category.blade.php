@@ -55,12 +55,11 @@
                                         <div class="text-end d-flex">
                                             <a href="javascript:void(0);"
                                                 class="btn btn-primary text-white ms-2 fs-13 btn-md" data-bs-toggle="modal"
-                                                data-bs-target="#add_charges"><i class="ti ti-plus me-1"></i>Add Charge
+                                                data-bs-target="#add_charges_category"><i class="ti ti-plus me-1"></i>Add Charge
                                                 Category</a>
                                         </div>
                                         <!-- Modal -->
-                                        <div class="modal fade" id="add_charges" tabindex="-1"
-                                            aria-labelledby="addSpecializationLabel" aria-hidden="true">
+                                        <div class="modal fade" id="add_charges_category" tabindex="-1" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered">
                                                 <div class="modal-content">
                                                     <div class="modal-header rounded-0"

@@ -111,4 +111,7 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/charge-category', function () {
         return view('admin.setup.charge_category');
     })->name('charge-category');
+    Route::get('/charge-type', function () {
+        return view('admin.setup.charge_type');
+    })->name('charge-type');
 });
