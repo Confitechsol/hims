@@ -50,62 +50,47 @@
                                                                 aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <form action="" method="POST">
+                                                            <form action="{{ route('operations.store') }}" method="POST">
                                                                 @csrf
-
 
                                                                 <div id="operationFields">
                                                                     <div class="row gy-3 operation-row mb-2">
-
                                                                         <!-- Operation Name -->
                                                                         <div class="col-md-5">
-                                                                            <label for="operation_name"
-                                                                                class="form-label">Operation Name</label>
-                                                                            <input type="text" name="operation_name[]"
-                                                                                class="form-control" />
+                                                                            <label class="form-label">Operation Name</label>
+                                                                            <input type="text" name="operation_name[]" class="form-control" />
                                                                         </div>
 
                                                                         <!-- Category -->
                                                                         <div class="col-md-6">
-                                                                            <label for="category"
-                                                                                class="form-label">Category</label>
+                                                                            <label class="form-label">Category</label>
                                                                             <select class="form-control" name="category[]">
                                                                                 <option value="">Select</option>
-                                                                                <option value="4">Cardiothoracic Surgery
-                                                                                </option>
-                                                                                <option value="7">ENT Surgery</option>
-                                                                                <option value="1">General Surgery</option>
-                                                                                <option value="3">Neurosurgery</option>
-                                                                                <option value="5">Obstetrics &amp;
-                                                                                    Gynecology (OBG)</option>
-                                                                                <option value="8">Ophthalmology</option>
-                                                                                <option value="2">Orthopedic Surgery
-                                                                                </option>
-                                                                                <option value="9">Plastic &amp;
-                                                                                    Reconstructive Surgery</option>
-                                                                                <option value="6">Urology</option>
+                                                                                @foreach($categories as $category)
+                                                                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                                                                @endforeach
                                                                             </select>
                                                                         </div>
 
+                                                                        <!-- Remove -->
                                                                         <div class="col-md-1 d-flex align-items-end">
-                                                                            <button type="button"
-                                                                                class="btn btn-danger remove-btn"
-                                                                                style="display:none;"><i class="ti ti-trash"></i></button>
+                                                                            <button type="button" class="btn btn-danger remove-btn" style="display:none;">
+                                                                                <i class="ti ti-trash"></i>
+                                                                            </button>
                                                                         </div>
                                                                     </div>
                                                                 </div>
 
-                                                                <!-- Add button -->
+                                                                <!-- Add Button -->
                                                                 <div class="mt-3">
-                                                                    <button type="button" id="addBtn"
-                                                                        class="btn btn-primary">Add</button>
+                                                                    <button type="button" id="addBtn" class="btn btn-primary">Add</button>
                                                                 </div>
+                                                            </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="submit" class="btn btn-primary">Save Role</button>
+                                                                </div>
+                                                            </form>
 
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="submit" class="btn btn-primary">Save Role</button>
-                                                        </div>
-                                                        </form>
                                                     </div>
                                                 </div>
                                             </div>
