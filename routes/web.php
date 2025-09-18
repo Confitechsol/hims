@@ -56,7 +56,7 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/database/backups', [DatabaseController::class, 'listBackups'])->name('database.backups');
     Route::get('/database/backups/download/{filename}', [DatabaseController::class, 'download'])->name('database.download');
     Route::delete('/database/backups/delete/{filename}', [DatabaseController::class, 'delete'])->name('database.delete');
-// Route::post('/database/restore', [DatabaseController::class, 'restore'])->name('database.restore');
+    // Route::post('/database/restore', [DatabaseController::class, 'restore'])->name('database.restore');
 // Route::get('/database/backup', [DatabaseController::class, 'backup'])->name('database.backup'); // optional link
     Route::get('/patients', [PatientController::class, 'index'])->name('patients');
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
@@ -130,20 +130,27 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/medicine-dosage', function () {
         return view('admin.setup.medicine_dosage');
     })->name('medicine-dosage');
-    
-     Route::get('/purpose', [FrontOfficeController::class, 'purposes'])->name('purpose');
-     Route::post('/purpose/store', [FrontOfficeController::class, 'storePurpose'])->name('purposes.store');
-     Route::put('/purpose/update/{id}', [FrontOfficeController::class, 'updatePurpose'])->name('purposes.update');
-     Route::delete('/purpose/destroy/{id}', [FrontOfficeController::class, 'destroyPurpose'])->name('purposes.destroy');
 
-     Route::get('/complaint', [FrontOfficeController::class, 'complaintTypes'])->name('complaint');
-     Route::post('/complaint/store', [FrontOfficeController::class, 'storeComplaint'])->name('complaint-types.store');
-     Route::put('/complaintType/update/{id}', [FrontOfficeController::class, 'updateComplaint'])->name('complaint.update');
-     Route::delete('/complaint/destroy/{id}', [FrontOfficeController::class, 'destroyComplaint'])->name('complaint-types.destroy');
+    Route::get('/purpose', [FrontOfficeController::class, 'purposes'])->name('purpose');
+    Route::post('/purpose/store', [FrontOfficeController::class, 'storePurpose'])->name('purposes.store');
+    Route::put('/purpose/update/{id}', [FrontOfficeController::class, 'updatePurpose'])->name('purposes.update');
+    Route::delete('/purpose/destroy/{id}', [FrontOfficeController::class, 'destroyPurpose'])->name('purposes.destroy');
 
-     Route::get('/sources', [FrontOfficeController::class, 'sources'])->name('sources');
-     Route::post('/sources/store', [FrontOfficeController::class, 'storeSources'])->name('sources.store');
-     Route::put('/sources/update/{id}', [FrontOfficeController::class, 'updateSources'])->name('sources.update');
-     Route::delete('/sources/destroy/{id}', [FrontOfficeController::class, 'destroySources'])->name('sources.destroy');
+    Route::get('/complaint', [FrontOfficeController::class, 'complaintTypes'])->name('complaint');
+    Route::post('/complaint/store', [FrontOfficeController::class, 'storeComplaint'])->name('complaint-types.store');
+    Route::put('/complaintType/update/{id}', [FrontOfficeController::class, 'updateComplaint'])->name('complaint.update');
+    Route::delete('/complaint/destroy/{id}', [FrontOfficeController::class, 'destroyComplaint'])->name('complaint-types.destroy');
 
-    });
+    Route::get('/sources', [FrontOfficeController::class, 'sources'])->name('sources');
+    Route::post('/sources/store', [FrontOfficeController::class, 'storeSources'])->name('sources.store');
+    Route::put('/sources/update/{id}', [FrontOfficeController::class, 'updateSources'])->name('sources.update');
+    Route::delete('/sources/destroy/{id}', [FrontOfficeController::class, 'destroySources'])->name('sources.destroy');
+
+});
+
+Route::get('/dosage-interval', function () {
+    return view('admin.setup.dosage_interval');
+})->name('dosage-interval');
+Route::get('/dosage-duration', function () {
+    return view('admin.setup.dosage_duration');
+})->name('dosage-duration');
