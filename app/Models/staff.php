@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -70,6 +69,12 @@ class Staff extends Model
         'identification_number',
         'local_identification_number',
     ];
+
+    // public function user()
+    // {
+    //     return $this->belongsTo(User::class, 'user_id', 'user_id');
+    //     // 'user_id' in staff table -> 'user_id' in users table
+    // }
 
     // If you want to disable default Laravel timestamps (created_at/updated_at)
     public $timestamps = false;

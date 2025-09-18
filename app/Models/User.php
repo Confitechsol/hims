@@ -29,6 +29,11 @@ class User extends Authenticatable
         'created_at',
     ];
 
+    // public function staff()
+    // {
+    //     return $this->hasOne(Staff::class, 'user_id', 'user_id');
+    // }
+
     /**
      * The attributes that should be hidden for serialization.
      *
