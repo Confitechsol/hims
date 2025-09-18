@@ -126,4 +126,7 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/supplier', function () {
         return view('admin.setup.supplier');
     })->name('supplier');
+    Route::get('/medicine-dosage', function () {
+        return view('admin.setup.medicine_dosage');
+    })->name('medicine-dosage');
 });
