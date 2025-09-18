@@ -12,6 +12,7 @@ use App\Http\Controllers\Setup\ProfileController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\Setup\UsersController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\FrontOfficeController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -130,3 +131,19 @@ Route::middleware(['admin'])->group(function () {
         return view('admin.setup.medicine_dosage');
     })->name('medicine-dosage');
 });
+     Route::get('/purpose', [FrontOfficeController::class, 'purposes'])->name('purpose');
+     Route::post('/purpose/store', [FrontOfficeController::class, 'storePurpose'])->name('purposes.store');
+     Route::put('/purpose/update/{id}', [FrontOfficeController::class, 'updatePurpose'])->name('purposes.update');
+     Route::delete('/purpose/destroy/{id}', [FrontOfficeController::class, 'destroyPurpose'])->name('purposes.destroy');
+
+     Route::get('/complaint', [FrontOfficeController::class, 'complaintTypes'])->name('complaint');
+     Route::post('/complaint/store', [FrontOfficeController::class, 'storeComplaint'])->name('complaint-types.store');
+     Route::put('/complaintType/update/{id}', [FrontOfficeController::class, 'updateComplaint'])->name('complaint.update');
+     Route::delete('/complaint/destroy/{id}', [FrontOfficeController::class, 'destroyComplaint'])->name('complaint-types.destroy');
+
+     Route::get('/sources', [FrontOfficeController::class, 'sources'])->name('sources');
+     Route::post('/sources/store', [FrontOfficeController::class, 'storeSources'])->name('sources.store');
+     Route::put('/sources/update/{id}', [FrontOfficeController::class, 'updateSources'])->name('sources.update');
+     Route::delete('/sources/destroy/{id}', [FrontOfficeController::class, 'destroySources'])->name('sources.destroy');
+
+    });

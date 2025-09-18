@@ -219,7 +219,7 @@
 
                 // Update form action dynamically
                 let form = document.getElementById("editPurposeForm");
-                form.action = "{{ url('visitorspurpose') }}/update/" + id; // route to update
+                form.action = "{{ url('purpose') }}/update/" + id; // route to update
 
                 // Show modal
                 let modal = new bootstrap.Modal(document.getElementById("editPurposeModal"));
