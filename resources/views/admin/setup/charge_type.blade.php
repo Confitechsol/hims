@@ -70,7 +70,7 @@
                                                             aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <form action="{{ route('roles.store')  }}" method="POST">
+                                                        <form action="" method="POST">
                                                             @csrf
                                                             <div class="row gy-3">
                                                                 <div class="col-md-12 border-bottom pb-3">
@@ -115,7 +115,7 @@
 
                                                     </div>
                                                     <div class="modal-footer">
-                                                        <button type="submit" class="btn btn-primary">Save Role</button>
+                                                        <button type="submit" class="btn btn-primary">Save</button>
                                                     </div>
                                                     </form>
                                                 </div>
