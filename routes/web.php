@@ -115,6 +115,18 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/charge-type', function () {
         return view('admin.setup.charge_type');
     })->name('charge-type');
+    Route::get('/tax-category', function () {
+        return view('admin.setup.tax_category');
+    })->name('tax-category');
+    Route::get('/unit-type', function () {
+        return view('admin.setup.unit_type');
+    })->name('unit-type');
+    Route::get('/medicine-category', function () {
+        return view('admin.setup.medicine_category');
+    })->name('medicine-category');
+    Route::get('/supplier', function () {
+        return view('admin.setup.supplier');
+    })->name('supplier');
      Route::get('/purpose', [FrontOfficeController::class, 'purposes'])->name('purpose');
      Route::post('/purpose/store', [FrontOfficeController::class, 'storePurpose'])->name('purposes.store');
      Route::put('/purpose/update/{id}', [FrontOfficeController::class, 'updatePurpose'])->name('purposes.update');
