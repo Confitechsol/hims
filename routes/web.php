@@ -130,7 +130,7 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/medicine-dosage', function () {
         return view('admin.setup.medicine_dosage');
     })->name('medicine-dosage');
-});
+    
      Route::get('/purpose', [FrontOfficeController::class, 'purposes'])->name('purpose');
      Route::post('/purpose/store', [FrontOfficeController::class, 'storePurpose'])->name('purposes.store');
      Route::put('/purpose/update/{id}', [FrontOfficeController::class, 'updatePurpose'])->name('purposes.update');
