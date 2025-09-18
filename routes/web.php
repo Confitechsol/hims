@@ -120,4 +120,10 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/unit-type', function () {
         return view('admin.setup.unit_type');
     })->name('unit-type');
+    Route::get('/medicine-category', function () {
+        return view('admin.setup.medicine_category');
+    })->name('medicine-category');
+    Route::get('/supplier', function () {
+        return view('admin.setup.supplier');
+    })->name('supplier');
 });
