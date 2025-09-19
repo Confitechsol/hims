@@ -2,18 +2,21 @@
 
 use App\Http\Controllers\AppointmentsController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\PrefixesController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\RolesController;
-use App\Http\Controllers\PermissionController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\EmailController;
 use App\Http\Controllers\DatabaseController;
+use App\Http\Controllers\EmailController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\BedController;
 use App\Http\Controllers\BedGroupController;
 use App\Http\Controllers\BedTypeController;
 use App\Http\Controllers\FloorController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\Setup\LanguagesController;
+use App\Http\Controllers\Setup\PrefixesController;
+use App\Http\Controllers\Setup\ProfileController;
+use App\Http\Controllers\RolesController;
+use App\Http\Controllers\Setup\UsersController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\FrontOfficeController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -48,18 +51,18 @@ Route::middleware(['admin'])->group(function () {
     //     return view('admin.setup.profile');
     // })->name('profile');
 
-    Route::get('/email-setting', [EmailController::class,'index'])->name('email-setting');
-    Route::post('/email-setting',[EmailController::class,'saveSetting'])->name('email-setting-save');
+    Route::get('/email-setting', [EmailController::class, 'index'])->name('email-setting');
+    Route::post('/email-setting', [EmailController::class, 'saveSetting'])->name('email-setting-save');
 
     Route::get('/database/backup', [DatabaseController::class, 'backup'])->name('database.backup');
     Route::post('/database/restore', [DatabaseController::class, 'restore'])->name('database.restore');
 
     Route::get('/database/backups', [DatabaseController::class, 'listBackups'])->name('database.backups');
-Route::get('/database/backups/download/{filename}', [DatabaseController::class, 'download'])->name('database.download');
-Route::delete('/database/backups/delete/{filename}', [DatabaseController::class, 'delete'])->name('database.delete');
-// Route::post('/database/restore', [DatabaseController::class, 'restore'])->name('database.restore');
+    Route::get('/database/backups/download/{filename}', [DatabaseController::class, 'download'])->name('database.download');
+    Route::delete('/database/backups/delete/{filename}', [DatabaseController::class, 'delete'])->name('database.delete');
+    // Route::post('/database/restore', [DatabaseController::class, 'restore'])->name('database.restore');
 // Route::get('/database/backup', [DatabaseController::class, 'backup'])->name('database.backup'); // optional link
-Route::get('/patients', [PatientController::class, 'index'])->name('patients');
+    Route::get('/patients', [PatientController::class, 'index'])->name('patients');
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::post('/profile/store', [ProfileController::class, 'store'])->name('profile.store');
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -69,26 +72,32 @@ Route::get('/patients', [PatientController::class, 'index'])->name('patients');
 
     Route::get('/roles', [RolesController::class, 'index'])->name('roles');
     Route::post('/roles/store', [RolesController::class, 'store'])->name('roles.store');
-    Route::get('/roles/edit', [RolesController::class, 'edit'])->name('roles.edit');
-    Route::post('/roles/destroy', [RolesController::class, 'destroy'])->name('roles.destroy');
+    Route::put('/roles/update/{id}', [RolesController::class, 'update'])->name('roles.update');
+    Route::delete('/roles/destroy/{id}', [RolesController::class, 'destroy'])->name('roles.destroy');
     Route::get('/languages', function () {
         return view('admin.setup.languages');
     })->name('languages');
 
-    
     Route::get('/modules', [PermissionController::class, 'modules'])->name('permissions.modules');
     Route::post('/permissions/toggle', [PermissionController::class, 'toggle'])
-    ->name('permissions.toggle');
+        ->name('permissions.toggle');
     Route::post('/modules/update', [PermissionController::class, 'update'])->name('permissions.update');
     Route::get('/roles/{role}/permissions', [PermissionController::class, 'permissions'])->name('permissions');
-Route::post('/roles/permissions/save', [PermissionController::class, 'savePermissions'])->name('roles.permissions.save');
+    Route::post('/roles/permissions/save', [PermissionController::class, 'savePermissions'])->name('roles.permissions.save');
 
-    Route::post('/patients', [PatientController::class, 'index'])->name('patients');
+    Route::get('/patients', [PatientController::class, 'index'])->name('patients');
     Route::post('/patient', [PatientController::class, 'store'])->name('patient-store');
     Route::delete('/patients/bulk-delete', [PatientController::class, 'bulkDelete'])->name('patients.bulkDelete');
     Route::get('/patients/import', [PatientController::class, 'import'])->name('patient-import');
     Route::post('/patients/import', [PatientController::class, 'import'])->name('patients.import');
 
+    Route::get('/languages', [LanguagesController::class, 'index'])->name('languages');
+    Route::post('/languages/create', [LanguagesController::class, 'store'])->name('languages.store');
+    Route::post('/languages/updateStatus/{id}', [LanguagesController::class, 'updateStatus'])->name('languages.updateStatus');
+    Route::post('/languages/updateRtl/{id}', [LanguagesController::class, 'updateRtl'])->name('languages.updateRtl');
+    Route::get('/languages/search', [LanguagesController::class, 'search'])->name('languages.search');
+
+    Route::get('/users', [UsersController::class, 'index'])->name('users');
     Route::get('/charges', function () {
         return view('admin.setup.charges');
     })->name('charges');
@@ -104,27 +113,79 @@ Route::post('/roles/permissions/save', [PermissionController::class, 'savePermis
     Route::get('/operation-category', function () {
         return view('admin.setup.operation_category');
     })->name('operation-category');
-    Route::get('/beds',[BedController::class,'index'])->name('bed');
-    Route::get('/bed-status',[BedController::class,'status'])->name('bed-status');
+    Route::get('/beds', [BedController::class, 'index'])->name('bed');
+    Route::get('/bed-status', [BedController::class, 'status'])->name('bed-status');
     Route::put('/beds/update', [BedController::class, 'update'])->name('beds.update');
     Route::post('/beds/store', [BedController::class, 'store'])->name('beds.store');
     Route::delete('/beds/destroy', [BedController::class, 'destroy'])->name('beds.destroy');
 
 
-Route::get('/bed-groups', [BedGroupController::class, 'index'])->name('bed-groups.index');
-Route::post('/bed-groups/store', [BedGroupController::class, 'store'])->name('bed-groups.store');
-Route::put('/bed-groups/update', [BedGroupController::class, 'update'])->name('bed-groups.update');
-Route::delete('/bed-groups/destroy', [BedGroupController::class, 'destroy'])->name('bed-groups.destroy');
+    Route::get('/bed-groups', [BedGroupController::class, 'index'])->name('bed-groups.index');
+    Route::post('/bed-groups/store', [BedGroupController::class, 'store'])->name('bed-groups.store');
+    Route::put('/bed-groups/update', [BedGroupController::class, 'update'])->name('bed-groups.update');
+    Route::delete('/bed-groups/destroy', [BedGroupController::class, 'destroy'])->name('bed-groups.destroy');
 
 
-Route::get('/bed-types', [BedTypeController::class, 'index'])->name('bed-types.index');
-Route::post('/bed-types/store', [BedTypeController::class, 'store'])->name('bed-types.store');
-Route::put('/bed-types/update', [BedTypeController::class, 'update'])->name('bed-types.update');
-Route::delete('/bed-types/destroy', [BedTypeController::class, 'destroy'])->name('bed-types.destroy');
+    Route::get('/bed-types', [BedTypeController::class, 'index'])->name('bed-types.index');
+    Route::post('/bed-types/store', [BedTypeController::class, 'store'])->name('bed-types.store');
+    Route::put('/bed-types/update', [BedTypeController::class, 'update'])->name('bed-types.update');
+    Route::delete('/bed-types/destroy', [BedTypeController::class, 'destroy'])->name('bed-types.destroy');
 
-Route::get('/floors', [FloorController::class, 'index'])->name('floors.index');
-Route::post('/floors/store', [FloorController::class, 'store'])->name('floors.store');
-Route::put('/floors/update', [FloorController::class, 'update'])->name('floors.update');
-Route::delete('/floors/destroy', [FloorController::class, 'destroy'])->name('floors.destroy');
+    Route::get('/floors', [FloorController::class, 'index'])->name('floors.index');
+    Route::post('/floors/store', [FloorController::class, 'store'])->name('floors.store');
+    Route::put('/floors/update', [FloorController::class, 'update'])->name('floors.update');
+    Route::delete('/floors/destroy', [FloorController::class, 'destroy'])->name('floors.destroy');
+    Route::get('/charge-category', function () {
+        return view('admin.setup.charge_category');
+    })->name('charge-category');
+    Route::get('/charge-type', function () {
+        return view('admin.setup.charge_type');
+    })->name('charge-type');
+    Route::get('/tax-category', function () {
+        return view('admin.setup.tax_category');
+    })->name('tax-category');
+    Route::get('/unit-type', function () {
+        return view('admin.setup.unit_type');
+    })->name('unit-type');
+    Route::get('/medicine-category', function () {
+        return view('admin.setup.medicine_category');
+    })->name('medicine-category');
+    Route::get('/supplier', function () {
+        return view('admin.setup.supplier');
+    })->name('supplier');
+    Route::get('/medicine-dosage', function () {
+        return view('admin.setup.medicine_dosage');
+    })->name('medicine-dosage');
+
+    Route::get('/purpose', [FrontOfficeController::class, 'purposes'])->name('purpose');
+    Route::post('/purpose/store', [FrontOfficeController::class, 'storePurpose'])->name('purposes.store');
+    Route::put('/purpose/update/{id}', [FrontOfficeController::class, 'updatePurpose'])->name('purposes.update');
+    Route::delete('/purpose/destroy/{id}', [FrontOfficeController::class, 'destroyPurpose'])->name('purposes.destroy');
+
+    Route::get('/complaint', [FrontOfficeController::class, 'complaintTypes'])->name('complaint');
+    Route::post('/complaint/store', [FrontOfficeController::class, 'storeComplaint'])->name('complaint-types.store');
+    Route::put('/complaintType/update/{id}', [FrontOfficeController::class, 'updateComplaint'])->name('complaint.update');
+    Route::delete('/complaint/destroy/{id}', [FrontOfficeController::class, 'destroyComplaint'])->name('complaint-types.destroy');
+
+    Route::get('/sources', [FrontOfficeController::class, 'sources'])->name('sources');
+    Route::post('/sources/store', [FrontOfficeController::class, 'storeSources'])->name('sources.store');
+    Route::put('/sources/update/{id}', [FrontOfficeController::class, 'updateSources'])->name('sources.update');
+    Route::delete('/sources/destroy/{id}', [FrontOfficeController::class, 'destroySources'])->name('sources.destroy');
 
 });
+
+Route::get('/dosage-interval', function () {
+    return view('admin.setup.dosage_interval');
+})->name('dosage-interval');
+Route::get('/dosage-duration', function () {
+    return view('admin.setup.dosage_duration');
+})->name('dosage-duration');
+Route::get('/unit-list', function () {
+    return view('admin.setup.unit_list');
+})->name('unit-list');
+Route::get('/company-list', function () {
+    return view('admin.setup.company_list');
+})->name('company-list');
+Route::get('/medicine-group', function () {
+    return view('admin.setup.medicine_group');
+})->name('medicine-group');

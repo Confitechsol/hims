@@ -7,7 +7,7 @@
         <div class="col-md-11">
             <div class="card shadow-sm border-0 mt-4">
                 <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                    <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Operation Category List</h5>
+                    <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Unit List</h5>
                 </div>
 
                 <div class="card-body">
@@ -34,18 +34,16 @@
                                             <div class="text-end d-flex">
                                                 <a href="javascript:void(0);"
                                                     class="btn btn-primary text-white ms-2 fs-13 btn-md"
-                                                    data-bs-toggle="modal" data-bs-target="#add_operation_category"><i
-                                                        class="ti ti-plus me-1"></i>
-                                                    Add Category</a>
+                                                    data-bs-toggle="modal" data-bs-target="#add_unit"><i
+                                                        class="ti ti-plus me-1"></i>Add Unit</a>
                                             </div>
                                             <!-- Modal -->
-                                            <div class="modal fade" id="add_operation_category" tabindex="-1"
-                                                aria-hidden="true">
+                                            <div class="modal fade" id="add_unit" tabindex="-1" aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered">
                                                     <div class="modal-content">
                                                         <div class="modal-header rounded-0"
                                                             style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                                            <h5 class="modal-title" id="addSpecializationLabel">Add Category
+                                                            <h5 class="modal-title" id="addSpecializationLabel">Add Unit
                                                             </h5>
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                                 aria-label="Close"></button>
@@ -54,17 +52,16 @@
                                                             <form action="" method="POST">
                                                                 @csrf
 
-
-                                                                <div id="operation_category">
-                                                                    <div class="row gy-3 operation_category_row mb-2">
+                                                                <div id="unit_fields">
+                                                                    <div class="row gy-3 unit-row mb-2">
 
                                                                         <!-- Operation Name -->
                                                                         <div class="col-md-11">
-                                                                            <label for="operation_name"
-                                                                                class="form-label">Operation
-                                                                                Category</label>
-                                                                            <input type="text" name="operation_category[]"
-                                                                                class="form-control" />
+                                                                            <label for="unit_name" class="form-label">Unit
+                                                                                Name <span
+                                                                                    class="text-danger">*</span></label>
+                                                                            <input type="text" name="unit_name"
+                                                                                id="unit_name" class="form-control" />
                                                                         </div>
 
                                                                         <div class="col-md-1 d-flex align-items-end">
@@ -98,43 +95,88 @@
                                         <table class="table mb-0">
                                             <thead>
                                                 <tr>
-                                                    <th>Name</th>
+                                                    <th>Database ID</th>
+                                                    <th>Unit Name</th>
                                                     <th style="width: 200px;">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
                                                     <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Cardiothoracic Surgery</h6>
+                                                        <h6 class="mb-0 fs-14 fw-semibold">1
+                                                        </h6>
                                                     </td>
-
+                                                    <td>Table</td>
                                                     <td>
                                                         <a href="javascript: void(0);"
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil" data-bs-toggle="tooltip"
-                                                                title="Assign Permission"></i></a>
+                                                            <i class="ti ti-pencil"></i></a>
                                                         <a href="javascript: void(0);"
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash" data-bs-toggle="tooltip"
-                                                                title="Assign Permission"></i></a>
+                                                            <i class="ti ti-trash"></i></a>
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">ENT Surgery</h6>
+                                                        <h6 class="mb-0 fs-14 fw-semibold">2
+                                                        </h6>
                                                     </td>
-
+                                                    <td>Syrup</td>
                                                     <td>
                                                         <a href="javascript: void(0);"
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil" data-bs-toggle="tooltip"
-                                                                title="Assign Permission"></i></a>
+                                                            <i class="ti ti-pencil"></i></a>
                                                         <a href="javascript: void(0);"
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash" data-bs-toggle="tooltip"
-                                                                title="Assign Permission"></i></a>
+                                                            <i class="ti ti-trash"></i></a>
                                                     </td>
                                                 </tr>
+                                                <tr>
+                                                    <td>
+                                                        <h6 class="mb-0 fs-14 fw-semibold">3
+                                                        </h6>
+                                                    </td>
+                                                    <td>Injection</td>
+                                                    <td>
+                                                        <a href="javascript: void(0);"
+                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+                                                            <i class="ti ti-pencil"></i></a>
+                                                        <a href="javascript: void(0);"
+                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                            <i class="ti ti-trash"></i></a>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <h6 class="mb-0 fs-14 fw-semibold">4
+                                                        </h6>
+                                                    </td>
+                                                    <td>Cream</td>
+                                                    <td>
+                                                        <a href="javascript: void(0);"
+                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+                                                            <i class="ti ti-pencil"></i></a>
+                                                        <a href="javascript: void(0);"
+                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                            <i class="ti ti-trash"></i></a>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <h6 class="mb-0 fs-14 fw-semibold">5
+                                                        </h6>
+                                                    </td>
+                                                    <td>Ointment</td>
+                                                    <td>
+                                                        <a href="javascript: void(0);"
+                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+                                                            <i class="ti ti-pencil"></i></a>
+                                                        <a href="javascript: void(0);"
+                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                            <i class="ti ti-trash"></i></a>
+                                                    </td>
+                                                </tr>
+                                               
                                             </tbody>
                                         </table>
                                     </div>
@@ -152,11 +194,11 @@
 
     <script>
         const addBtn = document.getElementById("addBtn");
-        const operationFields = document.getElementById("operation_category");
+        const operationFields = document.getElementById("unit_fields");
 
         addBtn.addEventListener("click", function () {
             // Clone the first row
-            let firstRow = operationFields.querySelector(".operation_category_row");
+            let firstRow = operationFields.querySelector(".unit-row");
             let newRow = firstRow.cloneNode(true);
 
             // Clear input values

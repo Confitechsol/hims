@@ -168,8 +168,57 @@
                                     <li><a href="layout-rtl.html">RTL</a></li>
                                 </ul>
                             </li> -->
+                            <li class="submenu">
+                                <a href="javascript:void(0);" class="active subdrop">
+                                    <i class="ti ti-layout-dashboard"></i><span>Billing</span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <ul>
+                                    
+                                    <li><a href="doctor-dashboard.html">Appointment
+                                            </a></li>
+                                    <li><a href="patient-dashboard.html">OPD
+                                            </a></li>
+                                            <li><a href="patient-dashboard.html">Pathology
+                                            </a></li>
+                                            <li><a href="patient-dashboard.html">Radiology
+                                            </a></li>
+                                            <li><a href="patient-dashboard.html">Blood Issue
+                                            </a></li>
+                                            <li><a href="patient-dashboard.html">Blood Component Issue
+                                            </a></li>
+                                </ul>
+                            </li>
+                            <li class="submenu">
+                                <a href="javascript:void(0);" class="active subdrop">
+                                    <i class="ti ti-layout-dashboard"></i><span>Birth & Death Record</span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <ul>
+                                    <li><a href="index.html" class="active">Birth Record
+                                            </a></li>
+                                    <li><a href="doctor-dashboard.html">Death Record
+                                            </a></li>
+                                    
+                                </ul>
+                            </li>
+                            <li class="submenu">
+                                <a href="javascript:void(0);" class="active subdrop">
+                                    <i class="ti ti-layout-dashboard"></i><span>Certificate</span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <ul>
+                                    <li><a href="index.html" class="active">Certificate
+                                            </a></li>
+                                    <li><a href="doctor-dashboard.html">Patient ID Card
+                                            </a></li>
+                                    <li><a href="patient-dashboard.html">Staff ID Card
+                                            </a></li>
+                                </ul>
+                            </li>
                         </ul>
                     </li>
+                    
                     <li class="menu-title"><span>Clinic</span></li>
                     <li>
                         <ul>
@@ -249,6 +298,27 @@
                                     <i class="ti ti-map-pin"></i><span>Front Office</span>
                                 </a>
                             </li>
+                            <li>
+                                <a href="#">
+                                    <i class="ti ti-map-pin"></i><span>Duty Roster</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="ti ti-map-pin"></i><span>Annual Calender</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="ti ti-map-pin"></i><span>TPA Management</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="ti ti-map-pin"></i><span>Inventory</span>
+                                </a>
+                            </li>
+
                             <!-- <li>
                                 <a href="services.html">
                                     <i class="ti ti-user-cog"></i><span>Services</span>
@@ -396,6 +466,39 @@
                                             Report</a></li>
                                     <li><a href="patient-report.html">Patient
                                             Report</a></li>
+                                            <li><a href="patient-report.html">Finance
+                                            Report</a></li>
+                                            <li><a href="patient-report.html">Appointment
+                                            Report</a></li>
+                                            <li><a href="patient-report.html">OPD
+                                            Report</a></li>
+                                            <li><a href="patient-report.html">IPD
+                                            Report</a></li>
+                                            <li><a href="patient-report.html">Pharmacy
+                                            Report</a></li>
+                                            <li><a href="patient-report.html">Pathology
+                                            Report</a></li>
+                                            <li><a href="patient-report.html">Radiology
+                                            Report</a></li>
+                                            <li><a href="patient-report.html">Blood Bank
+                                            Report</a></li>
+                                            <li><a href="patient-report.html">Ambulance
+                                            Report</a></li>
+                                            <li><a href="patient-report.html">Birth & Death
+                                            Report</a></li>
+                                            <li><a href="patient-report.html">Human Resource
+                                            Report</a></li>
+                                            <li><a href="patient-report.html">TPA
+                                            Report</a></li>
+                                            <li><a href="patient-report.html">Inventory
+                                            Report</a></li>
+                                            <li><a href="patient-report.html">Live Consultation
+                                            Report</a></li>
+                                            <li><a href="patient-report.html">Log
+                                            Report</a></li>
+                                            <li><a href="patient-report.html">OT
+                                            Report</a></li>
+                                            
                                 </ul>
                             </li>
                         </ul>
@@ -642,6 +745,199 @@
                                     <li><a href="integrations-settings.html">Languages</a></li>
                                     <li><a href="integrations-settings.html">Users</a></li>
                                     <li><a href="integrations-settings.html">Modules</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="integrations-settings.html">Patient</a></li>
+                            
+                            <li class="submenu">
+                                <a href="javascript:void(0);">
+                                    <i class="ti ti-world-cog"></i><span>Hospital Charges</span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <ul>
+                                    <li><a href="organization-settings.html">Charges</a></li>
+                                    <li><a href="localization-settings.html">Charge Category</a></li>
+                                    <li><a href="{{ route('prefix') }}">Charge Type</a></li>
+                                    <li><a href="seo-setup-settings.html">Tax
+                                            Category</a></li>
+                                    <li><a href="{{ route('languages') }}">Unit Type</a></li>
+                                    
+                                </ul>
+                            </li>
+                            
+                            <li class="submenu">
+                                <a href="javascript:void(0);">
+                                    <i class="ti ti-world-cog"></i><span>Bed
+                                        </span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <ul>
+                                    <li><a href="organization-settings.html">Bed Status</a></li>
+                                    <li><a href="localization-settings.html">Bed</a></li>
+                                    <li><a href="{{ route('prefix') }}">Bed Type</a></li>
+                                    <li><a href="seo-setup-settings.html">Bed
+                                            Group</a></li>
+                                    <li><a href="{{ route('languages') }}">Floor</a></li>
+                                    
+                                </ul>
+                            </li>
+                            <li><a href="integrations-settings.html">Print Header Footer</a></li>
+                            <li class="submenu">
+                                <a href="javascript:void(0);">
+                                    <i class="ti ti-world-cog"></i><span>Front
+                                        Office</span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <ul>
+                                    <li><a href="organization-settings.html">Purpose</a></li>
+                                    <li><a href="localization-settings.html">Complain Type</a></li>
+                                    <li><a href="{{ route('prefix') }}">Source</a></li>
+                                    
+                                </ul>
+                            </li>
+                            
+                            <li class="submenu">
+                                <a href="javascript:void(0);">
+                                    <i class="ti ti-world-cog"></i><span>Operations
+                                        </span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <ul>
+                                    <li><a href="organization-settings.html">Operation</a></li>
+                                    <li><a href="localization-settings.html">Operation Category</a></li>
+                                    
+                                </ul>
+                            </li>
+                            
+                            <li class="submenu">
+                                <a href="javascript:void(0);">
+                                    <i class="ti ti-world-cog"></i><span>Pharmacy
+                                        </span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <ul>
+                                    <li><a href="organization-settings.html">Medicine Category</a></li>
+                                    <li><a href="localization-settings.html">Supplier</a></li>
+                                    <li><a href="{{ route('prefix') }}">Medicine Dosage</a></li>
+                                    <li><a href="seo-setup-settings.html">Dose
+                                            Interval</a></li>
+                                    <li><a href="{{ route('languages') }}">Dose Duration</a></li>
+                                    <li><a href="maintenance-mode-settings.html">Unit
+                                            </a></li>
+                                    <li><a href="login-and-register-settings.html">Company
+                                            </a></li>
+                                    <li><a href="preferences-settings.html">Mediccine Group</a></li>
+                                </ul>
+                            </li>
+                            
+                            <li class="submenu">
+                                <a href="javascript:void(0);">
+                                    <i class="ti ti-world-cog"></i><span>Pathology
+                                        </span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <ul>
+                                    <li><a href="organization-settings.html">Pathology Category</a></li>
+                                    <li><a href="localization-settings.html">Unit</a></li>
+                                    <li><a href="{{ route('prefix') }}">Radiology Parameter</a></li>
+                                    
+                                </ul>
+                            </li>
+                          
+                            <li class="submenu">
+                                <a href="javascript:void(0);">
+                                    <i class="ti ti-world-cog"></i><span>Blood
+                                        Bank</span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <ul>
+                                    <li><a href="organization-settings.html">Products</a></li>
+                                    
+                                </ul>
+                            </li>
+                          
+                            <li class="submenu">
+                                <a href="javascript:void(0);">
+                                    <i class="ti ti-world-cog"></i><span>Symptoms
+                                        </span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <ul>
+                                    <li><a href="organization-settings.html">Symptoms Head</a></li>
+                                    <li><a href="localization-settings.html">Symptoms Type</a></li>
+                                    
+                                </ul>
+                            </li>
+                           
+                            <li class="submenu">
+                                <a href="javascript:void(0);">
+                                    <i class="ti ti-world-cog"></i><span>Findings
+                                        </span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <ul>
+                                    <li><a href="organization-settings.html">Finding</a></li>
+                                    <li><a href="localization-settings.html">Category</a></li>
+                                    
+                                </ul>
+                            </li>
+                            <li><a href="integrations-settings.html">Vitals</a></li>
+                            <li class="submenu">
+                                <a href="javascript:void(0);">
+                                    <i class="ti ti-world-cog"></i><span>Finance
+                                        </span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <ul>
+                                    <li><a href="organization-settings.html">Income </a></li>
+                                    <li><a href="localization-settings.html">Expenses </a></li>
+                                    
+                                </ul>
+                            </li>
+                           
+                            <li class="submenu">
+                                <a href="javascript:void(0);">
+                                    <i class="ti ti-world-cog"></i><span>Human
+                                        Resource</span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <ul>
+                                    <li><a href="organization-settings.html">Leave Type</a></li>
+                                    <li><a href="localization-settings.html">Department</a></li>
+                                    <li><a href="{{ route('prefix') }}">Designation</a></li>
+                                    <li><a href="seo-setup-settings.html">Specialist
+                                            </a></li>
+                                    
+                                </ul>
+                            </li>
+                            
+                            <li class="submenu">
+                                <a href="javascript:void(0);">
+                                    <i class="ti ti-world-cog"></i><span>Appointment
+                                        Settings</span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <ul>
+                                    <li><a href="organization-settings.html">Slots</a></li>
+                                    <li><a href="localization-settings.html">Doctor Shift</a></li>
+                                    <li><a href="{{ route('prefix') }}">Shift</a></li>
+                                    <li><a href="seo-setup-settings.html">Appointment
+                                            Priority</a></li>
+                                    
+                                </ul>
+                            </li>
+                           
+                            <li class="submenu">
+                                <a href="javascript:void(0);">
+                                    <i class="ti ti-world-cog"></i><span>Inventory
+                                        </span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <ul>
+                                    <li><a href="organization-settings.html">Item Category</a></li>
+                                    <li><a href="localization-settings.html">Item Store</a></li>
+                                    <li><a href="{{ route('prefix') }}">Item Supplier</a></li>
+                                    
                                 </ul>
                             </li>
                             <li class="submenu">

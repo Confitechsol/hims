@@ -1,9 +1,9 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+// use App\Http\Controllers\Controller;
 use App\Models\Role;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class RolesController extends Controller
@@ -12,8 +12,8 @@ class RolesController extends Controller
     {
         // Fetch all roles for the current hospital (optional filtering by branch)
         $roles = Role::where('hospital_id', auth()->user()->hospital_id)
-                     ->orderBy('id', 'desc')
-                     ->get();
+            ->orderBy('id', 'desc')
+            ->get();
 
         return view('admin.setup.role', compact('roles'));
     }
@@ -35,6 +35,30 @@ class RolesController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Role created successfully!');
+    }
+    public function update(Request $request, $id)
+    {
+        $role = Role::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255|unique:roles,name,' . $role->id,
+        ]);
+
+        $role->update([
+            'name' => $request->name,
+            'type' => $request->type ?? $role->type, // optional
+        ]);
+
+        return redirect()->back()->with('success', 'Role updated successfully.');
+    }
+
+    // Optional: Destroy role
+    public function destroy($id)
+    {
+        $role = Role::findOrFail($id);
+        $role->delete();
+
+        return redirect()->back()->with('success', 'Role deleted successfully.');
     }
     
 }
