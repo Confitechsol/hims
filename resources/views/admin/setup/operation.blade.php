@@ -55,11 +55,7 @@
 
                                                                 <div id="operationFields">
                                                                     <div class="row gy-3 operation-row mb-2">
-                                                                        <!-- Operation Name -->
-                                                                        <div class="col-md-5">
-                                                                            <label class="form-label">Operation Name</label>
-                                                                            <input type="text" name="operation_name[]" class="form-control" />
-                                                                        </div>
+                                                                        
 
                                                                         <!-- Category -->
                                                                         <div class="col-md-6">
@@ -67,9 +63,14 @@
                                                                             <select class="form-control" name="category[]">
                                                                                 <option value="">Select</option>
                                                                                 @foreach($categories as $category)
-                                                                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                                                                    <option value="{{ $category->id }}">{{ $category->category }}</option>
                                                                                 @endforeach
                                                                             </select>
+                                                                        </div>
+                                                                        <!-- Operation Name -->
+                                                                        <div class="col-md-5">
+                                                                            <label class="form-label">Operation Name</label>
+                                                                            <input type="text" name="operation_name[]" class="form-control" />
                                                                         </div>
 
                                                                         <!-- Remove -->
@@ -108,39 +109,42 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Adenoidectomy</h6>
-                                                    </td>
+    @foreach($operations as $operation)
+        <tr>
+            <td>
+                <h6 class="mb-0 fs-14 fw-semibold">{{ $operation->operation }}</h6>
+            </td>
 
-                                                    <td>ENT Surgery</td>
+            <td>
+                {{ $operation->category->category ?? 'N/A' }}
+            </td>
 
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Burn Debridement</h6>
-                                                    </td>
+            <td>
+                <a href="javascript:void(0);"
+   class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+   onclick="openOperationModal(this)"
+   data-operation-id="{{ $operation->id }}"
+   data-operation-name="{{ $operation->operation }}"
+   data-operation-category="{{ $operation->category_id }}">
+   <i class="ti ti-pencil"></i>
+</a>
 
-                                                    <td>Plastic & Reconstructive Surgery</td>
 
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
+
+                <a href="javascript:void(0);"
+                   onclick="deleteOperation({{ $operation->id }})"
+                   class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                   <i class="ti ti-trash"></i>
+                </a>
+                <form id="deleteOperationForm" method="POST" style="display:none;">
+                    @csrf
+                    @method('DELETE')
+                </form>
+            </td>
+        </tr>
+    @endforeach
+</tbody>
+
                                         </table>
                                     </div>
 
@@ -154,6 +158,40 @@
             </div>
         </div>
     </div>
+<div class="modal fade" id="editOperationModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Operation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form id="editOperationForm" method="POST" action="">
+        @csrf
+        @method('PUT')
+        <div class="modal-body">
+            <div class="mb-3">
+                <label class="form-label">Operation Name</label>
+                <input type="text" class="form-control" name="operation_name" id="editOperationName" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Category</label>
+                <select class="form-control" name="category_id" id="editOperationCategory" required>
+                    <option value="">Select Category</option>
+                    @foreach($categories as $category)
+                        <option value="{{ $category->id }}">{{ $category->category }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Update</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 
     <script>
         const addBtn = document.getElementById("addBtn");
@@ -179,7 +217,35 @@
             });
         });
     </script>
+<script>
+    function openOperationModal(el) {
+        let id = el.getAttribute("data-operation-id");
+        let name = el.getAttribute("data-operation-name");
+        let category = el.getAttribute("data-operation-category");
 
+        // Fill modal inputs
+        document.getElementById("editOperationName").value = name;
+        document.getElementById("editOperationCategory").value = category;
+
+        // Update form action dynamically
+        let form = document.getElementById("editOperationForm");
+        form.action = "{{ url('operations/update') }}/" + id; // route to update
+
+        // Show modal
+        let modal = new bootstrap.Modal(document.getElementById("editOperationModal"));
+        modal.show();
+    }
+</script>
+
+<script>
+    function deleteOperation(id) {
+        if (confirm("Are you sure you want to delete this operation?")) {
+            let form = document.getElementById("deleteOperationForm");
+            form.action = "{{ url('operations/destroy') }}/" + id; // adjust route if needed
+            form.submit();
+        }
+    }
+</script>
 
 
 @endsection

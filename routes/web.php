@@ -13,6 +13,7 @@ use App\Http\Controllers\RolesController;
 use App\Http\Controllers\Setup\UsersController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FrontOfficeController;
+use App\Http\Controllers\OperationController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -103,12 +104,7 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/appointment', function () {
         return view('admin.setup.appointment_head_foot');
     })->name('appointment');
-    Route::get('/operation', function () {
-        return view('admin.setup.operation');
-    })->name('operation');
-    Route::get('/operation-category', function () {
-        return view('admin.setup.operation_category');
-    })->name('operation-category');
+
     Route::get('/charge-category', function () {
         return view('admin.setup.charge_category');
     })->name('charge-category');
@@ -141,5 +137,22 @@ Route::middleware(['admin'])->group(function () {
      Route::post('/sources/store', [FrontOfficeController::class, 'storeSources'])->name('sources.store');
      Route::put('/sources/update/{id}', [FrontOfficeController::class, 'updateSources'])->name('sources.update');
      Route::delete('/sources/destroy/{id}', [FrontOfficeController::class, 'destroySources'])->name('sources.destroy');
+
+     Route::get('/sources', [FrontOfficeController::class, 'sources'])->name('sources');
+     Route::post('/sources/store', [FrontOfficeController::class, 'storeSources'])->name('sources.store');
+     Route::put('/sources/update/{id}', [FrontOfficeController::class, 'updateSources'])->name('sources.update');
+     Route::delete('/sources/destroy/{id}', [FrontOfficeController::class, 'destroySources'])->name('sources.destroy');
+
+     Route::get('/operations', [OperationController::class, 'operations'])->name('operations');
+     Route::post('/operations/store', [OperationController::class, 'store'])->name('operations.store');
+     Route::put('/operations/update/{id}', [OperationController::class, 'update'])->name('operations.update');
+     Route::delete('/operations/destroy/{id}', [OperationController::class, 'destroy'])->name('operations.destroy');
+
+    Route::prefix('operation-category')->group(function () {
+    Route::get('/', [OperationController::class, 'operationCategories'])->name('operation-category');
+    Route::post('/store', [OperationController::class, 'storeCategory'])->name('operation-category.store');
+    Route::put('/update/{id}', [OperationController::class, 'updateCategory'])->name('operation-category.update');
+    Route::delete('/destroy/{id}', [OperationController::class, 'destroyCategory'])->name('operation-category.destroy');
+});
 
     });
