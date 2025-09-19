@@ -17,6 +17,7 @@ use App\Http\Controllers\RolesController;
 use App\Http\Controllers\Setup\UsersController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FrontOfficeController;
+use App\Http\Controllers\OperationController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -107,12 +108,18 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/appointment', function () {
         return view('admin.setup.appointment_head_foot');
     })->name('appointment');
-    Route::get('/operation', function () {
-        return view('admin.setup.operation');
-    })->name('operation');
-    Route::get('/operation-category', function () {
-        return view('admin.setup.operation_category');
-    })->name('operation-category');
+    Route::prefix('operations')->group(function () {
+    Route::get('/', [OperationController::class, 'Operations'])->name('operations');
+    Route::post('/store', [OperationController::class, 'store'])->name('operations.store');
+    Route::put('/update/{id}', [OperationController::class, 'updateCategory'])->name('operations.update');
+    Route::delete('/destroy/{id}', [OperationController::class, 'destroyCategory'])->name('operations.destroy');
+});
+    Route::prefix('operation-category')->group(function () {
+    Route::get('/', [OperationController::class, 'operationCategories'])->name('operation-category');
+    Route::post('/store', [OperationController::class, 'storeCategory'])->name('operation-category.store');
+    Route::put('/update/{id}', [OperationController::class, 'updateCategory'])->name('operation-category.update');
+    Route::delete('/destroy/{id}', [OperationController::class, 'destroyCategory'])->name('operation-category.destroy');
+});
     Route::get('/beds', [BedController::class, 'index'])->name('bed');
     Route::get('/bed-status', [BedController::class, 'status'])->name('bed-status');
     Route::put('/beds/update', [BedController::class, 'update'])->name('beds.update');

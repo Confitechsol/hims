@@ -10,6 +10,7 @@ class OperationCategory extends Model
     use HasFactory;
 
     protected $table = 'operation_category';
+     public $timestamps = false;
 
     protected $fillable = [
         'hospital_id',
