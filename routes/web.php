@@ -207,6 +207,9 @@ Route::get('/radiology-unit', function () {
 Route::get('/radiology-parameter', function () {
     return view('admin.setup.radiology_parameter');
 })->name('radiology-parameter');
+Route::get('/product', function () {
+    return view('admin.setup.product');
+})->name('product');
 
 
  
