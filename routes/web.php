@@ -223,6 +223,42 @@ Route::get('/symptoms-head', function () {
 Route::get('/symptoms-type', function () {
     return view('admin.setup.symptoms_type');
 })->name('symptoms-tyep');
+Route::get('/finding', function () {
+    return view('admin.setup.finding');
+})->name('finding');
+Route::get('/finding-category', function () {
+    return view('admin.setup.finding_category');
+})->name('finding-category');
+Route::get('/vital', function () {
+    return view('admin.setup.vital');
+})->name('vital');
+Route::get('/income-head', function () {
+    return view('admin.setup.income_head');
+})->name('income-head');
+Route::get('/expense-head', function () {
+    return view('admin.setup.expense_head');
+})->name('expense-head');
+Route::get('/leave-type', function () {
+    return view('admin.setup.leave_type');
+})->name('leave-type');
+Route::get('/department', function () {
+    return view('admin.setup.department');
+})->name('department');
+Route::get('/designation ', function () {
+    return view('admin.setup.designation');
+})->name('designation');
+Route::get('/specialist ', function () {
+    return view('admin.setup.specialist');
+})->name('specialist');
+Route::get('/item-category ', function () {
+    return view('admin.setup.item_category');
+})->name('item-category');
+Route::get('/item-store ', function () {
+    return view('admin.setup.item_store');
+})->name('item-store');
+Route::get('/item-supplier ', function () {
+    return view('admin.setup.item_supplier');
+})->name('item-supplier');
 
 
  
