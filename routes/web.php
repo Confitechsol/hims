@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\BedController;
+use App\Http\Controllers\BedGroupController;
+use App\Http\Controllers\BedTypeController;
+use App\Http\Controllers\FloorController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -79,15 +83,15 @@ Route::get('/patients', [PatientController::class, 'index'])->name('patients');
     Route::get('/roles/{role}/permissions', [PermissionController::class, 'permissions'])->name('permissions');
 Route::post('/roles/permissions/save', [PermissionController::class, 'savePermissions'])->name('roles.permissions.save');
 
-    Route::get('/patients', function () {
-        return view('admin.setup.patient');
-    })->name('patients');
+    Route::post('/patients', [PatientController::class, 'index'])->name('patients');
+    Route::post('/patient', [PatientController::class, 'store'])->name('patient-store');
+    Route::delete('/patients/bulk-delete', [PatientController::class, 'bulkDelete'])->name('patients.bulkDelete');
+    Route::get('/patients/import', [PatientController::class, 'import'])->name('patient-import');
+    Route::post('/patients/import', [PatientController::class, 'import'])->name('patients.import');
+
     Route::get('/charges', function () {
         return view('admin.setup.charges');
     })->name('charges');
-    Route::get('/import', function () {
-        return view('admin.setup.import_patient');
-    })->name('import');
     Route::get('/disable', function () {
         return view('admin.setup.disable_patient');
     })->name('disable');
@@ -100,4 +104,27 @@ Route::post('/roles/permissions/save', [PermissionController::class, 'savePermis
     Route::get('/operation-category', function () {
         return view('admin.setup.operation_category');
     })->name('operation-category');
+    Route::get('/beds',[BedController::class,'index'])->name('bed');
+    Route::get('/bed-status',[BedController::class,'status'])->name('bed-status');
+    Route::put('/beds/update', [BedController::class, 'update'])->name('beds.update');
+    Route::post('/beds/store', [BedController::class, 'store'])->name('beds.store');
+    Route::delete('/beds/destroy', [BedController::class, 'destroy'])->name('beds.destroy');
+
+
+Route::get('/bed-groups', [BedGroupController::class, 'index'])->name('bed-groups.index');
+Route::post('/bed-groups/store', [BedGroupController::class, 'store'])->name('bed-groups.store');
+Route::put('/bed-groups/update', [BedGroupController::class, 'update'])->name('bed-groups.update');
+Route::delete('/bed-groups/destroy', [BedGroupController::class, 'destroy'])->name('bed-groups.destroy');
+
+
+Route::get('/bed-types', [BedTypeController::class, 'index'])->name('bed-types.index');
+Route::post('/bed-types/store', [BedTypeController::class, 'store'])->name('bed-types.store');
+Route::put('/bed-types/update', [BedTypeController::class, 'update'])->name('bed-types.update');
+Route::delete('/bed-types/destroy', [BedTypeController::class, 'destroy'])->name('bed-types.destroy');
+
+Route::get('/floors', [FloorController::class, 'index'])->name('floors.index');
+Route::post('/floors/store', [FloorController::class, 'store'])->name('floors.store');
+Route::put('/floors/update', [FloorController::class, 'update'])->name('floors.update');
+Route::delete('/floors/destroy', [FloorController::class, 'destroy'])->name('floors.destroy');
+
 });

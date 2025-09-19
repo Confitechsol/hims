@@ -12,6 +12,7 @@ class BedType extends Model
 
     protected $table = 'bed_type';
 
+    public $timestamps = false; 
     protected $fillable = [
         'hospital_id',
         'name',
