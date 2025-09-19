@@ -55,45 +55,85 @@
 
                                         </div>
                                     </div>
-                                    <div class="table-responsive">
-                                        <table class="table mb-0">
-                                            <thead>
-                                                <tr>
-                                                    <th>#</th>
-                                                    <th>Name</th>
-                                                    <th>Email</th>
-                                                    <th>Phone</th>
-                                                    <th>Role</th>
-                                                    <th>Designation</th>
-                                                    <th>Department</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach ($users as $user)
+                                    @if (!$isDoctorTab)
+                                        <div class="table-responsive">
+                                            <table class="table mb-0">
+                                                <thead>
                                                     <tr>
-                                                        <th scope="row">{{ $loop->iteration }}</th>
-                                                        <td>{{ $user->username }}</td>
-                                                        <td>{{ $user->email }}</td>
-                                                        <td>{{ $user->email }}</td>
-                                                        <td>
-                                                            {{ $user->role }}
-                                                        </td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td>
-                                                            <div class="form-check form-switch mb-0">
-                                                                <input class="form-check-input status-toggle"
-                                                                    type="checkbox" role="switch" id="switchCheckDefault"
-                                                                    name="is_active" data-id="{{ $user->id }}"
-                                                                    {{ $user->is_active == 'yes' ? 'checked' : '' }}>
-                                                            </div>
-                                                        </td>
+                                                        <th>#</th>
+                                                        <th>Name</th>
+                                                        <th>Email</th>
+                                                        <th>Phone</th>
+                                                        <th>Role</th>
+                                                        <th>Designation</th>
+                                                        <th>Department</th>
+                                                        <th>Action</th>
                                                     </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach ($users as $user)
+                                                        <tr>
+                                                            <th scope="row">{{ $loop->iteration }}</th>
+                                                            <td>{{ $user->name }}&nbsp;{{ $user->surname }}</td>
+                                                            <td>{{ $user->email }}</td>
+                                                            <td>{{ $user->contact_no }}</td>
+                                                            <td>{{ $user->role_name ?? '-' }}</td>
+                                                            <td>{{ $user->designation_name ?? '-' }}</td>
+                                                            <td>{{ $user->department_name ?? '-' }}</td>
+                                                            <td>
+                                                                <div class="form-check form-switch mb-0">
+                                                                    <input class="form-check-input status-toggle"
+                                                                        type="checkbox" role="switch"
+                                                                        id="switchCheckDefault" name="is_active"
+                                                                        data-id="{{ $user->id }}"
+                                                                        {{ $user->is_active == 1 ? 'checked' : '' }}>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    @else
+                                        <div class="table-responsive">
+                                            <table class="table mb-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Name</th>
+                                                        <th>Email</th>
+                                                        <th>Phone</th>
+                                                        <th>Role</th>
+                                                        <th>Designation</th>
+                                                        <th>Department</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach ($users as $user)
+                                                        <tr>
+                                                            <th scope="row">{{ $loop->iteration }}</th>
+                                                            <td>{{ $user->name }}&nbsp;{{ $user->surname }}</td>
+                                                            <td>{{ $user->email }}</td>
+                                                            <td>{{ $user->contact_no }}</td>
+                                                            <td>{{ $user->role_name ?? '-' }}</td>
+                                                            <td>{{ $user->designation_name ?? '-' }}</td>
+                                                            <td>{{ $user->department_name ?? '-' }}</td>
+                                                            <td>
+                                                                <div class="form-check form-switch mb-0">
+                                                                    <input class="form-check-input status-toggle"
+                                                                        type="checkbox" role="switch"
+                                                                        id="switchCheckDefault" name="is_active"
+                                                                        data-id="{{ $user->id }}"
+                                                                        {{ $user->is_active == 1 ? 'checked' : '' }}>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>

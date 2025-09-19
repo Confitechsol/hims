@@ -1,6 +1,5 @@
 @extends('layouts.adminLayout')
 @section('content')
-<div class="page-wrapper">
        <!-- Start Content -->
        <div class="content" id="profilePage">
 
@@ -145,7 +144,6 @@
                         
     </div>
     <!-- End Content -->
-</div>    
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         const typeRadios = document.querySelectorAll('input[name="email_type"]');

@@ -10,6 +10,7 @@ class BedGroup extends Model
     use HasFactory;
 
     protected $table = 'bed_group';
+    public $timestamps = false; // since only created_at exists and no updated_at
 
     protected $fillable = [
         'hospital_id',

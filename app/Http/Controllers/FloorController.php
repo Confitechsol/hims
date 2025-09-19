@@ -1,0 +1,50 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Floor;
+class FloorController extends Controller
+{
+    public function index()
+    {
+        $floors = Floor::all();
+        return view('admin.floor.index', compact('floors'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255|unique:floors,name',
+        ]);
+
+        Floor::create(['name' => $request->name]);
+
+        return redirect()->back()->with('success', 'Floor created successfully.');
+    }
+
+    public function update(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:floors,id',
+            'name' => 'required|string|max:255|unique:floors,name,' . $request->id,
+        ]);
+
+        $floor = Floor::findOrFail($request->id);
+        $floor->name = $request->name;
+        $floor->save();
+
+        return redirect()->back()->with('success', 'Floor updated successfully.');
+    }
+
+    public function destroy(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:floors,id',
+        ]);
+
+        Floor::findOrFail($request->id)->delete();
+
+        return redirect()->back()->with('success', 'Floor deleted successfully.');
+    }
+}
