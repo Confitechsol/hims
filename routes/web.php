@@ -154,3 +154,6 @@ Route::get('/dosage-interval', function () {
 Route::get('/dosage-duration', function () {
     return view('admin.setup.dosage_duration');
 })->name('dosage-duration');
+Route::get('/unit-list', function () {
+    return view('admin.setup.unit_list');
+})->name('unit-list');
