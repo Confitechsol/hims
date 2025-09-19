@@ -157,3 +157,6 @@ Route::get('/dosage-duration', function () {
 Route::get('/unit-list', function () {
     return view('admin.setup.unit_list');
 })->name('unit-list');
+Route::get('/company-list', function () {
+    return view('admin.setup.company_list');
+})->name('company-list');
