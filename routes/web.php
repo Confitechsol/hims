@@ -160,3 +160,6 @@ Route::get('/unit-list', function () {
 Route::get('/company-list', function () {
     return view('admin.setup.company_list');
 })->name('company-list');
+Route::get('/medicine-group', function () {
+    return view('admin.setup.medicine_group');
+})->name('medicine-group');
