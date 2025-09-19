@@ -163,3 +163,15 @@ Route::get('/company-list', function () {
 Route::get('/medicine-group', function () {
     return view('admin.setup.medicine_group');
 })->name('medicine-group');
+Route::get('/pathology-category', function () {
+    return view('admin.setup.pathology_category');
+})->name('pathology-category');
+Route::get('/pathology-unit', function () {
+    return view('admin.setup.pathology_unit');
+})->name('pathology-unit');
+Route::get('/pathology-parameter', function () {
+    return view('admin.setup.pathology_parameter');
+})->name('pathology-parameter');
+
+
+ 
