@@ -210,6 +210,12 @@ Route::get('/radiology-parameter', function () {
 Route::get('/product', function () {
     return view('admin.setup.product');
 })->name('product');
+Route::get('/symptoms-head', function () {
+    return view('admin.setup.symptoms_head');
+})->name('symptoms-head');
+Route::get('/symptoms-type', function () {
+    return view('admin.setup.symptoms_type');
+})->name('symptoms-tyep');
 
 
  
