@@ -198,6 +198,15 @@ Route::get('/pathology-unit', function () {
 Route::get('/pathology-parameter', function () {
     return view('admin.setup.pathology_parameter');
 })->name('pathology-parameter');
+Route::get('/radiology-category', function () {
+    return view('admin.setup.radiology_category');
+})->name('radiology-category');
+Route::get('/radiology-unit', function () {
+    return view('admin.setup.radiology_unit');
+})->name('radiology-unit');
+Route::get('/radiology-parameter', function () {
+    return view('admin.setup.radiology_parameter');
+})->name('radiology-parameter');
 
 
  

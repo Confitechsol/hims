@@ -7,7 +7,7 @@
         <div class="col-md-11">
             <div class="card shadow-sm border-0 mt-4">
                 <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                    <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Pathology Unit List</h5>
+                    <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Unit List</h5>
                 </div>
 
                 <div class="card-body">
@@ -34,11 +34,11 @@
                                             <div class="text-end d-flex">
                                                 <a href="javascript:void(0);"
                                                     class="btn btn-primary text-white ms-2 fs-13 btn-md"
-                                                    data-bs-toggle="modal" data-bs-target="#add_pathology_unit"><i
+                                                    data-bs-toggle="modal" data-bs-target="#add_radiology_unit"><i
                                                         class="ti ti-plus me-1"></i>Add Unit</a>
                                             </div>
                                             <!-- Modal -->
-                                            <div class="modal fade" id="add_pathology_unit" tabindex="-1"
+                                            <div class="modal fade" id="add_radiology_unit" tabindex="-1"
                                                 aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered">
                                                     <div class="modal-content">
@@ -87,7 +87,7 @@
                                             <tbody>
                                                 <tr>
                                                     <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Complete Blood Count (CBC)
+                                                        <h6 class="mb-0 fs-14 fw-semibold">Chest X-Ray (CXR)	
                                                         </h6>
                                                     </td>
                                                     <td>
@@ -101,7 +101,7 @@
                                                 </tr>
                                                 <tr>
                                                     <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Hemoglobin (Hb)
+                                                        <h6 class="mb-0 fs-14 fw-semibold">Skull X-Ray	
                                                         </h6>
                                                     </td>
                                                     <td>
@@ -115,7 +115,7 @@
                                                 </tr>
                                                 <tr>
                                                     <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Platelet Count
+                                                        <h6 class="mb-0 fs-14 fw-semibold">Abdomen X-Ray	
                                                         </h6>
                                                     </td>
                                                     <td>
@@ -129,7 +129,7 @@
                                                 </tr>
                                                 <tr>
                                                     <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Blood Smear Examination
+                                                        <h6 class="mb-0 fs-14 fw-semibold">Spine X-Ray (Cervical, Lumbar, Thoracic)	
                                                         </h6>
                                                     </td>
                                                     <td>
@@ -143,7 +143,7 @@
                                                 </tr>
                                                 <tr>
                                                     <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Liver Function Test (LFT)
+                                                        <h6 class="mb-0 fs-14 fw-semibold">Abdominal Ultrasound	
                                                         </h6>
                                                     </td>
                                                     <td>

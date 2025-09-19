@@ -7,7 +7,7 @@
         <div class="col-md-11">
             <div class="card shadow-sm border-0 mt-4">
                 <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                    <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Pathology Unit List</h5>
+                    <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Radiology Category List</h5>
                 </div>
 
                 <div class="card-body">
@@ -34,18 +34,17 @@
                                             <div class="text-end d-flex">
                                                 <a href="javascript:void(0);"
                                                     class="btn btn-primary text-white ms-2 fs-13 btn-md"
-                                                    data-bs-toggle="modal" data-bs-target="#add_pathology_unit"><i
-                                                        class="ti ti-plus me-1"></i>Add Unit</a>
+                                                    data-bs-toggle="modal" data-bs-target="#add_radiology_category"><i
+                                                        class="ti ti-plus me-1"></i>Add Radiology Category</a>
                                             </div>
                                             <!-- Modal -->
-                                            <div class="modal fade" id="add_pathology_unit" tabindex="-1"
+                                            <div class="modal fade" id="add_radiology_category" tabindex="-1"
                                                 aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered">
                                                     <div class="modal-content">
                                                         <div class="modal-header rounded-0"
                                                             style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                                            <h5 class="modal-title" id="addSpecializationLabel">Add
-                                                                Unit
+                                                            <h5 class="modal-title" id="addSpecializationLabel">Add Radiology Category
                                                             </h5>
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                                 aria-label="Close"></button>
@@ -57,13 +56,13 @@
 
                                                                     <!-- Operation Name -->
                                                                     <div class="col-md-12">
-                                                                        <label for="unit_name" class="form-label">Unit
-                                                                            Name <span class="text-danger">*</span></label>
-                                                                        <input type="text" name="unit_name" id="unit_name"
-                                                                            class="form-control" />
+                                                                        <label for="category_name"
+                                                                            class="form-label">Category Name<span
+                                                                                class="text-danger">*</span></label>
+                                                                        <input type="text" name="category_name"
+                                                                            id="category_name" class="form-control" />
                                                                     </div>
                                                                 </div>
-
                                                         </div>
                                                         <div class="modal-footer">
                                                             <button type="submit" class="btn btn-primary">Save</button>
@@ -80,14 +79,14 @@
                                         <table class="table mb-0">
                                             <thead>
                                                 <tr>
-                                                    <th>Unit Name</th>
+                                                    <th>Category Name</th>
                                                     <th style="width: 200px;">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
                                                     <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Complete Blood Count (CBC)
+                                                        <h6 class="mb-0 fs-14 fw-semibold">X-Ray	
                                                         </h6>
                                                     </td>
                                                     <td>
@@ -101,7 +100,7 @@
                                                 </tr>
                                                 <tr>
                                                     <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Hemoglobin (Hb)
+                                                        <h6 class="mb-0 fs-14 fw-semibold">Ultrasound (USG)	
                                                         </h6>
                                                     </td>
                                                     <td>
@@ -115,7 +114,7 @@
                                                 </tr>
                                                 <tr>
                                                     <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Platelet Count
+                                                        <h6 class="mb-0 fs-14 fw-semibold">CT Scan (Computed Tomography)
                                                         </h6>
                                                     </td>
                                                     <td>
@@ -129,7 +128,7 @@
                                                 </tr>
                                                 <tr>
                                                     <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Blood Smear Examination
+                                                        <h6 class="mb-0 fs-14 fw-semibold">MRI (Magnetic Resonance Imaging)	
                                                         </h6>
                                                     </td>
                                                     <td>
@@ -141,21 +140,6 @@
                                                             <i class="ti ti-trash"></i></a>
                                                     </td>
                                                 </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Liver Function Test (LFT)
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-
                                             </tbody>
                                         </table>
                                     </div>
