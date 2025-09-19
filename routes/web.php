@@ -115,10 +115,10 @@ Route::middleware(['admin'])->group(function () {
     Route::delete('/destroy/{id}', [OperationController::class, 'destroyCategory'])->name('operations.destroy');
 });
     Route::prefix('operation-category')->group(function () {
-    Route::get('/', [OperationController::class, 'operationCategories'])->name('operationCategory.index');
-    Route::post('/store', [OperationController::class, 'storeCategory'])->name('operationCategory.store');
-    Route::put('/update/{id}', [OperationController::class, 'updateCategory'])->name('operationCategory.update');
-    Route::delete('/delete/{id}', [OperationController::class, 'destroyCategory'])->name('operationCategory.destroy');
+    Route::get('/', [OperationController::class, 'operationCategories'])->name('operation-category');
+    Route::post('/store', [OperationController::class, 'storeCategory'])->name('operation-category.store');
+    Route::put('/update/{id}', [OperationController::class, 'updateCategory'])->name('operation-category.update');
+    Route::delete('/destroy/{id}', [OperationController::class, 'destroyCategory'])->name('operation-category.destroy');
 });
     Route::get('/beds', [BedController::class, 'index'])->name('bed');
     Route::get('/bed-status', [BedController::class, 'status'])->name('bed-status');
