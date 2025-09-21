@@ -2,22 +2,22 @@
 
 use App\Http\Controllers\AppointmentsController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\DatabaseController;
-use App\Http\Controllers\EmailController;
-use App\Http\Controllers\PatientController;
 use App\Http\Controllers\BedController;
 use App\Http\Controllers\BedGroupController;
 use App\Http\Controllers\BedTypeController;
+use App\Http\Controllers\DatabaseController;
+use App\Http\Controllers\EmailController;
 use App\Http\Controllers\FloorController;
+use App\Http\Controllers\FrontOfficeController;
+use App\Http\Controllers\OperationController;
+use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\RolesController;
 use App\Http\Controllers\Setup\LanguagesController;
 use App\Http\Controllers\Setup\PrefixesController;
 use App\Http\Controllers\Setup\ProfileController;
-use App\Http\Controllers\RolesController;
 use App\Http\Controllers\Setup\UsersController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\FrontOfficeController;
-use App\Http\Controllers\OperationController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -99,6 +99,9 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/languages/search', [LanguagesController::class, 'search'])->name('languages.search');
 
     Route::get('/users', [UsersController::class, 'index'])->name('users');
+    Route::post('/users/updatedrstatus/{id}', [UsersController::class, 'updateDrStatus'])->name('users.updateDrStatus');
+    Route::post('/users/updatestaffstatus/{id}', [UsersController::class, 'updateStaffStatus'])->name('users.updateStaffStatus');
+
     Route::get('/charges', function () {
         return view('admin.setup.charges');
     })->name('charges');
@@ -109,29 +112,27 @@ Route::middleware(['admin'])->group(function () {
         return view('admin.setup.appointment_head_foot');
     })->name('appointment');
     Route::prefix('operations')->group(function () {
-    Route::get('/', [OperationController::class, 'Operations'])->name('operations');
-    Route::post('/store', [OperationController::class, 'store'])->name('operations.store');
-    Route::put('/update/{id}', [OperationController::class, 'updateCategory'])->name('operations.update');
-    Route::delete('/destroy/{id}', [OperationController::class, 'destroyCategory'])->name('operations.destroy');
-});
+        Route::get('/', [OperationController::class, 'Operations'])->name('operations');
+        Route::post('/store', [OperationController::class, 'store'])->name('operations.store');
+        Route::put('/update/{id}', [OperationController::class, 'updateCategory'])->name('operations.update');
+        Route::delete('/destroy/{id}', [OperationController::class, 'destroyCategory'])->name('operations.destroy');
+    });
     Route::prefix('operation-category')->group(function () {
-    Route::get('/', [OperationController::class, 'operationCategories'])->name('operation-category');
-    Route::post('/store', [OperationController::class, 'storeCategory'])->name('operation-category.store');
-    Route::put('/update/{id}', [OperationController::class, 'updateCategory'])->name('operation-category.update');
-    Route::delete('/destroy/{id}', [OperationController::class, 'destroyCategory'])->name('operation-category.destroy');
-});
+        Route::get('/', [OperationController::class, 'operationCategories'])->name('operation-category');
+        Route::post('/store', [OperationController::class, 'storeCategory'])->name('operation-category.store');
+        Route::put('/update/{id}', [OperationController::class, 'updateCategory'])->name('operation-category.update');
+        Route::delete('/destroy/{id}', [OperationController::class, 'destroyCategory'])->name('operation-category.destroy');
+    });
     Route::get('/beds', [BedController::class, 'index'])->name('bed');
     Route::get('/bed-status', [BedController::class, 'status'])->name('bed-status');
     Route::put('/beds/update', [BedController::class, 'update'])->name('beds.update');
     Route::post('/beds/store', [BedController::class, 'store'])->name('beds.store');
     Route::delete('/beds/destroy', [BedController::class, 'destroy'])->name('beds.destroy');
 
-
     Route::get('/bed-groups', [BedGroupController::class, 'index'])->name('bed-groups.index');
     Route::post('/bed-groups/store', [BedGroupController::class, 'store'])->name('bed-groups.store');
     Route::put('/bed-groups/update', [BedGroupController::class, 'update'])->name('bed-groups.update');
     Route::delete('/bed-groups/destroy', [BedGroupController::class, 'destroy'])->name('bed-groups.destroy');
-
 
     Route::get('/bed-types', [BedTypeController::class, 'index'])->name('bed-types.index');
     Route::post('/bed-types/store', [BedTypeController::class, 'store'])->name('bed-types.store');
@@ -259,6 +260,3 @@ Route::get('/item-store ', function () {
 Route::get('/item-supplier ', function () {
     return view('admin.setup.item_supplier');
 })->name('item-supplier');
-
-
- 
