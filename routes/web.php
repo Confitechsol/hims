@@ -19,6 +19,7 @@ use App\Http\Controllers\Setup\ProfileController;
 use App\Http\Controllers\Setup\UsersController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PathologyController;
+use App\Http\Controllers\BloodBankController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -63,7 +64,7 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/database/backups/download/{filename}', [DatabaseController::class, 'download'])->name('database.download');
     Route::delete('/database/backups/delete/{filename}', [DatabaseController::class, 'delete'])->name('database.delete');
     // Route::post('/database/restore', [DatabaseController::class, 'restore'])->name('database.restore');
-// Route::get('/database/backup', [DatabaseController::class, 'backup'])->name('database.backup'); // optional link
+    // Route::get('/database/backup', [DatabaseController::class, 'backup'])->name('database.backup'); // optional link
     Route::get('/patients', [PatientController::class, 'index'])->name('patients');
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::post('/profile/store', [ProfileController::class, 'store'])->name('profile.store');
@@ -200,15 +201,23 @@ Route::get('/medicine-group', function () {
 })->name('medicine-group');
 Route::prefix('pathology-category')->group(function () {
 Route::get('/', [PathologyController::class, 'pathologyCategories'])->name('pathology-category');
-Route::post('/store', [PathologyController::class, 'store'])->name('pathology-category.store');
+Route::post('/store', [PathologyController::class, 'storeCategory'])->name('pathology-category.store');
+Route::put('/update/{id}', [PathologyController::class, 'updateCategory'])->name('pathology-category.update');
+Route::delete('/destroy/{id}', [PathologyController::class, 'destroyCategory'])->name('pathology-category.destroy');
 
 });
-Route::get('/pathology-unit', function () {
-    return view('admin.setup.pathology_unit');
-})->name('pathology-unit');
-Route::get('/pathology-parameter', function () {
-    return view('admin.setup.pathology_parameter');
-})->name('pathology-parameter');
+Route::prefix('/pathology-unit') ->group(function () {
+    Route::get('/', [PathologyController::class, 'pathologyUnits'])->name('pathology-unit');
+    Route::post('/store', [PathologyController::class, 'storeUnit'])->name('pathology-unit.store');
+    Route::put('/update/{id}', [PathologyController::class, 'updateUnit'])->name('pathology-unit.update');
+    Route::delete('/destroy/{id}', [PathologyController::class, 'destroyUnit'])->name('pathology-unit.destroy');  
+});
+Route::prefix('/pathology-parameter')->group(function () {
+    Route::get('/', [PathologyController::class, 'pathologyParameters'])->name('pathology-parameter');
+    Route::post('/store', [PathologyController::class, 'storeParameter'])->name('pathology-parameter.store');
+    Route::put('/update/{id}', [PathologyController::class, 'updateParameter'])->name('pathology-parameter.update');
+    Route::delete('/destroy/{id}', [PathologyController::class, 'destroyParameter'])->name('pathology-parameter.destroy');
+});
 Route::get('/radiology-category', function () {
     return view('admin.setup.radiology_category');
 })->name('radiology-category');
@@ -218,9 +227,9 @@ Route::get('/radiology-unit', function () {
 Route::get('/radiology-parameter', function () {
     return view('admin.setup.radiology_parameter');
 })->name('radiology-parameter');
-Route::get('/product', function () {
-    return view('admin.setup.product');
-})->name('product');
+Route::prefix('/blood-bank')->group(function () {
+    Route::get('/products', [BloodBankController::class, 'products'])->name('blood-bank.products');
+});
 Route::get('/symptoms-head', function () {
     return view('admin.setup.symptoms_head');
 })->name('symptoms-head');
