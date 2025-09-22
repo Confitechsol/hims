@@ -10,15 +10,16 @@ use App\Http\Controllers\EmailController;
 use App\Http\Controllers\FloorController;
 use App\Http\Controllers\FrontOfficeController;
 use App\Http\Controllers\OperationController;
+use App\Http\Controllers\PathologyController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\Setup\LanguagesController;
+use App\Http\Controllers\Setup\LetterHeadController;
 use App\Http\Controllers\Setup\PrefixesController;
 use App\Http\Controllers\Setup\ProfileController;
 use App\Http\Controllers\Setup\UsersController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PathologyController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -109,9 +110,11 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/disable', function () {
         return view('admin.setup.disable_patient');
     })->name('disable');
-    Route::get('/appointment', function () {
-        return view('admin.setup.appointment_head_foot');
-    })->name('appointment');
+
+    Route::get('/letterhead', [LetterHeadController::class, 'index'])->name('letterHead');
+    Route::post('/letterhead/store/{categoryId}', [LetterHeadController::class, 'store'])
+        ->name('letterhead.store');
+
     Route::prefix('operations')->group(function () {
         Route::get('/', [OperationController::class, 'Operations'])->name('operations');
         Route::post('/store', [OperationController::class, 'store'])->name('operations.store');
@@ -199,8 +202,8 @@ Route::get('/medicine-group', function () {
     return view('admin.setup.medicine_group');
 })->name('medicine-group');
 Route::prefix('pathology-category')->group(function () {
-Route::get('/', [PathologyController::class, 'pathologyCategories'])->name('pathology-category');
-Route::post('/store', [PathologyController::class, 'store'])->name('pathology-category.store');
+    Route::get('/', [PathologyController::class, 'pathologyCategories'])->name('pathology-category');
+    Route::post('/store', [PathologyController::class, 'store'])->name('pathology-category.store');
 
 });
 Route::get('/pathology-unit', function () {
