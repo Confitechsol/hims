@@ -263,3 +263,15 @@ Route::get('/item-store ', function () {
 Route::get('/item-supplier ', function () {
     return view('admin.setup.item_supplier');
 })->name('item-supplier');
+Route::get('/slots ', function () {
+    return view('admin.setup.slots');
+})->name('slots');
+Route::get('/doctor-shift ', function () {
+    return view('admin.setup.doctor_shift');
+})->name('doctor-shift');
+Route::get('/shift ', function () {
+    return view('admin.setup.shift');
+})->name('shift');
+Route::get('/appointment-priority ', function () {
+    return view('admin.setup.appointment_priority');
+})->name('appointment-priority');
