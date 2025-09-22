@@ -43,7 +43,8 @@
                                                     <div class="modal-content modal-lg">
                                                         <div class="modal-header rounded-0 modal-lg"
                                                             style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                                            <h5 class="modal-title" id="addSpecializationLabel">Add Item Supplier
+                                                            <h5 class="modal-title" id="addSpecializationLabel">Add Item
+                                                                Supplier
 
                                                             </h5>
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal"
@@ -63,47 +64,54 @@
                                                                     </div>
                                                                     <div class="col-md-6">
                                                                         <label for="phone" class="form-label">Phone
-                                                                           </label>
+                                                                        </label>
                                                                         <input type="tel" name="phone" id="phone"
-                                                                            class="form-control"  />
+                                                                            class="form-control" />
                                                                     </div>
                                                                     <div class="col-md-6">
                                                                         <label for="mail" class="form-label">Email
-                                                                           </label>
+                                                                        </label>
                                                                         <input type="email" name="mail" id="mail"
-                                                                            class="form-control"  />
+                                                                            class="form-control" />
                                                                     </div>
                                                                     <div class="col-md-6">
-                                                                        <label for="contact_person_name" class="form-label">Contact Person Name
-                                                                           </label>
-                                                                        <input type="text" name="contact_person_name" id="contact_person_name"
-                                                                            class="form-control"  />
+                                                                        <label for="contact_person_name"
+                                                                            class="form-label">Contact Person Name
+                                                                        </label>
+                                                                        <input type="text" name="contact_person_name"
+                                                                            id="contact_person_name" class="form-control" />
                                                                     </div>
                                                                     <div class="col-md-12">
                                                                         <label for="address" class="form-label">Address
-                                                                           </label>
+                                                                        </label>
                                                                         <input type="address" name="address" id="address"
-                                                                            class="form-control"  />
+                                                                            class="form-control" />
                                                                     </div>
                                                                     <div class="col-md-12">
-                                                                        <label for="contact_person_phone" class="form-label">Contact Person Phone
-                                                                           </label>
-                                                                        <input type="tel" name="contact_person_phone" id="contact_person_phone"
-                                                                            class="form-control"  />
+                                                                        <label for="contact_person_phone"
+                                                                            class="form-label">Contact Person Phone
+                                                                        </label>
+                                                                        <input type="tel" name="contact_person_phone"
+                                                                            id="contact_person_phone"
+                                                                            class="form-control" />
                                                                     </div>
                                                                     <div class="col-md-12">
-                                                                        <label for="contact_person_email" class="form-label">Contact Person Email
-                                                                           </label>
-                                                                        <input type="email" name="contact_person_email" id="contact_person_email"
-                                                                            class="form-control"  />
+                                                                        <label for="contact_person_email"
+                                                                            class="form-label">Contact Person Email
+                                                                        </label>
+                                                                        <input type="email" name="contact_person_email"
+                                                                            id="contact_person_email"
+                                                                            class="form-control" />
                                                                     </div>
                                                                     <div class="col-md-12">
-                                                                        <label for="description" class="form-label">Contact Person Email
-                                                                           </label>
-                                                                       <textarea name="description" id="description" class="form-control"></textarea>
+                                                                        <label for="description" class="form-label">Contact
+                                                                            Person Email
+                                                                        </label>
+                                                                        <textarea name="description" id="description"
+                                                                            class="form-control"></textarea>
                                                                     </div>
 
-                                                                    
+
                                                                     <div class="col-md-12">
                                                                         <label for="description"
                                                                             class="form-label">Description</label>
@@ -129,18 +137,42 @@
                                         <table class="table mb-0">
                                             <thead>
                                                 <tr>
-                                                    <th>Item Store Name</th>
-                                                    <th>Item Stock Code</th>
+                                                    <th>Item Supplier</th>
+                                                    <th>Contact Person</th>
+                                                    <th>Address</th>
                                                     <th style="width: 200px;">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
                                                     <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Surgical Consumables Store
-                                                        </h6>
+                                                        <a href="#" data-toggle="popover" class="detail_popover"
+                                                            data-original-title="" title="">
+                                                            SurgiMed Disposables <br>
+                                                        </a>
+                                                        <i class="fa fa-phone-square" style="color: #a941c6;"></i>
+                                                        +911127584482 <br>
+                                                        <i class="fa fa-envelope" style="color: #a941c6;"></i>
+                                                        sales@surgimed.in <div class="fee_detail_popover"
+                                                            style="display: none">
+                                                            <p class="text text-info">Supplier of high-quality disposable
+                                                                surgical items such as gloves, catheters, sutures, and
+                                                                sterile dressing packs.</p>
+                                                        </div>
                                                     </td>
-                                                    <td>SURC-</td>
+                                                    <td>
+                                                        <i class="fa fa-user" style="color: #a941c6;"></i> Ms. Preeti Verma
+                                                        <br>
+                                                        <i class="fa fa-phone-square" style="color: #a941c6;"></i>
+                                                        +919811722976 <br>
+                                                        <i class="fa fa-envelope" style="color: #a941c6;"></i>
+                                                        preeti.verma@surgimed.in
+                                                    </td>
+                                                    <td>
+                                                        <i class="fa fa-building" style="color: #a941c6;"></i> 14/6
+                                                        Industrial Area, Wazirpur, New
+                                                        Delhi 110052
+                                                    </td>
                                                     <td>
                                                         <a href="javascript: void(0);"
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">

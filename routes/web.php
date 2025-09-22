@@ -10,15 +10,17 @@ use App\Http\Controllers\EmailController;
 use App\Http\Controllers\FloorController;
 use App\Http\Controllers\FrontOfficeController;
 use App\Http\Controllers\OperationController;
+use App\Http\Controllers\PathologyController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\Setup\LanguagesController;
+use App\Http\Controllers\Setup\LetterHeadController;
 use App\Http\Controllers\Setup\PrefixesController;
 use App\Http\Controllers\Setup\ProfileController;
 use App\Http\Controllers\Setup\UsersController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PathologyController;
+
 use App\Http\Controllers\BloodBankController;
 
 Route::get('/', function () {
@@ -110,9 +112,11 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/disable', function () {
         return view('admin.setup.disable_patient');
     })->name('disable');
-    Route::get('/appointment', function () {
-        return view('admin.setup.appointment_head_foot');
-    })->name('appointment');
+
+    Route::get('/letterhead', [LetterHeadController::class, 'index'])->name('letterHead');
+    Route::post('/letterhead/store/{categoryId}', [LetterHeadController::class, 'store'])
+        ->name('letterhead.store');
+
     Route::prefix('operations')->group(function () {
         Route::get('/', [OperationController::class, 'Operations'])->name('operations');
         Route::post('/store', [OperationController::class, 'store'])->name('operations.store');
@@ -272,3 +276,15 @@ Route::get('/item-store ', function () {
 Route::get('/item-supplier ', function () {
     return view('admin.setup.item_supplier');
 })->name('item-supplier');
+Route::get('/slots ', function () {
+    return view('admin.setup.slots');
+})->name('slots');
+Route::get('/doctor-shift ', function () {
+    return view('admin.setup.doctor_shift');
+})->name('doctor-shift');
+Route::get('/shift ', function () {
+    return view('admin.setup.shift');
+})->name('shift');
+Route::get('/appointment-priority ', function () {
+    return view('admin.setup.appointment_priority');
+})->name('appointment-priority');
