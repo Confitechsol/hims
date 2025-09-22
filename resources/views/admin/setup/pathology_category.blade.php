@@ -51,7 +51,7 @@
                                                                 aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <form action="" method="POST">
+                                                            <form action="{{ route('pathology-category.store') }}" method="POST">
                                                                 @csrf
                                                                 <div class="row gy-3 medicine-group-row mb-2">
 
@@ -85,9 +85,12 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                @foreach($categories as $category)
+
+       
                                                 <tr>
                                                     <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Hematology
+                                                        <h6 class="mb-0 fs-14 fw-semibold">{{ $category->category_name }}
                                                         </h6>
                                                     </td>
                                                     <td>
@@ -99,62 +102,8 @@
                                                             <i class="ti ti-trash"></i></a>
                                                     </td>
                                                 </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Biochemistry
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Immunology/Serology
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Endocrinology
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Clinical Pathology
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
+                                            
+                                            @endforeach
 
                                             </tbody>
                                         </table>

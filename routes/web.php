@@ -18,6 +18,7 @@ use App\Http\Controllers\Setup\UsersController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FrontOfficeController;
 use App\Http\Controllers\OperationController;
+use App\Http\Controllers\PathologyController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -196,9 +197,11 @@ Route::get('/company-list', function () {
 Route::get('/medicine-group', function () {
     return view('admin.setup.medicine_group');
 })->name('medicine-group');
-Route::get('/pathology-category', function () {
-    return view('admin.setup.pathology_category');
-})->name('pathology-category');
+Route::prefix('pathology-category')->group(function () {
+Route::get('/', [PathologyController::class, 'pathologyCategories'])->name('pathology-category');
+Route::post('/store', [PathologyController::class, 'store'])->name('pathology-category.store');
+
+});
 Route::get('/pathology-unit', function () {
     return view('admin.setup.pathology_unit');
 })->name('pathology-unit');

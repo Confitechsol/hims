@@ -10,6 +10,7 @@ class PathologyCategory extends Model
     use HasFactory;
 
     protected $table = 'pathology_category';
+    public $timestamps = false; 
 
     protected $fillable = [
         'hospital_id',
