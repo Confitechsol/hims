@@ -18,7 +18,6 @@
 
                         <div class="col-lg-12">
                             <div class="card">
-
                                 <div class="card-body">
                                     <div
                                         class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
@@ -38,7 +37,7 @@
                                                         class="ti ti-plus me-1"></i>Add Medicine Dosage</a>
                                             </div>
                                             <!-- Modal -->
-                                            <div class="modal fade" id="add_medicine_dosage" tabindex="-1"
+                                            <div class="modal fade" id="--------add_medicine_dosage" tabindex="-1"
                                                 aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered">
                                                     <div class="modal-content">
@@ -131,24 +130,29 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                @foreach ($assocArr as $item)
                                                 <tr>
                                                     <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Antibiotic</h6>
+                                                        <h6 class="mb-0 fs-14 fw-semibold">{{$item["medicine_category"]}}</h6>
                                                     </td>
 
-                                                    <td>1</td>
-                                                    <td>Table</td>
-
+                                                    <td>{{$item["dosage"]}}</td>
+                                                    <td>{{$item["unit"]}}</td>
                                                     <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
+                                                    <button
+                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
+                                                            data-id="{{ $item["id"] }}"
+                                                            data-medicine_category="{{$item['medicine_category']}}"
+                                                            data-dosage="{{$item['dosage']}}"
+                                                            >
+                                                            <i class="ti ti-pencil"></i></button>
                                                         <a href="javascript: void(0);"
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
                                                             <i class="ti ti-trash"></i></a>
                                                     </td>
                                                 </tr>
-                                                <tr>
+                                                @endforeach                                              
+                                                <!-- <tr>
                                                     <td>
                                                         <h6 class="mb-0 fs-14 fw-semibold">Analgesic</h6>
                                                     </td>
@@ -181,7 +185,7 @@
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
                                                             <i class="ti ti-trash"></i></a>
                                                     </td>
-                                                </tr>
+                                                </tr> -->
                                             </tbody>
                                         </table>
                                     </div>
@@ -196,7 +200,19 @@
             </div>
         </div>
     </div>
-
+@php
+$options = ["Tablet","Syrup","Injection","Creame","Ointment","Inhaler","Solution"];
+@endphp
+    <x-modals.form-modal id="add_medicine_dosage" title="Add Medicine Dosage" action="{{route('supplier-store')}}" :fields="[
+        ['name' => 'medicine_category', 'label' => 'Medicine Category', 'type' => 'text', 'required' => true],
+        ['name' => 'dosage', 'label' => 'Dose', 'type' => 'text', 'required' => true],
+        ['name' => 'category', 'label' => 'Category', 'type' => 'select','options'=>$options, 'required' => true],
+    ]" :columns="2" />
+    <x-modals.form-modal id="edit_modal" title="Edit Medicine Dosage" action="{{route('supplier-store')}}" :fields="[
+        ['name' => 'medicine_category', 'label' => 'Medicine Category', 'type' => 'text', 'required' => true,'size'=>'12'],
+        ['name' => 'dosage', 'label' => 'Dose', 'type' => 'text', 'required' => true,'size'=>'5'],
+        ['name' => 'unit', 'label' => 'Unit', 'type' => 'select','options'=>$options, 'required' => true,'size'=>'6'],
+    ]" :columns="2" />
     <script>
         const addBtn = document.getElementById("addBtn");
         const operationFields = document.getElementById("medicine_dosage_fields");

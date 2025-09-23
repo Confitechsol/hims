@@ -10,7 +10,7 @@ class MedicineSupplier extends Model
     use HasFactory;
 
     protected $table = 'medicine_supplier';
-
+    public $timestamps = false;
     protected $fillable = [
         'hospital_id',
         'supplier',
