@@ -124,9 +124,9 @@
                                                             </a>
                                                         </td>
                                                         <form id="deleteOperationCategoryForm" method="POST" style="display:none;">
-    @csrf
-    @method('DELETE')
-</form>
+                                                            @csrf
+                                                            @method('DELETE')
+                                                        </form>
                                                     </tr>
                                                 @endforeach
                                             </tbody>

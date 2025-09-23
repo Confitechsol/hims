@@ -64,10 +64,10 @@ class OperationController extends Controller
     }
 
     public function operationCategories()
-{
-    $categories = OperationCategory::all();
-    return view('admin.setup.operation_category', compact('categories'));
-}
+    {
+        $categories = OperationCategory::all();
+        return view('admin.setup.operation_category', compact('categories'));
+    }
 
 public function storeCategory(Request $request)
 {

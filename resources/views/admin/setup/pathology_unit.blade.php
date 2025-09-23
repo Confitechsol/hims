@@ -51,7 +51,7 @@
                                                                 aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <form action="" method="POST">
+                                                            <form action="{{ route('pathology-unit.store') }}" method="POST">
                                                                 @csrf
                                                                 <div class="row gy-3 medicine-group-row mb-2">
 
@@ -64,11 +64,11 @@
                                                                     </div>
                                                                 </div>
 
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="submit" class="btn btn-primary">Save</button>
-                                                        </div>
-                                                        </form>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="submit" class="btn btn-primary">Save</button>
+                                                                </div>
+                                                            </form>
                                                     </div>
                                                 </div>
                                             </div>
@@ -85,76 +85,32 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Complete Blood Count (CBC)
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Hemoglobin (Hb)
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Platelet Count
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Blood Smear Examination
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Liver Function Test (LFT)
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
+                                                @foreach($units as $unit)
+                                                    <tr>
+                                                        <td>
+                                                            <h6 class="mb-0 fs-14 fw-semibold">{{ $unit->unit_name }}</h6>
+                                                        </td>
+                                                        <td>
+                                                            <a href="javascript:void(0);" 
+                                                                onclick="openPathologyUnitModal(this)" 
+                                                                data-unit-id="{{ $unit->id }}" 
+                                                                data-unit-name="{{ $unit->unit_name }}"
+                                                                class="btn btn-sm btn-soft-success rounded-pill">
+                                                                <i class="ti ti-pencil"></i>
+                                                            </a>
+                                                            <a href="javascript:void(0);" 
+                                                                onclick="deletePathologyUnit({{ $unit->id }})"
+                                                                class="btn btn-sm btn-soft-danger rounded-pill">
+                                                                <i class="ti ti-trash"></i>
+                                                            </a>
+                                                            <form id="deletePathologyUnitForm" method="POST" style="display:none;">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                            </form>
+
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
 
                                             </tbody>
                                         </table>
@@ -170,5 +126,58 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="editPathologyUnitModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Pathology Unit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editPathologyUnitForm" method="POST" action="">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Unit Name</label>
+                        <input type="text" class="form-control" name="unit_name" id="editPathologyUnitName" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openPathologyUnitModal(el) {
+    let id = el.getAttribute("data-unit-id");
+    let name = el.getAttribute("data-unit-name");
+
+    // Fill modal input
+    document.getElementById("editPathologyUnitName").value = name;
+
+    // Update form action dynamically
+    let form = document.getElementById("editPathologyUnitForm");
+    form.action = "{{ url('pathology-unit/update') }}/" + id; // your update route
+
+    // Show modal
+    let modal = new bootstrap.Modal(document.getElementById("editPathologyUnitModal"));
+    modal.show();
+}
+
+</script>
+<script>
+    function deletePathologyUnit(id) {
+        if (confirm("Are you sure you want to delete this pathology unit?")) {
+            let form = document.getElementById("deletePathologyUnitForm");
+            form.action = "{{ url('pathology-unit/destroy') }}/" + id; // your delete route
+            form.submit();
+        }
+    }
+
+</script>
 
 @endsection

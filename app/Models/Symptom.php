@@ -9,46 +9,29 @@ class Symptom extends Model
 {
     use HasFactory;
 
-    // Explicit table name
+    // Table name (optional if it follows Laravel convention)
     protected $table = 'symptoms';
 
-    // Primary key
+    // Primary key (optional since it's 'id' by default)
     protected $primaryKey = 'id';
 
-    // Only created_at exists, no updated_at
-    public $timestamps = false;
+    // Timestamps handling
+    public $timestamps = false; // since we only have created_at and no updated_at
 
-    // Fillable fields
+    // Mass assignable attributes
     protected $fillable = [
-        'hospital_id',
-        'notification_title',
-        'notification_type',
-        'notification_desc',
-        'notification_for',
-        'role_id',
-        'receiver_id',
-        'date',
-        'is_active',
+        'symptoms_title',
+        'description',
+        'type',
         'created_at',
     ];
 
-    // Casts
+    // If you want, you can also cast created_at to a datetime automatically
     protected $casts = [
-        'date' => 'datetime',
         'created_at' => 'datetime',
     ];
-
-    /**
-     * Relationships
-     */
-    public function role()
+     public function classification()
     {
-        return $this->belongsTo(Role::class, 'role_id');
-    }
-
-    public function receiver()
-    {
-        // Assuming receiver_id links to staff/users
-        return $this->belongsTo(Staff::class, 'receiver_id');
+        return $this->belongsTo(SymptomsClassification::class, 'type', 'id');
     }
 }

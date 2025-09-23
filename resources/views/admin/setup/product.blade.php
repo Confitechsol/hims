@@ -50,7 +50,7 @@
                                                                 aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <form action="" method="POST">
+                                                            <form action="{{ route('blood-bank-products.store') }}" method="POST">
                                                                 @csrf
                                                                 <div class="row gy-3 mb-2">
 
@@ -73,11 +73,11 @@
 
                                                                 </div>
 
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="submit" class="btn btn-primary">Save</button>
-                                                        </div>
-                                                        </form>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="submit" class="btn btn-primary">Save</button>
+                                                                </div>
+                                                            </form>
                                                     </div>
                                                 </div>
                                             </div>
@@ -95,36 +95,36 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                @foreach($products as $product)
                                                 <tr>
                                                     <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Plasma 
+                                                        <h6 class="mb-0 fs-14 fw-semibold">{{ $product->name }} 
                                                         </h6>
                                                     </td>
-                                                    <td>Component</td>
+                                                    <td>{{ $product->is_blood_group == 1 ? 'Blood Group' : 'Component' }}</td>
                                                     <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
+                                                        <a href="javascript:void(0);" 
+                                                        onclick="openProductModal(this)" 
+                                                        data-product-id="{{ $product->id }}" 
+                                                        data-product-name="{{ $product->name }}" 
+                                                        data-product-type="{{ $product->is_blood_group }}"
+                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+                                                        <i class="ti ti-pencil"></i>
+                                                        </a>
+
+                                                        <a href="javascript:void(0);" 
+                                                        onclick="deleteProduct({{ $product->id }})"
+                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                        <i class="ti ti-trash"></i>
+                                                        </a>
+                                                        <!-- Delete Product Hidden Form -->
+                                                        <form id="deleteProductForm" method="POST" style="display:none;">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                        </form>
                                                     </td>
                                                 </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Platelets
-                                                        </h6>
-                                                    </td>
-                                                    <td>Component</td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
+                                                @endforeach
 
                                             </tbody>
                                         </table>
@@ -140,5 +140,69 @@
             </div>
         </div>
     </div>
+<!-- Edit Product Modal -->
+<div class="modal fade" id="editProductModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editProductForm" method="POST" action="">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
 
+                    <!-- Type -->
+                    <div class="mb-3">
+                        <label class="form-label">Type</label>
+                        <select class="form-select" name="type" id="editProductType" required>
+                            <option value="">Select</option>
+                            <option value="1">Blood Group</option>
+                            <option value="2">Component</option>
+                        </select>
+                    </div>
+
+                    <!-- Name -->
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" name="name" id="editProductName" required>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+function openProductModal(el) {
+    let id   = el.getAttribute("data-product-id");
+    let name = el.getAttribute("data-product-name");
+    let type = el.getAttribute("data-product-type");
+
+    // Fill inputs
+    document.getElementById("editProductName").value = name;
+    document.getElementById("editProductType").value = type;
+
+    // Update form action
+    let form = document.getElementById("editProductForm");
+    form.action = "{{ url('blood-bank-products/update') }}/" + id; // update route
+
+    // Show modal
+    let modal = new bootstrap.Modal(document.getElementById("editProductModal"));
+    modal.show();
+}
+
+function deleteProduct(id) {
+    if (confirm("Are you sure you want to delete this product?")) {
+        let form = document.getElementById("deleteProductForm");
+        form.action = "{{ url('blood-bank-products/destroy') }}/" + id; // delete route
+        form.submit();
+    }
+}
+</script>
 @endsection
