@@ -2,25 +2,31 @@
 
 use App\Http\Controllers\AppointmentsController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\DatabaseController;
-use App\Http\Controllers\EmailController;
-use App\Http\Controllers\PatientController;
 use App\Http\Controllers\BedController;
 use App\Http\Controllers\BedGroupController;
 use App\Http\Controllers\BedTypeController;
+use App\Http\Controllers\DatabaseController;
+use App\Http\Controllers\EmailController;
 use App\Http\Controllers\FloorController;
+use App\Http\Controllers\FrontOfficeController;
+use App\Http\Controllers\OperationController;
+use App\Http\Controllers\PathologyController;
+use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\RolesController;
 use App\Http\Controllers\Setup\LanguagesController;
+use App\Http\Controllers\Setup\LetterHeadController;
 use App\Http\Controllers\Setup\PrefixesController;
 use App\Http\Controllers\Setup\ProfileController;
-use App\Http\Controllers\RolesController;
 use App\Http\Controllers\Setup\UsersController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\FrontOfficeController;
 use App\Http\Controllers\MedicineCategoryController;
 use App\Http\Controllers\MedicineGroupController;
 use App\Http\Controllers\Setup\MedicineSupplierController;
 use App\Http\Controllers\Setup\MedicineDosageController;
+
+use App\Http\Controllers\BloodBankController;
+use App\Http\Controllers\SymptomController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -65,7 +71,7 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/database/backups/download/{filename}', [DatabaseController::class, 'download'])->name('database.download');
     Route::delete('/database/backups/delete/{filename}', [DatabaseController::class, 'delete'])->name('database.delete');
     // Route::post('/database/restore', [DatabaseController::class, 'restore'])->name('database.restore');
-// Route::get('/database/backup', [DatabaseController::class, 'backup'])->name('database.backup'); // optional link
+    // Route::get('/database/backup', [DatabaseController::class, 'backup'])->name('database.backup'); // optional link
     Route::get('/patients', [PatientController::class, 'index'])->name('patients');
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::post('/profile/store', [ProfileController::class, 'store'])->name('profile.store');
@@ -102,33 +108,42 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/languages/search', [LanguagesController::class, 'search'])->name('languages.search');
 
     Route::get('/users', [UsersController::class, 'index'])->name('users');
+    Route::post('/users/updatedrstatus/{id}', [UsersController::class, 'updateDrStatus'])->name('users.updateDrStatus');
+    Route::post('/users/updatestaffstatus/{id}', [UsersController::class, 'updateStaffStatus'])->name('users.updateStaffStatus');
+
     Route::get('/charges', function () {
         return view('admin.setup.charges');
     })->name('charges');
     Route::get('/disable', function () {
         return view('admin.setup.disable_patient');
     })->name('disable');
-    Route::get('/appointment', function () {
-        return view('admin.setup.appointment_head_foot');
-    })->name('appointment');
-    Route::get('/operation', function () {
-        return view('admin.setup.operation');
-    })->name('operation');
-    Route::get('/operation-category', function () {
-        return view('admin.setup.operation_category');
-    })->name('operation-category');
+
+    Route::get('/letterhead', [LetterHeadController::class, 'index'])->name('letterHead');
+    Route::post('/letterhead/store/{categoryId}', [LetterHeadController::class, 'store'])
+        ->name('letterhead.store');
+
+    Route::prefix('operations')->group(function () {
+        Route::get('/', [OperationController::class, 'Operations'])->name('operations');
+        Route::post('/store', [OperationController::class, 'store'])->name('operations.store');
+        Route::put('/update/{id}', [OperationController::class, 'updateCategory'])->name('operations.update');
+        Route::delete('/destroy/{id}', [OperationController::class, 'destroyCategory'])->name('operations.destroy');
+    });
+    Route::prefix('operation-category')->group(function () {
+        Route::get('/', [OperationController::class, 'operationCategories'])->name('operation-category');
+        Route::post('/store', [OperationController::class, 'storeCategory'])->name('operation-category.store');
+        Route::put('/update/{id}', [OperationController::class, 'updateCategory'])->name('operation-category.update');
+        Route::delete('/destroy/{id}', [OperationController::class, 'destroyCategory'])->name('operation-category.destroy');
+    });
     Route::get('/beds', [BedController::class, 'index'])->name('bed');
     Route::get('/bed-status', [BedController::class, 'status'])->name('bed-status');
     Route::put('/beds/update', [BedController::class, 'update'])->name('beds.update');
     Route::post('/beds/store', [BedController::class, 'store'])->name('beds.store');
     Route::delete('/beds/destroy', [BedController::class, 'destroy'])->name('beds.destroy');
 
-
     Route::get('/bed-groups', [BedGroupController::class, 'index'])->name('bed-groups.index');
     Route::post('/bed-groups/store', [BedGroupController::class, 'store'])->name('bed-groups.store');
     Route::put('/bed-groups/update', [BedGroupController::class, 'update'])->name('bed-groups.update');
     Route::delete('/bed-groups/destroy', [BedGroupController::class, 'destroy'])->name('bed-groups.destroy');
-
 
     Route::get('/bed-types', [BedTypeController::class, 'index'])->name('bed-types.index');
     Route::post('/bed-types/store', [BedTypeController::class, 'store'])->name('bed-types.store');
@@ -199,3 +214,97 @@ Route::get('/medicine-categories', [MedicineCategoryController::class, 'index'])
 Route::post('/medicine-categories/store-multiple', [MedicineCategoryController::class, 'storeMultiple'])->name('medicine-categories.storeMultiple');
 Route::put('/medicine-categories/{id}', [MedicineCategoryController::class, 'update'])->name('medicine-categories.update');
 Route::delete('/medicine-categories/destroy', [MedicineCategoryController::class, 'destroy'])->name('medicine-categories.destroy');
+Route::get('/medicine-group', function () {
+    return view('admin.setup.medicine_group');
+})->name('medicine-group');
+Route::prefix('pathology-category')->group(function () {
+Route::get('/', [PathologyController::class, 'pathologyCategories'])->name('pathology-category');
+Route::post('/store', [PathologyController::class, 'storeCategory'])->name('pathology-category.store');
+Route::put('/update/{id}', [PathologyController::class, 'updateCategory'])->name('pathology-category.update');
+Route::delete('/destroy/{id}', [PathologyController::class, 'destroyCategory'])->name('pathology-category.destroy');
+
+});
+Route::prefix('/pathology-unit') ->group(function () {
+    Route::get('/', [PathologyController::class, 'pathologyUnits'])->name('pathology-unit');
+    Route::post('/store', [PathologyController::class, 'storeUnit'])->name('pathology-unit.store');
+    Route::put('/update/{id}', [PathologyController::class, 'updateUnit'])->name('pathology-unit.update');
+    Route::delete('/destroy/{id}', [PathologyController::class, 'destroyUnit'])->name('pathology-unit.destroy');  
+});
+Route::prefix('/pathology-parameter')->group(function () {
+    Route::get('/', [PathologyController::class, 'pathologyParameters'])->name('pathology-parameter');
+    Route::post('/store', [PathologyController::class, 'storeParameter'])->name('pathology-parameter.store');
+    Route::put('/update/{id}', [PathologyController::class, 'updateParameter'])->name('pathology-parameter.update');
+    Route::delete('/destroy/{id}', [PathologyController::class, 'destroyParameter'])->name('pathology-parameter.destroy');
+});
+Route::get('/radiology-category', function () {
+    return view('admin.setup.radiology_category');
+})->name('radiology-category');
+Route::get('/radiology-unit', function () {
+    return view('admin.setup.radiology_unit');
+})->name('radiology-unit');
+Route::get('/radiology-parameter', function () {
+    return view('admin.setup.radiology_parameter');
+})->name('radiology-parameter');
+Route::prefix('/blood-bank-products')->group(function () {
+    Route::get('/', [BloodBankController::class, 'products'])->name('blood-bank-products');
+    Route::post('/store', [BloodBankController::class, 'storeProduct'])->name('blood-bank-products.store');
+    Route::put('/update/{id}', [BloodBankController::class, 'updateProduct'])->name('blood-bank-products.update');
+    Route::delete('/destroy/{id}', [BloodBankController::class, 'destroyProduct'])->name('blood-bank-products.destroy');
+});
+Route::prefix('/symptoms-head')->group(function () {
+    Route::get('/', [SymptomController::class, 'symptomHead'])->name('symptoms-head');
+    Route::post('/store', [SymptomController::class, 'storeSymptomHead'])->name('symptoms-head.store');
+    Route::put('/update/{id}', [SymptomController::class, 'updateSymptomHead'])->name('symptoms-head.update');
+    Route::delete('/destroy/{id}', [SymptomController::class, 'destroySymptomHead'])->name('symptoms-head.destroy');
+});
+Route::get('/symptoms-type', function () {
+    return view('admin.setup.symptoms_type');
+})->name('symptoms-tyep');
+Route::get('/finding', function () {
+    return view('admin.setup.finding');
+})->name('finding');
+Route::get('/finding-category', function () {
+    return view('admin.setup.finding_category');
+})->name('finding-category');
+Route::get('/vital', function () {
+    return view('admin.setup.vital');
+})->name('vital');
+Route::get('/income-head', function () {
+    return view('admin.setup.income_head');
+})->name('income-head');
+Route::get('/expense-head', function () {
+    return view('admin.setup.expense_head');
+})->name('expense-head');
+Route::get('/leave-type', function () {
+    return view('admin.setup.leave_type');
+})->name('leave-type');
+Route::get('/department', function () {
+    return view('admin.setup.department');
+})->name('department');
+Route::get('/designation ', function () {
+    return view('admin.setup.designation');
+})->name('designation');
+Route::get('/specialist ', function () {
+    return view('admin.setup.specialist');
+})->name('specialist');
+Route::get('/item-category ', function () {
+    return view('admin.setup.item_category');
+})->name('item-category');
+Route::get('/item-store ', function () {
+    return view('admin.setup.item_store');
+})->name('item-store');
+Route::get('/item-supplier ', function () {
+    return view('admin.setup.item_supplier');
+})->name('item-supplier');
+Route::get('/slots ', function () {
+    return view('admin.setup.slots');
+})->name('slots');
+Route::get('/doctor-shift ', function () {
+    return view('admin.setup.doctor_shift');
+})->name('doctor-shift');
+Route::get('/shift ', function () {
+    return view('admin.setup.shift');
+})->name('shift');
+Route::get('/appointment-priority ', function () {
+    return view('admin.setup.appointment_priority');
+})->name('appointment-priority');

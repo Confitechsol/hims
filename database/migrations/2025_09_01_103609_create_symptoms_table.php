@@ -12,17 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('symptoms', function (Blueprint $table) {
-            $table->id();
-            $table->string('hospital_id', 8);
-                 $table->string('notification_title', 200)->index(); // notification_title
-            $table->string('notification_type', 50); // notification_type
-            $table->text('notification_desc')->nullable(); // notification_desc
-            $table->string('notification_for', 50); // notification_for
-            $table->unsignedBigInteger('role_id')->nullable(); // role_id
-            $table->unsignedBigInteger('receiver_id')->nullable(); // receiver_id
-            $table->dateTime('date'); // date
-            $table->string('is_active', 10); // is_active
-            $table->timestamp('created_at')->useCurrent(); // created_at
+            $table->id(); // Primary key, auto-increment
+            $table->string('symptoms_title', 200)->index(); // Indexed, not null
+            $table->text('description')->nullable(); // Nullable text field
+            $table->string('type', 100); // Not null
+            $table->timestamp('created_at')->useCurrent()->useCurrentOnUpdate(); // Default current timestamp, updates on modification
         });
     }
 

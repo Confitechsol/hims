@@ -11,6 +11,8 @@ class Operation extends Model
 
     protected $table = 'operation';
 
+    public $timestamps = false;
+
     protected $fillable = [
         'hospital_id',
         'operation',

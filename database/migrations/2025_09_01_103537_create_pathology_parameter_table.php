@@ -20,10 +20,10 @@ return new class extends Migration
             $table->string('range_from', 500)->nullable()->index();
             $table->string('range_to', 500)->nullable()->index();
             $table->string('gender', 100)->index();
-            $table->unsignedBigInteger('unit')->nullable()->index();
+            $table->unsignedBigInteger('unit_id')->nullable()->index();
             $table->text('description')->nullable();
             $table->timestamps();
-            $table->foreign('unit')->references('id')->on('unit')->onDelete('set null');
+            // $table->foreign('unit_')->references('id')->on('unit')->onDelete('set null');
         });
     }
 

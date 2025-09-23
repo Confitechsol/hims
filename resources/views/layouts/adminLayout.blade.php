@@ -21,7 +21,7 @@
     <link rel="shortcut icon" href="assets/images/favicon.ico" type="image/x-icon">
 
     <!-- style css -->
-     <link rel="stylesheet" href="assets/css/custom.css">
+    <link rel="stylesheet" href="assets/css/custom.css">
 
     <!-- Page Title -->
     <title>{{ config('app.name', 'Laravel') }}</title>
@@ -108,6 +108,90 @@
         /*=============================
            loader ends
  ==============================*/
+
+        /* Floating Button */
+        .chatbot-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 9998;
+            background-image: url("{{ asset('/assets/images/bot.png') }}");
+            background-size: 50%;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-color: #ecbff8;
+            transition: background-color 0.3s ease;
+        }
+
+        .chatbot-button:hover {
+            background-color: #f4dffa;
+        }
+
+        .chatbot-button:focus {
+            background-color: #ecbff8;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* When active, change icon */
+        .chatbot-button.active {
+            background-image: url("{{ asset('/assets/images/cross.png') }}");
+            /* Example: close icon */
+        }
+
+        /* Chatbot Popup */
+        .chatbot-iframe-wrapper {
+            position: fixed;
+            bottom: 120px;
+            right: 20px;
+            width: 460px;
+            height: 600px;
+            background: transparent;
+            display: flex;
+            transform: translateY(100%);
+            opacity: 0;
+            transition: transform 1s ease, opacity 1s ease;
+            z-index: 9999;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .chatbot-iframe-wrapper iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: transparent;
+        }
+
+        .chatbot-iframe-wrapper.active {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .chatbot-iframe-wrapper::-webkit-scrollbar,
+        .chatbot-iframe-wrapper iframe::-webkit-scrollbar {
+            display: none !important;
+        }
+
+        @media screen and (max-width: 480px) {
+            .chatbot-button {
+                width: 50px;
+                height: 50px;
+            }
+
+            .chatbot-iframe-wrapper {
+                width: 90vw;
+            }
+        }
     </style>
 </head>
 
@@ -396,7 +480,8 @@
                     <div class="dropdown profile-dropdown d-flex align-items-center justify-content-center">
                         <a href="javascript:void(0);"
                             class="topbar-link dropdown-toggle drop-arrow-none position-relative"
-                            data-bs-toggle="dropdown" data-bs-offset="0,22" aria-haspopup="false" aria-expanded="false">
+                            data-bs-toggle="dropdown" data-bs-offset="0,22" aria-haspopup="false"
+                            aria-expanded="false">
                             <img src="assets/img/users/user-01.jpg" width="32" class="rounded-circle d-flex"
                                 alt="user-image">
                             <span class="online text-success"><i
@@ -405,8 +490,8 @@
                         <div class="dropdown-menu dropdown-menu-end dropdown-menu-md p-2">
 
                             <div class="d-flex align-items-center bg-light rounded-3 p-2 mb-2">
-                                <img src="assets/img/users/user-01.jpg" class="rounded-circle" width="42" height="42"
-                                    alt>
+                                <img src="assets/img/users/user-01.jpg" class="rounded-circle" width="42"
+                                    height="42" alt>
                                 <div class="ms-2">
                                     <p class="fw-medium text-dark mb-0">Jimmy
                                         Anderson</p>
@@ -488,6 +573,11 @@
             @yield('content')
             <!-- Footer Start -->
             <div class="footer text-center bg-white p-2 border-top">
+                <button id="chatbotButton" class="chatbot-button" onclick="toggleChatbot()"></button>
+                <div id="chatbotWrapper" class="chatbot-iframe-wrapper">
+                    <iframe src="https://hospital-management-chatbot-eta.vercel.app/" allow="clipboard-write"
+                        title="Confitech Chatbot"></iframe>
+                </div>
                 <p class="text-dark mb-0">2025 &copy; <a href="javascript:void(0);"
                         class="link-primary">Cognaihealth</a>, All Rights
                     Reserved</p>
@@ -506,6 +596,7 @@
         button.classList.toggle('active');
     }
 </script>
+
 {{--
 <script src="{{ asset('assets/js/jquery-3.7.1.min.js') }}" type="e56d8e3ed6c4bef649884303-text/javascript"></script>
 --}}
