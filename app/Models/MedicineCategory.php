@@ -10,9 +10,8 @@ class MedicineCategory extends Model
     use HasFactory;
 
     protected $table = 'medicine_category';
-
+    public $timestamps = false;
     protected $fillable = [
-        'hospital_id',
         'medicine_category',
     ];
 
@@ -21,6 +20,6 @@ class MedicineCategory extends Model
      */
     public function medicines()
     {
-        return $this->hasMany(Medicine::class, 'medicine_category_id');
+        // return $this->hasMany(Medicine::class, 'medicine_category_id');
     }
 }

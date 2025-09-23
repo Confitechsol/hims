@@ -150,7 +150,6 @@
         const smtpFields = document.getElementById('smtpFields');
 
         function toggleFields() {
-            console.log("hello");
             const selected = document.querySelector('input[name="email_type"]:checked').value;
             if (selected === 'smtp') {
                 smtpFields.style.display = 'block';

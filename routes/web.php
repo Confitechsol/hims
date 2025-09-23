@@ -20,6 +20,10 @@ use App\Http\Controllers\Setup\PrefixesController;
 use App\Http\Controllers\Setup\ProfileController;
 use App\Http\Controllers\Setup\UsersController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MedicineCategoryController;
+use App\Http\Controllers\MedicineGroupController;
+use App\Http\Controllers\Setup\MedicineSupplierController;
+use App\Http\Controllers\Setup\MedicineDosageController;
 
 use App\Http\Controllers\BloodBankController;
 use App\Http\Controllers\SymptomController;
@@ -166,13 +170,11 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/medicine-category', function () {
         return view('admin.setup.medicine_category');
     })->name('medicine-category');
-    Route::get('/supplier', function () {
-        return view('admin.setup.supplier');
-    })->name('supplier');
-    Route::get('/medicine-dosage', function () {
-        return view('admin.setup.medicine_dosage');
-    })->name('medicine-dosage');
-
+    Route::get('/supplier',[MedicineSupplierController::class,'index'])->name('supplier');
+    Route::post('/supplier/store',[MedicineSupplierController::class,'store'])->name('supplier-store');
+    Route::delete('/supplier/destroy',[MedicineSupplierController::class,'destroy'])->name('supplier.destroy');
+    Route::put('/supplier/update',[MedicineSupplierController::class,'update'])->name('supplier.update');
+    Route::get('/medicine-dosage', [MedicineDosageController::class,'index'])->name('medicine-dosage');
     Route::get('/purpose', [FrontOfficeController::class, 'purposes'])->name('purpose');
     Route::post('/purpose/store', [FrontOfficeController::class, 'storePurpose'])->name('purposes.store');
     Route::put('/purpose/update/{id}', [FrontOfficeController::class, 'updatePurpose'])->name('purposes.update');
@@ -202,6 +204,17 @@ Route::get('/unit-list', function () {
 Route::get('/company-list', function () {
     return view('admin.setup.company_list');
 })->name('company-list');
+// Route::get('/medicine-group', function () {
+//     return view('admin.setup.medicine_group');
+// })->name('medicine-group');
+Route::get('/medicine-group', [MedicineGroupController::class, 'index'])->name('medicine-group');
+Route::post('/medicine-group/store-multiple', [MedicineGroupController::class, 'storeMultiple'])->name('medicine-group.storeMultiple');
+Route::put('/medicine-group/{id}', [MedicineGroupController::class, 'update'])->name('medicine-group.update');
+Route::delete('/medicine-group/destroy', [MedicineGroupController::class, 'destroy'])->name('medicine-group.destroy');
+Route::get('/medicine-categories', [MedicineCategoryController::class, 'index'])->name('medicine-categories');
+Route::post('/medicine-categories/store-multiple', [MedicineCategoryController::class, 'storeMultiple'])->name('medicine-categories.storeMultiple');
+Route::put('/medicine-categories/{id}', [MedicineCategoryController::class, 'update'])->name('medicine-categories.update');
+Route::delete('/medicine-categories/destroy', [MedicineCategoryController::class, 'destroy'])->name('medicine-categories.destroy');
 Route::get('/medicine-group', function () {
     return view('admin.setup.medicine_group');
 })->name('medicine-group');
