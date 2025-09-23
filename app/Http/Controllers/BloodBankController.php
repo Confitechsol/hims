@@ -16,18 +16,16 @@ class BloodBankController extends Controller
     // Store product
     public function storeProduct(Request $request)
     {
+       
         $request->validate([
-            'product_name' => 'required|string|max:255',
-            'blood_group'  => 'required|string|max:10',
-            'quantity'     => 'required|integer|min:1',
-            'expiry_date'  => 'required|date',
+            'name' => 'required|string|max:255',
+            'type'  => 'required',
+           
         ]);
 
         BloodBankProduct::insert([
-            'product_name' => $request->product_name,
-            'blood_group'  => $request->blood_group,
-            'quantity'     => $request->quantity,
-            'expiry_date'  => $request->expiry_date,
+            'name' => $request->name,
+            'is_blood_group'  => $request->type,
             'created_at'   => now(),
         ]);
 
@@ -38,18 +36,16 @@ class BloodBankController extends Controller
     public function updateProduct(Request $request, $id)
     {
         $validated = $request->validate([
-            'product_name' => 'required|string|max:255',
-            'blood_group'  => 'required|string|max:10',
-            'quantity'     => 'required|integer|min:1',
-            'expiry_date'  => 'required|date',
+            'name' => 'required|string|max:255',
+            'type'  => 'required',
+
         ]);
 
         $product = BloodBankProduct::findOrFail($id);
         $product->update([
-            'product_name' => $validated['product_name'],
-            'blood_group'  => $validated['blood_group'],
-            'quantity'     => $validated['quantity'],
-            'expiry_date'  => $validated['expiry_date'],
+            'name' => $validated['name'],
+            'is_blood_group'  => $validated['type'],
+
         ]);
 
         return redirect()->back()->with('success', 'Blood Bank Product updated successfully!');

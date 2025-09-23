@@ -22,6 +22,7 @@ use App\Http\Controllers\Setup\UsersController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\BloodBankController;
+use App\Http\Controllers\SymptomController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -231,12 +232,18 @@ Route::get('/radiology-unit', function () {
 Route::get('/radiology-parameter', function () {
     return view('admin.setup.radiology_parameter');
 })->name('radiology-parameter');
-Route::prefix('/blood-bank')->group(function () {
-    Route::get('/products', [BloodBankController::class, 'products'])->name('blood-bank.products');
+Route::prefix('/blood-bank-products')->group(function () {
+    Route::get('/', [BloodBankController::class, 'products'])->name('blood-bank-products');
+    Route::post('/store', [BloodBankController::class, 'storeProduct'])->name('blood-bank-products.store');
+    Route::put('/update/{id}', [BloodBankController::class, 'updateProduct'])->name('blood-bank-products.update');
+    Route::delete('/destroy/{id}', [BloodBankController::class, 'destroyProduct'])->name('blood-bank-products.destroy');
 });
-Route::get('/symptoms-head', function () {
-    return view('admin.setup.symptoms_head');
-})->name('symptoms-head');
+Route::prefix('/symptoms-head')->group(function () {
+    Route::get('/', [SymptomController::class, 'symptomHead'])->name('symptoms-head');
+    Route::post('/store', [SymptomController::class, 'storeSymptomHead'])->name('symptoms-head.store');
+    Route::put('/update/{id}', [SymptomController::class, 'updateSymptomHead'])->name('symptoms-head.update');
+    Route::delete('/destroy/{id}', [SymptomController::class, 'destroySymptomHead'])->name('symptoms-head.destroy');
+});
 Route::get('/symptoms-type', function () {
     return view('admin.setup.symptoms_type');
 })->name('symptoms-tyep');
