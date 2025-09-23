@@ -50,7 +50,7 @@
                                                                 aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <form action="" method="POST">
+                                                            <form action="{{ route('symptoms-type.store') }}" method="POST">
                                                                 @csrf
 
                                                                 <div id="symptom_type_fields">
@@ -59,7 +59,7 @@
                                                                             <label for="symptoms_type"
                                                                                 class="form-label">Symptoms Type <span
                                                                                     class="text-danger">*</span></label>
-                                                                            <input type="text" name="symptoms_type"
+                                                                            <input type="text" name="symptoms_type[]"
                                                                                 id="symptoms_type" class="form-control" />
                                                                         </div>
 
@@ -99,47 +99,33 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Neurological</h6>
-                                                    </td>
+                                                @foreach($symptomTypes as $type)
+        <tr>
+            <td>
+                <h6 class="mb-0 fs-14 fw-semibold">{{ $type->symptoms_type }}</h6>
+            </td>
+            <td>
+                <a href="javascript:void(0);"
+                   onclick="openEditSymptomTypeModal(this)"
+                   data-id="{{ $type->id }}"
+                   data-name="{{ $type->symptoms_type }}"
+                   class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+                   <i class="ti ti-pencil"></i>
+                </a>
+                <a href="javascript:void(0);"
+                   onclick="deleteSymptomType({{ $type->id }})"
+                   class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                   <i class="ti ti-trash"></i>
+                </a>
+            </td>
+        </tr>
+        <form id="deleteSymptomTypeForm" method="POST" style="display:none;">
+            @csrf
+            @method('DELETE')
+        </form>
 
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">General</h6>
-                                                    </td>
-
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Cardiovascular</h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
+    @endforeach
+                                                
                                             </tbody>
                                         </table>
                                     </div>
@@ -154,6 +140,31 @@
             </div>
         </div>
     </div>
+<div class="modal fade" id="editSymptomTypeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header rounded-0"
+                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                <h5 class="modal-title">Edit Symptoms Type</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editSymptomTypeForm" method="POST" action="">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="edit_symptoms_type" class="form-label">Symptoms Type</label>
+                        <input type="text" name="symptoms_type" id="edit_symptoms_type" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
     <script>
         const addBtn = document.getElementById("addBtn");
@@ -179,7 +190,28 @@
             });
         });
     </script>
+<script>
+    function openEditSymptomTypeModal(el) {
+    let id = el.getAttribute("data-id");
+    let name = el.getAttribute("data-name");
 
+    document.getElementById("edit_symptoms_type").value = name;
 
+    let form = document.getElementById("editSymptomTypeForm");
+    form.action = "{{ url('symptoms-type/update') }}/" + id;
+
+    let modal = new bootstrap.Modal(document.getElementById("editSymptomTypeModal"));
+    modal.show();
+}
+
+function deleteSymptomType(id) {
+    if (confirm("Are you sure you want to delete this Symptoms Type?")) {
+        let form = document.getElementById("deleteSymptomTypeForm");
+        form.action = "{{ url('symptoms-type/destroy') }}/" + id;
+        form.submit();
+    }
+}
+
+</script>
 
 @endsection

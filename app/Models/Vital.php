@@ -11,11 +11,13 @@ class Vital extends Model
 
     protected $table = 'vitals';
 
-    public $timestamps = true; // Laravel will handle created_at automatically
+    public $timestamps = false;
 
     protected $fillable = [
         'hospital_id',
         'name',
+        'range_from',
+        'range_to',
         'reference_range',
         'unit',
         'is_system',

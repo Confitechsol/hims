@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\BloodBankController;
 use App\Http\Controllers\SymptomController;
+use App\Http\Controllers\VitalController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -238,24 +239,31 @@ Route::prefix('/blood-bank-products')->group(function () {
     Route::put('/update/{id}', [BloodBankController::class, 'updateProduct'])->name('blood-bank-products.update');
     Route::delete('/destroy/{id}', [BloodBankController::class, 'destroyProduct'])->name('blood-bank-products.destroy');
 });
+Route::prefix('/symptoms-type')->group(function () {
+    Route::get('/', [SymptomController::class, 'symptomType'])->name('symptoms-type');
+    Route::post('/store', [SymptomController::class, 'storeSymptomType'])->name('symptoms-type.store');
+    Route::put('/update/{id}', [SymptomController::class, 'updateSymptomType'])->name('symptoms-type.update');
+    Route::delete('/destroy/{id}', [SymptomController::class, 'destroySymptomType'])->name('symptoms-type.destroy');
+});
 Route::prefix('/symptoms-head')->group(function () {
     Route::get('/', [SymptomController::class, 'symptomHead'])->name('symptoms-head');
     Route::post('/store', [SymptomController::class, 'storeSymptomHead'])->name('symptoms-head.store');
     Route::put('/update/{id}', [SymptomController::class, 'updateSymptomHead'])->name('symptoms-head.update');
     Route::delete('/destroy/{id}', [SymptomController::class, 'destroySymptomHead'])->name('symptoms-head.destroy');
 });
-Route::get('/symptoms-type', function () {
-    return view('admin.setup.symptoms_type');
-})->name('symptoms-tyep');
+
 Route::get('/finding', function () {
     return view('admin.setup.finding');
 })->name('finding');
 Route::get('/finding-category', function () {
     return view('admin.setup.finding_category');
 })->name('finding-category');
-Route::get('/vital', function () {
-    return view('admin.setup.vital');
-})->name('vital');
+Route::prefix('/vital') ->group(function () {
+    Route::get('/', [VitalController::class, 'index'])->name('vitals');
+    Route::post('/store', [VitalController::class, 'store'])->name('vital.store');
+    Route::put('/update/{id}', [VitalController::class, 'update'])->name('vital.update');
+    Route::delete('/destroy/{id}', [VitalController::class, 'destroy'])->name('vital.destroy');
+});
 Route::get('/income-head', function () {
     return view('admin.setup.income_head');
 })->name('income-head');
