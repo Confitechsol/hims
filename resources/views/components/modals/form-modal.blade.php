@@ -4,7 +4,8 @@
     'method' => 'POST',// HTTP Method
     'action',          // Form action URL
     'fields' => [],    // Array of fields with structure
-    'columns' => 1     // Number of columns (default: 1)
+    'columns' => 1,     // Number of columns (default: 1)
+    'repeatable_group'=>[]
 ])
 
 <div class="modal fade" id="{{ $id }}" tabindex="-1" aria-hidden="true">
@@ -60,6 +61,45 @@
                                 </div>
                             </div>
                         @endforeach
+                        {{-- Repeatable Group --}}
+@if (!empty($repeatable_group))
+    <div id="repeatable-group-wrapper">
+        <div class="repeatable-group row mb-3">
+            @foreach ($repeatable_group as $subField)
+                <div class="col-md-{{ $subField['size'] ?? 6 }}">
+                    <label class="form-label">
+                        {{ $subField['label'] ?? ucfirst($subField['name']) }}
+                        @if (!empty($subField['required']))<span class="text-danger">*</span>@endif
+                    </label>
+                    @if ($subField['type'] === 'select')
+                    <select name="{{ $subField['name'] }}[0]"
+                            class="form-select"
+                            data-name="{{ $subField['name'] }}"
+                            @if (!empty($subField['required'])) required @endif>
+                        @foreach ($subField['options'] ?? [] as $key => $value)
+                            <option value="{{ $key }}">{{ $value }}</option>
+                        @endforeach
+                    </select>
+                @else
+                    <input type="{{ $subField['type'] ?? 'text' }}"
+                           name="{{ $subField['name'] }}[0]"
+                           class="form-control"
+                           data-name="{{ $subField['name'] }}"
+                           @if (!empty($subField['required'])) required @endif>
+                @endif
+                </div>
+            @endforeach
+            <div class="col-md-1">
+            <button type="button" class="btn btn-danger btn-sm remove-group">
+                <i class="bi bi-x-lg"></i> {{-- Optional icon (Bootstrap Icons) --}}
+            </button>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <button type="button" class="btn btn-success" id="add-repeatable-group">Add</button>
+    </div>
+@endif
                     </div>
                 </div>
 
@@ -118,5 +158,49 @@
         }
     });
 </script>
+@if (!empty($repeatable_group))
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const addBtn = document.getElementById('add-repeatable-group');
+    const wrapper = document.getElementById('repeatable-group-wrapper');
 
-    
+    if (addBtn && wrapper) {
+        let index = 1;
+
+        addBtn.addEventListener('click', () => {
+            const group = wrapper.querySelector('.repeatable-group');
+            const clone = group.cloneNode(true);
+
+            // Clear inputs and update names with new index
+            clone.querySelectorAll('input, select').forEach(el => {
+                // input.value = '';
+                // const baseName = input.getAttribute('data-name');
+                // input.name = `${baseName}[${index}]`;
+                const baseName = el.getAttribute('data-name');
+            if (!baseName) return;
+
+            el.name = `${baseName}[${index}]`;
+
+            if (el.tagName === 'SELECT') {
+                el.selectedIndex = 0; // Reset to first option
+            } else {
+                el.value = '';
+            }
+            });
+
+            wrapper.appendChild(clone);
+            index++;
+        });
+        wrapper.addEventListener('click', function (e) {
+        if (e.target.closest('.remove-group')) {
+            const group = e.target.closest('.repeatable-group');
+            if (wrapper.querySelectorAll('.repeatable-group').length > 1) {
+                group.remove();
+            }
+        }
+    });
+    }
+});
+
+</script>
+@endif

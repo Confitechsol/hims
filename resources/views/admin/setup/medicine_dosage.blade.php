@@ -201,13 +201,22 @@
         </div>
     </div>
 @php
-$options = ["Tablet","Syrup","Injection","Creame","Ointment","Inhaler","Solution"];
+//$options = ["Tablet","Syrup","Injection","Creame","Ointment","Inhaler","Solution"];
+$options = [
+            ""=>"Select",
+            1 => 'Tablet',
+            2 => 'Capsule',
+            3 => 'Syrup',
+            4=>'Injection',
+            5=>'Creame'
+        ];
 @endphp
     <x-modals.form-modal id="add_medicine_dosage" title="Add Medicine Dosage" action="{{route('supplier-store')}}" :fields="[
-        ['name' => 'medicine_category', 'label' => 'Medicine Category', 'type' => 'text', 'required' => true],
-        ['name' => 'dosage', 'label' => 'Dose', 'type' => 'text', 'required' => true],
-        ['name' => 'category', 'label' => 'Category', 'type' => 'select','options'=>$options, 'required' => true],
-    ]" :columns="2" />
+        ['name' => 'medicine_category', 'label' => 'Medicine Category', 'type' => 'text', 'required' => true,'size'=>'12']
+    ]" :repeatable_group="[
+        ['name' => 'dosage', 'label' => 'Dose', 'type' => 'text', 'required' => true,'size'=>'5'],
+        ['name' => 'unit', 'label' => 'Unit', 'type' => 'select','options'=>$options, 'required' => true,'size'=>'6']
+        ]" :columns="2" />
     <x-modals.form-modal id="edit_modal" title="Edit Medicine Dosage" action="{{route('supplier-store')}}" :fields="[
         ['name' => 'medicine_category', 'label' => 'Medicine Category', 'type' => 'text', 'required' => true,'size'=>'12'],
         ['name' => 'dosage', 'label' => 'Dose', 'type' => 'text', 'required' => true,'size'=>'5'],
