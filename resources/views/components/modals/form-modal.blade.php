@@ -5,7 +5,8 @@
     'action',          // Form action URL
     'fields' => [],    // Array of fields with structure
     'columns' => 1,     // Number of columns (default: 1)
-    'repeatable_group'=>[]
+    'repeatable_group'=>[],
+    'type'
 ])
 
 <div class="modal fade" id="{{ $id }}" tabindex="-1" aria-hidden="true">
@@ -110,7 +111,9 @@
             </form>
         </div>
     </div>
+    </div>
 </div>
+@if(isset($type) && $type =="edit")
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const editButtons = document.querySelectorAll('.edit-btn');
@@ -146,6 +149,7 @@
         });
     });
 </script>
+@endif
 <script>
     // Listen for when *any* modal is hidden
     document.addEventListener('hidden.bs.modal', function (event) {
