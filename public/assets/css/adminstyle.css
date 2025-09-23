@@ -13311,6 +13311,11 @@ Author URL: https://themeforest.net/user/dreamstechnologies
   box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.0509803922);
   color: var(--primary);
 }
+.sidebars.settings-sidebar .sidebar-menu>ul>li>a.inactive {
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.0509803922);
+}
 
 .sidebars.settings-sidebar .sidebar-menu>ul>li.submenu ul {
   display: none;

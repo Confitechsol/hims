@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,5 +12,9 @@ class PrintSetting extends Model
 
     protected $fillable = [
         'hospital_id',
+        'print_header',
+        'print_footer',
+        'setting_for',
+        'is_active',
     ];
 }

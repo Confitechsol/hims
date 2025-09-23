@@ -10,6 +10,7 @@ class PathologyParameter extends Model
     use HasFactory;
 
     protected $table = 'pathology_parameter';
+    public $timestamps = false; 
 
     protected $fillable = [
         'hospital_id',
@@ -19,7 +20,7 @@ class PathologyParameter extends Model
         'range_from',
         'range_to',
         'gender',
-        'unit',
+        'unit_id',
         'description',
     ];
 
@@ -28,6 +29,6 @@ class PathologyParameter extends Model
      */
     public function unitRelation()
     {
-        return $this->belongsTo(Unit::class, 'unit');
+        return $this->belongsTo(Unit::class, 'unit_id');
     }
 }
