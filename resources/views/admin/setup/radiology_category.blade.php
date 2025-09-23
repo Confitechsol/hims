@@ -1,7 +1,6 @@
 {{-- resources/views/settings.blade.php --}}
 @extends('layouts.adminLayout')
 @section('content')
-
     <div class="row justify-content-center">
         {{-- Settings Form --}}
         <div class="col-md-11">
@@ -37,20 +36,22 @@
                                                     data-bs-toggle="modal" data-bs-target="#add_radiology_category"><i
                                                         class="ti ti-plus me-1"></i>Add Radiology Category</a>
                                             </div>
-                                            <!-- Modal -->
+                                            <!--Create Modal -->
                                             <div class="modal fade" id="add_radiology_category" tabindex="-1"
                                                 aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered">
                                                     <div class="modal-content">
                                                         <div class="modal-header rounded-0"
                                                             style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                                            <h5 class="modal-title" id="addSpecializationLabel">Add Radiology Category
+                                                            <h5 class="modal-title" id="addSpecializationLabel">Add
+                                                                Radiology Category
                                                             </h5>
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                                 aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <form action="" method="POST">
+                                                            <form action="{{ route('radiology-category.store') }}"
+                                                                method="POST">
                                                                 @csrf
                                                                 <div class="row gy-3 medicine-group-row mb-2">
 
@@ -80,68 +81,95 @@
                                             <thead>
                                                 <tr>
                                                     <th>Category Name</th>
-                                                    <th style="width: 200px;">Action</th>
+                                                    <th>Status</th>
+                                                    <th>Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">X-Ray	
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Ultrasound (USG)	
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">CT Scan (Computed Tomography)
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">MRI (Magnetic Resonance Imaging)	
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
+                                                @foreach ($radiologyCategories as $category)
+                                                    <tr>
+                                                        <td>
+                                                            <h6 class="mb-0 fs-14 fw-semibold">{{ $category->name }}
+                                                            </h6>
+                                                        </td>
+                                                        <td>
+                                                            <form
+                                                                action="{{ route('radiology-category.updateStatus', [$category->id]) }}"
+                                                                method="post">
+                                                                @csrf
+                                                                <div class="form-check form-switch mb-0">
+                                                                    <input class="form-check-input category-status-toggle"
+                                                                        type="checkbox" role="switch"
+                                                                        id="switchCheckDefault" name="is_active"
+                                                                        data-id="{{ $category->id }}"
+                                                                        {{ $category->is_active == 'yes' ? 'checked' : '' }}>
+                                                                </div>
+                                                            </form>
+                                                        </td>
+                                                        <td>
+                                                            <div class="d-flex gap-2">
+
+                                                                <a href="javascript: void(0);"
+                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#edit_radiology_category"
+                                                                    data-id="{{ $category->id }}"
+                                                                    data-name="{{ $category->name }}">
+                                                                    <i class="ti ti-pencil"></i></a>
+                                                                <form
+                                                                    action="{{ route('radiology-category.delete', [$category->id]) }}"
+                                                                    id="delete-form-{{ $category->id }}" method="POST">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <a href="javascript: void(0);"
+                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill delete-button"
+                                                                        data-category-id="{{ $category->id }}"
+                                                                        data-category-name="{{ $category->name }}"
+                                                                        data-form-id="delete-form-{{ $category->id }}">
+                                                                        <i class="ti ti-trash"></i></a>
+                                                                </form>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
                                             </tbody>
                                         </table>
+                                    </div>
+                                    <!--Edit Modal -->
+                                    <div class="modal fade" id="edit_radiology_category" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header rounded-0"
+                                                    style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                                    <h5 class="modal-title" id="addSpecializationLabel">Update
+                                                        Radiology Category
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form action="{{ route('radiology-category.update') }}"
+                                                        method="POST">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <div class="row gy-3 medicine-group-row mb-2">
+                                                            <!-- Operation Name -->
+                                                            <div class="col-md-12">
+                                                                <label for="category_name" class="form-label">Category
+                                                                    Name<span class="text-danger">*</span></label>
+                                                                <input type="text" name="category_name"
+                                                                    id="update_category_name" class="form-control" />
+                                                                <input type="hidden" name="category_id"
+                                                                    id="category_id">
+                                                            </div>
+                                                        </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="submit" class="btn btn-primary">Update</button>
+                                                </div>
+                                                </form>
+                                            </div>
+                                        </div>
                                     </div>
 
                                 </div> <!-- end card-body -->
@@ -155,4 +183,50 @@
         </div>
     </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var editModal = document.getElementById('edit_radiology_category');
+
+            editModal.addEventListener('show.bs.modal', function(event) {
+                var button = event.relatedTarget; // Button that triggered the modal
+                var id = button.getAttribute('data-id');
+                var name = button.getAttribute('data-name');
+
+                // Populate modal inputs
+                document.getElementById('category_id').value = id;
+                document.getElementById('update_category_name').value = name;
+            });
+        });
+    </script>
+    <script>
+        document.querySelectorAll('.category-status-toggle').forEach(input => {
+            input.addEventListener('change', function() {
+                this.closest('form').submit();
+            });
+        });
+    </script>
+    <script>
+        document.querySelectorAll('.delete-button').forEach(input => {
+            input.addEventListener('click', function() {
+                const categoryId = this.dataset.categoryId;
+                const categoryName = this.dataset.categoryName;
+                const formId = this.dataset.formId;
+
+                Swal.fire({
+                    title: `Please Confirm`,
+                    text: `Delete Radiology Category ${categoryName}(${categoryId})`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Delete!',
+                    cancelButtonText: 'Cancel',
+                }).then(result => {
+                    console.log(result);
+
+                    if (result.isConfirmed) {
+                        document.getElementById(formId).submit(); // Submit your form
+                    }
+                });
+            });
+        });
+    </script>
 @endsection

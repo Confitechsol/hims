@@ -1,7 +1,6 @@
 {{-- resources/views/settings.blade.php --}}
 @extends('layouts.adminLayout')
 @section('content')
-
     <div class="row justify-content-center">
         {{-- Settings Form --}}
         <div class="col-md-11">
@@ -51,7 +50,8 @@
                                                                 aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <form action="" method="POST">
+                                                            <form action="{{ route('radiology-unit.store') }}"
+                                                                method="POST">
                                                                 @csrf
                                                                 <div class="row gy-3 medicine-group-row mb-2">
 
@@ -59,8 +59,8 @@
                                                                     <div class="col-md-12">
                                                                         <label for="unit_name" class="form-label">Unit
                                                                             Name <span class="text-danger">*</span></label>
-                                                                        <input type="text" name="unit_name" id="unit_name"
-                                                                            class="form-control" />
+                                                                        <input type="text" name="unit_name"
+                                                                            id="unit_name" class="form-control" />
                                                                     </div>
                                                                 </div>
 
@@ -85,79 +85,71 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Chest X-Ray (CXR)	
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Skull X-Ray	
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Abdomen X-Ray	
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Spine X-Ray (Cervical, Lumbar, Thoracic)	
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Abdominal Ultrasound	
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
+                                                @foreach ($radiologyUnits as $unit)
+                                                    <tr>
+                                                        <td>
+                                                            <h6 class="mb-0 fs-14 fw-semibold">{{ $unit->name }}
+                                                            </h6>
+                                                        </td>
+                                                        <td>
+                                                            <a href="javascript: void(0);"
+                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                                data-bs-toggle="modal" data-bs-target="#edit_radiology_unit"
+                                                                data-id="{{ $unit->id }}"
+                                                                data-name="{{ $unit->name }}">
+                                                                <i class="ti ti-pencil"></i></a>
+                                                            <form action="{{ route('radiology-unit.deleteUnit', [$unit->id]) }}"
+                                                                id="delete-form-{{ $unit->id }}" method="POST" class="d-inline">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <a href="javascript: void(0);"
+                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill delete-button"
+                                                                    data-unit-id="{{ $unit->id }}"
+                                                                    data-unit-name="{{ $unit->name }}"
+                                                                    data-form-id="delete-form-{{ $unit->id }}">
+                                                                    <i class="ti ti-trash"></i></a>
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
 
                                             </tbody>
                                         </table>
+                                    </div>
+
+                                    <!--Edit Modal -->
+                                    <div class="modal fade" id="edit_radiology_unit" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header rounded-0"
+                                                    style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                                    <h5 class="modal-title" id="addSpecializationLabel">Update
+                                                        Radiology Unit
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form action="{{ route('radiology-unit.updateUnit') }}" method="POST">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <div class="row gy-3 medicine-group-row mb-2">
+                                                            <!-- Operation Name -->
+                                                            <div class="col-md-12">
+                                                                <label for="unit_name" class="form-label">Unit
+                                                                    Name<span class="text-danger">*</span></label>
+                                                                <input type="text" name="unit_name"
+                                                                    id="update_unit_name" class="form-control" />
+                                                                <input type="hidden" name="unit_id" id="unit_id">
+                                                            </div>
+                                                        </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="submit" class="btn btn-primary">Update</button>
+                                                </div>
+                                                </form>
+                                            </div>
+                                        </div>
                                     </div>
 
                                 </div> <!-- end card-body -->
@@ -170,5 +162,43 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var editModal = document.getElementById('edit_radiology_unit');
 
+            editModal.addEventListener('show.bs.modal', function(event) {
+                var button = event.relatedTarget; // Button that triggered the modal
+                var id = button.getAttribute('data-id');
+                var name = button.getAttribute('data-name');
+
+                // Populate modal inputs
+                document.getElementById('unit_id').value = id;
+                document.getElementById('update_unit_name').value = name;
+            });
+        });
+    </script>
+    <script>
+        document.querySelectorAll('.delete-button').forEach(input => {
+            input.addEventListener('click', function() {
+                const unitId = this.dataset.unitId;
+                const unitName = this.dataset.unitName;
+                const formId = this.dataset.formId;
+
+                Swal.fire({
+                    title: `Please Confirm`,
+                    text: `Delete Radiology Unit ${unitName}(${unitId})`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Delete!',
+                    cancelButtonText: 'Cancel',
+                }).then(result => {
+                    console.log(result);
+
+                    if (result.isConfirmed) {
+                        document.getElementById(formId).submit(); // Submit your form
+                    }
+                });
+            });
+        });
+    </script>
 @endsection

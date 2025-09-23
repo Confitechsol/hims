@@ -18,6 +18,7 @@ use App\Http\Controllers\Setup\LanguagesController;
 use App\Http\Controllers\Setup\LetterHeadController;
 use App\Http\Controllers\Setup\PrefixesController;
 use App\Http\Controllers\Setup\ProfileController;
+use App\Http\Controllers\Setup\RadiologyController;
 use App\Http\Controllers\Setup\UsersController;
 use Illuminate\Support\Facades\Route;
 
@@ -212,15 +213,23 @@ Route::get('/pathology-unit', function () {
 Route::get('/pathology-parameter', function () {
     return view('admin.setup.pathology_parameter');
 })->name('pathology-parameter');
-Route::get('/radiology-category', function () {
-    return view('admin.setup.radiology_category');
-})->name('radiology-category');
-Route::get('/radiology-unit', function () {
-    return view('admin.setup.radiology_unit');
-})->name('radiology-unit');
-Route::get('/radiology-parameter', function () {
-    return view('admin.setup.radiology_parameter');
-})->name('radiology-parameter');
+
+Route::get('/radiology-category', [RadiologyController::class, 'radiologyCategoryIndex'])->name('radiology-category');
+Route::post('/radiology-category/store', [RadiologyController::class, 'store'])->name('radiology-category.store');
+Route::put('/radiology-category/update', [RadiologyController::class, 'update'])->name('radiology-category.update');
+Route::post('/radiology-category/updateStatus/{id}', [RadiologyController::class, 'updateStatus'])->name('radiology-category.updateStatus');
+Route::delete('/radiology-category/delete/{id}', [RadiologyController::class, 'delete'])->name('radiology-category.delete');
+
+Route::get('/radiology-unit', [RadiologyController::class, 'radiologyUnitIndex'])->name('radiology-unit');
+Route::post('/radiology-unit/store', [RadiologyController::class, 'storeUnit'])->name('radiology-unit.store');
+Route::put('/radiology-unit/updateUnit', [RadiologyController::class, 'updateUnit'])->name('radiology-unit.updateUnit');
+Route::delete('/radiology-unit/deleteUnit/{id}', [RadiologyController::class, 'deleteUnit'])->name('radiology-unit.deleteUnit');
+
+Route::get('/radiology-parameter', [RadiologyController::class, 'radiologyParameterIndex'])->name('radiology-parameter');
+Route::post('/radiology-parameter/store', [RadiologyController::class, 'storeParameter'])->name('radiology-parameter.store');
+Route::put('/radiology-parameter/update', [RadiologyController::class, 'updateParameter'])->name('radiology-parameter.update');
+Route::delete('/radiology-parameter/delete/{id}', [RadiologyController::class, 'deleteParameter'])->name('radiology-parameter.delete');
+
 Route::get('/product', function () {
     return view('admin.setup.product');
 })->name('product');
