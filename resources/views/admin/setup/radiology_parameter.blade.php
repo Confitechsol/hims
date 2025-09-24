@@ -304,7 +304,6 @@
                 var rangeFrom = button.getAttribute('data-range_from');
                 var rangeTo = button.getAttribute('data-range_to');
                 var gender = button.getAttribute('data-gender');
-                console.log(name, unit, rangeFrom);
                 // Populate modal inputs
                 document.getElementById('update_parameter_id').value = id;
                 document.getElementById('update_parameter_name').value = name;
