@@ -50,7 +50,7 @@
                                                                 aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <form action="" method="POST">
+                                                            <form action="{{ route('symptoms-head.store') }}" method="POST">
                                                                 @csrf
                                                                 <div class="row gy-3 mb-2">
 
@@ -59,7 +59,7 @@
                                                                         <label for="symptom_head"
                                                                             class="form-label">Symptoms Head <span
                                                                                 class="text-danger">*</span></label>
-                                                                        <input type="text" name="symptom_head"
+                                                                        <input type="text" name="symptoms_title"
                                                                             id="symptom_head" class="form-control"
                                                                             required />
                                                                     </div>
@@ -70,12 +70,11 @@
                                                                         <select name="type" id="type" onchange=""
                                                                             class="form-select">
                                                                             <option value="">Select</option>
-                                                                            <option value="1">Neurological</option>
-                                                                            <option value="2">General</option>
-                                                                            <option value="3">Cardiovascular</option>
-                                                                            <option value="4">Respiratory</option>
-                                                                            <option value="5">Gastrointestinal</option>
-                                                                            <option value="6">Musculoskeletal</option>
+                                                                            @foreach($classifications as $classification)
+                                                                                <option value="{{ $classification->id }}">
+                                                                                    {{ $classification->symptoms_type }}
+                                                                                </option>
+                                                                            @endforeach
                                                                         </select>
                                                                     </div>
                                                                     <div class="col-md-12">
@@ -110,38 +109,37 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Chest Pain	
-                                                        </h6>
-                                                    </td>
-                                                    <td>Cardiovascular	</td>
-                                                    <td></td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Abdominal Pain	
-                                                        </h6>
-                                                    </td>
-                                                    <td>Gastrointestinal</td>
-                                                    <td></td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
+                                                  @foreach($symptoms as $symptom)
+        <tr>
+            <td>
+                <h6 class="mb-0 fs-14 fw-semibold">{{ $symptom->symptoms_title }}</h6>
+            </td>
+            <td>{{ $symptom->classification->symptoms_type }}</td>
+            <td>{{ $symptom->description }}</td>
+            <td>
+                <!-- Edit button -->
+                <a href="javascript:void(0);"
+                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                    onclick="openSymptomHeadModal(this)"
+                    data-symptom-id="{{ $symptom->id }}"
+                    data-symptom-title="{{ $symptom->symptoms_title }}"
+                    data-symptom-type="{{ $symptom->type }}"
+                    data-symptom-description="{{ $symptom->description }}">
+                    <i class="ti ti-pencil"></i>
+                </a>
+
+                <a href="javascript:void(0);"
+                    onclick="deleteSymptomHead({{ $symptom->id }})"
+                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                    <i class="ti ti-trash"></i>
+                </a>
+                <form id="deleteSymptomHeadForm" method="POST" style="display:none;">
+                    @csrf
+                    @method('DELETE')
+                </form>
+            </td>
+        </tr>
+    @endforeach
 
                                             </tbody>
                                         </table>
@@ -157,5 +155,80 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="editSymptomHeadModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Symptom Head</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editSymptomHeadForm" method="POST" action="">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Symptoms Head</label>
+                        <input type="text" class="form-control" name="symptoms_title" id="editSymptomTitle" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Symptoms Type</label>
+                        <select class="form-select" name="type" id="editSymptomType" required>
+                            <option value="">Select</option>
+                            @foreach($classifications as $classification)
+                                <option value="{{ $classification->id }}">
+                                    {{ $classification->symptoms_type }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" name="description" id="editSymptomDescription"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    function openSymptomHeadModal(el) 
+    {
+        let id = el.getAttribute("data-symptom-id");
+        let title = el.getAttribute("data-symptom-title");
+        let type = el.getAttribute("data-symptom-type");
+        let description = el.getAttribute("data-symptom-description");
+
+        // Fill modal fields
+        document.getElementById("editSymptomTitle").value = title;
+        document.getElementById("editSymptomType").value = type;
+        document.getElementById("editSymptomDescription").value = description;
+
+        // Update form action
+        let form = document.getElementById("editSymptomHeadForm");
+        form.action = "{{ url('symptoms-head/update') }}/" + id;
+
+        // Show modal
+        let modal = new bootstrap.Modal(document.getElementById("editSymptomHeadModal"));
+        modal.show();
+    }
+</script>
+<script>
+    function deleteSymptomHead(id) 
+    {
+        if (confirm("Are you sure you want to delete this symptom head?")) {
+            let form = document.getElementById("deleteSymptomHeadForm");
+            form.action = "{{ url('symptoms-head/destroy') }}/" + id;
+            form.submit();
+        }
+    }
+</script>
 
 @endsection
