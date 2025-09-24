@@ -48,4 +48,11 @@ class Charge extends Model
     {
         return $this->belongsTo(ChargeUnit::class, 'charge_unit_id');
     }
+
+    public function chargeType()
+    {
+        return $this->category->chargeType(); // This accesses the ChargeTypeMaster through the ChargeCategory
+    }
+
+   
 }
