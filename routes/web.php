@@ -30,7 +30,9 @@ use App\Http\Controllers\Setup\HospitalChargesController;
 use App\Http\Controllers\Setup\HospitalChargeCategoryController;
 use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\VitalController;
-
+use App\Http\Controllers\Setup\HospitalChargeTypeController;
+use App\Http\Controllers\Setup\HospitalTaxCategoryController;
+use App\Http\Controllers\Setup\HospitalUnitTypeController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -157,15 +159,12 @@ Route::middleware(['admin'])->group(function () {
     Route::put('/floors/update', [FloorController::class, 'update'])->name('floors.update');
     Route::delete('/floors/destroy', [FloorController::class, 'destroy'])->name('floors.destroy');
     Route::get('/charge-category',[HospitalChargeCategoryController::class,'index'])->name('charge_categories');
-    Route::get('/charge-type', function () {
-        return view('admin.setup.charge_type');
-    })->name('charge-type');
-    Route::get('/tax-category', function () {
-        return view('admin.setup.tax_category');
-    })->name('tax-category');
-    Route::get('/unit-type', function () {
-        return view('admin.setup.unit_type');
-    })->name('unit-type');
+    Route::get('/charge-type',[HospitalChargeTypeController::class,'index'])->name('charge_type_module');
+    Route::get('/tax-category',[HospitalTaxCategoryController::class,'index'])->name('tax_category');
+    Route::get('/unit-type',[HospitalUnitTypeController::class,'index'])->name('charge_units');
+    // Route::get('/unit-type', function () {
+    //     return view('admin.setup.unit_type');
+    // })->name('unit-type');
     Route::get('/medicine-category', function () {
         return view('admin.setup.medicine_category');
     })->name('medicine-category');

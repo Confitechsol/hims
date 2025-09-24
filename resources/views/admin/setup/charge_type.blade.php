@@ -127,173 +127,76 @@
                                         <table class="table mb-0">
                                             <thead>
                                                 <tr>
-                                                    <th>Charge Type</th>
-                                                    <th>Appointment</th>
-                                                    <th>OPD</th>
-                                                    <th>IPD</th>
-                                                    <th>Pathology</th>
-                                                    <th>Radiology</th>
-                                                    <th>Blood Bank</th>
-                                                    <th>Ambulance</th>
+                                                <th></th>
+                                                @foreach ( $chargestype as $chargestypes )
+
+                                                <th>
+                                                  {{$chargestypes ->charge_type}}
+                                                
+
+                                                </th>
+                                                    
+                                                @endforeach
+                                                  
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                            @foreach ( $chargestype as $chargestypes)
+                                                
+                                           
                                                 <tr>
+
                                                     <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold"> Appointment </h6>
+                                                        <h6 class="mb-0 fs-14 fw-semibold"> {{$chargestypes->charge_type}} </h6>
                                                     </td>
                                                     <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input" checked>
+                                                        <input type="checkbox" name="" id="" class="form-check-input"  {{ $chargestypes->charge_type=="Appointment" && $chargestypes->is_active == 'yes' ? 'checked' : '' }}>
                                                     </td>
                                                     <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
+                                                        <input type="checkbox" name="" id="" class="form-check-input" {{ $chargestypes->charge_type=="OPD" && $chargestypes->is_active == 'yes' ? 'checked' : '' }}>
                                                     </td>
                                                     <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
+                                                        <input type="checkbox" name="" id="" class="form-check-input" {{ $chargestypes->charge_type=="IPD" && $chargestypes->is_active == 'yes' ? 'checked' : '' }}>
                                                     </td>
                                                     <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
+                                                        <input type="checkbox" name="" id="" class="form-check-input" {{ $chargestypes->charge_type=="Pathology" && $chargestypes->is_active == 'yes' ? 'checked' : '' }}>
                                                     </td>
                                                     <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
+                                                        <input type="checkbox" name="" id="" class="form-check-input" {{ $chargestypes->charge_type=="Radiology" && $chargestypes->is_active == 'yes' ? 'checked' : '' }}>
                                                     </td>
                                                     <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
+                                                        <input type="checkbox" name="" id="" class="form-check-input" {{ $chargestypes->charge_type=="Blood Bank" && $chargestypes->is_active == 'yes' ? 'checked' : '' }}>
                                                     </td>
                                                     <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
+                                                        <input type="checkbox" name="" id="" class="form-check-input" {{ $chargestypes->charge_type=="Ambulance" && $chargestypes->is_active == 'yes' ? 'checked' : '' }}>
                                                     </td>
+                                                     
+                                                    <td>
+                                                        <input type="checkbox" name="" id="" class="form-check-input" {{ $chargestypes->charge_type=="Procedures" && $chargestypes->is_active == 'yes' ? 'checked' : '' }}>
+                                                    </td>
+                                                    <td>
+                                                        <input type="checkbox" name="" id="" class="form-check-input" {{ $chargestypes->charge_type=="Investigations" && $chargestypes->is_active == 'yes' ? 'checked' : '' }}>
+                                                    </td>
+                                                    <td>
+                                                        <input type="checkbox" name="" id="" class="form-check-input" {{ $chargestypes->charge_type=="Supplier" && $chargestypes->is_active == 'yes' ? 'checked' : '' }}>
+                                                    </td>
+                                                    <td>
+                                                        <input type="checkbox" name="" id="" class="form-check-input" {{ $chargestypes->charge_type=="Operations" && $chargestypes->is_active == 'yes' ? 'checked' : '' }}>
+                                                    </td>
+                                                    <td>
+                                                        <input type="checkbox" name="" id="" class="form-check-input" {{ $chargestypes->charge_type=="Others" && $chargestypes->is_active == 'yes' ? 'checked' : '' }}>
+                                                    </td>
+                                                    <td>
+                                                        <input type="checkbox" name="" id="" class="form-check-input" {{ $chargestypes->charge_type=="Bed Charges" && $chargestypes->is_active == 'yes' ? 'checked' : '' }}>
+                                                    </td>  
                                                     <td>
                                                         <a href="javascript: void(0);"
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
                                                             <i class="ti ti-pencil"></i></a>
                                                     </td>
                                                 </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold"> OPD </h6>
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input" checked>
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold"> IPD </h6>
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input" checked>
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold"> Pathology </h6>
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input" checked>
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold"> Radiology </h6>
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input" checked>
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="" id="" class="form-check-input">
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                    </td>
-                                                </tr>
+                                                 @endforeach
                                             </tbody>
                                         </table>
                                     </div>
