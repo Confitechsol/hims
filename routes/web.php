@@ -17,6 +17,7 @@ use App\Http\Controllers\PathologyController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RolesController;
+use App\Http\Controllers\Setup\FindingsController;
 use App\Http\Controllers\Setup\LanguagesController;
 use App\Http\Controllers\Setup\LetterHeadController;
 use App\Http\Controllers\Setup\MedicineDosageController;
@@ -273,12 +274,15 @@ Route::prefix('/symptoms-head')->group(function () {
     Route::delete('/destroy/{id}', [SymptomController::class, 'destroySymptomHead'])->name('symptoms-head.destroy');
 });
 
-Route::get('/finding', function () {
-    return view('admin.setup.finding');
-})->name('finding');
-Route::get('/finding-category', function () {
-    return view('admin.setup.finding_category');
-})->name('finding-category');
+Route::get('/finding', [FindingsController::class, 'index'])->name('finding');
+Route::post('/finding/store', [FindingsController::class, 'store'])->name('finding.store');
+Route::put('/finding/update', [FindingsController::class, 'update'])->name('finding.update');
+Route::delete('/finding/delete/{id}', [FindingsController::class, 'delete'])->name('finding.delete');
+Route::get('/finding-category', [FindingsController::class, 'indexCategory'])->name('finding-category');
+Route::post('/finding-category/storeCategory', [FindingsController::class, 'storeCategory'])->name('finding-category.storeCategory');
+Route::put('/finding-category/updateCategory', [FindingsController::class, 'updateCategory'])->name('finding-category.updateCategory');
+Route::delete('/finding-category/deleteCategory/{id}', [FindingsController::class, 'deleteCategory'])->name('finding-category.deleteCategory');
+
 Route::prefix('/vital')->group(function () {
     Route::get('/', [VitalController::class, 'index'])->name('vitals');
     Route::post('/store', [VitalController::class, 'store'])->name('vital.store');
