@@ -5,29 +5,35 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BedController;
 use App\Http\Controllers\BedGroupController;
 use App\Http\Controllers\BedTypeController;
+use App\Http\Controllers\BloodBankController;
 use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\FloorController;
 use App\Http\Controllers\FrontOfficeController;
+use App\Http\Controllers\MedicineCategoryController;
+use App\Http\Controllers\MedicineGroupController;
 use App\Http\Controllers\OperationController;
 use App\Http\Controllers\PathologyController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RolesController;
+use App\Http\Controllers\Setup\FindingsController;
 use App\Http\Controllers\Setup\LanguagesController;
 use App\Http\Controllers\Setup\LetterHeadController;
+use App\Http\Controllers\Setup\MedicineDosageController;
+use App\Http\Controllers\Setup\MedicineSupplierController;
 use App\Http\Controllers\Setup\PrefixesController;
 use App\Http\Controllers\Setup\ProfileController;
+use App\Http\Controllers\Setup\RadiologyController;
 use App\Http\Controllers\Setup\UsersController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\MedicineCategoryController;
-use App\Http\Controllers\MedicineGroupController;
-use App\Http\Controllers\Setup\MedicineSupplierController;
-use App\Http\Controllers\Setup\MedicineDosageController;
-
-use App\Http\Controllers\BloodBankController;
+use App\Http\Controllers\Setup\HospitalChargesController;
+use App\Http\Controllers\Setup\HospitalChargeCategoryController;
 use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\VitalController;
+use App\Http\Controllers\Setup\HospitalChargeTypeController;
+use App\Http\Controllers\Setup\HospitalTaxCategoryController;
+use App\Http\Controllers\Setup\HospitalUnitTypeController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\AppointmentController;
 
@@ -113,10 +119,8 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/users', [UsersController::class, 'index'])->name('users');
     Route::post('/users/updatedrstatus/{id}', [UsersController::class, 'updateDrStatus'])->name('users.updateDrStatus');
     Route::post('/users/updatestaffstatus/{id}', [UsersController::class, 'updateStaffStatus'])->name('users.updateStaffStatus');
-
-    Route::get('/charges', function () {
-        return view('admin.setup.charges');
-    })->name('charges');
+    
+    Route::get('/charges',[HospitalChargesController::class,'index'])->name('charges');
     Route::get('/disable', function () {
         return view('admin.setup.disable_patient');
     })->name('disable');
@@ -157,26 +161,21 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/floors/store', [FloorController::class, 'store'])->name('floors.store');
     Route::put('/floors/update', [FloorController::class, 'update'])->name('floors.update');
     Route::delete('/floors/destroy', [FloorController::class, 'destroy'])->name('floors.destroy');
-    Route::get('/charge-category', function () {
-        return view('admin.setup.charge_category');
-    })->name('charge-category');
-    Route::get('/charge-type', function () {
-        return view('admin.setup.charge_type');
-    })->name('charge-type');
-    Route::get('/tax-category', function () {
-        return view('admin.setup.tax_category');
-    })->name('tax-category');
-    Route::get('/unit-type', function () {
-        return view('admin.setup.unit_type');
-    })->name('unit-type');
+    Route::get('/charge-category',[HospitalChargeCategoryController::class,'index'])->name('charge_categories');
+    Route::get('/charge-type',[HospitalChargeTypeController::class,'index'])->name('charge_type_module');
+    Route::get('/tax-category',[HospitalTaxCategoryController::class,'index'])->name('tax_category');
+    Route::get('/unit-type',[HospitalUnitTypeController::class,'index'])->name('charge_units');
+    // Route::get('/unit-type', function () {
+    //     return view('admin.setup.unit_type');
+    // })->name('unit-type');
     Route::get('/medicine-category', function () {
         return view('admin.setup.medicine_category');
     })->name('medicine-category');
-    Route::get('/supplier',[MedicineSupplierController::class,'index'])->name('supplier');
-    Route::post('/supplier/store',[MedicineSupplierController::class,'store'])->name('supplier-store');
-    Route::delete('/supplier/destroy',[MedicineSupplierController::class,'destroy'])->name('supplier.destroy');
-    Route::put('/supplier/update',[MedicineSupplierController::class,'update'])->name('supplier.update');
-    Route::get('/medicine-dosage', [MedicineDosageController::class,'index'])->name('medicine-dosage');
+    Route::get('/supplier', [MedicineSupplierController::class, 'index'])->name('supplier');
+    Route::post('/supplier/store', [MedicineSupplierController::class, 'store'])->name('supplier-store');
+    Route::delete('/supplier/destroy', [MedicineSupplierController::class, 'destroy'])->name('supplier.destroy');
+    Route::put('/supplier/update', [MedicineSupplierController::class, 'update'])->name('supplier.update');
+    Route::get('/medicine-dosage', [MedicineDosageController::class, 'index'])->name('medicine-dosage');
     Route::get('/purpose', [FrontOfficeController::class, 'purposes'])->name('purpose');
     Route::post('/purpose/store', [FrontOfficeController::class, 'storePurpose'])->name('purposes.store');
     Route::put('/purpose/update/{id}', [FrontOfficeController::class, 'updatePurpose'])->name('purposes.update');
@@ -221,17 +220,17 @@ Route::get('/medicine-group', function () {
     return view('admin.setup.medicine_group');
 })->name('medicine-group');
 Route::prefix('pathology-category')->group(function () {
-Route::get('/', [PathologyController::class, 'pathologyCategories'])->name('pathology-category');
-Route::post('/store', [PathologyController::class, 'storeCategory'])->name('pathology-category.store');
-Route::put('/update/{id}', [PathologyController::class, 'updateCategory'])->name('pathology-category.update');
-Route::delete('/destroy/{id}', [PathologyController::class, 'destroyCategory'])->name('pathology-category.destroy');
+    Route::get('/', [PathologyController::class, 'pathologyCategories'])->name('pathology-category');
+    Route::post('/store', [PathologyController::class, 'storeCategory'])->name('pathology-category.store');
+    Route::put('/update/{id}', [PathologyController::class, 'updateCategory'])->name('pathology-category.update');
+    Route::delete('/destroy/{id}', [PathologyController::class, 'destroyCategory'])->name('pathology-category.destroy');
 
 });
-Route::prefix('/pathology-unit') ->group(function () {
+Route::prefix('/pathology-unit')->group(function () {
     Route::get('/', [PathologyController::class, 'pathologyUnits'])->name('pathology-unit');
     Route::post('/store', [PathologyController::class, 'storeUnit'])->name('pathology-unit.store');
     Route::put('/update/{id}', [PathologyController::class, 'updateUnit'])->name('pathology-unit.update');
-    Route::delete('/destroy/{id}', [PathologyController::class, 'destroyUnit'])->name('pathology-unit.destroy');  
+    Route::delete('/destroy/{id}', [PathologyController::class, 'destroyUnit'])->name('pathology-unit.destroy');
 });
 Route::prefix('/pathology-parameter')->group(function () {
     Route::get('/', [PathologyController::class, 'pathologyParameters'])->name('pathology-parameter');
@@ -239,15 +238,23 @@ Route::prefix('/pathology-parameter')->group(function () {
     Route::put('/update/{id}', [PathologyController::class, 'updateParameter'])->name('pathology-parameter.update');
     Route::delete('/destroy/{id}', [PathologyController::class, 'destroyParameter'])->name('pathology-parameter.destroy');
 });
-Route::get('/radiology-category', function () {
-    return view('admin.setup.radiology_category');
-})->name('radiology-category');
-Route::get('/radiology-unit', function () {
-    return view('admin.setup.radiology_unit');
-})->name('radiology-unit');
-Route::get('/radiology-parameter', function () {
-    return view('admin.setup.radiology_parameter');
-})->name('radiology-parameter');
+
+Route::get('/radiology-category', [RadiologyController::class, 'radiologyCategoryIndex'])->name('radiology-category');
+Route::post('/radiology-category/store', [RadiologyController::class, 'store'])->name('radiology-category.store');
+Route::put('/radiology-category/update', [RadiologyController::class, 'update'])->name('radiology-category.update');
+Route::post('/radiology-category/updateStatus/{id}', [RadiologyController::class, 'updateStatus'])->name('radiology-category.updateStatus');
+Route::delete('/radiology-category/delete/{id}', [RadiologyController::class, 'delete'])->name('radiology-category.delete');
+
+Route::get('/radiology-unit', [RadiologyController::class, 'radiologyUnitIndex'])->name('radiology-unit');
+Route::post('/radiology-unit/store', [RadiologyController::class, 'storeUnit'])->name('radiology-unit.store');
+Route::put('/radiology-unit/updateUnit', [RadiologyController::class, 'updateUnit'])->name('radiology-unit.updateUnit');
+Route::delete('/radiology-unit/deleteUnit/{id}', [RadiologyController::class, 'deleteUnit'])->name('radiology-unit.deleteUnit');
+
+Route::get('/radiology-parameter', [RadiologyController::class, 'radiologyParameterIndex'])->name('radiology-parameter');
+Route::post('/radiology-parameter/store', [RadiologyController::class, 'storeParameter'])->name('radiology-parameter.store');
+Route::put('/radiology-parameter/update', [RadiologyController::class, 'updateParameter'])->name('radiology-parameter.update');
+Route::delete('/radiology-parameter/delete/{id}', [RadiologyController::class, 'deleteParameter'])->name('radiology-parameter.delete');
+
 Route::prefix('/blood-bank-products')->group(function () {
     Route::get('/', [BloodBankController::class, 'products'])->name('blood-bank-products');
     Route::post('/store', [BloodBankController::class, 'storeProduct'])->name('blood-bank-products.store');
@@ -267,13 +274,16 @@ Route::prefix('/symptoms-head')->group(function () {
     Route::delete('/destroy/{id}', [SymptomController::class, 'destroySymptomHead'])->name('symptoms-head.destroy');
 });
 
-Route::get('/finding', function () {
-    return view('admin.setup.finding');
-})->name('finding');
-Route::get('/finding-category', function () {
-    return view('admin.setup.finding_category');
-})->name('finding-category');
-Route::prefix('/vital') ->group(function () {
+Route::get('/finding', [FindingsController::class, 'index'])->name('finding');
+Route::post('/finding/store', [FindingsController::class, 'store'])->name('finding.store');
+Route::put('/finding/update', [FindingsController::class, 'update'])->name('finding.update');
+Route::delete('/finding/delete/{id}', [FindingsController::class, 'delete'])->name('finding.delete');
+Route::get('/finding-category', [FindingsController::class, 'indexCategory'])->name('finding-category');
+Route::post('/finding-category/storeCategory', [FindingsController::class, 'storeCategory'])->name('finding-category.storeCategory');
+Route::put('/finding-category/updateCategory', [FindingsController::class, 'updateCategory'])->name('finding-category.updateCategory');
+Route::delete('/finding-category/deleteCategory/{id}', [FindingsController::class, 'deleteCategory'])->name('finding-category.deleteCategory');
+
+Route::prefix('/vital')->group(function () {
     Route::get('/', [VitalController::class, 'index'])->name('vitals');
     Route::post('/store', [VitalController::class, 'store'])->name('vital.store');
     Route::put('/update/{id}', [VitalController::class, 'update'])->name('vital.update');

@@ -72,10 +72,14 @@
                                     <div class="table-responsive">
                                         <table class="table mb-0">
                                             <thead>
+                                            @foreach ( $unittype as $unittypes)
+                                                
+                                           
                                                 <tr>
-                                                    <th>Unit Type</th>
+                                                    <th>{{$unittypes->unit}}</th>
                                                     <th style="width: 200px;">Action</th>
                                                 </tr>
+                                                 @endforeach
                                             </thead>
                                             <tbody>
                                                 <tr>

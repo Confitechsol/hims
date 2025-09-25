@@ -278,7 +278,6 @@
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="table-responsive">
                                         <table class="table mb-0">
                                             <thead>
@@ -293,15 +292,16 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                            @foreach($charges as $charge)
                                                 <tr>
                                                     <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold"> Bed</h6>
+                                                        <h6 class="mb-0 fs-14 fw-semibold"> {{$charge->name}}</h6>
                                                     </td>
-                                                    <td>Bed Charges</td>
+                                                    <td>{{$charge->category['name']}}</td>
                                                     <td>IPD</td>
-                                                    <td>Each</td>
-                                                    <td>10.00</td>
-                                                    <td>500</td>
+                                                    <td>{{$charge->unit['unit']}}</td>
+                                                    <td>{{$charge->taxCategory['percentage'] ?? ""}}</td>
+                                                    <td>{{$charge->standard_charge}}</td>
                                                     <td>
                                                         <a href="javascript: void(0);"
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
@@ -311,7 +311,8 @@
                                                             <i class="ti ti-trash"></i></a>
                                                     </td>
                                                 </tr>
-                                                <tr>
+                                                @endforeach
+                                                {{-- <tr>
                                                     <td>
                                                         <h6 class="mb-0 fs-14 fw-semibold"> Doctor Fees</h6>
                                                     </td>
@@ -329,7 +330,7 @@
                                                             <i class="ti ti-trash"></i></a>
                                                     </td>
 
-                                                </tr>
+                                                </tr> --}}
                                             </tbody>
                                         </table>
                                     </div>

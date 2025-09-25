@@ -107,11 +107,14 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                            @foreach ( $taxcatogery as $taxcatogerys )
+                                                
+                                           
                                                 <tr>
                                                     <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">VAT</h6>
+                                                        <h6 class="mb-0 fs-14 fw-semibold">{{$taxcatogerys->name}}</h6>
                                                     </td>
-                                                    <td>10.00</td>
+                                                    <td>{{$taxcatogerys->percentage}}</td>
                                                     <td>
                                                         <a href="javascript: void(0);"
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
@@ -121,6 +124,7 @@
                                                             <i class="ti ti-trash"></i></a>
                                                     </td>
                                                 </tr>
+                                                 @endforeach
                                             </tbody>
                                         </table>
                                     </div>
