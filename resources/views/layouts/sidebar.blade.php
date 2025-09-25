@@ -575,7 +575,7 @@
                             </li>
                         </ul>
                     </li>
-                    <li class="menu-title"><span>Pages</span></li>
+                    <!--<li class="menu-title"><span>Pages</span></li>
                     <li>
                         <ul>
                             <li>
@@ -628,7 +628,7 @@
                                 </a>
                             </li>
                         </ul>
-                    </li>
+                    </li> -->
                     <li class="menu-title"><span>Authentication</span></li>
                     <li>
                         <ul>
@@ -737,14 +737,14 @@
                                     <!--<li><a href="security-settings.html">Security</a></li>
                                     //<li><a href="notifications-settings.html">Notifications</a></li>
                                     <li><a href="integrations-settings.html">Integrations</a></li>-->
-                                    <li><a href="integrations-settings.html">General Settings</a></li>
-                                    <li><a href="integrations-settings.html">Email Settings</a></li>
-                                    <li><a href="integrations-settings.html">Prefix Settings</a></li>
-                                    <li><a href="integrations-settings.html">Roles Permissions</a></li>
-                                    <li><a href="integrations-settings.html">Backup/Restore</a></li>
-                                    <li><a href="integrations-settings.html">Languages</a></li>
-                                    <li><a href="integrations-settings.html">Users</a></li>
-                                    <li><a href="integrations-settings.html">Modules</a></li>
+                                    <li><a href="{{ route('profile') }}">General Settings</a></li>
+                                    <li><a href="{{ route('email-setting') }}">Email Settings</a></li>
+                                    <li><a href="{{ route('prefix') }}">Prefix Settings</a></li>
+                                    <li><a href="{{ route('roles') }}">Roles Permissions</a></li>
+                                    <li><a href="{{ route('database.backup') }}">Backup/Restore</a></li>
+                                    <li><a href="{{ route('languages') }}">Languages</a></li>
+                                    <li><a href="{{ route('users') }}">Users</a></li>
+                                    <li><a href="{{ route('permissions.modules') }}">Modules</a></li>
                                 </ul>
                             </li>
                             <li><a href="integrations-settings.html">Patient</a></li>
@@ -755,12 +755,12 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="organization-settings.html">Charges</a></li>
-                                    <li><a href="localization-settings.html">Charge Category</a></li>
-                                    <li><a href="{{ route('prefix') }}">Charge Type</a></li>
-                                    <li><a href="seo-setup-settings.html">Tax
+                                    <li><a href="{{ route('charges') }}">Charges</a></li>
+                                    <li><a href="{{ route('charge-category') }}">Charge Category</a></li>
+                                    <li><a href="{{ route('charge-type') }}">Charge Type</a></li>
+                                    <li><a href="{{ route('tax-category') }}">Tax
                                             Category</a></li>
-                                    <li><a href="{{ route('languages') }}">Unit Type</a></li>
+                                    <li><a href="{{ route('unit-type') }}">Unit Type</a></li>
                                     
                                 </ul>
                             </li>
@@ -772,12 +772,12 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="organization-settings.html">Bed Status</a></li>
-                                    <li><a href="localization-settings.html">Bed</a></li>
-                                    <li><a href="{{ route('prefix') }}">Bed Type</a></li>
-                                    <li><a href="seo-setup-settings.html">Bed
+                                    <li><a href="{{ route('bed-status') }}">Bed Status</a></li>
+                                    <li><a href="{{ route('bed') }}">Bed</a></li>
+                                    <li><a href="{{ route('bed-types.index') }}">Bed Type</a></li>
+                                    <li><a href="{{ route('bed-groups.index') }}">Bed
                                             Group</a></li>
-                                    <li><a href="{{ route('languages') }}">Floor</a></li>
+                                    <li><a href="{{ route('floors.index') }}">Floor</a></li>
                                     
                                 </ul>
                             </li>
@@ -789,9 +789,9 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="organization-settings.html">Purpose</a></li>
-                                    <li><a href="localization-settings.html">Complain Type</a></li>
-                                    <li><a href="{{ route('prefix') }}">Source</a></li>
+                                    <li><a href="{{ route('purpose') }}">Purpose</a></li>
+                                    <li><a href="{{ route('complaint') }}">Complain Type</a></li>
+                                    <li><a href="{{ route('sources') }}">Source</a></li>
                                     
                                 </ul>
                             </li>
@@ -803,8 +803,8 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="organization-settings.html">Operation</a></li>
-                                    <li><a href="localization-settings.html">Operation Category</a></li>
+                                    <li><a href="{{ route('operations') }}">Operation</a></li>
+                                    <li><a href="{{ route('operation-category') }}">Operation Category</a></li>
                                     
                                 </ul>
                             </li>
@@ -816,17 +816,17 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="organization-settings.html">Medicine Category</a></li>
-                                    <li><a href="localization-settings.html">Supplier</a></li>
-                                    <li><a href="{{ route('prefix') }}">Medicine Dosage</a></li>
-                                    <li><a href="seo-setup-settings.html">Dose
+                                    <li><a href="{{ route('medicine-category') }}">Medicine Category</a></li>
+                                    <li><a href="{{ route('medicine-dosage') }}">Supplier</a></li>
+                                    <li><a href="{{ route('medicine-dosage') }}">Medicine Dosage</a></li>
+                                    <li><a href="{{ route('dosage-interval') }}">Dose
                                             Interval</a></li>
-                                    <li><a href="{{ route('languages') }}">Dose Duration</a></li>
-                                    <li><a href="maintenance-mode-settings.html">Unit
+                                    <li><a href="{{ route('dosage-duration') }}">Dose Duration</a></li>
+                                    <li><a href="{{ route('unit-list') }}">Unit
                                             </a></li>
-                                    <li><a href="login-and-register-settings.html">Company
+                                    <li><a href="{{ route('company-list') }}">Company
                                             </a></li>
-                                    <li><a href="preferences-settings.html">Mediccine Group</a></li>
+                                    <li><a href="{{ route('medicine-group') }}">Mediccine Group</a></li>
                                 </ul>
                             </li>
                             
@@ -837,9 +837,23 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="organization-settings.html">Pathology Category</a></li>
-                                    <li><a href="localization-settings.html">Unit</a></li>
-                                    <li><a href="{{ route('prefix') }}">Radiology Parameter</a></li>
+                                    <li><a href="{{ route('pathology-category') }}">Pathology Category</a></li>
+                                    <li><a href="{{ route('pathology-unit') }}">Unit</a></li>
+                                    <li><a href="{{ route('pathology-parameter') }}">Pathology Parameter</a></li>
+                                    
+                                </ul>
+                            </li>
+
+                            <li class="submenu">
+                                <a href="javascript:void(0);">
+                                    <i class="ti ti-world-cog"></i><span>Radiology
+                                        </span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <ul>
+                                    <li><a href="{{ route('radiology-category') }}">Radiology Category</a></li>
+                                    <li><a href="{{ route('radiology-unit') }}">Unit</a></li>
+                                    <li><a href="{{ route('radiology-parameter') }}">Radiology Parameter</a></li>
                                     
                                 </ul>
                             </li>
@@ -851,7 +865,7 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="organization-settings.html">Products</a></li>
+                                    <li><a href="{{ route('blood-bank-products') }}">Products</a></li>
                                     
                                 </ul>
                             </li>
@@ -863,8 +877,8 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="organization-settings.html">Symptoms Head</a></li>
-                                    <li><a href="localization-settings.html">Symptoms Type</a></li>
+                                    <li><a href="{{ route('symptoms-head') }}">Symptoms Head</a></li>
+                                    <li><a href="{{ route('symptoms-type') }}">Symptoms Type</a></li>
                                     
                                 </ul>
                             </li>
@@ -876,8 +890,8 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="organization-settings.html">Finding</a></li>
-                                    <li><a href="localization-settings.html">Category</a></li>
+                                    <li><a href="{{ route('finding') }}">Finding</a></li>
+                                    <li><a href="{{ route('finding-category') }}">Category</a></li>
                                     
                                 </ul>
                             </li>
@@ -889,8 +903,8 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="organization-settings.html">Income </a></li>
-                                    <li><a href="localization-settings.html">Expenses </a></li>
+                                    <li><a href="{{ route('income-head') }}">Income </a></li>
+                                    <li><a href="{{ route('expense-head') }}">Expenses </a></li>
                                     
                                 </ul>
                             </li>
@@ -902,10 +916,10 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="organization-settings.html">Leave Type</a></li>
-                                    <li><a href="localization-settings.html">Department</a></li>
-                                    <li><a href="{{ route('prefix') }}">Designation</a></li>
-                                    <li><a href="seo-setup-settings.html">Specialist
+                                    <li><a href="{{ route('leave-type') }}">Leave Type</a></li>
+                                    <li><a href="{{ route('department') }}">Department</a></li>
+                                    <li><a href="{{ route('designation') }}">Designation</a></li>
+                                    <li><a href="{{ route('specialist') }}">Specialist
                                             </a></li>
                                     
                                 </ul>
@@ -918,10 +932,10 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="organization-settings.html">Slots</a></li>
-                                    <li><a href="localization-settings.html">Doctor Shift</a></li>
-                                    <li><a href="{{ route('prefix') }}">Shift</a></li>
-                                    <li><a href="seo-setup-settings.html">Appointment
+                                    <li><a href="{{ route('slots') }}">Slots</a></li>
+                                    <li><a href="{{ route('doctor-shift') }}">Doctor Shift</a></li>
+                                    <li><a href="{{ route('shift') }}">Shift</a></li>
+                                    <li><a href="{{ route('appointment-priority') }}">Appointment
                                             Priority</a></li>
                                     
                                 </ul>
@@ -934,9 +948,9 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="organization-settings.html">Item Category</a></li>
-                                    <li><a href="localization-settings.html">Item Store</a></li>
-                                    <li><a href="{{ route('prefix') }}">Item Supplier</a></li>
+                                    <li><a href="{{ route('item-category') }}">Item Category</a></li>
+                                    <li><a href="{{ route('item-store') }}">Item Store</a></li>
+                                    <li><a href="{{ route('item-supplier') }}">Item Supplier</a></li>
                                     
                                 </ul>
                             </li>
