@@ -22,18 +22,18 @@
 
             <!--Navigation-->
             <nav class="navbar navbar-top-default nav-radius navbar-expand-lg">
-                <div class="container">
+                <div class="container-fluid">
                     <a href="#home" title="Logo" class="logo scroll">
                         <!--Logo Default-->
-                        <!-- <img src="medical/img/logo.png" alt="logo" class="logo-dark default"> -->
-                        <h2>LOGO</h2>
+                        <img src="assets/img/logo.png" alt="logo" class="logo-dark default">
+                        <!-- <h2>LOGO</h2> -->
                     </a>
 
                     <!--Nav Links-->
                     <div class="collapse navbar-collapse">
-                        <div class="navbar-nav ml-auto">
+                        <div class="navbar-nav mx-auto">
                             <a class="nav-link scroll" href="{{ route('dashboard') }}">Home</a>
-                            <a class="nav-link scroll" href="#whymegaone">Why MegaOne</a>
+                            <a class="nav-link scroll" href="#whymegaone">Why Cognaihealth</a>
                             <a href="{{ route('doctors') }}" class="nav-link">Doctors</a>
                             <a class="nav-link" href="{{ route('appointments') }}">Appointment</a>
                             <a class="nav-link scroll" href="#pateintgallery">Pateint Gallery</a>

@@ -10,7 +10,7 @@ class HospitalChargesController extends Controller
 {
     public function index(){
        $charges = Charge::with(['category','taxCategory','unit','chargeType'])->get();
-       return $charges;
+    //   return $charges;
          return view('admin.setup.charges',compact('charges'));
     }
 }
