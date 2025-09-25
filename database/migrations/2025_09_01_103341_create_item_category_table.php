@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('item_category', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('item_category', 255)->nullable()->index();
             $table->string('is_active', 10)->default('yes');
             $table->text('description')->nullable();

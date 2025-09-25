@@ -15,6 +15,7 @@ class PatientCharge extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'date',
         'ipd_id',
         'opd_id',

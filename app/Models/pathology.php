@@ -13,6 +13,7 @@ class Pathology extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'test_name',
         'short_name',
         'test_type',

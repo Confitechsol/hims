@@ -13,6 +13,7 @@ class FrontCmsMenuItem extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'menu_id',
         'menu',
         'page_id',

@@ -13,6 +13,7 @@ class CaseReference extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'bill_id',
         'discount_percentage',
     ];

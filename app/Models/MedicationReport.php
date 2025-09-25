@@ -13,6 +13,7 @@ class MedicationReport extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'medicine_dosage_id',
         'pharmacy_id',
         'opd_details_id',

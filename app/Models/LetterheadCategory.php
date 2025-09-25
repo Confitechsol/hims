@@ -12,6 +12,7 @@ class LetterheadCategory extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'name',
         'header_text',
         'enable_view',

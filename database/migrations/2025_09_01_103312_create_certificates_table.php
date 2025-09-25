@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('certificates', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('certificate_name', 100);
             $table->text('certificate_text')->nullable();
             $table->string('left_header', 100);

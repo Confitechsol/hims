@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('bed', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('name', 100)->index();
             $table->unsignedBigInteger('bed_type_id')->nullable()->index();
             $table->unsignedBigInteger('bed_group_id')->nullable()->index();

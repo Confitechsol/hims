@@ -13,6 +13,7 @@ class FrontCmsSetting extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'theme',
         'is_active_rtl',
         'is_active_front_cms',

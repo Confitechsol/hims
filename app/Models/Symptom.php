@@ -20,6 +20,8 @@ class Symptom extends Model
 
     // Mass assignable attributes
     protected $fillable = [
+         'hospital_id',
+         'branch_id',
         'symptoms_title',
         'description',
         'type',

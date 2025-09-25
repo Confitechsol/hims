@@ -14,6 +14,7 @@ class AppointmentPayment extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'appointment_id',
         'charge_id',
         'standard_amount',

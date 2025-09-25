@@ -13,6 +13,7 @@ class PathologyBilling extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'case_reference_id',
         'ipd_prescription_basic_id',
         'date',

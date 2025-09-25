@@ -18,6 +18,7 @@ class RadiologyReportParameterDetail extends Model
     // Fillable fields
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'radiology_report_id',
         'radiology_parameterdetail_id',
     ];

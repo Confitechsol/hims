@@ -19,6 +19,7 @@ class DutyRosterList extends Model
      */
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'duty_roster_shift_id',
         'duty_roster_start_date',
         'duty_roster_end_date',

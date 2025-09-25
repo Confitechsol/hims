@@ -13,6 +13,7 @@ class Certificate extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'certificate_name',
         'certificate_text',
         'left_header',

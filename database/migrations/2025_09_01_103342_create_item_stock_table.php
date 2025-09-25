@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('item_stock', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->unsignedBigInteger('item_id')->nullable()->index();
             $table->unsignedBigInteger('supplier_id')->nullable()->index();
             $table->string('symbol', 10)->default('+');

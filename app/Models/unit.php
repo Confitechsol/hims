@@ -18,6 +18,7 @@ class Unit extends Model
     // Mass assignable fields
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'unit_name',
         'unit_type',
         'created_at',

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('radiology_category', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('name', 200);
             $table->string('is_active', 50)->default('yes');
             $table->timestamps();

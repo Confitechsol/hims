@@ -12,6 +12,7 @@ class RadiologyCategory extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'name',
         'is_active',
     ];

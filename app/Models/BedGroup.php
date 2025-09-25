@@ -14,6 +14,7 @@ class BedGroup extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'name',
         'color',
         'description',

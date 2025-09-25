@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('unit', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('unit_name', 100); // unit_name varchar(100) not null
             $table->string('unit_type', 100); // unit_type varchar(100) not null
             $table->timestamp('created_at')->useCurrent()->useCurrentOnUpdate();

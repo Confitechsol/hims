@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('staff_id_card', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('title', 255);
             $table->string('hospital_name', 255);
             $table->string('hospital_address', 255);

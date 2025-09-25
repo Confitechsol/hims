@@ -13,6 +13,7 @@ class PathologyReport extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'pathology_bill_id',
         'pathology_id',
         'customer_type',

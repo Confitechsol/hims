@@ -13,6 +13,7 @@ class Floor extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'name',
         'description',
     ];

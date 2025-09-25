@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('chat_connections', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->unsignedBigInteger('chat_user_one')->index();                // chat_user_one int(11) NOT NULL
             $table->unsignedBigInteger('chat_user_two')->index();                // chat_user_two int(11) NOT NULL
             $table->string('ip', 30)->nullable();                                // ip varchar(30) NULL

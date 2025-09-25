@@ -21,6 +21,7 @@ class TaxCategory extends Model
     // Fillable fields
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'name',
         'percentage',
         'created_at',

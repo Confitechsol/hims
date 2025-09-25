@@ -13,6 +13,7 @@ class Language extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'language',
         'short_code',
         'country_code',

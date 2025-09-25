@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('complaint', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->unsignedBigInteger('complaint_type_id')->nullable()->index(); // complaint_type_id int(11) NULL
             $table->string('source', 100);                                        // source varchar(100) NOT NULL
             $table->string('name', 100);                                          // name varchar(100) NOT NULL

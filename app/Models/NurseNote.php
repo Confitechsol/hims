@@ -13,6 +13,7 @@ class NurseNote extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'date',
         'ipd_id',
         'staff_id',

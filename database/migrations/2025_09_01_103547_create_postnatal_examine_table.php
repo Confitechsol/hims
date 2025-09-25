@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('postnatal_examine', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->unsignedBigInteger('patient_id')->index();
             $table->dateTime('labor_time')->index();
             $table->dateTime('delivery_time')->index();

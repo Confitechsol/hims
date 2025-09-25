@@ -13,6 +13,7 @@ class ChatUser extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'user_type',
         'staff_id',
         'patient_id',

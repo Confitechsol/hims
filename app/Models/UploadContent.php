@@ -15,6 +15,7 @@ class UploadContent extends Model
 
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'content_type_id',
         'image',
         'thumb_path',

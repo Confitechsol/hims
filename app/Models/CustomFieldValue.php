@@ -13,6 +13,7 @@ class CustomFieldValue extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'belong_table_id',
         'custom_field_id',
         'field_value',

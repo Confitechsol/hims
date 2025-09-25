@@ -21,6 +21,7 @@ class StaffRole extends Model
     // Fillable columns
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'role_id',
         'staff_id',
         'is_active',

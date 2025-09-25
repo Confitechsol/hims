@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('staff_payroll', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->float('basic_salary', 10, 2); // basic_salary
             $table->integer('pay_scale');         // pay_scale
             $table->string('grade', 50);          // grade

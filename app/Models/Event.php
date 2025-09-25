@@ -13,6 +13,7 @@ class Event extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'event_title',
         'event_description',
         'start_date',

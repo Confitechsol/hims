@@ -13,6 +13,7 @@ class AnnualCalendar extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'holiday_type',
         'from_date',
         'to_date',

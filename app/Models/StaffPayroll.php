@@ -21,6 +21,7 @@ class StaffPayroll extends Model
     // Mass assignable attributes
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'basic_salary',
         'pay_scale',
         'grade',

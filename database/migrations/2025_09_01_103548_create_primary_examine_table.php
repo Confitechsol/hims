@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('primary_examine', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->unsignedBigInteger('ipdid')->nullable()->index();
             $table->unsignedBigInteger('visit_details_id')->nullable()->index();
 

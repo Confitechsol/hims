@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->timestamps();
         });
     }

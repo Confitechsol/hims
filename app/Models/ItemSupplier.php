@@ -13,6 +13,7 @@ class ItemSupplier extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'item_supplier',
         'phone',
         'email',

@@ -13,6 +13,7 @@ class IpdPrescriptionBasic extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'ipd_id',
         'visit_details_id',
         'attachment',

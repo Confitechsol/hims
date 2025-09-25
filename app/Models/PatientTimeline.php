@@ -15,6 +15,7 @@ class PatientTimeline extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'patient_id',
         'title',
         'timeline_date',

@@ -15,6 +15,7 @@ class Vehicle extends Model
 
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'vehicle_no',
         'vehicle_model',
         'manufacture_year',
