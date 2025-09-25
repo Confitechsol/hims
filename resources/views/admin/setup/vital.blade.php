@@ -50,7 +50,7 @@
                                                                 aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <form action="" method="POST">
+                                                            <form action="{{ route('vital.store') }}" method="POST">
                                                                 @csrf
                                                                 <div class="row gy-3 mb-2">
 
@@ -70,11 +70,11 @@
                                                                     </div>
 
                                                                     <div class="col-md-6">
-                                                                        <input type="text" name="from" id="from"
+                                                                        <input type="text" name="range_from" id="from"
                                                                             class="form-control" placeholder="From" />
                                                                     </div>
                                                                     <div class="col-md-6">
-                                                                        <input type="text" name="to" id="to"
+                                                                        <input type="text" name="range_to" id="to"
                                                                             class="form-control" placeholder="To" />
                                                                     </div>
                                                                     <div class="col-md-12">
@@ -156,6 +156,7 @@
         <div class="modal-content">
             <form id="editVitalForm" method="POST">
                 @csrf
+                @method('PUT')
                 <div class="modal-header rounded-0"
                      style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                     <h5 class="modal-title">Edit Vital</h5>
@@ -172,10 +173,10 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <input type="text" name="from" id="edit_from" class="form-control" placeholder="From">
+                            <input type="text" name="range_from" id="edit_from" class="form-control" placeholder="From">
                         </div>
                         <div class="col-md-6 mb-3">
-                            <input type="text" name="to" id="edit_to" class="form-control" placeholder="To">
+                            <input type="text" name="range_to" id="edit_to" class="form-control" placeholder="To">
                         </div>
                     </div>
 
@@ -208,7 +209,7 @@
     document.getElementById('edit_unit').value = unit;
 
     let form = document.getElementById('editVitalForm');
-    form.action = '/setup/vitals/' + id; // update route
+    form.action = '{{ url('vital/update') }}/' + id; // update route
 
     new bootstrap.Modal(document.getElementById('edit_vital_modal')).show();
 }
@@ -217,7 +218,7 @@ function deleteVital(id) {
     if (confirm('Are you sure you want to delete this vital?')) {
         let form = document.createElement('form');
         form.method = 'POST';
-        form.action = '/setup/vitals/' + id;
+        form.action = '{{ url('vital/destroy') }}/' + id;
 
         let token = document.createElement('input');
         token.type = 'hidden';

@@ -28,6 +28,8 @@ use App\Http\Controllers\Setup\MedicineDosageController;
 use App\Http\Controllers\BloodBankController;
 use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\VitalController;
+use App\Http\Controllers\FinanceController;
+use App\Http\Controllers\AppointmentController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -277,12 +279,18 @@ Route::prefix('/vital') ->group(function () {
     Route::put('/update/{id}', [VitalController::class, 'update'])->name('vital.update');
     Route::delete('/destroy/{id}', [VitalController::class, 'destroy'])->name('vital.destroy');
 });
-Route::get('/income-head', function () {
-    return view('admin.setup.income_head');
-})->name('income-head');
-Route::get('/expense-head', function () {
-    return view('admin.setup.expense_head');
-})->name('expense-head');
+Route::prefix('/income-head')->group( function () {
+    Route::get('/', [FinanceController::class, 'income'])->name('income-head');
+    Route::post('/store', [FinanceController::class, 'incomeStore'])->name('income-head.store');
+    Route::put('/update/{id}', [FinanceController::class, 'incomeUpdate'])->name('income-head.update');
+    Route::delete('/destroy/{id}', [FinanceController::class, 'incomeDestroy'])->name('income-head.destroy');
+});
+Route::prefix('/expense-head')->group( function () {
+    Route::get('/', [FinanceController::class, 'expense'])->name('expense-head');
+    Route::post('/store', [FinanceController::class, 'expenseStore'])->name('expense-head.store');
+    Route::put('/update/{id}', [FinanceController::class, 'expenseUpdate'])->name('expense-head.update');
+    Route::delete('/destroy/{id}', [FinanceController::class, 'expenseDestroy'])->name('expense-head.destroy');
+});
 Route::get('/leave-type', function () {
     return view('admin.setup.leave_type');
 })->name('leave-type');
@@ -304,9 +312,15 @@ Route::get('/item-store ', function () {
 Route::get('/item-supplier ', function () {
     return view('admin.setup.item_supplier');
 })->name('item-supplier');
-Route::get('/slots ', function () {
-    return view('admin.setup.slots');
-})->name('slots');
+Route::prefix('/slots')->group( function () {
+    Route::get('/', [AppointmentController::class, 'slots'])->name('slots');
+    Route::post('/store', [AppointmentController::class, 'slotsStore'])->name('slots.store');
+    Route::put('/update/{id}', [AppointmentController::class, 'slotsUpdate'])->name('slots.update');
+    Route::delete('/destroy/{id}', [AppointmentController::class, 'slotsDestroy'])->name('slots.destroy');
+});
+// Route::get('/slots ', function () {
+//     return view('admin.setup.slots');
+// })->name('slots');
 Route::get('/doctor-shift ', function () {
     return view('admin.setup.doctor_shift');
 })->name('doctor-shift');
