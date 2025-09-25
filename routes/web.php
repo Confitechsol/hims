@@ -18,6 +18,9 @@ use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\Setup\FindingsController;
+use App\Http\Controllers\Setup\HospitalChargeCategoryController;
+use App\Http\Controllers\Setup\HospitalChargesController;
+use App\Http\Controllers\Setup\HrController;
 use App\Http\Controllers\Setup\LanguagesController;
 use App\Http\Controllers\Setup\LetterHeadController;
 use App\Http\Controllers\Setup\MedicineDosageController;
@@ -26,12 +29,9 @@ use App\Http\Controllers\Setup\PrefixesController;
 use App\Http\Controllers\Setup\ProfileController;
 use App\Http\Controllers\Setup\RadiologyController;
 use App\Http\Controllers\Setup\UsersController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Setup\HospitalChargesController;
-use App\Http\Controllers\Setup\HospitalChargeCategoryController;
 use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\VitalController;
-
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -115,8 +115,8 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/users', [UsersController::class, 'index'])->name('users');
     Route::post('/users/updatedrstatus/{id}', [UsersController::class, 'updateDrStatus'])->name('users.updateDrStatus');
     Route::post('/users/updatestaffstatus/{id}', [UsersController::class, 'updateStaffStatus'])->name('users.updateStaffStatus');
-    
-    Route::get('/charges',[HospitalChargesController::class,'index'])->name('charges');
+
+    Route::get('/charges', [HospitalChargesController::class, 'index'])->name('charges');
     Route::get('/disable', function () {
         return view('admin.setup.disable_patient');
     })->name('disable');
@@ -157,7 +157,7 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/floors/store', [FloorController::class, 'store'])->name('floors.store');
     Route::put('/floors/update', [FloorController::class, 'update'])->name('floors.update');
     Route::delete('/floors/destroy', [FloorController::class, 'destroy'])->name('floors.destroy');
-    Route::get('/charge-category',[HospitalChargeCategoryController::class,'index'])->name('charge_categories');
+    Route::get('/charge-category', [HospitalChargeCategoryController::class, 'index'])->name('charge_categories');
     Route::get('/charge-type', function () {
         return view('admin.setup.charge_type');
     })->name('charge-type');
@@ -294,18 +294,31 @@ Route::get('/income-head', function () {
 Route::get('/expense-head', function () {
     return view('admin.setup.expense_head');
 })->name('expense-head');
-Route::get('/leave-type', function () {
-    return view('admin.setup.leave_type');
-})->name('leave-type');
-Route::get('/department', function () {
-    return view('admin.setup.department');
-})->name('department');
-Route::get('/designation ', function () {
-    return view('admin.setup.designation');
-})->name('designation');
-Route::get('/specialist ', function () {
-    return view('admin.setup.specialist');
-})->name('specialist');
+
+Route::get('/leave-type', [HrController::class, 'index'])->name('leave-type');
+Route::post('/leave-type/store', [HrController::class, 'store'])->name('leave-type.store');
+Route::post('/leave-type/updateStatus/{id}', [HrController::class, 'updateStatus'])->name('leave-type.updateStatus');
+Route::put('/leave-type/update', [HrController::class, 'update'])->name('leave-type.update');
+Route::delete('/leave-type/delete/{id}', [HrController::class, 'delete'])->name('leave-type.delete');
+
+Route::get('/department', [HrController::class, 'indexDepartment'])->name('department');
+Route::post('/department/store', [HrController::class, 'storeDepartment'])->name('department.store');
+Route::post('/department/updateStatus/{id}', [HrController::class, 'updateDepartmentStatus'])->name('department.updateStatus');
+Route::put('/department/update', [HrController::class, 'updateDepartment'])->name('department.update');
+Route::delete('/department/delete/{id}', [HrController::class, 'deleteDepartment'])->name('department.delete');
+
+Route::get('/designation', [HrController::class, 'indexDesignation'])->name('designation');
+Route::post('/designation/store', [HrController::class, 'storeDesignation'])->name('designation.store');
+Route::post('/designation/updateStatus/{id}', [HrController::class, 'updateDesignationStatus'])->name('designation.updateStatus');
+Route::put('/designation/update', [HrController::class, 'updateDesignation'])->name('designation.update');
+Route::delete('/designation/delete/{id}', [HrController::class, 'deleteDesignation'])->name('designation.delete');
+
+Route::get('/specialist', [HrController::class, 'indexSpecialist'])->name('specialist');
+Route::post('/specialist/store', [HrController::class, 'storeSpecialist'])->name('specialist.store');
+Route::post('/specialist/updateSpecialistStatus/{id}', [HrController::class, 'updateSpecialistStatus'])->name('specialist.updateSpecialistStatus');
+Route::put('/specialist/updateSpecialist', [HrController::class, 'updateSpecialist'])->name('specialist.updateSpecialist');
+Route::delete('/specialist/deleteSpecialist/{id}', [HrController::class, 'deleteSpecialist'])->name('specialist.deleteSpecialist');
+
 Route::get('/item-category ', function () {
     return view('admin.setup.item_category');
 })->name('item-category');
