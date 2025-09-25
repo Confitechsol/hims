@@ -268,7 +268,7 @@
                             <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
                                 <div class="flex-grow-1">
                                     <h4 class="fw-bold mb-0" id="dynamic-title">
-                                        {{ $letterheadCategory->first()->name }} Header Footer
+                                        {{ $letterheadCategory->first()->name ?? '' }} Header Footer
                                     </h4>
                                 </div>
                             </div>
@@ -608,8 +608,8 @@
                         reader.onload = function(e) {
                             placeHolderLogo.classList.add("d-none");
                             previewContainer.innerHTML = `
-                            <img src="${e.target.result}" 
-                                 class="img-fluid rounded shadow-sm" 
+                            <img src="${e.target.result}"
+                                 class="img-fluid rounded shadow-sm"
                                  style="max-height: 120px; object-fit: cover;">
                         `;
                         };
