@@ -747,7 +747,7 @@
                                     <li><a href="{{ route('permissions.modules') }}">Modules</a></li>
                                 </ul>
                             </li>
-                            <li><a href="integrations-settings.html">Patient</a></li>
+                            <li><a href="{{ route('patients') }}">Patient</a></li>
                             
                             <li class="submenu">
                                 <a href="javascript:void(0);">
@@ -756,11 +756,11 @@
                                 </a>
                                 <ul>
                                     <li><a href="{{ route('charges') }}">Charges</a></li>
-                                    <li><a href="{{ route('charge-category') }}">Charge Category</a></li>
-                                    <li><a href="{{ route('charge-type') }}">Charge Type</a></li>
-                                    <li><a href="{{ route('tax-category') }}">Tax
+                                    <li><a href="{{ route('charge_categories') }}">Charge Category</a></li>
+                                    <li><a href="{{ route('charge_type_module') }}">Charge Type</a></li>
+                                    <li><a href="{{ route('tax_category') }}">Tax
                                             Category</a></li>
-                                    <li><a href="{{ route('unit-type') }}">Unit Type</a></li>
+                                    <li><a href="{{ route('charge_units') }}">Unit Type</a></li>
                                     
                                 </ul>
                             </li>
@@ -781,7 +781,7 @@
                                     
                                 </ul>
                             </li>
-                            <li><a href="integrations-settings.html">Print Header Footer</a></li>
+                            <li><a href="{{ route('letterHead') }}">Print Header Footer</a></li>
                             <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-world-cog"></i><span>Front
@@ -817,7 +817,7 @@
                                 </a>
                                 <ul>
                                     <li><a href="{{ route('medicine-category') }}">Medicine Category</a></li>
-                                    <li><a href="{{ route('medicine-dosage') }}">Supplier</a></li>
+                                    <li><a href="{{ route('supplier') }}">Supplier</a></li>
                                     <li><a href="{{ route('medicine-dosage') }}">Medicine Dosage</a></li>
                                     <li><a href="{{ route('dosage-interval') }}">Dose
                                             Interval</a></li>
@@ -895,7 +895,7 @@
                                     
                                 </ul>
                             </li>
-                            <li><a href="integrations-settings.html">Vitals</a></li>
+                            <li><a href="{{ route('vitals') }}">Vitals</a></li>
                             <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-world-cog"></i><span>Finance
