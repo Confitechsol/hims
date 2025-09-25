@@ -112,12 +112,13 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                            @foreach($chargesCatogery as $chargesCatogerys)
                                                 <tr>
                                                     <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold"> Utility Charges	</h6>
+                                                        <h6 class="mb-0 fs-14 fw-semibold">{{$chargesCatogerys->name}}</h6>
                                                     </td>
-                                                    <td>Others</td>
-                                                    <td>Utility Charges	</td>
+                                                    <td>{{$chargesCatogerys->chargeType['charge_type']}}</td>
+                                                    <td>{{$chargesCatogerys->description}}</td>
                                                     <td>
                                                         <a href="javascript: void(0);"
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
@@ -127,21 +128,7 @@
                                                             <i class="ti ti-trash"></i></a>
                                                     </td>
                                                 </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold"> Anesthesia Charges</h6>
-                                                    </td>
-                                                    <td>Operations</td>
-                                                    <td>Anesthesia Charges</td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
+                                                 @endforeach
                                             </tbody>
                                         </table>
                                     </div>

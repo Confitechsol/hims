@@ -17,6 +17,7 @@ use App\Http\Controllers\PathologyController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RolesController;
+use App\Http\Controllers\Setup\FindingsController;
 use App\Http\Controllers\Setup\LanguagesController;
 use App\Http\Controllers\Setup\LetterHeadController;
 use App\Http\Controllers\Setup\MedicineDosageController;
@@ -25,9 +26,14 @@ use App\Http\Controllers\Setup\PrefixesController;
 use App\Http\Controllers\Setup\ProfileController;
 use App\Http\Controllers\Setup\RadiologyController;
 use App\Http\Controllers\Setup\UsersController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Setup\HospitalChargesController;
+use App\Http\Controllers\Setup\HospitalChargeCategoryController;
 use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\VitalController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Setup\HospitalChargeTypeController;
+use App\Http\Controllers\Setup\HospitalTaxCategoryController;
+use App\Http\Controllers\Setup\HospitalUnitTypeController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -111,10 +117,8 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/users', [UsersController::class, 'index'])->name('users');
     Route::post('/users/updatedrstatus/{id}', [UsersController::class, 'updateDrStatus'])->name('users.updateDrStatus');
     Route::post('/users/updatestaffstatus/{id}', [UsersController::class, 'updateStaffStatus'])->name('users.updateStaffStatus');
-
-    Route::get('/charges', function () {
-        return view('admin.setup.charges');
-    })->name('charges');
+    
+    Route::get('/charges',[HospitalChargesController::class,'index'])->name('charges');
     Route::get('/disable', function () {
         return view('admin.setup.disable_patient');
     })->name('disable');
@@ -155,18 +159,13 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/floors/store', [FloorController::class, 'store'])->name('floors.store');
     Route::put('/floors/update', [FloorController::class, 'update'])->name('floors.update');
     Route::delete('/floors/destroy', [FloorController::class, 'destroy'])->name('floors.destroy');
-    Route::get('/charge-category', function () {
-        return view('admin.setup.charge_category');
-    })->name('charge-category');
-    Route::get('/charge-type', function () {
-        return view('admin.setup.charge_type');
-    })->name('charge-type');
-    Route::get('/tax-category', function () {
-        return view('admin.setup.tax_category');
-    })->name('tax-category');
-    Route::get('/unit-type', function () {
-        return view('admin.setup.unit_type');
-    })->name('unit-type');
+    Route::get('/charge-category',[HospitalChargeCategoryController::class,'index'])->name('charge_categories');
+    Route::get('/charge-type',[HospitalChargeTypeController::class,'index'])->name('charge_type_module');
+    Route::get('/tax-category',[HospitalTaxCategoryController::class,'index'])->name('tax_category');
+    Route::get('/unit-type',[HospitalUnitTypeController::class,'index'])->name('charge_units');
+    // Route::get('/unit-type', function () {
+    //     return view('admin.setup.unit_type');
+    // })->name('unit-type');
     Route::get('/medicine-category', function () {
         return view('admin.setup.medicine_category');
     })->name('medicine-category');
@@ -273,12 +272,15 @@ Route::prefix('/symptoms-head')->group(function () {
     Route::delete('/destroy/{id}', [SymptomController::class, 'destroySymptomHead'])->name('symptoms-head.destroy');
 });
 
-Route::get('/finding', function () {
-    return view('admin.setup.finding');
-})->name('finding');
-Route::get('/finding-category', function () {
-    return view('admin.setup.finding_category');
-})->name('finding-category');
+Route::get('/finding', [FindingsController::class, 'index'])->name('finding');
+Route::post('/finding/store', [FindingsController::class, 'store'])->name('finding.store');
+Route::put('/finding/update', [FindingsController::class, 'update'])->name('finding.update');
+Route::delete('/finding/delete/{id}', [FindingsController::class, 'delete'])->name('finding.delete');
+Route::get('/finding-category', [FindingsController::class, 'indexCategory'])->name('finding-category');
+Route::post('/finding-category/storeCategory', [FindingsController::class, 'storeCategory'])->name('finding-category.storeCategory');
+Route::put('/finding-category/updateCategory', [FindingsController::class, 'updateCategory'])->name('finding-category.updateCategory');
+Route::delete('/finding-category/deleteCategory/{id}', [FindingsController::class, 'deleteCategory'])->name('finding-category.deleteCategory');
+
 Route::prefix('/vital')->group(function () {
     Route::get('/', [VitalController::class, 'index'])->name('vitals');
     Route::post('/store', [VitalController::class, 'store'])->name('vital.store');

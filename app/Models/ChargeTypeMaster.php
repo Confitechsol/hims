@@ -23,4 +23,6 @@ class ChargeTypeMaster extends Model
     protected $casts = [
         'created_at' => 'datetime',
     ];
+
+    
 }
