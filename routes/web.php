@@ -327,16 +327,32 @@ Route::prefix('/slots')->group( function () {
     Route::post('/store', [AppointmentController::class, 'slotsStore'])->name('slots.store');
     Route::put('/update/{id}', [AppointmentController::class, 'slotsUpdate'])->name('slots.update');
     Route::delete('/destroy/{id}', [AppointmentController::class, 'slotsDestroy'])->name('slots.destroy');
+    Route::get('/search', [AppointmentController::class, 'searchSlots'])->name('slots.search');
+    Route::get('/get-charges/{id}', [AppointmentController::class, 'getCharges'])->name('get.charges');
 });
-// Route::get('/slots ', function () {
-//     return view('admin.setup.slots');
-// })->name('slots');
-Route::get('/doctor-shift ', function () {
-    return view('admin.setup.doctor_shift');
-})->name('doctor-shift');
-Route::get('/shift ', function () {
-    return view('admin.setup.shift');
-})->name('shift');
-Route::get('/appointment-priority ', function () {
-    return view('admin.setup.appointment_priority');
-})->name('appointment-priority');
+Route::get('/doctor/{id}/shifts', [AppointmentController::class, 'getDoctorShifts'])
+    ->name('doctor.shifts');
+
+Route::prefix('/doctor-shift')->group(function () {
+    Route::get('/', [AppointmentController::class, 'doctorShift'])->name('doctor-shift');
+    Route::post('/store', [AppointmentController::class, 'doctorShiftStore'])->name('doctor-shift.store');
+    Route::put('/update/{id}', [AppointmentController::class, 'shiftUpdate'])->name('doctor-shift.update');
+    Route::delete('/destroy/{id}', [AppointmentController::class, 'shiftDestroy'])->name('doctor-shift.destroy');
+    Route::post('/toggle', [AppointmentController::class, 'toggleDoctorShift'])->name('doctor-shift.toggle');
+    Route::get('/fetchShifts/{doctor}', [AppointmentController::class, 'getDoctorShifts'])->name('doctor.shifts');
+
+
+});
+Route::prefix('/shift')->group(function () {
+    Route::get('/', [AppointmentController::class, 'shift'])->name('shift');
+    Route::post('/store', [AppointmentController::class, 'shiftStore'])->name('shift.store');
+    Route::put('/update/{id}', [AppointmentController::class, 'shiftUpdate'])->name('shift.update');
+    Route::delete('/destroy/{id}', [AppointmentController::class, 'shiftDestroy'])->name('shift.destroy');
+
+});
+Route::prefix('/appointment-priority')->group( function () {
+   Route::get('/', [AppointmentController::class, 'appointmentPriority'])->name('appointment-priority');
+    Route::post('/store', [AppointmentController::class, 'appointmentPriorityStore'])->name('appointment-priority.store');
+    Route::put('/update/{id}', [AppointmentController::class, 'appointmentPriorityUpdate'])->name('appointment-priority.update');
+    Route::delete('/destroy/{id}', [AppointmentController::class, 'appointmentPriorityDestroy'])->name('appointment-priority.destroy');
+});

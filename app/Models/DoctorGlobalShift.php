@@ -11,6 +11,7 @@ class DoctorGlobalShift extends Model
 
     // Table name (since it doesn’t follow plural convention)
     protected $table = 'doctor_global_shift';
+    public $timestamps  = false;
 
     // Primary key
     protected $primaryKey = 'id';
@@ -18,9 +19,9 @@ class DoctorGlobalShift extends Model
     // Mass assignable attributes
     protected $fillable = [
         'hospital_id',
-        'staff_id',
+        'branch_id',
+        'doctor_id',
         'global_shift_id',
-        'branch_id', // as said by Shreya Didi
     ];
 
     // Relationships (if you want to use them later)
