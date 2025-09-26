@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,8 +12,8 @@ class MedicineBatchDetail extends Model
 
     protected $fillable = [
         'hospital_id',
-        'supplier_bill_
-        'branch_id',basic_id',
+        'supplier_bill_id',
+        'branch_id', 'basic_id',
         'pharmacy_id',
         'inward_date',
         'expiry',
