@@ -13,6 +13,7 @@ class GatewayInsResponse extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'gateway_ins_id',
         'posted_data',
         'response',

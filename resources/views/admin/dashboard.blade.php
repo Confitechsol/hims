@@ -238,9 +238,7 @@
                                         </a>
                                         <div>
                                             <h6 class="fs-14 mb-1 text-truncate"><a href="doctor-details.html"
-                                                    class="fw-semibold">Dr.
-                                                    Alex
-                                                    Morgan</a></h6>
+                                                    class="fw-semibold">Dr. Vikram Patel</a></h6>
                                             <p class="mb-0 fs-13">Cardiologist</p>
                                         </div>
                                     </div>
@@ -259,9 +257,7 @@
                                         </a>
                                         <div>
                                             <h6 class="fs-14 mb-1 text-truncate"><a href="doctor-details.html"
-                                                    class="fw-semibold">Dr.
-                                                    Emily
-                                                    Carter</a></h6>
+                                                    class="fw-semibold">Dr. Ashok Seth</a></h6>
                                             <p class="mb-0 fs-13">Pediatrician</p>
                                         </div>
                                     </div>
@@ -278,9 +274,7 @@
                                         </a>
                                         <div>
                                             <h6 class="fs-14 mb-1 text-truncate"><a href="doctor-details.html"
-                                                    class="fw-semibold">Dr.
-                                                    David
-                                                    Lee</a></h6>
+                                                    class="fw-semibold">Dr. Indira Hinduja</a></h6>
                                             <p class="mb-0 fs-13">Gynecologist</p>
                                         </div>
                                     </div>

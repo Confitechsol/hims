@@ -13,6 +13,7 @@ class ItemStock extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'item_id',
         'supplier_id',
         'symbol',

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('system_notification_setting', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('event', 100)->index(); // event
             $table->string('subject', 255); // subject
             $table->text('staff_message')->nullable(); // staff_message

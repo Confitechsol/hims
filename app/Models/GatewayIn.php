@@ -13,6 +13,7 @@ class GatewayIn extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'online_appointment_id',
         'type',
         'gateway_name',

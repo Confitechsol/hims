@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('staff_attendence_schedules', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
                         $table->unsignedBigInteger('staff_attendence_type_id')->nullable();
             $table->unsignedBigInteger('role_id')->nullable();
 

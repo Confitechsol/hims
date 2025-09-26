@@ -15,6 +15,7 @@ class PharmacyBillDetail extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'pharmacy_bill_basic_id',
         'medicine_batch_detail_id',
         'quantity',

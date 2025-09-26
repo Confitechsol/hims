@@ -15,6 +15,7 @@ class ReferralType extends Model
     // Mass assignable fields
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'name',
         'prefixes_type',
         'is_active',

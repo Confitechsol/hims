@@ -14,6 +14,7 @@ class ExpenseHead extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'exp_category',
         'description',
         'is_active',

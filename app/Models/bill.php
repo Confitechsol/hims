@@ -14,6 +14,7 @@ class Bill extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'case_id',
         'attachment',
         'attachment_name',

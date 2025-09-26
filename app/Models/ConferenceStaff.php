@@ -13,6 +13,7 @@ class ConferenceStaff extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'conference_id',
         'staff_id',
     ];

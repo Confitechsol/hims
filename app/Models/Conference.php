@@ -13,6 +13,7 @@ class Conference extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'purpose',
         'staff_id',
         'patient_id',

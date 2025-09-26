@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('death_report', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->unsignedBigInteger('patient_id')->nullable()->index();
             // INT(11), NULL, indexed
 

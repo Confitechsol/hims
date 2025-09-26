@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('annual_calendar', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->unsignedBigInteger('holiday_type');
             $table->dateTime('from_date')->nullable();
             $table->dateTime('to_date')->nullable();

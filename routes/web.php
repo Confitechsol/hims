@@ -18,6 +18,13 @@ use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\Setup\FindingsController;
+use App\Http\Controllers\Setup\HospitalChargeCategoryController;
+use App\Http\Controllers\Setup\HospitalChargesController;
+use App\Http\Controllers\Setup\HospitalChargeTypeController;
+use App\Http\Controllers\Setup\HospitalTaxCategoryController;
+use App\Http\Controllers\Setup\HospitalUnitTypeController;
+use App\Http\Controllers\Setup\HrController;
+use App\Http\Controllers\Setup\InventoryController;
 use App\Http\Controllers\Setup\LanguagesController;
 use App\Http\Controllers\Setup\LetterHeadController;
 use App\Http\Controllers\Setup\MedicineDosageController;
@@ -26,14 +33,9 @@ use App\Http\Controllers\Setup\PrefixesController;
 use App\Http\Controllers\Setup\ProfileController;
 use App\Http\Controllers\Setup\RadiologyController;
 use App\Http\Controllers\Setup\UsersController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Setup\HospitalChargesController;
-use App\Http\Controllers\Setup\HospitalChargeCategoryController;
 use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\VitalController;
-use App\Http\Controllers\Setup\HospitalChargeTypeController;
-use App\Http\Controllers\Setup\HospitalTaxCategoryController;
-use App\Http\Controllers\Setup\HospitalUnitTypeController;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\AppointmentController;
 
@@ -119,8 +121,8 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/users', [UsersController::class, 'index'])->name('users');
     Route::post('/users/updatedrstatus/{id}', [UsersController::class, 'updateDrStatus'])->name('users.updateDrStatus');
     Route::post('/users/updatestaffstatus/{id}', [UsersController::class, 'updateStaffStatus'])->name('users.updateStaffStatus');
-    
-    Route::get('/charges',[HospitalChargesController::class,'index'])->name('charges');
+
+    Route::get('/charges', [HospitalChargesController::class, 'index'])->name('charges');
     Route::get('/disable', function () {
         return view('admin.setup.disable_patient');
     })->name('disable');
@@ -161,10 +163,10 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/floors/store', [FloorController::class, 'store'])->name('floors.store');
     Route::put('/floors/update', [FloorController::class, 'update'])->name('floors.update');
     Route::delete('/floors/destroy', [FloorController::class, 'destroy'])->name('floors.destroy');
-    Route::get('/charge-category',[HospitalChargeCategoryController::class,'index'])->name('charge_categories');
-    Route::get('/charge-type',[HospitalChargeTypeController::class,'index'])->name('charge_type_module');
-    Route::get('/tax-category',[HospitalTaxCategoryController::class,'index'])->name('tax_category');
-    Route::get('/unit-type',[HospitalUnitTypeController::class,'index'])->name('charge_units');
+    Route::get('/charge-category', [HospitalChargeCategoryController::class, 'index'])->name('charge_categories');
+    Route::get('/charge-type', [HospitalChargeTypeController::class, 'index'])->name('charge_type_module');
+    Route::get('/tax-category', [HospitalTaxCategoryController::class, 'index'])->name('tax_category');
+    Route::get('/unit-type', [HospitalUnitTypeController::class, 'index'])->name('charge_units');
     // Route::get('/unit-type', function () {
     //     return view('admin.setup.unit_type');
     // })->name('unit-type');

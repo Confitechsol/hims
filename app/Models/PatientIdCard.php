@@ -15,6 +15,7 @@ class PatientIdCard extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'title',
         'hospital_name',
         'hospital_address',

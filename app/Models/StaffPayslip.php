@@ -21,6 +21,7 @@ class StaffPayslip extends Model
     // Mass assignable attributes
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'role_id',
         'staff_id',
         'is_active',

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('obstetric_history', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->unsignedBigInteger('patient_id');
             $table->string('place_of_delivery', 250)->index();
             $table->string('pregnancy_duration', 250)->index();

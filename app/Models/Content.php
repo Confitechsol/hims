@@ -13,6 +13,7 @@ class Content extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'title',
         'type',
         'is_public',

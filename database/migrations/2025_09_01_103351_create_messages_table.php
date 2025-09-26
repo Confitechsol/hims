@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('title', 200)->nullable()->index();          // title (nullable, indexed)
             $table->string('template_id', 100);                         // template id (required)
             $table->text('message')->nullable();                        // message body

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('radiology_report', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->unsignedBigInteger('radiology_bill_id')->nullable()->index();
             $table->unsignedBigInteger('radiology_id')->nullable()->index();
             $table->unsignedBigInteger('patient_id')->nullable()->index();

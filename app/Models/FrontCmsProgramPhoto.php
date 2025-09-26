@@ -13,6 +13,7 @@ class FrontCmsProgramPhoto extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'program_id',
         'media_gallery_id',
     ];

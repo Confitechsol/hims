@@ -13,6 +13,7 @@ class ContentFor extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'role',
         'content_id',
         'user_id',

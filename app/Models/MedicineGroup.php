@@ -13,6 +13,7 @@ class MedicineGroup extends Model
     public $timestamps = false;
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'group_name',
     ];
 

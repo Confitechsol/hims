@@ -13,6 +13,7 @@ class OpdDetail extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'case_reference_id',
         'patient_id',
         'generated_by',

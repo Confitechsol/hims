@@ -13,6 +13,7 @@ class Log extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'message',
         'record_id',
         'user_id',

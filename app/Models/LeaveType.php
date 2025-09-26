@@ -13,6 +13,7 @@ class LeaveType extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'type',
         'is_active',
     ];

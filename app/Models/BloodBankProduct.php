@@ -17,6 +17,7 @@ class BloodBankProduct extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'name',
         'is_blood_group',
         'created_at',

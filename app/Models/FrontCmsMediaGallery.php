@@ -13,6 +13,7 @@ class FrontCmsMediaGallery extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'image',
         'thumb_path',
         'dir_path',

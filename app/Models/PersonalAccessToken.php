@@ -12,6 +12,7 @@ class PersonalAccessToken extends Model
     protected $table = 'personal_access_tokens';
 
     protected $fillable = [
+        'branch_id',
         'tokenable_type',
         'tokenable_id',
         'name',

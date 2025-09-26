@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('read_notification', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->unsignedBigInteger('staff_id')->nullable()->index();
             $table->unsignedBigInteger('notification_id')->nullable()->index();
             $table->string('is_active', 10)->default('no')->nullable();

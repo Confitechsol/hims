@@ -13,6 +13,7 @@ class ChargeCategory extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'charge_type_id',
         'name',
         'description',

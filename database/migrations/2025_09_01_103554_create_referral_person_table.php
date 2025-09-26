@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('referral_person', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('name', 100)->index();
             $table->unsignedBigInteger('category_id')->nullable()->index();
             $table->string('contact', 20)->nullable()->index();

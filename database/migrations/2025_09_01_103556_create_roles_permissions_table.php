@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('roles_permissions', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->unsignedBigInteger('role_id')->nullable()->index();
             $table->unsignedBigInteger('perm_cat_id')->nullable()->index();
             $table->integer('can_view')->nullable();

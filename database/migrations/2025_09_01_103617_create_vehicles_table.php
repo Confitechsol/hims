@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('vehicles', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('vehicle_no', 20)->nullable()->index();
             $table->string('vehicle_model', 100)->index();
             $table->string('manufacture_year', 4)->nullable()->index();

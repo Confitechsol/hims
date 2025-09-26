@@ -15,6 +15,7 @@ return new class extends Migration
 
             $table->id(); // id INT AUTO_INCREMENT PRIMARY KEY
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('name', 100)->index();
             $table->timestamps();
         });

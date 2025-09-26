@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('hospital_id'); // parent hospital
 
             $table->string('name', 150);                // branch name
-            $table->string('branch_id', 50)->unique(); // unique branch code
+            $table->string('branch_id', 8)->unique(); // unique branch code
             $table->string('email', 100)->nullable();
             $table->string('phone', 50)->nullable();
             $table->string('city', 100)->nullable();

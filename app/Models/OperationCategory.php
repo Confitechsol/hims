@@ -14,6 +14,7 @@ class OperationCategory extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'category',
         'is_active',
     ];

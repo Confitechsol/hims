@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('duty_roster_list', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->unsignedBigInteger('duty_roster_shift_id')->index();
 
             $table->date('duty_roster_start_date')->index();

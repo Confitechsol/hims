@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('zoom_settings', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('zoom_api_key', 200)->nullable();
             $table->string('zoom_api_secret', 200)->nullable();
 

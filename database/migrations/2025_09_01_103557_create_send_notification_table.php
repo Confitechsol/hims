@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('send_notification', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('title', 50)->nullable()->index();
             $table->date('publish_date')->nullable()->index();
             $table->date('date')->nullable()->index();

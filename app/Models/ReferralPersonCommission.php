@@ -15,6 +15,7 @@ class ReferralPersonCommission extends Model
     // Mass assignable fields
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'referral_person_id',
         'referral_type_id',
         'commission',

@@ -14,6 +14,7 @@ class IncomeHead extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'income_category',
         'description',
         'is_active',

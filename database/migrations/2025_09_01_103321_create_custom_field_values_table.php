@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('custom_field_values', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->unsignedBigInteger('belong_table_id')->nullable()->index();
             // int(11), NULL, indexed (MUL)
 

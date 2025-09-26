@@ -13,6 +13,7 @@ class OperationTheatre extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'opd_details_id',
         'ipd_details_id',
         'customer_type',

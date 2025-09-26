@@ -18,6 +18,7 @@ class ReferralPayment extends Model
     // Fillable fields
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'referral_person_id',
         'patient_id',
         'referral_type',
