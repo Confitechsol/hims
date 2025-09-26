@@ -13,6 +13,7 @@ class Income extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'inc_head_id',
         'name',
         'invoice_no',

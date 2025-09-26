@@ -15,6 +15,7 @@ class StaffAttendance extends Model
     // Fillable columns
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'date',
         'staff_id',
         'staff_attendance_type_id',

@@ -13,6 +13,7 @@ class ChatMessage extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'message',
         'chat_user_id',
         'ip',

@@ -15,6 +15,7 @@ class Vital extends Model
 
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'name',
         'range_from',
         'range_to',

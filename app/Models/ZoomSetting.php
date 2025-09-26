@@ -15,6 +15,7 @@ class ZoomSetting extends Model
 
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'zoom_api_key',
         'zoom_api_secret',
         'use_doctor_api',

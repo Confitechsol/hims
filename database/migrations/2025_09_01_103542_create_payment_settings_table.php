@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('payment_settings', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
              $table->string('payment_type', 200)->index();
             $table->string('api_username', 200)->nullable()->index();
             $table->string('api_secret_key', 200)->index();

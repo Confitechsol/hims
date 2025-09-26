@@ -13,6 +13,7 @@ class Message extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'title',
         'template_id',
         'message',

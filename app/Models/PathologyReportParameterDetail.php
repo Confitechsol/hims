@@ -13,6 +13,7 @@ class PathologyReportParameterDetail extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'pathology_report_id',
         'pathology_parameterdetail_id',
         'pathology_report_value',

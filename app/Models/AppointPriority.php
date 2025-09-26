@@ -13,6 +13,7 @@ class AppointPriority extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'appoint_priority',
     ];
 

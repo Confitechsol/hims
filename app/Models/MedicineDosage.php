@@ -13,6 +13,7 @@ class MedicineDosage extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'medicine_category_id',
         'dosage',
         'units_id',

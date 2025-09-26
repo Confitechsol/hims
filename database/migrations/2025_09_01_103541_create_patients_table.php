@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('patients', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->integer('lang_id')->nullable();
             $table->string('patient_name', 100)->nullable()->index();
             $table->date('dob')->nullable()->index();

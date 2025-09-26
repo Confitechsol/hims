@@ -14,6 +14,8 @@ return new class extends Migration
     {
         Schema::create('letterhead_settings', function (Blueprint $table) {
             $table->id();
+            $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             // $table->binary('print_header')->nullable();
             $table->text('print_footer')->nullable();
             $table->unsignedBigInteger('letterhead_cat_id');

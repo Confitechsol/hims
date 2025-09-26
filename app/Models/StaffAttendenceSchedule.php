@@ -13,6 +13,7 @@ class StaffAttendenceSchedule extends Model
 
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'staff_attendence_type_id',
         'role_id',
         'entry_time_from',

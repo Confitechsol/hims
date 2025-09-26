@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('blood_donor', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('donor_name', 100)->nullable()->index(); // donor_name varchar(100) YES MUL
             $table->date('date_of_birth')->nullable();              // date_of_birth date YES
 

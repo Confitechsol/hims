@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('symptoms', function (Blueprint $table) {
             $table->id(); // Primary key, auto-increment
+            $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('symptoms_title', 200)->index(); // Indexed, not null
             $table->text('description')->nullable(); // Nullable text field
             $table->string('type', 100); // Not null

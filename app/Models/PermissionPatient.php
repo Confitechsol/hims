@@ -15,6 +15,7 @@ class PermissionPatient extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'permission_group_short_code',
         'name',
         'short_code',

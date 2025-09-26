@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('ipd_prescription_details', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->unsignedBigInteger('basic_id')->nullable()->index();
             $table->unsignedBigInteger('pharmacy_id')->nullable()->index();
             $table->unsignedBigInteger('dosage')->nullable()->index();

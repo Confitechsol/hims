@@ -15,6 +15,7 @@ class PayslipAllowance extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'staff_payslip_id',
         'staff_id',
         'allowance_type',

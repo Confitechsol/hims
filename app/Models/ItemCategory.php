@@ -12,6 +12,7 @@ class ItemCategory extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'item_category',
         'is_active',
         'item_head',

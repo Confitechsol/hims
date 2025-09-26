@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('medicine_supplier', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('supplier', 200)->index();                // supplier name
             $table->string('contact', 200)->index();                 // supplier contact
             $table->string('supplier_person', 200)->index();         // contact person

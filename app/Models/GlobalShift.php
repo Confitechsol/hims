@@ -13,6 +13,7 @@ class GlobalShift extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'name',
         'start_time',
         'end_time',

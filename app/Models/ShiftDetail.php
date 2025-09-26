@@ -13,6 +13,7 @@ class ShiftDetail extends Model
 
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'staff_id',
         'consult_duration',
         'charge_id',

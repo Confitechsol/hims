@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('transactions_processing', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->integer('gateway_ins_id'); // gateway_ins_id INT(11) NOT NULL
             $table->string('type', 100)->nullable(); // type VARCHAR(100) NULL
             $table->string('section', 50); // section VARCHAR(50) NOT NULL

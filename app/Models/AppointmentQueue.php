@@ -14,6 +14,7 @@ class AppointmentQueue extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'appointment_id',
         'staff_id',
         'position',

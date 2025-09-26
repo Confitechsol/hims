@@ -13,6 +13,7 @@ class ChargeTypeModule extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'charge_type_master_id',
         'module_shortcode',
     ];

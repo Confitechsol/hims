@@ -21,6 +21,7 @@ class SymptomsClassification extends Model
     // Fillable fields
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'symptoms_type',
         'created_at',
     ];

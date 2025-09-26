@@ -15,6 +15,7 @@ class StaffDesignation extends Model
     // Fillable columns
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'designation',
         'is_active',
     ];

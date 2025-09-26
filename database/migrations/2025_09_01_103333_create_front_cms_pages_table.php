@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('front_cms_pages', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('page_type', 10)->default('manual');
             // VARCHAR(10), NOT NULL, default 'manual'
 

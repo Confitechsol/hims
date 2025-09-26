@@ -13,6 +13,7 @@ class DutyRosterShift extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'shift_name',
         'shift_start',
         'shift_end',

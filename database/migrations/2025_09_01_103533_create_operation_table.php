@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('operation', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('operation', 250)->index();
             $table->unsignedBigInteger('category_id')->nullable()->index();
             $table->string('is_active', 10);

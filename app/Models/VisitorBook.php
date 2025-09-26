@@ -13,6 +13,7 @@ class VisitorBook extends Model
 
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'source',
         'purpose',
         'name',

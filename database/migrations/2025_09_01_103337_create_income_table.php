@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('income', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->unsignedBigInteger('inc_head_id')->nullable()->index();
             $table->string('name', 50)->nullable()->index();
             $table->string('invoice_no', 200)->index();

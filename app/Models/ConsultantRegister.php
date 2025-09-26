@@ -13,6 +13,7 @@ class ConsultantRegister extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'ipd_id',
         'date',
         'ins_date',

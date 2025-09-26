@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('gateway_ins_response', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->unsignedBigInteger('gateway_ins_id')->nullable()->index();
             $table->text('posted_data')->nullable();
             $table->text('response')->nullable();

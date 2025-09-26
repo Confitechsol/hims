@@ -13,6 +13,7 @@ class EmailConfig extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'email_type',
         'smtp_server',
         'smtp_port',

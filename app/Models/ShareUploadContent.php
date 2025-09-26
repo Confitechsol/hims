@@ -13,6 +13,7 @@ class ShareUploadContent extends Model
 
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'upload_content_id',
         'share_content_id',
     ];

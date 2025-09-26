@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('vitals', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('name', 100)->index(); // name varchar(100) NOT NULL
             $table->string('reference_range', 100)->index(); // reference_range varchar(100) NOT NULL
             $table->string('unit', 11)->nullable()->index(); // unit varchar(11) NULL

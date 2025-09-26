@@ -21,6 +21,7 @@ class SystemNotification extends Model
     // Fillable fields
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'notification_title',
         'notification_type',
         'notification_desc',

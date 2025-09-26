@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('appointment_queue', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->unsignedBigInteger('appointment_id')->nullable();
             $table->unsignedBigInteger('staff_id')->nullable();
             $table->integer('position')->nullable();

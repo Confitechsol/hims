@@ -13,6 +13,7 @@ class ConsultCharge extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'doctor',
         'standard_charge',
         'date',
