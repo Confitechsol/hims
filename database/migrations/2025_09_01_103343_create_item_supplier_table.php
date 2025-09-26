@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('contact_person_name', 255)->index();
             $table->string('contact_person_phone', 255)->index();
             $table->string('contact_person_email', 255)->index();
+            $table->string('is_active', 20)->index();
             $table->text('description')->nullable();
             $table->timestamps();
         });

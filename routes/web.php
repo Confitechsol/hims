@@ -24,6 +24,7 @@ use App\Http\Controllers\Setup\HospitalChargeTypeController;
 use App\Http\Controllers\Setup\HospitalTaxCategoryController;
 use App\Http\Controllers\Setup\HospitalUnitTypeController;
 use App\Http\Controllers\Setup\HrController;
+use App\Http\Controllers\Setup\InventoryController;
 use App\Http\Controllers\Setup\LanguagesController;
 use App\Http\Controllers\Setup\LetterHeadController;
 use App\Http\Controllers\Setup\MedicineDosageController;
@@ -318,15 +319,23 @@ Route::post('/specialist/updateSpecialistStatus/{id}', [HrController::class, 'up
 Route::put('/specialist/updateSpecialist', [HrController::class, 'updateSpecialist'])->name('specialist.updateSpecialist');
 Route::delete('/specialist/deleteSpecialist/{id}', [HrController::class, 'deleteSpecialist'])->name('specialist.deleteSpecialist');
 
-Route::get('/item-category ', function () {
-    return view('admin.setup.item_category');
-})->name('item-category');
-Route::get('/item-store ', function () {
-    return view('admin.setup.item_store');
-})->name('item-store');
-Route::get('/item-supplier ', function () {
-    return view('admin.setup.item_supplier');
-})->name('item-supplier');
+Route::get('/item-category', [InventoryController::class, 'index'])->name('item-category');
+Route::post('/item-category/store', [InventoryController::class, 'store'])->name('item-category.store');
+Route::put('/item-category/update', [InventoryController::class, 'update'])->name('item-category.update');
+Route::post('/item-category/updateStatus/{id}', [InventoryController::class, 'updateStatus'])->name('item-category.updateStatus');
+Route::delete('/item-category/delete/{id}', [InventoryController::class, 'delete'])->name('item-category.delete');
+
+Route::get('/item-store', [InventoryController::class, 'indexStore'])->name('item-store');
+Route::post('/item-store/store', [InventoryController::class, 'storeItemStore'])->name('item-store.store');
+Route::put('/item-store/update', [InventoryController::class, 'updateStore'])->name('item-store.update');
+Route::post('/item-store/updateStatus/{id}', [InventoryController::class, 'updateStoreStatus'])->name('item-store.updateStatus');
+Route::delete('/item-store/delete/{id}', [InventoryController::class, 'deleteStore'])->name('item-store.delete');
+
+Route::get('/item-supplier', [InventoryController::class, 'indexSupplier'])->name('item-supplier');
+Route::post('/item-supplier/store', [InventoryController::class, 'storeItemSupplier'])->name('item-supplier.store');
+Route::post('/item-supplier/updateStatus/{id}', [InventoryController::class, 'updateSupplierStatus'])->name('item-supplier.updateStatus');
+Route::put('/item-supplier/update', [InventoryController::class, 'updateSupplier'])->name('item-supplier.update');
+Route::delete('/item-supplier/delete/{id}', [InventoryController::class, 'deleteSupplier'])->name('item-supplier.delete');
 Route::get('/slots ', function () {
     return view('admin.setup.slots');
 })->name('slots');

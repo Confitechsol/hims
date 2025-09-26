@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('hospital_id', 8);
             $table->string('item_store', 255)->index();
+            $table->text('description');
+            $table->string('is_active', 20)->index();
             $table->string('code', 255)->index();
             $table->timestamps();
         });
