@@ -11,82 +11,80 @@
                 </div>
 
                 <div class="card-body">
-                    <form id="slot_form" method="POST"
-      action="{{ route('slots.store') }}"
-      enctype="multipart/form-data">
-    @csrf
+                    <form id="slot_form" method="POST" action="{{ route('slots.store') }}" enctype="multipart/form-data">
+                        @csrf
 
-    {{-- Doctor & Shift --}}
-    <div class="row mb-3 align-items-center">
-        <div class="col-md-4">
-            <label for="doctor" class="form-label fw-bold">Doctor <span class="text-danger">*</span></label>
-            <select id="doctor" name="doctor" class="select2 form-select" style="width: 100%">
-                <option value="">Select</option>
-                @foreach($doctors as $doctor)
-                    <option value="{{ $doctor->id }}">{{ $doctor->name }} ({{ $doctor->doctor_id }})</option>
-                @endforeach
-            </select>
-        </div>
+                        {{-- Doctor & Shift --}}
+                        <div class="row mb-3 align-items-center">
+                            <div class="col-md-4">
+                                <label for="doctor" class="form-label fw-bold">Doctor <span class="text-danger">*</span></label>
+                                <select id="doctor" name="doctor" class="select2 form-select" style="width: 100%">
+                                    <option value="">Select</option>
+                                    @foreach($doctors as $doctor)
+                                        <option value="{{ $doctor->id }}">{{ $doctor->name }} ({{ $doctor->doctor_id }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-        <div class="col-md-4">
-            <label for="shift" class="form-label fw-bold">Shift <span class="text-danger">*</span></label>
-            <select id="shift" name="shift" class="select2 form-select" style="width: 100%">
-                <option value="">Select</option>
-            </select>
-        </div>
+                            <div class="col-md-4">
+                                <label for="shift" class="form-label fw-bold">Shift <span class="text-danger">*</span></label>
+                                <select id="shift" name="shift" class="select2 form-select" style="width: 100%">
+                                    <option value="">Select</option>
+                                </select>
+                            </div>
 
-        <div class="col-md-4">
-            <button type="button" onclick="search()" class="btn btn-primary btn-sm mt-4">Search</button>
-        </div>
-    </div>
+                            <div class="col-md-4">
+                                <button type="button" onclick="search()" class="btn btn-primary btn-sm mt-4">Search</button>
+                            </div>
+                        </div>
 
-    <hr>
+                        <hr>
 
-    {{-- Consultation & Charges --}}
-    <div class="row mb-3">
-        <div class="col-md-3">
-            <label for="consult_time" class="form-label fw-bold">
-                Consultation Duration Minutes <span class="text-danger">*</span>
-            </label>
-            <input type="number" name="consult_time" value="" placeholder=""
-                   class="form-control" id="consult_time" autocomplete="off" required>
-        </div>
+                        {{-- Consultation & Charges --}}
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label for="consult_time" class="form-label fw-bold">
+                                    Consultation Duration Minutes <span class="text-danger">*</span>
+                                </label>
+                                <input type="number" name="consult_time" value="" placeholder=""
+                                    class="form-control" id="consult_time" autocomplete="off" required>
+                            </div>
 
-        <div class="col-md-3">
-            <label for="charge_category" class="form-label fw-bold">Charge Category</label>
-            <select name="charge_category" id="charge_category" style="width: 100%"
-                    class="form-select charge_category select2">
-                <option value="">Select</option>
-                @foreach($categories as $category)
-                    <option value="{{ $category->id }}">{{ $category->name }}</option>
-                @endforeach
-            </select>
-        </div>
+                            <div class="col-md-3">
+                                <label for="charge_category" class="form-label fw-bold">Charge Category</label>
+                                <select name="charge_category" id="charge_category" style="width: 100%"
+                                        class="form-select charge_category select2">
+                                    <option value="">Select</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-        <div class="col-md-3">
-            <label for="charge_id" class="form-label fw-bold">Charge <span class="text-danger">*</span></label>
-            <select name="charge_id" id="charge_id" style="width: 100%"
-                    class="form-select charge select2" required>
-                <option value="">Select</option>
-            </select>
-        </div>
+                            <div class="col-md-3">
+                                <label for="charge_id" class="form-label fw-bold">Charge <span class="text-danger">*</span></label>
+                                <select name="charge_id" id="charge_id" style="width: 100%"
+                                        class="form-select charge select2" required>
+                                    <option value="">Select</option>
+                                </select>
+                            </div>
 
-        <div class="col-md-3">
-            <label for="amount" class="form-label fw-bold">Amount (INR)</label>
-            <input type="text" class="form-control standard_charge" name="amount" id="amount" value="">
-        </div>
-    </div>
+                            <div class="col-md-3">
+                                <label for="amount" class="form-label fw-bold">Amount (INR)</label>
+                                <input type="text" class="form-control standard_charge" name="amount" id="amount" value="">
+                            </div>
+                        </div>
 
-    <hr>
+                        <hr>
 
-    <div class="row mb-3" id="slotsContainer"></div>
+                        <div class="row mb-3" id="slotsContainer"></div>
 
-    <div class="row mb-3">
-        <div class="col-md-12">
-            <button type="submit" class="btn btn-success">Save Slots</button>
-        </div>
-    </div>
-</form>
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <button type="submit" class="btn btn-success">Save Slots</button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -236,66 +234,87 @@
             }
         });
     }
-function search() {
-    let doctorId = $('#doctor').val();
-    let shiftId = $('#shift').val();
+    function search() {
+        let doctorId = $('#doctor').val();
+        let shiftId = $('#shift').val();
 
-    if(!doctorId || !shiftId) {
-        alert('Please select both doctor and shift');
-        return;
+        if(!doctorId || !shiftId) {
+            alert('Please select both doctor and shift');
+            return;
+        }
+
+        $.ajax({
+            url: '{{ route("slots.search") }}',
+            type: 'GET',
+            data: { doctor: doctorId, shift: shiftId },
+            success: function(response) {
+                let container = $('#slotsContainer');
+                container.empty();
+                console.log(response);
+
+                let days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+                let tabsNav = '<ul class="nav nav-tabs" role="tablist">';
+                let tabsContent = '<div class="tab-content mt-3">';
+
+                days.forEach((day, index) => {
+                    let activeClass = index === 0 ? 'active' : '';
+                    tabsNav += `<li class="nav-item" role="presentation">
+                                    <button class="nav-link ${activeClass}" id="${day}-tab" data-bs-toggle="tab" data-bs-target="#${day}" type="button" role="tab">${day}</button>
+                                </li>`;
+
+                    // Check if slot exists for this day
+                    let slot = response.slots.find(s => s.day === day);
+                    let timeFrom = slot ? slot.start_time : (response.shift ? response.shift.start_time : '');
+                    let timeTo = slot ? slot.end_time : (response.shift ? response.shift.end_time : '');
+
+                    tabsContent += `<div class="tab-pane fade ${activeClass} show" id="${day}" role="tabpanel">
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label>Time From</label>
+                                                <input type="time" class="form-control" name="slots[${day}][time_from]" value="${timeFrom}">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label>Time To</label>
+                                                <input type="time" class="form-control" name="slots[${day}][time_to]" value="${timeTo}">
+                                            </div>
+                                        </div>
+                                    </div>`;
+                });
+
+                tabsNav += '</ul>';
+                tabsContent += '</div>';
+
+                container.html(tabsNav + tabsContent);
+            },
+            error: function(xhr) {
+                console.error(xhr.responseText);
+                alert('Could not fetch slots!');
+            }
+        });
     }
+</script>
+<script>
+    $('#slot_form').on('submit', function(e) {
+    let isValid = true;
+    let errorMessage = "";
 
-    $.ajax({
-        url: '{{ route("slots.search") }}',
-        type: 'GET',
-        data: { doctor: doctorId, shift: shiftId },
-        success: function(response) {
-            let container = $('#slotsContainer');
-            container.empty();
-            console.log(response);
+    // Loop through all slot inputs
+    $('#slotsContainer .tab-pane').each(function() {
+        let day = $(this).attr('id');
+        let timeFrom = $(this).find('input[name^="slots"]').first().val();
+        let timeTo = $(this).find('input[name^="slots"]').last().val();
 
-            let days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-            let tabsNav = '<ul class="nav nav-tabs" role="tablist">';
-            let tabsContent = '<div class="tab-content mt-3">';
-
-            days.forEach((day, index) => {
-                let activeClass = index === 0 ? 'active' : '';
-                tabsNav += `<li class="nav-item" role="presentation">
-                                <button class="nav-link ${activeClass}" id="${day}-tab" data-bs-toggle="tab" data-bs-target="#${day}" type="button" role="tab">${day}</button>
-                            </li>`;
-
-                // Check if slot exists for this day
-                let slot = response.slots.find(s => s.day === day);
-                let timeFrom = slot ? slot.start_time : (response.shift ? response.shift.start_time : '');
-                let timeTo = slot ? slot.end_time : (response.shift ? response.shift.end_time : '');
-
-                tabsContent += `<div class="tab-pane fade ${activeClass} show" id="${day}" role="tabpanel">
-                                    <div class="row mb-3">
-                                        <div class="col-md-6">
-                                            <label>Time From</label>
-                                            <input type="time" class="form-control" name="slots[${day}][time_from]" value="${timeFrom}">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label>Time To</label>
-                                            <input type="time" class="form-control" name="slots[${day}][time_to]" value="${timeTo}">
-                                        </div>
-                                    </div>
-                                </div>`;
-            });
-
-            tabsNav += '</ul>';
-            tabsContent += '</div>';
-
-            container.html(tabsNav + tabsContent);
-        },
-        error: function(xhr) {
-            console.error(xhr.responseText);
-            alert('Could not fetch slots!');
+        if (timeFrom && timeTo && timeFrom >= timeTo) {
+            isValid = false;
+            errorMessage += `Invalid time for ${day}: "From" should be less than "To".\n`;
         }
     });
-}
 
-    
+    if (!isValid) {
+        e.preventDefault(); // stop form submit
+        alert(errorMessage);
+    }
+});
 
-    </script>
+</script>
 @endsection
