@@ -205,32 +205,38 @@ class AppointmentController extends Controller
     //         'shift' => $shift
     //     ]);
     // }
-    public function searchSlots(Request $request)
+   public function searchSlots(Request $request)
 {
     $doctorId = $request->doctor;
     $shiftId = $request->shift;
 
-    // Get slots for this doctor & shift
-    $slots = DoctorShiftTime::where('doctor_id', $doctorId)
-                ->where('doctor_global_shift_id', $shiftId)
-                ->get();
-                
+    // Find the pivot record linking doctor and shift
+    $doctorGlobalShift = DoctorGlobalShift::where('doctor_id', $doctorId)
+                        ->where('global_shift_id', $shiftId)
+                        ->first();
 
-    if ($slots->isNotEmpty()) {
-        // Case 1: Doctor already has custom slots → return them
-        return response()->json([
-            'slots' => $slots,
-            'shift' => null  // no need to send global shift
-        ]);
-    } else {
-        // Case 2: Doctor has no slots → return global shift timings
-        $shift = GlobalShift::find($shiftId);
+    if ($doctorGlobalShift) {
+        // Get slots for this doctor & doctorGlobalShift
+        $slots = DoctorShiftTime::where('doctor_id', $doctorId)
+                    ->where('doctor_global_shift_id', $doctorGlobalShift->id)
+                    ->get();
 
-        return response()->json([
-            'slots' => [],   // no doctor slots yet
-            'shift' => $shift
-        ]);
+        if ($slots->isNotEmpty()) {
+            // Doctor already has custom slots → return them
+            return response()->json([
+                'slots' => $slots,
+                'shift' => null  // no need for global shift
+            ]);
+        }
     }
+
+    // Case: No custom slots exist → return global shift timings
+    $shift = GlobalShift::find($shiftId);
+
+    return response()->json([
+        'slots' => [],   // no doctor slots yet
+        'shift' => $shift
+    ]);
 }
 
 

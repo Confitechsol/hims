@@ -160,7 +160,7 @@
 </script>
 
 <script>
-    function search() {
+    function searOle() {
         alert('hi');
         let doctorId = $('#doctor').val();
         let shiftId = $('#shift').val();
@@ -177,21 +177,25 @@
             success: function(response) {
                 let container = $('#slotsContainer');
                 container.empty();
-
+                console.log(response);
+                console.log(response.slots);
+                console.log(response.slots.length);
                 if(response.slots && response.slots.length > 0) {
+                    alert('hii slots');
                     // Populate table of existing slots
                     let table = '<table class="table table-bordered"><thead><tr><th>Day</th><th>Time From</th><th>Time To</th></tr></thead><tbody>';
                     response.slots.forEach(function(slot){
                         table += `<tr>
                             <td>${slot.day}</td>
-                            <td>${slot.time_from}</td>
-                            <td>${slot.time_to}</td>
+                            <td>${slot.start_time}</td>
+                            <td>${slot.start_time}</td>
                         </tr>`;
                     });
                     table += '</tbody></table>';
                     container.html(table);
                 } else {
                     // No slots exist, generate day tabs with pre-filled shift time
+                    alert('hii no slots');
                     let days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
                     let tabsNav = '<ul class="nav nav-tabs" role="tablist">';
                     let tabsContent = '<div class="tab-content mt-3">';
@@ -232,6 +236,64 @@
             }
         });
     }
+function search() {
+    let doctorId = $('#doctor').val();
+    let shiftId = $('#shift').val();
+
+    if(!doctorId || !shiftId) {
+        alert('Please select both doctor and shift');
+        return;
+    }
+
+    $.ajax({
+        url: '{{ route("slots.search") }}',
+        type: 'GET',
+        data: { doctor: doctorId, shift: shiftId },
+        success: function(response) {
+            let container = $('#slotsContainer');
+            container.empty();
+            console.log(response);
+
+            let days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+            let tabsNav = '<ul class="nav nav-tabs" role="tablist">';
+            let tabsContent = '<div class="tab-content mt-3">';
+
+            days.forEach((day, index) => {
+                let activeClass = index === 0 ? 'active' : '';
+                tabsNav += `<li class="nav-item" role="presentation">
+                                <button class="nav-link ${activeClass}" id="${day}-tab" data-bs-toggle="tab" data-bs-target="#${day}" type="button" role="tab">${day}</button>
+                            </li>`;
+
+                // Check if slot exists for this day
+                let slot = response.slots.find(s => s.day === day);
+                let timeFrom = slot ? slot.start_time : (response.shift ? response.shift.start_time : '');
+                let timeTo = slot ? slot.end_time : (response.shift ? response.shift.end_time : '');
+
+                tabsContent += `<div class="tab-pane fade ${activeClass} show" id="${day}" role="tabpanel">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label>Time From</label>
+                                            <input type="time" class="form-control" name="slots[${day}][time_from]" value="${timeFrom}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>Time To</label>
+                                            <input type="time" class="form-control" name="slots[${day}][time_to]" value="${timeTo}">
+                                        </div>
+                                    </div>
+                                </div>`;
+            });
+
+            tabsNav += '</ul>';
+            tabsContent += '</div>';
+
+            container.html(tabsNav + tabsContent);
+        },
+        error: function(xhr) {
+            console.error(xhr.responseText);
+            alert('Could not fetch slots!');
+        }
+    });
+}
 
     
 
