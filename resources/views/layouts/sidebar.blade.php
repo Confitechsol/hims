@@ -741,7 +741,7 @@
                                     <li><a href="{{ route('email-setting') }}">Email Settings</a></li>
                                     <li><a href="{{ route('prefix') }}">Prefix Settings</a></li>
                                     <li><a href="{{ route('roles') }}">Roles Permissions</a></li>
-                                    <li><a href="{{ route('database.backup') }}">Backup/Restore</a></li>
+                                    <li><a href="{{ route('database.backups') }}">Backup/Restore</a></li>
                                     <li><a href="{{ route('languages') }}">Languages</a></li>
                                     <li><a href="{{ route('users') }}">Users</a></li>
                                     <li><a href="{{ route('permissions.modules') }}">Modules</a></li>
