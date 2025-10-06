@@ -13,6 +13,7 @@ class UnitController extends Controller
         $units = Unit::get();
         return view('admin.setup.unit_list', compact('units'));
     }
+
     function store(Request $request)
     {
         $user = Auth::user();
@@ -24,6 +25,10 @@ class UnitController extends Controller
         $request->validate([
             "unit_name" => "required|array|min:1",
             "unit_name.*" => 'required'
+        ],
+        [
+            "unit_name.required" => "Please provide at least one unit name.",
+            "unit_name.*.required" => "Each unit name is required."
         ]);
         $unit_names = $request->unit_name;
         foreach ($unit_names as $key => $unit_name) {

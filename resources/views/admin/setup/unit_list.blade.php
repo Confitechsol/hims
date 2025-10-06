@@ -163,7 +163,6 @@
         </div>
     </div>
 </div>
-unit-list.update
 <x-modals.form-modal type="add" id="add_unit" title="Add Unit" action="{{route('unit-list.store')}}" :repeatable_group="[
         ['name' => 'unit_name', 'label' => 'Unit Name', 'type' => 'text', 'required' => true,'size'=>'11']
         ]" :columns="2" />
