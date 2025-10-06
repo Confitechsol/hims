@@ -948,7 +948,8 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('item-category') }}">Item Category</a></li>
+                                    <li><a href="{{ route('item-category') }}">Item
+                                            Category</a></li>
                                     <li><a href="{{ route('item-store') }}">Item Store</a></li>
                                     <li><a href="{{ route('item-supplier') }}">Item Supplier</a></li>
                                     
