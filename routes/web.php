@@ -35,9 +35,12 @@ use App\Http\Controllers\Setup\PrefixesController;
 use App\Http\Controllers\Setup\ProfileController;
 use App\Http\Controllers\Setup\RadiologyController;
 use App\Http\Controllers\Setup\UsersController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Setup\DoseIntervalController;
+use App\Http\Controllers\Setup\DosageDurationController;
+use App\Http\Controllers\Setup\UnitController;
 use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\VitalController;
-use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -173,11 +176,18 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/medicine-category', function () {
         return view('admin.setup.medicine_category');
     })->name('medicine-category');
-    Route::get('/supplier', [MedicineSupplierController::class, 'index'])->name('supplier');
-    Route::post('/supplier/store', [MedicineSupplierController::class, 'store'])->name('supplier-store');
-    Route::delete('/supplier/destroy', [MedicineSupplierController::class, 'destroy'])->name('supplier.destroy');
-    Route::put('/supplier/update', [MedicineSupplierController::class, 'update'])->name('supplier.update');
-    Route::get('/medicine-dosage', [MedicineDosageController::class, 'index'])->name('medicine-dosage');
+
+    Route::get('/supplier',[MedicineSupplierController::class,'index'])->name('supplier');
+    Route::post('/supplier/store',[MedicineSupplierController::class,'store'])->name('supplier-store');
+    Route::delete('/supplier/destroy',[MedicineSupplierController::class,'destroy'])->name('supplier.destroy');
+    Route::put('/supplier/update',[MedicineSupplierController::class,'update'])->name('supplier.update');
+
+    Route::get('/medicine-dosage', [MedicineDosageController::class,'index'])->name('medicine-dosage');
+    Route::put('/medicine-dosage/update', [MedicineDosageController::class,'update'])->name('medicine-dosage.update');
+    Route::post('/medicine-dosage/store', [MedicineDosageController::class,'store'])->name('medicine-dosage.store');
+    Route::delete('/medicine-dosage/destroy', [MedicineDosageController::class,'destroy'])->name('medicine-dosage.destroy');
+
+
     Route::get('/purpose', [FrontOfficeController::class, 'purposes'])->name('purpose');
     Route::post('/purpose/store', [FrontOfficeController::class, 'storePurpose'])->name('purposes.store');
     Route::put('/purpose/update/{id}', [FrontOfficeController::class, 'updatePurpose'])->name('purposes.update');
@@ -195,15 +205,21 @@ Route::middleware(['admin'])->group(function () {
 
 });
 
-Route::get('/dosage-interval', function () {
-    return view('admin.setup.dosage_interval');
-})->name('dosage-interval');
-Route::get('/dosage-duration', function () {
-    return view('admin.setup.dosage_duration');
-})->name('dosage-duration');
-Route::get('/unit-list', function () {
-    return view('admin.setup.unit_list');
-})->name('unit-list');
+Route::get('/dosage-interval',[DoseIntervalController::class,'index'])->name('dosage-interval');
+Route::put('/dosage-interval/update',[DoseIntervalController::class,'update'])->name('dosage-interval.update');
+Route::post('/dosage-interval/store',[DoseIntervalController::class,'store'])->name('dosage-interval.store');
+Route::delete('/dosage-interval/destroy',[DoseIntervalController::class,'destroy'])->name('dosage-interval.destroy');
+
+Route::get('/dosage-duration', [DosageDurationController::class,'index'])->name('dosage-duration');
+Route::put('/dosage-duration/update', [DosageDurationController::class,'update'])->name('dosage-duration.update');
+Route::post('/dosage-duration/store', [DosageDurationController::class,'store'])->name('dosage-duration.store');
+Route::delete('/dosage-duration/destroy', [DosageDurationController::class,'destroy'])->name('dosage-duration.destroy');
+
+Route::get('/unit-list',[UnitController::class,'index'])->name('unit-list');
+Route::post('/unit-list/store',[UnitController::class,'store'])->name('unit-list.store');
+Route::put('/unit-list/update',[UnitController::class,'update'])->name('unit-list.update');
+Route::delete('/unit-list/destroy',[UnitController::class,'destroy'])->name('unit-list.destroy');
+
 Route::get('/company-list', function () {
     return view('admin.setup.company_list');
 })->name('company-list');
