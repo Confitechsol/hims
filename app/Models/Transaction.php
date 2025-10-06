@@ -18,6 +18,7 @@ class Transaction extends Model
     // Mass assignable attributes
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'type',
         'section',
         'patient_id',

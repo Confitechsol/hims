@@ -13,6 +13,7 @@ class ContentType extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'name',
         'description',
         'is_active',

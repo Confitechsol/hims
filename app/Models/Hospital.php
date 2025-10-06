@@ -13,6 +13,7 @@ class Hospital extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'base_url',
         'folder_path',
         'name',

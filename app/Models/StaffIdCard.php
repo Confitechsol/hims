@@ -15,6 +15,7 @@ class StaffIdCard extends Model
     // Fillable fields
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'title',
         'hospital_name',
         'hospital_address',

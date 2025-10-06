@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('visitors_book', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
                         $table->string('source', 100)->nullable()->index(); // varchar(100) NULL
             $table->string('purpose', 100)->index(); // varchar(100) NOT NULL
             $table->string('name', 100)->index(); // varchar(100) NOT NULL

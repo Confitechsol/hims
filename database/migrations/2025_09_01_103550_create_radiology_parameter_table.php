@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('radiology_parameter', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
-
+            $table->string('branch_id', 8);
             $table->string('parameter_name', 100)->index();
             $table->string('test_value', 100)->index();
             $table->string('reference_range', 100)->index();

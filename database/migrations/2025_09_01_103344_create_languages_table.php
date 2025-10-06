@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('languages', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('language', 50)->nullable()->index();
             $table->string('short_code', 255)->index();
             $table->string('country_code', 255)->index();

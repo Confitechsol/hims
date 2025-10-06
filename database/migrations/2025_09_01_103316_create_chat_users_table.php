@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('chat_users', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('user_type', 20)->nullable();                          // user_type varchar(20) NULL
             $table->unsignedBigInteger('staff_id')->nullable()->index();          // staff_id int(11) NULL
             $table->unsignedBigInteger('patient_id')->nullable()->index();        // patient_id int(11) NULL

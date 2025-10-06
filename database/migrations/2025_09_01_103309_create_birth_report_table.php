@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('birth_report', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('child_name', 200);
             $table->text('child_pic');
             $table->string('gender', 200);

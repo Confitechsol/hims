@@ -13,6 +13,7 @@ class FrontCmsPageContent extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'page_id',
         'content_type',
     ];

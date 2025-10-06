@@ -15,6 +15,7 @@ class PharmacyCompany extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'company_name',
         'created_at',
     ];

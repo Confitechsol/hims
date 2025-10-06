@@ -15,6 +15,7 @@ class UserAuthentication extends Model
 
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'users_id',
         'token',
         'expired_at',

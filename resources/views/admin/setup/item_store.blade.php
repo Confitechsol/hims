@@ -1,7 +1,6 @@
 {{-- resources/views/settings.blade.php --}}
 @extends('layouts.adminLayout')
 @section('content')
-
     <div class="row justify-content-center">
         {{-- Settings Form --}}
         <div class="col-md-11">
@@ -43,37 +42,40 @@
                                                     <div class="modal-content">
                                                         <div class="modal-header rounded-0"
                                                             style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                                            <h5 class="modal-title" id="addSpecializationLabel">Add Item Store
+                                                            <h5 class="modal-title" id="addSpecializationLabel">Add Item
+                                                                Store
 
                                                             </h5>
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                                 aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <form action="" method="POST">
+                                                            <form action="{{ route('item-store.store') }}" method="POST">
                                                                 @csrf
                                                                 <div class="row gy-3 mb-2">
 
                                                                     <!-- Operation Name -->
                                                                     <div class="col-md-12">
-                                                                        <label for="item_store_name" class="form-label">Item Store Name
+                                                                        <label for="item_store_name" class="form-label">Item
+                                                                            Store Name
                                                                             <span class="text-danger">*</span></label>
-                                                                        <input type="text" name="item_store_name" id="item_store_name"
-                                                                            class="form-control" required />
+                                                                        <input type="text" name="item_store_name"
+                                                                            id="item_store_name" class="form-control"
+                                                                            required />
                                                                     </div>
                                                                     <div class="col-md-12">
-                                                                        <label for="item_stock_code" class="form-label">Item Stock Code
-                                                                           </label>
-                                                                        <input type="text" name="item_stock_code" id="item_stock_code"
-                                                                            class="form-control"  />
+                                                                        <label for="item_stock_code" class="form-label">Item
+                                                                            Stock Code
+                                                                        </label>
+                                                                        <input type="text" name="item_stock_code"
+                                                                            id="item_stock_code" class="form-control" />
                                                                     </div>
 
-                                                                    
+
                                                                     <div class="col-md-12">
                                                                         <label for="description"
                                                                             class="form-label">Description</label>
-                                                                        <textarea name="description" id="description"
-                                                                            class="form-control"></textarea>
+                                                                        <textarea name="description" id="description" class="form-control"></textarea>
                                                                     </div>
 
                                                                 </div>
@@ -96,28 +98,115 @@
                                                 <tr>
                                                     <th>Item Store Name</th>
                                                     <th>Item Stock Code</th>
+                                                    <th>Description</th>
+                                                    <th>Status</th>
                                                     <th style="width: 200px;">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Surgical Consumables Store
-                                                        </h6>
-                                                    </td>
-                                                    <td>SURC-</td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
+                                                @foreach ($itemStores as $itemStore)
+                                                    <tr>
+                                                        <td>
+                                                            <h6 class="mb-0 fs-14 fw-semibold">{{ $itemStore->item_store }}
+                                                            </h6>
+                                                        </td>
+                                                        <td>{{ $itemStore->code }}</td>
+                                                        <td class="text-wrap">{{ $itemStore->description }}</td>
+                                                        <td>
+                                                            <form
+                                                                action="{{ route('item-store.updateStatus', [$itemStore->id]) }}"
+                                                                method="post">
+                                                                @csrf
+                                                                <div class="form-check form-switch mb-0">
+                                                                    <input class="form-check-input status-toggle"
+                                                                        type="checkbox" role="switch"
+                                                                        id="switchCheckDefault" name="is_active"
+                                                                        data-id="{{ $itemStore->id }}"
+                                                                        {{ $itemStore->is_active == 'yes' ? 'checked' : '' }}>
+                                                                </div>
+                                                            </form>
+                                                        </td>
+                                                        <td>
+                                                            <a href="javascript: void(0);"
+                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                                data-bs-toggle="modal" data-bs-target="#edit_itemStore"
+                                                                data-id="{{ $itemStore->id }}"
+                                                                data-name="{{ $itemStore->item_store }}"
+                                                                data-code="{{ $itemStore->code }}"
+                                                                data-description="{{ $itemStore->description }}">
+                                                                <i class="ti ti-pencil"></i></a>
+                                                            <form
+                                                                action="{{ route('item-store.delete', [$itemStore->id]) }}"
+                                                                class="d-inline" id="delete-form-{{ $itemStore->id }}"
+                                                                method="POST">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <a href="javascript: void(0);"
+                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill delete-button"
+                                                                    data-item-store-id="{{ $itemStore->id }}"
+                                                                    data-item-store-name="{{ $itemStore->item_store }}"
+                                                                    data-form-id="delete-form-{{ $itemStore->id }}">
+                                                                    <i class="ti ti-trash"></i></a>
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
 
                                             </tbody>
                                         </table>
+                                    </div>
+
+                                    <div class="modal fade" id="edit_itemStore" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header rounded-0"
+                                                    style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                                    <h5 class="modal-title" id="addSpecializationLabel">Update Item
+                                                        Store
+
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form action="{{ route('item-store.update') }}" method="POST">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <div class="row gy-3 mb-2">
+
+                                                            <!-- Operation Name -->
+                                                            <input type="hidden" name="item_store_id"
+                                                                id="update_item_store_id">
+                                                            <div class="col-md-12">
+                                                                <label for="item_store_name" class="form-label">Item
+                                                                    Store Name
+                                                                    <span class="text-danger">*</span></label>
+                                                                <input type="text" name="item_store_name"
+                                                                    id="update_item_store_name" class="form-control"
+                                                                    required />
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <label for="item_stock_code" class="form-label">Item
+                                                                    Stock Code
+                                                                </label>
+                                                                <input type="text" name="item_stock_code"
+                                                                    id="update_item_stock_code" class="form-control" />
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <label for="description"
+                                                                    class="form-label">Description</label>
+                                                                <textarea name="description" id="update_description" class="form-control"></textarea>
+                                                            </div>
+
+                                                        </div>
+
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="submit" class="btn btn-primary">Update</button>
+                                                </div>
+                                                </form>
+                                            </div>
+                                        </div>
                                     </div>
 
                                 </div> <!-- end card-body -->
@@ -131,4 +220,56 @@
         </div>
     </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var editModal = document.getElementById('edit_itemStore');
+
+            editModal.addEventListener('show.bs.modal', function(event) {
+                var button = event.relatedTarget; // Button that triggered the modal
+                var id = button.getAttribute('data-id');
+                var name = button.getAttribute('data-name');
+                var code = button.getAttribute('data-code');
+                var description = button.getAttribute('data-description');
+                console.log(name);
+
+                // Populate modal inputs
+                document.getElementById('update_item_store_id').value = id;
+                document.getElementById('update_item_store_name').value = name;
+                document.getElementById('update_item_stock_code').value = code;
+                document.getElementById('update_description').value = description;
+
+            });
+        });
+    </script>
+    <script>
+        document.querySelectorAll('.status-toggle').forEach(input => {
+            input.addEventListener('change', function() {
+                this.closest('form').submit();
+            });
+        });
+    </script>
+    <script>
+        document.querySelectorAll('.delete-button').forEach(input => {
+            input.addEventListener('click', function() {
+                const itemStoreId = this.dataset.itemStoreId;
+                const itemStoreName = this.dataset.itemStoreName;
+                const formId = this.dataset.formId;
+
+                Swal.fire({
+                    title: `Please Confirm`,
+                    text: `Delete Item Store ${itemStoreName}(${itemStoreId})`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Delete!',
+                    cancelButtonText: 'Cancel',
+                }).then(result => {
+                    console.log(result);
+
+                    if (result.isConfirmed) {
+                        document.getElementById(formId).submit(); // Submit your form
+                    }
+                });
+            });
+        });
+    </script>
 @endsection

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('item_issue', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->integer('issue_type')->nullable();
             $table->unsignedBigInteger('issue_to')->nullable()->index();
             $table->string('issue_by', 100)->nullable();

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('income_head', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('income_category', 255)->nullable()->index();
             $table->text('description')->nullable();
             $table->string('is_active', 10)->default('yes');

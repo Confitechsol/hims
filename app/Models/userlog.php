@@ -15,6 +15,7 @@ class Userlog extends Model
 
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'user',
         'role',
         'ipaddress',

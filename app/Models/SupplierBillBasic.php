@@ -21,6 +21,7 @@ class SupplierBillBasic extends Model
     // Fillable columns
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'invoice_no',
         'date',
         'supplier_id',

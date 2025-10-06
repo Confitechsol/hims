@@ -50,7 +50,7 @@
                                                                 aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <form action="" method="POST">
+                                                            <form action="{{ route('appointment-priority.store')}}" method="POST">
                                                                 @csrf
 
                                                                 <div id="priority_fields">
@@ -61,7 +61,7 @@
                                                                             <label for="priority"
                                                                                 class="form-label">Priority <span
                                                                                     class="text-danger">*</span></label>
-                                                                            <input type="text" name="priority"
+                                                                            <input type="text" name="priority[]"
                                                                                 id="priority" class="form-control" />
                                                                         </div>
 
@@ -101,62 +101,37 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Normal
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Urgent
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Very Urgent
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Low
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
+                                                @forelse($appointments as $priority)
+                                                    <tr>
+                                                        <td>
+                                                            <h6 class="mb-0 fs-14 fw-semibold">{{ $priority->appoint_priority }}</h6>
+                                                        </td>
+                                                        <td>
+                                                            <a href="javascript:void(0);"
+                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                                onclick="openAppointPriorityModal(this)"
+                                                                data-priority-id="{{ $priority->id }}"
+                                                                data-priority-name="{{ $priority->appoint_priority }}">
+                                                                <i class="ti ti-pencil"></i>
+                                                            </a>
+
+                                                            <a href="javascript:void(0);" 
+                                                                onclick="deletePriority({{ $priority->id }})"
+                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                                <i class="ti ti-trash"></i>
+                                                            </a>
+                                                            <form id="deletePriorityForm" method="POST" style="display:none;">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="2" class="text-center">No records found</td>
+                                                    </tr>
+                                                @endforelse
+                                               
                                             </tbody>
                                         </table>
                                     </div>
@@ -196,7 +171,58 @@
             });
         });
     </script>
+<div class="modal fade" id="editAppointmentPriorityModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Appointment Priority</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form id="editAppointmentPriorityForm" method="POST" action="">
+        @csrf
+        @method('PUT')
+        <div class="modal-body">
+            <div class="mb-3">
+                <label class="form-label">Priority Name</label>
+                <input type="text" class="form-control" name="priority" id="editAppointmentPriorityName" required>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Update</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
+<script>
+    function openAppointPriorityModal(el) 
+    {
+        let id = el.getAttribute("data-priority-id");
+        let name = el.getAttribute("data-priority-name");
 
+        // Fill modal inputs
+        document.getElementById("editAppointmentPriorityName").value = name;
+
+        // Update form action dynamically
+        let form = document.getElementById("editAppointmentPriorityForm");
+        form.action = "{{ url('appointment-priority/update') }}/" + id; // route to update
+
+        // Show modal
+        let modal = new bootstrap.Modal(document.getElementById("editAppointmentPriorityModal"));
+        modal.show();
+    }
+
+</script>
+<script>
+    function deletePriority(id) {
+        if (confirm("Are you sure you want to delete this appointment priority?")) {
+            let form = document.getElementById("deletePriorityForm");
+            form.action = "{{ url('appointment-priority/destroy') }}/" + id; // matches your route
+            form.submit();
+        }
+    }
+</script>
 
 @endsection

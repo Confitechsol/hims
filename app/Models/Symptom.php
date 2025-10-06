@@ -20,6 +20,8 @@ class Symptom extends Model
 
     // Mass assignable attributes
     protected $fillable = [
+         'hospital_id',
+         'branch_id',
         'symptoms_title',
         'description',
         'type',
@@ -30,4 +32,8 @@ class Symptom extends Model
     protected $casts = [
         'created_at' => 'datetime',
     ];
+     public function classification()
+    {
+        return $this->belongsTo(SymptomsClassification::class, 'type', 'id');
+    }
 }

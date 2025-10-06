@@ -13,6 +13,7 @@ class NotificationRole extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'send_notification_id',
         'role_id',
         'is_active',

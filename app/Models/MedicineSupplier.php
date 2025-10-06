@@ -13,6 +13,7 @@ class MedicineSupplier extends Model
     public $timestamps = false;
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'supplier',
         'contact',
         'supplier_person',

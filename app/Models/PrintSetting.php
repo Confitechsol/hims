@@ -12,6 +12,7 @@ class PrintSetting extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'print_header',
         'print_footer',
         'setting_for',

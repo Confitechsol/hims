@@ -15,6 +15,7 @@ class PaymentSetting extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'payment_type',
         'api_username',
         'api_secret_key',

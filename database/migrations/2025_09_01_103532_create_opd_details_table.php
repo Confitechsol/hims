@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('opd_details', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->unsignedBigInteger('case_reference_id')->nullable()->index();
             $table->unsignedBigInteger('patient_id')->nullable()->index();
             $table->unsignedBigInteger('generated_by')->nullable()->index();

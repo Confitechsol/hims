@@ -13,6 +13,7 @@ class BloodDonor extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'donor_name',
         'date_of_birth',
         'blood_bank_product_id',

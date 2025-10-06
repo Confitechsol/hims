@@ -13,6 +13,7 @@ class Expense extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'exp_head_id',
         'name',
         'invoice_no',

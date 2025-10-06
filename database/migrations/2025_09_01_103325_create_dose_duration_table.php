@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('dose_duration', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('name', 255)->index();
             $table->timestamps();
         });

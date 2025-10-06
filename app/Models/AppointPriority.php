@@ -10,9 +10,11 @@ class AppointPriority extends Model
     use HasFactory;
 
     protected $table = 'appoint_priority';
+     public $timestamps = false;
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'appoint_priority',
     ];
 

@@ -10,9 +10,11 @@ class IncomeHead extends Model
     use HasFactory;
 
     protected $table = 'income_head';
+    public $timestamps = false;
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'income_category',
         'description',
         'is_active',

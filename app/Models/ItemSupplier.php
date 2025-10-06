@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,6 +12,7 @@ class ItemSupplier extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'item_supplier',
         'phone',
         'email',
@@ -21,6 +21,7 @@ class ItemSupplier extends Model
         'contact_person_phone',
         'contact_person_email',
         'description',
+        'is_active',
     ];
 
     /**

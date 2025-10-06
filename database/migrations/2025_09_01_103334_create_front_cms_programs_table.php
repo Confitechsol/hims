@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('front_cms_programs', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('type', 50)->nullable();
             $table->string('slug', 255)->nullable();
             $table->mediumText('url')->nullable();

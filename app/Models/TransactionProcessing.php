@@ -18,6 +18,7 @@ class TransactionProcessing extends Model
     // Mass assignable fields
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'gateway_ins_id',
         'type',
         'section',

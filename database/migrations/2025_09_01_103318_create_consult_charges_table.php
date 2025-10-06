@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('consult_charges', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->integer('doctor')->unsigned()->nullable(false)->index();
 
             $table->float('standard_charge', 10, 2)->nullable(false);

@@ -15,6 +15,7 @@ class StaffLeaveDetail extends Model
     // Fillable fields
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'staff_id',
         'leave_type_id',
         'alloted_leave',

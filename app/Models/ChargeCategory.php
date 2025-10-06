@@ -13,6 +13,7 @@ class ChargeCategory extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'charge_type_id',
         'name',
         'description',
@@ -26,4 +27,9 @@ class ChargeCategory extends Model
         'charge_type_id' => 'integer',
         'created_at' => 'datetime',
     ];
+
+     public function chargeType()
+    {
+        return $this->belongsTo(ChargeTypeMaster::class, 'charge_type_id');
+    }
 }

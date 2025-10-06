@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('share_contents', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('send_to', 50)->nullable()->index();
             $table->text('title')->nullable();
             $table->date('share_date')->nullable()->index();

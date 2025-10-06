@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('doctor_shift_time', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('day', 20)->nullable()->index();
 
             $table->unsignedBigInteger('staff_id')->nullable()->index();

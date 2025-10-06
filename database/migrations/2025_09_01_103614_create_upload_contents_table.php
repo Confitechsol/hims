@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('upload_contents', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
              $table->unsignedBigInteger('content_type_id'); // content_type_id int(11) not null
             $table->text('image')->nullable(); // image text
             $table->text('thumb_path')->nullable(); // thumb_path text

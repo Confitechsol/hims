@@ -13,6 +13,7 @@ class ObstetricHistory extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'patient_id',
         'place_of_delivery',
         'pregnancy_duration',

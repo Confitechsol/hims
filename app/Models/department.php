@@ -13,6 +13,7 @@ class Department extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'department_name',
         'is_active',
     ];

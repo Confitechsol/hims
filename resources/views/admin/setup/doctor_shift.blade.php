@@ -39,44 +39,28 @@
                                             <thead>
                                                 <tr>
                                                     <th>Doctor Name</th>
-                                                    <th>Morning Shift</th>
-                                                    <th>Afternoon Shift</th>
-                                                    <th>Evening Shift</th>
-                                                    <th>Night Shift</th>
+                                                     @foreach($shifts as $shift)
+                                                        <th>{{ $shift->name }}</th>
+                                                    @endforeach
+                                                    
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <a href="#" class="mb-0 fs-14 fw-semibold">Bimal Kundu (D001)
-                                                        </a>
-                                                    </td>
-                                                    <td><input type="checkbox" name="" id="" class="form-check"></td>
-                                                    <td><input type="checkbox" name="" id="" class="form-check"></td>
-                                                    <td><input type="checkbox" name="" id="" class="form-check"></td>
-                                                    <td><input type="checkbox" name="" id="" class="form-check"></td>  
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <a href="#" class="mb-0 fs-14 fw-semibold">Priya Sharma (D002)
-                                                        </a>
-                                                    </td>
-                                                    <td><input type="checkbox" name="" id="" class="form-check"></td>
-                                                    <td><input type="checkbox" name="" id="" class="form-check"></td>
-                                                    <td><input type="checkbox" name="" id="" class="form-check"></td>
-                                                    <td><input type="checkbox" name="" id="" class="form-check"></td>  
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <a href="#" class="mb-0 fs-14 fw-semibold">Sandeep Sharma (D004)
-                                                        </a>
-                                                    </td>
-                                                    <td><input type="checkbox" name="" id="" class="form-check"></td>
-                                                    <td><input type="checkbox" name="" id="" class="form-check"></td>
-                                                    <td><input type="checkbox" name="" id="" class="form-check"></td>
-                                                    <td><input type="checkbox" name="" id="" class="form-check"></td>  
-                                                </tr>
-
+                                                @foreach($doctors as $doctor)
+                                                    <tr>
+                                                        <td>{{ $doctor->name }}</td>
+                                                        @foreach($shifts as $shift)
+                                                            <td>
+                                                                <input type="checkbox" 
+                                                                    class="doctor-shift-checkbox"
+                                                                    data-doctor-id="{{ $doctor->id }}"
+                                                                    data-shift-id="{{ $shift->id }}"
+                                                                    @if($doctor->doctorGlobalShifts->contains('global_shift_id', $shift->id)) checked @endif>
+                                                            </td>
+                                                        @endforeach
+                                                    </tr>
+                                                @endforeach
+                                                
                                             </tbody>
                                         </table>
                                     </div>
@@ -91,5 +75,62 @@
             </div>
         </div>
     </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Delegated binding ensures it works even if table reloads
+    $(document).on('change', '.doctor-shift-checkbox', function() {
+        let doctorId = $(this).data('doctor-id');
+        let shiftId = $(this).data('shift-id');
+        let status = $(this).is(':checked') ? 1 : 0;
+
+        console.log("Checkbox changed:", {
+            doctor_id: doctorId,
+            shift_id: shiftId,
+            status: status
+        });
+
+        $.ajax({
+            url: '{{ route("doctor-shift.toggle") }}',
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                doctor_id: doctorId,
+                shift_id: shiftId,
+                status: status
+            },
+            success: function(response) {
+                console.log("AJAX success:", response);
+
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: response.message || 'Shift saved successfully!',
+                    showConfirmButton: false,
+                    timer: 1500,
+                    timerProgressBar: true
+                });
+            },
+            error: function(xhr) {
+                console.error("AJAX error:", xhr.status, xhr.responseText);
+
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    title: 'Shift not saved!',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true
+                });
+            }
+        });
+    });
+});
+
+</script>
+
+
 
 @endsection

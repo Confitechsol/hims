@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('appoint_priority', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('appoint_priority', 100);
 
             $table->timestamp('created_at')

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('permission_patient', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('permission_group_short_code', 100)->index();
             $table->string('name', 100)->index();
             $table->string('short_code', 100)->index();

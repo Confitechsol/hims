@@ -13,6 +13,7 @@ class ChatConnection extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'chat_user_one',
         'chat_user_two',
         'ip',

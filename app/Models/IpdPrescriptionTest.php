@@ -13,6 +13,7 @@ class IpdPrescriptionTest extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'ipd_prescription_basic_id',
         'pathology_id',
         'radiology_id',

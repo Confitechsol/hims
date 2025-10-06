@@ -18,6 +18,7 @@ class ReferralCommission extends Model
     // Fillable fields
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'referral_category_id',
         'referral_type_id',
         'commission',

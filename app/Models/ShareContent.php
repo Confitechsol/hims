@@ -15,6 +15,7 @@ class ShareContent extends Model
     // Mass assignable attributes
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'send_to',
         'title',
         'share_date',

@@ -15,6 +15,7 @@ class SendNotification extends Model
     // Mass assignable attributes
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'title',
         'publish_date',
         'date',

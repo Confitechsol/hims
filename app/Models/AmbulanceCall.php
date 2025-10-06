@@ -14,6 +14,7 @@ class AmbulanceCall extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'patient_id',
         'case_reference_id',
         'vehicle_id',
