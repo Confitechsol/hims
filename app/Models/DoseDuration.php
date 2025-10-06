@@ -10,7 +10,7 @@ class DoseDuration extends Model
     use HasFactory;
 
     protected $table = 'dose_duration';
-
+    public $timestamps = false;
     protected $fillable = [
         'hospital_id',
     ];
