@@ -346,7 +346,7 @@
                             </li> -->
                         </ul>
                     </li>
-                    <li class="menu-title"><span>HRM</span></li>
+                    <!--<li class="menu-title"><span>HRM</span></li>
                     <li>
                         <ul>
                             <li>
@@ -391,7 +391,7 @@
                                 </a>
                             </li>
                         </ul>
-                    </li>
+                    </li> -->
                     <li class="menu-title"><span>Finance &
                             Accounts</span></li>
                     <li>
@@ -435,10 +435,10 @@
                             </li>
                         </ul>
                     </li>
-                    <li class="menu-title"><span>Administration</span></li>
+                    <li class="menu-title"><span>Administration & HRM</span></li>
                     <li>
                         <ul>
-                            <li class="submenu">
+                            <!--<li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-user"></i><span>Users</span>
                                     <span class="menu-arrow"></span>
@@ -449,7 +449,52 @@
                                     <li><a href="delete-account-request.html">Delete
                                             Account Request</a></li>
                                 </ul>
+                            </li>-->
+                            <li>
+                        <ul>
+                            <li>
+                                <a href="staffs.html">
+                                    <i class="ti ti-users-group"></i><span>Staffs</span>
+                                </a>
                             </li>
+                            <li>
+                                <a href="hrm-departments.html">
+                                    <i class="ti ti-building-bank"></i><span>Departments</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="designation.html">
+                                    <i class="ti ti-user-cog"></i><span>Designation</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="attendance.html">
+                                    <i class="ti ti-user-check"></i><span>Attendance</span>
+                                </a>
+                            </li>
+                            <li class="submenu">
+                                <a href="javascript:void(0);">
+                                    <i class="ti ti-users-minus"></i><span>Leaves</span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <ul>
+                                    <li><a href="leaves.html">Leaves</a></li>
+                                    <li><a href="leave-type.html">Leave
+                                            Type</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="holidays.html">
+                                    <i class="ti ti-home-exclamation"></i><span>Holidays</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="payroll.html">
+                                    <i class="ti ti-coin"></i><span>Payroll</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                             <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-report"></i><span>Reports</span>
@@ -503,8 +548,8 @@
                             </li>
                         </ul>
                     </li>
-                    <li class="menu-title"><span>Content</span></li>
-                    <!-- <li>
+ <!--                   <li class="menu-title"><span>Content</span></li>
+                     <li>
                         <ul>
                             <li>
                                 <a href="pages.html">
@@ -548,8 +593,8 @@
                                 </a>
                             </li>
                         </ul>
-                    </li> -->
-                    <!-- <li class="menu-title"><span>Support</span></li> -->
+                    </li> 
+                     <li class="menu-title"><span>Support</span></li> 
                     <li>
                         <ul>
                             <li>
@@ -575,7 +620,7 @@
                             </li>
                         </ul>
                     </li>
-                    <!--<li class="menu-title"><span>Pages</span></li>
+                    <li class="menu-title"><span>Pages</span></li>
                     <li>
                         <ul>
                             <li>
@@ -628,7 +673,7 @@
                                 </a>
                             </li>
                         </ul>
-                    </li> -->
+                    </li> 
                     <li class="menu-title"><span>Authentication</span></li>
                     <li>
                         <ul>
@@ -722,7 +767,7 @@
                                 </ul>
                             </li>
                         </ul>
-                    </li>
+                    </li>    -->
                     <li class="menu-title"><span>Settings</span></li>
                     <li>
                         <ul>
