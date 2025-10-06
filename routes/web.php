@@ -381,3 +381,7 @@ Route::prefix('/appointment-priority')->group(function () {
 Route::get('/opd', function () {
     return view('admin.opd.index');
 })->name('opd');
+
+Route::get('/appointment-details', function () {
+    return view('admin.appointment_details');
+})->name('appointment-details');
