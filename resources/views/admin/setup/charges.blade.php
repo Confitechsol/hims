@@ -69,7 +69,7 @@
                                                             aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <form action="{{ route('roles.store')  }}" method="POST">
+                                                        <form action="{{ route('charges.store')  }}" method="POST">
                                                             @csrf
                                                             <div class="row">
                                                                 <div class="col-md-6">
@@ -78,22 +78,13 @@
                                                                             <label for="" class="form-label">Charge
                                                                                 Type <span
                                                                                     class="text-danger">*</span></label>
-                                                                            <select name=" charge_type" id="charge_type"
+                                                                            <select name="charge_type" id="charge_type"
                                                                                 class="form-select" required>
                                                                                 <option value="">Select</option>
-                                                                                <option value="1">Appointment</option>
-                                                                                <option value="2">OPD</option>
-                                                                                <option value="3">IPD</option>
-                                                                                <option value="4">Pathology</option>
-                                                                                <option value="5">Radiology</option>
-                                                                                <option value="6">Blood Bank</option>
-                                                                                <option value="7">Ambulance</option>
-                                                                                <option value="8">Procedures</option>
-                                                                                <option value="9">Investigations</option>
-                                                                                <option value="10">Supplier</option>
-                                                                                <option value="11">Operations</option>
-                                                                                <option value="12">Others</option>
-                                                                                <option value="13">Bed Charges</option>
+                                                                                @foreach ( $charge_types as $charge_type )
+                                                                                   <option value="{{$charge_type -> id}}">{{$charge_type -> charge_type}}</option> 
+                                                                                @endforeach
+
                                                                             </select>
                                                                         </div>
                                                                         <div class="col-md-6">
@@ -103,8 +94,11 @@
                                                                             <select name=" charge_category"
                                                                                 id="charge_category" class="form-select"
                                                                                 required>
-                                                                                <option value="">Select</option>
-                                                                                <option value="1">Appointment</option>
+                                                                                @foreach ( $charge_types as $charge_type)
+                                                                                    <option value="{{$charge_type -> id}}">{{$charge_type->charge_type}}</option> 
+                                                                                @endforeach
+                                                                               
+                                                                                {{-- <option value="1">Appointment</option>
                                                                                 <option value="2">OPD</option>
                                                                                 <option value="3">IPD</option>
                                                                                 <option value="4">Pathology</option>
@@ -116,7 +110,7 @@
                                                                                 <option value="10">Supplier</option>
                                                                                 <option value="11">Operations</option>
                                                                                 <option value="12">Others</option>
-                                                                                <option value="13">Bed Charges</option>
+                                                                                <option value="13">Bed Charges</option> --}}
                                                                             </select>
                                                                         </div>
                                                                         <div class="col-md-6">
@@ -126,8 +120,11 @@
                                                                             <select name="tax_category" id="tax_category"
                                                                                 class="form-select" autocomplete="off"
                                                                                 required>
-                                                                                <option value="">Select</option>
-                                                                                <option value="2">VAT</option>
+                                                                                @foreach ($charge_tax_category_id as $charge_tax_category_ids )
+                                                                                    <option value="{{$charge_tax_category_ids->id}}">{{$charge_tax_category_ids->name}}</option>
+                                                                                @endforeach
+                                                                                
+                                                                                {{-- <option value="2">VAT</option> --}}
                                                                             </select>
                                                                         </div>
                                                                         <div class="col-md-6">
@@ -165,8 +162,11 @@
                                                                             <select name="unit_type" id="unit_type"
                                                                                 class="form-select" autocomplete="off"
                                                                                 required>
-                                                                                <option value="">Select</option>
-                                                                                <option value="2">Each</option>
+                                                                                @foreach ( $charge_unit as $charge_units )
+                                                                                    <option value="{{$charge_units->id}}">{{$charge_units->unit}}</option>
+                                                                                @endforeach
+                                                                                
+                                                                                {{-- <option value="2">Each</option> --}}
                                                                             </select>
                                                                         </div>
                                                                         <div class="col-md-8">
@@ -185,13 +185,15 @@
                                                                                 <div class="form-group">
                                                                                     <table class="printablea4">
                                                                                         <tbody>
-                                                                                            <tr id="schedule_charge">
+                                                                                        @foreach ( $organisation_name as $organisation_names)
+
+                                                                                          <tr id="schedule_charge">
                                                                                                 <input type="hidden"
                                                                                                     name="schedule_charge_id[]"
                                                                                                     value="5">
                                                                                                 <td class="col-sm-8"
                                                                                                     style="vertical-align: bottom; text-align: left; padding-right: 20px;">
-                                                                                                    MedoLogi TPA Pvt. Ltd.
+                                                                                                    {{$organisation_names ->organisation_name}}
                                                                                                 </td>
                                                                                                 <td class="col-sm-4">
                                                                                                     <input type="text"
@@ -200,65 +202,10 @@
                                                                                                         class="form-control schedule_charge">
                                                                                                 </td>
                                                                                             </tr>
-                                                                                            <tr id="schedule_charge">
-                                                                                                <input type="hidden"
-                                                                                                    name="schedule_charge_id[]"
-                                                                                                    value="4">
-                                                                                                <td class="col-sm-8"
-                                                                                                    style="vertical-align: bottom; text-align: left; padding-right: 20px;">
-                                                                                                    Vidal Health TPA </td>
-                                                                                                <td class="col-sm-4">
-                                                                                                    <input type="text"
-                                                                                                        name="schedule_charge_4"
-                                                                                                        id="schedule_charge_4"
-                                                                                                        class="form-control schedule_charge">
-                                                                                                </td>
-                                                                                            </tr>
-                                                                                            <tr id="schedule_charge">
-                                                                                                <input type="hidden"
-                                                                                                    name="schedule_charge_id[]"
-                                                                                                    value="3">
-                                                                                                <td class="col-sm-8"
-                                                                                                    style="vertical-align: bottom; text-align: left; padding-right: 20px;">
-                                                                                                    Paramount Health
-                                                                                                    Services </td>
-                                                                                                <td class="col-sm-4">
-                                                                                                    <input type="text"
-                                                                                                        name="schedule_charge_3"
-                                                                                                        id="schedule_charge_3"
-                                                                                                        class="form-control schedule_charge">
-                                                                                                </td>
-                                                                                            </tr>
-                                                                                            <tr id="schedule_charge">
-                                                                                                <input type="hidden"
-                                                                                                    name="schedule_charge_id[]"
-                                                                                                    value="2">
-                                                                                                <td class="col-sm-8"
-                                                                                                    style="vertical-align: bottom; text-align: left; padding-right: 20px;">
-                                                                                                    Raksha TPA Pvt. Ltd.
-                                                                                                </td>
-                                                                                                <td class="col-sm-4">
-                                                                                                    <input type="text"
-                                                                                                        name="schedule_charge_2"
-                                                                                                        id="schedule_charge_2"
-                                                                                                        class="form-control schedule_charge">
-                                                                                                </td>
-                                                                                            </tr>
-                                                                                            <tr id="schedule_charge">
-                                                                                                <input type="hidden"
-                                                                                                    name="schedule_charge_id[]"
-                                                                                                    value="1">
-                                                                                                <td class="col-sm-8"
-                                                                                                    style="vertical-align: bottom; text-align: left; padding-right: 20px;">
-                                                                                                    MediAssist TPA Pvt. Ltd.
-                                                                                                </td>
-                                                                                                <td class="col-sm-4">
-                                                                                                    <input type="text"
-                                                                                                        name="schedule_charge_1"
-                                                                                                        id="schedule_charge_1"
-                                                                                                        class="form-control schedule_charge">
-                                                                                                </td>
-                                                                                            </tr>
+                                                                                            
+                                                                                        @endforeach
+                                                                                          
+                                                                                           
                                                                                         </tbody>
                                                                                     </table>
                                                                                     <span class="text-danger"></span>

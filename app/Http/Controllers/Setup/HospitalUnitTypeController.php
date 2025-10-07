@@ -13,4 +13,17 @@ class HospitalUnitTypeController extends Controller
        // return $unittype;
          return view('admin.setup.unit_type',compact('unittype'));
     }
-}
+
+     public function store(Request $request)
+{
+    // Validate input
+    $validator = $request->validate ( [
+        'unit' => 'required|string|max:255',
+        
+    ]);
+
+    ChargeUnit::create(['unit'=>$request->unit,'is_active'=>'0','hospital_id'=>'HS001']);
+
+    return redirect()->back()->with("success","Unit Created Sucessfully!");
+
+}}
