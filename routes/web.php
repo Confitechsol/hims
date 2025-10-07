@@ -413,3 +413,9 @@ Route::get('/opd', function () {
 Route::get('/appointment-details', function () {
     return view('admin.appointment_details');
 })->name('appointment-details');
+Route::get('/doctor-wise', function () {
+    return view('admin.doctor_wise');
+})->name('doctor-wise');
+Route::get('/queue', function () {
+    return view('admin.queue');
+})->name('queue');
