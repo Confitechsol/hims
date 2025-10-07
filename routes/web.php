@@ -125,8 +125,10 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/users', [UsersController::class, 'index'])->name('users');
     Route::post('/users/updatedrstatus/{id}', [UsersController::class, 'updateDrStatus'])->name('users.updateDrStatus');
     Route::post('/users/updatestaffstatus/{id}', [UsersController::class, 'updateStaffStatus'])->name('users.updateStaffStatus');
+    
+    Route::get('/charges',[HospitalChargesController::class,'index'])->name('charges');
+    Route::post('/charges',[HospitalChargesController::class,'store'])->name('charges.store');
 
-    Route::get('/charges', [HospitalChargesController::class, 'index'])->name('charges');
     Route::get('/disable', function () {
         return view('admin.setup.disable_patient');
     })->name('disable');
@@ -167,13 +169,17 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/floors/store', [FloorController::class, 'store'])->name('floors.store');
     Route::put('/floors/update', [FloorController::class, 'update'])->name('floors.update');
     Route::delete('/floors/destroy', [FloorController::class, 'destroy'])->name('floors.destroy');
-    Route::get('/charge-category', [HospitalChargeCategoryController::class, 'index'])->name('charge_categories');
-    Route::get('/charge-type', [HospitalChargeTypeController::class, 'index'])->name('charge_type_module');
-    Route::get('/tax-category', [HospitalTaxCategoryController::class, 'index'])->name('tax_category');
-    Route::get('/unit-type', [HospitalUnitTypeController::class, 'index'])->name('charge_units');
-    // Route::get('/unit-type', function () {
-    //     return view('admin.setup.unit_type');
-    // })->name('unit-type');
+    Route::get('/charge-category',[HospitalChargeCategoryController::class,'index'])->name('charge_categories');
+    Route::post('/charge-category',[HospitalChargeCategoryController::class,'store'])->name('charge_categories.store');
+
+    Route::get('/charge-type',[HospitalChargeTypeController::class,'index'])->name('charge_type_module');
+    Route::post('/charge-type',[HospitalChargeTypeController::class,'store'])->name('charge_type_module.store');
+
+    Route::get('/tax-category',[HospitalTaxCategoryController::class,'index'])->name('tax_category');
+    Route::post('/tax-category', [HospitalTaxCategoryController::class, 'store'])->name('tax_category.store');
+    Route::get('/unit-type',[HospitalUnitTypeController::class,'index'])->name('charge_units');
+    Route::post('/unit-type',[HospitalUnitTypeController::class,'store'])->name('charge_units.store');
+
     Route::get('/medicine-category', function () {
         return view('admin.setup.medicine_category');
     })->name('medicine-category');

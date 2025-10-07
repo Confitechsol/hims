@@ -55,28 +55,19 @@
                                                             aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <form action="" method="POST">
+                                                        <form action="{{route('charge_categories.store')}}" method="POST">
                                                             @csrf
                                                             <div class="row gy-3">
                                                                 <div class="col-md-12">
                                                                     <label for="" class="form-label">Charge
                                                                         Type <span class="text-danger">*</span></label>
-                                                                    <select name=" charge_type" id="charge_type"
+                                                                    <select name="charge_type" id="charge_type"
                                                                         class="form-select" required>
                                                                         <option value="">Select</option>
-                                                                        <option value="1">Appointment</option>
-                                                                        <option value="2">OPD</option>
-                                                                        <option value="3">IPD</option>
-                                                                        <option value="4">Pathology</option>
-                                                                        <option value="5">Radiology</option>
-                                                                        <option value="6">Blood Bank</option>
-                                                                        <option value="7">Ambulance</option>
-                                                                        <option value="8">Procedures</option>
-                                                                        <option value="9">Investigations</option>
-                                                                        <option value="10">Supplier</option>
-                                                                        <option value="11">Operations</option>
-                                                                        <option value="12">Others</option>
-                                                                        <option value="13">Bed Charges</option>
+                                                                        @foreach ($charge_types as $charge_type)
+                                                                            <option value="{{$charge_type -> id}}">{{$charge_type -> charge_type}}</option>
+                                                                        @endforeach
+                                                                      
                                                                     </select>
                                                                 </div>
                                                                 <div class="col-md-12">

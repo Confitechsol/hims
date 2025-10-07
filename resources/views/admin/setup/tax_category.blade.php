@@ -66,7 +66,7 @@
                                                             aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <form action="" method="POST">
+                                                        <form action="{{route('tax_category.store')}}" method="POST">
                                                             @csrf
                                                             <div class="row gy-3">
 
