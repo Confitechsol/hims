@@ -177,6 +177,8 @@ Route::middleware(['admin'])->group(function () {
 
     Route::get('/tax-category',[HospitalTaxCategoryController::class,'index'])->name('tax_category');
     Route::post('/tax-category', [HospitalTaxCategoryController::class, 'store'])->name('tax_category.store');
+    Route::put('/tax-category/update', [HospitalTaxCategoryController::class, 'update'])->name('tax_category.update');
+    Route::delete('/tax-category/destroy', [HospitalTaxCategoryController::class, 'destroy'])->name('tax_category.destroy');
     Route::get('/unit-type',[HospitalUnitTypeController::class,'index'])->name('charge_units');
     Route::post('/unit-type',[HospitalUnitTypeController::class,'store'])->name('charge_units.store');
 
