@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('userlog', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('user', 100)->nullable(); // user varchar(100) NULL
             $table->string('role', 100)->nullable(); // role varchar(100) NULL
             $table->string('ipaddress', 100)->nullable(); // ipaddress varchar(100) NULL

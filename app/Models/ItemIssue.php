@@ -13,6 +13,7 @@ class ItemIssue extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'issue_type',
         'issue_to',
         'issue_by',

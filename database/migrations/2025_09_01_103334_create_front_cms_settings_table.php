@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('front_cms_settings', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('theme', 50)->nullable();
             $table->integer('is_active_rtl')->default(0);
             $table->integer('is_active_front_cms')->default(0);

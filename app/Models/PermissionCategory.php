@@ -15,6 +15,7 @@ class PermissionCategory extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'perm_group_id',
         'name',
         'short_code',

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('front_cms_program_photos', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->unsignedBigInteger('program_id')->nullable();
             $table->unsignedBigInteger('media_gallery_id')->nullable();
 

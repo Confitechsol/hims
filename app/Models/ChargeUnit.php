@@ -13,6 +13,7 @@ class ChargeUnit extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'unit',
         'is_active',
     ];

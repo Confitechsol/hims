@@ -10,9 +10,11 @@ class ExpenseHead extends Model
     use HasFactory;
 
     protected $table = 'expense_head';
+    public $timestamps = false;
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'exp_category',
         'description',
         'is_active',

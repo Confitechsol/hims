@@ -14,6 +14,7 @@ class PathologyParameter extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'parameter_name',
         'test_value',
         'reference_range',

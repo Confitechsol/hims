@@ -20,6 +20,27 @@
                             <div class="card">
 
                                 <div class="card-body">
+                                    @if ($errors->any())
+                                    @foreach ($errors->all() as $error)
+                                        <div class="alert alert-danger">
+                                            <ul class="mb-0">
+                                                @foreach ($errors->all() as $error)
+                                                    <li>{{ $error }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    @endforeach
+                                    @endif
+                                    @if(session('error'))
+                                        <div class="alert alert-danger">
+                                            {{session('error')}}
+                                        </div>
+                                    @endif
+                                    @if(session('success'))
+                                        <div class="alert alert-success">
+                                            {{session('success')}}
+                                        </div>
+                                    @endif
                                     <div
                                         class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
 
@@ -38,7 +59,7 @@
                                                         class="ti ti-plus me-1"></i>Add Company</a>
                                             </div>
                                             <!-- Modal -->
-                                            <div class="modal fade" id="add_company" tabindex="-1" aria-hidden="true">
+                                            <div class="modal fade" id="--add_company" tabindex="-1" aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered">
                                                     <div class="modal-content">
                                                         <div class="modal-header rounded-0"
@@ -101,82 +122,31 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                @foreach ($companys as $key => $item)
                                                 <tr>
                                                     <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">1
+                                                        <h6 class="mb-0 fs-14 fw-semibold">{{$item->id}}</h6>
                                                         </h6>
                                                     </td>
-                                                    <td>Cipla</td>
+                                                    <td>{{$item->company_name}}</td>
                                                     <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
+                                                         <button
+                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
+                                                            data-id="{{ $item["id"] }}"
+                                                            data-company_name="{{$item->company_name}}">
+                                                            <i class="ti ti-pencil"></i>
+                                                        </button>
+                                                        <form action="{{ route('company-list.destroy')}}" method="POST" style="display:inline-block;">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                                <input type="hidden" name="id" value="{{$item->id}}">
+                                                                <button onclick="return confirm('Are you sure?')" class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                                <i class="ti ti-trash"></i>
+                                                                </button>
+                                                        </form>
                                                     </td>
                                                 </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">2
-                                                        </h6>
-                                                    </td>
-                                                    <td>Sun Pharma</td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">3
-                                                        </h6>
-                                                    </td>
-                                                    <td>Abbott</td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">4
-                                                        </h6>
-                                                    </td>
-                                                    <td>Mankind</td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">5
-                                                        </h6>
-                                                    </td>
-                                                    <td>Dr. Reddy's	</td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                               
+                                                @endforeach
                                             </tbody>
                                         </table>
                                     </div>
@@ -191,7 +161,14 @@
             </div>
         </div>
     </div>
-
+    <x-modals.form-modal type="add" id="add_company" title="Add company" action="{{route('company-list.store')}}" :repeatable_group="[
+        ['name' => 'company_name', 'label' => 'Company Name', 'type' => 'text', 'required' => true,'size'=>'11']
+        ]" :columns="2" />
+    <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Company Name"
+    action="{{route('company-list.update')}}" :fields="[
+        ['name' => 'id', 'type' => 'hidden', 'required' => true],
+        ['name' => 'company_name', 'label' => 'Unit Name', 'type' => 'text', 'required' => true, 'size' => '12']
+    ]" :columns="2" />
     <script>
         const addBtn = document.getElementById("addBtn");
         const operationFields = document.getElementById("company_fields");

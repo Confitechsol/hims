@@ -13,6 +13,7 @@ class OrganisationsCharge extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'org_id',
         'charge_id',
         'org_charge',

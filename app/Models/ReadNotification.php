@@ -18,6 +18,7 @@ class ReadNotification extends Model
     // Fillable fields
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'staff_id',
         'notification_id',
         'is_active',

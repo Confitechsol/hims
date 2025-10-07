@@ -13,6 +13,7 @@ class IpdDoctor extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'ipd_id',
         'consult_doctor',
     ];

@@ -11,6 +11,8 @@ class LetterheadSettings extends Model
     // protected $table = 'letterhead_settings';
 
     protected $fillable = [
+        'hospital_id',
+         'branch_id',
         'letterhead_cat_id',
         'print_header',
         'print_footer',

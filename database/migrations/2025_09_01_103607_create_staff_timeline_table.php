@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('staff_timeline', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
              $table->string('invoice_no', 100); // invoice_no
             $table->dateTime('date'); // date
             $table->unsignedBigInteger('supplier_id')->nullable()->index(); // supplier_id

@@ -13,6 +13,7 @@ class NurseNotesComment extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'nurse_note_id',
         'comment_staffid',
         'comment_staff',

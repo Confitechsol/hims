@@ -13,6 +13,7 @@ class FrontCmsPage extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'page_type',
         'is_homepage',
         'title',

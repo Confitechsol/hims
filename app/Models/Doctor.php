@@ -50,4 +50,9 @@ class Doctor extends Model
     {
         return $this->belongsTo(StaffDesignation::class, 'designation_id');
     }
+
+    public function doctorGlobalShifts()
+    {
+        return $this->hasMany(DoctorGlobalShift::class, 'doctor_id', 'id');
+    }
 }

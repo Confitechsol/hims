@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('content_types', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('name', 200)->nullable()->index();
             // VARCHAR(200), NULL, indexed
 

@@ -50,7 +50,7 @@
                                                                 aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <form action="" method="POST">
+                                                            <form action="{{ route('expense-head.store') }}" method="POST">
                                                                 @csrf
 
                                                                 <div id="expense_head_fields">
@@ -61,13 +61,13 @@
                                                                             <label for="expense_head"
                                                                                 class="form-label">Expense Head <span
                                                                                     class="text-danger">*</span></label>
-                                                                            <input type="text" name="expense_head"
+                                                                            <input type="text" name="expense_head[]"
                                                                                 id="expense_head" class="form-control" required />
                                                                         </div>
                                                                         <div class="col-md-7">
                                                                             <label for="description"
                                                                                 class="form-label">Description</label>
-                                                                            <input type="text" name="description"
+                                                                            <input type="text" name="description[]"
                                                                                 id="description" class="form-control"  />
                                                                         </div>
 
@@ -107,48 +107,43 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Salaries & Wages
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Medical Supplies
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Utility Bills
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
+                                                @forelse($expenseHeads as $expenseHead)
+    <tr>
+        <td>
+            <h6 class="mb-0 fs-14 fw-semibold">{{ $expenseHead->exp_category }}</h6>
+            <small class="text-muted">{{ $expenseHead->description }}</small>
+        </td>
+        <td>
+            <!-- Edit Button -->
+            <a href="javascript:void(0);" 
+                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
+                data-id="{{ $expenseHead->id }}"
+                data-name="{{ $expenseHead->exp_category }}"
+                data-desc="{{ $expenseHead->description }}">
+                <i class="ti ti-pencil"></i>
+            </a>
+
+            <!-- Delete Button -->
+            <a href="javascript:void(0);"
+                onclick="deleteExpenseHead({{ $expenseHead->id }})"
+                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                <i class="ti ti-trash"></i>
+            </a>
+        </td>
+
+        <!-- Hidden Delete Form -->
+        <form id="deleteExpenseHeadForm" method="POST" style="display:none;">
+            @csrf
+            @method('DELETE')
+        </form>
+    </tr>
+@empty
+    <tr>
+        <td colspan="2" class="text-center text-muted">No expense heads found</td>
+    </tr>
+@endforelse
+
+                                               
                                             </tbody>
                                         </table>
                                     </div>
@@ -163,6 +158,81 @@
             </div>
         </div>
     </div>
+    <!-- Edit Expense Head Modal -->
+<div class="modal fade" id="edit_expense_head" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header rounded-0"
+                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                <h5 class="modal-title">Edit Expense Head</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm" method="POST">
+                    @csrf
+                    @method('PUT')
+
+                    <!-- Hidden ID field -->
+                    <input type="hidden" id="edit_id" name="id">
+
+                    <div class="row gy-3">
+                        <!-- Expense Head Name -->
+                        <div class="col-md-6">
+                            <label for="edit_expense_head_name" class="form-label">Expense Head <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" name="expense_head" id="edit_expense_head_name"
+                                class="form-control" required />
+                        </div>
+
+                        <!-- Description -->
+                        <div class="col-md-6">
+                            <label for="edit_description" class="form-label">Description</label>
+                            <input type="text" name="description" id="edit_description"
+                                class="form-control" />
+                        </div>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Update</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+    <script>
+    // Handle Edit button click
+    document.querySelectorAll(".edit-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            let id = this.dataset.id;
+            let name = this.dataset.name;
+            let desc = this.dataset.desc;
+
+            // Set values inside modal
+            document.getElementById("edit_id").value = id;
+            document.getElementById("edit_expense_head_name").value = name;
+            document.getElementById("edit_description").value = desc;
+
+            // Update form action URL dynamically
+            let form = document.getElementById("editForm");
+            form.action = '{{ url('expense-head/update') }}/' + id;
+
+            // Open modal
+            new bootstrap.Modal(document.getElementById("edit_expense_head")).show();
+        });
+    });
+
+    function deleteExpenseHead(id) {
+        if (confirm("Are you sure you want to delete this Expense Head?")) {
+            let form = document.getElementById("deleteExpenseHeadForm");
+            form.action = "{{ url('expense-head/destroy') }}/" + id;
+            form.submit();
+        }
+    }
+</script>
+
 
     <script>
         const addBtn = document.getElementById("addBtn");

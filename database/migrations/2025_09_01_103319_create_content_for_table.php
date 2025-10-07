@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('content_for', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('role', 50)->nullable();
             // VARCHAR(50), NULL
 

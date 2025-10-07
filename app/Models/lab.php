@@ -13,6 +13,7 @@ class Lab extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'lab_name',
     ];
 

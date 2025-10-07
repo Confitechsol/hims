@@ -7793,6 +7793,12 @@ Author URL: https://themeforest.net/user/dreamstechnologies
   outline: 0;
   box-shadow: none;
 }
+.form-select:focus {
+  border-color: var(--primary);
+  background-color: var(--white);
+  outline: 0;
+  box-shadow: none;
+}
 
 .form-control-sm {
   font-size: 12px;

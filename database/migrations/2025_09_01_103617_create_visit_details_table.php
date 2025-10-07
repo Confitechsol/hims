@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('visit_details', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->unsignedInteger('opd_details_id')->nullable()->index();
             $table->unsignedInteger('organisation_id')->nullable()->index();
             $table->unsignedInteger('patient_charge_id')->nullable()->index();

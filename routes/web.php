@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AppointmentsController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BedController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\BedTypeController;
 use App\Http\Controllers\BloodBankController;
 use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\EmailController;
+use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\FloorController;
 use App\Http\Controllers\FrontOfficeController;
 use App\Http\Controllers\MedicineCategoryController;
@@ -18,6 +20,13 @@ use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\Setup\FindingsController;
+use App\Http\Controllers\Setup\HospitalChargeCategoryController;
+use App\Http\Controllers\Setup\HospitalChargesController;
+use App\Http\Controllers\Setup\HospitalChargeTypeController;
+use App\Http\Controllers\Setup\HospitalTaxCategoryController;
+use App\Http\Controllers\Setup\HospitalUnitTypeController;
+use App\Http\Controllers\Setup\HrController;
+use App\Http\Controllers\Setup\InventoryController;
 use App\Http\Controllers\Setup\LanguagesController;
 use App\Http\Controllers\Setup\LetterHeadController;
 use App\Http\Controllers\Setup\MedicineDosageController;
@@ -27,13 +36,12 @@ use App\Http\Controllers\Setup\ProfileController;
 use App\Http\Controllers\Setup\RadiologyController;
 use App\Http\Controllers\Setup\UsersController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Setup\HospitalChargesController;
-use App\Http\Controllers\Setup\HospitalChargeCategoryController;
+use App\Http\Controllers\Setup\DoseIntervalController;
+use App\Http\Controllers\Setup\DosageDurationController;
+use App\Http\Controllers\Setup\UnitController;
 use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\VitalController;
-use App\Http\Controllers\Setup\HospitalChargeTypeController;
-use App\Http\Controllers\Setup\HospitalTaxCategoryController;
-use App\Http\Controllers\Setup\HospitalUnitTypeController;
+use App\Http\Controllers\Setup\CompanyListController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -175,11 +183,18 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/medicine-category', function () {
         return view('admin.setup.medicine_category');
     })->name('medicine-category');
-    Route::get('/supplier', [MedicineSupplierController::class, 'index'])->name('supplier');
-    Route::post('/supplier/store', [MedicineSupplierController::class, 'store'])->name('supplier-store');
-    Route::delete('/supplier/destroy', [MedicineSupplierController::class, 'destroy'])->name('supplier.destroy');
-    Route::put('/supplier/update', [MedicineSupplierController::class, 'update'])->name('supplier.update');
-    Route::get('/medicine-dosage', [MedicineDosageController::class, 'index'])->name('medicine-dosage');
+
+    Route::get('/supplier',[MedicineSupplierController::class,'index'])->name('supplier');
+    Route::post('/supplier/store',[MedicineSupplierController::class,'store'])->name('supplier-store');
+    Route::delete('/supplier/destroy',[MedicineSupplierController::class,'destroy'])->name('supplier.destroy');
+    Route::put('/supplier/update',[MedicineSupplierController::class,'update'])->name('supplier.update');
+
+    Route::get('/medicine-dosage', [MedicineDosageController::class,'index'])->name('medicine-dosage');
+    Route::put('/medicine-dosage/update', [MedicineDosageController::class,'update'])->name('medicine-dosage.update');
+    Route::post('/medicine-dosage/store', [MedicineDosageController::class,'store'])->name('medicine-dosage.store');
+    Route::delete('/medicine-dosage/destroy', [MedicineDosageController::class,'destroy'])->name('medicine-dosage.destroy');
+
+
     Route::get('/purpose', [FrontOfficeController::class, 'purposes'])->name('purpose');
     Route::post('/purpose/store', [FrontOfficeController::class, 'storePurpose'])->name('purposes.store');
     Route::put('/purpose/update/{id}', [FrontOfficeController::class, 'updatePurpose'])->name('purposes.update');
@@ -195,34 +210,43 @@ Route::middleware(['admin'])->group(function () {
     Route::put('/sources/update/{id}', [FrontOfficeController::class, 'updateSources'])->name('sources.update');
     Route::delete('/sources/destroy/{id}', [FrontOfficeController::class, 'destroySources'])->name('sources.destroy');
 
+    Route::get('/company-list', [CompanyListController::class,'index'])->name('company-list');
+    Route::post('/company-list/store', [CompanyListController::class,'store'])->name('company-list.store');
+    Route::put('/company-list/update', [CompanyListController::class,'update'])->name('company-list.update');
+    Route::delete('/company-list/destroy', [CompanyListController::class,'destroy'])->name('company-list.destroy');
+
+    Route::get('/dosage-interval',[DoseIntervalController::class,'index'])->name('dosage-interval');
+    Route::put('/dosage-interval/update',[DoseIntervalController::class,'update'])->name('dosage-interval.update');
+    Route::post('/dosage-interval/store',[DoseIntervalController::class,'store'])->name('dosage-interval.store');
+    Route::delete('/dosage-interval/destroy',[DoseIntervalController::class,'destroy'])->name('dosage-interval.destroy');
+
+    Route::get('/dosage-duration', [DosageDurationController::class,'index'])->name('dosage-duration');
+    Route::put('/dosage-duration/update', [DosageDurationController::class,'update'])->name('dosage-duration.update');
+    Route::post('/dosage-duration/store', [DosageDurationController::class,'store'])->name('dosage-duration.store');
+    Route::delete('/dosage-duration/destroy', [DosageDurationController::class,'destroy'])->name('dosage-duration.destroy');
+
+    Route::get('/unit-list',[UnitController::class,'index'])->name('unit-list');
+    Route::post('/unit-list/store',[UnitController::class,'store'])->name('unit-list.store');
+    Route::put('/unit-list/update',[UnitController::class,'update'])->name('unit-list.update');
+    Route::delete('/unit-list/destroy',[UnitController::class,'destroy'])->name('unit-list.destroy');
+
+    Route::get('/medicine-group', [MedicineGroupController::class, 'index'])->name('medicine-group');
+    Route::post('/medicine-group/store-multiple', [MedicineGroupController::class, 'storeMultiple'])->name('medicine-group.storeMultiple');
+    Route::put('/medicine-group/{id}', [MedicineGroupController::class, 'update'])->name('medicine-group.update');
+    Route::delete('/medicine-group/destroy', [MedicineGroupController::class, 'destroy'])->name('medicine-group.destroy');
+
+    Route::get('/medicine-categories', [MedicineCategoryController::class, 'index'])->name('medicine-categories');
+    Route::post('/medicine-categories/store-multiple', [MedicineCategoryController::class, 'storeMultiple'])->name('medicine-categories.storeMultiple');
+    Route::put('/medicine-categories/{id}', [MedicineCategoryController::class, 'update'])->name('medicine-categories.update');
+    Route::delete('/medicine-categories/destroy', [MedicineCategoryController::class, 'destroy'])->name('medicine-categories.destroy');             
+
 });
 
-Route::get('/dosage-interval', function () {
-    return view('admin.setup.dosage_interval');
-})->name('dosage-interval');
-Route::get('/dosage-duration', function () {
-    return view('admin.setup.dosage_duration');
-})->name('dosage-duration');
-Route::get('/unit-list', function () {
-    return view('admin.setup.unit_list');
-})->name('unit-list');
-Route::get('/company-list', function () {
-    return view('admin.setup.company_list');
-})->name('company-list');
 // Route::get('/medicine-group', function () {
 //     return view('admin.setup.medicine_group');
 // })->name('medicine-group');
-Route::get('/medicine-group', [MedicineGroupController::class, 'index'])->name('medicine-group');
-Route::post('/medicine-group/store-multiple', [MedicineGroupController::class, 'storeMultiple'])->name('medicine-group.storeMultiple');
-Route::put('/medicine-group/{id}', [MedicineGroupController::class, 'update'])->name('medicine-group.update');
-Route::delete('/medicine-group/destroy', [MedicineGroupController::class, 'destroy'])->name('medicine-group.destroy');
-Route::get('/medicine-categories', [MedicineCategoryController::class, 'index'])->name('medicine-categories');
-Route::post('/medicine-categories/store-multiple', [MedicineCategoryController::class, 'storeMultiple'])->name('medicine-categories.storeMultiple');
-Route::put('/medicine-categories/{id}', [MedicineCategoryController::class, 'update'])->name('medicine-categories.update');
-Route::delete('/medicine-categories/destroy', [MedicineCategoryController::class, 'destroy'])->name('medicine-categories.destroy');
-Route::get('/medicine-group', function () {
-    return view('admin.setup.medicine_group');
-})->name('medicine-group');
+
+
 Route::prefix('pathology-category')->group(function () {
     Route::get('/', [PathologyController::class, 'pathologyCategories'])->name('pathology-category');
     Route::post('/store', [PathologyController::class, 'storeCategory'])->name('pathology-category.store');
@@ -293,42 +317,97 @@ Route::prefix('/vital')->group(function () {
     Route::put('/update/{id}', [VitalController::class, 'update'])->name('vital.update');
     Route::delete('/destroy/{id}', [VitalController::class, 'destroy'])->name('vital.destroy');
 });
-Route::get('/income-head', function () {
-    return view('admin.setup.income_head');
-})->name('income-head');
-Route::get('/expense-head', function () {
-    return view('admin.setup.expense_head');
-})->name('expense-head');
-Route::get('/leave-type', function () {
-    return view('admin.setup.leave_type');
-})->name('leave-type');
-Route::get('/department', function () {
-    return view('admin.setup.department');
-})->name('department');
-Route::get('/designation ', function () {
-    return view('admin.setup.designation');
-})->name('designation');
-Route::get('/specialist ', function () {
-    return view('admin.setup.specialist');
-})->name('specialist');
-Route::get('/item-category ', function () {
-    return view('admin.setup.item_category');
-})->name('item-category');
-Route::get('/item-store ', function () {
-    return view('admin.setup.item_store');
-})->name('item-store');
-Route::get('/item-supplier ', function () {
-    return view('admin.setup.item_supplier');
-})->name('item-supplier');
-Route::get('/slots ', function () {
-    return view('admin.setup.slots');
-})->name('slots');
-Route::get('/doctor-shift ', function () {
-    return view('admin.setup.doctor_shift');
-})->name('doctor-shift');
-Route::get('/shift ', function () {
-    return view('admin.setup.shift');
-})->name('shift');
-Route::get('/appointment-priority ', function () {
-    return view('admin.setup.appointment_priority');
-})->name('appointment-priority');
+Route::prefix('/income-head')->group(function () {
+    Route::get('/', [FinanceController::class, 'income'])->name('income-head');
+    Route::post('/store', [FinanceController::class, 'incomeStore'])->name('income-head.store');
+    Route::put('/update/{id}', [FinanceController::class, 'incomeUpdate'])->name('income-head.update');
+    Route::delete('/destroy/{id}', [FinanceController::class, 'incomeDestroy'])->name('income-head.destroy');
+});
+Route::prefix('/expense-head')->group(function () {
+    Route::get('/', [FinanceController::class, 'expense'])->name('expense-head');
+    Route::post('/store', [FinanceController::class, 'expenseStore'])->name('expense-head.store');
+    Route::put('/update/{id}', [FinanceController::class, 'expenseUpdate'])->name('expense-head.update');
+    Route::delete('/destroy/{id}', [FinanceController::class, 'expenseDestroy'])->name('expense-head.destroy');
+});
+Route::get('/leave-type', [HrController::class, 'index'])->name('leave-type');
+Route::post('/leave-type/store', [HrController::class, 'store'])->name('leave-type.store');
+Route::post('/leave-type/updateStatus/{id}', [HrController::class, 'updateStatus'])->name('leave-type.updateStatus');
+Route::put('/leave-type/update', [HrController::class, 'update'])->name('leave-type.update');
+Route::delete('/leave-type/delete/{id}', [HrController::class, 'delete'])->name('leave-type.delete');
+
+Route::get('/department', [HrController::class, 'indexDepartment'])->name('department');
+Route::post('/department/store', [HrController::class, 'storeDepartment'])->name('department.store');
+Route::post('/department/updateStatus/{id}', [HrController::class, 'updateDepartmentStatus'])->name('department.updateStatus');
+Route::put('/department/update', [HrController::class, 'updateDepartment'])->name('department.update');
+Route::delete('/department/delete/{id}', [HrController::class, 'deleteDepartment'])->name('department.delete');
+
+Route::get('/designation', [HrController::class, 'indexDesignation'])->name('designation');
+Route::post('/designation/store', [HrController::class, 'storeDesignation'])->name('designation.store');
+Route::post('/designation/updateStatus/{id}', [HrController::class, 'updateDesignationStatus'])->name('designation.updateStatus');
+Route::put('/designation/update', [HrController::class, 'updateDesignation'])->name('designation.update');
+Route::delete('/designation/delete/{id}', [HrController::class, 'deleteDesignation'])->name('designation.delete');
+
+Route::get('/specialist', [HrController::class, 'indexSpecialist'])->name('specialist');
+Route::post('/specialist/store', [HrController::class, 'storeSpecialist'])->name('specialist.store');
+Route::post('/specialist/updateSpecialistStatus/{id}', [HrController::class, 'updateSpecialistStatus'])->name('specialist.updateSpecialistStatus');
+Route::put('/specialist/updateSpecialist', [HrController::class, 'updateSpecialist'])->name('specialist.updateSpecialist');
+Route::delete('/specialist/deleteSpecialist/{id}', [HrController::class, 'deleteSpecialist'])->name('specialist.deleteSpecialist');
+Route::get('/item-category', [InventoryController::class, 'index'])->name('item-category');
+Route::post('/item-category/store', [InventoryController::class, 'store'])->name('item-category.store');
+Route::put('/item-category/update', [InventoryController::class, 'update'])->name('item-category.update');
+Route::post('/item-category/updateStatus/{id}', [InventoryController::class, 'updateStatus'])->name('item-category.updateStatus');
+Route::delete('/item-category/delete/{id}', [InventoryController::class, 'delete'])->name('item-category.delete');
+
+Route::get('/item-store', [InventoryController::class, 'indexStore'])->name('item-store');
+Route::post('/item-store/store', [InventoryController::class, 'storeItemStore'])->name('item-store.store');
+Route::put('/item-store/update', [InventoryController::class, 'updateStore'])->name('item-store.update');
+Route::post('/item-store/updateStatus/{id}', [InventoryController::class, 'updateStoreStatus'])->name('item-store.updateStatus');
+Route::delete('/item-store/delete/{id}', [InventoryController::class, 'deleteStore'])->name('item-store.delete');
+
+Route::get('/item-supplier', [InventoryController::class, 'indexSupplier'])->name('item-supplier');
+Route::post('/item-supplier/store', [InventoryController::class, 'storeItemSupplier'])->name('item-supplier.store');
+Route::post('/item-supplier/updateStatus/{id}', [InventoryController::class, 'updateSupplierStatus'])->name('item-supplier.updateStatus');
+Route::put('/item-supplier/update', [InventoryController::class, 'updateSupplier'])->name('item-supplier.update');
+Route::delete('/item-supplier/delete/{id}', [InventoryController::class, 'deleteSupplier'])->name('item-supplier.delete');
+
+Route::prefix('/slots')->group(function () {
+    Route::get('/', [AppointmentController::class, 'slots'])->name('slots');
+    Route::post('/store', [AppointmentController::class, 'slotsStore'])->name('slots.store');
+    Route::put('/update/{id}', [AppointmentController::class, 'slotsUpdate'])->name('slots.update');
+    Route::delete('/destroy/{id}', [AppointmentController::class, 'slotsDestroy'])->name('slots.destroy');
+    Route::get('/search', [AppointmentController::class, 'searchSlots'])->name('slots.search');
+    Route::get('/get-charges/{id}', [AppointmentController::class, 'getCharges'])->name('get.charges');
+});
+Route::get('/doctor/{id}/shifts', [AppointmentController::class, 'getDoctorShifts'])
+    ->name('doctor.shifts');
+
+Route::prefix('/doctor-shift')->group(function () {
+    Route::get('/', [AppointmentController::class, 'doctorShift'])->name('doctor-shift');
+    Route::post('/store', [AppointmentController::class, 'doctorShiftStore'])->name('doctor-shift.store');
+    Route::put('/update/{id}', [AppointmentController::class, 'shiftUpdate'])->name('doctor-shift.update');
+    Route::delete('/destroy/{id}', [AppointmentController::class, 'shiftDestroy'])->name('doctor-shift.destroy');
+    Route::post('/toggle', [AppointmentController::class, 'toggleDoctorShift'])->name('doctor-shift.toggle');
+    Route::get('/fetchShifts/{doctor}', [AppointmentController::class, 'getDoctorShifts'])->name('doctor.shifts');
+
+});
+Route::prefix('/shift')->group(function () {
+    Route::get('/', [AppointmentController::class, 'shift'])->name('shift');
+    Route::post('/store', [AppointmentController::class, 'shiftStore'])->name('shift.store');
+    Route::put('/update/{id}', [AppointmentController::class, 'shiftUpdate'])->name('shift.update');
+    Route::delete('/destroy/{id}', [AppointmentController::class, 'shiftDestroy'])->name('shift.destroy');
+
+});
+Route::prefix('/appointment-priority')->group(function () {
+    Route::get('/', [AppointmentController::class, 'appointmentPriority'])->name('appointment-priority');
+    Route::post('/store', [AppointmentController::class, 'appointmentPriorityStore'])->name('appointment-priority.store');
+    Route::put('/update/{id}', [AppointmentController::class, 'appointmentPriorityUpdate'])->name('appointment-priority.update');
+    Route::delete('/destroy/{id}', [AppointmentController::class, 'appointmentPriorityDestroy'])->name('appointment-priority.destroy');
+});
+
+Route::get('/opd', function () {
+    return view('admin.opd.index');
+})->name('opd');
+
+Route::get('/appointment-details', function () {
+    return view('admin.appointment_details');
+})->name('appointment-details');

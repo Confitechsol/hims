@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('doctor', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('doctor_id', 200)->unique()->nullable();
             $table->string('branch_id', 200)->unique()->nullable();
 

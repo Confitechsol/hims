@@ -13,6 +13,7 @@ class MedicineBadStock extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'medicine_batch_details_id',
         'pharmacy_id',
         'outward_date',

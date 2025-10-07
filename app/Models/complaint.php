@@ -13,6 +13,7 @@ class Complaint extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'complaint_type_id',
         'source',
         'name',

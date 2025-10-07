@@ -15,6 +15,7 @@ class Specialist extends Model
     // Fillable fields
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'specialist_name',
         'is_active',
     ];

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('charge_categories', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->unsignedBigInteger('charge_type_id')->nullable()->index();               // charge_type_id
             $table->string('name', 200)->index();                                            // name
             $table->mediumText('description')->nullable();                                   // description

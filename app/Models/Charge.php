@@ -13,6 +13,7 @@ class Charge extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'charge_category_id',
         'tax_category_id',
         'charge_unit_id',

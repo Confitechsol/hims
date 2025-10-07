@@ -13,6 +13,7 @@ class MedicineBatchDetail extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'supplier_bill_basic_id',
         'pharmacy_id',
         'inward_date',

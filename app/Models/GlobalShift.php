@@ -10,9 +10,11 @@ class GlobalShift extends Model
     use HasFactory;
 
     protected $table = 'global_shift';
+    public $timestamps = false;
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'name',
         'start_time',
         'end_time',

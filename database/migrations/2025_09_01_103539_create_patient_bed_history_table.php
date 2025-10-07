@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('patient_bed_history', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->unsignedBigInteger('case_reference_id')->nullable()->index();
             $table->unsignedBigInteger('bed_group_id')->nullable()->index();
             $table->unsignedBigInteger('bed_id')->nullable()->index();

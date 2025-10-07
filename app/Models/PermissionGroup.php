@@ -15,6 +15,7 @@ class PermissionGroup extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'name',
         'short_code',
         'is_active',

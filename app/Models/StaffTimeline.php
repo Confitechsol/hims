@@ -21,6 +21,7 @@ class StaffTimeline extends Model
     // Fillable fields
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'invoice_no',
         'date',
         'supplier_id',

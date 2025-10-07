@@ -13,6 +13,7 @@ class ChargeTypeMaster extends Model
 
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'charge_type',
         'is_default',
         'is_active',

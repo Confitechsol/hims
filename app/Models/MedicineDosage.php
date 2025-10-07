@@ -10,9 +10,10 @@ class MedicineDosage extends Model
     use HasFactory;
 
     protected $table = 'medicine_dosage';
-
+    public $timestamps = false;
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'medicine_category_id',
         'dosage',
         'units_id',

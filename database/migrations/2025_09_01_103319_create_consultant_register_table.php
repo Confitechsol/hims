@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('consultant_register', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->integer('ipd_id')->unsigned()->nullable()->index();
 
             $table->dateTime('date')->nullable();

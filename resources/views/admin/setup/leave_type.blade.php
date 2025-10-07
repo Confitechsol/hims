@@ -1,7 +1,6 @@
 {{-- resources/views/settings.blade.php --}}
 @extends('layouts.adminLayout')
 @section('content')
-
     <div class="row justify-content-center">
         {{-- Settings Form --}}
         <div class="col-md-11">
@@ -38,28 +37,27 @@
                                                         class="ti ti-plus me-1"></i>Add Leave Type</a>
                                             </div>
                                             <!-- Modal -->
-                                            <div class="modal fade" id="add_leave_type" tabindex="-1"
-                                                aria-hidden="true">
+                                            <div class="modal fade" id="add_leave_type" tabindex="-1" aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered">
                                                     <div class="modal-content">
                                                         <div class="modal-header rounded-0"
                                                             style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                                            <h5 class="modal-title" id="addSpecializationLabel">Add Leave Type
+                                                            <h5 class="modal-title" id="addSpecializationLabel">Add Leave
+                                                                Type
                                                             </h5>
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                                 aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <form action="" method="POST">
+                                                            <form action="{{ route('leave-type.store') }}" method="POST">
                                                                 @csrf
                                                                 <div class="row gy-3 mb-2">
                                                                     <div class="col-md-12">
                                                                         <label for="name" class="form-label">Name <span
                                                                                 class="text-danger">*</span></label>
-                                                                        <input type="text" name="name" id="name" class="form-control" required>
+                                                                        <input type="text" name="name" id="name"
+                                                                            class="form-control" required>
                                                                     </div>
-                                                                    
-
                                                                 </div>
 
                                                         </div>
@@ -79,43 +77,92 @@
                                             <thead>
                                                 <tr>
                                                     <th>Name</th>
+                                                    <th>Status</th>
                                                     <th style="width: 200px;">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Sick Leave 
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Casual Leave	
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
+                                                @foreach ($leaves as $leave)
+                                                    <tr>
+                                                        <td>
+                                                            <h6 class="mb-0 fs-14 fw-semibold">{{ $leave->type }}
+                                                            </h6>
+                                                        </td>
+                                                        <td>
+                                                            <form
+                                                                action="{{ route('leave-type.updateStatus', [$leave->id]) }}"
+                                                                method="post">
+                                                                @csrf
+                                                                <div class="form-check form-switch mb-0">
+                                                                    <input class="form-check-input status-toggle"
+                                                                        type="checkbox" role="switch"
+                                                                        id="switchCheckDefault" name="is_active"
+                                                                        data-id="{{ $leave->id }}"
+                                                                        {{ $leave->is_active == 'yes' ? 'checked' : '' }}>
+                                                                </div>
+                                                            </form>
+                                                        </td>
+                                                        <td>
+                                                            <a href="javascript: void(0);"
+                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                                data-bs-toggle="modal" data-bs-target="#edit_leave_type"
+                                                                data-id="{{ $leave->id }}"
+                                                                data-name="{{ $leave->type }}">
+                                                                <i class="ti ti-pencil"></i></a>
+                                                            <form action="{{ route('leave-type.delete', [$leave->id]) }}" class="d-inline"
+                                                                id="delete-form-{{ $leave->id }}" method="POST">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <a href="javascript: void(0);"
+                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill delete-button"
+                                                                    data-leave-type-id="{{ $leave->id }}"
+                                                                    data-leave-type-name="{{ $leave->type }}"
+                                                                    data-form-id="delete-form-{{ $leave->id }}">
+                                                                    <i class="ti ti-trash"></i></a>
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+
 
                                             </tbody>
                                         </table>
                                     </div>
-
+                                    <!--Edit Modal -->
+                                    <div class="modal fade" id="edit_leave_type" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header rounded-0"
+                                                    style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                                    <h5 class="modal-title" id="addSpecializationLabel">Update
+                                                        Leave Type
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form action="{{ route('leave-type.update') }}" method="POST">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <div class="row gy-3 medicine-group-row mb-2">
+                                                            <!-- Operation Name -->
+                                                            <div class="col-md-12">
+                                                                <label for="update_name" class="form-label">Name<span
+                                                                        class="text-danger">*</span></label>
+                                                                <input type="text" name="name" id="update_name"
+                                                                    class="form-control" />
+                                                                <input type="hidden" name="leave_type_id"
+                                                                    id="leave_type_id">
+                                                            </div>
+                                                        </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="submit" class="btn btn-primary">Update</button>
+                                                </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div> <!-- end card-body -->
                             </div> <!-- end card -->
                         </div> <!-- end col -->
@@ -126,5 +173,50 @@
             </div>
         </div>
     </div>
+    <script>
+        document.querySelectorAll('.status-toggle').forEach(input => {
+            input.addEventListener('change', function() {
+                this.closest('form').submit();
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var editModal = document.getElementById('edit_leave_type');
 
+            editModal.addEventListener('show.bs.modal', function(event) {
+                var button = event.relatedTarget; // Button that triggered the modal
+                var id = button.getAttribute('data-id');
+                var name = button.getAttribute('data-name');
+
+                // Populate modal inputs
+                document.getElementById('leave_type_id').value = id;
+                document.getElementById('update_name').value = name;
+            });
+        });
+    </script>
+    <script>
+        document.querySelectorAll('.delete-button').forEach(input => {
+            input.addEventListener('click', function() {
+                const leaveTypeId = this.dataset.leaveTypeId;
+                const leaveTypeName = this.dataset.leaveTypeName;
+                const formId = this.dataset.formId;
+
+                Swal.fire({
+                    title: `Please Confirm`,
+                    text: `Delete Leave Type ${leaveTypeName}(${leaveTypeId})`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Delete!',
+                    cancelButtonText: 'Cancel',
+                }).then(result => {
+                    console.log(result);
+
+                    if (result.isConfirmed) {
+                        document.getElementById(formId).submit(); // Submit your form
+                    }
+                });
+            });
+        });
+    </script>
 @endsection

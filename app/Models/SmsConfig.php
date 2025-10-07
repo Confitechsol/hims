@@ -13,6 +13,7 @@ class SmsConfig extends Model
 
     protected $fillable = [
         'hospital_id',
+         'branch_id',
         'type',
         'name',
         'api_id',

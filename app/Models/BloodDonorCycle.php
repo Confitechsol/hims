@@ -21,6 +21,7 @@ class BloodDonorCycle extends Model
     // Allow mass assignment
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'blood_donor_cycle_id',
         'blood_bank_product_id',
         'blood_donor_id',

@@ -50,7 +50,7 @@
                                                                 aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <form action="" method="POST">
+                                                            <form action="{{ route('shift.store') }}" method="POST">
                                                                 @csrf
                                                                 <div class="row gy-3 mb-2">
 
@@ -58,7 +58,7 @@
                                                                     <div class="col-md-12">
                                                                         <label for="name" class="form-label">Name
                                                                             <span class="text-danger">*</span></label>
-                                                                        <input type="text" name="name" id="name"
+                                                                        <input type="text" name="shift_name" id="name"
                                                                             class="form-control" required />
                                                                     </div>
                                                                     <div class="col-md-12">
@@ -99,39 +99,40 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <a href="#" class="mb-0 fs-14 fw-semibold">Morning Shift
-                                                        </h6>
-                                                    </td>
-                                                    <td>8:00 AM</td>
-                                                    <td>12:00 PM</td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <a href="#" class="mb-0 fs-14 fw-semibold">Affternoon Shift
-                                                        </h6>
-                                                    </td>
-                                                    <td>1:00 PM</td>
-                                                    <td>4:00 PM</td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-                                                </tr>
+                                                @forelse($shifts as $shift)
+                                                    <tr>
+                                                        <td>
+                                                            <span class="mb-0 fs-14 fw-semibold">{{ $shift->name }}</span>
+                                                        </td>
+                                                        <td>{{ \Carbon\Carbon::parse($shift->start_time)->format('h:i A') }}</td>
+                                                        <td>{{ \Carbon\Carbon::parse($shift->end_time)->format('h:i A') }}</td>
+                                                        <td>
+                                                            <a href="javascript:void(0);"
+                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                            data-shift-id="{{ $shift->id }}"
+                                                            data-shift-name="{{ $shift->name }}"
+                                                            data-start-time="{{ $shift->start_time }}"
+                                                            data-end-time="{{ $shift->end_time }}"
+                                                            onclick="openShiftEditModal(this)">
+                                                            <i class="ti ti-pencil"></i>
+                                                            </a>
 
+                                                            <a href="javascript:void(0);"
+                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
+                                                            onclick="deleteShift({{ $shift->id }})">
+                                                            <i class="ti ti-trash"></i>
+                                                            </a>
+                                                            <form id="deleteShiftForm" method="POST" style="display:none;">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="4" class="text-center text-muted">No shifts available</td>
+                                                    </tr>
+                                                @endforelse
                                             </tbody>
                                         </table>
                                     </div>
@@ -146,5 +147,68 @@
             </div>
         </div>
     </div>
+<!-- Example Modal -->
+<div class="modal fade" id="editShiftModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Shift</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form id="editShiftForm" method="POST" action="">
+        @csrf
+        @method('PUT')
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Shift Name</label>
+            <input type="text" class="form-control" name="shift_name" id="editShiftName" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Start Time</label>
+            <input type="time" class="form-control" name="start_time" id="editShiftStartTime" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">End Time</label>
+            <input type="time" class="form-control" name="end_time" id="editShiftEndTime" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Update</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+    // JS Function
+    function openShiftEditModal(el) {
+        let id = el.getAttribute("data-shift-id");
+        let name = el.getAttribute("data-shift-name");
+        let startTime = el.getAttribute("data-start-time");
+        let endTime = el.getAttribute("data-end-time");
 
+        // Fill modal inputs
+        document.getElementById("editShiftName").value = name;
+        document.getElementById("editShiftStartTime").value = startTime;
+        document.getElementById("editShiftEndTime").value = endTime;
+
+        // Update form action dynamically
+        let form = document.getElementById("editShiftForm");
+        form.action = "{{ url('shift/update/') }}/" + id; // Adjust route if using named routes
+
+        // Show modal
+        let modal = new bootstrap.Modal(document.getElementById("editShiftModal"));
+        modal.show();
+    }
+</script>
+<script>
+    function deleteShift(id) {
+        if (confirm("Are you sure you want to delete this appointment priority?")) {
+            let form = document.getElementById("deleteShiftForm");
+            form.action = "{{ url('shift/destroy') }}/" + id; // matches your route
+            form.submit();
+        }
+    }
+</script>
 @endsection

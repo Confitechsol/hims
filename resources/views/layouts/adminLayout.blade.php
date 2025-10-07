@@ -20,6 +20,14 @@
     <!-- Favicon -->
     <link rel="shortcut icon" href="assets/images/favicon.ico" type="image/x-icon">
 
+    <!-- Styles -->
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" />
+
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+    <!-- Or for RTL support -->
+
     <!-- style css -->
     <link rel="stylesheet" href="assets/css/custom.css">
 
@@ -480,8 +488,7 @@
                     <div class="dropdown profile-dropdown d-flex align-items-center justify-content-center">
                         <a href="javascript:void(0);"
                             class="topbar-link dropdown-toggle drop-arrow-none position-relative"
-                            data-bs-toggle="dropdown" data-bs-offset="0,22" aria-haspopup="false"
-                            aria-expanded="false">
+                            data-bs-toggle="dropdown" data-bs-offset="0,22" aria-haspopup="false" aria-expanded="false">
                             <img src="assets/img/users/user-01.jpg" width="32" class="rounded-circle d-flex"
                                 alt="user-image">
                             <span class="online text-success"><i
@@ -490,8 +497,8 @@
                         <div class="dropdown-menu dropdown-menu-end dropdown-menu-md p-2">
 
                             <div class="d-flex align-items-center bg-light rounded-3 p-2 mb-2">
-                                <img src="assets/img/users/user-01.jpg" class="rounded-circle" width="42"
-                                    height="42" alt>
+                                <img src="assets/img/users/user-01.jpg" class="rounded-circle" width="42" height="42"
+                                    alt>
                                 <div class="ms-2">
                                     <p class="fw-medium text-dark mb-0">Jimmy
                                         Anderson</p>
@@ -587,6 +594,32 @@
     </div>
 </body>
 <!-- JavaScript -->
+
+
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/js/select2.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Re-initialize Select2 every time the modal is shown
+        $('#appointmentModal').on('shown.bs.modal', function () {
+            $('#appointment-type').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                dropdownParent: $('#appointmentModal'),
+                placeholder: "Enter Patient Name or Id…",
+                allowClear: true
+            });
+        });
+
+        // Initialize Select2 on page load for any other select elements
+        $('#appointment-type').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            placeholder: "Enter Patient Name or Id…",
+            allowClear: true
+        });
+    });
+</script> -->
 <script>
     function toggleChatbot() {
         var chatbot = document.getElementById('chatbotWrapper');

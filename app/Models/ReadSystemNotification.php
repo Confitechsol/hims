@@ -18,6 +18,7 @@ class ReadSystemNotification extends Model
     // Fillable fields
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'notification_id',
         'receiver_id',
         'is_active',

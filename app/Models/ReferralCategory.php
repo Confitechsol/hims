@@ -18,6 +18,7 @@ class ReferralCategory extends Model
     // Fillable fields
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'name',
         'is_active',
     ];

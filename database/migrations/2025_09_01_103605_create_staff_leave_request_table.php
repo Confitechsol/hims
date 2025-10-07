@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('staff_leave_request', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->unsignedBigInteger('staff_id')->nullable();       // staff_id
             $table->unsignedBigInteger('leave_type_id')->nullable();  // leave_type_id
 

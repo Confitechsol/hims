@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('sch_settings', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
+            $table->string('branch_id', 8);
             $table->string('base_url', 500)->nullable();
             $table->text('folder_path')->nullable();
             $table->string('name', 100)->nullable();
