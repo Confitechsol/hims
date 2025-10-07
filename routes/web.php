@@ -409,7 +409,7 @@ Route::get('/opd', function () {
 })->name('opd');
 
 Route::get('/appointment-details', function () {
-    return view('admin.appointment.appointment_details');
+    return view('admin.appointment_details');
 })->name('appointment-details');
 Route::get('/doctor-wise', function () {
     return view('admin.doctor_wise');
