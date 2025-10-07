@@ -2,8 +2,8 @@
 
 @section('content')
     <!-- ========================
-                                                                                               Start Page Content
-                                                                                              ========================= -->
+        Start Page Content
+      ========================= -->
 
     {{-- <div class="page-wrapper"> --}}
 

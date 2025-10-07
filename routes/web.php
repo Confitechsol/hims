@@ -383,5 +383,5 @@ Route::get('/opd', function () {
 })->name('opd');
 
 Route::get('/appointment-details', function () {
-    return view('admin.appointment_details');
+    return view('admin.appointment.appointment_details');
 })->name('appointment-details');
