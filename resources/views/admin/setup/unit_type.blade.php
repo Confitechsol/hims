@@ -47,7 +47,7 @@
                                                             aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <form action="" method="POST">
+                                                        <form action="{{route('charge_units.store')}}" method="POST">
                                                             @csrf
                                                             <div class="row gy-3">
 
@@ -72,19 +72,19 @@
                                     <div class="table-responsive">
                                         <table class="table mb-0">
                                             <thead>
-                                            @foreach ( $unittype as $unittypes)
-                                                
-                                           
-                                                <tr>
-                                                    <th>{{$unittypes->unit}}</th>
-                                                    <th style="width: 200px;">Action</th>
-                                                </tr>
-                                                 @endforeach
+                                            <tr>
+
+                                            <th>Unit Type </th>
+                                            <th style="width: 200px;">Action</th>
+
+                                            </tr>
+                                    
                                             </thead>
                                             <tbody>
+                                            @foreach ($unittype as $unittypes )
                                                 <tr>
                                                     <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">Each</h6>
+                                                        <h6 class="mb-0 fs-14 fw-semibold">{{ $unittypes -> unit  }}</h6>
                                                     </td>
                                                     <td>
                                                         <a href="javascript: void(0);"
@@ -95,6 +95,8 @@
                                                             <i class="ti ti-trash"></i></a>
                                                     </td>
                                                 </tr>
+
+                                                 @endforeach
                                             </tbody>
                                         </table>
                                     </div>

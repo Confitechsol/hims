@@ -82,11 +82,14 @@
                                                                 <div class="col-md-12">
                                                                     <label for="" class="form-label">Module <span
                                                                             class="text-danger">*</span></label>
-                                                                    <div class="d-flex align-items-center gap-2">
-                                                                        <input type="checkbox" name="appointment" id="appointment" class="form-check-input mt-0">
-                                                                        <label for="" class="form-check-label mb-0">Appointment</label>
-                                                                    </div>
-                                                                    <div class="d-flex align-items-center gap-2">
+                                                                    @foreach ($chargestypemodul  as $chargestypemoduls )
+                                                                         <div class="d-flex align-items-center gap-2">
+                                                                        <input type="checkbox" name="appointment" id="appointment" class="form-check-input mt-0" value="{{ $chargestypemoduls->id }}">
+                                                                        <label for="{{ $chargestypemoduls->id }}" class="form-check-label mb-0">{{ $chargestypemoduls->module_shortcode }}</label>
+                                                                        </div>
+                                                                    @endforeach
+                                                                   
+                                                                    {{-- <div class="d-flex align-items-center gap-2">
                                                                         <input type="checkbox" name="opd" id="opd" class="form-check-input mt-0">
                                                                         <label for="" class="form-check-label mb-0">OPD</label>
                                                                     </div>
@@ -109,7 +112,7 @@
                                                                     <div class="d-flex align-items-center gap-2">
                                                                         <input type="checkbox" name="ambulance" id="ambulance" class="form-check-input mt-0">
                                                                         <label for="" class="form-check-label mb-0">Ambulance</label>
-                                                                    </div>
+                                                                    </div> --}}
                                                                 </div>
                                                             </div>
 
