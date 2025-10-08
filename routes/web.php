@@ -419,3 +419,18 @@ Route::get('/doctor-wise', function () {
 Route::get('/queue', function () {
     return view('admin.queue');
 })->name('queue');
+Route::get('/billing', function () {
+    return view('admin.billing');
+})->name('billing');
+Route::get('/appointment-billing', function () {
+    return view('admin.appointment_billing');
+})->name('appointment-billing');
+Route::get('/opd', function () {
+    return view('admin.opd');
+})->name('opd');
+Route::get('/pathology', function () {
+    return view('admin.pathology');
+})->name('pathology');
+Route::get('/patient-profile', function () {
+    return view('admin.patient_profile');
+})->name('patient-profile');

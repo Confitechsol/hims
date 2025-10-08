@@ -30,7 +30,7 @@
                         <div class="card-header d-flex align-items-center justify-content-between">
                             <div class="d-flex align-items-sm-center justify-content-between flex-wrap gap-2 w-100">
                                 <div>
-                                    <h4 class="fw-bold mb-0">Appointment Details</h4>
+                                    <h4 class="fw-bold mb-0">Appointment Billing</h4>
                                 </div>
                                 <div class="d-flex align-items-center flex-wrap gap-2">
                                     <div class="text-end d-flex">
@@ -52,8 +52,8 @@
                                                             <select class="form-select" id="appointment-type"
                                                                 data-placeholder="Enter Patient Name or Id…">
                                                                 <option value=""></option>
-                                                                <option value="1">Patient 1</option>
-                                                                <option value="2">Patient 2</option>
+                                                                <option>Patient 1</option>
+                                                                <option>Patient 2</option>
                                                             </select>
                                                         </div>
                                                         <div class="col-md-4">
@@ -80,7 +80,7 @@
                                                             <select class="form-select" id="doctor"
                                                                 data-placeholder="Select">
                                                                 <option value=""></option>
-                                                                <option value="1">Amitabh Kulkarni</option>
+                                                                <option value="">Amitabh Kulkarni</option>
                                                             </select>
                                                         </div>
                                                         <div class="col-md-3">
@@ -95,7 +95,7 @@
                                                             <select class="form-select" id="shift"
                                                                 data-placeholder="Select">
                                                                 <option value=""></option>
-                                                                <option value="1">1</option>
+                                                                <option value="">1</option>
                                                             </select>
                                                         </div>
                                                         <div class="col-md-3">
@@ -458,12 +458,6 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <a href="doctor-schedule.html"
-                                        class="btn btn-outline-primary d-inline-flex align-items-center"><i
-                                            class="ti ti-menu me-1"></i>Doctor Wise</a>
-                                    <a href="doctor-schedule.html"
-                                        class="btn btn-outline-primary d-inline-flex align-items-center"><i
-                                            class="ti ti-menu me-1"></i>Queue</a>
                                 </div>
                             </div>
                         </div>
