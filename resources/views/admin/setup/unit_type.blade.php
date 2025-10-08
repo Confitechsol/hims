@@ -1,7 +1,6 @@
 {{-- resources/views/settings.blade.php --}}
 @extends('layouts.adminLayout')
 @section('content')
-
     <div class="row justify-content-center">
         {{-- Settings Form --}}
         <div class="col-md-11">
@@ -47,7 +46,7 @@
                                                             aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <form action="{{route('charge_units.store')}}" method="POST">
+                                                        <form action="{{ route('charge_units.store') }}" method="POST">
                                                             @csrf
                                                             <div class="row gy-3">
 
@@ -72,33 +71,66 @@
                                     <div class="table-responsive">
                                         <table class="table mb-0">
                                             <thead>
-                                            <tr>
-
-                                            <th>Unit Type </th>
-                                            <th style="width: 200px;">Action</th>
-
-                                            </tr>
-                                    
-                                            </thead>
-                                            <tbody>
-                                            @foreach ($unittype as $unittypes )
                                                 <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">{{ $unittypes -> unit  }}</h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
+
+                                                    <th>Unit Type </th>
+                                                    <th style="width: 200px;">Action</th>
+
                                                 </tr>
 
-                                                 @endforeach
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($unittype as $unittypes)
+                                                    <tr>
+                                                        <td>
+                                                            <h6 class="mb-0 fs-14 fw-semibold">{{ $unittypes->unit }}</h6>
+                                                        </td>
+                                                        <td>
+                                                            <a href="javascript: void(0);"
+                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                                data-bs-toggle="modal" data-bs-target="#edit_unit"
+                                                                onclick="handleEditUnit({{ $unittypes->id }},'{{ $unittypes->unit }}')">
+                                                                <i class="ti ti-pencil"></i></a>
+                                                            <a href="javascript: void(0);"
+                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                                <i class="ti ti-trash"></i></a>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
                                             </tbody>
                                         </table>
+                                    </div>
+                                    <div class="modal fade" id="edit_unit" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header rounded-0"
+                                                    style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                                    <h5 class="modal-title" id="addSpecializationLabel">Edit Unit Type
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form action="{{ route('charge_units.update') }}" method="POST">
+                                                        @csrf
+                                                        @method('put')
+                                                        <div class="row gy-3">
+                                                            <input type="hidden" name="id">
+                                                            <div class="col-md-12">
+                                                                <label for="" class="form-label">Unit <span
+                                                                        class="text-danger">*</span></label>
+                                                                <input type="text" name="update_unit" id="update_unit"
+                                                                    class="form-control" required>
+                                                            </div>
+                                                        </div>
+
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="submit" class="btn btn-primary">Save</button>
+                                                </div>
+                                                </form>
+                                            </div>
+                                        </div>
                                     </div>
 
                                 </div> <!-- end card-body -->
@@ -112,7 +144,13 @@
         </div>
     </div>
 
+    <script>
+        function handleEditUnit(id, unit) {
+            let unitInput = document.querySelector("#edit_unit input[name='update_unit']");
+            let unitId = document.querySelector("#edit_unit input[name='id']");
 
-
-
+            unitInput.value = unit;
+            unitId.value = id;
+        }
+    </script>
 @endsection
