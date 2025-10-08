@@ -49,7 +49,7 @@ class HospitalUnitTypeController extends Controller
         ]);
         $unittype = ChargeUnit::findOrFail($request->id);
         $unittype->delete();
-        return redirect()->back()->with("success", "Unit Tyoe Deleted Sucessfully!");
+        return redirect()->back()->with("success", "Unit Type Deleted Sucessfully!");
     }
 
 }
