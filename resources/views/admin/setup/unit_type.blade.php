@@ -91,9 +91,12 @@
                                                                 data-bs-toggle="modal" data-bs-target="#edit_unit"
                                                                 onclick="handleEditUnit({{ $unittypes->id }},'{{ $unittypes->unit }}')">
                                                                 <i class="ti ti-pencil"></i></a>
-                                                            <a href="javascript: void(0);"
-                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                <i class="ti ti-trash"></i></a>
+                                                            <form action="{{route('charge_units.delete')}}" method="POST" style="display: inline">
+                                                                @method('delete')
+                                                                @csrf
+                                                            <input type="hidden" name="id" value="{{$unittypes->id}}">
+                                                            <button onclick='return confirm("Are you sure?")' class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"><i class="ti ti-trash"></i></button>
+                                                            </form>
                                                         </td>
                                                     </tr>
                                                 @endforeach

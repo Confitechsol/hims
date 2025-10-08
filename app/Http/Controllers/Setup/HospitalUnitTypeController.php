@@ -42,4 +42,14 @@ class HospitalUnitTypeController extends Controller
         return redirect()->back()->with("success", "Unit Type Updated Sucessfully!");
     }
 
+      public function delete(Request $request)
+    {
+        $validator = $request->validate([
+            'id' => 'required'
+        ]);
+        $unittype = ChargeUnit::findOrFail($request->id);
+        $unittype->delete();
+        return redirect()->back()->with("success", "Unit Tyoe Deleted Sucessfully!");
+    }
+
 }
