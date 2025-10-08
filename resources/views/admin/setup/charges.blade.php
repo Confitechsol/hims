@@ -95,21 +95,9 @@
                                                                             <select name=" charge_category"
                                                                                 id="charge_category" class="form-select"
                                                                                 required>
-                                                                                <option value="">Select</option>
-                                                                               
-                                                                                {{-- <option value="1">Appointment</option>
-                                                                                <option value="2">OPD</option>
-                                                                                <option value="3">IPD</option>
-                                                                                <option value="4">Pathology</option>
-                                                                                <option value="5">Radiology</option>
-                                                                                <option value="6">Blood Bank</option>
-                                                                                <option value="7">Ambulance</option>
-                                                                                <option value="8">Procedures</option>
-                                                                                <option value="9">Investigations</option>
-                                                                                <option value="10">Supplier</option>
-                                                                                <option value="11">Operations</option>
-                                                                                <option value="12">Others</option>
-                                                                                <option value="13">Bed Charges</option> --}}
+                                                                                @foreach ( $charge_types as $charge_type)
+                                                                                    <option value="{{$charge_type -> id}}">{{$charge_type->charge_type}}</option> 
+                                                                                @endforeach
                                                                             </select>
                                                                         </div>
                                                                         <div class="col-md-6">
@@ -126,7 +114,7 @@
                                                                                     <option value="{{$charge_tax_category_ids->id}}">{{$charge_tax_category_ids->name}}</option>
                                                                                 @endforeach
                                                                                 
-                                                                                {{-- <option value="2">VAT</option> --}}
+                                                                               
                                                                             </select>
                                                                         </div>
                                                                         <div class="col-md-6">
@@ -168,7 +156,7 @@
                                                                                     <option value="{{$charge_units->id}}">{{$charge_units->unit}}</option>
                                                                                 @endforeach
                                                                                 
-                                                                                {{-- <option value="2">Each</option> --}}
+                                                                               
                                                                             </select>
                                                                         </div>
                                                                         <div class="col-md-8">
@@ -261,25 +249,7 @@
                                                     </td>
                                                 </tr>
                                                 @endforeach
-                                                {{-- <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold"> Doctor Fees</h6>
-                                                    </td>
-                                                    <td>IPD Doctor Fees</td>
-                                                    <td>IPD</td>
-                                                    <td>Each</td>
-                                                    <td>10.00
-                                                    <td>800</td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
-                                                    </td>
-
-                                                </tr> --}}
+                                                
                                             </tbody>
                                         </table>
                                     </div>
