@@ -169,8 +169,11 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/floors/store', [FloorController::class, 'store'])->name('floors.store');
     Route::put('/floors/update', [FloorController::class, 'update'])->name('floors.update');
     Route::delete('/floors/destroy', [FloorController::class, 'destroy'])->name('floors.destroy');
+
     Route::get('/charge-category',[HospitalChargeCategoryController::class,'index'])->name('charge_categories');
     Route::post('/charge-category',[HospitalChargeCategoryController::class,'store'])->name('charge_categories.store');
+    route::put('/charge-category/update',[HospitalChargeCategoryController::class,'update'])->name('charge_categories.update');
+    route::delete('/charge-category/destroy',[HospitalChargeCategoryController::class,'destroy'])->name('charge_categories.destroy');
 
     Route::get('/charge-type',[HospitalChargeTypeController::class,'index'])->name('charge_type_module');
     Route::post('/charge-type',[HospitalChargeTypeController::class,'store'])->name('charge_type_module.store');
@@ -179,8 +182,11 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/tax-category', [HospitalTaxCategoryController::class, 'store'])->name('tax_category.store');
     Route::put('/tax-category/update', [HospitalTaxCategoryController::class, 'update'])->name('tax_category.update');
     Route::delete('/tax-category/destroy', [HospitalTaxCategoryController::class, 'destroy'])->name('tax_category.destroy');
+
     Route::get('/unit-type',[HospitalUnitTypeController::class,'index'])->name('charge_units');
     Route::post('/unit-type',[HospitalUnitTypeController::class,'store'])->name('charge_units.store');
+    Route::put('/unit-type/update',[HospitalUnitTypeController::class,'update'])->name('charge_units.update');  
+    Route::delete('/unit-type/destroy',[HospitalUnitTypeController::class,'destroy'])->name('charge_units.destroy');
 
     Route::get('/medicine-category', function () {
         return view('admin.setup.medicine_category');

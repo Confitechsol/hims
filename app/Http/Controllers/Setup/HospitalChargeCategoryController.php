@@ -29,4 +29,33 @@ class HospitalChargeCategoryController extends Controller
      return redirect()->back()->with("success","ChargeCategory Created Sucessfully!");
 
     }
+
+    public function update(Request $request){
+        $validator = $request->validate ( [
+            'id'=>'required|exists:charge_categories,id',
+            'charge_type' => 'required',
+            'name' => 'required',
+            'description' => 'required',
+    
+            
+        ]);
+    
+         $chargeCategory = ChargeCategory::findOrFail($request->id);
+         $chargeCategory->charge_type_id = $request->charge_type;
+         $chargeCategory->name = $request->name;
+         $chargeCategory->description = $request->description;
+         $chargeCategory->save();
+         
+         return redirect()->back()->with("success","ChargeCategory Updated Sucessfully!");
+    
+    }
+
+    public function destroy(Request $request){
+            $validator = $request->validate ([
+                'id'=>'required'
+            ]);
+            $chargeCategory = ChargeCategory::findOrFail($request->id);
+            $chargeCategory->delete();
+            return redirect()->back()->with("success","Charge Category Deleted Sucessfully!");
+    }
 }
