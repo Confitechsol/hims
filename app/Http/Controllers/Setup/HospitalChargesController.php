@@ -9,24 +9,29 @@ use App\Models\ChargeTypeMaster;
 use App\Models\ChargeUnit;
 use App\Models\TaxCategory;
 use App\Models\Organisation;
+use App\Models\ChargeCategory;
 
 
 class HospitalChargesController extends Controller
 {
     public function index(){
-       $charges = Charge::with(['category','taxCategory','unit'])->get();
+       $charges = Charge::with(['category.chargeType','taxCategory','unit'])->get();
        $charge_types = ChargeTypeMaster::get();
+       $chargeCategories = ChargeCategory::get();
        $charge_unit= ChargeUnit::get();
        $charge_tax_category_id=TaxCategory::get();
        $organisation_name=organisation::get();
-
+        // return array(
+        //     "charge_types"=>$charge_types,
+        //     "charge_categories"=>$chargeCategories
+        // );
        
-     // return  $organisation_name;
-         return view('admin.setup.charges',compact('charges','charge_types','charge_unit','charge_tax_category_id','organisation_name'));
+    //  return  $charge_tax_category_id;
+         return view('admin.setup.charges',compact('charges','charge_types','charge_unit','charge_tax_category_id','organisation_name','chargeCategories'));
     }
 
     public function store(Request $request){
-
+return $request->schedule_charge_5;
          $validator = $request->validate ( [
         // 'charge_type' => 'required',
         // 'name' => 'required',

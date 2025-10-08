@@ -79,6 +79,7 @@
                                                                                 Type <span
                                                                                     class="text-danger">*</span></label>
                                                                             <select name="charge_type" id="charge_type"
+                                                                            onchange="handleCategory(this)"
                                                                                 class="form-select" required>
                                                                                 <option value="">Select</option>
                                                                                 @foreach ( $charge_types as $charge_type )
@@ -94,9 +95,7 @@
                                                                             <select name=" charge_category"
                                                                                 id="charge_category" class="form-select"
                                                                                 required>
-                                                                                @foreach ( $charge_types as $charge_type)
-                                                                                    <option value="{{$charge_type -> id}}">{{$charge_type->charge_type}}</option> 
-                                                                                @endforeach
+                                                                                <option value="">Select</option>
                                                                                
                                                                                 {{-- <option value="1">Appointment</option>
                                                                                 <option value="2">OPD</option>
@@ -119,7 +118,10 @@
                                                                                     class="text-danger">*</span></label>
                                                                             <select name="tax_category" id="tax_category"
                                                                                 class="form-select" autocomplete="off"
-                                                                                required>
+                                                                                required
+                                                                                onchange="taxCategory()"
+                                                                                >
+                                                                                <option value="">Select</option>
                                                                                 @foreach ($charge_tax_category_id as $charge_tax_category_ids )
                                                                                     <option value="{{$charge_tax_category_ids->id}}">{{$charge_tax_category_ids->name}}</option>
                                                                                 @endforeach
@@ -132,7 +134,7 @@
                                                                             <div class="input-group">
                                                                                 <input type="text" class="form-control"
                                                                                     name="tax_percentage"
-                                                                                    id="tax_percentage">
+                                                                                    id="tax_percentage" disabled>
                                                                                 <span class="input-group-addon "> %</span>
                                                                             </div>
                                                                         </div>
@@ -178,7 +180,7 @@
                                                                         </div>
                                                                         <div class="col-md-12">
                                                                             <label>Scheduled Charges For TPA</label>
-                                                                            <button type="button" class="plusign float-end"
+                                                                            <button type="button" class="btn btn-secondary plusign float-end"
                                                                                 onclick="apply_to_all()">Apply To
                                                                                 All</button>
                                                                             <div class="chargesborbg form-control mt-4">
@@ -245,7 +247,7 @@
                                                         <h6 class="mb-0 fs-14 fw-semibold"> {{$charge->name}}</h6>
                                                     </td>
                                                     <td>{{$charge->category['name']}}</td>
-                                                    <td>IPD</td>
+                                                    <td>{{$charge->category["chargeType"]->charge_type}}</td>
                                                     <td>{{$charge->unit['unit']}}</td>
                                                     <td>{{$charge->taxCategory['percentage'] ?? ""}}</td>
                                                     <td>{{$charge->standard_charge}}</td>
@@ -294,6 +296,25 @@
     </div>
 
 
-
+<script>
+    let chargeCategories = @json($chargeCategories);
+    function handleCategory(charge_type){
+        let charge_category = document.getElementById("charge_category");
+        let newData = chargeCategories.filter(item => item.charge_type_id == charge_type.value);
+        let html = '<option value="">Select</option>';
+        newData.map((item)=>{
+            html+=`<option value="${item.id}">${item.name}</option>`;
+        })
+        charge_category.innerHTML = html;
+    }
+    
+    function taxCategory(){
+        let charge_tax_categories = @json($charge_tax_category_id);
+        let tax_category = document.getElementById("tax_category");
+        let category = charge_tax_categories.filter(item  => item.id == tax_category.value);
+        document.getElementById("tax_percentage").value = category[0].percentage;
+        // console.log("category",category);
+    }
+</script>
 
 @endsection
