@@ -38,6 +38,27 @@
                             <div class="card">
 
                                 <div class="card-body">
+                                    @if ($errors->any())
+                                    @foreach ($errors->all() as $error)
+                                        <div class="alert alert-danger">
+                                            <ul class="mb-0">
+                                                @foreach ($errors->all() as $error)
+                                                    <li>{{ $error }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    @endforeach
+                                @endif
+                                @if(session('error'))
+                                    <div class="alert alert-danger">
+                                        {{session('error')}}
+                                    </div>
+                                @endif
+                                @if(session('success'))
+                                    <div class="alert alert-success">
+                                        {{session('success')}}
+                                    </div>
+                                @endif
                                     <div
                                         class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
 
@@ -95,6 +116,47 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="modal fade" id="edit_tax_category" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header rounded-0"
+                                                        style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                                        <h5 class="modal-title" id="addSpecializationLabel">Edit Tax Category
+                                                        </h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form action="{{route('tax_category.update')}}" method="POST">
+                                                            @csrf
+                                                            @method('put')
+                                                            <div class="row gy-3">
+                                                                <input type="hidden" name="id">
+                                                                <div class="col-md-12">
+                                                                    <label for="" class="form-label">Name <span
+                                                                            class="text-danger">*</span></label>
+                                                                    <input type="text" name="name" id="name"
+                                                                        class="form-control" required>
+                                                                </div>
+                                                                <div class="col-md-12">
+                                                                    <label for="" class="form-label">Tax <span
+                                                                            class="text-danger">*</span></label>
+                                                                    <div class="input-group">
+                                                                        <input type="text" class="form-control"
+                                                                            name="tax_percentage" id="tax_percentage" required>
+                                                                        <span class="input-group-addon"> %</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="submit" class="btn btn-primary">Save</button>
+                                                    </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div class="table-responsive">
@@ -117,11 +179,22 @@
                                                     <td>{{$taxcatogerys->percentage}}</td>
                                                     <td>
                                                         <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#edit_tax_category"
+                                                            onclick="handleEdit({{$taxcatogerys->id}},'{{$taxcatogerys->name}}',{{$taxcatogerys->percentage}})"
+                                                            >
                                                             <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
+                                                        {{-- <a href="javascript: void(0);"
+                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
+                                                            >
+                                                            <i class="ti ti-trash"></i></a> --}}
+                                                            <form action="{{route('tax_category.destroy')}}" method="POST" style="display: inline">
+                                                                @method('delete')
+                                                                @csrf
+                                                            <input type="hidden" name="id" value="{{$taxcatogerys->id}}">
+                                                            <button onclick='return confirm("Are you sure?")' class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"><i class="ti ti-trash"></i></button>
+                                                            </form>
                                                     </td>
                                                 </tr>
                                                  @endforeach
@@ -140,7 +213,16 @@
         </div>
     </div>
 
-
+<script>
+    function handleEdit(taxId,taxName,taxPercentage){
+        let name = document.querySelector("#edit_tax_category input[name='name']");
+        let tax = document.querySelector("#edit_tax_category input[name='tax_percentage']");
+        let id = document.querySelector("#edit_tax_category input[name='id']");
+        name.value=taxName;
+        tax.value=taxPercentage;
+        id.value = taxId;
+    }
+</script>
 
 
 @endsection

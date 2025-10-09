@@ -167,66 +167,82 @@
                                    
 
 
-                                    <!-- Second Modal (nested) -->
-                                    <div class="modal fade" id="new_patient" tabindex="-1" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered modal-xl">
-                                            <div class="modal-content">
+                                                    <!-- Second Modal (nested) -->
+                                                    <div class="modal fade" id="new_patient" tabindex="-1"
+                                                        aria-hidden="true">
+                                                        <div class="modal-dialog modal-dialog-centered modal-xl">
+                                                            <div class="modal-content">
 
-                                                <div class="modal-header"
-                                                    style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                                    <h5 class="modal-title">Add New Patient</h5>
-                                                    <button type="button" class="btn-close"
-                                                        data-bs-dismiss="modal"></button>
-                                                </div>
+                                                                <div class="modal-header"
+                                                                    style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                                                    <h5 class="modal-title">Add New Patient</h5>
+                                                                    <button type="button" class="btn-close"
+                                                                        data-bs-dismiss="modal"></button>
+                                                                </div>
 
-                                                <div class="modal-body">
-                                                    <form>
-                                                        <div class="row align-items-center gy-3">
-                                                            <div class="col-lg-6 col-md-6 col-sm-6">
-                                                                <div class="form-group">
-                                                                    <label>Name</label><span class="text-danger"> *</span>
-                                                                    <input id="name" name="name" placeholder="" type="text"
-                                                                        class="form-control" value="" autocomplete="off">
-                                                                    <span class="text-danger"></span>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-lg-6 col-md-6 col-sm-6">
-                                                                <div class="form-group">
-                                                                    <label>Guardian Name</label>
-                                                                    <input type="text" name="guardian_name" placeholder=""
-                                                                        value="" class="form-control">
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 col-sm-12">
-                                                                <div class="row">
-                                                                    <div class="col-sm-3">
-                                                                        <div class="form-group">
-                                                                            <label> Gender</label>
-                                                                            <select class="form-select" name="gender"
-                                                                                id="addformgender" autocomplete="off">
-                                                                                <option value="">Select</option>
-                                                                                <option value="Male">Male</option>
-                                                                                <option value="Female">Female</option>
-                                                                            </select>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-sm-4">
-                                                                        <div class="form-group">
-                                                                            <label for="dob">Date Of Birth</label>
-                                                                            <input type="text" name="dob" id="birth_date"
-                                                                                placeholder=""
-                                                                                class="form-control date patient_dob">
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-sm-5" id="calculate">
-                                                                        <div class="form-group">
-                                                                            <label>Age (yy-mm-dd) </label><small
-                                                                                class="req"> *</small>
-                                                                            <div style="clear: both;overflow: hidden;">
-                                                                                <input type="text" placeholder="Year"
-                                                                                    name="age[year]" id="age_year" value=""
-                                                                                    class="form-control patient_age_year"
-                                                                                    style="width: 30%; float: left;">
+                                                                <div class="modal-body">
+                                                                    <form>
+                                                                        <div class="row align-items-center gy-3">
+                                                                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                                                                <div class="form-group">
+                                                                                    <label>Name</label><span
+                                                                                        class="text-danger"> *</span>
+                                                                                    <input id="name" name="name"
+                                                                                        placeholder="" type="text"
+                                                                                        class="form-control" value=""
+                                                                                        autocomplete="off">
+                                                                                    <span class="text-danger"></span>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                                                                <div class="form-group">
+                                                                                    <label>Guardian Name</label>
+                                                                                    <input type="text" name="guardian_name"
+                                                                                        placeholder="" value=""
+                                                                                        class="form-control">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-6 col-sm-12">
+                                                                                <div class="row">
+                                                                                    <div class="col-sm-3">
+                                                                                        <div class="form-group">
+                                                                                            <label> Gender</label>
+                                                                                            <select class="form-select"
+                                                                                                name="gender"
+                                                                                                id="addformgender"
+                                                                                                autocomplete="off">
+                                                                                                <option value="">Select
+                                                                                                </option>
+                                                                                                <option value="Male">Male
+                                                                                                </option>
+                                                                                                <option value="Female">
+                                                                                                    Female</option>
+                                                                                            </select>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-sm-4">
+                                                                                        <div class="form-group">
+                                                                                            <label for="dob">Date Of
+                                                                                                Birth</label>
+                                                                                            <input type="text" name="dob"
+                                                                                                id="birth_date"
+                                                                                                placeholder=""
+                                                                                                class="form-control date patient_dob">
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-sm-5" id="calculate">
+                                                                                        <div class="form-group">
+                                                                                            <label>Age (yy-mm-dd)
+                                                                                            </label><small class="req">
+                                                                                                *</small>
+                                                                                            <div
+                                                                                                style="clear: both;overflow: hidden;">
+                                                                                                <input type="text"
+                                                                                                    placeholder="Year"
+                                                                                                    name="age[year]"
+                                                                                                    id="age_year" value=""
+                                                                                                    class="form-control patient_age_year"
+                                                                                                    style="width: 30%; float: left;">
 
                                                                                 <input type="text" id="age_month"
                                                                                     placeholder="Month" name="age[month]"
