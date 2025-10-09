@@ -42,6 +42,7 @@ use App\Http\Controllers\Setup\UnitController;
 use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\VitalController;
 use App\Http\Controllers\Setup\CompanyListController;
+use App\Http\Controllers\TpamanagmentController;
 
 
 Route::get('/', function () {
@@ -249,6 +250,10 @@ Route::middleware(['admin'])->group(function () {
     Route::put('/medicine-categories/{id}', [MedicineCategoryController::class, 'update'])->name('medicine-categories.update');
     Route::delete('/medicine-categories/destroy', [MedicineCategoryController::class, 'destroy'])->name('medicine-categories.destroy');             
 
+    Route::get('/tpamanagement', [TpamanagmentController::class, 'index'])->name('tpamanagement');
+    Route::post('/tpamanagement/store', [TpamanagmentController::class, 'store'])->name('tpamanagement.store'); 
+    Route::put('/tpamanagement/update', [TpamanagmentController::class, 'update'])->name('tpamanagement.update');
+    Route::delete('/tpamanagement/destroy', [TpamanagmentController::class, 'destroy'])->name('tpamanagement.destroy');
 });
 
 // Route::get('/medicine-group', function () {
