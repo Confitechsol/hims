@@ -440,3 +440,6 @@ Route::get('/pathology', function () {
 Route::get('/patient-profile', function () {
     return view('admin.patient_profile');
 })->name('patient-profile');
+Route::get('/patient-details', function () {
+    return view('admin.patient_details');
+})->name('patient-details');
