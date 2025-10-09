@@ -11,6 +11,7 @@ class Appointment extends Model
     use HasFactory;
 
     protected $table = 'appointment';
+    public $timestamps  = false;
 
     protected $fillable = [
         'hospital_id',
@@ -60,9 +61,9 @@ class Appointment extends Model
         return $this->belongsTo(VisitDetail::class, 'visit_details_id');
     }
 
-    public function doctorUser(): BelongsTo
+    public function doctorUser()
     {
-        return $this->belongsTo(User::class, 'doctor');
+        return $this->belongsTo(Doctor::class, 'doctor', 'id');
     }
 
     public function doctorShift(): BelongsTo

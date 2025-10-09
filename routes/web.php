@@ -43,6 +43,7 @@ use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\VitalController;
 use App\Http\Controllers\Setup\CompanyListController;
 
+
 Route::get('/', function () {
     return view('home.homeScreen');
 })->name('dashboard');
@@ -408,12 +409,20 @@ Route::get('/opd', function () {
     return view('admin.opd.index');
 })->name('opd');
 
-Route::get('/appointment-details', function () {
-    return view('admin.appointment_details');
-})->name('appointment-details');
-Route::get('/doctor-wise', function () {
-    return view('admin.doctor_wise');
-})->name('doctor-wise');
-Route::get('/queue', function () {
-    return view('admin.queue');
-})->name('queue');
+Route::prefix('/appointment-details')->group(function () {
+    Route::get('/', [AppointmentsController::class, 'appointmentDetails'])->name('appointment-details');
+    Route::post('/store', [AppointmentsController::class, 'store'])->name('appointments.store');
+    Route::get('/get-doctor-shifts/{id}', [AppointmentController::class, 'getDoctorShifts'])->name('doctor.shifts');
+    Route::get('/get-doctor-slots/{doctorId}/{shiftId}', [AppointmentController::class, 'getDoctorSlots'])->name('doctor.slots');
+    Route::get('/get-appointment-priorities', [AppointmentController::class, 'getAppointmentPriorities'])->name('appointment.priorities');
+    // Route::put('/appointments/{id}', [AppointmentsController::class, 'update'])->name('appointments.update');
+    Route::get('/appointments/{id}/edit', [AppointmentsController::class, 'edit'])->name('appointments.edit');
+    Route::put('/appointments/{id}', [AppointmentsController::class, 'update'])->name('appointments.update');
+    Route::get('/doctor-wise', [AppointmentsController::class, 'doctorwise'])->name('appointments.doctor-wise');
+    Route::post('/doctor-wise/search', [AppointmentsController::class, 'searchAppointments'])->name('appointments.search');
+    Route::get('/queue', function () { return view('admin.appointments.queue');})->name('appointments.queue');
+
+});
+
+
+

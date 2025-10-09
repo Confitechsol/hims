@@ -2,8 +2,8 @@
 
 @section('content')
     <!-- ========================
-                                                                                                                               Start Page Content
-                                                                                                                              ========================= -->
+        Start Page Content
+    ========================= -->
 
     {{-- <div class="page-wrapper"> --}}
 
@@ -43,134 +43,129 @@
                                     <div class="modal fade" id="add_appointment" tabindex="-1" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered modal-xl">
                                             <div class="modal-content">
-
-                                                <div class="modal-header"
-                                                    style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-
-                                                    <div class="row w-100 align-items-center">
-                                                        <div class="col-md-7">
-                                                            <select class="form-select" id="appointment-type"
-                                                                data-placeholder="Enter Patient Name or Id…">
-                                                                <option value=""></option>
-                                                                <option>Patient 1</option>
-                                                                <option>Patient 2</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <!-- Button to open nested modal -->
-                                                            <a href="javascript:void(0);" class="btn btn-primary"
-                                                                data-bs-toggle="modal" data-bs-target="#new_patient">
-                                                                <i class="ti ti-plus me-1"></i>New Patient
-                                                            </a>
-                                                        </div>
-                                                        <div class="col-md-1 text-end">
-                                                            <button type="button" class="btn-close"
-                                                                data-bs-dismiss="modal"></button>
+                                                <form method="POST" action="{{ route('appointments.store') }}">
+                                                    @csrf
+                                                    <div class="modal-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                                        <div class="row w-100 align-items-center">
+                                                            <div class="col-md-7">
+                                                                <select class="form-select" id="patient_id" name="patient_id"
+                                                                    data-placeholder="Enter Patient Name or Id…">
+                                                                    <option value="">Select Patient</option>
+                                                                    @foreach($patients as $patient)
+                                                                        <option value="{{ $patient->id }}" >
+                                                                            {{ $patient->patient_name }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
+                                                                    data-bs-target="#new_patient">
+                                                                    <i class="ti ti-plus me-1"></i>New Patient
+                                                                </a>
+                                                            </div>
+                                                            <div class="col-md-1 text-end">
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                            </div>
                                                         </div>
                                                     </div>
 
-                                                </div>
+                                                    <div class="modal-body">
+                                                        <div class="row align-items-center gy-3">
+                                                            <div class="col-md-3">
+                                                                <label for="doctor" class="form-label">Doctor <span class="text-danger">*</span></label>
+                                                                <select class="form-select js-example-basic-single" id="doctor" name="doctor" required>
+                                                                    <option value="">Select Doctor</option>
+                                                                    @foreach($doctors as $doctor)
+                                                                        <option value="{{ $doctor->id }}" >
+                                                                            {{ $doctor->name }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
 
-                                                <div class="modal-body">
+                                                            <div class="col-md-3">
+                                                                <label for="doctor_fees" class="form-label">Doctor Fees (INR)</label>
+                                                                <input type="text" name="doctor_fees" id="doctor_fees" class="form-control">
+                                                            </div>
 
-                                                    <div class="row align-items-center gy-3">
-                                                        <div class="col-md-3">
-                                                            <label for="doctor" class="form-label">Doctor <span
-                                                                    class="text-danger">*</span></label>
-                                                            <select class="form-select" id="doctor"
-                                                                data-placeholder="Select">
-                                                                <option value=""></option>
-                                                                <option value="">Amitabh Kulkarni</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="col-md-3">
-                                                            <label for="doctor_fees" class="form-label">Doctor Fees (INR)
-                                                                <span class="text-danger">*</span></label>
-                                                            <input type="text" name="amount" id="doctor_fees"
-                                                                class="form-control" readonly="readonly" disabled>
-                                                        </div>
-                                                        <div class="col-md-3">
-                                                            <label for="shift" class="form-label">Shift <span
-                                                                    class="text-danger">*</span></label>
-                                                            <select class="form-select" id="shift"
-                                                                data-placeholder="Select">
-                                                                <option value=""></option>
-                                                                <option value="">1</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="col-md-3">
-                                                            <label for="datetimepicker" class="form-label">Appointment Date
-                                                                <span class="text-danger">*</span></label>
-                                                            <input type="date" id="datetimepicker" name="date"
-                                                                class="form-control datetime">
-                                                        </div>
+                                                            <div class="col-md-3">
+                                                                <label for="shift" class="form-label">Shift <span class="text-danger">*</span></label>
+                                                                <select class="form-select" id="shift" name="shift" required>
+                                                                    <option value="">Select Shift</option>
+                                                                </select>
+                                                            </div>
 
-                                                        <div class="col-md-3">
-                                                            <label for="slot" class="form-label">Slot <span
-                                                                    class="text-danger">*</span></label>
-                                                            <select class="form-select" id="slot">
-                                                                <option value="">Select</option>
-                                                                <option value="1">1</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="col-md-3">
-                                                            <label for="appointment_priority" class="form-label">Appointment
-                                                                Priority</label>
-                                                            <select class="form-select" id="appointment_priority"
-                                                                data-placeholder="Normal">
-                                                                <option value=""></option>
-                                                                <option value="low">Low</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="col-md-3">
-                                                            <label for="payment_method" class="form-label">Payment
-                                                                Method</label>
-                                                            <select class="form-select" id="payment_method">
-                                                                <option value="">Select</option>
-                                                                <option value="cash">Cash</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="col-md-3">
-                                                            <label for="status" class="form-label">Status <span
-                                                                    class="text-danger">*</span></label>
-                                                            <select class="form-select" id="status">
-                                                                <option value="">Select</option>
-                                                                <option value="pending">Pending</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="col-md-3">
-                                                            <label for="discount_percentage" class="form-label">Discount
-                                                                Percentage <span class="text-danger">*</span></label>
-                                                            <input type="text" id="discount_percentage"
-                                                                name="discount_percentage" class="form-control">
+                                                            <div class="col-md-3">
+                                                                <label for="datetimepicker" class="form-label">Appointment Date</label>
+                                                                <input type="date" id="datetimepicker" name="appointment_date" class="form-control" required>
+                                                            </div>
 
-                                                        </div>
-                                                        <div class="col-md-9">
-                                                            <label for="discount_percentage"
-                                                                class="form-label">Message</label>
-                                                            <textarea name="message" id="message"
-                                                                class="form-control"></textarea>
+                                                            <div class="col-md-4">
+                                                                <label for="slot" class="form-label fw-bold">Slot</label>
+                                                                <select id="slot" name="slot" class="form-select">
+                                                                    <option value="">Select</option>
+                                                                </select>
+                                                            </div>
 
-                                                        </div>
-                                                        <div class="col-md-5">
-                                                            <label for="live_con" class="form-label">Live Consultant (On
-                                                                Video Conference) <span class="text-danger">*</span></label>
-                                                            <select class="form-select" id="live_con">
-                                                                <option value="">Select</option>
-                                                                <option value="no">No</option>
-                                                            </select>
-                                                        </div>
+                                                            <div class="col-md-3">
+                                                                <label for="appointment_priority" class="form-label">Appointment Priority</label>
+                                                                <select class="form-select" id="appointment_priority" name="appointment_priority">
+                                                                    <option value="">Select</option>
+                                                                </select>
+                                                            </div>
 
+                                                            <div class="col-md-3">
+                                                                <label for="payment_method" class="form-label">Payment Method</label>
+                                                                <select class="form-select" id="payment_method" name="payment_method">
+                                                                    <option value="">Select</option>
+                                                                    <option value="cash">Cash</option>
+                                                                    <option value="card">Card</option>
+                                                                    <option value="upi">UPI</option>
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="col-md-3">
+                                                                <label for="status" class="form-label">Status</label>
+                                                                <select class="form-select" id="status" name="status">
+                                                                    <option value="pending">Pending</option>
+                                                                    <option value="confirmed">Confirmed</option>
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="col-md-3">
+                                                                <label for="discount_percentage" class="form-label">Discount Percentage</label>
+                                                                <input type="text" id="discount_percentage" name="discount_percentage" class="form-control">
+                                                            </div>
+
+                                                            <div class="col-md-9">
+                                                                <label for="message" class="form-label">Message</label>
+                                                                <textarea name="message" id="message" class="form-control"></textarea>
+                                                            </div>
+
+                                                            <div class="col-md-5">
+                                                                <label for="live_con" class="form-label">Live Consultant (On Video Conference)</label>
+                                                                <select class="form-select" id="live_con" name="live_con">
+                                                                    <option value="">Select</option>
+                                                                    <option value="no">No</option>
+                                                                    <option value="yes">Yes</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
                                                     </div>
 
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="submit" class="btn btn-primary">Save & Print</button>
-                                                    <button type="submit" class="btn btn-primary">Save</button>
-                                                </div>
+                                                    <div class="modal-footer">
+                                                        <button type="submit" class="btn btn-primary">Save & Print</button>
+                                                        <button type="submit" class="btn btn-secondary">Save</button>
+                                                    </div>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
+
+                                   
+
 
                                     <!-- Second Modal (nested) -->
                                     <div class="modal fade" id="new_patient" tabindex="-1" aria-hidden="true">
@@ -458,10 +453,10 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <a href="doctor-schedule.html"
+                                    <a href="{{ route('appointments.doctor-wise') }}"
                                         class="btn btn-outline-primary d-inline-flex align-items-center"><i
                                             class="ti ti-menu me-1"></i>Doctor Wise</a>
-                                    <a href="doctor-schedule.html"
+                                    <a href="{{ route('appointments.queue') }}"
                                         class="btn btn-outline-primary d-inline-flex align-items-center"><i
                                             class="ti ti-menu me-1"></i>Queue</a>
                                 </div>
@@ -489,41 +484,102 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        @forelse($appointments as $appointment)
                                         <tr>
                                             <td>
-                                                <h6 class="fs-14 mb-1"><a href="doctor-details.html"
-                                                        class="fw-semibold">Virat Kohli (13)</a></h6>
+                                                <h6 class="fs-14 mb-1">
+                                                    <a href="#" class="fw-semibold">
+                                                        {{ $appointment->patient->patient_name ?? 'N/A' }} ({{ $appointment->patient_id }})
+                                                    </a>
+                                                </h6>
                                             </td>
 
-                                            <td>APPN2</td>
-                                            <td>07/02/2025 07:30 PM </td>
-                                            <td></td>
-                                            <td>Male</td>
-                                            <td>Anjali Rao (D011)</td>
-                                            <td>Offline</td>
-                                            <td>Normal</td>
-                                            <td>No</td>
-                                            <td>0.00</td>
-                                            <td>150.00</td>
-                                            <td><span
-                                                    class="badge fs-13 py-1 badge-soft-success border border-success rounded text-success fw-medium">Approved</span>
+                                            <td>{{ $appointment->appointment_id ?? 'N/A' }}</td>
+
+                                            <td>
+                                                {{ \Carbon\Carbon::parse($appointment->date)->format('d/m/Y') }}
+                                                <!-- {{ $appointment->slot->start_time ?? '' }} -->
                                             </td>
+
+                                            <td>{{ $appointment->patient->contact_no ?? '-' }}</td>
+
+                                            <td>{{ ucfirst($appointment->patient->gender ?? 'N/A') }}</td>
+
+                                            <td>{{ $appointment->doctorUser->name ?? 'N/A' }} ({{ $appointment->doctorUser->doctor_id ?? '' }})</td>
+
+                                            <td>{{ ucfirst($appointment->source ?? 'Offline') }}</td>
+
+                                            <td>{{ $appointment->priority }}</td>
+
+                                            <td>{{ ucfirst($appointment->live_consult ?? 'No') }}</td>
+
+                                            <td>{{ number_format($appointment->discount_percentage ?? 0, 2) }}</td>
+
+                                            <td>{{ number_format($appointment->amount ?? 0, 2) }}</td>
+
+                                            <td>
+                                                @if($appointment->appointment_status === 'confirmed')
+                                                    <span class="badge fs-13 py-1 badge-soft-success border border-success rounded text-success fw-medium">Confirmed</span>
+                                                @elseif($appointment->appointment_status === 'pending')
+                                                    <span class="badge fs-13 py-1 badge-soft-warning border border-warning rounded text-warning fw-medium">Pending</span>
+                                                @elseif($appointment->appointment_status === 'rescheduled')
+                                                    <span class="badge fs-13 py-1 badge-soft-secondary border border-secondary rounded text-secondary fw-medium">Rescheduled</span>
+                                                @endif
+                                            </td>
+
                                             <td>
                                                 <div class="d-flex">
-                                                    <a href="javascript: void(0);"
-                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                        <i class="ti ti-menu" data-bs-toggle="tooltip" title="Show"></i></a>
-                                                    <a href="javascript: void(0);"
-                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-warning rounded-pill">
-                                                        <i class="ti ti-file-description" data-bs-toggle="tooltip"
-                                                            title="Print"></i></a>
-                                                    <a href="javascript: void(0);"
-                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                        <i class="ti ti-calendar-time" data-bs-toggle="tooltip"
-                                                            title="Reschedule"></i></a>
+                                                    <a href="#"
+                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                    data-bs-toggle="tooltip" title="Show">
+                                                        <i class="ti ti-menu"></i>
+                                                    </a>
+
+                                                    <a href="#"
+                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-warning rounded-pill"
+                                                    data-bs-toggle="tooltip" title="Print">
+                                                        <i class="ti ti-file-description"></i>
+                                                    </a>
+
+                                                    <!-- <a href="javascript:void(0);"
+                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill reschedule-btn"
+                                                data-bs-toggle="tooltip" 
+                                                title="Reschedule"
+                                                data-id="{{ $appointment->id }}"
+                                                data-patient="{{ $appointment->patient->patient_name ?? '' }}"
+                                                data-patientid="{{ $appointment->patient_id }}"
+                                                data-doctor="{{ $appointment->doctor->name ?? '' }}"
+                                                data-doctorid="{{ $appointment->doctor_id }}"
+                                                data-fees="{{ $appointment->doctor_fees ?? '' }}"
+                                                data-date="{{ $appointment->appointment_date }}"
+                                                data-shift="{{ $appointment->shift_id }}"
+                                                data-slot="{{ $appointment->slot_id }}"
+                                                data-priority="{{ $appointment->appointment_priority }}"
+                                                data-status="{{ $appointment->status }}"
+                                                data-payment="{{ $appointment->payment_method }}"
+                                                data-discount="{{ $appointment->discount_percentage }}"
+                                                data-message="{{ $appointment->message }}"
+                                                data-live="{{ $appointment->live_con }}">
+                                                    <i class="ti ti-calendar-time"></i>
+                                                </a> -->
+
+                                                <a href="javascript:void(0);" 
+                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill rescheduleBtn" 
+                                                    data-id="{{ $appointment->id }}" 
+                                                    data-bs-toggle="tooltip" 
+                                                    title="Reschedule">
+                                                        <i class="ti ti-calendar-time"></i>
+                                                </a>
+
+
                                                 </div>
                                             </td>
                                         </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="13" class="text-center text-muted">No appointments found.</td>
+                                        </tr>
+                                    @endforelse
                                     </tbody>
                                 </table>
                             </div>
@@ -534,9 +590,147 @@
             </div>
             <!-- row end -->
         </div>
+         <!-- Edit Modal (nested) -->
+        <div class="modal fade" id="rescheduleModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-xl">
+                <div class="modal-content">
+                    <form id="rescheduleForm" method="POST">
+                        @csrf
+                        @method('PUT')
+
+                        <div class="modal-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                            <h5 class="mb-0 text-dark fw-bold">Reschedule Appointment</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            <div class="row gy-3">
+                                {{-- Patient Name --}}
+                                <div class="col-md-3">
+                                    <label>Patient</label>
+                                    <input type="text" id="reschedule_patient" class="form-control" readonly>
+                                </div>
+
+                                {{-- Doctor --}}
+                                <div class="col-md-3">
+                                    <label>Doctor</label>
+                                    <input type="text" id="reschedule_doctor" class="form-control" readonly>
+                                </div>
+
+                                {{-- Fees --}}
+                                <div class="col-md-3">
+                                    <label>Doctor Fees (INR)</label>
+                                    <input type="text" id="reschedule_fees" class="form-control" readonly>
+                                </div>
+
+                                {{-- Shift --}}
+                                <div class="col-md-3">
+                                    <label>Shift</label>
+                                    <select id="reschedule_shift" name="shift" class="form-select" required></select>
+                                </div>
+
+                                {{-- Date --}}
+                                <div class="col-md-3">
+                                    <label>Date</label>
+                                    <input type="date" id="reschedule_date" name="appointment_date" class="form-control" required>
+                                </div>
+
+                                {{-- Slot --}}
+                                <div class="col-md-3">
+                                    <label>Slot</label>
+                                    <select id="reschedule_slot" name="slot" class="form-select" required></select>
+                                </div>
+                                {{-- Status --}}
+                                <div class="col-md-3">
+                                    <label>Status</label>
+                                    <select id="reschedule_status" name="status" class="form-select">
+                                        <option value="pending">Pending</option>
+                                        <option value="confirmed">Confirmed</option>
+                                        <option value="rescheduled">Rescheduled</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Update Appointment</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
 
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/js/select2.min.js"></script>
+        <script>
+
+            document.querySelectorAll('.rescheduleBtn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.dataset.id;
+
+                    fetch(`{{ url('appointment-details/appointments') }}/${id}/edit`)
+                        .then(response => response.json())
+                        .then(data => {
+                            const appointment = data.appointment;
+
+                            // Set form action dynamically
+                            const form = document.getElementById('rescheduleForm');
+                            form.action = `{{ url('appointment-details/appointments') }}/${appointment.id}`;
+
+                            // Fill modal fields
+                            document.getElementById('reschedule_patient').value = appointment.patient.patient_name;
+                            document.getElementById('reschedule_doctor').value = appointment.doctor_user.name;
+                            document.getElementById('reschedule_fees').value = appointment.amount;
+                            
+
+                            // Set date (extract yyyy-mm-dd)
+                            document.getElementById('reschedule_date').value = appointment.date.split('T')[0];
+
+                            // Populate shifts
+                            const shiftSelect = document.getElementById('reschedule_shift');
+                            shiftSelect.innerHTML = '';
+                            data.shifts.forEach(shift => {
+                                const option = document.createElement('option');
+                                option.value = shift.id;
+                                option.text = shift.global_shift?.name || 'N/A';
+                                if (appointment.doctor_global_shift_id == shift.global_shift_id) {
+                                    option.selected = true;
+                                }
+                                shiftSelect.appendChild(option);
+                            });
+
+                            // Populate slots
+                            const slotSelect = document.getElementById('reschedule_slot');
+                            slotSelect.innerHTML = '';
+                            data.slots.forEach(slot => {
+                                const option = document.createElement('option');
+                                option.value = slot.id;
+                                option.text = `${slot.start_time} - ${slot.end_time}`;
+                                if (appointment.doctor_shift_time_id == slot.id) {
+                                    option.selected = true;
+                                }
+                                slotSelect.appendChild(option);
+                            });
+                            // Populate status
+                            const statusSelect = document.getElementById('reschedule_status');
+                            statusSelect.value = appointment.appointment_status;
+
+                            // Show modal
+                            const rescheduleModal = new bootstrap.Modal(document.getElementById('rescheduleModal'));
+                            rescheduleModal.show();
+                        })
+                        .catch(error => {
+                            console.error('Error fetching appointment:', error);
+                        });
+                });
+            });
+
+        </script>
+
+
         <script>
             $(document).ready(function () {
                 // Re-initialize Select2 every time the modal is shown
@@ -585,7 +779,7 @@
                 $('#add_appointment').on('shown.bs.modal', function () {
                     $('#appointment_priority').select2({
                         width: '100%',
-                        placeholder: 'Normal',
+                        placeholder: 'Select',
                         allowClear: true,
                         dropdownParent: $('#add_appointment')
 
@@ -593,4 +787,93 @@
                 });
             });
         </script>
+        
+        <script>
+            $(document).ready(function () {
+
+                // Fetch shifts based on doctor
+                $('#doctor').change(function() {
+                    let doctorId = $(this).val();
+
+                    if (!doctorId) {
+                        $('#shift').html('<option value="">Select</option>');
+                        $('#slot').html('<option value="">Select</option>');
+                        return;
+                    }
+
+                    $.ajax({
+                        url: '{{ route("doctor.shifts", ":doctorId") }}'.replace(':doctorId', doctorId),
+                        type: 'GET',
+                        success: function(response) {
+                            let options = '<option value="">Select Shift</option>';
+                            response.shifts.forEach(function(shift) {
+                                options += `<option value="${shift.id}">${shift.name}</option>`;
+                            });
+                            $('#shift').html(options);
+                        },
+                        error: function() {
+                            alert('Could not fetch shifts!');
+                        }
+                    });
+                });
+
+                // Fetch slots based on doctor + shift
+                $('#shift').change(function() {
+                    let doctorId = $('#doctor').val();
+                    console.log('doctor:', doctorId);
+                    let shiftId = $(this).val();
+                    console.log('doctor:', shiftId);
+                    if (!shiftId || !doctorId) {
+                        $('#slot').html('<option value="">Select</option>');
+                        return;
+                    }
+
+                    $.ajax({
+                        url: '{{ route("doctor.slots", [":doctorId", ":shiftId"]) }}'
+                            .replace(':doctorId', doctorId)
+                            .replace(':shiftId', shiftId),
+                        type: 'GET',
+                        success: function(response) {
+                            console.log('Slots Response:', response);
+                            let options = '<option value="">Select Slot</option>';
+                            response.slots.forEach(function(slot) {
+                                options += `<option value="${slot.id}">${slot.day} (${slot.start_time} - ${slot.end_time})</option>`;
+                            });
+                            $('#slot').html(options);
+                        },
+                        error: function(xhr) {
+
+                            console.error('Error:', xhr.responseText);
+                            alert('Could not fetch slots!');
+                        }
+                    });
+                });
+
+                $('.js-example-basic-single').select2();
+            });
+        </script>
+        <script>
+$(document).ready(function() {
+    // Fetch priorities dynamically when modal is opened
+    $('#add_appointment').on('shown.bs.modal', function () {
+        $.ajax({
+            url: '{{ route("appointment.priorities") }}',
+            type: 'GET',
+            success: function(response) {
+                let options = '<option value="">Select</option>';
+                response.priorities.forEach(function(priority) {
+                    options += `<option value="${priority.appoint_priority.toLowerCase()}">${priority.appoint_priority}</option>`;
+                });
+                $('#appointment_priority').html(options);
+            },
+            error: function(xhr) {
+                console.error('Error fetching priorities:', xhr.responseText);
+                alert('Could not load appointment priorities!');
+            }
+        });
+    });
+});
+</script>
+
+
 @endsection
