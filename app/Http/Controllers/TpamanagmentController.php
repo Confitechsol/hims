@@ -25,14 +25,14 @@ class TpamanagmentController extends Controller
             'contact_person_phone' => 'required|string|max:15|different:contact_no',
         ]);
 
-        Organisation::create([
-            'organisation_name' => $request->organisation_name,
-            'code' => $request->code,
-            'contact_no' => $request->contact_no,
-            'address' => $request->address,
-            'contact_person_name' => $request->contact_person_name,
-            'contact_person_phone' => $request->contact_person_phone,
-        ]);
+        $organisation = new Organisation();
+        $organisation->organisation_name = $request->organisation_name;
+        $organisation->code = $request->code;
+        $organisation->contact_no = $request->contact_no;
+        $organisation->address = $request->address;
+        $organisation->contact_person_name = $request->contact_person_name;
+        $organisation->contact_person_phone = $request->contact_person_phone;
+        $organisation->save();
 
         return redirect()->route('tpamanagement')->with('success', 'TPA added successfully.');
     }
