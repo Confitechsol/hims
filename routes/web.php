@@ -42,6 +42,7 @@ use App\Http\Controllers\Setup\UnitController;
 use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\VitalController;
 use App\Http\Controllers\Setup\CompanyListController;
+use App\Http\Controllers\TpamanagmentController;
 use App\Http\Controllers\InventoriesController;
 
 
@@ -130,6 +131,8 @@ Route::middleware(['admin'])->group(function () {
     
     Route::get('/charges',[HospitalChargesController::class,'index'])->name('charges');
     Route::post('/charges',[HospitalChargesController::class,'store'])->name('charges.store');
+    Route::put('/charges/update',[HospitalChargesController::class,'update'])->name('charges.update');
+    Route::delete('/charges/destroy',[HospitalChargesController::class,'destroy'])->name('charges.destroy');
 
     Route::get('/disable', function () {
         return view('admin.setup.disable_patient');
@@ -179,6 +182,9 @@ Route::middleware(['admin'])->group(function () {
 
     Route::get('/charge-type',[HospitalChargeTypeController::class,'index'])->name('charge_type_module');
     Route::post('/charge-type',[HospitalChargeTypeController::class,'store'])->name('charge_type_module.store');
+    Route::put('/charge-type/update',[HospitalChargeTypeController::class,'update'])->name('charge_type_module.update');
+    Route::delete('/charge-type/destroy',[HospitalChargeTypeController::class,'destroy'])->name('charge_type_module.destroy');
+    Route::post('/update-charge-type-module', [HospitalChargeTypeController::class, 'updateChargeTypeModule'])->name('updateChargeTypeModule');
 
     Route::get('/tax-category',[HospitalTaxCategoryController::class,'index'])->name('tax_category');
     Route::post('/tax-category', [HospitalTaxCategoryController::class, 'store'])->name('tax_category.store');
@@ -250,6 +256,10 @@ Route::middleware(['admin'])->group(function () {
     Route::put('/medicine-categories/{id}', [MedicineCategoryController::class, 'update'])->name('medicine-categories.update');
     Route::delete('/medicine-categories/destroy', [MedicineCategoryController::class, 'destroy'])->name('medicine-categories.destroy');             
 
+    Route::get('/tpamanagement', [TpamanagmentController::class, 'index'])->name('tpamanagement');
+    Route::post('/tpamanagement/store', [TpamanagmentController::class, 'store'])->name('tpamanagement.store'); 
+    Route::put('/tpamanagement/update', [TpamanagmentController::class, 'update'])->name('tpamanagement.update');
+    Route::delete('/tpamanagement/destroy', [TpamanagmentController::class, 'destroy'])->name('tpamanagement.destroy');
 });
 
 // Route::get('/medicine-group', function () {
@@ -418,6 +428,19 @@ Route::get('/opd', function () {
     return view('admin.opd.index');
 })->name('opd');
 
+Route::get('/tpa_details', function () {
+    return view('admin.tpa.tpa_details');
+})->name('tpa_details');
+Route::get('/billing', function () {
+    return view('admin.billing.billing');
+})->name('billing');
+Route::get('/patient_profile', function () {
+    return view('admin.patient_profile');
+})->name('patient_profile');
+Route::get('/patient_details', function () {
+    return view('admin.patient_details');
+})->name('patient_details');
+
 Route::prefix('/appointment-details')->group(function () {
     Route::get('/', [AppointmentsController::class, 'appointmentDetails'])->name('appointment-details');
     Route::post('/store', [AppointmentsController::class, 'store'])->name('appointments.store');
@@ -429,6 +452,7 @@ Route::prefix('/appointment-details')->group(function () {
     Route::put('/appointments/{id}', [AppointmentsController::class, 'update'])->name('appointments.update');
     Route::get('/doctor-wise', [AppointmentsController::class, 'doctorwise'])->name('appointments.doctor-wise');
     Route::post('/doctor-wise/search', [AppointmentsController::class, 'searchAppointments'])->name('appointments.search');
+    Route::get('/queue', function () { return view('admin.appointments.queue');})->name('appointments.queue');
     Route::get('/queue', function () { return view('admin.appointments.queue');})->name('appointments.queue');
 
 });

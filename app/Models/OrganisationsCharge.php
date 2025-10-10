@@ -10,7 +10,7 @@ class OrganisationsCharge extends Model
     use HasFactory;
 
     protected $table = 'organisations_charges';
-
+    public $timestamps = false;
     protected $fillable = [
         'hospital_id',
         'branch_id',
