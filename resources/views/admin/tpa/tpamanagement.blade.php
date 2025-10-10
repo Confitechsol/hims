@@ -2,7 +2,7 @@
 @section('content')
 
  <!-- row start -->
-<div class="row">
+<div class="row px-5 py-4">
     <div class="col-12 d-flex">
         <div class="card shadow-sm flex-fill w-100">
             <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">

@@ -422,6 +422,16 @@ Route::get('/opd', function () {
     return view('admin.opd.index');
 })->name('opd');
 
+Route::get('/tpa_details', function () {
+    return view('admin.tpa.tpa_details');
+})->name('tpa_details');
+Route::get('/billing', function () {
+    return view('admin.billing.billing');
+})->name('billing');
+Route::get('/patient_profile', function () {
+    return view('admin.patient_profile');
+})->name('patient_profile');
+
 Route::prefix('/appointment-details')->group(function () {
     Route::get('/', [AppointmentsController::class, 'appointmentDetails'])->name('appointment-details');
     Route::post('/store', [AppointmentsController::class, 'store'])->name('appointments.store');
@@ -433,6 +443,7 @@ Route::prefix('/appointment-details')->group(function () {
     Route::put('/appointments/{id}', [AppointmentsController::class, 'update'])->name('appointments.update');
     Route::get('/doctor-wise', [AppointmentsController::class, 'doctorwise'])->name('appointments.doctor-wise');
     Route::post('/doctor-wise/search', [AppointmentsController::class, 'searchAppointments'])->name('appointments.search');
+    Route::get('/queue', function () { return view('admin.appointments.queue');})->name('appointments.queue');
     Route::get('/queue', function () { return view('admin.appointments.queue');})->name('appointments.queue');
 
 });
