@@ -4,7 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Models\ChargeTypeMaster;
+use App\Models\ChargeCategory;
 class Charge extends Model
 {
     use HasFactory;
@@ -50,10 +51,10 @@ class Charge extends Model
         return $this->belongsTo(ChargeUnit::class, 'charge_unit_id');
     }
 
-    public function chargeType()
-    {
-        return $this->category->chargeType(); // This accesses the ChargeTypeMaster through the ChargeCategory
-    }
+    // public function chargeType()
+    // {
+    //     return $this->category->chargeType(); // This accesses the ChargeTypeMaster through the ChargeCategory
+    // }
 
    
 }

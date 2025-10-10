@@ -128,6 +128,8 @@ Route::middleware(['admin'])->group(function () {
     
     Route::get('/charges',[HospitalChargesController::class,'index'])->name('charges');
     Route::post('/charges',[HospitalChargesController::class,'store'])->name('charges.store');
+    Route::put('/charges/update',[HospitalChargesController::class,'update'])->name('charges.update');
+    Route::delete('/charges/destroy',[HospitalChargesController::class,'destroy'])->name('charges.destroy');
 
     Route::get('/disable', function () {
         return view('admin.setup.disable_patient');
@@ -177,6 +179,9 @@ Route::middleware(['admin'])->group(function () {
 
     Route::get('/charge-type',[HospitalChargeTypeController::class,'index'])->name('charge_type_module');
     Route::post('/charge-type',[HospitalChargeTypeController::class,'store'])->name('charge_type_module.store');
+    Route::put('/charge-type/update',[HospitalChargeTypeController::class,'update'])->name('charge_type_module.update');
+    Route::delete('/charge-type/destroy',[HospitalChargeTypeController::class,'destroy'])->name('charge_type_module.destroy');
+    Route::post('/update-charge-type-module', [HospitalChargeTypeController::class, 'updateChargeTypeModule'])->name('updateChargeTypeModule');
 
     Route::get('/tax-category',[HospitalTaxCategoryController::class,'index'])->name('tax_category');
     Route::post('/tax-category', [HospitalTaxCategoryController::class, 'store'])->name('tax_category.store');
