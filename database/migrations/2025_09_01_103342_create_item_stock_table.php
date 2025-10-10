@@ -24,6 +24,11 @@ return new class extends Migration
             $table->float('purchase_price', 10, 2)->default(0.00)->index();
 
             $table->date('date')->nullable()->index();
+            $table->date('expiry_date')->nullable();
+            $table->text('description')->nullable();
+            $table->text('salvage_value')->nullable();
+            $table->text('useful_life')->nullable();
+            $table->text('annual_depreciation')->nullable();
             $table->text('attachment')->nullable();
             $table->text('description')->nullable();
 
