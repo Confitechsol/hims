@@ -431,6 +431,9 @@ Route::get('/billing', function () {
 Route::get('/patient_profile', function () {
     return view('admin.patient_profile');
 })->name('patient_profile');
+Route::get('/patient_details', function () {
+    return view('admin.patient_details');
+})->name('patient_details');
 
 Route::prefix('/appointment-details')->group(function () {
     Route::get('/', [AppointmentsController::class, 'appointmentDetails'])->name('appointment-details');

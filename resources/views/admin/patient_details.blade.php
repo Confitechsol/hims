@@ -29,8 +29,8 @@
         <!-- tab start -->
         <ul class="nav nav-tabs nav-bordered mb-3">
             <li class="nav-item">
-                <a href="#appointments" data-bs-toggle="tab" aria-expanded="false" class="nav-link active bg-transparent">
-                    <span>Appointments</span>
+                <a href="#overview" data-bs-toggle="tab" aria-expanded="false" class="nav-link active bg-transparent">
+                    <span>Overview</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -43,421 +43,122 @@
 
         <!-- tab content start -->
         <div class="tab-content">
-            <div class="tab-pane show active" id="appointments">
+            <div class="tab-pane show active" id="overview">
 
-                <!--  Start Filter -->
-                <div class=" d-flex align-items-center justify-content-between flex-wrap">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="search-set mb-3">
-                            <div class="d-flex align-items-center flex-wrap gap-2">
-                                <div class="table-search d-flex align-items-center mb-0">
-                                    <div class="search-input">
-                                        <a href="javascript:void(0);" class="btn-searchset"></a>
+                <div class="row">
+                    <div class="col-md-6">
+
+                        <div class="card shadow-sm border-0 mt-2">
+                            <div class="card-header"
+                                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Virat Kohli (13)
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-sm-flex position-relative z-0 overflow-hidden p-2">
+                                    <!-- <img src="assets/img/icons/shape-01.svg" alt="img"
+                                                                                            class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
+                                    <a href="javascript:void(0);"
+                                        class="avatar avatar-xxxl patient-avatar me-2 flex-shrink-0">
+                                        <img src="assets/img/patient.png" alt="product" class="rounded">
+                                    </a>
+                                    <div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-phone text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <h6 class="fs-13 fw-bold mb-1">Phone :</h6>
+                                                <p class="mb-0">8910245678</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-calendar-days text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <h6 class="fs-13 fw-bold mb-1">Age :</h6>
+                                                <p class="mb-0">22 Year 9 Month 5 Days (As Of Date 10/06/2025)</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-hands-holding-child text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <h6 class="fs-13 fw-bold mb-1">Guardian Name :</h6>
+                                                <p class="mb-0">--</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-mars-and-venus text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <h6 class="fs-13 fw-bold mb-1">Gender :</h6>
+                                                <p class="mb-0">Female</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-users-gear text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <h6 class="fs-13 fw-bold mb-1">TPA :</h6>
+                                                <p class="mb-0">--</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-id-badge text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <h6 class="fs-13 fw-bold mb-1">TPA ID :</h6>
+                                                <p class="mb-0">--</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-user-check text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <h6 class="fs-13 fw-bold mb-1">TPA Validity :</h6>
+                                                <p class="mb-0">--</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-barcode text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <h6 class="fs-13 fw-bold mb-1">Barcode :</h6>
+                                                <p class="mb-0">--</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-qrcode text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <h6 class="fs-13 fw-bold mb-1">QR Code :</h6>
+                                                <p class="mb-0">--</p>
+                                            </div>
+                                        </div>
                                     </div>
+                                    <!-- <div class="row">
+                                                                                <div class="col-sm-5">
+
+                                                                                </div>
+                                                                                <div class="col-sm-7">
+
+                                                                                </div>
+                                                                                <div class="col-sm-5">
+
+                                                                                </div>
+                                                                                <div class="col-sm-7">
+
+                                                                                </div>
+                                                                            </div> -->
                                 </div>
                             </div>
                         </div>
-
-                        <div class="d-flex right-content align-items-center flex-wrap mb-3">
-                            <div class="reportrange-picker d-flex align-items-center reportrange">
-                                <i class="ti ti-calendar text-gray-5 fs-14 me-1"></i><span
-                                    class="reportrange-picker-field">16
-                                    Apr 25 - 16 Apr 25</span>
-                            </div>
-                        </div>
                     </div>
+                    <div class="col-md-6">
 
-                    
+                    </div>
                 </div>
-                <!--  End Filter -->
-
-                <!--  Start Table -->
-                <div class="table-responsive">
-                    <table class="table datatable table-nowrap">
-                        <thead class="">
-                            <tr>
-                                <th class="no-sort">
-                                    Date & Time
-                                </th>
-                                <th>Doctor Name</th>
-                                <th>Mode</th>
-                                <th>Status</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>30 Apr 2025 - 09:30 AM</td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="doctor-details.html" class="avatar me-2 flex-shrink-0">
-                                            <img src="assets/img/doctors/doctor-01.jpg" alt="img" class="rounded-circle">
-                                        </a>
-                                        <div>
-                                            <h6 class="fs-14 mb-1 text-truncate"><a href="doctor-details.html"
-                                                    class="fw-semibold">Dr. Mick Thompson</a></h6>
-                                            <p class="mb-0 fs-13 text-truncate">Cardiologist</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    In-person
-                                </td>
-                                <td> <span class="badge fs-13 badge-soft-info rounded text-info fw-medium">Checked
-                                        Out</span>
-                                </td>
-                                <td class="action-item">
-                                    <a href="javascript:void(0);" data-bs-toggle="dropdown">
-                                        <i class="ti ti-dots-vertical"></i>
-                                    </a>
-                                    <ul class="dropdown-menu p-2">
-                                        <li>
-                                            <a href="javascript:void(0);" class="dropdown-item d-flex align-items-center"
-                                                data-bs-toggle="offcanvas" data-bs-target="#view_details">View</a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:void(0);" class="dropdown-item d-flex align-items-center"
-                                                data-bs-toggle="modal" data-bs-target="#delete_modal">Delete</a>
-                                        </li>
-                                    </ul>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>15 Apr 2025 - 11:20 AM</td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="doctor-details.html" class="avatar me-2 flex-shrink-0">
-                                            <img src="assets/img/doctors/doctor-02.jpg" alt="img" class="rounded-circle">
-                                        </a>
-                                        <div>
-                                            <h6 class="fs-14 mb-1 text-truncate"><a href="doctor-details.html"
-                                                    class="fw-semibold">Dr. Sarah Johnson</a></h6>
-                                            <p class="mb-0 fs-13 text-truncate">Orthopedic Surgeon</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    Online
-                                </td>
-                                <td> <span class="badge fs-13 badge-soft-warning rounded text-warning fw-medium">Checked
-                                        In</span> </td>
-                                <td class="action-item">
-                                    <a href="javascript:void(0);" data-bs-toggle="dropdown">
-                                        <i class="ti ti-dots-vertical"></i>
-                                    </a>
-                                    <ul class="dropdown-menu p-2">
-                                        <li>
-                                            <a href="javascript:void(0);" class="dropdown-item d-flex align-items-center"
-                                                data-bs-toggle="offcanvas" data-bs-target="#view_details">View</a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:void(0);" class="dropdown-item d-flex align-items-center"
-                                                data-bs-toggle="modal" data-bs-target="#delete_modal">Delete</a>
-                                        </li>
-                                    </ul>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>02 Apr 2025 - 08:15 AM</td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="doctor-details.html" class="avatar me-2 flex-shrink-0">
-                                            <img src="assets/img/doctors/doctor-03.jpg" alt="img" class="rounded-circle">
-                                        </a>
-                                        <div>
-                                            <h6 class="fs-14 mb-1 text-truncate"><a href="doctor-details.html"
-                                                    class="fw-semibold">Dr. Emily Carter</a></h6>
-                                            <p class="mb-0 fs-13 text-truncate">Pediatrician</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    In-Person
-                                </td>
-                                <td> <span
-                                        class="badge fs-13 badge-soft-danger rounded text-danger fw-medium">Cancelled</span>
-                                </td>
-                                <td class="action-item">
-                                    <a href="javascript:void(0);" data-bs-toggle="dropdown">
-                                        <i class="ti ti-dots-vertical"></i>
-                                    </a>
-                                    <ul class="dropdown-menu p-2">
-                                        <li>
-                                            <a href="javascript:void(0);" class="dropdown-item d-flex align-items-center"
-                                                data-bs-toggle="offcanvas" data-bs-target="#view_details">View</a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:void(0);" class="dropdown-item d-flex align-items-center"
-                                                data-bs-toggle="modal" data-bs-target="#delete_modal">Delete</a>
-                                        </li>
-                                    </ul>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>27 Mar 2025 - 02:00 PM</td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="doctor-details.html" class="avatar me-2 flex-shrink-0">
-                                            <img src="assets/img/doctors/doctor-04.jpg" alt="img" class="rounded-circle">
-                                        </a>
-                                        <div>
-                                            <h6 class="fs-14 mb-1 text-truncate"><a href="doctor-details.html"
-                                                    class="fw-semibold">Dr. David Lee</a></h6>
-                                            <p class="mb-0 fs-13 text-truncate">Gynecologist</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    In-person
-                                </td>
-                                <td> <span class="badge fs-13 badge-soft-info rounded text-info fw-medium">Schedule</span>
-                                </td>
-                                <td class="action-item">
-                                    <a href="javascript:void(0);" data-bs-toggle="dropdown">
-                                        <i class="ti ti-dots-vertical"></i>
-                                    </a>
-                                    <ul class="dropdown-menu p-2">
-                                        <li>
-                                            <a href="javascript:void(0);" class="dropdown-item d-flex align-items-center"
-                                                data-bs-toggle="offcanvas" data-bs-target="#view_details">View</a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:void(0);" class="dropdown-item d-flex align-items-center"
-                                                data-bs-toggle="modal" data-bs-target="#delete_modal">Delete</a>
-                                        </li>
-                                    </ul>
-                                </td>
-                            </tr>
-
-
-                            <tr>
-                                <td>12 Mar 2025 - 05:40 PM</td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="doctor-details.html" class="avatar me-2 flex-shrink-0">
-                                            <img src="assets/img/doctors/doctor-05.jpg" alt="img" class="rounded-circle">
-                                        </a>
-                                        <div>
-                                            <h6 class="fs-14 mb-1 text-truncate"><a href="doctor-details.html"
-                                                    class="fw-semibold">Dr. Anna Kim</a></h6>
-                                            <p class="mb-0 fs-13 text-truncate">Psychiatrist</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    Online
-                                </td>
-                                <td> <span
-                                        class="badge fs-13 badge-soft-success rounded text-success fw-medium">Confirmed</span>
-                                </td>
-                                <td class="action-item">
-                                    <a href="javascript:void(0);" data-bs-toggle="dropdown">
-                                        <i class="ti ti-dots-vertical"></i>
-                                    </a>
-                                    <ul class="dropdown-menu p-2">
-                                        <li>
-                                            <a href="javascript:void(0);" class="dropdown-item d-flex align-items-center"
-                                                data-bs-toggle="offcanvas" data-bs-target="#view_details">View</a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:void(0);" class="dropdown-item d-flex align-items-center"
-                                                data-bs-toggle="modal" data-bs-target="#delete_modal">Delete</a>
-                                        </li>
-                                    </ul>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>24 Feb 2025 - 09:20 AM</td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="doctor-details.html" class="avatar me-2 flex-shrink-0">
-                                            <img src="assets/img/doctors/doctor-06.jpg" alt="img" class="rounded-circle">
-                                        </a>
-                                        <div>
-                                            <h6 class="fs-14 mb-1 text-truncate"><a href="doctor-details.html"
-                                                    class="fw-semibold">Dr. John Smith</a></h6>
-                                            <p class="mb-0 fs-13 text-truncate">Neurosurgeon</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    In-Person
-                                </td>
-                                <td> <span
-                                        class="badge fs-13 badge-soft-danger rounded text-danger fw-medium">Cancelled</span>
-                                </td>
-                                <td class="action-item">
-                                    <a href="javascript:void(0);" data-bs-toggle="dropdown">
-                                        <i class="ti ti-dots-vertical"></i>
-                                    </a>
-                                    <ul class="dropdown-menu p-2">
-                                        <li>
-                                            <a href="javascript:void(0);" class="dropdown-item d-flex align-items-center"
-                                                data-bs-toggle="offcanvas" data-bs-target="#view_details">View</a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:void(0);" class="dropdown-item d-flex align-items-center"
-                                                data-bs-toggle="modal" data-bs-target="#delete_modal">Delete</a>
-                                        </li>
-                                    </ul>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>16 Feb 2025 - 11:40 AM</td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="doctor-details.html" class="avatar me-2 flex-shrink-0">
-                                            <img src="assets/img/doctors/doctor-07.jpg" alt="img" class="rounded-circle">
-                                        </a>
-                                        <div>
-                                            <h6 class="fs-14 mb-1 text-truncate"><a href="doctor-details.html"
-                                                    class="fw-semibold">Dr. Lisa White</a></h6>
-                                            <p class="mb-0 fs-13 text-truncate">Oncologist</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    Online
-                                </td>
-                                <td> <span
-                                        class="badge fs-13 badge-soft-success rounded text-success fw-medium">Confirmed</span>
-                                </td>
-                                <td class="action-item">
-                                    <a href="javascript:void(0);" data-bs-toggle="dropdown">
-                                        <i class="ti ti-dots-vertical"></i>
-                                    </a>
-                                    <ul class="dropdown-menu p-2">
-                                        <li>
-                                            <a href="javascript:void(0);" class="dropdown-item d-flex align-items-center"
-                                                data-bs-toggle="offcanvas" data-bs-target="#view_details">View</a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:void(0);" class="dropdown-item d-flex align-items-center"
-                                                data-bs-toggle="modal" data-bs-target="#delete_modal">Delete</a>
-                                        </li>
-                                    </ul>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>01 Feb 2025 - 04:00 PM</td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="doctor-details.html" class="avatar me-2 flex-shrink-0">
-                                            <img src="assets/img/doctors/doctor-08.jpg" alt="img" class="rounded-circle">
-                                        </a>
-                                        <div>
-                                            <h6 class="fs-14 mb-1 text-truncate"><a href="doctor-details.html"
-                                                    class="fw-semibold">Dr. Patricia Brown</a></h6>
-                                            <p class="mb-0 fs-13 text-truncate">Pulmonologist</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    Online
-                                </td>
-                                <td> <span class="badge fs-13 badge-soft-info rounded text-info fw-medium">Checked
-                                        Out</span>
-                                </td>
-                                <td class="action-item">
-                                    <a href="javascript:void(0);" data-bs-toggle="dropdown">
-                                        <i class="ti ti-dots-vertical"></i>
-                                    </a>
-                                    <ul class="dropdown-menu p-2">
-                                        <li>
-                                            <a href="javascript:void(0);" class="dropdown-item d-flex align-items-center"
-                                                data-bs-toggle="offcanvas" data-bs-target="#view_details">View</a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:void(0);" class="dropdown-item d-flex align-items-center"
-                                                data-bs-toggle="modal" data-bs-target="#delete_modal">Delete</a>
-                                        </li>
-                                    </ul>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>25 Jan 2025 - 03:10 PM</td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="doctor-details.html" class="avatar me-2 flex-shrink-0">
-                                            <img src="assets/img/doctors/doctor-09.jpg" alt="img" class="rounded-circle">
-                                        </a>
-                                        <div>
-                                            <h6 class="fs-14 mb-1 text-truncate"><a href="doctor-details.html"
-                                                    class="fw-semibold">Dr. Rachel Green</a></h6>
-                                            <p class="mb-0 fs-13 text-truncate">Urologist</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    Online
-                                </td>
-                                <td> <span
-                                        class="badge fs-13 badge-soft-primary rounded text-primary fw-medium">Schedule</span>
-                                </td>
-                                <td class="action-item">
-                                    <a href="javascript:void(0);" data-bs-toggle="dropdown">
-                                        <i class="ti ti-dots-vertical"></i>
-                                    </a>
-                                    <ul class="dropdown-menu p-2">
-                                        <li>
-                                            <a href="javascript:void(0);" class="dropdown-item d-flex align-items-center"
-                                                data-bs-toggle="offcanvas" data-bs-target="#view_details">View</a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:void(0);" class="dropdown-item d-flex align-items-center"
-                                                data-bs-toggle="modal" data-bs-target="#delete_modal">Delete</a>
-                                        </li>
-                                    </ul>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>12 Jan 2025 - 03:10 PM</td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="doctor-details.html" class="avatar me-2 flex-shrink-0">
-                                            <img src="assets/img/doctors/doctor-10.jpg" alt="img" class="rounded-circle">
-                                        </a>
-                                        <div>
-                                            <h6 class="fs-14 mb-1 text-truncate"><a href="doctor-details.html"
-                                                    class="fw-semibold">Dr. Michael Smith</a></h6>
-                                            <p class="mb-0 fs-13 text-truncate">Cardiologist</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    In-Person
-                                </td>
-                                <td> <span
-                                        class="badge fs-13 badge-soft-danger rounded text-danger fw-medium">cancelled</span>
-                                </td>
-                                <td class="action-item">
-                                    <a href="javascript:void(0);" data-bs-toggle="dropdown">
-                                        <i class="ti ti-dots-vertical"></i>
-                                    </a>
-                                    <ul class="dropdown-menu p-2">
-                                        <li>
-                                            <a href="javascript:void(0);" class="dropdown-item d-flex align-items-center"
-                                                data-bs-toggle="offcanvas" data-bs-target="#view_details">View</a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:void(0);" class="dropdown-item d-flex align-items-center"
-                                                data-bs-toggle="modal" data-bs-target="#delete_modal">Delete</a>
-                                        </li>
-                                    </ul>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <!--  End Table -->
 
             </div>
             <div class="tab-pane" id="transactions">
