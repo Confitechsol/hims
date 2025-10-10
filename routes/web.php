@@ -42,6 +42,7 @@ use App\Http\Controllers\Setup\UnitController;
 use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\VitalController;
 use App\Http\Controllers\Setup\CompanyListController;
+use App\Http\Controllers\InventoriesController;
 
 
 Route::get('/', function () {
@@ -431,6 +432,14 @@ Route::prefix('/appointment-details')->group(function () {
     Route::get('/queue', function () { return view('admin.appointments.queue');})->name('appointments.queue');
 
 });
+
+Route::prefix('/inventory')->group(function () {
+     Route::get('/', [InventoriesController::class, 'index'])->name('inventory-details');
+     Route::get('/get-items/{categoryId}', [InventoriesController::class, 'getItems'])->name('get.items');
+     Route::post('/store', [InventoriesController::class, 'store'])->name('items.store');
+     Route::get('/edit', [InventoriesController::class, 'store'])->name('itemstock.edit');
+     Route::get('/destroy', [InventoriesController::class, 'destroy'])->name('itemstock.destroy');
+    });
 
 
 
