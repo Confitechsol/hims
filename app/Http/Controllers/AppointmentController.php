@@ -7,6 +7,7 @@ use App\Models\Appointment;
 use App\Models\GlobalShift;
 use App\Models\DoctorShiftTime;
 use App\Models\DoctorGlobalShift;
+
 use App\Models\Doctor;
 use App\Models\AppointPriority;
 use App\Models\ChargeCategory;
@@ -169,23 +170,8 @@ class AppointmentController extends Controller
         return response()->json($charges);
     }
 
-    public function getDoctorShifts($doctorId)
-    {
-        // Get all shifts linked to this doctor
-        $shifts = DoctorGlobalShift::with('globalShift')
-                    ->where('doctor_id', $doctorId)
-                    ->get()
-                    ->map(function($item) {
-                        return [
-                            'id' => $item->globalShift->id,
-                            'name' => $item->globalShift->name
-                        ];
-                    });
+    
 
-        return response()->json([
-            'shifts' => $shifts
-        ]);
-    }
 
     // public function searchSlots(Request $request)
     // {
@@ -337,4 +323,38 @@ class AppointmentController extends Controller
 
         return back()->with('success', 'Slot deleted successfully.');
     }
+
+    public function getDoctorShifts($doctorId)
+    {
+        // Get all shifts linked to this doctor
+        $shifts = DoctorGlobalShift::with('globalShift')
+                    ->where('doctor_id', $doctorId)
+                    ->get()
+                    ->map(function($item) {
+                        return [
+                            'id' => $item->globalShift->id,
+                            'name' => $item->globalShift->name
+                        ];
+                    });
+
+        return response()->json([
+            'shifts' => $shifts
+        ]);
+    }
+    public function getDoctorSlots($doctorId, $shiftId)
+    {
+        $slots = DoctorShiftTime::where('doctor_id', $doctorId)
+                    ->where('doctor_global_shift_id', $shiftId)
+                    ->get(['id', 'day', 'start_time', 'end_time']);
+        //dd($slots);
+
+        return response()->json(['slots' => $slots]);
+    }
+    public function getAppointmentPriorities()
+    {
+        $priorities = AppointPriority::select('id', 'appoint_priority')->get();
+
+        return response()->json(['priorities' => $priorities]);
+    }
+
 }
