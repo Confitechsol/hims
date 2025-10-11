@@ -595,34 +595,18 @@
 
         </div>
     </div>
-</body>
-<!-- JavaScript -->
-
-
-<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/js/select2.min.js"></script>
-<script>
-    $(document).ready(function () {
-        // Re-initialize Select2 every time the modal is shown
-        $('#appointmentModal').on('shown.bs.modal', function () {
-            $('#appointment-type').select2({
-                theme: 'bootstrap-5',
-                width: '100%',
-                dropdownParent: $('#appointmentModal'),
-                placeholder: "Enter Patient Name or Id…",
-                allowClear: true
-            });
-        });
-
-        // Initialize Select2 on page load for any other select elements
-        $('#appointment-type').select2({
-            theme: 'bootstrap-5',
-            width: '100%',
-            placeholder: "Enter Patient Name or Id…",
-            allowClear: true
-        });
-    });
-</script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/printjs/1.6.0/print.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Print.js for printing functionality -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/print-js/1.6.0/print.min.js"></script>
+    @unless(request()->is('beds','bed-status'))
+        <script src="{{ asset('assets/js/custom.js') }}"></script>
+    @endunless
+   <!-- JavaScript -->
 <script>
     function toggleChatbot() {
         var chatbot = document.getElementById('chatbotWrapper');
@@ -632,24 +616,5 @@
         button.classList.toggle('active');
     }
 </script>
-
-{{--
-<script src="{{ asset('assets/js/jquery-3.7.1.min.js') }}" type="e56d8e3ed6c4bef649884303-text/javascript"></script>
---}}
-
-<!-- Plugin Js -->
-{{--
-<script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}" type="e56d8e3ed6c4bef649884303-text/javascript"></script>
---}}
-{{--
-<script src="{{ asset('assets/plugins/simplebar/simplebar.min.js') }}"
-    type="e56d8e3ed6c4bef649884303-text/javascript"></script> --}}
-{{--
-<script src="{{ asset('assets/js/moment.min.js') }}"></script> --}}
-{{--
-<script src="{{ asset('assets/plugins/daterangepicker/daterangepicker.js') }}"></script> --}}
-{{--
-<script src="{{ asset('assets/js/bootstrap-datetimepicker.min.js') }}"></script> --}}
-
-
+</body>
 </html>

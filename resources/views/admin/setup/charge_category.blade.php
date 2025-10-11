@@ -16,13 +16,10 @@
                 <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                     <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Charge Category List</h5>
                 </div>
-
                 <div class="card-body">
-
-
+                <x-table-actions.actions id="charges_category" name="Charge Category" />
                     {{-- Hospital Name & Code --}}
                     <div class="row">
-
                         <div class="col-lg-12">
                             <div class="card">
 
@@ -48,22 +45,6 @@
                                             {{session('success')}}
                                         </div>
                                     @endif
-                                    <div
-                                        class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
-
-                                        <div class="input-icon-start position-relative me-2">
-                                            <span class="input-icon-addon">
-                                                <i class="ti ti-search"></i>
-                                            </span>
-                                            <input type="text" class="form-control shadow-sm" placeholder="Search">
-
-                                        </div>
-                                        <div class="text-end d-flex">
-                                            <a href="javascript:void(0);"
-                                                class="btn btn-primary text-white ms-2 fs-13 btn-md" data-bs-toggle="modal"
-                                                data-bs-target="#add_charges_category"><i class="ti ti-plus me-1"></i>Add Charge
-                                                Category</a>
-                                        </div>
                                         <!-- Modal -->
                                         <div class="modal fade" id="add_charges_category" tabindex="-1" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered">
@@ -86,9 +67,9 @@
                                                                         class="form-select" required>
                                                                         <option value="">Select</option>
                                                                         @foreach ($charge_types as $charge_type)
-                                                                            <option value="{{$charge_type -> id}}">{{$charge_type -> charge_type}}</option>
+                                                                            <option value="{{$charge_type->id}}">{{$charge_type->charge_type}}</option>
                                                                         @endforeach
-                                                                      
+
                                                                     </select>
                                                                 </div>
                                                                 <div class="col-md-12">
@@ -114,7 +95,7 @@
                                     </div>
 
                                     <div class="table-responsive">
-                                        <table class="table mb-0">
+                                        <table class="table mb-0" id="charges_category">
                                             <thead>
                                                 <tr>
                                                     <th>Name</th>
@@ -132,7 +113,7 @@
                                                     <td>{{$chargesCatogerys->chargeType['charge_type']}}</td>
                                                     <td>{{$chargesCatogerys->description}}</td>
                                                     <td>
-                                                        
+
                                                         <a href="javascript:void(0);" class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill" data-bs-toggle="modal" data-bs-target="#edit_charges_category_{{$chargesCatogerys->id}}">
                                                             <i class="ti ti-pencil"></i>
                                                         </a>
@@ -155,9 +136,9 @@
                                                                                     <select name="charge_type" id="charge_type" class="form-select" required>
                                                                                         <option value="">Select</option>
                                                                                         @foreach ($charge_types as $charge_type)
-                                                                                            <option value="{{$charge_type -> id}}" {{$chargesCatogerys->charge_type_id == $charge_type -> id ? 'selected' : ''}}>{{$charge_type -> charge_type}}</option>
+                                                                                            <option value="{{$charge_type->id}}" {{$chargesCatogerys->charge_type_id == $charge_type->id ? 'selected' : ''}}>{{$charge_type->charge_type}}</option>
                                                                                         @endforeach
-                                                                                      
+
                                                                                     </select>
                                                                                 </div>
                                                                                 <div class="col-md-12">

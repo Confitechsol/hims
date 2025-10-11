@@ -21,14 +21,14 @@
 
                                 <div class="card-body">
                                     @if ($errors->any())
-                                    @foreach ($errors->all() as $error)
-                                        <div class="alert alert-danger">
-                                            <ul class="mb-0">
-                                                @foreach ($errors->all() as $error)
-                                                    <li>{{ $error }}</li>
-                                                @endforeach
-                                            </ul>
-                                        </div>
+                                        @foreach ($errors->all() as $error)
+                                            <div class="alert alert-danger">
+                                                <ul class="mb-0">
+                                                    @foreach ($errors->all() as $error)
+                                                        <li>{{ $error }}</li>
+                                                    @endforeach
+                                                </ul>
+                                            </div>
                                         @endforeach
                                     @endif
                                     @if (session('success'))
@@ -40,132 +40,117 @@
                                         <div class="alert alert-danger">
                                             {{ session('error') }}
                                         </div>
-                                    @endif  
+                                    @endif
                                     {{-- Search & Add --}}
+                                    <x-table-actions.actions id="unit_type" name="Unit Type" />
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header rounded-0"
+                                                    style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                                    <h5 class="modal-title" id="addSpecializationLabel">Add Unit Type
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form action="{{route('charge_units.store')}}" method="POST">
+                                                        @csrf
+                                                        <div class="row gy-3">
 
-                                    <div
-                                        class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
-
-                                        <form method="GET" action="{{ route('charge_units') }}" class="input-icon-start position-relative me-2">
-                                            <span class="input-icon-addon">
-                                                <i class="ti ti-search"></i>
-                                            </span>
-                                            <input type="text" name="search" value="{{ request('search') }}" class="form-control shadow-sm" placeholder="Search">
-                                        </form>
-                                        <div class="text-end d-flex">
-                                            <a href="javascript:void(0);"
-                                                class="btn btn-primary text-white ms-2 fs-13 btn-md" data-bs-toggle="modal"
-                                                data-bs-target="#add_unit"><i class="ti ti-plus me-1"></i>Add Unit Type</a>
-                                        </div>
-                                        <!-- Modal -->
-                                        <div class="modal fade" id="add_unit" tabindex="-1" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered">
-                                                <div class="modal-content">
-                                                    <div class="modal-header rounded-0"
-                                                        style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                                        <h5 class="modal-title" id="addSpecializationLabel">Add Unit Type
-                                                        </h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                            aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <form action="{{route('charge_units.store')}}" method="POST">
-                                                            @csrf
-                                                            <div class="row gy-3">
-
-                                                                <div class="col-md-12">
-                                                                    <label for="" class="form-label">Unit <span
-                                                                            class="text-danger">*</span></label>
-                                                                    <input type="text" name="unit" id="unit"
-                                                                        class="form-control" required>
-                                                                </div>
+                                                            <div class="col-md-12">
+                                                                <label for="" class="form-label">Unit <span
+                                                                        class="text-danger">*</span></label>
+                                                                <input type="text" name="unit" id="unit"
+                                                                    class="form-control" required>
                                                             </div>
+                                                        </div>
 
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="submit" class="btn btn-primary">Save</button>
+                                                </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Edit Modal -->
+                                    <div class="modal fade" id="edit_unit" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header rounded-0"
+                                                    style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                                    <h5 class="modal-title" id="addSpecializationLabel">Edit Unit Type
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <form action="{{route('charge_units.update')}}" method="POST">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <div class="modal-body">
+                                                        <div class="row gy-3">
+                                                            <input type="hidden" name="id" id="edit_id">
+                                                            <div class="col-md-12">
+                                                                <label for="" class="form-label">Unit <span
+                                                                        class="text-danger">*</span></label>
+                                                                <input type="text" name="unit" id="edit_unit_input"
+                                                                    class="form-control" required>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                     <div class="modal-footer">
-                                                        <button type="submit" class="btn btn-primary">Save</button>
+                                                        <button type="submit" class="btn btn-primary">Update</button>
                                                     </div>
-                                                    </form>
-                                                </div>
+                                                </form>
                                             </div>
                                         </div>
-                                        <!-- Edit Modal -->
-                                        <div class="modal fade" id="edit_unit" tabindex="-1" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered">
-                                                <div class="modal-content">
-                                                    <div class="modal-header rounded-0"
-                                                        style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                                        <h5 class="modal-title" id="addSpecializationLabel">Edit Unit Type
-                                                        </h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                            aria-label="Close"></button>
-                                                    </div>
-                                                    <form action="{{route('charge_units.update')}}" method="POST">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <div class="modal-body">
-                                                            <div class="row gy-3">
-                                                                <input type="hidden" name="id" id="edit_id">
-                                                                <div class="col-md-12">
-                                                                    <label for="" class="form-label">Unit <span
-                                                                            class="text-danger">*</span></label>
-                                                                    <input type="text" name="unit" id="edit_unit_input"
-                                                                        class="form-control" required>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="submit" class="btn btn-primary">Update</button>   
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!-- End of Modal -->
-
                                     </div>
-
+                                    <!-- End of Modal -->
                                     <div class="table-responsive">
-                                        <table class="table mb-0">
+                                        <table class="table mb-0" id="unit_type">
                                             <thead>
-                                            <tr>
-
-                                            <th>Unit Type </th>
-                                            <th style="width: 200px;">Action</th>
-
-                                            </tr>
-                                    
-                                            </thead>
-                                            <tbody>
-                                            @foreach ($unittype as $unittypes )
                                                 <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">{{ $unittypes -> unit  }}</h6>
-                                                    </td>
-                                                    <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill editbtn"
-                                                            data-id="{{ $unittypes->id }}"
-                                                            data-unit="{{ $unittypes->unit }}" data-bs-toggle="modal"
-                                                            data-bs-target="#edit_unit">
-                                                            <i class="ti ti-pencil"></i>
-                                                        </a>
-                                                        {{-- <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a> --}}
-                                                        <form class="d-inline" method="POST" action="{{ route('charge_units.destroy') }}">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <input type="hidden" name="id" value="{{ $unittypes->id }}">
-                                                            <button type="submit" class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
-                                                                onclick="return confirm('Are you sure you want to delete this item?');">
-                                                                <i class="ti ti-trash"></i>
-                                                            </button>
-                                                        </form>
-                                                    </td>
+
+                                                    <th>Unit Type </th>
+                                                    <th style="width: 200px;">Action</th>
+
                                                 </tr>
 
-                                                 @endforeach
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($unittype as $unittypes)
+                                                    <tr>
+                                                        <td>
+                                                            <h6 class="mb-0 fs-14 fw-semibold">{{ $unittypes->unit  }}</h6>
+                                                        </td>
+                                                        <td>
+                                                            <a href="javascript: void(0);"
+                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill editbtn"
+                                                                data-id="{{ $unittypes->id }}"
+                                                                data-unit="{{ $unittypes->unit }}" data-bs-toggle="modal"
+                                                                data-bs-target="#edit_unit">
+                                                                <i class="ti ti-pencil"></i>
+                                                            </a>
+                                                            {{-- <a href="javascript: void(0);"
+                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                                <i class="ti ti-trash"></i></a> --}}
+                                                            <form class="d-inline" method="POST"
+                                                                action="{{ route('charge_units.destroy') }}">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <input type="hidden" name="id" value="{{ $unittypes->id }}">
+                                                                <button type="submit"
+                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
+                                                                    onclick="return confirm('Are you sure you want to delete this item?');">
+                                                                    <i class="ti ti-trash"></i>
+                                                                </button>
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+
+                                                @endforeach
                                             </tbody>
                                         </table>
                                     </div>
@@ -182,7 +167,7 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             var editModal = document.getElementById('edit_unit');
             if (editModal) {
                 editModal.addEventListener('show.bs.modal', function (event) {

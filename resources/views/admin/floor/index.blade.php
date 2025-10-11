@@ -8,7 +8,7 @@
             </div>
 
             <div class="card-body">
-
+            <x-table-actions.actions id="floors" name="Floor" />
                 {{-- Flash Messages --}}
                 @if (session('success'))
                     <div class="alert alert-success alert-dismissible fade show">{{ session('success') }}</div>
@@ -16,12 +16,8 @@
                 @if (session('error'))
                     <div class="alert alert-danger alert-dismissible fade show">{{ session('error') }}</div>
                 @endif
-
-                {{-- Add Floor --}}
-                <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createModal">Add Floor</button>
-
                 {{-- Floor Table --}}
-                <table class="table table-bordered">
+                <table class="table table-bordered" id="floors">
                     <thead>
                         <tr>
                             <th>Floor Name</th>
@@ -34,16 +30,16 @@
                                 <td>{{ $floor->name }}</td>
                                 <td>
                                     {{-- Edit Button --}}
-                                    <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#editModal"
+                                    <button class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill" data-bs-toggle="modal" data-bs-target="#editModal"
                                         data-id="{{ $floor->id }}" data-name="{{ $floor->name }}">
-                                        Edit
+                                        <i class="ti ti-pencil"></i>
                                     </button>
 
                                     {{-- Delete Button --}}
-                                    <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                                    <button class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill" data-bs-toggle="modal"
                                         data-bs-target="#deleteModal" data-id="{{ $floor->id }}"
                                         data-name="{{ $floor->name }}">
-                                        Delete
+                                        <i class="ti ti-trash"></i>
                                     </button>
                                 </td>
                             </tr>
