@@ -11,12 +11,25 @@ use App\Models\BedType;
 
 class BedController extends Controller
 {
-   public function index()
+   public function index(Request $request)
    {
-      $beds = Bed::with(['bedGroup', 'bedType'])->get();
+      $beds = Bed::with(['bedGroup', 'bedType']);
       $bedGroups = BedGroup::all();
       $bedTypes = BedType::all();
-
+      $search = $request->input('search', '');
+      if ($search) {
+         $beds->where(function($query) use ($search) {
+             $query->where('name', 'like', "%$search%")
+                   ->orWhereHas('bedGroup', function ($q) use ($search) {
+                       $q->where('name', 'like', "%$search%");
+                   })
+                   ->orWhereHas('bedType', function ($q) use ($search) {
+                       $q->where('name', 'like', "%$search%");
+                   });
+         });
+         return array("beds"=>$beds->get());
+     }
+     $beds = $beds->get();
       return view('admin.bed.index', compact('beds', 'bedGroups', 'bedTypes'));
    }
    public function status()
