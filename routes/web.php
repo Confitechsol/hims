@@ -14,6 +14,7 @@ use App\Http\Controllers\FloorController;
 use App\Http\Controllers\FrontOfficeController;
 use App\Http\Controllers\MedicineCategoryController;
 use App\Http\Controllers\MedicineGroupController;
+use App\Http\Controllers\Modules\OpdController;
 use App\Http\Controllers\OperationController;
 use App\Http\Controllers\PathologyController;
 use App\Http\Controllers\PatientController;
@@ -84,6 +85,7 @@ Route::middleware(['admin'])->group(function () {
     // Route::post('/database/restore', [DatabaseController::class, 'restore'])->name('database.restore');
     // Route::get('/database/backup', [DatabaseController::class, 'backup'])->name('database.backup'); // optional link
     Route::get('/patients', [PatientController::class, 'index'])->name('patients');
+    Route::get('/getPatients', [PatientController::class, 'getPatients'])->name('getPatients');
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::post('/profile/store', [ProfileController::class, 'store'])->name('profile.store');
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -378,6 +380,11 @@ Route::prefix('/appointment-priority')->group(function () {
     Route::delete('/destroy/{id}', [AppointmentController::class, 'appointmentPriorityDestroy'])->name('appointment-priority.destroy');
 });
 
-Route::get('/opd', function () {
-    return view('admin.opd.index');
-})->name('opd');
+Route::get('/opd', [OpdController::class, 'index'])->name('opd');
+Route::post('/opd/store', [OpdController::class, 'store'])->name('opd.store');
+Route::get('/getOrganizations', [PatientController::class, 'organizations'])->name('getOrganizations');
+Route::get('/getDoctors', [OpdController::class, 'getDoctors'])->name('getDoctors');
+Route::get('/getChargeCategories', [OpdController::class, 'getChargeCategories'])->name('getChargeCategories');
+Route::get('/getCharges/{id}', [OpdController::class, 'getCharges'])->name('getCharges');
+Route::get('/getSymptomsTypes', [OpdController::class, 'getSymptomsType'])->name('getSymptomsTypes');
+Route::post('/getSymptoms', [OpdController::class, 'getSymptoms'])->name('getSymptoms');

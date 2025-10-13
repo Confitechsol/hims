@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -46,6 +45,8 @@ class Patient extends Model
         'is_active',
         'disable_at',
         'created_at',
+        'tpa_code',
+        'tpa_validity',
     ];
 
     protected $casts = [

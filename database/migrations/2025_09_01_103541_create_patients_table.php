@@ -43,6 +43,8 @@ return new class extends Migration
             $table->string('is_dead', 255)->default('no');
             $table->integer('is_antenatal');
             $table->string('is_active', 255)->nullable()->default('no');
+            $table->string('tpa_code', 255)->nullable();
+            $table->string('tpa_validity', 255)->nullable();
             $table->date('disable_at')->nullable();
 
             $table->timestamp('created_at')->useCurrent()->useCurrentOnUpdate();
