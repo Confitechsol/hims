@@ -21,4 +21,6 @@ class Organisation extends Model
         'contact_person_name',
         'contact_person_phone',
     ];
+
+    public $timestamps = false;
 }

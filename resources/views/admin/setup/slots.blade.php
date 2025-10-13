@@ -97,31 +97,33 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        $(document).ready(function () {
-            $('#doctor').change(function() {
-        let doctorId = $(this).val();
+        $(document).ready(function () 
+        {
+            $('#doctor').change(function() 
+            {
+                let doctorId = $(this).val();
 
-        if(!doctorId) {
-            $('#shift').html('<option value="">Select</option>');
-            return;
-        }
+                if(!doctorId) {
+                    $('#shift').html('<option value="">Select</option>');
+                    return;
+                }
 
-        $.ajax({
-            url: '{{ route("doctor.shifts", ":doctorId") }}'.replace(':doctorId', doctorId),
-            type: 'GET',
-            success: function(response) {
-                let options = '<option value="">Select</option>';
-                response.shifts.forEach(function(shift) {
-                    options += `<option value="${shift.id}">${shift.name}</option>`;
+                $.ajax({
+                    url: '{{ route("doctor.shifts", ":doctorId") }}'.replace(':doctorId', doctorId),
+                    type: 'GET',
+                    success: function(response) {
+                        let options = '<option value="">Select</option>';
+                        response.shifts.forEach(function(shift) {
+                            options += `<option value="${shift.id}">${shift.name}</option>`;
+                        });
+                        $('#shift').html(options);
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                        alert('Could not fetch shifts!');
+                    }
                 });
-                $('#shift').html(options);
-            },
-            error: function(xhr) {
-                console.error(xhr.responseText);
-                alert('Could not fetch shifts!');
-            }
-        });
-        });
+            });
             $('.js-example-basic-single').select2();
         });
     </script>

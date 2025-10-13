@@ -48,8 +48,10 @@
                                         @endif
                                     </label>
                                     @if ($field['type'] === 'select')
-                                        <select name="{{ $field['name'] }}" id="{{ $field['name'] }}"
-                                            class="form-select" data-field="{{ $field['name'] }}">
+                                        <select name="{{ $field['name'] }}" id="{{ $field['name'] }}" class="form-select" data-field="{{ $field['name'] }}"
+                                        @if (!empty($field['required'])) required @endif
+                                        >
+                                            <option value="">Select {{ $field['label'] }}</option>
                                             @foreach ($field['options'] ?? [] as $key => $val)
                                                 <option value="{{ $key }}">{{ $val }}</option>
                                             @endforeach

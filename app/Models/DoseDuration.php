@@ -11,7 +11,7 @@ class DoseDuration extends Model
 
     // Table name (explicit since it doesn’t follow plural convention)
     protected $table = 'dose_duration';
-
+    public $timestamps = false;
     // Primary key
     protected $primaryKey = 'id';
 

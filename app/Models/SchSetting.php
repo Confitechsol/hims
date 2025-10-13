@@ -15,6 +15,7 @@ class SchSetting extends Model
     // Mass assignable attributes
     protected $fillable = [
         'hospital_id',
+        'branch_id',
         'base_url',
         'folder_path',
         'name',

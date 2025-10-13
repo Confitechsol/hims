@@ -7,6 +7,7 @@ use App\Models\Appointment;
 use App\Models\GlobalShift;
 use App\Models\DoctorShiftTime;
 use App\Models\DoctorGlobalShift;
+
 use App\Models\Doctor;
 use App\Models\AppointPriority;
 use App\Models\ChargeCategory;
@@ -164,28 +165,13 @@ class AppointmentController extends Controller
     }
 
     public function getCharges($categoryId)
-{
-    $charges = Charge::where('charge_category_id', $categoryId)->get();
-    return response()->json($charges);
-}
-
-    public function getDoctorShifts($doctorId)
     {
-        // Get all shifts linked to this doctor
-        $shifts = DoctorGlobalShift::with('globalShift')
-                    ->where('doctor_id', $doctorId)
-                    ->get()
-                    ->map(function($item) {
-                        return [
-                            'id' => $item->globalShift->id,
-                            'name' => $item->globalShift->name
-                        ];
-                    });
-
-        return response()->json([
-            'shifts' => $shifts
-        ]);
+        $charges = Charge::where('charge_category_id', $categoryId)->get();
+        return response()->json($charges);
     }
+
+    
+
 
     // public function searchSlots(Request $request)
     // {
@@ -205,42 +191,39 @@ class AppointmentController extends Controller
     //         'shift' => $shift
     //     ]);
     // }
-   public function searchSlots(Request $request)
-{
-    $doctorId = $request->doctor;
-    $shiftId = $request->shift;
+    public function searchSlots(Request $request)
+    {
+        $doctorId = $request->doctor;
+        $shiftId = $request->shift;
 
-    // Find the pivot record linking doctor and shift
-    $doctorGlobalShift = DoctorGlobalShift::where('doctor_id', $doctorId)
-                        ->where('global_shift_id', $shiftId)
-                        ->first();
+        // Find the pivot record linking doctor and shift
+        $doctorGlobalShift = DoctorGlobalShift::where('doctor_id', $doctorId)
+                            ->where('global_shift_id', $shiftId)
+                            ->first();
 
-    if ($doctorGlobalShift) {
-        // Get slots for this doctor & doctorGlobalShift
-        $slots = DoctorShiftTime::where('doctor_id', $doctorId)
-                    ->where('doctor_global_shift_id', $doctorGlobalShift->id)
-                    ->get();
+        if ($doctorGlobalShift) {
+            // Get slots for this doctor & doctorGlobalShift
+            $slots = DoctorShiftTime::where('doctor_id', $doctorId)
+                        ->where('doctor_global_shift_id', $doctorGlobalShift->id)
+                        ->get();
 
-        if ($slots->isNotEmpty()) {
-            // Doctor already has custom slots → return them
-            return response()->json([
-                'slots' => $slots,
-                'shift' => null  // no need for global shift
-            ]);
+            if ($slots->isNotEmpty()) {
+                // Doctor already has custom slots → return them
+                return response()->json([
+                    'slots' => $slots,
+                    'shift' => null  // no need for global shift
+                ]);
+            }
         }
+
+        // Case: No custom slots exist → return global shift timings
+        $shift = GlobalShift::find($shiftId);
+
+        return response()->json([
+            'slots' => [],   // no doctor slots yet
+            'shift' => $shift
+        ]);
     }
-
-    // Case: No custom slots exist → return global shift timings
-    $shift = GlobalShift::find($shiftId);
-
-    return response()->json([
-        'slots' => [],   // no doctor slots yet
-        'shift' => $shift
-    ]);
-}
-
-
-
 
     public function saveDoctorSlot(Request $request)
     {
@@ -340,4 +323,38 @@ class AppointmentController extends Controller
 
         return back()->with('success', 'Slot deleted successfully.');
     }
+
+    public function getDoctorShifts($doctorId)
+    {
+        // Get all shifts linked to this doctor
+        $shifts = DoctorGlobalShift::with('globalShift')
+                    ->where('doctor_id', $doctorId)
+                    ->get()
+                    ->map(function($item) {
+                        return [
+                            'id' => $item->globalShift->id,
+                            'name' => $item->globalShift->name
+                        ];
+                    });
+
+        return response()->json([
+            'shifts' => $shifts
+        ]);
+    }
+    public function getDoctorSlots($doctorId, $shiftId)
+    {
+        $slots = DoctorShiftTime::where('doctor_id', $doctorId)
+                    ->where('doctor_global_shift_id', $shiftId)
+                    ->get(['id', 'day', 'start_time', 'end_time']);
+        //dd($slots);
+
+        return response()->json(['slots' => $slots]);
+    }
+    public function getAppointmentPriorities()
+    {
+        $priorities = AppointPriority::select('id', 'appoint_priority')->get();
+
+        return response()->json(['priorities' => $priorities]);
+    }
+
 }

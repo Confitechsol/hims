@@ -14,6 +14,7 @@ class ItemStock extends Model
     protected $fillable = [
         'hospital_id',
         'branch_id',
+        'item_category_id',
         'item_id',
         'supplier_id',
         'symbol',
@@ -21,14 +22,23 @@ class ItemStock extends Model
         'quantity',
         'purchase_price',
         'date',
+        'expiry_date',
+        'salvage_value',
+        'useful_life',
+        'annual_depreciation',
         'attachment',
         'description',
         'is_active',
     ];
 
+
     /**
      * Relationship: ItemStock belongs to Item
      */
+    public function itemCategory()
+{
+    return $this->belongsTo(ItemCategory::class, 'item_category_id');
+}
     public function item()
     {
         return $this->belongsTo(Item::class, 'item_id');

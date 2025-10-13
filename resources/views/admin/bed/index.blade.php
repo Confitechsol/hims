@@ -277,33 +277,62 @@
 </script>
 
 <script>
+    let debounceTimer;
     function searchTable() {
-        var input, filter, table, tr, td, i, txtValue;
+        var input,search_term;
         input = document.getElementById("search-input");
-        filter = input.value.toLowerCase();
-        table = document.getElementById("bed-table");
-        tr = table.getElementsByTagName("tr");
-
-        // Loop through all table rows and hide those that don't match the search query
-        for (i = 1; i < tr.length; i++) { // Skip the header row
-            td = tr[i].getElementsByTagName("td");
-            let rowContainsSearchText = false;
-            // Loop through all columns of the row to check for a match
-            for (let j = 0; j < td.length; j++) {
-                if (td[j]) {
-                    txtValue = td[j].textContent || td[j].innerText;
-                    if (txtValue.toLowerCase().indexOf(filter) > -1) {
-                        rowContainsSearchText = true;
-                    }
-                }
+        search_term  = input.value;
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+        callApi(search_term);
+    }, 500);
+    }
+   function callApi(search_term){        
+        fetch('http://localhost/hims/public/beds?search='+search_term)
+        .then((res)=>res.json())
+        .then((data)=>{
+            const table = document.getElementById("bed-table");
+            const rows = table.getElementsByTagName("tr");
+            while (rows.length > 1) {
+                table.deleteRow(1);
             }
 
-            if (rowContainsSearchText) {
-                tr[i].style.display = ""; // Show the row
-            } else {
-                tr[i].style.display = "none"; // Hide the row
-            }
-        }
+            // Populate the table with the new data
+            data.beds.forEach(bed => {
+                const row = table.insertRow();
+                
+                // Add the cells (assuming bed object has bed_name, bed_number, etc.)
+                row.insertCell(0).textContent = bed.name;
+                row.insertCell(1).textContent = bed.bed_type.name;
+                row.insertCell(2).textContent = bed.bed_group.name;
+                row.insertCell(3).innerHTML = bed.is_active != "noused" ? ' <i class="fa-solid fa-square-check ms-2"></i>' : 'N/A';
+                
+                const actionCell = row.insertCell(4);
+                actionCell.innerHTML = `
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#editModal"
+                        data-id="${bed.id}"
+                        data-name="${bed.name}"
+                        data-bed_type_id="${bed.bed_type.id}"
+                        data-bed_group_id="${bed.bed_group.id}"
+                        data-is_available="${bed.is_active}">
+                        Edit
+                    </button>
+                    <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                        data-bs-target="#deleteModal"
+                        data-id="${bed.id}"
+                        data-name="${bed.name}">
+                        Delete
+                    </button>
+                `;
+                
+                // You can add other bed properties as necessary
+            });
+        })
+        .catch(error => {
+            console.error("Error fetching bed data:", error);
+            alert("Error fetching data. Please try again.");
+        });
     }
     // Copy Table to Clipboard
     new ClipboardJS('#copy-btn');

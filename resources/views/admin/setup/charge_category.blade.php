@@ -16,33 +16,35 @@
                 <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                     <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Charge Category List</h5>
                 </div>
-
                 <div class="card-body">
-
-
+                <x-table-actions.actions id="charges_category" name="Charge Category" />
                     {{-- Hospital Name & Code --}}
                     <div class="row">
-
                         <div class="col-lg-12">
                             <div class="card">
 
                                 <div class="card-body">
-                                    <div
-                                        class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
-
-                                        <div class="input-icon-start position-relative me-2">
-                                            <span class="input-icon-addon">
-                                                <i class="ti ti-search"></i>
-                                            </span>
-                                            <input type="text" class="form-control shadow-sm" placeholder="Search">
-
+                                    @if ($errors->any())
+                                        @foreach ($errors->all() as $error)
+                                            <div class="alert alert-danger">
+                                                <ul class="mb-0">
+                                                    @foreach ($errors->all() as $error)
+                                                        <li>{{ $error }}</li>
+                                                    @endforeach
+                                                </ul>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                    @if(session('error'))
+                                        <div class="alert alert-danger">
+                                            {{session('error')}}
                                         </div>
-                                        <div class="text-end d-flex">
-                                            <a href="javascript:void(0);"
-                                                class="btn btn-primary text-white ms-2 fs-13 btn-md" data-bs-toggle="modal"
-                                                data-bs-target="#add_charges_category"><i class="ti ti-plus me-1"></i>Add Charge
-                                                Category</a>
+                                    @endif
+                                    @if(session('success'))
+                                        <div class="alert alert-success">
+                                            {{session('success')}}
                                         </div>
+                                    @endif
                                         <!-- Modal -->
                                         <div class="modal fade" id="add_charges_category" tabindex="-1" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered">
@@ -55,28 +57,19 @@
                                                             aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <form action="" method="POST">
+                                                        <form action="{{route('charge_categories.store')}}" method="POST">
                                                             @csrf
                                                             <div class="row gy-3">
                                                                 <div class="col-md-12">
                                                                     <label for="" class="form-label">Charge
                                                                         Type <span class="text-danger">*</span></label>
-                                                                    <select name=" charge_type" id="charge_type"
+                                                                    <select name="charge_type" id="charge_type"
                                                                         class="form-select" required>
                                                                         <option value="">Select</option>
-                                                                        <option value="1">Appointment</option>
-                                                                        <option value="2">OPD</option>
-                                                                        <option value="3">IPD</option>
-                                                                        <option value="4">Pathology</option>
-                                                                        <option value="5">Radiology</option>
-                                                                        <option value="6">Blood Bank</option>
-                                                                        <option value="7">Ambulance</option>
-                                                                        <option value="8">Procedures</option>
-                                                                        <option value="9">Investigations</option>
-                                                                        <option value="10">Supplier</option>
-                                                                        <option value="11">Operations</option>
-                                                                        <option value="12">Others</option>
-                                                                        <option value="13">Bed Charges</option>
+                                                                        @foreach ($charge_types as $charge_type)
+                                                                            <option value="{{$charge_type->id}}">{{$charge_type->charge_type}}</option>
+                                                                        @endforeach
+
                                                                     </select>
                                                                 </div>
                                                                 <div class="col-md-12">
@@ -102,7 +95,7 @@
                                     </div>
 
                                     <div class="table-responsive">
-                                        <table class="table mb-0">
+                                        <table class="table mb-0" id="charges_category">
                                             <thead>
                                                 <tr>
                                                     <th>Name</th>
@@ -120,12 +113,58 @@
                                                     <td>{{$chargesCatogerys->chargeType['charge_type']}}</td>
                                                     <td>{{$chargesCatogerys->description}}</td>
                                                     <td>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                            <i class="ti ti-trash"></i></a>
+
+                                                        <a href="javascript:void(0);" class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill" data-bs-toggle="modal" data-bs-target="#edit_charges_category_{{$chargesCatogerys->id}}">
+                                                            <i class="ti ti-pencil"></i>
+                                                        </a>
+                                                        <!-- Modal -->
+                                                        <div class="modal fade" id="edit_charges_category_{{$chargesCatogerys->id}}" tabindex="-1" aria-hidden="true">
+                                                            <div class="modal-dialog modal-dialog-centered">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header rounded-0" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                                                        <h5 class="modal-title" id="addSpecializationLabel">Edit Charge Category</h5>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <form action="{{route('charge_categories.update')}}" method="POST">
+                                                                            @csrf
+                                                                            @method('PUT')
+                                                                            <input type="hidden" name="id" value="{{$chargesCatogerys->id}}">
+                                                                            <div class="row gy-3">
+                                                                                <div class="col-md-12">
+                                                                                    <label for="" class="form-label">Charge Type <span class="text-danger">*</span></label>
+                                                                                    <select name="charge_type" id="charge_type" class="form-select" required>
+                                                                                        <option value="">Select</option>
+                                                                                        @foreach ($charge_types as $charge_type)
+                                                                                            <option value="{{$charge_type->id}}" {{$chargesCatogerys->charge_type_id == $charge_type->id ? 'selected' : ''}}>{{$charge_type->charge_type}}</option>
+                                                                                        @endforeach
+
+                                                                                    </select>
+                                                                                </div>
+                                                                                <div class="col-md-12">
+                                                                                    <label for="" class="form-label">Name <span class="text-danger">*</span></label>
+                                                                                    <input type="text" name="name" id="name" class="form-control" value="{{$chargesCatogerys->name}}" required>
+                                                                                </div>
+                                                                                <div class="col-md-12">
+                                                                                    <label for="" class="form-label">Description <span class="text-danger">*</span></label>
+                                                                                    <textarea name="description" id="description" class="form-control" required>{{$chargesCatogerys->description}}</textarea>
+                                                                                </div>
+                                                                            </div>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="submit" class="btn btn-primary">Update</button>
+                                                                    </div>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <!-- Modal End -->
+                                                        <form class="d-inline" action="{{route('charge_categories.destroy')}}" method="POST" onsubmit="return confirm('Are you sure you want to delete this item?');">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <input type="hidden" name="id" value="{{$chargesCatogerys->id}}">
+                                                            <button type="submit" class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"><i class="ti ti-trash"></i></button>
+                                                        </form>
                                                     </td>
                                                 </tr>
                                                  @endforeach
