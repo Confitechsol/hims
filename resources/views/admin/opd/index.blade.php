@@ -16,13 +16,13 @@
                 <div class="text-end d-flex">
                     <ul class="nav nav-tabs">
                         <li class="nav-item" style="border-bottom:0">
-                            <a class="nav-link mb-0 {{ @$isDoctorTab ? 'active' : '' }} text-white"
+                            <a class="nav-link mb-0 {{ @$isOpdTab ? 'active' : '' }} text-white"
                                 href="{{ route('opd', array_merge(request()->except('tab'), ['tab' => 'opd'])) }}">
                                 OPD View
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link mb-0 {{ @!$isDoctorTab ? 'active' : '' }} text-white"
+                            <a class="nav-link mb-0 {{ @!$isOpdTab ? 'active' : '' }} text-white"
                                 href="{{ route('opd', array_merge(request()->except('tab'), ['tab' => 'patient'])) }}">
                                 Patient View
                             </a>
@@ -68,6 +68,9 @@
                                                 <label class="input-group-text" for="inputGroupSelect01">Consultant</label>
                                                 <select class="form-select" id="inputGroupSelect01">
                                                     <option selected>Select</option>
+                                                    @foreach ($doctors as $doctor)
+                                                        <option value="{{ $doctor->id }}">{{ $doctor->name }}</option>
+                                                    @endforeach
 
                                                 </select>
                                             </div>
@@ -82,93 +85,162 @@
 
                                     <div class="text-end d-flex">
                                         <button class="btn btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#createModal">Add Patient</button>
+                                            data-bs-target="#createOpdModal">Appoint Patient</button>
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>OPD No.</th>
+                                                <th>Patient Name</th>
+                                                <th>Consultant</th>
+                                                <th>Reference</th>
+                                                <th>Symptoms</th>
+                                                <th>Admission Date</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($opd as $opdDetails)
+                                                <tr>
+                                                    <td>{{ $loop->iteration }}</td>
+                                                    <td><a href="#"
+                                                            class="text-primary">{{ $opdDetails->opd_no }}</a>
+                                                    </td>
+                                                    <td>{{ $opdDetails->patient->patient_name }}</td>
+                                                    <td>{{ $opdDetails->doctor->name ?? '-' }}</td>
+                                                    <td>{{ $opdDetails->reference ?? '-' }}</td>
+                                                    <td>
+                                                        @if (isset($opdSymptoms[$opdDetails->opd_no]) && count($opdSymptoms[$opdDetails->opd_no]) > 0)
+                                                            @foreach ($opdSymptoms[$opdDetails->opd_no] as $symptom)
+                                                                <span
+                                                                    class="badge bg-primary me-1">{{ $symptom->symptoms_title }}</span>
+                                                            @endforeach
+                                                        @else
+                                                            -
+                                                        @endif
+                                                    </td>
+                                                    <td>{{ \Carbon\Carbon::parse($opdDetails->created_at)->format('d-M-Y') }}
+                                                    </td>
+                                                    <td>
+                                                        <a href="javascript: void(0);"
+                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                            data-bs-toggle="modal" data-bs-target="#edit_opd"
+                                                            data-id="{{ $opdDetails->id }}">
+                                                            <i class="ti ti-pencil"></i></a>
+                                                        <form action="" class="d-inline"
+                                                            id="delete-form-{{ $opdDetails->id }}" method="POST">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <a href="javascript: void(0);"
+                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill delete-button"
+                                                                data-opd-id="{{ $opdDetails->id }}"
+                                                                data-form-id="delete-form-{{ $opdDetails->id }}">
+                                                                <i class="ti ti-trash"></i></a>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="offcanvas offcanvas-top" style="height: fit-content;" tabindex="-1"
+                                id="offcanvasTop" aria-labelledby="offcanvasTopLabel">
+                                <div class="offcanvas-header justify-content-center">
+                                    <h4 class="offcanvas-title m-auto font-weight-bold" id="offcanvasTopLabel">FILTERS</h4>
+                                </div>
+                                <div class="offcanvas-body">
+                                    <div class="filter-section pb-3 rounded">
+                                        <form action="{{ request()->routeIs('opd') ? route('opd') : route('opd') }}"
+                                            method="GET" class="text-center" id="searchForm">
+                                            <div
+                                                class="d-flex flex-column flex-md-row gap-2 align-items-center justify-content-center">
+                                                <!-- Filter Type Selector -->
+                                                <div class="align-items-center">
+                                                    <label for="filterType" class="form-label font-weight-bold">Select
+                                                        Filter
+                                                        Type</label>
+                                                    <select id="filterType" class="form-select" name="filter_type"
+                                                        style="width: 250px;">
+                                                        <option value="dateRange"
+                                                            {{ request('filter_type') == 'dateRange' ? 'selected' : '' }}>
+                                                            Date
+                                                            Range
+                                                        </option>
+                                                        <option value="monthly"
+                                                            {{ request('filter_type') == 'monthly' ? 'selected' : '' }}>
+                                                            Monthly</option>
+                                                        <option value="weekly"
+                                                            {{ request('filter_type') == 'weekly' ? 'selected' : '' }}>
+                                                            Weekly</option>
+                                                    </select>
+                                                </div>
+
+                                                <!-- Date Range Filter -->
+                                                <div id="dateRangeFilter">
+                                                    <div
+                                                        class="d-flex flex-column flex-md-row gap-2 align-items-center filter-group">
+                                                        <div>
+                                                            <label class="form-label">From</label>
+                                                            <input type="date" class="form-control" name="fromDate"
+                                                                value="{{ request('fromDate') }}" />
+                                                        </div>
+                                                        <div>
+                                                            <label class="form-label">To</label>
+                                                            <input type="date" class="form-control" name="toDate"
+                                                                value="{{ request('toDate') }}" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- Monthly Filter -->
+                                                <div id="monthlyFilter" class="d-none">
+                                                    <div class="filter-group">
+                                                        <label class="form-label text-nowrap">Select Month</label>
+                                                        <input type="month" class="form-control" name="monthFilter"
+                                                            value="{{ request('monthFilter') }}" />
+                                                    </div>
+                                                </div>
+                                                <!-- Weekly Filter -->
+                                                <div id="weeklyFilter" class="d-none">
+                                                    <div class="filter-group">
+                                                        <label class="form-label text-nowrap">Select Week</label>
+                                                        <input type="week" class="form-control" name="weekFilter"
+                                                            value="{{ request('weekFilter') }}" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 d-flex gap-2 mx-auto mt-3">
+                                                <button type="submit" class="btn cmn_btn btn-primary w-100">
+                                                    <i class="fas fa-filter me-1"></i> Filter
+                                                </button>
+                                                <a href="{{ request()->routeIs('opd') ? route('opd') : route('opd') }}"
+                                                    class="btn btn-outline-dark w-100">
+                                                    Reset
+                                                </a>
+                                            </div>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="offcanvas offcanvas-top" style="height: fit-content;" tabindex="-1" id="offcanvasTop"
-                            aria-labelledby="offcanvasTopLabel">
-                            <div class="offcanvas-header justify-content-center">
-                                <h4 class="offcanvas-title m-auto font-weight-bold" id="offcanvasTopLabel">FILTERS</h4>
-                            </div>
-                            <div class="offcanvas-body">
-                                <div class="filter-section pb-3 rounded">
-                                    <form action="{{ request()->routeIs('opd') ? route('opd') : route('opd') }}"
-                                        method="GET" class="text-center" id="searchForm">
-                                        <div
-                                            class="d-flex flex-column flex-md-row gap-2 align-items-center justify-content-center">
-                                            <!-- Filter Type Selector -->
-                                            <div class="align-items-center">
-                                                <label for="filterType" class="form-label font-weight-bold">Select Filter
-                                                    Type</label>
-                                                <select id="filterType" class="form-select" name="filter_type" style="width: 250px;">
-                                                    <option value="dateRange"
-                                                        {{ request('filter_type') == 'dateRange' ? 'selected' : '' }}>Date
-                                                        Range
-                                                    </option>
-                                                    <option value="monthly"
-                                                        {{ request('filter_type') == 'monthly' ? 'selected' : '' }}>
-                                                        Monthly</option>
-                                                    <option value="weekly"
-                                                        {{ request('filter_type') == 'weekly' ? 'selected' : '' }}>
-                                                        Weekly</option>
-                                                </select>
-                                            </div>
-
-                                            <!-- Date Range Filter -->
-                                            <div id="dateRangeFilter">
-                                                <div
-                                                    class="d-flex flex-column flex-md-row gap-2 align-items-center filter-group">
-                                                    <div>
-                                                        <label class="form-label">From</label>
-                                                        <input type="date" class="form-control" name="fromDate"
-                                                            value="{{ request('fromDate') }}" />
-                                                    </div>
-                                                    <div>
-                                                        <label class="form-label">To</label>
-                                                        <input type="date" class="form-control" name="toDate"
-                                                            value="{{ request('toDate') }}" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <!-- Monthly Filter -->
-                                            <div id="monthlyFilter" class="d-none">
-                                                <div class="filter-group">
-                                                    <label class="form-label text-nowrap">Select Month</label>
-                                                    <input type="month" class="form-control" name="monthFilter"
-                                                        value="{{ request('monthFilter') }}" />
-                                                </div>
-                                            </div>
-                                            <!-- Weekly Filter -->
-                                            <div id="weeklyFilter" class="d-none">
-                                                <div class="filter-group">
-                                                    <label class="form-label text-nowrap">Select Week</label>
-                                                    <input type="week" class="form-control" name="weekFilter"
-                                                        value="{{ request('weekFilter') }}" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3 d-flex gap-2 mx-auto mt-3">
-                                            <button type="submit" class="btn cmn_btn btn-primary w-100">
-                                                <i class="fas fa-filter me-1"></i> Filter
-                                            </button>
-                                            <a href="{{ request()->routeIs('opd') ? route('opd') : route('opd') }}"
-                                                class="btn btn-outline-dark w-100">
-                                                Reset
-                                            </a>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
                     </div>
+
+
                 </div>
             </div>
         </div>
     </div>
+
+    {{-- create OPD modal --}}
+    @include('components.modals.opd-create-modal')
+
     {{-- filters --}}
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const filterTypeSelect = document.getElementById('filterType');

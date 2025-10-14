@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,21 +13,42 @@ class OpdDetail extends Model
     protected $fillable = [
         'hospital_id',
         'branch_id',
-        'case_reference_id',
+        'opd_no',
         'patient_id',
-        'generated_by',
-        'is_ipd_moved',
-        'discharged',
+        'appointment_date',
+        'case_type',
+        'apply_tpa',
+        'casualty',
+        'reference',
+        'doctor_id',
+        'charge_category',
+        'charge',
+        'standard_charge',
+        'applied_charge',
+        'discount',
+        'tax',
+        'amount',
+        'payment_mode',
+        'paid_amount',
+        'live_consultation',
+        'symptoms_type',
+        'symptoms_title',
+        'allergies',
+        'symptoms_description',
+        'note',
+        'status',
+
+        'created_by',
     ];
 
     /**
      * Relationships
      */
 
-    public function caseReference()
-    {
-        return $this->belongsTo(CaseReference::class, 'case_reference_id');
-    }
+    // public function caseReference()
+    // {
+    //     return $this->belongsTo(CaseReference::class, 'case_reference_id');
+    // }
 
     public function patient()
     {
@@ -39,4 +59,22 @@ class OpdDetail extends Model
     {
         return $this->belongsTo(User::class, 'generated_by');
     }
+
+    public function doctor()
+    {
+        return $this->belongsTo(Doctor::class, 'doctor_id');
+    }
+    public function chargeCategory()
+    {
+        return $this->belongsTo(ChargeCategory::class, 'charge_category');
+    }
+    public function charge()
+    {
+        return $this->belongsTo(Charge::class, 'charges');
+    }
+
+    // public function symptom()
+    // {
+    //     return $this->belongsTo(Symptom::class, 'symptom_id');
+    // }
 }
