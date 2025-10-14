@@ -7,11 +7,27 @@ use App\Models\Organisation;
 
 class TpamanagmentController extends Controller
 {
-    function index() {
+    function index(Request $request) {
+    $query = Organisation::query();
+    if ($request->has("search")) {
+        $search = $request->input('search');
+        $query->where(function ($q) use ($search) {
+        $q->where('organisation_name', 'like', "%{$search}%")
+          ->orWhere('code', 'like', "%{$search}%")
+          ->orWhere('contact_no', 'like', "%{$search}%")
+          ->orWhere('contact_person_name', 'like', "%{$search}%")
+          ->orWhere('contact_person_phone', 'like', "%{$search}%");
+    });
+    $data = $query->get();
+    return array(
+        "status"=>200,
+        "result"=>$data,
+        "total"=>count($data)
+    );
+    }
+    $organisations = $query->get();
 
-        $organisations = Organisation::all();
-        return view('admin.tpa.tpamanagement', compact('organisations'));
-        // return view('admin.tpa.tpamanagement', compact('organisations'));
+    return view('admin.tpa.tpamanagement', compact('organisations'));
         
     }
     
