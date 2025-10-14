@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -51,12 +50,12 @@ class DischargeCard extends Model
 
     public function opdDetails()
     {
-        return $this->belongsTo(OpdDetails::class, 'opd_details_id');
+        return $this->belongsTo(OpdDetail::class, 'opd_details_id');
     }
 
     public function ipdDetails()
     {
-        return $this->belongsTo(IpdDetails::class, 'ipd_details_id');
+        return $this->belongsTo(IpdDetail::class, 'ipd_details_id');
     }
 
     public function dischargedBy()

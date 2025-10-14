@@ -284,11 +284,14 @@
         search_term  = input.value;
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
-        callApi(search_term);
+            if(search_term){
+                callApi(search_term);
+            }
+       
     }, 500);
     }
    function callApi(search_term){        
-        fetch('http://localhost/hims/public/beds?search='+search_term)
+        fetch('{{route('bed')}}?search='+search_term)
         .then((res)=>res.json())
         .then((data)=>{
             const table = document.getElementById("bed-table");
