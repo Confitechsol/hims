@@ -470,3 +470,7 @@ Route::prefix('/inventory')->group(function () {
     Route::get('/edit', [InventoriesController::class, 'store'])->name('itemstock.edit');
     Route::get('/destroy', [InventoriesController::class, 'destroy'])->name('itemstock.destroy');
 });
+
+Route::get('/opd', function () {
+    return view('admin.billing.opd');
+})->name('opd');
