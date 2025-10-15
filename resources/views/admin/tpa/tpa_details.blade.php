@@ -109,6 +109,27 @@
                     </div>
 
                     <div class="card-body" id="charge_type_form">
+                        @if ($errors->any())
+                            @foreach ($errors->all() as $error)
+                                <div class="alert alert-danger">
+                                    <ul class="mb-0">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endforeach
+                        @endif
+                        @if(session('error'))
+                            <div class="alert alert-danger">
+                                {{session('error')}}
+                            </div>
+                        @endif
+                        @if(session('success'))
+                            <div class="alert alert-success">
+                                {{session('success')}}
+                            </div>
+                        @endif
                         <form action="" method="post">
                             @csrf
                             <div class="d-flex gap-3 align-items-center">
@@ -120,7 +141,7 @@
                                     <select class="form-select" id="charge-type" name="charge_type" style="width: 100%;">
                                         <option value="">Select</option>
                                         @foreach($chargetypes as $chargetype)
-                                            <option value="{{ $chargetype->id }}">{{ $chargetype->charge_type }}</option>
+                                            <option value="{{ $chargetype->id }}" {{ session('charge_type') == $chargetype->id ? 'selected' : '' }}>{{ $chargetype->charge_type }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -146,19 +167,24 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @if(isset($organisationCharge) && $organisationCharge->count() > 0)
+                                @foreach($organisationCharge as $item)
                                 <tr>
                                     <td>
-                                        <h6 class="fs-14 mb-1">opd</h6>
+                                        <h6 class="fs-14 mb-1">{{$item->charge['category']['chargeType']['charge_type']}}</h6>
                                     </td>
-                                    <td>qw</td>
-                                    <td>qw</td>
-                                    <td>qw</td>
-                                    <td>100</td>
-                                    <td>2323</td>
+                                    <td>{{$item->charge['category']['name']}}</td>
+                                    <td>{{$item->charge['name']}}</td>
+                                    <td>{{$item->charge['description']}}</td>
+                                    <td>{{$item->charge['standard_charge']}}</td>
+                                    <td>{{$item->org_charge}}</td>
                                     <td>
                                         <div class="d-flex">
                                             <a href="javascript: void(0);"
-                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
+                                                data-id="{{ $item->id }}"
+                                                data-org_charge="{{ $item->org_charge }}"
+                                                >
                                                 <i class="ti ti-pencil" data-bs-toggle="tooltip" title="Show"></i></a>
                                             <a href="javascript: void(0);"
                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
@@ -166,6 +192,8 @@
                                         </div>
                                     </td>
                                 </tr>
+                                @endforeach
+                                @endif
                             </tbody>
                         </table>
                     </div>
@@ -175,7 +203,11 @@
         </div>
         <!-- row end -->
     </div>
-
+    <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit TPA Charge"
+    action="" :fields="[
+        ['name' => 'id', 'type' => 'hidden', 'required' => true],
+        ['name' => 'org_charge', 'label' => 'TPA Charge (INR)', 'type' => 'text', 'required' => true,'size'=>'12']
+    ]" :columns="1" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/js/select2.min.js"></script>
