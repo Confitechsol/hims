@@ -164,12 +164,12 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="edit-name" class="form-label">Bed Name</label>
-                        <input type="text" class="form-control" id="edit-name" name="name" required>
+                        <input type="text" class="form-control"  name="name" required>
                     </div>
 
                     <div class="mb-3">
                         <label for="edit-bed-type" class="form-label">Bed Type</label>
-                        <select class="form-select" id="edit-bed-type" name="bed_type_id" required>
+                        <select class="form-select" name="bed_type_id" required>
                             <option value="">Select Type</option>
                             @foreach($bedTypes as $type)
                                 <option value="{{ $type->id }}">{{ $type->name }}</option>
@@ -179,7 +179,7 @@
 
                     <div class="mb-3">
                         <label for="edit-bed-group" class="form-label">Bed Group</label>
-                        <select class="form-select" id="edit-bed-group" name="bed_group_id" required>
+                        <select class="form-select" name="bed_group_id" required>
                             <option value="">Select Group</option>
                             @foreach($bedGroups as $group)
                                 <option value="{{ $group->id }}">{{ $group->name }}</option>
@@ -188,7 +188,7 @@
                     </div>
 
                     <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" id="edit-is-available" name="is_active"
+                        <input class="form-check-input" type="checkbox" name="is_active"
                             value="0">
                         <label class="form-check-label" for="edit-is-available">
                             Not available for use
@@ -408,9 +408,9 @@ createAjaxTable({
                     data-bs-target="#editModal"
                     data-id="${bed.id}"
                     data-name="${bed.name}"
-                    data-bed_type_id="${bed.bed_type?.id ?? ''}"
-                    data-bed_group_id="${bed.bed_group?.id ?? ''}"
-                    data-is_available="${bed.is_active}">
+                    data-bed_type_id="${bed?.bed_type_id ?? ''}"
+                    data-bed_group_id="${bed?.bed_group_id ?? ''}"
+                    data-is_available="${bed?.is_active}">
                     Edit
                 </button>
                 <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
@@ -473,10 +473,9 @@ createAjaxTable({
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const editModal = document.getElementById('c');
+        const editModal = document.getElementById('editModal');
         editModal.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
-            console.log("modal shown");
             document.getElementById('edit-id').value = button.getAttribute('data-id');
             document.getElementById('edit-name').value = button.getAttribute('data-name');
             document.getElementById('edit-bed-type').value = button.getAttribute('data-bed_type_id');

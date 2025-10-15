@@ -261,9 +261,9 @@ Route::middleware(['admin'])->group(function () {
     Route::put('/tpamanagement/update', [TpamanagmentController::class, 'update'])->name('tpamanagement.update');
     Route::delete('/tpamanagement/destroy', [TpamanagmentController::class, 'destroy'])->name('tpamanagement.destroy');
 
-    Route::get('/tpa_details', function () {
-    return view('admin.tpa.tpa_details');
-    })->name('tpa_details');
+    Route::get('/tpa_details/{id?}', [TpamanagmentController::class, 'detailsshow'])->name('tpa_details.show');
+    Route::post('/tpa_details/{id?}', [TpamanagmentController::class, 'detailsshow'])->name('tpa_details.chragetype');
+
 });
 
 // Route::get('/medicine-group', function () {
