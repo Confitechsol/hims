@@ -8,8 +8,21 @@ use Illuminate\Http\Request;
 
 class MedicineSupplierController extends Controller
 {
-   public function index(){
-    $medicineSuppliers = MedicineSupplier::get();
+   public function index(Request $request){
+    $medicineSuppliers = MedicineSupplier::query();
+    $perPage = intval($request->input('perPage', 5));
+        if ($perPage <= 0) {
+           $perPage = 5;
+        }
+        if($request->has('search')){
+            $search_term = $request->search;
+            $medicineSuppliers->where(function ($query) use ($search_term) {
+                $query->where('supplier', 'like', "%{$search_term}%");
+            });
+            $medicineSuppliers = $medicineSuppliers->paginate($perPage);
+            return array("result"=>$medicineSuppliers);
+        }
+        $medicineSuppliers = $medicineSuppliers->paginate($perPage);
     return view('admin.setup.supplier',compact('medicineSuppliers'));
    }
    public function store(Request $request){
