@@ -260,6 +260,10 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/tpamanagement/store', [TpamanagmentController::class, 'store'])->name('tpamanagement.store');
     Route::put('/tpamanagement/update', [TpamanagmentController::class, 'update'])->name('tpamanagement.update');
     Route::delete('/tpamanagement/destroy', [TpamanagmentController::class, 'destroy'])->name('tpamanagement.destroy');
+
+    Route::get('/tpa_details', function () {
+    return view('admin.tpa.tpa_details');
+    })->name('tpa_details');
 });
 
 // Route::get('/medicine-group', function () {
@@ -432,9 +436,7 @@ Route::get('/getCharges/{id}', [OpdController::class, 'getCharges'])->name('getC
 Route::get('/getSymptomsTypes', [OpdController::class, 'getSymptomsType'])->name('getSymptomsTypes');
 Route::post('/getSymptoms', [OpdController::class, 'getSymptoms'])->name('getSymptoms');
 
-Route::get('/tpa_details', function () {
-    return view('admin.tpa.tpa_details');
-})->name('tpa_details');
+
 Route::get('/billing', function () {
     return view('admin.billing.billing');
 })->name('billing');
