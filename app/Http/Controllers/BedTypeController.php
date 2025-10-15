@@ -6,9 +6,24 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 class BedTypeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $bedTypes = BedType::all();
+        $perPage = intval($request->input('perPage', 5));
+        if ($perPage <= 0) {
+            $perPage = 5;
+        }
+        $bedTypeQuery = BedType::query();
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $bedTypeQuery->where(function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%");
+            });
+            $bedTypes = $bedTypeQuery->paginate($perPage);
+            return response()->json([
+                'result' => $bedTypes
+            ]);
+        }
+        $bedTypes = $bedTypeQuery->paginate($perPage);
         return view('admin.bed-type.index', compact('bedTypes'));
     }
 

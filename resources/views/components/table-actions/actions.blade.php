@@ -15,7 +15,8 @@
     <span class="input-icon-addon">
         <i class="ti ti-search"></i>
     </span>
-    <input type="text" class="form-control shadow-sm" placeholder="Search" id="search-input-{{$id}}"
-        onkeyup="searchTable(this, '{{$id}}')">
+    <input type="text" class="form-control shadow-sm" placeholder="Search" id="search-input"
+        {{-- onkeyup="searchTable(this, '{{$id}}')" --}}
+        >
 
 </div>

@@ -44,7 +44,7 @@
                     <!-- Search Input Box -->
                     <div class="mb-3">
                         <input type="text" id="search-input" class="form-control" placeholder="Search for beds..."
-                            onkeyup="searchTable()">
+                        >
                     </div>
                     @if(session('success'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -106,6 +106,42 @@
                             </tbody>
                         </table>
                     </div>
+                    {{-- Pagination Links --}}
+                    <div class="mt-3" id="pagination-wrapper">
+                        @php
+                            $currentPage = $beds->currentPage();
+                            $lastPage = $beds->lastPage();
+                        @endphp
+                    
+                        {{-- Previous --}}
+                        @if ($beds->onFirstPage())
+                            <button class="btn btn-outline-secondary btn-sm me-1" disabled>« Prev</button>
+                        @else
+                            <a href="{{ $beds->previousPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm me-1">
+                                « Prev
+                            </a>
+                        @endif
+                    
+                        {{-- Page numbers --}}
+                        @for ($page = 1; $page <= $lastPage; $page++)
+                            @if ($page == $currentPage)
+                                <button class="btn btn-primary btn-sm me-1">{{ $page }}</button>
+                            @else
+                                <a href="{{ $beds->url($page) }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm me-1">
+                                    {{ $page }}
+                                </a>
+                            @endif
+                        @endfor
+                    
+                        {{-- Next --}}
+                        @if ($beds->hasMorePages())
+                            <a href="{{ $beds->nextPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm">
+                                Next »
+                            </a>
+                        @else
+                            <button class="btn btn-outline-secondary btn-sm" disabled>Next »</button>
+                        @endif
+                    </div>                                        
                     <!--  End Table -->
                     <div class="mt-3">
                         <strong>Total Beds: <span id="bed-count">{{ count($beds) }}</span></strong>
@@ -269,74 +305,125 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
 
 <script>
-    const options = {
-        valueNames: ['name', 'type', 'group', 'floor', 'status']
-    };
-
-    const bedTable = new List('bed-table-wrapper', options);
-</script>
-
-<script>
+function createAjaxTable({
+    apiUrl,
+    tableSelector,
+    paginationSelector,
+    searchInputSelector,
+    perPageSelector,
+    rowRenderer
+}) {
     let debounceTimer;
-    function searchTable() {
-        var input,search_term;
-        input = document.getElementById("search-input");
-        search_term  = input.value;
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-            if(search_term){
-                callApi(search_term);
-            }
-       
-    }, 500);
-    }
-   function callApi(search_term){        
-        fetch('{{route('bed')}}?search='+search_term)
-        .then((res)=>res.json())
-        .then((data)=>{
-            const table = document.getElementById("bed-table");
-            const rows = table.getElementsByTagName("tr");
-            while (rows.length > 1) {
-                table.deleteRow(1);
-            }
-
-            // Populate the table with the new data
-            data.beds.forEach(bed => {
-                const row = table.insertRow();
-                
-                // Add the cells (assuming bed object has bed_name, bed_number, etc.)
-                row.insertCell(0).textContent = bed.name;
-                row.insertCell(1).textContent = bed.bed_type.name;
-                row.insertCell(2).textContent = bed.bed_group.name;
-                row.insertCell(3).innerHTML = bed.is_active != "noused" ? ' <i class="fa-solid fa-square-check ms-2"></i>' : 'N/A';
-                
-                const actionCell = row.insertCell(4);
-                actionCell.innerHTML = `
-                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
-                        data-bs-target="#editModal"
-                        data-id="${bed.id}"
-                        data-name="${bed.name}"
-                        data-bed_type_id="${bed.bed_type.id}"
-                        data-bed_group_id="${bed.bed_group.id}"
-                        data-is_available="${bed.is_active}">
-                        Edit
-                    </button>
-                    <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
-                        data-bs-target="#deleteModal"
-                        data-id="${bed.id}"
-                        data-name="${bed.name}">
-                        Delete
-                    </button>
-                `;
-                
-                // You can add other bed properties as necessary
-            });
-        })
-        .catch(error => {
-            console.error("Error fetching bed data:", error);
-            alert("Error fetching data. Please try again.");
+    const searchInput = document.querySelector(searchInputSelector);
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                callApi(1);
+            }, 500);
         });
     }
+
+    // Public call function (can be used by pagination too)
+    function callApi(page = 1) {
+        const searchTerm = searchInput?.value || '';
+        const perPage = document.querySelector(perPageSelector)?.value || 5;
+
+        const url = new URL(apiUrl, window.location.origin);
+        url.searchParams.set("search", searchTerm);
+        url.searchParams.set("page", page);
+        url.searchParams.set("perPage", perPage);
+
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                updateTable(data.result.data);        
+                updatePagination(data.result);
+            })
+            .catch(error => {
+                console.error("Error fetching table data:", error);
+                alert("Error fetching data. Please try again.");
+            });
+    }
+
+    function updateTable(items) {
+        const tableBody = document.querySelector(`${tableSelector} tbody`);
+        if (!tableBody) return;
+        tableBody.innerHTML = "";
+
+        items.forEach(item => {
+            const row = rowRenderer(item);
+            tableBody.appendChild(row);
+        });
+    }
+
+    function updatePagination(pagination) {
+        const wrapper = document.querySelector(paginationSelector);
+        if (!wrapper) return;
+        wrapper.innerHTML = "";
+
+        const currentPage = pagination.current_page;
+        const lastPage = pagination.last_page;
+
+        const prevBtn = createButton("« Prev", currentPage > 1, () => callApi(currentPage - 1));
+        wrapper.appendChild(prevBtn);
+
+        for (let page = 1; page <= lastPage; page++) {
+            const btn = createButton(page, true, () => callApi(page), page === currentPage);
+            wrapper.appendChild(btn);
+        }
+        const nextBtn = createButton("Next »", currentPage < lastPage, () => callApi(currentPage + 1));
+        wrapper.appendChild(nextBtn);
+    }
+
+    function createButton(label, enabled, onClick, isActive = false) {
+        const btn = document.createElement("button");
+        btn.textContent = label;
+        btn.className = `btn btn-sm me-1 ${isActive ? 'btn-primary' : 'btn-outline-secondary'}`;
+        btn.disabled = !enabled;
+        if (enabled) btn.onclick = onClick;
+        return btn;
+    }
+
+    // Expose callApi if needed externally
+    return {
+        refresh: callApi
+    };
+}
+createAjaxTable({
+    apiUrl: "{{ route('bed') }}",
+    tableSelector: "#bed-table",
+    paginationSelector: "#pagination-wrapper",
+    searchInputSelector: "#search-input",
+    perPageSelector: "#perPage",
+    rowRenderer: function (bed) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td class="name">${bed.name}</td>
+            <td class="type">${bed.bed_type?.name ?? 'N/A'}</td>
+            <td class="group">${bed.bed_group?.name ?? 'N/A'}</td>
+            <td class="status">${bed.is_active !== "noused" ? '<i class="fa-solid fa-square-check ms-2"></i>' : 'N/A'}</td>
+            <td>
+                <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#editModal"
+                    data-id="${bed.id}"
+                    data-name="${bed.name}"
+                    data-bed_type_id="${bed.bed_type?.id ?? ''}"
+                    data-bed_group_id="${bed.bed_group?.id ?? ''}"
+                    data-is_available="${bed.is_active}">
+                    Edit
+                </button>
+                <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                    data-bs-target="#deleteModal"
+                    data-id="${bed.id}"
+                    data-name="${bed.name}">
+                    Delete
+                </button>
+            </td>
+        `;
+        return row;
+    }
+});
     // Copy Table to Clipboard
     new ClipboardJS('#copy-btn');
 
@@ -386,10 +473,10 @@
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const editModal = document.getElementById('editModal');
+        const editModal = document.getElementById('c');
         editModal.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
-
+            console.log("modal shown");
             document.getElementById('edit-id').value = button.getAttribute('data-id');
             document.getElementById('edit-name').value = button.getAttribute('data-name');
             document.getElementById('edit-bed-type').value = button.getAttribute('data-bed_type_id');

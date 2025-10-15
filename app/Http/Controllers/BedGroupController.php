@@ -8,10 +8,23 @@ use App\Models\Floor;
 
 class BedGroupController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $bedGroups = BedGroup::all();
+        $bedGroups = BedGroup::query();
         $floors = Floor::all();
+        $perPage = intval($request->input('perPage', 5));
+        if ($perPage <= 0) {
+           $perPage = 5;
+        }
+        if($request->has('search')){
+            $search_term = $request->search;
+            $bedGroups->where(function ($query) use ($search_term) {
+                $query->where('name', 'like', "%{$search_term}%");
+            });
+            $bedGroups = $bedGroups->paginate($perPage);
+            return array("result"=>$bedGroups);
+        }
+        $bedGroups = $bedGroups->paginate($perPage);
         return view('admin.bed-group.index', compact('bedGroups', 'floors'));
     }
 

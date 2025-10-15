@@ -64,3 +64,88 @@ function searchTable(input, tableId) {
         tr[i].style.display = rowContainsSearchText ? "" : "none";
     }
 }
+function createAjaxTable({
+    apiUrl,
+    tableSelector,
+    paginationSelector,
+    searchInputSelector,
+    perPageSelector,
+    rowRenderer
+}) {
+    let debounceTimer;
+    const searchInput = document.querySelector(searchInputSelector);
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                callApi(1);
+            }, 500);
+        });
+    }
+
+    // Public call function (can be used by pagination too)
+    function callApi(page = 1) {
+        const searchTerm = searchInput?.value || '';
+        const perPage = document.querySelector(perPageSelector)?.value || 5;
+
+        const url = new URL(apiUrl, window.location.origin);
+        url.searchParams.set("search", searchTerm);
+        url.searchParams.set("page", page);
+        url.searchParams.set("perPage", perPage);
+
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                updateTable(data.result.data);        
+                updatePagination(data.result);
+            })
+            .catch(error => {
+                console.error("Error fetching table data:", error);
+                alert("Error fetching data. Please try again.");
+            });
+    }
+
+    function updateTable(items) {
+        const tableBody = document.querySelector(`${tableSelector} tbody`);
+        if (!tableBody) return;
+        tableBody.innerHTML = "";
+
+        items.forEach(item => {
+            const row = rowRenderer(item);
+            tableBody.appendChild(row);
+        });
+    }
+
+    function updatePagination(pagination) {
+        const wrapper = document.querySelector(paginationSelector);
+        if (!wrapper) return;
+        wrapper.innerHTML = "";
+
+        const currentPage = pagination.current_page;
+        const lastPage = pagination.last_page;
+
+        const prevBtn = createButton("« Prev", currentPage > 1, () => callApi(currentPage - 1));
+        wrapper.appendChild(prevBtn);
+
+        for (let page = 1; page <= lastPage; page++) {
+            const btn = createButton(page, true, () => callApi(page), page === currentPage);
+            wrapper.appendChild(btn);
+        }
+        const nextBtn = createButton("Next »", currentPage < lastPage, () => callApi(currentPage + 1));
+        wrapper.appendChild(nextBtn);
+    }
+
+    function createButton(label, enabled, onClick, isActive = false) {
+        const btn = document.createElement("button");
+        btn.textContent = label;
+        btn.className = `btn btn-sm me-1 ${isActive ? 'btn-primary' : 'btn-outline-secondary'}`;
+        btn.disabled = !enabled;
+        if (enabled) btn.onclick = onClick;
+        return btn;
+    }
+
+    // Expose callApi if needed externally
+    return {
+        refresh: callApi
+    };
+}
