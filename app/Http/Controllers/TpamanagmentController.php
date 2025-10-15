@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Organisation;
+use App\Models\ChargeTypeMaster;
+use Illuminate\Support\Facades\DB;
 
 class TpamanagmentController extends Controller
 {
@@ -86,6 +88,26 @@ class TpamanagmentController extends Controller
         $organisation->delete();
 
         return redirect()->route('tpamanagement')->with('success', 'TPA deleted successfully.');
+    }
+
+    function detailsshow($id=null, Request $request) {
+
+        if($id==null){
+            return redirect()->route('tpamanagement');
+        }
+        $chargetypes = ChargeTypeMaster::all();
+        $organisations = Organisation::findOrFail($id);
+        //return $organisations;
+        if($request->isMethod('post')){
+            $request->validate([
+                'charge_type' => 'required|exists:charge_type_master,id',
+            ]);
+            $charge_type = $request->input('charge_type');
+            
+            DB::select("select * from organisation_charge_type where organisation_id=$id and charge_type_id=$charge_type");
+            return $charge_type;
+        }
+        return  view('admin.tpa.tpa_details', compact('organisations','chargetypes'));
     }
 }
 

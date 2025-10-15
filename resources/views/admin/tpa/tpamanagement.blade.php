@@ -23,7 +23,7 @@
                                             </ul>
                                         </div>
                                     @endforeach
-                                    @endif
+                                @endif
                                     @if(session('error'))
                                         <div class="alert alert-danger">
                                             {{session('error')}}
@@ -85,7 +85,7 @@
                                                 <td>{{$item->contact_person_phone}}</td>
                                                 <td>
                                                     <div class="d-flex">
-                                                        <a href="javascript: void(0);"
+                                                        <a href="{{ route('tpa_details.show', $item->id) }}"
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
                                                             <i class="ti ti-menu" data-bs-toggle="tooltip"
                                                                 title="Show"></i></a>

@@ -48,46 +48,44 @@
                     <div class="tpa_details p-4">
                         <div class="row gy-4">
                             <div class="col-md-4">
-
                                 <div class="module_billing">
                                     <h5>TPA Name</h5>
-                                    <p class="gray_text">MedoLogi TPA Pvt. Ltd.
+                                    <p class="gray_text">{{ $organisations->organisation_name }}
                                     </p>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="module_billing">
                                     <h5> Code</h5>
-                                    <p class="gray_text">TPA005
+                                    <p class="gray_text">{{ $organisations->code }}
                                     </p>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="module_billing">
                                     <h5>Contact No</h5>
-                                    <p class="gray_text">+91-8034849273
+                                    <p class="gray_text">{{ $organisations->contact_no }}
                                     </p>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="module_billing">
                                     <h5>Address</h5>
-                                    <p class="gray_text">Flat No. 502, Green Heights Apartments, JP
-                                        Road, Andheri East
+                                    <p class="gray_text">{{ $organisations->address }}
                                     </p>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="module_billing">
                                     <h5>Contact Person Name</h5>
-                                    <p class="gray_text">Suresh Rao
+                                    <p class="gray_text">{{ $organisations->contact_person_name }}
                                     </p>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="module_billing">
                                     <h5>Contact Person Phone</h5>
-                                    <p class="gray_text">+91-7982038428
+                                    <p class="gray_text">{{ $organisations->contact_person_phone }}
                                     </p>
                                 </div>
                             </div>
@@ -111,20 +109,23 @@
                     </div>
 
                     <div class="card-body" id="charge_type_form">
-                        <form action="">
+                        <form action="" method="post">
+                            @csrf
                             <div class="d-flex gap-3 align-items-center">
                                 <div class="col-md-1">
                                     <label for="case_id" class="form-label">Charge Type<span
                                             class="text-danger">*</span></label>
                                 </div>
                                 <div class="col-md-4">
-                                    <select class="form-select" id="charge-type" style="width: 100%;">
+                                    <select class="form-select" id="charge-type" name="charge_type" style="width: 100%;">
                                         <option value="">Select</option>
-                                        <option value="1">OPD</option>
+                                        @foreach($chargetypes as $chargetype)
+                                            <option value="{{ $chargetype->id }}">{{ $chargetype->charge_type }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <button type="button" onclick="search()" class="btn btn-primary btn-sm">Search</button>
+                                    <button type="submit" class="btn btn-primary btn-sm">Search</button>
                                 </div>
                             </div>
                         </form>
@@ -147,13 +148,13 @@
                             <tbody>
                                 <tr>
                                     <td>
-                                        <h6 class="fs-14 mb-1"></h6>
+                                        <h6 class="fs-14 mb-1">opd</h6>
                                     </td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                    <td>qw</td>
+                                    <td>qw</td>
+                                    <td>qw</td>
+                                    <td>100</td>
+                                    <td>2323</td>
                                     <td>
                                         <div class="d-flex">
                                             <a href="javascript: void(0);"
