@@ -21,8 +21,8 @@ class OpdDetail extends Model
         'casualty',
         'reference',
         'doctor_id',
-        'charge_category',
-        'charge',
+        'charge_category_id',
+        'charge_id',
         'standard_charge',
         'applied_charge',
         'discount',
@@ -30,6 +30,7 @@ class OpdDetail extends Model
         'amount',
         'payment_mode',
         'paid_amount',
+        'payment_date',
         'live_consultation',
         'symptoms_type',
         'symptoms_title',
@@ -66,11 +67,11 @@ class OpdDetail extends Model
     }
     public function chargeCategory()
     {
-        return $this->belongsTo(ChargeCategory::class, 'charge_category');
+        return $this->belongsTo(ChargeCategory::class, 'charge_category_id');
     }
     public function charge()
     {
-        return $this->belongsTo(Charge::class, 'charges');
+        return $this->belongsTo(Charge::class, 'charge_id');
     }
 
     // public function symptom()

@@ -125,9 +125,9 @@
                                                     <td>{{ \Carbon\Carbon::parse($opdDetails->created_at)->format('d-M-Y') }}
                                                     </td>
                                                     <td>
-                                                        <a href="javascript: void(0);"
+
+                                                        <a href="{{ route('opd.edit', [$opdDetails->id]) }}"
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
-                                                            data-bs-toggle="modal" data-bs-target="#edit_opd"
                                                             data-id="{{ $opdDetails->id }}">
                                                             <i class="ti ti-pencil"></i></a>
                                                         <form action="" class="d-inline"
@@ -294,4 +294,125 @@
             });
         });
     </script>
+
+
+    {{-- <script>
+        // const editButton = document.querySelector('.edit-opd')
+        // console.log(editButton);
+
+        function openEditModal() {
+            const editOpdModal = document.getElementById('editOpdModal');
+            console.log(editOpdModal);
+
+            const symptomTypeSelect = document.getElementById('symptoms_type');
+            const symptomTitleSelect = document.getElementById('symptoms_title');
+
+            let selectedTypeIds = [];
+            let preselectedTitleIds = [];
+
+            // 🟢 When the modal is about to open
+            editOpdModal.addEventListener('show.bs.modal', async function(event) {
+                const button = event.relatedTarget;
+                const opdId = button.getAttribute('data-id');
+
+                // Clear previous options
+                symptomTypeSelect.innerHTML = '<option value="">Loading...</option>';
+                symptomTitleSelect.innerHTML =
+                    '<option value="">Select symptom types first...</option>';
+
+                try {
+                    const baseUrl = "{{ route('opd.edit', ['id' => 'ID']) }}";
+                    const finalUrl = baseUrl.replace('ID', opdId);
+                    const response = await fetch(finalUrl);
+                    const data = await response.json();
+
+                    // Extract preselected values
+                    const opd = data.opd;
+                    const symptoms = data.symptoms;
+                    const allTypes = data.symptomTypes;
+
+                    selectedTypeIds = opd.symptoms_type ? opd.symptoms_type.split(',').map(Number) : [];
+                    preselectedTitleIds = opd.symptoms_title ? opd.symptoms_title.split(',').map(
+                        Number) : [];
+
+                    console.log(selectedTypeIds);
+
+                    // 🟢 Populate Symptom Types dropdown
+                    symptomTypeSelect.innerHTML = '';
+                    allTypes.forEach(type => {
+                        const option = document.createElement('option');
+                        option.value = type.id;
+                        option.textContent = type.name;
+                        if (selectedTypeIds.includes(type.id)) option.selected = true;
+                        symptomTypeSelect.appendChild(option);
+                    });
+
+                    // 🟢 Load and populate symptom titles for selected types
+                    await loadSymptomsByTypes(selectedTypeIds);
+
+                    // 🟢 Set preselected titles
+                    for (const option of symptomTitleSelect.options) {
+                        if (preselectedTitleIds.includes(parseInt(option.value))) {
+                            option.selected = true;
+                        }
+                    }
+
+                } catch (error) {
+                    console.error("Error fetching OPD details:", error);
+                }
+            });
+
+            // 🟢 When symptom types change
+            symptomTypeSelect.addEventListener('change', async function() {
+                const selected = Array.from(this.selectedOptions).map(opt => parseInt(opt.value));
+                selectedTypeIds = selected;
+                await loadSymptomsByTypes(selectedTypeIds);
+            });
+
+            // 🟢 Function to fetch and update symptoms based on selected types
+            async function loadSymptomsByTypes(typeIds) {
+                if (!typeIds.length) {
+                    symptomTitleSelect.innerHTML = '<option value="">Select symptom types first...</option>';
+                    return;
+                }
+
+                try {
+                    const response = await fetch("{{ route('getSymptoms') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({
+                            typeIds.join(',')
+                        })
+                    });
+                    const data = await response.json();
+
+                    symptomTitleSelect.innerHTML = '';
+                    if (data.length === 0) {
+                        symptomTitleSelect.innerHTML = '<option value="">No symptoms found</option>';
+                        return;
+                    }
+
+                    data.forEach(symptom => {
+                        const option = document.createElement('option');
+                        option.value = symptom.id;
+                        option.textContent = symptom.name;
+                        if (preselectedTitleIds.includes(symptom.id)) option.selected = true;
+                        symptomTitleSelect.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error("Error fetching symptoms:", error);
+                }
+            }
+
+            // 🧹 Fix focus warning when modal closes
+            editOpdModal.addEventListener('hide.bs.modal', () => {
+                if (document.activeElement && editOpdModal.contains(document.activeElement)) {
+                    document.activeElement.blur();
+                }
+            });
+        }
+    </script> --}}
 @endsection

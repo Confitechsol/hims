@@ -635,7 +635,7 @@
 <div class="modal fade" id="createOpdModal" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
-            <form action="{{ route('opd.store') }}" method="POST">
+            <form action="{{ route('opd.store') }}" id="opdForm" method="POST">
                 @csrf
                 <!-- Modal Header -->
                 <div class="modal-header align-items-start">
@@ -889,7 +889,14 @@
                                 <input type="number" class="form-control" name="paid_amount" id="paid_amount"
                                     placeholder="0.00">
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-6">
+                                <label for="payment_date" class="form-label">
+                                    Payment Date <span class="required">*</span>
+                                </label>
+                                <input type="date" name="payment_date" id="payment_date" class="form-control"
+                                    required>
+                            </div>
+                            <div class="col-md-6">
                                 <label class="form-label">Live Consultation</label>
                                 <select class="form-select" name="live_consultation">
                                     <option value="No" selected>No</option>
@@ -1736,7 +1743,6 @@
                 .filter(opt => opt.style.display !== 'none');
 
             visibleOptions.forEach(opt => {
-                console.log(!this.selectedValues.includes(opt.dataset.value));
 
                 if (!this.selectedValues.includes(Number(opt.dataset.value))) {
                     this.selectedValues.push(Number(opt.dataset.value));
@@ -1783,24 +1789,7 @@
             });
 
             this.allOptions = options;
-            console.log(this.allOptions);
 
-            this.renderOptions();
-        }
-
-        setTitleOptions(options) {
-            this.selectElement.innerHTML = '';
-
-            options.forEach(opt => {
-                console.log(opt);
-
-                const option = document.createElement('option');
-                option.value = opt.id;
-                option.innerHTML = opt.symptoms_title;
-                this.selectElement.appendChild(option);
-            });
-
-            this.allOptions = options;
             this.renderOptions();
         }
 

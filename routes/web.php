@@ -425,6 +425,8 @@ Route::prefix('/appointment-priority')->group(function () {
 
 Route::get('/opd', [OpdController::class, 'index'])->name('opd');
 Route::post('/opd/store', [OpdController::class, 'store'])->name('opd.store');
+Route::get('/opd/edit/{id}', [OpdController::class, 'edit'])->name('opd.edit');
+Route::put('/opd/update/{id}', [OpdController::class, 'update'])->name('opd.update');
 Route::get('/getOrganizations', [PatientController::class, 'organizations'])->name('getOrganizations');
 Route::get('/getDoctors', [OpdController::class, 'getDoctors'])->name('getDoctors');
 Route::get('/getChargeCategories', [OpdController::class, 'getChargeCategories'])->name('getChargeCategories');

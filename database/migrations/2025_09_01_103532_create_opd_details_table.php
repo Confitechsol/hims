@@ -26,6 +26,7 @@ return new class extends Migration
 
             // 🔹 Appointment & Case Details
             $table->date('appointment_date');
+            $table->date('payment_date')->nullable();
             $table->string('case_type');
             $table->string('casualty');
             $table->string('reference')->nullable();

@@ -57,6 +57,7 @@ class OpdController extends Controller
             'tax'                  => 'required|numeric|min:0',
             'amount'               => 'required|numeric|min:0',
             'payment_mode'         => 'nullable|string|max:50',
+            'payment_date'         => 'nullable|date',
             'paid_amount'          => 'required|numeric|min:0',
             'live_consultation'    => 'nullable|string|max:100',
             'symptoms_type'        => 'required|array',
@@ -115,6 +116,7 @@ class OpdController extends Controller
             $opd->tax             = $request->tax ?? 0;
             $opd->amount          = $request->amount ?? 0;
             $opd->paid_amount     = $request->paid_amount;
+            $opd->payment_date    = $request->payment_date;
             $opd->payment_mode    = $request->payment_mode;
 
             // Misc
@@ -133,6 +135,101 @@ class OpdController extends Controller
             DB::commit();
 
             return redirect()->route('opd')->with('success', 'OPD record created successfully . ');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            dd($e);
+            return redirect()->back()->withInput()->with('error', 'Failed to save OPD record: ' . $e->getMessage());
+        }
+    }
+
+    public function edit(Request $request, $id)
+    {
+        $opd     = OpdDetail::with('patient', 'doctor', 'chargeCategory', 'charge')->where('id', $id)->firstOrFail();
+        $doctors = Doctor::all();
+
+        $symptomTypeIds = array_filter(
+            explode(', ', $opd->symptoms_type),
+            fn($id) => $id !== null && trim($id) !== ''
+        );
+        $symptomIds = array_filter(
+            explode(', ', $opd->symptoms_title),
+            fn($id) => $id !== null && trim($id) !== ''
+        );
+
+        // Fetch symptoms related to this OPD
+        // $symptomTypes = ! empty($symptomTypeIds)
+        //     ? SymptomsClassification::whereIn('id', $symptomTypeIds)->get()
+        //     : collect(); // return empty collection if no symptoms
+        $symptoms = ! empty($symptomIds)
+            ? Symptom::whereIn('id', $symptomIds)->get()
+            : collect(); // return empty collection if no symptoms
+
+        $allSymptomTypes = SymptomsClassification::all();
+        return view('admin.opd.edit-opd', compact('opd', 'doctors', 'symptomTypeIds', 'allSymptomTypes', 'symptoms'));
+
+    }
+
+    public function update(Request $request, $id)
+    {
+        // dd($request->all());
+        $request->validate([
+            'appointment_date'     => 'required|date',
+            'old_patient'          => 'required|string',
+            'casualty'             => 'required|string',
+            'reference'            => 'nullable|string',
+            'consultant_doctor'    => 'required|exists:doctor,id',
+            'payment_date'         => 'nullable|date',
+            'paid_amount'          => 'required|numeric|min:0',
+            'payment_mode'         => 'nullable|string|max:50',
+            'symptoms_type'        => 'required|array',
+            'symptoms_type.*'      => 'string',
+            'symptoms_title'       => 'required|array',
+            'symptoms_title.*'     => 'string',
+            'symptoms_description' => 'required|string',
+            'known_allergies'      => 'nullable|string',
+            'note'                 => 'nullable|string',
+        ]);
+
+        DB::beginTransaction();
+        $user = Auth::user();
+        // dd($user);
+        if (! $user || ! $user->hospital_id) {
+            return redirect()->back()->with('error', 'User not authenticated or hospital ID missing.');
+        }
+        try {
+            $symptomType          = array_filter($request->symptoms_type, fn($type) => $type !== null && $type !== '');
+            $symptomTitle         = array_filter($request->symptoms_title, fn($title) => $title !== null && $title !== '');
+            $implodedSymptomType  = implode(", ", $symptomType);
+            $implodedSymptomTitle = implode(", ", $symptomTitle);
+            // 🔹 Update OPD record
+            $opd = OpdDetail::findOrFail($id);
+            // dd($opd);
+            // Doctor Details
+            $opd->doctor_id = $request->consultant_doctor;
+
+            // Visit Details
+            $opd->appointment_date = $request->appointment_date;
+            $opd->case_type        = $request->old_patient;
+            $opd->casualty         = $request->casualty;
+            $opd->reference        = $request->reference;
+
+            // Billing / Payment
+            $opd->paid_amount  = $request->paid_amount;
+            $opd->payment_date = $request->payment_date;
+            $opd->payment_mode = $request->payment_mode;
+
+            // Misc
+            $opd->symptoms_type        = $implodedSymptomType ?? "";
+            $opd->symptoms_title       = $implodedSymptomTitle ?? "";
+            $opd->symptoms_description = $request->symptoms_description;
+            $opd->allergies            = $request->known_allergies;
+            $opd->note                 = $request->note;
+            // Save OPD Record
+            $opd->save();
+
+            DB::commit();
+
+            return redirect()->route('opd')->with('success', 'OPD record Updated successfully . ');
         } catch (\Exception $e) {
             DB::rollBack();
             dd($e);
