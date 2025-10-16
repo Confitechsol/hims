@@ -476,3 +476,6 @@ Route::prefix('/inventory')->group(function () {
 Route::get('/opd', function () {
     return view('admin.billing.opd');
 })->name('opd');
+Route::get('/visit_details', function () {
+    return view('admin.visit_details');
+})->name('visit_details');
