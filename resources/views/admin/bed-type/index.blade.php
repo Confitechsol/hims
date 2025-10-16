@@ -7,47 +7,88 @@
             </div>
 
             <div class="card-body">
-            <x-table-actions.actions id="bed_type" name="Bed Type" />
+                <x-table-actions.actions id="bed_type" name="Bed Type" />
                 {{-- Flash Messages --}}
-                @if(session('success'))
+                @if (session('success'))
                     <div class="alert alert-success alert-dismissible fade show">{{ session('success') }}</div>
                 @endif
 
-                @if(session('error'))
+                @if (session('error'))
                     <div class="alert alert-danger alert-dismissible fade show">{{ session('error') }}</div>
                 @endif
 
                 {{-- Table --}}
-                <table class="table table-bordered" id="bed_type">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th width="180">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($bedTypes as $type)
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="bed_type">
+                        <thead>
                             <tr>
-                                <td>{{ $type->name }}</td>
-                                <td>
-                                    {{-- Edit Button --}}
-                                    <button class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
-                                        data-bs-toggle="modal" data-bs-target="#editModal" data-id="{{ $type->id }}"
-                                        data-name="{{ $type->name }}">
-                                        <i class="ti ti-pencil"></i>
-                                    </button>
-
-                                    {{-- Delete Button --}}
-                                    <button class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
-                                        data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ $type->id }}"
-                                        data-name="{{ $type->name }}">
-                                        <i class="ti ti-trash"></i>
-                                    </button>
-                                </td>
+                                <th>Name</th>
+                                <th width="180">Actions</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach ($bedTypes as $type)
+                                <tr>
+                                    <td>{{ $type->name }}</td>
+                                    <td>
+                                        {{-- Edit Button --}}
+                                        <button class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                            data-bs-toggle="modal" data-bs-target="#editModal" data-id="{{ $type->id }}"
+                                            data-name="{{ $type->name }}">
+                                            <i class="ti ti-pencil"></i>
+                                        </button>
+
+                                        {{-- Delete Button --}}
+                                        <button class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
+                                            data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                            data-id="{{ $type->id }}" data-name="{{ $type->name }}">
+                                            <i class="ti ti-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                {{-- Pagination Links --}}
+                <div class="mt-3" id="pagination-wrapper">
+                    @php
+                        $currentPage = $bedTypes->currentPage();
+                        $lastPage = $bedTypes->lastPage();
+                    @endphp
+
+                    {{-- Previous --}}
+                    @if ($bedTypes->onFirstPage())
+                        <button class="btn btn-outline-secondary btn-sm me-1" disabled>« Prev</button>
+                    @else
+                        <a href="{{ $bedTypes->previousPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                            class="btn btn-outline-secondary btn-sm me-1">
+                            « Prev
+                        </a>
+                    @endif
+
+                    {{-- Page numbers --}}
+                    @for ($page = 1; $page <= $lastPage; $page++)
+                        @if ($page == $currentPage)
+                            <button class="btn btn-primary btn-sm me-1">{{ $page }}</button>
+                        @else
+                            <a href="{{ $bedTypes->url($page) }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                                class="btn btn-outline-secondary btn-sm me-1">
+                                {{ $page }}
+                            </a>
+                        @endif
+                    @endfor
+
+                    {{-- Next --}}
+                    @if ($bedTypes->hasMorePages())
+                        <a href="{{ $bedTypes->nextPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                            class="btn btn-outline-secondary btn-sm">
+                            Next »
+                        </a>
+                    @else
+                        <button class="btn btn-outline-secondary btn-sm" disabled>Next »</button>
+                    @endif
+                </div>
             </div>
         </div>
     </div>
@@ -113,20 +154,51 @@
 
     {{-- Script to handle modal value setting --}}
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const editModal = document.getElementById('editModal');
             const deleteModal = document.getElementById('deleteModal');
 
-            editModal.addEventListener('show.bs.modal', function (event) {
+            editModal.addEventListener('show.bs.modal', function(event) {
                 const button = event.relatedTarget;
                 document.getElementById('edit-id').value = button.getAttribute('data-id');
                 document.getElementById('edit-name').value = button.getAttribute('data-name');
             });
 
-            deleteModal.addEventListener('show.bs.modal', function (event) {
+            deleteModal.addEventListener('show.bs.modal', function(event) {
                 const button = event.relatedTarget;
                 document.getElementById('delete-id').value = button.getAttribute('data-id');
                 document.getElementById('delete-name').textContent = button.getAttribute('data-name');
+            });
+            createAjaxTable({
+                apiUrl: "{{ route('bed-types.index') }}",
+                tableSelector: "#bed_type",
+                paginationSelector: "#pagination-wrapper",
+                searchInputSelector: "#search-input",
+                perPageSelector: "#perPage",
+                rowRenderer: function(item) {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+            <td class="name">${item.name}</td>
+            <td>
+                <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#editModal"
+                    data-id="${item.id}"
+                    data-name="${item.name}"
+                    data-bed_type_id="${item.bed_type?.id ?? ''}"
+                    data-bed_group_id="${item.bed_group?.id ?? ''}"
+                    data-is_available="${item.is_active}">
+                    Edit
+                </button>
+                <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                    data-bs-target="#deleteModal"
+                    data-id="${item.id}"
+                    data-name="${item.name}">
+                    Delete
+                </button>
+            </td>
+        `;
+                    return row;
+                }
             });
         });
     </script>

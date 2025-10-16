@@ -23,7 +23,7 @@
                                             </ul>
                                         </div>
                                     @endforeach
-                                    @endif
+                                @endif
                                     @if(session('error'))
                                         <div class="alert alert-danger">
                                             {{session('error')}}
@@ -36,14 +36,18 @@
                                     @endif
                                 <div
                                     class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
-
-                                    <div class="input-icon-start position-relative me-2">
-                                        <span class="input-icon-addon">
-                                            <i class="ti ti-search"></i>
-                                        </span>
-                                        <input type="text" class="form-control shadow-sm" placeholder="Search">
-
-                                    </div>
+                                            <div class="d-flex align-items-center">
+                                                <div class="input-icon-start position-relative me-2">
+                                                    <span class="input-icon-addon">
+                                                        <i class="ti ti-search"></i>
+                                                    </span>
+                                                    <input onkeyup="dataSearch()" type="text" id="language-search" name="search"
+                                                         class="form-control shadow-sm"
+                                                        placeholder="Search">
+                                                </div>
+                                               
+                                            </div>
+                
                                     <div class="d-flex align-items-center flex-wrap gap-2">
                                         <div class="text-end d-flex">
                                             <a href="javascript:void(0);"
@@ -58,7 +62,7 @@
                                 </div>
                                 <!-- Table start -->
                                 <div class="table-responsive table-nowrap">
-                                    <table class="table">
+                                    <table class="table" id="table">
                                         <thead class="thead-light">
                                             <tr>
                                                 <th>Name</th>
@@ -81,7 +85,7 @@
                                                 <td>{{$item->contact_person_phone}}</td>
                                                 <td>
                                                     <div class="d-flex">
-                                                        <a href="javascript: void(0);"
+                                                        <a href="{{ route('tpa_details.show', $item->id) }}"
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
                                                             <i class="ti ti-menu" data-bs-toggle="tooltip"
                                                                 title="Show"></i></a>
@@ -96,10 +100,6 @@
                                                             data-contact_person_phone="{{$item->contact_person_phone}}">
                                                             <i class="ti ti-pencil"></i>
                                                         </button>
-                                                        {{-- <a href="javascript: void(0);"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
-                                                            >
-                                                            <i class="ti ti-trash"></i></a>         --}}
                                                         <form method="POST" action="{{ route('tpamanagement.destroy') }}">
                                                             @csrf
                                                             @method('DELETE')
@@ -144,7 +144,68 @@
         ['name' => 'contact_person_name', 'label' => 'Contact Person Name', 'type' => 'text', 'required' => true,'size'=>'6'],
         ['name' => 'contact_person_phone', 'label' => 'Contact Person Phone', 'type' => 'text', 'required' => true,'size'=>'6'],
     ]" :columns="3" />
-    <script>
+    
+   
 <!-- row end -->
+
+<script>
+   function dataSearch(){
+    const data=document.querySelector('#language-search');
+    let table = document.querySelector("#table");
+    
+    fetch("{{route('tpamanagement')}}?search="+encodeURIComponent(data.value))
+    .then(res => res.json())
+    .then(data => {
+        if(data.status == 200){
+            table.querySelector("tbody").innerHTML = '';
+data.result.forEach((item)=>{
+ const row = document.createElement('tr');
+ row.innerHTML = `
+ <td>${item.organisation_name}</td>
+ <td>${item.code}</td>
+ <td>${item.contact_no}</td>
+ <td>${item.address}</td>
+ <td>${item.contact_person_name}</td>
+ <td>${item.contact_person_phone}</td>
+ <td>
+                                                    <div class="d-flex">
+                                                        <a href="javascript: void(0);"
+                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+                                                            <i class="ti ti-menu" data-bs-toggle="tooltip"
+                                                                title="Show"></i></a>
+                                                        <button
+                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
+                                                            data-id="${item.id}"
+                                                            data-organisation_name="${item.organisation_name}"
+                                                            data-code="${item.code}"
+                                                            data-contact_no="${item.contact_no}"
+                                                            data-address="${item.address}"
+                                                            data-contact_person_name="${item.contact_person_name}"
+                                                            data-contact_person_phone="${item.contact_person_phone}">
+                                                            <i class="ti ti-pencil"></i>
+                                                        </button>
+                                                        <form method="POST" action="{{ route('tpamanagement.destroy') }}">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <input type="hidden" name="id" value="{{ $item['id'] }}">
+                                                            <button type="submit"
+                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
+                                                                onclick="return confirm('Are you sure you want to delete this item?');">
+                                                                <i class="ti ti-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+ `;
+
+ table.querySelector("tbody").appendChild(row);
+});
+        }
+        
+    })
+    .catch(err => console.error(err));
+
+   }
+</script>
 
 @endsection

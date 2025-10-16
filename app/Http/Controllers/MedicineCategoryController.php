@@ -8,8 +8,21 @@ use App\Models\MedicineCategory;
 
 class MedicineCategoryController extends Controller
 {
-    public function index(){
-        $categories = MedicineCategory::get();
+    public function index(Request $request){
+        $categories = MedicineCategory::query();
+        $perPage = intval($request->input('perPage', 5));
+        if ($perPage <= 0) {
+           $perPage = 5;
+        }
+        if($request->has('search')){
+            $search_term = $request->search;
+            $categories->where(function ($query) use ($search_term) {
+                $query->where('medicine_category', 'like', "%{$search_term}%");
+            });
+            $categories = $categories->paginate($perPage);
+            return array("result"=>$categories);
+        }
+        $categories = $categories->paginate($perPage);
         return view('admin.setup.medicine_category',compact('categories'));
     }
     public function storeMultiple(Request $request)

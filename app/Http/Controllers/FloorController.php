@@ -6,9 +6,23 @@ use Illuminate\Http\Request;
 use App\Models\Floor;
 class FloorController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $floors = Floor::all();
+        $floors = Floor::query();
+        $perPage = intval($request->input('perPage', 5));
+        if ($perPage <= 0) {
+           $perPage = 5;
+        }
+        if($request->has('search')){
+            $search_term = $request->search;
+            $floors->where(function ($query) use ($search_term) {
+                $query->where('name', 'like', "%{$search_term}%");
+            });
+            $floors = $floors->paginate($perPage);
+            return array("result"=>$floors);
+
+        }
+        $floors = $floors->paginate($perPage);
         return view('admin.floor.index', compact('floors'));
     }
 

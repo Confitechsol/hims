@@ -13,28 +13,56 @@ class BedController extends Controller
 {
    public function index(Request $request)
    {
-      $beds = Bed::with(['bedGroup', 'bedType']);
-      $bedGroups = BedGroup::all();
-      $bedTypes = BedType::all();
-      $search = $request->input('search', '');
-      if ($search) {
-         $beds->where(function($query) use ($search) {
-             $query->where('name', 'like', "%$search%")
+       $bedsQuery = Bed::with(['bedGroup', 'bedType']);
+       $bedGroups = BedGroup::all();
+       $bedTypes = BedType::all();
+       $perPage = intval($request->input('perPage', 5));
+       if ($perPage <= 0) {
+           $perPage = 5;
+       }
+       if ($request->has('search')) {
+           $search = $request->input('search');
+           $bedsQuery->where(function ($query) use ($search) {
+               $query->where('name', 'like', "%{$search}%")
                    ->orWhereHas('bedGroup', function ($q) use ($search) {
-                       $q->where('name', 'like', "%$search%");
+                       $q->where('name', 'like', "%{$search}%");
                    })
                    ->orWhereHas('bedType', function ($q) use ($search) {
-                       $q->where('name', 'like', "%$search%");
+                       $q->where('name', 'like', "%{$search}%");
                    });
-         });
-         return array("beds"=>$beds->get());
-     }
-     $beds = $beds->get();
-      return view('admin.bed.index', compact('beds', 'bedGroups', 'bedTypes'));
-   }
-   public function status()
+           });
+           $beds = $bedsQuery->paginate($perPage);
+           return response()->json([
+               'result' => $beds
+           ]);
+       }
+       $beds = $bedsQuery->paginate($perPage);
+       return view('admin.bed.index', compact('beds', 'bedGroups', 'bedTypes'));
+   }   
+   public function status(Request $request)
    {
-      $beds = Bed::with(['bedGroup', 'bedType'])->get();
+   $perPage = intval($request->input('perPage', 5));
+   if ($perPage <= 0) {
+          $perPage = 5;
+   }
+     $bedsQuery = Bed::with(['bedGroup', 'bedType']);
+     if ($request->has('search')) {
+      $search = $request->input('search');
+      $bedsQuery->where(function ($query) use ($search) {
+          $query->where('name', 'like', "%{$search}%")
+              ->orWhereHas('bedGroup', function ($q) use ($search) {
+                  $q->where('name', 'like', "%{$search}%");
+              })
+              ->orWhereHas('bedType', function ($q) use ($search) {
+                  $q->where('name', 'like', "%{$search}%");
+              });
+      });
+      $beds = $bedsQuery->paginate($perPage);
+      return response()->json([
+          'result' => $beds
+      ]);
+  }
+     $beds = $bedsQuery->paginate($perPage);
       return view('admin.bed.status', compact('beds'));
    }
    public function store(Request $request)

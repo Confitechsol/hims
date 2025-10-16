@@ -6,55 +6,101 @@
                 <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Bed Groups</h5>
             </div>
             <div class="card-body">
-    <x-table-actions.actions id="bed-groups" name="Bed Group" />
+                <x-table-actions.actions id="bed-groups" name="Bed Group" />
                 {{-- Alerts --}}
-                @if(session('success'))
+                @if (session('success'))
                     <div class="alert alert-success alert-dismissible fade show">{{ session('success') }}</div>
                 @endif
-                @if(session('error'))
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                {{ session('error') }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
-                        @endif
-                        @if ($errors->any())
-            <div class="alert alert-danger">
-                <strong>There were some problems with your input:</strong>
-                <ul class="mb-0">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+                @if (session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <strong>There were some problems with your input:</strong>
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
                 {{-- Table --}}
-                <table class="table table-bordered" id="bed-groups">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($bedGroups as $group)
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="bed-groups">
+                        <thead>
                             <tr>
-                                <td>{{ $group->name }}</td>
-                                <td>
-                                    <button class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill" data-bs-toggle="modal" data-bs-target="#editModal"
-                                        data-id="{{ $group->id }}" data-name="{{ $group->name }}" data-floor="{{$group->floor}}" data-color="{{$group->color}}" data-cost="{{$group->cost}}" data-description="{{$group->description}}">
-                                        <i class="ti ti-pencil"></i>
-                                    </button>
-
-                                    <button class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill" data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                        data-id="{{ $group->id }}" data-name="{{ $group->name }}">
-                                        <i class="ti ti-trash"></i>
-                                    </button>
-                                </td>
+                                <th>Name</th>
+                                <th>Actions</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach ($bedGroups as $group)
+                                <tr>
+                                    <td>{{ $group->name }}</td>
+                                    <td>
+                                        <button class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                            data-bs-toggle="modal" data-bs-target="#editModal" data-id="{{ $group->id }}"
+                                            data-name="{{ $group->name }}" data-floor="{{ $group->floor }}"
+                                            data-color="{{ $group->color }}" data-cost="{{ $group->bed_cost }}"
+                                            data-description="{{ $group->description }}">
+                                            <i class="ti ti-pencil"></i>
+                                        </button>
+
+                                        <button class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
+                                            data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                            data-id="{{ $group->id }}" data-name="{{ $group->name }}">
+                                            <i class="ti ti-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                {{-- Pagination Links --}}
+                <div class="mt-3" id="pagination-wrapper">
+                    @php
+                        $currentPage = $bedGroups->currentPage();
+                        $lastPage = $bedGroups->lastPage();
+                    @endphp
+
+                    {{-- Previous --}}
+                    @if ($bedGroups->onFirstPage())
+                        <button class="btn btn-outline-secondary btn-sm me-1" disabled>« Prev</button>
+                    @else
+                        <a href="{{ $bedGroups->previousPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                            class="btn btn-outline-secondary btn-sm me-1">
+                            « Prev
+                        </a>
+                    @endif
+
+                    {{-- Page numbers --}}
+                    @for ($page = 1; $page <= $lastPage; $page++)
+                        @if ($page == $currentPage)
+                            <button class="btn btn-primary btn-sm me-1">{{ $page }}</button>
+                        @else
+                            <a href="{{ $bedGroups->url($page) }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                                class="btn btn-outline-secondary btn-sm me-1">
+                                {{ $page }}
+                            </a>
+                        @endif
+                    @endfor
+
+                    {{-- Next --}}
+                    @if ($bedGroups->hasMorePages())
+                        <a href="{{ $bedGroups->nextPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                            class="btn btn-outline-secondary btn-sm">
+                            Next »
+                        </a>
+                    @else
+                        <button class="btn btn-outline-secondary btn-sm" disabled>Next »</button>
+                    @endif
+                </div>
+
             </div>
         </div>
     </div>
@@ -77,7 +123,7 @@
                         <select name="floor" id="" class="form-select" required>
                             <option value="">Select Floor</option>
                             @foreach ($floors as $floor)
-                                <option value="{{$floor->id}}">{{$floor->name}}</option>
+                                <option value="{{ $floor->id }}">{{ $floor->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -87,7 +133,7 @@
                     </div>
                     <div class="form-group mb-2">
                         <label for="" class="form-label">Bed Cost</label>
-                        <input type="text" class="form-control" name="bed_cost" >
+                        <input type="text" class="form-control" name="bed_cost">
                     </div>
                     <div class="form-group mb-2">
                         <label for="" class="form-label">Description</label>
@@ -114,14 +160,15 @@
                 <div class="modal-body">
                     <div class="form-group mb-2">
                         <label for="" class="form-label">Name</label>
-                        <input type="text" class="form-control" name="name" id="edit-name" placeholder="Bed Group Name" required>
+                        <input type="text" class="form-control" name="name" id="edit-name"
+                            placeholder="Bed Group Name" required>
                     </div>
                     <div class="form-group mb-2">
                         <label for="" class="form-label">Floor</label>
                         <select name="floor" id="edit-floor" class="form-select" required>
                             <option value="">Select Floor</option>
                             @foreach ($floors as $floor)
-                                <option value="{{$floor->id}}">{{$floor->name}}</option>
+                                <option value="{{ $floor->id }}">{{ $floor->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -131,7 +178,7 @@
                     </div>
                     <div class="form-group mb-2">
                         <label for="" class="form-label">Bed Cost</label>
-                        <input type="text" id="edit-cost" class="form-control" name="bed_cost" >
+                        <input type="text" id="edit-cost" class="form-control" name="bed_cost">
                     </div>
                     <div class="form-group mb-2">
                         <label for="" class="form-label">Description</label>
@@ -168,9 +215,9 @@
 
     {{-- JS to populate modals --}}
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             var editModal = document.getElementById('editModal');
-            editModal.addEventListener('show.bs.modal', function (event) {
+            editModal.addEventListener('show.bs.modal', function(event) {
                 var button = event.relatedTarget;
                 document.getElementById('edit-id').value = button.getAttribute('data-id');
                 document.getElementById('edit-name').value = button.getAttribute('data-name');
@@ -181,11 +228,43 @@
             });
 
             var deleteModal = document.getElementById('deleteModal');
-            deleteModal.addEventListener('show.bs.modal', function (event) {
+            deleteModal.addEventListener('show.bs.modal', function(event) {
                 var button = event.relatedTarget;
                 document.getElementById('delete-id').value = button.getAttribute('data-id');
                 document.getElementById('delete-name').textContent = button.getAttribute('data-name');
             });
+createAjaxTable({
+    apiUrl: "{{ route('bed-groups.index') }}",
+    tableSelector: "#bed-groups",
+    paginationSelector: "#pagination-wrapper",
+    searchInputSelector: "#search-input",
+    perPageSelector: "#perPage",
+    rowRenderer: function (item) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td class="name">${item.name}</td>
+            <td>
+                <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#editModal"
+                    data-id="${item.id}"
+                    data-name="${item.name}"
+                    data-floor="${item.floor}"
+                    data-color="${item.color}" 
+                    data-cost="${item.bed_cost}"
+                    data-description="${item.description}">
+                    Edit
+                </button>
+                <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                    data-bs-target="#deleteModal"
+                    data-id="${item.id}"
+                    data-name="${item.name}">
+                    Delete
+                </button>
+            </td>
+        `;
+        return row;
+    }
+});
         });
     </script>
 
