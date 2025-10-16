@@ -180,15 +180,23 @@
                                     <td>{{$item->org_charge}}</td>
                                     <td>
                                         <div class="d-flex">
-                                            <a href="javascript: void(0);"
+                                            <button
                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
                                                 data-id="{{ $item->id }}"
                                                 data-org_charge="{{ $item->org_charge }}"
                                                 >
-                                                <i class="ti ti-pencil" data-bs-toggle="tooltip" title="Show"></i></a>
-                                            <a href="javascript: void(0);"
-                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                <i class="ti ti-trash" data-bs-toggle="tooltip" title="Reschedule"></i></a>
+                                                <i class="ti ti-pencil" data-bs-toggle="tooltip" title="Show"></i>
+                                            </button>
+                                            <form method="POST" action="{{ route('tpa_details.destroy') }}">
+                                                @csrf
+                                                @method('DELETE')
+                                                <input type="hidden" name="id" value="{{ $item->id }}">
+                                                <button type="submit"
+                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
+                                                    onclick="return confirm('Are you sure you want to delete this item?');">
+                                                    <i class="ti ti-trash"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
@@ -203,11 +211,13 @@
         </div>
         <!-- row end -->
     </div>
+    <!-- Modal -->
     <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit TPA Charge"
-    action="" :fields="[
+    action="{{route('tpa_details.update')}}" :fields="[
         ['name' => 'id', 'type' => 'hidden', 'required' => true],
         ['name' => 'org_charge', 'label' => 'TPA Charge (INR)', 'type' => 'text', 'required' => true,'size'=>'12']
     ]" :columns="1" />
+    <!-- end madal -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/js/select2.min.js"></script>
