@@ -447,7 +447,7 @@ Route::prefix('/appointment-details')->group(function () {
     Route::get('/get-doctor-shifts/{id}', [AppointmentController::class, 'getDoctorShifts'])->name('doctor.shifts');
     Route::get('/get-doctor-slots/{doctorId}/{shiftId}', [AppointmentController::class, 'getDoctorSlots'])->name('doctor.slots');
     Route::get('/get-appointment-priorities', [AppointmentController::class, 'getAppointmentPriorities'])->name('appointment.priorities');
-    // Route::put('/appointments/{id}', [AppointmentsController::class, 'update'])->name('appointments.update');
+  
     Route::get('/appointments/{id}/edit', [AppointmentsController::class, 'edit'])->name('appointments.edit');
     Route::put('/appointments/{id}', [AppointmentsController::class, 'update'])->name('appointments.update');
     Route::get('/doctor-wise', [AppointmentsController::class, 'doctorwise'])->name('appointments.doctor-wise');
@@ -460,9 +460,16 @@ Route::prefix('/appointment-details')->group(function () {
 Route::prefix('/inventory')->group(function () {
      Route::get('/', [InventoriesController::class, 'index'])->name('inventory-details');
      Route::get('/get-items/{categoryId}', [InventoriesController::class, 'getItems'])->name('get.items');
-     Route::post('/store', [InventoriesController::class, 'store'])->name('items.store');
-     Route::get('/edit', [InventoriesController::class, 'store'])->name('itemstock.edit');
-     Route::get('/destroy', [InventoriesController::class, 'destroy'])->name('itemstock.destroy');
+     Route::post('/store', [InventoriesController::class, 'store'])->name('itemstock.store');
+     Route::get('/{id}/edit', [InventoriesController::class, 'edit'])->name('itemstock.edit');
+     Route::put('/update/{id}', [InventoriesController::class, 'update'])->name('itemstock.update');
+     Route::delete('/destroy/{id}', [InventoriesController::class, 'destroy'])->name('itemstock.destroy');
+     Route::get('/items', [InventoriesController::class, 'items'])->name('item-details');
+     Route::get('/issue-item', [InventoriesController::class, 'itemIssue'])->name('issue-items');
+     Route::post('/item/store', [InventoriesController::class, 'storeItem'])->name('items.store');
+     Route::get('/item/{id}/edit', [InventoriesController::class, 'editItem'])->name('items.edit');
+     Route::put('/item/update/{id}', [InventoriesController::class, 'updateItem'])->name('items.update');
+     Route::delete('/item/destroy/{id}', [InventoriesController::class, 'destroyItem'])->name('items.destroy');
     });
 
 
