@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -21,7 +20,7 @@ class TaxCategory extends Model
     // Fillable fields
     protected $fillable = [
         'hospital_id',
-         'branch_id',
+        'branch_id',
         'name',
         'percentage',
         'created_at',

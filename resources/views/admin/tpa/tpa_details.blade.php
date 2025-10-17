@@ -48,46 +48,44 @@
                     <div class="tpa_details p-4">
                         <div class="row gy-4">
                             <div class="col-md-4">
-
                                 <div class="module_billing">
                                     <h5>TPA Name</h5>
-                                    <p class="gray_text">MedoLogi TPA Pvt. Ltd.
+                                    <p class="gray_text">{{ $organisations->organisation_name }}
                                     </p>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="module_billing">
                                     <h5> Code</h5>
-                                    <p class="gray_text">TPA005
+                                    <p class="gray_text">{{ $organisations->code }}
                                     </p>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="module_billing">
                                     <h5>Contact No</h5>
-                                    <p class="gray_text">+91-8034849273
+                                    <p class="gray_text">{{ $organisations->contact_no }}
                                     </p>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="module_billing">
                                     <h5>Address</h5>
-                                    <p class="gray_text">Flat No. 502, Green Heights Apartments, JP
-                                        Road, Andheri East
+                                    <p class="gray_text">{{ $organisations->address }}
                                     </p>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="module_billing">
                                     <h5>Contact Person Name</h5>
-                                    <p class="gray_text">Suresh Rao
+                                    <p class="gray_text">{{ $organisations->contact_person_name }}
                                     </p>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="module_billing">
                                     <h5>Contact Person Phone</h5>
-                                    <p class="gray_text">+91-7982038428
+                                    <p class="gray_text">{{ $organisations->contact_person_phone }}
                                     </p>
                                 </div>
                             </div>
@@ -111,20 +109,44 @@
                     </div>
 
                     <div class="card-body" id="charge_type_form">
-                        <form action="">
+                        @if ($errors->any())
+                            @foreach ($errors->all() as $error)
+                                <div class="alert alert-danger">
+                                    <ul class="mb-0">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endforeach
+                        @endif
+                        @if(session('error'))
+                            <div class="alert alert-danger">
+                                {{session('error')}}
+                            </div>
+                        @endif
+                        @if(session('success'))
+                            <div class="alert alert-success">
+                                {{session('success')}}
+                            </div>
+                        @endif
+                        <form action="" method="post">
+                            @csrf
                             <div class="d-flex gap-3 align-items-center">
                                 <div class="col-md-1">
                                     <label for="case_id" class="form-label">Charge Type<span
                                             class="text-danger">*</span></label>
                                 </div>
                                 <div class="col-md-4">
-                                    <select class="form-select" id="charge-type" style="width: 100%;">
+                                    <select class="form-select" id="charge-type" name="charge_type" style="width: 100%;">
                                         <option value="">Select</option>
-                                        <option value="1">OPD</option>
+                                        @foreach($chargetypes as $chargetype)
+                                            <option value="{{ $chargetype->id }}" {{ session('charge_type') == $chargetype->id ? 'selected' : '' }}>{{ $chargetype->charge_type }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <button type="button" onclick="search()" class="btn btn-primary btn-sm">Search</button>
+                                    <button type="submit" class="btn btn-primary btn-sm">Search</button>
                                 </div>
                             </div>
                         </form>
@@ -145,26 +167,41 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @if(isset($organisationCharge) && $organisationCharge->count() > 0)
+                                @foreach($organisationCharge as $item)
                                 <tr>
                                     <td>
-                                        <h6 class="fs-14 mb-1"></h6>
+                                        <h6 class="fs-14 mb-1">{{$item->charge['category']['chargeType']['charge_type']}}</h6>
                                     </td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                    <td>{{$item->charge['category']['name']}}</td>
+                                    <td>{{$item->charge['name']}}</td>
+                                    <td>{{$item->charge['description']}}</td>
+                                    <td>{{$item->charge['standard_charge']}}</td>
+                                    <td>{{$item->org_charge}}</td>
                                     <td>
                                         <div class="d-flex">
-                                            <a href="javascript: void(0);"
-                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                <i class="ti ti-pencil" data-bs-toggle="tooltip" title="Show"></i></a>
-                                            <a href="javascript: void(0);"
-                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                <i class="ti ti-trash" data-bs-toggle="tooltip" title="Reschedule"></i></a>
+                                            <button
+                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
+                                                data-id="{{ $item->id }}"
+                                                data-org_charge="{{ $item->org_charge }}"
+                                                >
+                                                <i class="ti ti-pencil" data-bs-toggle="tooltip" title="Show"></i>
+                                            </button>
+                                            <form method="POST" action="{{ route('tpa_details.destroy') }}">
+                                                @csrf
+                                                @method('DELETE')
+                                                <input type="hidden" name="id" value="{{ $item->id }}">
+                                                <button type="submit"
+                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
+                                                    onclick="return confirm('Are you sure you want to delete this item?');">
+                                                    <i class="ti ti-trash"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
+                                @endforeach
+                                @endif
                             </tbody>
                         </table>
                     </div>
@@ -174,7 +211,13 @@
         </div>
         <!-- row end -->
     </div>
-
+    <!-- Modal -->
+    <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit TPA Charge"
+    action="{{route('tpa_details.update')}}" :fields="[
+        ['name' => 'id', 'type' => 'hidden', 'required' => true],
+        ['name' => 'org_charge', 'label' => 'TPA Charge (INR)', 'type' => 'text', 'required' => true,'size'=>'12']
+    ]" :columns="1" />
+    <!-- end madal -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/js/select2.min.js"></script>

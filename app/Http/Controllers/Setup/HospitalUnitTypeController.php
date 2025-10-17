@@ -10,11 +10,18 @@ use Illuminate\Validation\Rule;
 
 class HospitalUnitTypeController extends Controller
 {
-    public function index(){
+    public function index(Request $request){
         
-       $unittype = ChargeUnit::get();
-       // return $unittype;
-         return view('admin.setup.unit_type',compact('unittype'));
+       $query = ChargeUnit::query();
+       $perPage = $request->input('per_page', 10); 
+   if ($request->has('search')) {
+        $search = $request->input('search');
+        $query->where('unit', 'like', "%{$search}%");
+        $data = $query->paginate($perPage);
+        return $data;
+    }
+    $unittype =   $query->paginate($perPage);
+    return view('admin.setup.unit_type',compact('unittype'));
     }
 
     public function store(Request $request){

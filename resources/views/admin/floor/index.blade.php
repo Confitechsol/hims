@@ -8,7 +8,7 @@
             </div>
 
             <div class="card-body">
-
+            <x-table-actions.actions id="floors" name="Floor" />
                 {{-- Flash Messages --}}
                 @if (session('success'))
                     <div class="alert alert-success alert-dismissible fade show">{{ session('success') }}</div>
@@ -16,40 +16,77 @@
                 @if (session('error'))
                     <div class="alert alert-danger alert-dismissible fade show">{{ session('error') }}</div>
                 @endif
-
-                {{-- Add Floor --}}
-                <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createModal">Add Floor</button>
-
                 {{-- Floor Table --}}
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Floor Name</th>
-                            <th width="180">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($floors as $floor)
+                 <div class="table-responsive">
+                    <table class="table table-bordered" id="floors">
+                        <thead>
                             <tr>
-                                <td>{{ $floor->name }}</td>
-                                <td>
-                                    {{-- Edit Button --}}
-                                    <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#editModal"
-                                        data-id="{{ $floor->id }}" data-name="{{ $floor->name }}">
-                                        Edit
-                                    </button>
-
-                                    {{-- Delete Button --}}
-                                    <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
-                                        data-bs-target="#deleteModal" data-id="{{ $floor->id }}"
-                                        data-name="{{ $floor->name }}">
-                                        Delete
-                                    </button>
-                                </td>
+                                <th>Floor Name</th>
+                                <th width="180">Actions</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach ($floors as $floor)
+                                <tr>
+                                    <td>{{ $floor->name }}</td>
+                                    <td>
+                                        {{-- Edit Button --}}
+                                        <button class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill" data-bs-toggle="modal" data-bs-target="#editModal"
+                                            data-id="{{ $floor->id }}" data-name="{{ $floor->name }}">
+                                            <i class="ti ti-pencil"></i>
+                                        </button>
+
+                                        {{-- Delete Button --}}
+                                        <button class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill" data-bs-toggle="modal"
+                                            data-bs-target="#deleteModal" data-id="{{ $floor->id }}"
+                                            data-name="{{ $floor->name }}">
+                                            <i class="ti ti-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                 </div>
+                    {{-- Pagination Links --}}
+                <div class="mt-3" id="pagination-wrapper">
+                    @php
+                        $currentPage = $floors->currentPage();
+                        $lastPage = $floors->lastPage();
+                    @endphp
+
+                    {{-- Previous --}}
+                    @if ($floors->onFirstPage())
+                        <button class="btn btn-outline-secondary btn-sm me-1" disabled>« Prev</button>
+                    @else
+                        <a href="{{ $floors->previousPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                            class="btn btn-outline-secondary btn-sm me-1">
+                            « Prev
+                        </a>
+                    @endif
+
+                    {{-- Page numbers --}}
+                    @for ($page = 1; $page <= $lastPage; $page++)
+                        @if ($page == $currentPage)
+                            <button class="btn btn-primary btn-sm me-1">{{ $page }}</button>
+                        @else
+                            <a href="{{ $floors->url($page) }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                                class="btn btn-outline-secondary btn-sm me-1">
+                                {{ $page }}
+                            </a>
+                        @endif
+                    @endfor
+
+                    {{-- Next --}}
+                    @if ($floors->hasMorePages())
+                        <a href="{{ $floors->nextPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                            class="btn btn-outline-secondary btn-sm">
+                            Next »
+                        </a>
+                    @else
+                        <button class="btn btn-outline-secondary btn-sm" disabled>Next »</button>
+                    @endif
+                </div>
             </div>
         </div>
     </div>

@@ -56,5 +56,4 @@ class Charge extends Model
     //     return $this->category->chargeType(); // This accesses the ChargeTypeMaster through the ChargeCategory
     // }
 
-   
 }

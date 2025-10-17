@@ -20,6 +20,6 @@ class AdminMiddleware
         }
 
         // Redirect to login or error page if not authorized
-        return redirect('/login')->with('error', 'Unauthorized access.');
+        return redirect()->guest(route('login'))->with('error', 'Unauthorized access.');
     }
 }

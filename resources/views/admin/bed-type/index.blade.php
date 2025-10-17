@@ -1,133 +1,205 @@
 @extends('layouts.adminLayout')
 @section('content')
-<div class="container">
-<div class="card shadow-sm border-0 mt-4">
-                <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                    <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Bed Types</h5>
+    <div class="container">
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Bed Types</h5>
+            </div>
+
+            <div class="card-body">
+                <x-table-actions.actions id="bed_type" name="Bed Type" />
+                {{-- Flash Messages --}}
+                @if (session('success'))
+                    <div class="alert alert-success alert-dismissible fade show">{{ session('success') }}</div>
+                @endif
+
+                @if (session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show">{{ session('error') }}</div>
+                @endif
+
+                {{-- Table --}}
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="bed_type">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th width="180">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($bedTypes as $type)
+                                <tr>
+                                    <td>{{ $type->name }}</td>
+                                    <td>
+                                        {{-- Edit Button --}}
+                                        <button class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                            data-bs-toggle="modal" data-bs-target="#editModal" data-id="{{ $type->id }}"
+                                            data-name="{{ $type->name }}">
+                                            <i class="ti ti-pencil"></i>
+                                        </button>
+
+                                        {{-- Delete Button --}}
+                                        <button class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
+                                            data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                            data-id="{{ $type->id }}" data-name="{{ $type->name }}">
+                                            <i class="ti ti-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
+                {{-- Pagination Links --}}
+                <div class="mt-3" id="pagination-wrapper">
+                    @php
+                        $currentPage = $bedTypes->currentPage();
+                        $lastPage = $bedTypes->lastPage();
+                    @endphp
 
-                <div class="card-body">
-    {{-- Flash Messages --}}
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show">{{ session('success') }}</div>
-    @endif
+                    {{-- Previous --}}
+                    @if ($bedTypes->onFirstPage())
+                        <button class="btn btn-outline-secondary btn-sm me-1" disabled>« Prev</button>
+                    @else
+                        <a href="{{ $bedTypes->previousPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                            class="btn btn-outline-secondary btn-sm me-1">
+                            « Prev
+                        </a>
+                    @endif
 
-    @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show">{{ session('error') }}</div>
-    @endif
+                    {{-- Page numbers --}}
+                    @for ($page = 1; $page <= $lastPage; $page++)
+                        @if ($page == $currentPage)
+                            <button class="btn btn-primary btn-sm me-1">{{ $page }}</button>
+                        @else
+                            <a href="{{ $bedTypes->url($page) }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                                class="btn btn-outline-secondary btn-sm me-1">
+                                {{ $page }}
+                            </a>
+                        @endif
+                    @endfor
 
-    {{-- Add Button --}}
-    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createModal">Add Bed Type</button>
-
-    {{-- Table --}}
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th width="180">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($bedTypes as $type)
-                <tr>
-                    <td>{{ $type->name }}</td>
-                    <td>
-                        {{-- Edit Button --}}
-                        <button class="btn btn-sm btn-info"
-                            data-bs-toggle="modal"
-                            data-bs-target="#editModal"
-                            data-id="{{ $type->id }}"
-                            data-name="{{ $type->name }}">
-                            Edit
-                        </button>
-
-                        {{-- Delete Button --}}
-                        <button class="btn btn-sm btn-danger"
-                            data-bs-toggle="modal"
-                            data-bs-target="#deleteModal"
-                            data-id="{{ $type->id }}"
-                            data-name="{{ $type->name }}">
-                            Delete
-                        </button>
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
-</div>
-</div>
-</div>
-
-{{-- Create Modal --}}
-<div class="modal fade" id="createModal" tabindex="-1">
-  <div class="modal-dialog">
-    <form action="{{ route('bed-types.store') }}" method="POST" class="modal-content">
-        @csrf
-        <div class="modal-header"><h5 class="modal-title">Add Bed Type</h5></div>
-        <div class="modal-body">
-            <input type="text" class="form-control" name="name" placeholder="Enter bed type name" required>
+                    {{-- Next --}}
+                    @if ($bedTypes->hasMorePages())
+                        <a href="{{ $bedTypes->nextPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                            class="btn btn-outline-secondary btn-sm">
+                            Next »
+                        </a>
+                    @else
+                        <button class="btn btn-outline-secondary btn-sm" disabled>Next »</button>
+                    @endif
+                </div>
+            </div>
         </div>
-        <div class="modal-footer">
-            <button type="submit" class="btn btn-success">Create</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        </div>
-    </form>
-  </div>
-</div>
+    </div>
 
-{{-- Edit Modal --}}
-<div class="modal fade" id="editModal" tabindex="-1">
-  <div class="modal-dialog">
-    <form action="{{ route('bed-types.update') }}" method="POST" class="modal-content">
-        @csrf @method('PUT')
-        <input type="hidden" name="id" id="edit-id">
-        <div class="modal-header"><h5 class="modal-title">Edit Bed Type</h5></div>
-        <div class="modal-body">
-            <input type="text" class="form-control" name="name" id="edit-name" required>
+    {{-- Create Modal --}}
+    <div class="modal fade" id="createModal" tabindex="-1">
+        <div class="modal-dialog">
+            <form action="{{ route('bed-types.store') }}" method="POST" class="modal-content">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Bed Type</h5>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="form-control" name="name" placeholder="Enter bed type name" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Create</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
         </div>
-        <div class="modal-footer">
-            <button type="submit" class="btn btn-success">Update</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    </div>
+
+    {{-- Edit Modal --}}
+    <div class="modal fade" id="editModal" tabindex="-1">
+        <div class="modal-dialog">
+            <form action="{{ route('bed-types.update') }}" method="POST" class="modal-content">
+                @csrf @method('PUT')
+                <input type="hidden" name="id" id="edit-id">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Bed Type</h5>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="form-control" name="name" id="edit-name" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Update</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
         </div>
-    </form>
-  </div>
-</div>
+    </div>
 
-{{-- Delete Modal --}}
-<div class="modal fade" id="deleteModal" tabindex="-1">
-  <div class="modal-dialog">
-    <form action="{{ route('bed-types.destroy') }}" method="POST" class="modal-content">
-        @csrf @method('DELETE')
-        <input type="hidden" name="id" id="delete-id">
-        <div class="modal-header"><h5 class="modal-title">Delete Bed Type</h5></div>
-        <div class="modal-body">
-            Are you sure you want to delete <strong id="delete-name"></strong>?
+    {{-- Delete Modal --}}
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <form action="{{ route('bed-types.destroy') }}" method="POST" class="modal-content">
+                @csrf @method('DELETE')
+                <input type="hidden" name="id" id="delete-id">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Bed Type</h5>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete <strong id="delete-name"></strong>?
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
         </div>
-        <div class="modal-footer">
-            <button type="submit" class="btn btn-danger">Delete</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        </div>
-    </form>
-  </div>
-</div>
+    </div>
 
-{{-- Script to handle modal value setting --}}
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const editModal = document.getElementById('editModal');
-    const deleteModal = document.getElementById('deleteModal');
+    {{-- Script to handle modal value setting --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const editModal = document.getElementById('editModal');
+            const deleteModal = document.getElementById('deleteModal');
 
-    editModal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        document.getElementById('edit-id').value = button.getAttribute('data-id');
-        document.getElementById('edit-name').value = button.getAttribute('data-name');
-    });
+            editModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                document.getElementById('edit-id').value = button.getAttribute('data-id');
+                document.getElementById('edit-name').value = button.getAttribute('data-name');
+            });
 
-    deleteModal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        document.getElementById('delete-id').value = button.getAttribute('data-id');
-        document.getElementById('delete-name').textContent = button.getAttribute('data-name');
-    });
-});
-</script>
+            deleteModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                document.getElementById('delete-id').value = button.getAttribute('data-id');
+                document.getElementById('delete-name').textContent = button.getAttribute('data-name');
+            });
+            createAjaxTable({
+                apiUrl: "{{ route('bed-types.index') }}",
+                tableSelector: "#bed_type",
+                paginationSelector: "#pagination-wrapper",
+                searchInputSelector: "#search-input",
+                perPageSelector: "#perPage",
+                rowRenderer: function(item) {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+            <td class="name">${item.name}</td>
+            <td>
+                <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#editModal"
+                    data-id="${item.id}"
+                    data-name="${item.name}"
+                    data-bed_type_id="${item.bed_type?.id ?? ''}"
+                    data-bed_group_id="${item.bed_group?.id ?? ''}"
+                    data-is_available="${item.is_active}">
+                    Edit
+                </button>
+                <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                    data-bs-target="#deleteModal"
+                    data-id="${item.id}"
+                    data-name="${item.name}">
+                    Delete
+                </button>
+            </td>
+        `;
+                    return row;
+                }
+            });
+        });
+    </script>
 @endsection

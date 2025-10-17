@@ -44,7 +44,7 @@
                     <!-- Search Input Box -->
                     <div class="mb-3">
                         <input type="text" id="search-input" class="form-control" placeholder="Search for beds..."
-                            onkeyup="searchTable()">
+                        >
                     </div>
                     @if(session('success'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -106,6 +106,42 @@
                             </tbody>
                         </table>
                     </div>
+                    {{-- Pagination Links --}}
+                    <div class="mt-3" id="pagination-wrapper">
+                        @php
+                            $currentPage = $beds->currentPage();
+                            $lastPage = $beds->lastPage();
+                        @endphp
+                    
+                        {{-- Previous --}}
+                        @if ($beds->onFirstPage())
+                            <button class="btn btn-outline-secondary btn-sm me-1" disabled>« Prev</button>
+                        @else
+                            <a href="{{ $beds->previousPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm me-1">
+                                « Prev
+                            </a>
+                        @endif
+                    
+                        {{-- Page numbers --}}
+                        @for ($page = 1; $page <= $lastPage; $page++)
+                            @if ($page == $currentPage)
+                                <button class="btn btn-primary btn-sm me-1">{{ $page }}</button>
+                            @else
+                                <a href="{{ $beds->url($page) }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm me-1">
+                                    {{ $page }}
+                                </a>
+                            @endif
+                        @endfor
+                    
+                        {{-- Next --}}
+                        @if ($beds->hasMorePages())
+                            <a href="{{ $beds->nextPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm">
+                                Next »
+                            </a>
+                        @else
+                            <button class="btn btn-outline-secondary btn-sm" disabled>Next »</button>
+                        @endif
+                    </div>                                        
                     <!--  End Table -->
                     <div class="mt-3">
                         <strong>Total Beds: <span id="bed-count">{{ count($beds) }}</span></strong>
@@ -128,12 +164,12 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="edit-name" class="form-label">Bed Name</label>
-                        <input type="text" class="form-control" id="edit-name" name="name" required>
+                        <input type="text" class="form-control"  name="name" required>
                     </div>
 
                     <div class="mb-3">
                         <label for="edit-bed-type" class="form-label">Bed Type</label>
-                        <select class="form-select" id="edit-bed-type" name="bed_type_id" required>
+                        <select class="form-select" name="bed_type_id" required>
                             <option value="">Select Type</option>
                             @foreach($bedTypes as $type)
                                 <option value="{{ $type->id }}">{{ $type->name }}</option>
@@ -143,7 +179,7 @@
 
                     <div class="mb-3">
                         <label for="edit-bed-group" class="form-label">Bed Group</label>
-                        <select class="form-select" id="edit-bed-group" name="bed_group_id" required>
+                        <select class="form-select" name="bed_group_id" required>
                             <option value="">Select Group</option>
                             @foreach($bedGroups as $group)
                                 <option value="{{ $group->id }}">{{ $group->name }}</option>
@@ -152,7 +188,7 @@
                     </div>
 
                     <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" id="edit-is-available" name="is_active"
+                        <input class="form-check-input" type="checkbox" name="is_active"
                             value="0">
                         <label class="form-check-label" for="edit-is-available">
                             Not available for use
@@ -269,42 +305,125 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
 
 <script>
-    const options = {
-        valueNames: ['name', 'type', 'group', 'floor', 'status']
-    };
-
-    const bedTable = new List('bed-table-wrapper', options);
-</script>
-
-<script>
-    function searchTable() {
-        var input, filter, table, tr, td, i, txtValue;
-        input = document.getElementById("search-input");
-        filter = input.value.toLowerCase();
-        table = document.getElementById("bed-table");
-        tr = table.getElementsByTagName("tr");
-
-        // Loop through all table rows and hide those that don't match the search query
-        for (i = 1; i < tr.length; i++) { // Skip the header row
-            td = tr[i].getElementsByTagName("td");
-            let rowContainsSearchText = false;
-            // Loop through all columns of the row to check for a match
-            for (let j = 0; j < td.length; j++) {
-                if (td[j]) {
-                    txtValue = td[j].textContent || td[j].innerText;
-                    if (txtValue.toLowerCase().indexOf(filter) > -1) {
-                        rowContainsSearchText = true;
-                    }
-                }
-            }
-
-            if (rowContainsSearchText) {
-                tr[i].style.display = ""; // Show the row
-            } else {
-                tr[i].style.display = "none"; // Hide the row
-            }
-        }
+function createAjaxTable({
+    apiUrl,
+    tableSelector,
+    paginationSelector,
+    searchInputSelector,
+    perPageSelector,
+    rowRenderer
+}) {
+    let debounceTimer;
+    const searchInput = document.querySelector(searchInputSelector);
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                callApi(1);
+            }, 500);
+        });
     }
+
+    // Public call function (can be used by pagination too)
+    function callApi(page = 1) {
+        const searchTerm = searchInput?.value || '';
+        const perPage = document.querySelector(perPageSelector)?.value || 5;
+
+        const url = new URL(apiUrl, window.location.origin);
+        url.searchParams.set("search", searchTerm);
+        url.searchParams.set("page", page);
+        url.searchParams.set("perPage", perPage);
+
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                updateTable(data.result.data);        
+                updatePagination(data.result);
+            })
+            .catch(error => {
+                console.error("Error fetching table data:", error);
+                alert("Error fetching data. Please try again.");
+            });
+    }
+
+    function updateTable(items) {
+        const tableBody = document.querySelector(`${tableSelector} tbody`);
+        if (!tableBody) return;
+        tableBody.innerHTML = "";
+
+        items.forEach(item => {
+            const row = rowRenderer(item);
+            tableBody.appendChild(row);
+        });
+    }
+
+    function updatePagination(pagination) {
+        const wrapper = document.querySelector(paginationSelector);
+        if (!wrapper) return;
+        wrapper.innerHTML = "";
+
+        const currentPage = pagination.current_page;
+        const lastPage = pagination.last_page;
+
+        const prevBtn = createButton("« Prev", currentPage > 1, () => callApi(currentPage - 1));
+        wrapper.appendChild(prevBtn);
+
+        for (let page = 1; page <= lastPage; page++) {
+            const btn = createButton(page, true, () => callApi(page), page === currentPage);
+            wrapper.appendChild(btn);
+        }
+        const nextBtn = createButton("Next »", currentPage < lastPage, () => callApi(currentPage + 1));
+        wrapper.appendChild(nextBtn);
+    }
+
+    function createButton(label, enabled, onClick, isActive = false) {
+        const btn = document.createElement("button");
+        btn.textContent = label;
+        btn.className = `btn btn-sm me-1 ${isActive ? 'btn-primary' : 'btn-outline-secondary'}`;
+        btn.disabled = !enabled;
+        if (enabled) btn.onclick = onClick;
+        return btn;
+    }
+
+    // Expose callApi if needed externally
+    return {
+        refresh: callApi
+    };
+}
+createAjaxTable({
+    apiUrl: "{{ route('bed') }}",
+    tableSelector: "#bed-table",
+    paginationSelector: "#pagination-wrapper",
+    searchInputSelector: "#search-input",
+    perPageSelector: "#perPage",
+    rowRenderer: function (bed) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td class="name">${bed.name}</td>
+            <td class="type">${bed.bed_type?.name ?? 'N/A'}</td>
+            <td class="group">${bed.bed_group?.name ?? 'N/A'}</td>
+            <td class="status">${bed.is_active !== "noused" ? '<i class="fa-solid fa-square-check ms-2"></i>' : 'N/A'}</td>
+            <td>
+                <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#editModal"
+                    data-id="${bed.id}"
+                    data-name="${bed.name}"
+                    data-bed_type_id="${bed?.bed_type_id ?? ''}"
+                    data-bed_group_id="${bed?.bed_group_id ?? ''}"
+                    data-is_available="${bed?.is_active}">
+                    Edit
+                </button>
+                <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                    data-bs-target="#deleteModal"
+                    data-id="${bed.id}"
+                    data-name="${bed.name}">
+                    Delete
+                </button>
+            </td>
+        `;
+        return row;
+    }
+});
     // Copy Table to Clipboard
     new ClipboardJS('#copy-btn');
 
@@ -357,7 +476,6 @@
         const editModal = document.getElementById('editModal');
         editModal.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
-
             document.getElementById('edit-id').value = button.getAttribute('data-id');
             document.getElementById('edit-name').value = button.getAttribute('data-name');
             document.getElementById('edit-bed-type').value = button.getAttribute('data-bed_type_id');

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\ChargeCategory;
 
 class ChargeTypeMaster extends Model
 {
@@ -25,5 +26,9 @@ class ChargeTypeMaster extends Model
         'created_at' => 'datetime',
     ];
 
+    public function chargeCategories()
+{
+    return $this->hasMany(ChargeCategory::class, 'charge_type_id');
+}
     
 }
