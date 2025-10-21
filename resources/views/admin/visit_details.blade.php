@@ -101,7 +101,7 @@
                             <div class="card-body">
                                 <div class="d-sm-flex position-relative z-0 overflow-hidden p-2">
                                     <!-- <img src="assets/img/icons/shape-01.svg" alt="img"
-                                                                                                                                                                                                                                                                class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
+                                                                                                                                                                                                                                                                            class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
                                     <a href="javascript:void(0);"
                                         class="avatar avatar-xxxl patient-avatar me-2 flex-shrink-0">
                                         <img src="assets/img/patient.png" alt="product" class="rounded">
@@ -183,19 +183,19 @@
                                         </div>
                                     </div>
                                     <!-- <div class="row">
-                                                                                                                                                                                                                                                    <div class="col-sm-5">
+                                                                                                                                                                                                                                                                <div class="col-sm-5">
 
-                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                    <div class="col-sm-7">
+                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                <div class="col-sm-7">
 
-                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                    <div class="col-sm-5">
+                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                <div class="col-sm-5">
 
-                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                    <div class="col-sm-7">
+                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                <div class="col-sm-7">
 
-                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                </div> -->
+                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                            </div> -->
                                 </div>
                                 <hr>
                                 <div class="d-flex align-items-center mb-3">
@@ -524,7 +524,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                        
+
                                         </tbody>
                                     </table>
                                 </div>
@@ -638,12 +638,15 @@
                                                                                         <label for="symptoms_title"
                                                                                             class="form-label">Symptoms
                                                                                             Title </label>
-                                                                                        <input type="text" name="symptoms_title" id="symptoms_title" class="form-control">
+                                                                                        <input type="text"
+                                                                                            name="symptoms_title"
+                                                                                            id="symptoms_title"
+                                                                                            class="form-control">
                                                                                     </div>
                                                                                     <div class="col-md-6">
                                                                                         <label for="symptoms_des"
                                                                                             class="form-label">Symptoms
-                                                                                            </label>
+                                                                                        </label>
                                                                                         <textarea name="symptoms"
                                                                                             id="symptoms"
                                                                                             class="form-control"></textarea>
@@ -855,7 +858,7 @@
                                                                                             </option>
                                                                                         </select>
                                                                                     </div>
-                                                                                    
+
                                                                                 </div>
                                                                             </div>
 
@@ -1248,7 +1251,7 @@
                                                                 <td>
                                                                     <h6 class="fs-14 mb-1">OCID14</h6>
                                                                 </td>
-                                                                <td>09/17/2025 12:49 PM	</td>
+                                                                <td>09/17/2025 12:49 PM </td>
                                                                 <td>Anjali Rao (D011)</td>
                                                                 <td></td>
                                                                 <td>Fever</td>
@@ -1264,7 +1267,7 @@
                                                                             <i class="fa-solid fa-prescription"
                                                                                 data-bs-toggle="tooltip"
                                                                                 title="Add Prescription"></i></a>
-                                                                       
+
                                                                         <a href="javascript: void(0);"
                                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
                                                                             <i class="ti ti-menu" data-bs-toggle="tooltip"
@@ -1285,7 +1288,7 @@
                     </div>
                 </div>
             </div>
-              <div class="tab-pane" id="medication">
+            <div class="tab-pane" id="medication">
                 <!-- row start -->
                 <div class="row">
                     <div class="col-12 d-flex">
@@ -1314,20 +1317,20 @@
                                                         <div class="text-end d-flex">
                                                             <a href="javascript:void(0);"
                                                                 class="btn btn-primary text-white ms-2 btn-md"
-                                                                data-bs-toggle="modal" data-bs-target="#add_timeline"><i
-                                                                    class="ti ti-plus me-1"></i>Add Timeline</a>
+                                                                data-bs-toggle="modal" data-bs-target="#add_medication"><i
+                                                                    class="ti ti-plus me-1"></i>Add Medication Dose</a>
                                                         </div>
                                                         <!-- First Modal -->
-                                                        <div class="modal fade" id="add_timeline" tabindex="-1"
+                                                        <div class="modal fade" id="add_medication" tabindex="-1"
                                                             aria-hidden="true">
-                                                            <div class="modal-dialog modal-dialog-centered">
-                                                                <div class="modal-content">
+                                                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                                <div class="modal-content ">
 
                                                                     <div class="modal-header"
                                                                         style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
                                                                         <h5 class="modal-title" id="addSpecializationLabel">
-                                                                            Add Timeline
+                                                                            Add Medication Dose
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
                                                                             data-bs-dismiss="modal"></button>
@@ -1338,42 +1341,65 @@
 
                                                                         <div class="row gy-3">
 
-                                                                            <div class="col-md-12">
-                                                                                <label for="title" class="form-label">Title
-                                                                                    <span class="text-danger">*</span>
-                                                                                </label>
-                                                                                <input type="text" name="title" id="title"
-                                                                                    class="form-control">
-                                                                            </div>
-                                                                            <div class="col-md-12">
+                                                                            <div class="col-md-6">
                                                                                 <label for="date" class="form-label">Date
                                                                                     <span class="text-danger">*</span>
                                                                                 </label>
                                                                                 <input type="date" name="date" id="date"
                                                                                     class="form-control">
                                                                             </div>
-                                                                            <div class="col-md-12">
-                                                                                <label for="description"
-                                                                                    class="form-label">Description
+                                                                            <div class="col-md-6">
+                                                                                <label for="time" class="form-label">Time
+                                                                                    <span class="text-danger">*</span>
                                                                                 </label>
-                                                                                <textarea name="description"
-                                                                                    id="description"
+                                                                                <input type="time" name="time" id="time"
+                                                                                    class="form-control">
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <label for="medi_cat"
+                                                                                    class="form-label">Medicine Category
+                                                                                    <span class="text-danger">*</span>
+                                                                                </label>
+                                                                                <select name="medi_cat" id="med_cat"
+                                                                                    class="form-select"
+                                                                                    data-placeholder="Enter Patient Name or Id…">
+                                                                                    <option value="0">Select</option>
+                                                                                    <option value="1">Antibiotic</option>
+                                                                                </select>
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <label for="med_name"
+                                                                                    class="form-label">Medicine Name
+                                                                                    <span class="text-danger">*</span>
+                                                                                </label>
+                                                                                <select name="med_name" id="med_name"
+                                                                                    class="form-select"
+                                                                                    data-placeholder="Enter Patient Name or Id…">
+                                                                                    <option value="0">Select</option>
+                                                                                    <option value="1">Paracetamol 500mg
+                                                                                    </option>
+                                                                                </select>
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <label for="dosage"
+                                                                                    class="form-label">Dosage
+                                                                                    <span class="text-danger">*</span>
+                                                                                </label>
+                                                                                <select name="dosage" id="dosage"
+                                                                                    class="form-select"
+                                                                                    data-placeholder="Enter Patient Name or Id…">
+                                                                                    <option value="0">Select</option>
+                                                                                    <option value="1">1 Tablet
+                                                                                    </option>
+                                                                                </select>
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <label for="remark"
+                                                                                    class="form-label">Remarks
+                                                                                </label>
+                                                                                <textarea name="remark"
+                                                                                    id="remark"
                                                                                     class="form-control"></textarea>
-                                                                            </div>
-                                                                            <div class="col-md-12">
-                                                                                <label for="attch_doc"
-                                                                                    class="form-label">Attach Document
-                                                                                </label>
-                                                                                <input type="file" name="attch_doc"
-                                                                                    id="date" class="form-control">
-                                                                            </div>
-                                                                            <div class="col-md-12">
-                                                                                <label for="visible_person"
-                                                                                    class="form-check-label">Visible to this
-                                                                                    person
-                                                                                </label>
-                                                                                <input type="checkbox" name="visible_person"
-                                                                                    id="date" class="form-check-input">
                                                                             </div>
                                                                         </div>
 
@@ -1897,6 +1923,20 @@
     <!-- Chart JS -->
     <script src="assets/plugins/chartjs/chart.min.js"></script>
     <script src="assets/plugins/chartjs/chart-data.js"></script>
+   
+    <script>
+        $(document).ready(function () {
+            // Re-initialize Select2 every time the modal is shown
+            $('#add_medication').on('shown.bs.modal', function () {
+                $('#med_cat, #med_name, #dosage').select2({
+                    width: '100%',
+                    placeholder: 'Select',
+                    allowClear: true,
+                    dropdownParent: $('#add_medication')
+                });
+            });
+        });
+    </script>
 
     <!-- Chart.js -->
     <script>
