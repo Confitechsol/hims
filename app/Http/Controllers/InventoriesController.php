@@ -9,9 +9,12 @@ use App\Models\ItemCategory;
 use App\Models\ItemStock;
 use App\Models\ItemStore;
 use App\Models\ItemSupplier;
-use App\Models\ItemStockBatches;
+use App\Models\Department;
+use App\Models\Staff;
 use Illuminate\Support\Facades\DB; 
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
+
 class InventoriesController extends Controller
 {
     public function index()
@@ -205,16 +208,6 @@ class InventoriesController extends Controller
         }
     }
 
-    public function itemIssue()
-    {
-        $categories = ItemCategory::all();
-        $issuedItems = ItemIssue::all();
-        $suppliers = ItemSupplier::all();
-        $stores = ItemStore::all();
-        $stocks = ItemStock::with(['itemCategory', 'item', 'supplier', 'store'])->latest()->get();
-        return view('admin.inventory.issue_item', compact('categories','issuedItems','suppliers','stores','stocks'));
-    }
-
     public function items()
     {
         $items = Item::with('category')->get();
@@ -351,6 +344,132 @@ class InventoriesController extends Controller
                 return redirect()->back()->with('error', 'Failed to delete item: ' . $e->getMessage());
         }
     }
+
+    public function issueItems()
+    {
+        $categories = ItemCategory::all();
+        $itemIssues = ItemIssue::with(['item', 'category','issuedTo'])->get();
+        // $suppliers = ItemSupplier::all();
+        $staffs = Staff::with('department')->get();
+        $stores = ItemStore::all();
+        $departments = Department::all();
+        $stocks = ItemStock::with(['itemCategory', 'item', 'supplier', 'store'])->latest()->get();
+        return view('admin.inventory.issue_item', compact('categories','itemIssues','departments','stores','stocks','staffs'));
+    }
+
+    public function getStaffByDepartment(Request $request)
+    {
+        $staff = Staff::where('department_id', $request->department_id)
+                    ->select('id', 'name', 'surname')
+                    ->get();
+        return response()->json($staff);
+    }
+
+    public function storeIssuedItem(Request $request)
+    {
+         $validator = Validator::make($request->all(), [
+            'department_id' => 'required',
+            'item_category_id' => 'required|integer|exists:item_category,id',
+            'item_id' => 'required|integer|exists:item,id',
+            'quantity' => 'required|numeric|min:1',
+            'issue_to' => 'required|integer|exists:staff,id',
+            'issue_date' => 'required|date',
+            'return_date' => 'nullable|date|after_or_equal:issue_date',
+            'note' => 'nullable|string|max:500',
+        ]);
+
+        if ($validator->fails()) {
+            dd($validator->errors()->all()); // Dumps all error messages
+        }
+
+        $validatedData = $validator->validated();
+        // dd( $validatedData);
+
+        try {
+            $issue = new ItemIssue();
+            $issue->hospital_id = Auth::user()->hospital_id ?? null;
+            $issue->branch_id = Auth::user()->branch_id ?? null;
+            $issue->department_id = $validatedData['department_id'];
+            $issue->item_category_id = $validatedData['item_category_id'];
+            $issue->item_id = $validatedData['item_id'];
+            $issue->quantity = $validatedData['quantity'];
+            $issue->issue_to = $validatedData['issue_to'];
+            $issue->issue_by = Auth::id();
+            $issue->issue_date = $validatedData['issue_date'];
+            $issue->return_date = $validatedData['return_date'] ?? null;
+            $issue->note = $validatedData['note'] ?? null;
+            $issue->is_returned = 0;
+            $issue->is_active = 1;
+
+            $issue->save();
+
+            return redirect()->back()->with('success', 'Item issued successfully.');
+
+        } catch (\Exception $e) {
+            //dd( $e);
+            return redirect()->back()->with('error', 'Error issuing item: ' . $e->getMessage());
+        }
+    }
+    public function editIssuedItem($id)
+    {
+        
+        $issue = ItemIssue::with(['category', 'item', 'issuedTo', 'department'])
+                    ->findOrFail($id);
+        $categories = ItemCategory::select('id', 'item_category')->get();
+         $departments = Department::select('id', 'department_name')->get();
+        return response()->json(['issue' => $issue, 'categories' => $categories,
+        'departments' => $departments]);
+    }
+    public function getItemsByCategory(Request $request)
+    {
+        $items = Item::where('item_category_id', $request->category_id)->select('id', 'name')->get();
+        return response()->json($items);
+    }
+
+    public function updateIssuedItem(Request $request, $id)
+{
+    
+    // Validate incoming request
+    $validator = Validator::make($request->all(), [
+        'item_category_id' => 'required',
+        'item_id' => 'required',
+        'department_id' => 'required',
+        'issued_to' => 'nullable',
+        'issued_date' => 'required|date',
+        'quantity' => 'required|numeric|min:1',
+        'remarks' => 'nullable|string',
+    ]);
+
+    if ($validator->fails()) {
+            dd($validator->errors()->all()); // Dumps all error messages
+        }
+
+        $validatedData = $validator->validated();
+
+    // Find the issue record
+    $issue = ItemIssue::findOrFail($id);
+
+    // Update the issue record
+    $issue->update([
+        'item_category_id' => $request->item_category_id,
+        'item_id' => $request->item_id,
+        'department_id' => $request->department_id,
+        'issue_to' => $request->issued_to,
+        'issue_by' => auth()->id(), // or get from form if editable
+        'issue_date' => $request->issued_date,
+        'return_date' => $request->return_date ?? null,
+        'quantity' => $request->quantity,
+        'note' => $request->remarks,
+        'is_returned' => $request->has('is_returned') ? 1 : 0,
+        'is_active' => $request->has('is_active') ? 1 : 0,
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Item issue updated successfully.',
+        'issue' => $issue,
+    ]);
+}
 
 
 }

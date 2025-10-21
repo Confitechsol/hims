@@ -14,7 +14,7 @@ class ItemIssue extends Model
     protected $fillable = [
         'hospital_id',
         'branch_id',
-        'issue_type',
+        'department_id',
         'issue_to',
         'issue_by',
         'issue_date',
@@ -42,4 +42,16 @@ class ItemIssue extends Model
     {
         return $this->belongsTo(Item::class, 'item_id');
     }
+
+    public function issuedTo()
+{
+    return $this->belongsTo(Staff::class, 'issue_to', 'id'); 
+}
+
+public function department()
+    {
+        return $this->belongsTo(Department::class, 'department_id', 'id');
+    }
+
+
 }

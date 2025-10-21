@@ -48,7 +48,7 @@
                                                     <div class="modal-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                                                         <div class="row w-100 align-items-center">
                                                             <div class="col-md-7">
-                                                                <select class="form-select" id="patient_id" name="patient_id"
+                                                                <select class="form-select select2" id="patient_id" name="patient_id"
                                                                     data-placeholder="Enter Patient Name or Id…">
                                                                     <option value="">Select Patient</option>
                                                                     @foreach($patients as $patient)
