@@ -263,6 +263,8 @@ Route::middleware(['admin'])->group(function () {
 
     Route::get('/tpa_details/{id?}', [TpamanagmentController::class, 'detailsshow'])->name('tpa_details.show');
     Route::post('/tpa_details/{id?}', [TpamanagmentController::class, 'detailsshow'])->name('tpa_details.chragetype');
+    Route::delete('/tpa_details/destroy', [TpamanagmentController::class, 'destroyTpaDetails'])->name('tpa_details.destroy');
+    Route::put('/tpa_details/update', [TpamanagmentController::class, 'updateTpaDetails'])->name('tpa_details.update');
 
 });
 
@@ -454,7 +456,7 @@ Route::prefix('/appointment-details')->group(function () {
     Route::get('/get-doctor-shifts/{id}', [AppointmentController::class, 'getDoctorShifts'])->name('doctor.shifts');
     Route::get('/get-doctor-slots/{doctorId}/{shiftId}', [AppointmentController::class, 'getDoctorSlots'])->name('doctor.slots');
     Route::get('/get-appointment-priorities', [AppointmentController::class, 'getAppointmentPriorities'])->name('appointment.priorities');
-    // Route::put('/appointments/{id}', [AppointmentsController::class, 'update'])->name('appointments.update');
+
     Route::get('/appointments/{id}/edit', [AppointmentsController::class, 'edit'])->name('appointments.edit');
     Route::put('/appointments/{id}', [AppointmentsController::class, 'update'])->name('appointments.update');
     Route::get('/doctor-wise', [AppointmentsController::class, 'doctorwise'])->name('appointments.doctor-wise');
@@ -475,3 +477,6 @@ Route::prefix('/inventory')->group(function () {
 Route::get('/opd-billing', function () {
     return view('admin.billing.opd');
 })->name('opd.billing');
+Route::get('/visit_details', function () {
+    return view('admin.visit_details');
+})->name('visit_details');

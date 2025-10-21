@@ -53,6 +53,12 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a href="#medication" data-bs-toggle="tab" aria-expanded="true" class="nav-link bg-transparent"><i
+                        class="fa-solid fa-flask text-primary"></i>
+                    <span>Medication</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a href="#lab_investigation" data-bs-toggle="tab" aria-expanded="true" class="nav-link bg-transparent"><i
                         class="fa-solid fa-flask text-primary"></i>
                     <span>Lab Investigation</span>
@@ -95,7 +101,7 @@
                             <div class="card-body">
                                 <div class="d-sm-flex position-relative z-0 overflow-hidden p-2">
                                     <!-- <img src="assets/img/icons/shape-01.svg" alt="img"
-                                                                                                                                                                                                                class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
+                                                                                                                                                                                                                                                                class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
                                     <a href="javascript:void(0);"
                                         class="avatar avatar-xxxl patient-avatar me-2 flex-shrink-0">
                                         <img src="assets/img/patient.png" alt="product" class="rounded">
@@ -177,19 +183,19 @@
                                         </div>
                                     </div>
                                     <!-- <div class="row">
-                                                                                                                                                                                                    <div class="col-sm-5">
+                                                                                                                                                                                                                                                    <div class="col-sm-5">
 
-                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                    <div class="col-sm-7">
+                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                    <div class="col-sm-7">
 
-                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                    <div class="col-sm-5">
+                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                    <div class="col-sm-5">
 
-                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                    <div class="col-sm-7">
+                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                    <div class="col-sm-7">
 
-                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                </div> -->
+                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                </div> -->
                                 </div>
                                 <hr>
                                 <div class="d-flex align-items-center mb-3">
@@ -277,26 +283,67 @@
                         <div class="card shadow-sm border-0 mt-2">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Medical History
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> OPD Payment /
+                                    Billing
                                 </h5>
                             </div>
                             <div class="card-body">
-                                <div class="card card-h-100">
-                                    <div class="card-header">
-                                        <div class="card-title">Line Chart</div>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="chartjs-wrapper-demo">
-                                            <canvas id="chartLine1" class="h-300"></canvas>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="text-primary">OPD Payment/Billing</h6>
+                                        <span>92.31%</span>
+                                        <div class="progress mb-3 mt-1" role="progressbar" aria-valuenow="92.31"
+                                            aria-valuemin="0" aria-valuemax="100">
+                                            <div class="progress-bar bg-gradient" style="width: 90%;"></div>
                                         </div>
-                                    </div><!-- end card body -->
-                                </div><!-- end card -->
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-primary">Pharmacy Payment/Billing</h6>
+                                        <span>0%</span>
+                                        <div class="progress mb-3 mt-1" role="progressbar" aria-valuenow="0"
+                                            aria-valuemin="0" aria-valuemax="100">
+                                            <div class="progress-bar" style="width: 0%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-primary">Pathology Payment/Billing</h6>
+                                        <span>0%</span>
+                                        <div class="progress mb-3 mt-1" role="progressbar" aria-valuenow="0"
+                                            aria-valuemin="0" aria-valuemax="100">
+                                            <div class="progress-bar" style="width: 0%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-primary">Radiology Payment/Billing</h6>
+                                        <span>0%</span>
+                                        <div class="progress mb-3 mt-1" role="progressbar" aria-valuenow="0"
+                                            aria-valuemin="0" aria-valuemax="100">
+                                            <div class="progress-bar" style="width: 0%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-primary">Blood Bank Payment/Billing</h6>
+                                        <span>0%</span>
+                                        <div class="progress mb-3 mt-1" role="progressbar" aria-valuenow="0"
+                                            aria-valuemin="0" aria-valuemax="100">
+                                            <div class="progress-bar" style="width: 0%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-primary">Ambulance Payment/Billing</h6>
+                                        <span>0%</span>
+                                        <div class="progress mb-0 mt-1" role="progressbar" aria-valuenow="0"
+                                            aria-valuemin="0" aria-valuemax="100">
+                                            <div class="progress-bar" style="width: 0%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="card shadow-sm border-0 mt-2">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Visit Details
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Medication
                                 </h5>
                             </div>
                             <div class="card-body">
@@ -305,24 +352,16 @@
                                     <table class="table border">
                                         <thead class="thead-light">
                                             <tr>
-                                                <th>OPD No</th>
-                                                <th>Case ID</th>
-                                                <th>Appointment Date</th>
-                                                <th>Consultant</th>
-                                                <th>Reference</th>
-                                                <th>Symptoms</th>
+                                                <th>Date</th>
+                                                <th>Medicine Name</th>
+                                                <th>Dose</th>
+                                                <th>Time</th>
+                                                <th>Remark</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td>
-                                                    <h6 class="fs-14 mb-1"><a href="#" class="fw-semibold">OPDN28</a></h6>
-                                                </td>
-                                                <td>33</td>
-                                                <td>10/09/2025 12:30 PM </td>
-                                                <td>Anirban Ghosh (D010)</td>
-                                                <td></td>
-                                                <td>Fever</td>
+
                                             </tr>
                                         </tbody>
                                     </table>
@@ -343,7 +382,6 @@
                                         <thead class="thead-light">
                                             <tr>
                                                 <th>Test Name</th>
-                                                <th>Case ID</th>
                                                 <th>Lab</th>
                                                 <th>Sample Collected</th>
                                                 <th>Expected Date</th>
@@ -356,7 +394,6 @@
                                                     Lipid Profile
                                                     (Lipid Profile)
                                                 </td>
-                                                <td></td>
                                                 <td>Pathology</td>
                                                 <td></td>
                                                 <td>09/21/2025</td>
@@ -371,7 +408,7 @@
                         <div class="card shadow-sm border-0 mt-2">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Treatment History
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Operation
                                 </h5>
                             </div>
                             <div class="card-body">
@@ -380,25 +417,114 @@
                                     <table class="table border">
                                         <thead class="thead-light">
                                             <tr>
-                                                <th>OPD No</th>
-                                                <th>Case ID</th>
-                                                <th>Appointment Date</th>
-                                                <th>Consultant</th>
-                                                <th>Reference</th>
-                                                <th>Symptoms</th>
+                                                <th>Reference No</th>
+                                                <th>Operation Date</th>
+                                                <th>Operation Name</th>
+                                                <th>Operation Category</th>
+                                                <th>OT Technician</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- Table end -->
+                            </div>
+                        </div>
+                        <div class="card shadow-sm border-0 mt-2">
+                            <div class="card-header"
+                                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Charges
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Table start -->
+                                <div class="table-responsive table-nowrap">
+                                    <table class="table border">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Charge Type</th>
+                                                <th>Standard Charge (INR)</th>
+                                                <th>Tax</th>
+                                                <th>Applied Charge (INR)</th>
+                                                <th>Amount (INR)</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr>
                                                 <td>
-                                                    <h6 class="fs-14 mb-1"><a href="#" class="fw-semibold">OPDN28</a></h6>
+                                                    Doctor Fees
                                                 </td>
-                                                <td>33</td>
-                                                <td>10/09/2025 12:30 PM </td>
-                                                <td>Anirban Ghosh (D010)</td>
-                                                <td></td>
-                                                <td>Fever</td>
+                                                <td style="text-transform: capitalize;">OPD</td>
+                                                <td class="text-right">50.00</td>
+                                                <td class="text-right">(0.00%) 0.00</td>
+                                                <td class="text-right">400.00</td>
+                                                <td class="text-right">400.00</td>
                                             </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- Table end -->
+                            </div>
+                        </div>
+                        <div class="card shadow-sm border-0 mt-2">
+                            <div class="card-header"
+                                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Payment
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Table start -->
+                                <div class="table-responsive table-nowrap">
+                                    <table class="table border">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>Transaction ID </th>
+                                                <th>Date</th>
+                                                <th>Note</th>
+                                                <th>Payment Mode</th>
+                                                <th>Paid Amount (INR)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="text-right">TRID83</td>
+                                                <td class="text-right">10/13/2025 06:25 PM</td>
+                                                <td class="text-right">SmartPay Transaction ID: 528612554379</td>
+                                                <td class="text-right"><br> </td>
+                                                <td class="text-right">20.00</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- Table end -->
+                            </div>
+                        </div>
+                        <div class="card shadow-sm border-0 mt-2">
+                            <div class="card-header"
+                                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Live Consultation
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Table start -->
+                                <div class="table-responsive table-nowrap">
+                                    <table class="table border">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>Consultation Title</th>
+                                                <th>Date</th>
+                                                <th>Created By</th>
+                                                <th>Created For</th>
+                                                <th>Patient</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        
                                         </tbody>
                                     </table>
                                 </div>
@@ -418,7 +544,7 @@
                         <div class="card shadow-sm flex-fill w-100">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Visits</h5>
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Checkups</h5>
                             </div>
                             <div class="card-body">
                                 <div class="row">
@@ -440,7 +566,7 @@
                                                             <a href="javascript:void(0);"
                                                                 class="btn btn-primary text-white ms-2 btn-md"
                                                                 data-bs-toggle="modal" data-bs-target="#add_appointment"><i
-                                                                    class="ti ti-plus me-1"></i>New Visit</a>
+                                                                    class="ti ti-plus me-1"></i>New Checkup</a>
                                                         </div>
                                                         <!-- First Modal -->
                                                         <div class="modal fade" id="add_appointment" tabindex="-1"
@@ -512,17 +638,14 @@
                                                                                         <label for="symptoms_title"
                                                                                             class="form-label">Symptoms
                                                                                             Title </label>
-                                                                                        <input type="text"
-                                                                                            name="symptoms_title"
-                                                                                            id="symptoms_title"
-                                                                                            class="form-control">
+                                                                                        <input type="text" name="symptoms_title" id="symptoms_title" class="form-control">
                                                                                     </div>
                                                                                     <div class="col-md-6">
                                                                                         <label for="symptoms_des"
                                                                                             class="form-label">Symptoms
-                                                                                            Description</label>
-                                                                                        <textarea name="symptoms_des"
-                                                                                            id="symptoms_des"
+                                                                                            </label>
+                                                                                        <textarea name="symptoms"
+                                                                                            id="symptoms"
                                                                                             class="form-control"></textarea>
                                                                                     </div>
                                                                                     <div class="col-md-6">
@@ -732,18 +855,7 @@
                                                                                             </option>
                                                                                         </select>
                                                                                     </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <div
-                                                                                            class="form-check d-flex gap-2 mt-5">
-                                                                                            <input type="checkbox"
-                                                                                                name="antenatal"
-                                                                                                id="antenatal"
-                                                                                                class="form-check-input">
-                                                                                            <label for="antenatal"
-                                                                                                class="form-check-label">Is
-                                                                                                Antenatal</label>
-                                                                                        </div>
-                                                                                    </div>
+                                                                                    
                                                                                 </div>
                                                                             </div>
 
@@ -1123,10 +1235,9 @@
                                                     <table class="table border">
                                                         <thead class="thead-light">
                                                             <tr>
-                                                                <th>OPD No</th>
-                                                                <th>Case ID</th>
+                                                                <th>OPD Checkup ID</th>
                                                                 <th>Appointment Date</th>
-                                                                <th>Consultant Doctor</th>
+                                                                <th>Consultant</th>
                                                                 <th>Reference</th>
                                                                 <th>Symptoms</th>
                                                                 <th>Action</th>
@@ -1135,12 +1246,10 @@
                                                         <tbody>
                                                             <tr>
                                                                 <td>
-                                                                    <h6 class="fs-14 mb-1"><a href="#"
-                                                                            class="fw-semibold">OPDN25</a></h6>
+                                                                    <h6 class="fs-14 mb-1">OCID14</h6>
                                                                 </td>
-                                                                <td>30</td>
-                                                                <td>10/21/2025 01:44 PM</td>
-                                                                <td>Anirban Ghosh (D010)</td>
+                                                                <td>09/17/2025 12:49 PM	</td>
+                                                                <td>Anjali Rao (D011)</td>
                                                                 <td></td>
                                                                 <td>Fever</td>
                                                                 <td>
@@ -1155,20 +1264,160 @@
                                                                             <i class="fa-solid fa-prescription"
                                                                                 data-bs-toggle="tooltip"
                                                                                 title="Add Prescription"></i></a>
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
-                                                                            <i class="fa-solid fa-file-prescription"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Manual Prescription"></i></a>
+                                                                       
                                                                         <a href="javascript: void(0);"
                                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
                                                                             <i class="ti ti-menu" data-bs-toggle="tooltip"
                                                                                 title="Show"></i></a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <!-- Table end -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+              <div class="tab-pane" id="medication">
+                <!-- row start -->
+                <div class="row">
+                    <div class="col-12 d-flex">
+                        <div class="card shadow-sm flex-fill w-100">
+                            <div class="card-header"
+                                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Timeline
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div
+                                                    class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
+                                                    <div class="input-icon-start position-relative me-2">
+                                                        <span class="input-icon-addon">
+                                                            <i class="ti ti-search"></i>
+                                                        </span>
+                                                        <input type="text" class="form-control shadow-sm"
+                                                            placeholder="Search">
+
+                                                    </div>
+                                                    <div class="d-flex align-items-center flex-wrap gap-2">
+                                                        <div class="text-end d-flex">
+                                                            <a href="javascript:void(0);"
+                                                                class="btn btn-primary text-white ms-2 btn-md"
+                                                                data-bs-toggle="modal" data-bs-target="#add_timeline"><i
+                                                                    class="ti ti-plus me-1"></i>Add Timeline</a>
+                                                        </div>
+                                                        <!-- First Modal -->
+                                                        <div class="modal fade" id="add_timeline" tabindex="-1"
+                                                            aria-hidden="true">
+                                                            <div class="modal-dialog modal-dialog-centered">
+                                                                <div class="modal-content">
+
+                                                                    <div class="modal-header"
+                                                                        style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+
+                                                                        <h5 class="modal-title" id="addSpecializationLabel">
+                                                                            Add Timeline
+                                                                        </h5>
+                                                                        <button type="button" class="btn-close"
+                                                                            data-bs-dismiss="modal"></button>
+
+                                                                    </div>
+
+                                                                    <div class="modal-body">
+
+                                                                        <div class="row gy-3">
+
+                                                                            <div class="col-md-12">
+                                                                                <label for="title" class="form-label">Title
+                                                                                    <span class="text-danger">*</span>
+                                                                                </label>
+                                                                                <input type="text" name="title" id="title"
+                                                                                    class="form-control">
+                                                                            </div>
+                                                                            <div class="col-md-12">
+                                                                                <label for="date" class="form-label">Date
+                                                                                    <span class="text-danger">*</span>
+                                                                                </label>
+                                                                                <input type="date" name="date" id="date"
+                                                                                    class="form-control">
+                                                                            </div>
+                                                                            <div class="col-md-12">
+                                                                                <label for="description"
+                                                                                    class="form-label">Description
+                                                                                </label>
+                                                                                <textarea name="description"
+                                                                                    id="description"
+                                                                                    class="form-control"></textarea>
+                                                                            </div>
+                                                                            <div class="col-md-12">
+                                                                                <label for="attch_doc"
+                                                                                    class="form-label">Attach Document
+                                                                                </label>
+                                                                                <input type="file" name="attch_doc"
+                                                                                    id="date" class="form-control">
+                                                                            </div>
+                                                                            <div class="col-md-12">
+                                                                                <label for="visible_person"
+                                                                                    class="form-check-label">Visible to this
+                                                                                    person
+                                                                                </label>
+                                                                                <input type="checkbox" name="visible_person"
+                                                                                    id="date" class="form-check-input">
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="submit"
+                                                                            class="btn btn-primary">Save</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- Table start -->
+                                                <div class="table-responsive table-nowrap">
+                                                    <table class="table border">
+                                                        <thead class="thead-light">
+                                                            <tr>
+                                                                <th>OPD No</th>
+                                                                <th>Case ID</th>
+                                                                <th>Appointment Date</th>
+                                                                <th>Title</th>
+                                                                <th>Date</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <h6 class="fs-14 mb-1"><a href="#"
+                                                                            class="fw-semibold">OPDN14</a></h6>
+                                                                </td>
+                                                                <td>18</td>
+                                                                <td> 09/17/2025 12:49 PM</td>
+                                                                <td>xyz
+                                                                </td>
+                                                                <td>09/17/2025 12:49 PM
+                                                                </td>
+                                                                <td>
+                                                                    <div class="d-flex gap-2">
                                                                         <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-warning rounded-pill">
-                                                                            <i class="fa-solid fa-arrow-right-from-bracket"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Move in IPD"></i></a>
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
+                                                                            <i class="ti ti-menu" data-bs-toggle="tooltip"
+                                                                                title="Show"></i></a>
                                                                     </div>
                                                                 </td>
                                                             </tr>
