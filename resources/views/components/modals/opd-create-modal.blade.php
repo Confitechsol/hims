@@ -653,7 +653,7 @@
                             </div>
                         </div>
                     </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close button-close" data-bs-dismiss="modal"></button>
                 </div>
 
                 <!-- Modal Body -->
@@ -1014,7 +1014,8 @@
 
                 <!-- Modal Footer -->
                 <div class="modal-footer mt-3">
-                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">
+                    <button type="button" class="btn btn-outline-dark button-close" id="button-close"
+                        data-bs-dismiss="modal">
                         <i class="bi bi-x-circle me-2"></i>Cancel
                     </button>
                     <button type="submit" class="btn btn-outline-primary">
@@ -1777,6 +1778,8 @@
         }
 
         setOptions(options) {
+            // console.log("options", options);
+
             this.selectElement.innerHTML = '';
 
             options.forEach(opt => {
@@ -1819,99 +1822,119 @@
     }
 
     // Initialize the application
-    document.addEventListener('shown.bs.modal', function() {
-        // Mock data for symptom types
-        const symptomTypes = window.symptomTypesData;
+    document.addEventListener('DOMContentLoaded', function() {
+        const createOpdModal = document.getElementById('createOpdModal');
+        const closeButton = createOpdModal.querySelector('.button-close');
+        const cancelButton = document.getElementById('button-close');
+
+        createOpdModal.addEventListener('shown.bs.modal', function() {
+            if (window.symptomTypeSelect) window.symptomTypeSelect = null;
+            if (window.symptomTitleSelect) window.symptomTitleSelect = null;
+
+            // Mock data for symptom types
+            const symptomTypes = window.symptomTypesData;
 
 
-        // Initialize Symptom Type Select
-        const symptomTypeSelect = new CustomMultiSelect('symptoms_type', {
-            onChange: function(selectedValues) {
-                loadSymptomTitles(selectedValues);
-            }
-        });
 
-        // Load initial symptom types
-        symptomTypeSelect.setOptions(symptomTypes);
+            // Initialize Symptom Type Select
+            const symptomTypeSelect = new CustomMultiSelect('symptoms_type', {
+                onChange: function(selectedValues) {
+                    loadSymptomTitles(selectedValues);
+                }
+            });
 
-        // Initialize Symptom Title Select (disabled initially)
-        const symptomTitleSelect = new CustomMultiSelect('symptoms_title', {
-            disabled: true,
-            onChange: function(selectedValues) {}
-        });
+            // Load initial symptom types
+            symptomTypeSelect.setOptions(symptomTypes);
+
+            // Initialize Symptom Title Select (disabled initially)
+            const symptomTitleSelect = new CustomMultiSelect('symptoms_title', {
+                disabled: true,
+                onChange: function(selectedValues) {}
+            });
 
 
-        function loadSymptomTitles(selectedTypeIds) {
-            if (selectedTypeIds.length === 0) {
-                symptomTitleSelect.disable();
-                symptomTitleSelect.reset();
-                return;
-            }
+            function loadSymptomTitles(selectedTypeIds) {
+                if (selectedTypeIds.length === 0) {
+                    symptomTitleSelect.disable();
+                    symptomTitleSelect.reset();
+                    return;
+                }
 
-            symptomTitleSelect.showLoading();
-            symptomTitleSelect.enable();
-            const symptomSelect = document.getElementById('symptoms_title');
-            fetch("{{ route('getSymptoms') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    body: JSON.stringify({
-                        selectedTypeIds
+                symptomTitleSelect.showLoading();
+                symptomTitleSelect.enable();
+                const symptomSelect = document.getElementById('symptoms_title');
+                fetch("{{ route('getSymptoms') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                .content
+                        },
+                        body: JSON.stringify({
+                            selectedTypeIds
+                        })
                     })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    symptomSelect.innerHTML = '<option value="">Select</option>';
-                    data.forEach(title => {
-                        const option = document.createElement('option');
-                        option.value = title.id;
-                        option.textContent = title.symptoms_title;
-                        if ("{{ old('symptoms_title[]') }}" == title.id) {
-                            option.selected = true;
-                        }
-                        symptomSelect.appendChild(option);
+                    .then(response => response.json())
+                    .then(data => {
+                        symptomSelect.innerHTML = '<option value="">Select</option>';
+                        data.forEach(title => {
+                            const option = document.createElement('option');
+                            option.value = title.id;
+                            option.textContent = title.symptoms_title;
+                            if ("{{ old('symptoms_title[]') }}" == title.id) {
+                                option.selected = true;
+                            }
+                            symptomSelect.appendChild(option);
+                        });
+                        symptomTitleSelect.setOptions(data);
+                    })
+                    .catch(error => {
+                        console.error('Error loading symptom titles:', error);
+                        symptomTitleSelect.optionsContainer.innerHTML =
+                            '<div class="multiselect-no-results">Error loading titles. Please try again.</div>';
                     });
-                    symptomTitleSelect.setOptions(data);
-                })
-                .catch(error => {
-                    console.error('Error loading symptom titles:', error);
-                    symptomTitleSelect.optionsContainer.innerHTML =
-                        '<div class="multiselect-no-results">Error loading titles. Please try again.</div>';
-                });
-        }
+            }
 
-        const form = document.querySelector('#opdForm'); // Replace with your actual form ID
-        form.addEventListener('submit', function(e) {
-            // Before submitting, inject hidden inputs for both multi-select fields
-            const existingHiddenInputs = form.querySelectorAll(
-                'input[name="symptoms_type[]"], input[name="symptoms_title[]"]');
-            existingHiddenInputs.forEach(input => input.remove()); // Clear old ones
+            // const form = document.querySelector('#opdForm'); // Replace with your actual form ID
+            // form.addEventListener('submit', function(e) {
+            //     // Before submitting, inject hidden inputs for both multi-select fields
+            //     const existingHiddenInputs = form.querySelectorAll(
+            //         'input[name="symptoms_type[]"], input[name="symptoms_title[]"]');
+            //     existingHiddenInputs.forEach(input => input.remove()); // Clear old ones
 
-            const selectedTypes = symptomTypeSelect.getSelectedValues();
-            const selectedTitles = symptomTitleSelect.getSelectedValues();
+            //     const selectedTypes = symptomTypeSelect.getSelectedValues();
+            //     const selectedTitles = symptomTitleSelect.getSelectedValues();
 
-            // Add symptom types
-            selectedTypes.forEach(value => {
-                const hiddenInput = document.createElement('input');
-                hiddenInput.type = 'hidden';
-                hiddenInput.name = 'symptoms_type[]';
-                hiddenInput.value = value;
-                form.appendChild(hiddenInput);
-            });
+            //     // Add symptom types
+            //     selectedTypes.forEach(value => {
+            //         const hiddenInput = document.createElement('input');
+            //         hiddenInput.type = 'hidden';
+            //         hiddenInput.name = 'symptoms_type[]';
+            //         hiddenInput.value = value;
+            //         form.appendChild(hiddenInput);
+            //     });
 
-            // Add symptom titles
-            selectedTitles.forEach(value => {
-                const hiddenInput = document.createElement('input');
-                hiddenInput.type = 'hidden';
-                hiddenInput.name = 'symptoms_title[]';
-                hiddenInput.value = value;
-                form.appendChild(hiddenInput);
-            });
+            //     // Add symptom titles
+            //     selectedTitles.forEach(value => {
+            //         const hiddenInput = document.createElement('input');
+            //         hiddenInput.type = 'hidden';
+            //         hiddenInput.name = 'symptoms_title[]';
+            //         hiddenInput.value = value;
+            //         form.appendChild(hiddenInput);
+            //     });
 
-            // Form continues submitting normally
+            //     // Form continues submitting normally
+            // });
+
         });
 
-    });
+        closeButton.addEventListener('click', () => {
+            window.location.reload();
+        })
+
+
+        cancelButton.addEventListener('click', () => {
+            window.location.reload();
+        })
+    })
 </script>
