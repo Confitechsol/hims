@@ -88,65 +88,120 @@
                                             data-bs-target="#createOpdModal">Appoint Patient</button>
                                     </div>
                                 </div>
-                                <div class="table-responsive">
-                                    <table class="table mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>OPD No.</th>
-                                                <th>Patient Name</th>
-                                                <th>Consultant</th>
-                                                <th>Reference</th>
-                                                <th>Symptoms</th>
-                                                <th>Admission Date</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($opd as $opdDetails)
+                                @if ($isOpdTab)
+                                    <div class="table-responsive">
+                                        <table class="table mb-0">
+                                            <thead>
                                                 <tr>
-                                                    <td>{{ $loop->iteration }}</td>
-                                                    <td><a href="#"
-                                                            class="text-primary">{{ $opdDetails->opd_no }}</a>
-                                                    </td>
-                                                    <td>{{ $opdDetails->patient->patient_name }}</td>
-                                                    <td>{{ $opdDetails->doctor->name ?? '-' }}</td>
-                                                    <td>{{ $opdDetails->reference ?? '-' }}</td>
-                                                    <td>
-                                                        @if (isset($opdSymptoms[$opdDetails->opd_no]) && count($opdSymptoms[$opdDetails->opd_no]) > 0)
-                                                            @foreach ($opdSymptoms[$opdDetails->opd_no] as $symptom)
-                                                                <span
-                                                                    class="badge bg-primary me-1">{{ $symptom->symptoms_title }}</span>
-                                                            @endforeach
-                                                        @else
-                                                            -
-                                                        @endif
-                                                    </td>
-                                                    <td>{{ \Carbon\Carbon::parse($opdDetails->created_at)->format('d-M-Y') }}
-                                                    </td>
-                                                    <td>
-
-                                                        <a href="{{ route('opd.edit', [$opdDetails->id]) }}"
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
-                                                            data-id="{{ $opdDetails->id }}">
-                                                            <i class="ti ti-pencil"></i></a>
-                                                        <form action="" class="d-inline"
-                                                            id="delete-form-{{ $opdDetails->id }}" method="POST">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <a href="javascript: void(0);"
-                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill delete-button"
-                                                                data-opd-id="{{ $opdDetails->id }}"
-                                                                data-form-id="delete-form-{{ $opdDetails->id }}">
-                                                                <i class="ti ti-trash"></i></a>
-                                                        </form>
-                                                    </td>
+                                                    <th>#</th>
+                                                    <th>OPD No.</th>
+                                                    <th>Patient Name</th>
+                                                    <th>Consultant</th>
+                                                    <th>Reference</th>
+                                                    <th>Symptoms</th>
+                                                    <th>Admission Date</th>
+                                                    <th>Action</th>
                                                 </tr>
-                                            @endforeach
-                                        </tbody>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($opd as $opdDetails)
+                                                    <tr>
+                                                        <td>{{ $loop->iteration }}</td>
+                                                        <td><a href="#"
+                                                                class="text-primary">{{ $opdDetails->opd_no }}</a>
+                                                        </td>
+                                                        <td>{{ $opdDetails->patient->patient_name }}</td>
+                                                        <td>{{ $opdDetails->doctor->name ?? '-' }}</td>
+                                                        <td>{{ $opdDetails->reference ?? '-' }}</td>
+                                                        <td>
+                                                            @if (isset($opdSymptoms[$opdDetails->opd_no]) && count($opdSymptoms[$opdDetails->opd_no]) > 0)
+                                                                @foreach ($opdSymptoms[$opdDetails->opd_no] as $symptom)
+                                                                    <span
+                                                                        class="badge bg-primary me-1">{{ $symptom->symptoms_title }}</span>
+                                                                @endforeach
+                                                            @else
+                                                                -
+                                                            @endif
+                                                        </td>
+                                                        <td>{{ \Carbon\Carbon::parse($opdDetails->created_at)->format('d-M-Y') }}
+                                                        </td>
+                                                        <td>
 
-                                    </table>
-                                </div>
+                                                            <a href="{{ route('opd.edit', [$opdDetails->id]) }}"
+                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                                data-id="{{ $opdDetails->id }}">
+                                                                <i class="ti ti-pencil"></i></a>
+                                                            <form action="" class="d-inline"
+                                                                id="delete-form-{{ $opdDetails->id }}" method="POST">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <a href="javascript: void(0);"
+                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill delete-button"
+                                                                    data-opd-id="{{ $opdDetails->id }}"
+                                                                    data-form-id="delete-form-{{ $opdDetails->id }}">
+                                                                    <i class="ti ti-trash"></i></a>
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                @else
+                                    <div class="table-responsive">
+                                        <table class="table mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Name</th>
+                                                    <th>Phone</th>
+                                                    <th>Email</th>
+                                                    <th>Address</th>
+                                                    <th>Gender</th>
+                                                    <th>Guardian Name</th>
+                                                    <th>Consultant</th>
+                                                    <th>Last Visit</th>
+                                                    <th>Total Re-Checkup</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($opd as $opdDetails)
+                                                    <tr>
+                                                        <td>{{ $loop->iteration }}</td>
+                                                        <td><a href="#"
+                                                                class="text-primary">{{ $opdDetails->patient_name }}</a>
+                                                        </td>
+                                                        <td>{{ $opdDetails->mobileno }}</td>
+                                                        <td>{{ $opdDetails->email }}</td>
+                                                        <td>{{ $opdDetails->address }}</td>
+                                                        <td>{{ $opdDetails->gender }}</td>
+                                                        <td>{{ $opdDetails->guardian_name }}</td>
+                                                        <td>{{ $opdDetails->opds[0]->doctor->name ?? '-' }}</td>
+                                                        @if ($opdDetails->opds && $opdDetails->opds->isNotEmpty())
+                                                            <td>{{ \Carbon\Carbon::parse($opdDetails->opds[0]->created_at)->format('d-M-Y') ?? '-' }}
+                                                            </td>
+                                                        @else
+                                                            <td>-</td>
+                                                        @endif
+                                                        <td>{{ optional($opdDetails->opds)->count() ?? 0 }}</td>
+                                                        {{-- @if ($opdDetails->opds && $opdDetails->opds->isNotEmpty())
+                                                            <td>{{ $opdDetails->opds->count() ?? '-' }}
+                                                            </td>
+                                                        @else
+                                                            <td>0</td>
+                                                        @endif --}}
+
+                                                        {{-- <td>{{ \Carbon\Carbon::parse($opdDetails->created_at)->format('d-M-Y') }}
+                                                        </td> --}}
+
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                @endif
                             </div>
 
                             <div class="offcanvas offcanvas-top" style="height: fit-content;" tabindex="-1"

@@ -88,4 +88,10 @@ class Patient extends Model
     {
         return $this->hasMany(PatientTimeline::class, 'patient_id');
     }
+
+    public function opds()
+    {
+        return $this->belongsToMany(OpdDetail::class, 'opd_patient', 'patient_id', 'opd_id')->withPivot('doctor_id')->orderBy('created_at', 'desc')
+            ->withTimestamps();
+    }
 }

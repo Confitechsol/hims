@@ -74,6 +74,12 @@ class OpdDetail extends Model
         return $this->belongsTo(Charge::class, 'charge_id');
     }
 
+    public function patients()
+    {
+        return $this->belongsToMany(Patient::class, 'opd_patient', 'opd_id', 'patient_id')->withPivot('doctor_id')
+            ->withTimestamps();
+    }
+
     // public function symptom()
     // {
     //     return $this->belongsTo(Symptom::class, 'symptom_id');

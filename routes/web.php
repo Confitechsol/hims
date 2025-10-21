@@ -438,7 +438,6 @@ Route::get('/getCharges/{id}', [OpdController::class, 'getCharges'])->name('getC
 Route::get('/getSymptomsTypes', [OpdController::class, 'getSymptomsType'])->name('getSymptomsTypes');
 Route::post('/getSymptoms', [OpdController::class, 'getSymptoms'])->name('getSymptoms');
 
-
 Route::get('/billing', function () {
     return view('admin.billing.billing');
 })->name('billing');
@@ -473,6 +472,6 @@ Route::prefix('/inventory')->group(function () {
     Route::get('/destroy', [InventoriesController::class, 'destroy'])->name('itemstock.destroy');
 });
 
-Route::get('/opd', function () {
+Route::get('/opd-billing', function () {
     return view('admin.billing.opd');
-})->name('opd');
+})->name('opd.billing');
