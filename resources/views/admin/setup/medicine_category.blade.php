@@ -20,7 +20,8 @@
                         <div class="card">
 
                             <div class="card-body">
-                                <div
+                                <x-table-actions.actions id="medicine-category" name="Medicine Category" />
+                                {{-- <div
                                     class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
 
                                     <div class="input-icon-start position-relative me-2">
@@ -35,9 +36,9 @@
                                             class="btn btn-primary text-white ms-2 fs-13 btn-md" data-bs-toggle="modal"
                                             data-bs-target="#add_medicine_category"><i class="ti ti-plus me-1"></i>Add
                                             Medicine Category</a>
-                                    </div>
+                                    </div> --}}
                                     <!-- Modal -->
-                                    <div class="modal fade" id="add_medicine_category" tabindex="-1" aria-hidden="true">
+                                    <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered">
                                             <div class="modal-content">
                                                 <div class="modal-header rounded-0"
@@ -83,7 +84,7 @@
                                     </div>
                                 @endif
                                 <div class="table-responsive">
-                                    <table class="table mb-0">
+                                    <table class="table mb-0" id="medicine-category">
                                         <thead>
                                             <tr>
                                                 <th>Category Name</th>
@@ -102,7 +103,7 @@
                                                         <button
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
                                                             data-id="{{ $category->id }}"
-                                                            data-name="{{ $category->medicine_category }}"><i
+                                                            data-medicine_category="{{ $category->medicine_category }}"><i
                                                                 class="ti ti-pencil"></i></button>
 
                                                         <form action="{{ route('medicine-categories.destroy')}}"
@@ -171,7 +172,7 @@
     </div>
 </div>
 <!-- Edit Modal -->
-<div class="modal fade" id="editMedicineGroupModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+{{-- <div class="modal fade" id="editMedicineGroupModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <form id="editMedicineGroupForm" method="POST">
@@ -201,28 +202,53 @@
       </form>
     </div>
   </div>
-</div>
+</div> --}}
+<x-modals.form-modal 
+    id="edit_modal"
+    title="Edit Medicine Category"
+    action="{{url('/')}}/medicine-categories/${id}"
+    method="put"
+    type="edit"
+    :fields="[
+        ['name' => 'id', 'label' => '', 'type' => 'hidden', 'required' => true],
+        ['name' => 'medicine_category', 'label' => 'Medicine Group', 'type' => 'text', 'required' => true]
+    ]"
+    :columns="1"
+/>
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    const editButtons = document.querySelectorAll('.edit-btn');
-    const modal = new bootstrap.Modal(document.getElementById('editMedicineGroupModal'));
-    const form = document.getElementById('editMedicineGroupForm');
-    const nameInput = document.getElementById('edit_medicine_category');
-
-    editButtons.forEach(button => {
-      button.addEventListener('click', function () {
-        const id = this.getAttribute('data-id');
-        const name = this.getAttribute('data-name');
-
-        // Set form action dynamically
-        form.action = `{{url('/')}}/medicine-categories/${id}`;
-        nameInput.value = name;
-
-        // Show modal
-        modal.show();
-      });
-    });
+    createAjaxTable({
+    apiUrl: "{{ route('medicine-categories') }}",
+    tableSelector: "#medicine-category",
+    paginationSelector: "#pagination-wrapper",
+    searchInputSelector: "#search-input",
+    perPageSelector: "#perPage",
+    rowRenderer: function (item) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td><h6 class="mb-0 fs-14 fw-semibold">${item.medicine_category}</h6></td>
+            <td>
+            <button
+                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
+                    data-id="${item.id}"
+                    data-name="${item.medicine_category}">
+                    <i class="ti ti-pencil"></i>
+                </button>
+                <form action="{{ route('medicine-categories.destroy')}}"
+                method="POST" style="display:inline-block;">
+                @csrf
+                @method('DELETE')
+                <input type="hidden" name="id" value="${item.id}">
+                <button onclick="return confirm('Are you sure?')"
+                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"><i
+                class="ti ti-trash"></i></button>
+            </form>
+            </td>
+        `;
+        return row;
+    }
+});
   });
 </script>
 
