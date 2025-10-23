@@ -300,11 +300,12 @@ class InventoriesController extends Controller
             $item->update($validated);
 
             // ✅ 5. Return success response
-            return response()->json([
-                'status'  => 'success',
-                'message' => 'Item updated successfully!',
-                'item'    => $item
-            ]);
+            // return response()->json([
+            //     'status'  => 'success',
+            //     'message' => 'Item updated successfully!',
+            //     'item'    => $item
+            // ]);
+             return redirect()->back()->with('success', 'Item added successfully.');
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Return validation errors
@@ -464,12 +465,31 @@ class InventoriesController extends Controller
         'is_active' => $request->has('is_active') ? 1 : 0,
     ]);
 
-    return response()->json([
-        'success' => true,
-        'message' => 'Item issue updated successfully.',
-        'issue' => $issue,
-    ]);
+    // return response()->json([
+    //     'success' => true,
+    //     'message' => 'Item issue updated successfully.',
+    //     'issue' => $issue,
+    // ]);
+     return redirect()->back()->with('success', 'Item added successfully.');
 }
+    public function destroyIssuedItem($id)
+    {
+        try {
+                // ✅ 1. Find the item
+                $item = ItemIssue::findOrFail($id);
+
+               
+                // ✅ 3. Delete the record
+                $item->delete();
+
+                // ✅ 4. Redirect back with success message
+                return redirect()->back()->with('success', 'Issued Item deleted successfully.');
+
+            } catch (\Exception $e) {
+                // Handle exceptions gracefully
+                return redirect()->back()->with('error', 'Failed to delete item: ' . $e->getMessage());
+        }
+    }
 
 
 }
