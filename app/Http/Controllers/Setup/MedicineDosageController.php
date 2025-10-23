@@ -9,10 +9,25 @@ use App\Models\Unit;
 use App\Models\MedicineCategory;
 class MedicineDosageController extends Controller
 {
-    public function index(){
+    public function index(request $request){
         $medicineDosage = MedicineDosage::with(['category','unit'])->get();
         $units = Unit::get();
         $medicineCategories = MedicineCategory::get();
+        $perPage = intval($request->input('perPage', 5));
+        if ($perPage <= 0) {
+           $perPage = 5;
+        }
+        if($request->has('search')){
+            $medicineCategories = MedicineCategory::query();
+            $search_term = $request->search;
+            $medicineCategories->where(function ($query) use ($search_term) {
+                $query->where('medicine_category', 'like', "%{$search_term}%");
+            });
+            return $medicineCategories;
+            $medicineDosage = $medicineDosage->paginate($perPage);
+            return array("result"=>$medicineDosage);
+        }
+        $medicineDosage = $medicineDosage->paginate($perPage);
         return view('admin.setup.medicine_dosage',compact('medicineDosage','units','medicineCategories'));
     }
     public function store(Request $request){

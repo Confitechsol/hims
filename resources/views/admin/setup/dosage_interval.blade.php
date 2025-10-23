@@ -146,7 +146,45 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                {{-- Pagination Links --}}
+                                <div class="mt-3" id="pagination-wrapper">
+                                    @php
+                                        $currentPage = $dosageInterval->currentPage();
+                                        $lastPage = $dosageInterval->lastPage();
+                                    @endphp
 
+                                    {{-- Previous --}}
+                                    @if ($dosageInterval->onFirstPage())
+                                        <button class="btn btn-outline-secondary btn-sm me-1" disabled>« Prev</button>
+                                    @else
+                                        <a href="{{ $dosageInterval->previousPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                                            class="btn btn-outline-secondary btn-sm me-1">
+                                            « Prev
+                                        </a>
+                                    @endif
+
+                                    {{-- Page numbers --}}
+                                    @for ($page = 1; $page <= $lastPage; $page++)
+                                        @if ($page == $currentPage)
+                                            <button class="btn btn-primary btn-sm me-1">{{ $page }}</button>
+                                        @else
+                                            <a href="{{ $dosageInterval->url($page) }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                                                class="btn btn-outline-secondary btn-sm me-1">
+                                                {{ $page }}
+                                            </a>
+                                        @endif
+                                    @endfor
+
+                                    {{-- Next --}}
+                                    @if ($dosageInterval->hasMorePages())
+                                        <a href="{{ $dosageInterval->nextPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                                            class="btn btn-outline-secondary btn-sm">
+                                            Next »
+                                        </a>
+                                    @else
+                                        <button class="btn btn-outline-secondary btn-sm" disabled>Next »</button>
+                                    @endif
+                                </div>
                             </div> <!-- end card-body -->
                         </div> <!-- end card -->
                     </div> <!-- end col -->

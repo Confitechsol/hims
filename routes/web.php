@@ -478,7 +478,7 @@ Route::prefix('/inventory')->group(function () {
     Route::post('/item-store', [InventoriesController::class, 'storeItem'])->name('items.store');
     Route::get('/item-edit/{id}', [InventoriesController::class, 'editItem'])->name('items.edit');
     Route::get('/item-update', [InventoriesController::class, 'updateItem'])->name('items.update');
-    Route::get('/item-destroy', [InventoriesController::class, 'destroyItem'])->name('items.destroy');
+    Route::delete('/item-destroy/{id}', [InventoriesController::class, 'destroyItem'])->name('items.destroy');
 
     Route::get('/get-staff-by-department', [InventoriesController::class, 'getStaffByDepartment'])->name('get-staff-by-department');
     
@@ -487,7 +487,7 @@ Route::prefix('/inventory')->group(function () {
     Route::get('/issue-edit/{id}', [InventoriesController::class, 'editIssuedItem'])->name('issue-items.edit');
     Route::get('/get-items-by-category', [InventoriesController::class, 'getItemsByCategory'])->name('get-items-by-category');
     Route::get('/issue-update/{id}', [InventoriesController::class, 'updateIssuedItem'])->name('issue-items.update');
-    Route::get('/issue-destroy', [InventoriesController::class, 'destroyIssuedItem'])->name('issue-items.destroy');
+    Route::delete('/issue-destroy/{id}', [InventoriesController::class, 'destroyIssuedItem'])->name('issue-items.destroy');
 });
 
 Route::get('/opd-billing', function () {

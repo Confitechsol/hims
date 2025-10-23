@@ -137,10 +137,10 @@
 
 
                                                     
-                                    <a href="#"
+                                    <a href="{{ route('inventory-details')}}"
                                         class="btn btn-outline-primary d-inline-flex align-items-center"><i
-                                            class="ti ti-menu me-1"></i>Issue Item</a>
-                                    <a href="#"
+                                            class="ti ti-menu me-1"></i>Inventory</a>
+                                    <a href="{{ route('items')}}"
                                         class="btn btn-outline-primary d-inline-flex align-items-center"><i
                                             class="ti ti-menu me-1"></i>Item</a>
                                 </div>
@@ -167,54 +167,54 @@
                                     </thead>
                                     <tbody>
                                         @forelse ($itemIssues as $issue)
-            <tr>
-                <td>{{ $issue->item->name ?? '-' }}</td>
-                <td>{{ $issue->category->item_category ?? '-' }}</td>
-                <!-- <td>{{ $issue->department_id ?? '-' }}</td> -->
-                <td>{{ ucfirst($issue->return_date) }}</td>
-                <td>
-                    {{ $issue->issuedTo ? $issue->issuedTo->name . ' ' . $issue->issuedTo->surname . ' (' . $issue->issuedTo->employee_id . ')' : '-' }}
-                </td>
+                                            <tr>
+                                                <td>{{ $issue->item->name ?? '-' }}</td>
+                                                <td>{{ $issue->category->item_category ?? '-' }}</td>
+                                                <!-- <td>{{ $issue->department_id ?? '-' }}</td> -->
+                                                <td>{{ ucfirst($issue->return_date) }}</td>
+                                                <td>
+                                                    {{ $issue->issuedTo ? $issue->issuedTo->name . ' ' . $issue->issuedTo->surname . ' (' . $issue->issuedTo->employee_id . ')' : '-' }}
+                                                </td>
 
-                <td>{{ $issue->issue_by ?? '-' }}</td>
-                <td>{{ $issue->quantity ?? 0 }}</td>
-                <td>{{ $issue->note ?? '-' }}</td>
+                                                <td>{{ $issue->issue_by ?? '-' }}</td>
+                                                <td>{{ $issue->quantity ?? 0 }}</td>
+                                                <td>{{ $issue->note ?? '-' }}</td>
 
-                <td>
-                    @if ($issue->is_returned === 'yes')
-                        <span class="badge bg-success">Returned</span>
-                    @else
-                        <span class="badge bg-warning text-dark">Issued</span>
-                    @endif
-                </td>
+                                                <td>
+                                                    @if ($issue->is_returned === 'yes')
+                                                        <span class="badge bg-success">Returned</span>
+                                                    @else
+                                                        <span class="badge bg-warning text-dark">Issued</span>
+                                                    @endif
+                                                </td>
 
-                <td>
-                    <a href="javascript:void(0);" 
-                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill editIssueBtn"
-                        data-id="{{ $issue->id }}" data-bs-toggle="tooltip" title="Edit">
-                        <i class="ti ti-pencil"></i>
-                    </a>
+                                                <td>
+                                                    <a href="javascript:void(0);" 
+                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill editIssueBtn"
+                                                        data-id="{{ $issue->id }}" data-bs-toggle="tooltip" title="Edit">
+                                                        <i class="ti ti-pencil"></i>
+                                                    </a>
 
-                    <a href="javascript:void(0);" 
-                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
-                        onclick="if(confirm('Are you sure you want to delete this issue record?')) { document.getElementById('delete-issue-{{ $issue->id }}').submit(); }"
-                        data-bs-toggle="tooltip" title="Delete">
-                        <i class="ti ti-trash"></i>
-                    </a>
+                                                    <a href="javascript:void(0);" 
+                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
+                                                        onclick="if(confirm('Are you sure you want to delete this issue record?')) { document.getElementById('delete-issue-{{ $issue->id }}').submit(); }"
+                                                        data-bs-toggle="tooltip" title="Delete">
+                                                        <i class="ti ti-trash"></i>
+                                                    </a>
 
-                    <form id="delete-issue-{{ $issue->id }}" 
-                          action="{{ route('issue-items.destroy', $issue->id) }}" 
-                          method="POST" style="display: none;">
-                        @csrf
-                        @method('DELETE')
-                    </form>
-                </td>
-            </tr>
-        @empty
-            <tr>
-                <td colspan="9" class="text-center text-muted">No item issues found.</td>
-            </tr>
-        @endforelse
+                                                    <form id="delete-issue-{{ $issue->id }}" 
+                                                        action="{{ route('issue-items.destroy', $issue->id) }}" 
+                                                        method="POST" style="display: none;">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="9" class="text-center text-muted">No item issues found.</td>
+                                            </tr>
+                                        @endforelse
                                     </tbody>
                                 </table>
                             </div>
@@ -227,61 +227,61 @@
         </div>
          <!-- Edit Modal (nested) -->
         <!-- Edit Issue Modal -->
-<div class="modal fade" id="editIssueModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Edit Item Issue</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="editIssueForm">
-                    @csrf
-                    <input type="hidden" id="edit_issue_id" name="id">
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label>Item Category</label>
-                            <select id="edit_item_category" name="item_category_id" class="form-control select2"></select>
+            <div class="modal fade" id="editIssueModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edit Item Issue</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
+                        <div class="modal-body">
+                            <form id="editIssueForm">
+                                @csrf
+                                <input type="hidden" id="edit_issue_id" name="id">
 
-                        <div class="col-md-6 mb-3">
-                            <label>Item</label>
-                            <select id="edit_item" name="item_id" class="form-control select2"></select>
-                        </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label>Item Category</label>
+                                        <select id="edit_item_category" name="item_category_id" class="form-control select2"></select>
+                                    </div>
 
-                        <div class="col-md-6 mb-3">
-                            <label>Department</label>
-                            <select id="edit_department" name="department_id" class="form-control select2"></select>
-                        </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label>Item</label>
+                                        <select id="edit_item" name="item_id" class="form-control select2"></select>
+                                    </div>
 
-                        <div class="col-md-6 mb-3">
-                            <label>Issued To</label>
-                            <select id="edit_issued_to" name="issued_to" class="form-control select2"></select>
-                        </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label>Department</label>
+                                        <select id="edit_department" name="department_id" class="form-control select2"></select>
+                                    </div>
 
-                        <div class="col-md-6 mb-3">
-                            <label>Issued Date</label>
-                            <input type="date" id="edit_issued_date" name="issued_date" class="form-control">
-                        </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label>Issued To</label>
+                                        <select id="edit_issued_to" name="issued_to" class="form-control select2"></select>
+                                    </div>
 
-                        <div class="col-md-6 mb-3">
-                            <label>Quantity</label>
-                            <input type="number" id="edit_quantity" name="quantity" class="form-control">
-                        </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label>Issued Date</label>
+                                        <input type="date" id="edit_issued_date" name="issued_date" class="form-control">
+                                    </div>
 
-                        <div class="col-md-12 mb-3">
-                            <label>Remarks</label>
-                            <textarea id="edit_remarks" name="remarks" class="form-control"></textarea>
+                                    <div class="col-md-6 mb-3">
+                                        <label>Quantity</label>
+                                        <input type="number" id="edit_quantity" name="quantity" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-12 mb-3">
+                                        <label>Remarks</label>
+                                        <textarea id="edit_remarks" name="remarks" class="form-control"></textarea>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </form>
                         </div>
                     </div>
-
-                    <button type="submit" class="btn btn-primary">Update</button>
-                </form>
+                </div>
             </div>
-        </div>
-    </div>
-</div>
 
 
 
