@@ -8,9 +8,23 @@ use App\Models\Unit;
 use Illuminate\Support\Facades\Auth;
 class UnitController extends Controller
 {
-    function index()
+    function index(Request $request)
     {
-        $units = Unit::get();
+        $units = Unit::query();
+        $perPage = intval($request->input('perPage', 5));
+        if ($perPage <= 0) {
+           $perPage = 5;
+        }
+        if ($request->has('search')) {
+            $search_term = $request->search;
+            $units->where(function ($query) use ($search_term) {
+                $query->where('unit_name', 'like', "%{$search_term}%");
+            });
+            $units = $units->paginate($perPage);
+            return array("result" => $units);
+        }
+        $units = $units->paginate($perPage);
+
         return view('admin.setup.unit_list', compact('units'));
     }
 
