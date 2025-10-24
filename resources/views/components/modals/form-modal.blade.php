@@ -150,8 +150,13 @@
                         const fieldValue = button.getAttribute(`data-${fieldName}`);
 
                         // Set the input field's value dynamically
-                        if (fieldValue !== null) {
+                        if(input.tagName === 'SELECT') {
+                            $(input).select2(); 
+                            $(input).val(fieldValue).trigger('change.select2');
+                        } else{
+                            if (fieldValue !== null) {
                             input.value = fieldValue;
+                        }
                         }
                     });
 

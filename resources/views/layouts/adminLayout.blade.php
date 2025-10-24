@@ -576,7 +576,7 @@
         </div>
 
         <!-- Sidenav Menu Start -->
-        @extends('layouts.sidebar')
+        @include('layouts.sidebar')
         <div class="page-wrapper">
             <!-- Sidenav Menu End -->
             @yield('content')
@@ -625,6 +625,10 @@
 
                 function initSelect($el) {
                     if ($el.data('select2-inited')) return;
+
+                    //skip which are inside edit modal
+                    if ($el.closest('#edit_modal').length > 0) return;
+                
                     var dp = $el.closest('.modal').find('.modal-content').first();
                     if (!dp || dp.length === 0) dp = $(document.body);
                     try {
@@ -646,6 +650,7 @@
                 // Initialize selects that appear inside modals when they open
                 $('.modal').off('shown.bs.modal.select2init').on('shown.bs.modal.select2init', function () {
                     var $modal = $(this);
+                    if ($modal.attr('id') === 'edit_modal') return;
                     $modal.find('select.form-select').each(function() {
                         initSelect($(this));
                     });

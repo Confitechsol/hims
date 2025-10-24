@@ -20,7 +20,7 @@ class MedicineGroupController extends Controller
                 $query->where('group_name', 'like', "%{$search_term}%");
             });
             $categories = $categoriesQuery->paginate($perPage);
-            return response()->json($categories);
+            return response()->json(array("result"=>$categories));
         }
         $categories = $categoriesQuery->paginate($perPage);
         return view('admin.setup.medicine_group', compact('categories'));

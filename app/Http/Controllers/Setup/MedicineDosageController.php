@@ -7,10 +7,12 @@ use Illuminate\Http\Request;
 use App\Models\MedicineDosage;
 use App\Models\Unit;
 use App\Models\MedicineCategory;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 class MedicineDosageController extends Controller
 {
     public function index(request $request){
-        $medicineDosage = MedicineDosage::with(['category','unit'])->get();
+        $medicineDosage = MedicineDosage::with(['category','unit']);
         $units = Unit::get();
         $medicineCategories = MedicineCategory::get();
         $perPage = intval($request->input('perPage', 5));
@@ -23,9 +25,31 @@ class MedicineDosageController extends Controller
             $medicineCategories->where(function ($query) use ($search_term) {
                 $query->where('medicine_category', 'like', "%{$search_term}%");
             });
-            return $medicineCategories;
-            $medicineDosage = $medicineDosage->paginate($perPage);
-            return array("result"=>$medicineDosage);
+            $medicineCategories = $medicineCategories->get();
+            $data = collect();
+            foreach($medicineCategories  as $medicineCategory){
+                $dosages = MedicineDosage::with(['category','unit'])
+                            ->where('medicine_category_id',$medicineCategory->id)
+                            ->get();
+                $data = $data->merge($dosages);
+            }
+            $page = LengthAwarePaginator::resolveCurrentPage();
+            $paginatedData = new LengthAwarePaginator(
+            $data->forPage($page, $perPage)->values(),
+            $data->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+            );
+            return response()->json([
+                "result"=>[
+                    'data' => $paginatedData->items(),
+                    'total' => $paginatedData->total(),
+                    'per_page' => $paginatedData->perPage(),
+                    'current_page' => $paginatedData->currentPage(),
+                    'last_page' => $paginatedData->lastPage(),
+                ]
+            ]);
         }
         $medicineDosage = $medicineDosage->paginate($perPage);
         return view('admin.setup.medicine_dosage',compact('medicineDosage','units','medicineCategories'));
