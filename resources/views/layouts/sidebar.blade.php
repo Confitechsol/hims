@@ -108,14 +108,15 @@
                             </li>
                             <li class="submenu">
                                 <a href="javascript:void(0);" class="active subdrop">
-                                    <i class="ti ti-layout-dashboard"></i><span>Billing</span>
+                                    <i class="ti ti-layout-dashboard"></i><span>Billing Section</span>
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    
+                                    <li><a href="{{ route('billing') }}">Billing
+                                            </a></li>
                                     <li><a href="doctor-dashboard.html">Appointment
                                             </a></li>
-                                    <li><a href="patient-dashboard.html">OPD
+                                    <li><a href="{{ route('opd.billing') }}">OPD
                                             </a></li>
                                             <li><a href="patient-dashboard.html">Pathology
                                             </a></li>
@@ -247,7 +248,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="#">
+                                <a href="{{ route('tpamanagement') }}">
                                     <i class="ti ti-map-pin"></i><span>TPA Management</span>
                                 </a>
                             </li>
