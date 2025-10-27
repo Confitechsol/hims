@@ -6,6 +6,8 @@ use App\Models\Charge;
 use App\Models\ChargeCategory;
 use App\Models\Doctor;
 use App\Models\OpdDetail;
+use App\Models\OpdPatient;
+use App\Models\Patient;
 use App\Models\Prefix;
 use App\Models\Symptom;
 use App\Models\SymptomsClassification;
@@ -18,24 +20,34 @@ class OpdController extends Controller
     public function index(Request $request)
     {
         $isOpdTab    = $request->get('tab', 'opd') == 'opd';
-        $opd         = OpdDetail::with('patient', 'doctor', 'chargeCategory', 'charge')->get();
         $doctors     = Doctor::all();
         $opdSymptoms = [];
+        if ($isOpdTab) {
+            $opdDetails = OpdDetail::with('patient', 'doctor', 'chargeCategory', 'charge')->get();
+            foreach ($opdDetails as $opdDetail) {
+                // Split comma-separated symptom IDs and clean up
+                $symptomIds = array_filter(
+                    explode(',', $opdDetail->symptoms_title),
+                    fn($id) => $id !== null && trim($id) !== ''
+                );
 
-        foreach ($opd as $opdDetail) {
-            // Split comma-separated symptom IDs and clean up
-            $symptomIds = array_filter(
-                explode(',', $opdDetail->symptoms_title),
-                fn($id) => $id !== null && trim($id) !== ''
-            );
+                // Fetch symptoms related to this OPD
+                $symptoms = ! empty($symptomIds)
+                    ? Symptom::whereIn('id', $symptomIds)->get()
+                    : collect();
 
-            // Fetch symptoms related to this OPD
-            $symptoms = Symptom::whereIn('id', $symptomIds)->get();
-
-            // Store in array using OPD number as key
-            $opdSymptoms[$opdDetail->opd_no] = $symptoms;
+                // Store in array using OPD number as key
+                $opdSymptoms[$opdDetail->opd_no] = $symptoms;
+            }
+            $opd = $opdDetails;
+        } else {
+            $patients = Patient::with(['opds.doctor'])->get();
+            $opd      = $patients;
+            // dd($opd[1]->opds[0]->doctor);
+            // dd($opd);
         }
 
+        // $opd         = OpdDetail::with('patient', 'doctor', 'chargeCategory', 'charge')->get();
         return view("admin.opd.index", compact("opd", 'opdSymptoms', 'doctors', 'isOpdTab'));
     }
 
@@ -93,7 +105,8 @@ class OpdController extends Controller
             $nextNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
             $opdNo      = $opdPrefix->prefix . $nextNumber;
             // 🔹 Create OPD record
-            $opd = new OpdDetail();
+            $opd        = new OpdDetail();
+            $opdPatient = new OpdPatient();
             // dd($opd);
             $opd->hospital_id = $user->hospital_id;
             // Patient Details
@@ -131,6 +144,12 @@ class OpdController extends Controller
             $opd->opd_no               = $opdNo;
             // Save OPD Record
             $opd->save();
+
+            // dd($opd->id);
+            $opdPatient->patient_id = $request->patient_id ?? null;
+            $opdPatient->opd_id     = $opd->id ?? null;
+
+            $opdPatient->save();
 
             DB::commit();
 

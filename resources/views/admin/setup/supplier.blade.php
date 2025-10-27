@@ -20,7 +20,8 @@
                         <div class="card">
 
                             <div class="card-body">
-                                <div
+                                <x-table-actions.actions id="supplier" name="Supplier" />
+                                {{-- <div
                                     class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
 
                                     <div class="input-icon-start position-relative me-2">
@@ -37,7 +38,7 @@
                                             Supplier</a>
                                     </div>
 
-                                </div>
+                                </div> --}}
                                 @if (session('success'))
                                     <div class="alert alert-success mt-2">{{ session('success') }}</div>
                                 @endif
@@ -51,7 +52,7 @@
                                     </div>
                                 @endif
                                 <div class="table-responsive">
-                                    <table class="table mb-0">
+                                    <table class="table mb-0" id="supplier">
                                         <thead>
                                             <tr>
                                                 <th>Supplier Name</th>
@@ -222,6 +223,7 @@
     title="Edit Supplier"
     action="{{route('supplier.update')}}"
     method="put"
+    type="edit"
     :fields="[
         ['name' => 'id', 'label' => '', 'type' => 'hidden', 'required' => true],
         ['name' => 'supplier_name', 'label' => 'Supplier Name', 'type' => 'text', 'required' => true],
@@ -234,7 +236,7 @@
     :columns="2"
 />
 
-<x-modals.form-modal id="add_supplier" title="Add Supplier" action="{{route('supplier-store')}}" :fields="[
+<x-modals.form-modal id="createModal" title="Add Supplier" action="{{route('supplier-store')}}" :fields="[
         ['name' => 'supplier_name', 'label' => 'Supplier Name', 'type' => 'text', 'required' => true],
         ['name' => 'supplier_contact', 'label' => 'Supplier Contact', 'type' => 'text'],
         ['name' => 'contact_person_name', 'label' => 'Contact Person Name', 'type' => 'text'],
@@ -242,5 +244,52 @@
         ['name' => 'licence', 'label' => 'Drug License Number', 'type' => 'text'],
         ['name' => 'address', 'label' => 'Address', 'type' => 'text'],
     ]" :columns="2" />
-
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    createAjaxTable({
+    apiUrl: "{{ route('supplier') }}",
+    tableSelector: "#supplier",
+    paginationSelector: "#pagination-wrapper",
+    searchInputSelector: "#search-input",
+    perPageSelector: "#perPage",
+    rowRenderer: function (item) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+        <td>
+            <h6 class="mb-0 fs-14 fw-semibold">${item.supplier}
+            </h6>
+        </td>
+        <td>${item.contact}</td>
+        <td>${item.supplier_person}</td>
+        <td>${item.supplier_person_contact}</td>
+        <td>${item.supplier_drug_licence}</td>
+        <td>${item.address}</td>
+        <td>
+        <button
+            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
+            data-id="${item.id}"
+            data-supplier_name="${item.supplier}"
+            data-supplier_contact="${item.contact}"
+            data-contact_person_name="${item.supplier_person}"
+            data-contact_person_phone="${item.supplier_person_contact}"
+            data-licence="${item.supplier_drug_licence}"
+            data-address="${item.address}"
+        >
+            <i class="ti ti-pencil"></i>
+        </button>
+        <form action="{{ route('supplier.destroy')}}" method="POST" style="display:inline-block;">
+            <input type="hidden" name="_method" value="DELETE">
+            <input type="hidden" name="id" value="${item.id}">
+            <button onclick="return confirm('Are you sure?')"
+                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                <i class="ti ti-trash"></i>
+            </button>
+        </form>
+        </td>
+        `;
+        return row;
+    }
+    });
+});
+</script>
 @endsection

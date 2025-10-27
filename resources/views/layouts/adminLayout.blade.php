@@ -25,12 +25,6 @@
 
     <!-- Styles -->
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" />
-
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
-    <!-- Or for RTL support -->
-
     <!-- style css -->
     <link rel="stylesheet" href="assets/css/custom.css">
 
@@ -203,6 +197,11 @@
                 width: 90vw;
             }
         }
+    </style>
+    <style>
+        /* Global override: ensure Select2 dropdown search is visible */
+        .select2-container .select2-search--dropdown { display: block !important; }
+        .select2-container .select2-search__field { display: block !important; }
     </style>
 </head>
 
@@ -577,7 +576,7 @@
         </div>
 
         <!-- Sidenav Menu Start -->
-        @extends('layouts.sidebar')
+        @include('layouts.sidebar')
         <div class="page-wrapper">
             <!-- Sidenav Menu End -->
             @yield('content')
@@ -616,5 +615,57 @@
         button.classList.toggle('active');
     }
 </script>
+    <!-- Resilient global Select2 initializer: waits for Select2 then initializes all selects -->
+    <script>
+        (function() {
+            function tryInitSelect2() {
+                if (typeof window.jQuery === 'undefined') return false;
+                var $ = window.jQuery;
+                if (typeof $.fn.select2 === 'undefined') return false;
+
+                function initSelect($el) {
+                    if ($el.data('select2-inited')) return;
+
+                    //skip which are inside edit modal
+                    if ($el.closest('#edit_modal').length > 0) return;
+                
+                    var dp = $el.closest('.modal').find('.modal-content').first();
+                    if (!dp || dp.length === 0) dp = $(document.body);
+                    try {
+                        $el.select2({
+                            width: '100%',
+                            dropdownParent: dp,
+                            minimumResultsForSearch: 0
+                        });
+                        $el.data('select2-inited', true);
+                    } catch (e) {
+                        // ignore init errors
+                    }
+                }
+
+                $('select.form-select').each(function() {
+                    initSelect($(this));
+                });
+
+                // Initialize selects that appear inside modals when they open
+                $('.modal').off('shown.bs.modal.select2init').on('shown.bs.modal.select2init', function () {
+                    var $modal = $(this);
+                    if ($modal.attr('id') === 'edit_modal') return;
+                    $modal.find('select.form-select').each(function() {
+                        initSelect($(this));
+                    });
+                });
+
+                return true;
+            }
+
+            var attempts = 0;
+            var interval = setInterval(function() {
+                if (tryInitSelect2() || attempts++ > 50) {
+                    clearInterval(interval);
+                }
+            }, 150);
+        })();
+    </script>
 </body>
 </html>

@@ -11,17 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('item', function (Blueprint $table) {
+        Schema::create('item_stock_batches', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
             $table->string('branch_id', 8);
-            $table->unsignedBigInteger('item_category_id')->nullable()->index();
-            $table->string('name', 255)->index();
-            $table->string('unit', 200);
-            $table->text('item_photo')->nullable();
-            $table->text('description')->nullable();
-            $table->integer('quantity')->index();
-            $table->date('date')->nullable()->index();
+            $table->string('item_stock_id');
+            $table->string('batch_no')->nullable();
+            $table->string('serial_no')->nullable();
+            $table->text('salvage_value')->nullable();
+            $table->text('useful_life')->nullable();
+            $table->text('annual_depreciation')->nullable();
+            $table->date('expiry_date')->nullable();
             $table->timestamps();
         });
     }
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('item');
+        Schema::dropIfExists('item_stock_batches');
     }
 };

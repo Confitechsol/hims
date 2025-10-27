@@ -129,8 +129,11 @@
             const form = document.getElementById('edit_modal-form');
 
             // Loop through all edit buttons
-            editButtons.forEach(button => {
-                button.addEventListener('click', function() {
+            // editButtons.forEach(button => {
+            //     button.addEventListener('click', function() {
+        document.addEventListener('click', function(e) {
+            const button = e.target.closest('.edit-btn');
+            if (!button) return;
                     // Get the ID from the button
                     // const id = this.getAttribute('data-id');
 
@@ -142,21 +145,25 @@
 
                     // Loop through each input field
                     inputFields.forEach(input => {
-                        const fieldName = input.getAttribute(
-                        'data-field'); // Get the field name from data-field attribute
-                        const fieldValue = this.getAttribute(
-                        `data-${fieldName}`); // Get corresponding data-* attribute from button
+                        const fieldName = input.getAttribute('data-field'); // Get the field name from data-field attribute
+                        // const fieldValue = this.getAttribute(`data-${fieldName}`); // Get corresponding data-* attribute from button
+                        const fieldValue = button.getAttribute(`data-${fieldName}`);
 
                         // Set the input field's value dynamically
-                        if (fieldValue !== null) {
+                        if(input.tagName === 'SELECT') {
+                            $(input).select2(); 
+                            $(input).val(fieldValue).trigger('change.select2');
+                        } else{
+                            if (fieldValue !== null) {
                             input.value = fieldValue;
+                        }
                         }
                     });
 
                     // Show the modal
                     modal.show();
                 });
-            });
+            // });
         });
     </script>
 @endif

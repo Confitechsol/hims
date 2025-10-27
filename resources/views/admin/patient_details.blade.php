@@ -95,7 +95,7 @@
                             <div class="card-body">
                                 <div class="d-sm-flex position-relative z-0 overflow-hidden p-2">
                                     <!-- <img src="assets/img/icons/shape-01.svg" alt="img"
-                                                                                                                                                                                                            class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
+                                                                                                                                                                                                                class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
                                     <a href="javascript:void(0);"
                                         class="avatar avatar-xxxl patient-avatar me-2 flex-shrink-0">
                                         <img src="assets/img/patient.png" alt="product" class="rounded">
@@ -177,19 +177,19 @@
                                         </div>
                                     </div>
                                     <!-- <div class="row">
-                                                                                                                                                                                                <div class="col-sm-5">
+                                                                                                                                                                                                    <div class="col-sm-5">
 
-                                                                                                                                                                                                </div>
-                                                                                                                                                                                                <div class="col-sm-7">
+                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                    <div class="col-sm-7">
 
-                                                                                                                                                                                                </div>
-                                                                                                                                                                                                <div class="col-sm-5">
+                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                    <div class="col-sm-5">
 
-                                                                                                                                                                                                </div>
-                                                                                                                                                                                                <div class="col-sm-7">
+                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                    <div class="col-sm-7">
 
-                                                                                                                                                                                                </div>
-                                                                                                                                                                                            </div> -->
+                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                </div> -->
                                 </div>
                                 <hr>
                                 <div class="d-flex align-items-center mb-3">
@@ -512,11 +512,10 @@
                                                                                         <label for="symptoms_title"
                                                                                             class="form-label">Symptoms
                                                                                             Title </label>
-                                                                                        <select class="form-select"
-                                                                                            id="symptoms_title">
-                                                                                            <option value="">Select
-                                                                                            </option>
-                                                                                        </select>
+                                                                                        <input type="text"
+                                                                                            name="symptoms_title"
+                                                                                            id="symptoms_title"
+                                                                                            class="form-control">
                                                                                     </div>
                                                                                     <div class="col-md-6">
                                                                                         <label for="symptoms_des"

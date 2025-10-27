@@ -263,6 +263,8 @@ Route::middleware(['admin'])->group(function () {
 
     Route::get('/tpa_details/{id?}', [TpamanagmentController::class, 'detailsshow'])->name('tpa_details.show');
     Route::post('/tpa_details/{id?}', [TpamanagmentController::class, 'detailsshow'])->name('tpa_details.chragetype');
+    Route::delete('/tpa_details/destroy', [TpamanagmentController::class, 'destroyTpaDetails'])->name('tpa_details.destroy');
+    Route::put('/tpa_details/update', [TpamanagmentController::class, 'updateTpaDetails'])->name('tpa_details.update');
 
 });
 
@@ -438,7 +440,6 @@ Route::get('/getCharges/{id}', [OpdController::class, 'getCharges'])->name('getC
 Route::get('/getSymptomsTypes', [OpdController::class, 'getSymptomsType'])->name('getSymptomsTypes');
 Route::post('/getSymptoms', [OpdController::class, 'getSymptoms'])->name('getSymptoms');
 
-
 Route::get('/billing', function () {
     return view('admin.billing.billing');
 })->name('billing');
@@ -455,7 +456,7 @@ Route::prefix('/appointment-details')->group(function () {
     Route::get('/get-doctor-shifts/{id}', [AppointmentController::class, 'getDoctorShifts'])->name('doctor.shifts');
     Route::get('/get-doctor-slots/{doctorId}/{shiftId}', [AppointmentController::class, 'getDoctorSlots'])->name('doctor.slots');
     Route::get('/get-appointment-priorities', [AppointmentController::class, 'getAppointmentPriorities'])->name('appointment.priorities');
-    // Route::put('/appointments/{id}', [AppointmentsController::class, 'update'])->name('appointments.update');
+
     Route::get('/appointments/{id}/edit', [AppointmentsController::class, 'edit'])->name('appointments.edit');
     Route::put('/appointments/{id}', [AppointmentsController::class, 'update'])->name('appointments.update');
     Route::get('/doctor-wise', [AppointmentsController::class, 'doctorwise'])->name('appointments.doctor-wise');
@@ -468,14 +469,33 @@ Route::prefix('/appointment-details')->group(function () {
 Route::prefix('/inventory')->group(function () {
     Route::get('/', [InventoriesController::class, 'index'])->name('inventory-details');
     Route::get('/get-items/{categoryId}', [InventoriesController::class, 'getItems'])->name('get.items');
-    Route::post('/store', [InventoriesController::class, 'store'])->name('items.store');
-    Route::get('/edit', [InventoriesController::class, 'store'])->name('itemstock.edit');
+    Route::post('/store', [InventoriesController::class, 'store'])->name('itemstock.store');
+    Route::get('/edit/{id}', [InventoriesController::class, 'edit'])->name('itemstock.edit');
+    Route::get('/update', [InventoriesController::class, 'update'])->name('itemstock.update');
     Route::get('/destroy', [InventoriesController::class, 'destroy'])->name('itemstock.destroy');
+
+    Route::get('/items', [InventoriesController::class, 'items'])->name('items');
+    Route::post('/item-store', [InventoriesController::class, 'storeItem'])->name('items.store');
+    Route::get('/item-edit/{id}', [InventoriesController::class, 'editItem'])->name('items.edit');
+    Route::get('/item-update', [InventoriesController::class, 'updateItem'])->name('items.update');
+    Route::delete('/item-destroy/{id}', [InventoriesController::class, 'destroyItem'])->name('items.destroy');
+
+    Route::get('/get-staff-by-department', [InventoriesController::class, 'getStaffByDepartment'])->name('get-staff-by-department');
+    
+    Route::get('/issue-items', [InventoriesController::class, 'issueItems'])->name('issue-items');
+    Route::post('/issue-store', [InventoriesController::class, 'storeIssuedItem'])->name('issue-items.store');
+    Route::get('/issue-edit/{id}', [InventoriesController::class, 'editIssuedItem'])->name('issue-items.edit');
+    Route::get('/get-items-by-category', [InventoriesController::class, 'getItemsByCategory'])->name('get-items-by-category');
+    Route::get('/issue-update/{id}', [InventoriesController::class, 'updateIssuedItem'])->name('issue-items.update');
+    Route::delete('/issue-destroy/{id}', [InventoriesController::class, 'destroyIssuedItem'])->name('issue-items.destroy');
 });
 
-Route::get('/opd', function () {
+Route::get('/opd-billing', function () {
     return view('admin.billing.opd');
-})->name('opd');
+})->name('opd.billing');
+Route::get('/visit_details', function () {
+    return view('admin.visit_details');
+})->name('visit_details');
 
 // Pharmacy Routes
 Route::prefix('pharmacy')->group(function () {

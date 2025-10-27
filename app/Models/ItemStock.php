@@ -59,4 +59,8 @@ class ItemStock extends Model
     {
         return $this->belongsTo(ItemStore::class, 'store_id');
     }
+    public function batches()
+    {
+    return $this->hasMany(ItemStockBatches::class, 'item_stock_id');
+    }
 }

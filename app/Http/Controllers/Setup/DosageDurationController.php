@@ -7,8 +7,22 @@ use Illuminate\Http\Request;
 use App\Models\DoseDuration;
 class DosageDurationController extends Controller
 {
-    function index() {
-        $dosageDuration = DoseDuration::get();
+    function index(Request $request){ {
+        $dosageDuration = DoseDuration::query();
+        $perPage = intval($request->input('perPage', 5));
+        if ($perPage <= 0) {
+           $perPage = 5;
+        }
+        if($request->has('search')){
+            $search_term = $request->search;
+            $dosageDuration->where(function ($query) use ($search_term) {
+                $query->where('name', 'like', "%{$search_term}%");
+            });
+            $dosageDuration = $dosageDuration->paginate($perPage);
+            return array("result"=>$dosageDuration);
+        }
+        $dosageDuration = $dosageDuration->paginate($perPage);
+    }
         return view('admin.setup.dosage_duration',compact('dosageDuration'));
     }
     public function store(Request $request) {

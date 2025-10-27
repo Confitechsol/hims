@@ -108,6 +108,10 @@ class TpamanagmentController extends Controller
                 'charge_type' => 'required|exists:charge_type_master,id',
             ]);
             $charge_type = $request->input('charge_type');
+
+            // ✅ Save selected charge type in session (so it persists after reload)
+            session(['charge_type' => $charge_type]);
+
             $chargeCategory = ChargeCategory::where('charge_type_id', $charge_type)->first();
             if (!$chargeCategory) {
                 return redirect()->back()->with('error', 'Charge category not found.');
@@ -123,9 +127,64 @@ class TpamanagmentController extends Controller
                 if (!$organisationCharge) {
                     return redirect()->back()->with('error', 'No data available for '.$charge_type->charge_type.' on this organisation.');
                 }
-                return view('admin.tpa.tpa_details', compact('organisations', 'chargetypes', 'organisationCharge'))->with('charge_type',$charge_type->id);
+                return view('admin.tpa.tpa_details', compact('organisations', 'chargetypes', 'organisationCharge'))->with('charge_type',$charge_type);
         }
+        session()->forget('charge_type');
         return view('admin.tpa.tpa_details', compact('organisations', 'chargetypes'));
+    }
+
+    function destroyTpaDetails(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:organisations_charges,id',
+        ]);
+
+        // ✅ Clear the stored charge_type from session
+        session()->forget('charge_type');
+        $organisationCharge = OrganisationsCharge::findOrFail($request->id);return $organisationCharge;
+        $organisationCharge->delete();
+
+        return redirect()->back()->with('success', 'TPA Charge deleted successfully.');
+    }
+
+    function updateTpaDetails(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:organisations_charges,id',
+            'org_charge' => 'required|numeric|min:0',
+        ]);
+        session()->get('charge_type');
+
+        $chargetypes = ChargeTypeMaster::all();
+        $organisationCharge = OrganisationsCharge::findOrFail($request->id);
+        $organisationCharge->org_charge = $request->org_charge;
+        $organisationCharge->save();
+
+        $organisations = Organisation::findOrFail($organisationCharge->org_id);
+        // $request->validate([
+        //         'charge_type' => 'required|exists:charge_type_master,id',
+        //     ]);
+            $charge_type = session()->get('charge_type');
+
+            $chargeCategory = ChargeCategory::where('charge_type_id', $charge_type)->first();
+            if (!$chargeCategory) {
+                return redirect()->back()->with('error', 'Charge category not found.');
+            }
+            $charge = Charge::where('charge_category_id', $chargeCategory->id)->first();
+            if (!$charge) {
+                return redirect()->back()->with('error', 'Charge not found.');
+            }
+            $organisationCharge = OrganisationsCharge::with(['charge.category.chargeType'])->where('charge_id', $charge->id)
+                ->where('org_id', $organisationCharge->org_id)
+                ->get();
+            $charge_type = ChargeTypeMaster::findOrFail($charge_type);
+                if (!$organisationCharge) {
+                    return redirect()->back()->with('error', 'No data available for '.$charge_type->charge_type.' on this organisation.');
+                }
+                return view('admin.tpa.tpa_details', compact('organisations', 'chargetypes', 'organisationCharge'))->with('charge_type',$charge_type);
+        
+
+        return redirect()->back()->with('success', 'TPA Charge updated successfully.');
     }
 }
 

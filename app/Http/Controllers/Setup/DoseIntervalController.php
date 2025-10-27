@@ -7,9 +7,22 @@ use Illuminate\Http\Request;
 use App\Models\DoseInterval;
 class DoseIntervalController extends Controller
 {
-    public function index() {
-        $dosageInterval = DoseInterval::get();
+    public function index(Request $request) {
+        $dosageInterval = DoseInterval::query();
         // return $dosageInterval;
+        $perPage = intval($request->input('perPage', 5));
+        if ($perPage <= 0) {
+           $perPage = 5;
+        }
+        if($request->has('search')){
+            $search_term = $request->search;
+            $dosageInterval->where(function ($query) use ($search_term) {
+                $query->where('name', 'like', "%{$search_term}%");
+            });
+            $dosageInterval = $dosageInterval->paginate($perPage);
+            return array("result"=>$dosageInterval);
+        }
+        $dosageInterval = $dosageInterval->paginate($perPage);
         return view('admin.setup.dosage_interval',compact('dosageInterval'));
     }
     public function store(Request $request) {
