@@ -476,3 +476,68 @@ Route::prefix('/inventory')->group(function () {
 Route::get('/opd', function () {
     return view('admin.billing.opd');
 })->name('opd');
+
+// Pharmacy Routes
+Route::prefix('pharmacy')->group(function () {
+    // Medicine Management
+    Route::get('/', [App\Http\Controllers\PharmacyController::class, 'index'])->name('pharmacy.index');
+    Route::get('/create', [App\Http\Controllers\PharmacyController::class, 'create'])->name('pharmacy.create');
+    Route::post('/store', [App\Http\Controllers\PharmacyController::class, 'store'])->name('pharmacy.store');
+    Route::get('/{id}', [App\Http\Controllers\PharmacyController::class, 'show'])->name('pharmacy.show');
+    Route::get('/{id}/edit', [App\Http\Controllers\PharmacyController::class, 'edit'])->name('pharmacy.edit');
+    Route::put('/{id}', [App\Http\Controllers\PharmacyController::class, 'update'])->name('pharmacy.update');
+    Route::delete('/{id}', [App\Http\Controllers\PharmacyController::class, 'destroy'])->name('pharmacy.destroy');
+    
+    // Stock Management
+    Route::get('/stock/below-min-level', [App\Http\Controllers\PharmacyController::class, 'belowMinLevel'])->name('pharmacy.below-min-level');
+    Route::get('/stock/needs-reorder', [App\Http\Controllers\PharmacyController::class, 'needsReorder'])->name('pharmacy.needs-reorder');
+    Route::get('/stock/info/{id}', [App\Http\Controllers\PharmacyController::class, 'getStockInfo'])->name('pharmacy.stock-info');
+    
+    // Import
+    Route::get('/import/medicines', [App\Http\Controllers\PharmacyController::class, 'import'])->name('pharmacy.import');
+    Route::post('/import/medicines', [App\Http\Controllers\PharmacyController::class, 'import'])->name('pharmacy.import.store');
+    
+        // API Routes
+        Route::get('/api/medicines', [App\Http\Controllers\PharmacyController::class, 'getMedicines'])->name('pharmacy.api.medicines');
+        Route::get('/api/batches/{pharmacyId}', [App\Http\Controllers\PharmacyBillingController::class, 'getMedicineBatches'])->name('pharmacy.api.batches');
+        Route::get('/api/batch-details', [App\Http\Controllers\PharmacyBillingController::class, 'getBatchDetails'])->name('pharmacy.api.batch-details');
+        Route::get('/api/patient-prescriptions/{patientId}', [App\Http\Controllers\PharmacyBillingController::class, 'getPatientPrescriptions'])->name('pharmacy.api.patient-prescriptions');
+    });
+
+    // Test routes
+    Route::get('/test-pharmacy', function () {
+        return 'Pharmacy test route working!';
+    });
+    
+    Route::get('/test-pharmacy-controller', [App\Http\Controllers\PharmacyBillingController::class, 'test']);
+
+    // Pharmacy Billing Routes - Simplified
+    Route::get('/pharmacy-billing', [App\Http\Controllers\PharmacyBillingController::class, 'index'])->name('pharmacy.billing.index');
+    Route::get('/pharmacy-billing/create', [App\Http\Controllers\PharmacyBillingController::class, 'create'])->name('pharmacy.billing.create');
+    Route::post('/pharmacy-billing/store', [App\Http\Controllers\PharmacyBillingController::class, 'store'])->name('pharmacy.billing.store');
+    Route::get('/pharmacy-billing/{id}', [App\Http\Controllers\PharmacyBillingController::class, 'show'])->name('pharmacy.billing.show');
+    Route::get('/pharmacy-billing/{id}/edit', [App\Http\Controllers\PharmacyBillingController::class, 'edit'])->name('pharmacy.billing.edit');
+    Route::put('/pharmacy-billing/{id}', [App\Http\Controllers\PharmacyBillingController::class, 'update'])->name('pharmacy.billing.update');
+    Route::delete('/pharmacy-billing/{id}', [App\Http\Controllers\PharmacyBillingController::class, 'destroy'])->name('pharmacy.billing.destroy');
+    Route::get('/pharmacy-billing/{id}/print', [App\Http\Controllers\PharmacyBillingController::class, 'print'])->name('pharmacy.billing.print');
+    Route::get('/pharmacy-billing-search', [App\Http\Controllers\PharmacyBillingController::class, 'search'])->name('pharmacy.billing.search');
+
+// Pharmacy Purchase Routes
+Route::prefix('pharmacy/purchase')->group(function () {
+    Route::get('/', [App\Http\Controllers\PharmacyPurchaseController::class, 'index'])->name('pharmacy.purchase.index');
+    Route::get('/create', [App\Http\Controllers\PharmacyPurchaseController::class, 'create'])->name('pharmacy.purchase.create');
+    Route::post('/store', [App\Http\Controllers\PharmacyPurchaseController::class, 'store'])->name('pharmacy.purchase.store');
+    Route::get('/{id}', [App\Http\Controllers\PharmacyPurchaseController::class, 'show'])->name('pharmacy.purchase.show');
+    Route::get('/{id}/edit', [App\Http\Controllers\PharmacyPurchaseController::class, 'edit'])->name('pharmacy.purchase.edit');
+    Route::put('/{id}', [App\Http\Controllers\PharmacyPurchaseController::class, 'update'])->name('pharmacy.purchase.update');
+    Route::get('/{id}/print', [App\Http\Controllers\PharmacyPurchaseController::class, 'print'])->name('pharmacy.purchase.print');
+    Route::get('/search/orders', [App\Http\Controllers\PharmacyPurchaseController::class, 'search'])->name('pharmacy.purchase.search');
+});
+
+// Pharmacy Company Routes
+Route::prefix('pharmacy/company')->group(function () {
+    Route::get('/', [App\Http\Controllers\PharmacyCompanyController::class, 'index'])->name('pharmacy.company.index');
+    Route::post('/store', [App\Http\Controllers\PharmacyCompanyController::class, 'store'])->name('pharmacy.company.store');
+    Route::put('/update', [App\Http\Controllers\PharmacyCompanyController::class, 'update'])->name('pharmacy.company.update');
+    Route::delete('/destroy', [App\Http\Controllers\PharmacyCompanyController::class, 'destroy'])->name('pharmacy.company.destroy');
+});
