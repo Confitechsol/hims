@@ -463,6 +463,9 @@ Route::prefix('/appointment-details')->group(function () {
     Route::post('/doctor-wise/search', [AppointmentsController::class, 'searchAppointments'])->name('appointments.search');
     Route::get('/queue', function () {return view('admin.appointments.queue');})->name('appointments.queue');
     Route::get('/queue', function () {return view('admin.appointments.queue');})->name('appointments.queue');
+    Route::get('patient-view/{patient_id}', [AppointmentsController::class, 'show'])->name('patient.view');
+
+    
 
 });
 

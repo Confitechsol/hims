@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Organisation;
 use App\Models\Patient;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class PatientController extends Controller
 {
@@ -15,7 +16,7 @@ class PatientController extends Controller
     }
     public function store(Request $request)
     {
-        // dd($request->all());
+        //dd($request->all());
         $validated = $request->validate([
             'name'               => 'required|string|max:255',
             'guardian_name'      => 'nullable|string|max:255',

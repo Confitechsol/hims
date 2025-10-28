@@ -61,7 +61,7 @@
                                                             </div>
                                                             <div class="col-md-4">
                                                                 <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
-                                                                    data-bs-target="#new_patient">
+                                                                    data-bs-target="#add_patient">
                                                                     <i class="ti ti-plus me-1"></i>New Patient
                                                                 </a>
                                                             </div>
@@ -456,9 +456,9 @@
                                     <a href="{{ route('appointments.doctor-wise') }}"
                                         class="btn btn-outline-primary d-inline-flex align-items-center"><i
                                             class="ti ti-menu me-1"></i>Doctor Wise</a>
-                                    <a href="{{ route('appointments.queue') }}"
+                                    <!-- <a href="{{ route('appointments.queue') }}"
                                         class="btn btn-outline-primary d-inline-flex align-items-center"><i
-                                            class="ti ti-menu me-1"></i>Queue</a>
+                                            class="ti ti-menu me-1"></i>Queue</a> -->
                                 </div>
                             </div>
                         </div>
@@ -488,8 +488,9 @@
                                         <tr>
                                             <td>
                                                 <h6 class="fs-14 mb-1">
-                                                    <a href="#" class="fw-semibold">
-                                                        {{ $appointment->patient->patient_name ?? 'N/A' }} ({{ $appointment->patient_id }})
+                                                     <a href="{{ route('patient.view', $appointment->patient_id) }}" 
+                                                        class="fw-semibold text-primary">
+                                                            {{ $appointment->patient->patient_name ?? 'N/A' }} ({{ $appointment->patient_id }})
                                                     </a>
                                                 </h6>
                                             </td>
@@ -590,6 +591,8 @@
             </div>
             <!-- row end -->
         </div>
+
+        @include('components.modals.add-patients-modal')
          <!-- Edit Modal (nested) -->
         <div class="modal fade" id="rescheduleModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-xl">
