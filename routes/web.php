@@ -499,3 +499,6 @@ Route::get('/opd-billing', function () {
 Route::get('/visit_details', function () {
     return view('admin.visit_details');
 })->name('visit_details');
+Route::get('/opd_view', function () {
+    return view('admin.opd.opd_view');
+})->name('opd_view');

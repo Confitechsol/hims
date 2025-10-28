@@ -281,26 +281,13 @@
                                                     <img src="assets/img/patient.png" alt="product" class="rounded">
                                                 </div>
                                                 <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="fs-13 fw-bold mb-1">Anirban Ghosh (D010)</h6>
+                                                    <h6 class="fs-13 fw-bold mb-1">Amitabh Kulkarni (D007)</h6>
                                                 </div>
                                             </div>
                                         </a>
 
                                     </div>
-                                    <hr>
-                                    <div>
-                                        <a href="#">
-                                            <div class="d-flex align-items-center mb-3 gap-2">
-                                                <div class="patient_img">
-                                                    <img src="assets/img/patient.png" alt="product" class="rounded">
-                                                </div>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="fs-13 fw-bold mb-1">Anjali Rao (D011)</h6>
-                                                </div>
-                                            </div>
-                                        </a>
-
-                                    </div>
+                                   
                                 </div>
                             </div>
                             <div class="card shadow-sm border-0 mt-2">
@@ -326,10 +313,10 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <h6 class="text-primary">OPD Payment/Billing</h6>
-                                            <span>92.31%</span>
-                                            <div class="progress mb-3 mt-1" role="progressbar" aria-valuenow="92.31"
+                                            <span>68.18%</span>
+                                            <div class="progress mb-3 mt-1" role="progressbar" aria-valuenow="68.18"
                                                 aria-valuemin="0" aria-valuemax="100">
-                                                <div class="progress-bar bg-gradient" style="width: 90%;"></div>
+                                                <div class="progress-bar bg-gradient" style="width: 68%;"></div>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -349,14 +336,6 @@
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <h6 class="text-primary">Radiology Payment/Billing</h6>
-                                            <span>0%</span>
-                                            <div class="progress mb-3 mt-1" role="progressbar" aria-valuenow="0"
-                                                aria-valuemin="0" aria-valuemax="100">
-                                                <div class="progress-bar" style="width: 0%;"></div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
                                             <h6 class="text-primary">Blood Bank Payment/Billing</h6>
                                             <span>0%</span>
                                             <div class="progress mb-3 mt-1" role="progressbar" aria-valuenow="0"
@@ -364,14 +343,7 @@
                                                 <div class="progress-bar" style="width: 0%;"></div>
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
-                                            <h6 class="text-primary">Ambulance Payment/Billing</h6>
-                                            <span>0%</span>
-                                            <div class="progress mb-0 mt-1" role="progressbar" aria-valuenow="0"
-                                                aria-valuemin="0" aria-valuemax="100">
-                                                <div class="progress-bar" style="width: 0%;"></div>
-                                            </div>
-                                        </div>
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -629,25 +601,23 @@
                                                                                     <div class="row gy-3">
                                                                                         <div class="col-md-10">
                                                                                             <h3>
-                                                                                                Shreya Bhattacharyya (29)
+                                                                                                Animesh Das (39)
                                                                                             </h3>
                                                                                             <p>Guardian : --</p>
-                                                                                            <p>Gender : Female</p>
-                                                                                            <p>Blood Group : </p>
-                                                                                            <p>Marital Status: </p>
-                                                                                            <p>Age: 22 Year 9 Month 5 Days
-                                                                                                (As Of Date
-                                                                                                10/06/2025)</p>
-                                                                                            <p>Phone: 8910245678</p>
-                                                                                            <p>Email: abs.shrey@gmail.com
+                                                                                            <p>Gender : Male</p>
+                                                                                            <p>Blood Group : A+</p>
+                                                                                            <p>Marital Status: Single</p>
+                                                                                            <p>Age: 41 Year 2 Month 27 Days (As Of Date 10/14/2025)</p>
+                                                                                            <p>Phone: --</p>
+                                                                                            <p>Email: 
                                                                                             </p>
-                                                                                            <p>Address: m,nm,nm,nm,</p>
-                                                                                            <p>Any Known Allergies: No</p>
-                                                                                            <p>Remarks: m,nmnmn</p>
-                                                                                            <p>TPA : MedoLogi TPA Pvt. Ltd.
+                                                                                            <p>Address: --</p>
+                                                                                            <p>Any Known Allergies: --</p>
+                                                                                            <p>Remarks: --</p>
+                                                                                            <p>TPA : --
                                                                                             </p>
-                                                                                            <p>TPA ID : TPA005</p>
-                                                                                            <p>TPA Validity : 07/22/2021</p>
+                                                                                            <p>TPA ID : --</p>
+                                                                                            <p>TPA Validity : --</p>
                                                                                             <p>National Identification
                                                                                                 Number : --</p>
                                                                                         </div>
@@ -2109,8 +2079,7 @@
 
                                                                                     </label>
                                                                                     <select name="payment_mode"
-                                                                                        id="payment_mode" class="form-select"
-                                                                                        data-placeholder="Enter Patient Name or Id…">
+                                                                                        id="payment_mode" class="form-select">
                                                                                         <option value="0">Select</option>
                                                                                         <option value="1">Cash</option>
                                                                                     </select>
@@ -2149,10 +2118,10 @@
                                                             <tbody>
                                                                 <tr>
                                                                     <td>
-                                                                        TRID83
+                                                                        TRID95
                                                                     </td>
-                                                                    <td>10/13/2025 06:25 PM </td>
-                                                                    <td> Time:SmartPay Transaction ID: 528612554379
+                                                                    <td>10/14/2025 11:45 AM	</td>
+                                                                    <td>SmartPay Transaction ID: 528706160448	
                                                                     </td>
                                                                     <td></td>
                                                                     <td>20.00</td>
