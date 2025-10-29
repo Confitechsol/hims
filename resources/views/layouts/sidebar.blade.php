@@ -4,7 +4,7 @@
         <div class="sidebar-logo">
             <div>
                 <!-- Logo Normal -->
-                <a href="index.html" class="logo logo-normal">
+                <a href="{{ route('dashboard') }}" class="logo logo-normal">
                     <img src="assets/img/logo.png" alt="Logo">
                 </a>
 
@@ -98,7 +98,7 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="index.html" class="active">Admin
+                                    <li><a href="{{ route('dashboard') }}" class="active">Admin
                                             Dashboard</a></li>
                                     <li><a href="doctor-dashboard.html">Doctor
                                             Dashboard</a></li>
@@ -106,16 +106,18 @@
                                             Dashboard</a></li>
                                 </ul>
                             </li>
-                            <li class="submenu">
-                                <a href="javascript:void(0);" class="active subdrop">
-                                    <i class="ti ti-layout-dashboard"></i><span>Billing</span>
-                                    <span class="menu-arrow"></span>
+                            <li>
+                                   <a href="{{ route('billing') }}">
+                                      <!--<i class="fa fa-file-invoice"></i>  optional icon -->
+                                          <span>Billing Section</span>
+                                              <!--<span class="menu-arrow"></span>-->
                                 </a>
-                                <ul>
-                                    
+                                <!--<ul>
+                                    <li><a href="{{ route('billing') }}">Billing
+                                            </a></li>
                                     <li><a href="doctor-dashboard.html">Appointment
                                             </a></li>
-                                    <li><a href="patient-dashboard.html">OPD
+                                    <li><a href="{{ route('opd.billing') }}">OPD
                                             </a></li>
                                             <li><a href="patient-dashboard.html">Pathology
                                             </a></li>
@@ -125,7 +127,7 @@
                                             </a></li>
                                             <li><a href="patient-dashboard.html">Blood Component Issue
                                             </a></li>
-                                </ul>
+                                </ul>-->
                             </li>
                             <li class="submenu">
                                 <a href="javascript:void(0);" class="active subdrop">
@@ -200,12 +202,13 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="appointments.html">Appointments</a></li>
-                                    <li><a href="new-appointment.html">New
+                                    <li><a href="{{ route('appointment-details') }}">Appointment Details</a></li>
+                                    <!--<li><a href="new-appointment.html">New
                                             Appointment</a></li>
                                     <li><a href="appointment-calendar.html">Calendar</a></li>
-                                </ul>
-                            </li>
+                                
+                            </li>-->
+                            </ul>
                             <li>
                                 <a href="#">
                                     <i class="ti ti-map-pin"></i><span>Pharmacy</span>
@@ -247,12 +250,12 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="#">
+                                <a href="{{ route('tpamanagement') }}">
                                     <i class="ti ti-map-pin"></i><span>TPA Management</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="#">
+                                <a href="{{ route('inventory-details') }}">
                                     <i class="ti ti-map-pin"></i><span>Inventory</span>
                                 </a>
                             </li>

@@ -176,6 +176,15 @@ class AppointmentsController extends Controller
         ]);
     }
 
+    public function show($patient_id)
+    {
+        // Fetch the patient details
+        $appointment = Appointment::with(['patient'])->where('patient_id', $patient_id)->firstOrFail();
+
+        // Return to patient details view
+        return view('admin.appointments.patient_view', compact('appointment'));
+    }
+
 
 
     

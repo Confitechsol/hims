@@ -47,6 +47,7 @@ use App\Http\Controllers\Setup\UsersController;
 use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\TpamanagmentController;
 use App\Http\Controllers\VitalController;
+use App\Http\Controllers\IncomeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -269,6 +270,9 @@ Route::middleware(['admin'])->group(function () {
     Route::delete('/tpa_details/destroy', [TpamanagmentController::class, 'destroyTpaDetails'])->name('tpa_details.destroy');
     Route::put('/tpa_details/update', [TpamanagmentController::class, 'updateTpaDetails'])->name('tpa_details.update');
 
+    Route::get('/income', [IncomeController::class, 'index']);
+
+
 });
 
 // Route::get('/medicine-group', function () {
@@ -466,6 +470,9 @@ Route::prefix('/appointment-details')->group(function () {
     Route::post('/doctor-wise/search', [AppointmentsController::class, 'searchAppointments'])->name('appointments.search');
     Route::get('/queue', function () {return view('admin.appointments.queue');})->name('appointments.queue');
     Route::get('/queue', function () {return view('admin.appointments.queue');})->name('appointments.queue');
+    Route::get('patient-view/{patient_id}', [AppointmentsController::class, 'show'])->name('patient.view');
+
+    
 
 });
 
@@ -499,6 +506,9 @@ Route::get('/opd-billing', function () {
 Route::get('/visit_details', function () {
     return view('admin.visit_details');
 })->name('visit_details');
+Route::get('/opd_view', function () {
+    return view('admin.opd.opd_view');
+})->name('opd_view');
 
 // Pharmacy Routes
 Route::prefix('pharmacy')->group(function () {
