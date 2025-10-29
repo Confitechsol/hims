@@ -65,4 +65,20 @@ class PathologyBilling extends Model
     {
         return $this->belongsTo(Doctor::class, 'doctor_id');
     }
+
+    /**
+     * Relationship with PathologyReport
+     */
+    public function reports()
+    {
+        return $this->hasMany(PathologyReport::class, 'pathology_bill_id');
+    }
+
+    /**
+     * Relationship with CaseReference
+     */
+    public function caseReference()
+    {
+        return $this->belongsTo(CaseReference::class, 'case_reference_id');
+    }
 }

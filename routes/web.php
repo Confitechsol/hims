@@ -18,7 +18,10 @@ use App\Http\Controllers\MedicineGroupController;
 use App\Http\Controllers\Modules\OpdController;
 use App\Http\Controllers\OperationController;
 use App\Http\Controllers\PathologyController;
+use App\Http\Controllers\PathologyTestController;
+use App\Http\Controllers\PathologyBillingController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\PharmacyCompanyController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\Setup\CompanyListController;
@@ -556,8 +559,42 @@ Route::prefix('pharmacy/purchase')->group(function () {
 
 // Pharmacy Company Routes
 Route::prefix('pharmacy/company')->group(function () {
-    Route::get('/', [App\Http\Controllers\PharmacyCompanyController::class, 'index'])->name('pharmacy.company.index');
-    Route::post('/store', [App\Http\Controllers\PharmacyCompanyController::class, 'store'])->name('pharmacy.company.store');
-    Route::put('/update', [App\Http\Controllers\PharmacyCompanyController::class, 'update'])->name('pharmacy.company.update');
-    Route::delete('/destroy', [App\Http\Controllers\PharmacyCompanyController::class, 'destroy'])->name('pharmacy.company.destroy');
+    Route::get('/', [PharmacyCompanyController::class, 'index'])->name('pharmacy.company.index');
+    Route::post('/store', [PharmacyCompanyController::class, 'store'])->name('pharmacy.company.store');
+    Route::put('/update', [PharmacyCompanyController::class, 'update'])->name('pharmacy.company.update');
+    Route::delete('/destroy', [PharmacyCompanyController::class, 'destroy'])->name('pharmacy.company.destroy');
+});
+
+// Pathology Test Routes
+Route::prefix('pathology/test')->group(function () {
+    Route::get('/', [PathologyTestController::class, 'index'])->name('pathology.test.index');
+    Route::get('/create', [PathologyTestController::class, 'create'])->name('pathology.test.create');
+    Route::post('/store', [PathologyTestController::class, 'store'])->name('pathology.test.store');
+    Route::get('/{id}', [PathologyTestController::class, 'show'])->name('pathology.test.show');
+    Route::get('/{id}/edit', [PathologyTestController::class, 'edit'])->name('pathology.test.edit');
+    Route::put('/{id}', [PathologyTestController::class, 'update'])->name('pathology.test.update');
+    Route::delete('/{id}', [PathologyTestController::class, 'destroy'])->name('pathology.test.destroy');
+});
+
+// Pathology Test API Routes
+Route::prefix('pathology/api')->group(function () {
+    Route::get('/charge-names', [PathologyTestController::class, 'getChargeNames'])->name('pathology.api.charge-names');
+    Route::get('/charge-details', [PathologyTestController::class, 'getChargeDetails'])->name('pathology.api.charge-details');
+});
+
+// Pathology Billing Routes
+Route::prefix('pathology/billing')->group(function () {
+    Route::get('/', [PathologyBillingController::class, 'index'])->name('pathology.billing.index');
+    Route::get('/create', [PathologyBillingController::class, 'create'])->name('pathology.billing.create');
+    Route::post('/store', [PathologyBillingController::class, 'store'])->name('pathology.billing.store');
+    Route::get('/{id}', [PathologyBillingController::class, 'show'])->name('pathology.billing.show');
+    Route::get('/{id}/edit', [PathologyBillingController::class, 'edit'])->name('pathology.billing.edit');
+    Route::put('/{id}', [PathologyBillingController::class, 'update'])->name('pathology.billing.update');
+    Route::delete('/{id}', [PathologyBillingController::class, 'destroy'])->name('pathology.billing.destroy');
+});
+
+// Pathology Billing API Routes
+Route::prefix('pathology/billing/api')->group(function () {
+    Route::get('/patient-prescriptions/{patientId}', [PathologyBillingController::class, 'getPatientPrescriptions'])->name('pathology.billing.api.patient-prescriptions');
+    Route::get('/test-details', [PathologyBillingController::class, 'getTestDetails'])->name('pathology.billing.api.test-details');
 });
