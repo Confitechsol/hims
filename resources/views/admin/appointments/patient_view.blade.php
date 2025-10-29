@@ -89,7 +89,7 @@
                         <div class="card shadow-sm border-0 mt-2">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Virat Kohli (13)
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> {{ $appointment->patient->patient_name }}
                                 </h5>
                             </div>
                             <div class="card-body">
@@ -106,7 +106,7 @@
                                                     class="fa-solid fa-phone text-primary"></i></span>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">Phone :</h6>
-                                                <p class="patient_data mb-0">8910245678</p>
+                                                <p class="patient_data mb-0">{{ $appointment->patient->mobileno }}</p>
                                             </div>
                                         </div>
 
@@ -115,7 +115,7 @@
                                                     class="fa-solid fa-calendar-days text-primary"></i></span>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">Age :</h6>
-                                                <p class="patient_data mb-0">22 Year 9 Month 5 Days (As Of Date 10/06/2025)
+                                                <p class="patient_data mb-0"> {{ $appointment->patient->age }}
                                                 </p>
                                             </div>
                                         </div>
@@ -124,7 +124,7 @@
                                                     class="fa-solid fa-hands-holding-child text-primary"></i></span>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">Guardian Name :</h6>
-                                                <p class="patient_data mb-0">--</p>
+                                                <p class="patient_data mb-0">{{ $appointment->patient->	guardian_name }}</p>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-3">
@@ -132,7 +132,7 @@
                                                     class="fa-solid fa-mars-and-venus text-primary"></i></span>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">Gender :</h6>
-                                                <p class="patient_data mb-0">Male</p>
+                                                <p class="patient_data mb-0">{{ $appointment->patient->gender }}</p>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-3">
@@ -197,7 +197,7 @@
                                             class="fa-solid fa-tag text-primary"></i></span>
                                     <div class="d-flex align-items-center gap-2">
                                         <h6 class="about_patient fs-13 fw-bold mb-1"> Known Allergies :</h6>
-                                        <p class="patient_data mb-0">--</p>
+                                        <p class="patient_data mb-0">{{ $appointment->patient->known_allergies ?? 'N/A'}}</p>
                                     </div>
                                 </div>
                                 <div class="d-flex align-items-center mb-3">
@@ -233,19 +233,7 @@
                             </div>
                             <div class="card-body">
 
-                                <div>
-                                    <a href="#">
-                                        <div class="d-flex align-items-center mb-3 gap-2">
-                                            <div class="patient_img">
-                                                <img src="assets/img/patient.png" alt="product" class="rounded">
-                                            </div>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <h6 class="fs-13 fw-bold mb-1">Anirban Ghosh (D010)</h6>
-                                            </div>
-                                        </div>
-                                    </a>
-
-                                </div>
+                               
                                 <hr>
                                 <div>
                                     <a href="#">
@@ -254,7 +242,7 @@
                                                 <img src="assets/img/patient.png" alt="product" class="rounded">
                                             </div>
                                             <div class="d-flex align-items-center gap-2">
-                                                <h6 class="fs-13 fw-bold mb-1">Anjali Rao (D011)</h6>
+                                                <h6 class="fs-13 fw-bold mb-1">{{ $appointment->doctorUser->name ?? 'N/A' }}</h6>
                                             </div>
                                         </div>
                                     </a>

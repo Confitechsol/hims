@@ -99,9 +99,5 @@ class Patient extends Model
         return $this->hasMany(Appointment::class, 'patient_id');
     }
 
-    public function doctors()
-    {
-        // A patient can have many doctors through appointments
-        return $this->hasManyThrough(Doctor::class, Appointment::class, 'patient_id', 'doctor', 'id', 'doctor_id');
-    }
+    
 }
