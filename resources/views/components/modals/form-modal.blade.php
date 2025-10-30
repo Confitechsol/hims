@@ -7,6 +7,7 @@
     'columns' => 1, // Number of columns (default: 1)
     'repeatable_group' => [],
     'type',
+    'fileTypes'
 ])
 
 <div class="modal fade" id="{{ $id }}" tabindex="-1" aria-hidden="true">
@@ -63,7 +64,7 @@
                                         <input type="{{ $field['type'] ?? 'text' }}" name="{{ $field['name'] }}"
                                             data-field="{{ $field['name'] }}" id="{{ $field['name'] }}"
                                             value="{{ $field['value'] ?? old($field['name']) }}" class="form-control"
-                                            @if (!empty($field['required'])) required @endif>
+                                            @if (!empty($field['required'])) required @endif @if(isset($field['fileTypes']))accept="{{$field['fileTypes']}}"@endif>
                                     @endif
                                 </div>
                             </div>
