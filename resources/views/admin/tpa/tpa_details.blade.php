@@ -223,19 +223,4 @@
         .select2-container .select2-search--dropdown { display: block !important; }
         .select2-container .select2-search__field { display: block !important; }
     </style>
-
-    <script>
-        $(document).ready(function () {
-            $('#charge-type').select2({
-                width: '100%',
-                placeholder: 'Select',
-                allowClear: true,
-                dropdownParent: $('#charge_type_form'),
-                // always show the search box even for small option sets
-                minimumResultsForSearch: 0
-
-            });
-        });
-    </script>
-
 @endsection

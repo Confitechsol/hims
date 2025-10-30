@@ -27,7 +27,7 @@ class Income extends Model
         'generated_by',
         'is_active',
     ];
-
+    public $timestamps = false;
     public function incomeHead(): BelongsTo{
         return $this->belongsTo(IncomeHead::class,"inc_head_id");
     }

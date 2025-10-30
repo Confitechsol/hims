@@ -268,7 +268,10 @@ Route::middleware(['admin'])->group(function () {
     Route::delete('/tpa_details/destroy', [TpamanagmentController::class, 'destroyTpaDetails'])->name('tpa_details.destroy');
     Route::put('/tpa_details/update', [TpamanagmentController::class, 'updateTpaDetails'])->name('tpa_details.update');
 
-    Route::get('/income', [IncomeController::class, 'index']);
+    Route::get('/income', [IncomeController::class, 'index'])->name('income');
+    Route::post('/income/create', [IncomeController::class, 'create'])->name('income.create');
+    Route::put('/income/update', [IncomeController::class, 'update'])->name('income.update');
+    Route::delete('/income/destroy', [IncomeController::class, 'destroy'])->name('income.destroy');
 
 
     Route::get('/expense', [ExpenseController::class, 'index']);
@@ -510,3 +513,6 @@ Route::get('/visit_details', function () {
 Route::get('/opd_view', function () {
     return view('admin.opd.opd_view');
 })->name('opd_view');
+Route::get('/generate_certificate', function () {
+    return view('admin.certificate.generate_certificate');
+})->name('generate_certificate');
