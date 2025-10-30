@@ -267,7 +267,10 @@ Route::middleware(['admin'])->group(function () {
     Route::delete('/tpa_details/destroy', [TpamanagmentController::class, 'destroyTpaDetails'])->name('tpa_details.destroy');
     Route::put('/tpa_details/update', [TpamanagmentController::class, 'updateTpaDetails'])->name('tpa_details.update');
 
-    Route::get('/income', [IncomeController::class, 'index']);
+    Route::get('/income', [IncomeController::class, 'index'])->name('income');
+    Route::post('/income/create', [IncomeController::class, 'create'])->name('income.create');
+    Route::put('/income/update', [IncomeController::class, 'update'])->name('income.update');
+    Route::delete('/income/destroy', [IncomeController::class, 'destroy'])->name('income.destroy');
 
 
 });
