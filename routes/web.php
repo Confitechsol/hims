@@ -45,6 +45,7 @@ use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\TpamanagmentController;
 use App\Http\Controllers\VitalController;
 use App\Http\Controllers\IncomeController;
+use App\Http\Controllers\ExpenseController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -268,6 +269,9 @@ Route::middleware(['admin'])->group(function () {
     Route::put('/tpa_details/update', [TpamanagmentController::class, 'updateTpaDetails'])->name('tpa_details.update');
 
     Route::get('/income', [IncomeController::class, 'index']);
+
+
+    Route::get('/expense', [ExpenseController::class, 'index']);
 
 
 });
