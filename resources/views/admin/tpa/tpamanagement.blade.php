@@ -127,6 +127,7 @@
                                                             data-contact_person_phone="{{$item->contact_person_phone}}"
                                                             data-poilicy_no="{{$item->poilicy_no}}"
                                                             data-e_card_no="{{$item->e_card_no}}"
+                                                            data-e_card_image="/{{$item->e_card_upload}}"
                                                             data-e_card_upload="">
                                                             <i class="ti ti-pencil"></i>
                                                         </button>
@@ -178,7 +179,8 @@
         ['name' => 'contact_person_phone', 'label' => 'Contact Person Phone', 'type' => 'text', 'required' => true,'size'=>'6'],
         ['name' => 'poilicy_no', 'label' => 'Poilicy No', 'type' => 'text', 'required' => true,'size'=>'6'],
         ['name' => 'e_card_no', 'label' => 'E Card No', 'type' => 'text', 'required' => true,'size'=>'6'],
-        ['name' => 'e_card_upload', 'label' => 'E Card Upload', 'type' => 'file', 'required' => true,'size'=>'12'],
+        ['name' => 'e_card_image', 'label' => 'E Card Current Image', 'type' => 'img', 'required' => true,'size'=>'12'],
+        ['name' => 'e_card_upload', 'label' => 'E Card Image Update', 'type' => 'file', 'required' => false ,'size'=>'12'],
     ]" :columns="3" />
     
    
