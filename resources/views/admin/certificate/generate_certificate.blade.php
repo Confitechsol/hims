@@ -6,27 +6,24 @@
     <div class="row p-4 ">
         <div class="col-12 d-flex">
             <div class="card shadow-sm flex-fill w-100">
-                <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                <div class="card-header d-flex justify-content-between"
+                    style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                     <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>
                         Select Criteria
                     </h5>
+                    <div class="d-flex align-items-center flex-wrap gap-2">
+                        <div class="text-end d-flex">
+                            <a href="certificate" class="btn btn-light text-primary ms-2 btn-md"><i
+                                    class="fa-regular fa-newspaper pe-1"></i> Certificate Template</a>
+                        </div>
+
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <div
-                                        class="d-flex align-items-sm-center justify-content-end flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
-                                       
-                                        <div class="d-flex align-items-center flex-wrap gap-2">
-                                            <div class="text-end d-flex">
-                                                <a href="certificate" class="btn btn-primary text-white ms-2 btn-md"><i
-                                                        class="fa-regular fa-newspaper pe-1"></i> Certificate Template</a>
-                                            </div>
-
-                                        </div>
-                                    </div>
 
                                     <form action="">
                                         <div class="row">
@@ -67,47 +64,47 @@
                                     </div>
                                     <!-- Table start -->
                                     <!-- <div class="table-responsive table-nowrap">
-                                                    <table class="table border">
-                                                        <thead class="thead-light">
-                                                            <tr>
-                                                                <th>Transaction ID</th>
-                                                                <th>Date</th>
-                                                                <th>Note</th>
-                                                                <th>Payment Mode</th>
-                                                                <th>Paid Amount (INR)</th>
-                                                                <th>Action</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td>
-                                                                    TRID95
-                                                                </td>
-                                                                <td>10/14/2025 11:45 AM </td>
-                                                                <td>SmartPay Transaction ID: 528706160448
-                                                                </td>
-                                                                <td></td>
-                                                                <td>20.00</td>
-                                                                <td>
-                                                                    <div class="d-flex gap-2">
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
-                                                                            <i class="fa-solid fa-print" data-bs-toggle="tooltip"
-                                                                                title="Print"></i></a>
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
-                                                                            <i class="ti ti-pencil" data-bs-toggle="tooltip"
-                                                                                title="Show"></i></a>
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                            <i class="ti ti-trash" data-bs-toggle="tooltip"
-                                                                                title="Show"></i></a>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div> -->
+                                                        <table class="table border">
+                                                            <thead class="thead-light">
+                                                                <tr>
+                                                                    <th>Transaction ID</th>
+                                                                    <th>Date</th>
+                                                                    <th>Note</th>
+                                                                    <th>Payment Mode</th>
+                                                                    <th>Paid Amount (INR)</th>
+                                                                    <th>Action</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>
+                                                                        TRID95
+                                                                    </td>
+                                                                    <td>10/14/2025 11:45 AM </td>
+                                                                    <td>SmartPay Transaction ID: 528706160448
+                                                                    </td>
+                                                                    <td></td>
+                                                                    <td>20.00</td>
+                                                                    <td>
+                                                                        <div class="d-flex gap-2">
+                                                                            <a href="javascript: void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
+                                                                                <i class="fa-solid fa-print" data-bs-toggle="tooltip"
+                                                                                    title="Print"></i></a>
+                                                                            <a href="javascript: void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
+                                                                                <i class="ti ti-pencil" data-bs-toggle="tooltip"
+                                                                                    title="Show"></i></a>
+                                                                            <a href="javascript: void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                                                <i class="ti ti-trash" data-bs-toggle="tooltip"
+                                                                                    title="Show"></i></a>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div> -->
                                     <!-- Table end -->
                                 </div>
                             </div>
@@ -143,7 +140,7 @@
                                         <div class="d-flex align-items-center flex-wrap gap-2">
                                             <div class="text-end d-flex">
                                                 <a href="certificate" class="btn btn-primary text-white ms-2 btn-md"><i
-                                                        class="fa-regular fa-newspaper pe-1"></i> Generate</a>
+                                                        class="fa-solid fa-sliders pe-1"></i> Generate</a>
                                             </div>
 
                                         </div>

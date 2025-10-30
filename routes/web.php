@@ -512,3 +512,6 @@ Route::get('/opd_view', function () {
 Route::get('/generate_certificate', function () {
     return view('admin.certificate.generate_certificate');
 })->name('generate_certificate');
+Route::get('/certificate', function () {
+    return view('admin.certificate.certificate');
+})->name('certificate');
