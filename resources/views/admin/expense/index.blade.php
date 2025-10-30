@@ -1,11 +1,11 @@
 @extends('layouts.adminLayout')
 @section('content')
-    <!-- row start -->
-    <div class="row px-5 py-4">
+
+<div class="row px-5 py-4">
         <div class="col-12 d-flex">
             <div class="card shadow-sm flex-fill w-100">
                 <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                    <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Income List</h5>
+                    <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Expense List</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -52,55 +52,47 @@
                                             <a href="javascript:void(0);"
                                                 class="btn btn-primary text-white ms-2 btn-md"
                                                 data-bs-toggle="modal" data-bs-target="#add_tpa"><i
-                                                    class="ti ti-plus me-1"></i>Add Income</a>
+                                                    class="ti ti-plus me-1"></i>Add Expense</a>
                                         </div>
                                         <!-- First Modal -->
                                         
                                     </div>
 
                                 </div> --}}
-                                    <x-table-actions.actions id="income" name="Income" />
+                                    <x-table-actions.actions id="expense" name="Expense" />
                                     <!-- Table start -->
                                     <div class="table-responsive table-nowrap">
-                                        <table class="table" id="income">
+                                        <table class="table" id="expense">
                                             <thead class="thead-light">
                                                 <tr>
                                                     <th>Name</th>
                                                     <th>Invoice Number</th>
                                                     <th>Date</th>
                                                     <th>Description</th>
-                                                    <th>Income Head</th>
+                                                    <th>Expense Head</th>
                                                     <th>Amount (INR)</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach ($incomes as $income)
+                                                 @foreach($expenses as $expense)
                                                     <tr>
-                                                        <td>{{ $income->name }}</td>
-                                                        <td>{{ $income->invoice_no }}</td>
-                                                        <td>{{ \Carbon\Carbon::parse($income->date)->format('d-m-Y') }}</td>
-                                                        <td>{{ $income->note }}</td>
-                                                        <td>{{ $income->incomeHead->income_category ?? '-' }}</td>
-                                                        <td>{{ $income->amount }}</td>
+                                                        <td>{{ $expense->name }}</td>
+                                                        <td>{{ $expense->invoice_no }}</td>
+                                                        <td>{{ \Carbon\Carbon::parse($expense->date)->format('d-m-Y') }}</td>
+                                                        <td>{{ $expense->note }}</td>
+                                                        <td>{{ $expense->expenseHead->exp_category ?? '-' }}</td>
+                                                        <td>{{ $expense->amount }}</td>
                                                         <td>
                                                             <div class="d-flex">
                                                                 <button
                                                                     class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
-                                                                    data-id="{{$income->id}}"
-                                                                    data-name="{{$income->name}}"
-                                                                    data-invoice_no="{{$income->invoice_no}}"
-                                                                    data-date="{{$income->date}}"
-                                                                    data-note="{{$income->note}}"
-                                                                    data-income_head_id="{{$income->incomeHead->id ?? '-'}}"
-                                                                    data-amount="{{$income->amount}}"
-                                                                    >
+                                                                    data-id="">
                                                                     <i class="ti ti-pencil"></i>
                                                                 </button>
-                                                                <form method="POST" action="{{route('income.destroy')}}" onsubmit="return confirm('Are you Sure?')">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                    <input type="hidden" name="id" value="{{$income->id}}">
+                                                                <form method="POST" action="">
+
+                                                                    <input type="hidden" name="id" value="">
                                                                     <button type="submit"
                                                                         class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
                                                                         <i class="ti ti-trash"></i>
@@ -117,15 +109,15 @@
                                     {{-- Pagination Links --}}
                                     <div class="mt-3" id="pagination-wrapper">
                                         @php
-                                            $currentPage = $incomes->currentPage();
-                                            $lastPage = $incomes->lastPage();
+                                            $currentPage = $expenses->currentPage();
+                                            $lastPage = $expenses->lastPage();
                                         @endphp
 
                                         {{-- Previous --}}
-                                        @if ($incomes->onFirstPage())
+                                        @if ($expenses->onFirstPage())
                                             <button class="btn btn-outline-secondary btn-sm me-1" disabled>« Prev</button>
                                         @else
-                                            <a href="{{ $incomes->previousPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                                            <a href="{{ $expenses->previousPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
                                                 class="btn btn-outline-secondary btn-sm me-1">
                                                 « Prev
                                             </a>
@@ -136,7 +128,7 @@
                                             @if ($page == $currentPage)
                                                 <button class="btn btn-primary btn-sm me-1">{{ $page }}</button>
                                             @else
-                                                <a href="{{ $incomes->url($page) }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                                                <a href="{{ $expenses->url($page) }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
                                                     class="btn btn-outline-secondary btn-sm me-1">
                                                     {{ $page }}
                                                 </a>
@@ -144,8 +136,8 @@
                                         @endfor
 
                                         {{-- Next --}}
-                                        @if ($incomes->hasMorePages())
-                                            <a href="{{ $incomes->nextPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                                        @if ($expenses->hasMorePages())
+                                            <a href="{{ $expenses->nextPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
                                                 class="btn btn-outline-secondary btn-sm">
                                                 Next »
                                             </a>
@@ -165,138 +157,61 @@
     </div>
     </div>
     </div>
-    @php
-    $options = $incomeHeads->mapWithKeys(function ($item) {
-        return [$item->id => $item->income_category];
-    })->toArray();
-    @endphp
-    <x-modals.form-modal type="add" id="createModal" title="Add Income" action="{{ route('income.create') }}"
+    <x-modals.form-modal type="add" id="createModal" title="Add TPA" action="{{ route('tpamanagement.store') }}"
         :fields="[
             [
-                'name' => 'income_head_id',
-                'label' => 'Income Head',
-                'type' => 'select',
-                'options'=>$options,
-                'required' => true,
-            ],
-            [
-                'name' => 'name',
-                'label' => 'Name',
+                'name' => 'organisation_name',
+                'label' => 'organisation Name',
                 'type' => 'text',
                 'required' => true,
+                'size' => '5',
             ],
+            ['name' => 'code', 'label' => 'Code', 'type' => 'text', 'required' => true, 'size' => '3'],
+            ['name' => 'contact_no', 'label' => 'Phone', 'type' => 'text', 'required' => true, 'size' => '4'],
+            ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => true, 'size' => '12'],
             [
-                'name' => 'invoice_no',
-                'label' => 'Invoice Number',
-                'type' => 'text',
-            ],
-            [
-                'name' => 'date',
-                'label' => 'Date',
-                'type' => 'date',
-                'required' => true,
-            ],
-            [
-                'name' => 'amount',
-                'label' => 'Amount (INR)',
+                'name' => 'contact_person_name',
+                'label' => 'Contact Person Name',
                 'type' => 'text',
                 'required' => true,
+                'size' => '6',
             ],
             [
-                'name' => 'document',
-                'label' => 'Attach Document',
-                'type' => 'file',
-            ],
-            [
-                'name' => 'note',
-                'label' => 'Description',
-                'type' => 'textarea',
+                'name' => 'contact_person_phone',
+                'label' => 'Contact Person Phone',
+                'type' => 'text',
                 'required' => true,
-                'size' => '12',
+                'size' => '6',
             ],
-            
-        ]" :columns="2" />
+        ]" :columns="3" />
     <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Company Name"
-        action="{{ route('income.update') }}" :fields="[
+        action="{{ route('tpamanagement.update') }}" :fields="[
             ['name' => 'id', 'type' => 'hidden', 'required' => true],
             [
-                'name' => 'income_head_id',
-                'label' => 'Income Head',
-                'type' => 'select',
-                'options'=>$options,
-                'required' => true,
-            ],
-            [
-                'name' => 'name',
-                'label' => 'Name',
+                'name' => 'organisation_name',
+                'label' => 'organisation Name',
                 'type' => 'text',
                 'required' => true,
+                'size' => '5',
             ],
+            ['name' => 'code', 'label' => 'Code', 'type' => 'text', 'required' => true, 'size' => '3'],
+            ['name' => 'contact_no', 'label' => 'Phone', 'type' => 'text', 'required' => true, 'size' => '4'],
+            ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => true, 'size' => '12'],
             [
-                'name' => 'invoice_no',
-                'label' => 'Invoice Number',
-                'type' => 'text',
-            ],
-            [
-                'name' => 'date',
-                'label' => 'Date',
-                'type' => 'date',
-                'required' => true,
-            ],
-            [
-                'name' => 'amount',
-                'label' => 'Amount (INR)',
+                'name' => 'contact_person_name',
+                'label' => 'Contact Person Name',
                 'type' => 'text',
                 'required' => true,
+                'size' => '6',
             ],
             [
-                'name' => 'document',
-                'label' => 'Attach Document',
-                'type' => 'file',
-            ],
-            [
-                'name' => 'note',
-                'label' => 'Description',
-                'type' => 'textarea',
+                'name' => 'contact_person_phone',
+                'label' => 'Contact Person Phone',
+                'type' => 'text',
                 'required' => true,
-                'size' => '12',
+                'size' => '6',
             ],
-        ]" :columns="2" />
+        ]" :columns="3" />
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-createAjaxTable({
-    apiUrl: "{{ route('income') }}",
-    tableSelector: "#income",
-    paginationSelector: "#pagination-wrapper",
-    searchInputSelector: "#search-input",
-    perPageSelector: "#perPage",
-    rowRenderer: function (item) {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${item.name}</td>
-            <td>${item.invoice_no}</td>
-            <td>${item.date}</td>
-            <td>${item.note}</td>
-            <td>${item.income_head.income_category}</td>
-            <td>${item.amount}</td>
-            <td>
-                <button class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill" data-bs-toggle="modal" data-bs-target="#editModal"
-                    data-id="${item.id}"
-                    data-name="${item.name}">
-                    <i class="ti ti-pencil"></i>
-                </button>
-                <button class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill" data-bs-toggle="modal"
-                data-bs-target="#deleteModal" data-id="${item.id}"
-                data-name="${item.name}">
-                <i class="ti ti-trash"></i>
-                </button>
-            </form>
-            </td>
-        `;
-        return row;
-    }
-    });  
-}); 
-</script>
+
 @endsection()
