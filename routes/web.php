@@ -45,6 +45,7 @@ use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\TpamanagmentController;
 use App\Http\Controllers\VitalController;
 use App\Http\Controllers\IncomeController;
+use App\Http\Controllers\ExpenseController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -271,6 +272,9 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/income/create', [IncomeController::class, 'create'])->name('income.create');
     Route::put('/income/update', [IncomeController::class, 'update'])->name('income.update');
     Route::delete('/income/destroy', [IncomeController::class, 'destroy'])->name('income.destroy');
+
+
+    Route::get('/expense', [ExpenseController::class, 'index']);
 
 
 });
@@ -509,6 +513,6 @@ Route::get('/visit_details', function () {
 Route::get('/opd_view', function () {
     return view('admin.opd.opd_view');
 })->name('opd_view');
-Route::get('/certificate', function () {
-    return view('admin.certificate.certificate');
-})->name('certificate');
+Route::get('/generate_certificate', function () {
+    return view('admin.certificate.generate_certificate');
+})->name('generate_certificate');
