@@ -59,12 +59,14 @@ class TpamanagmentController extends Controller
         $organisation->contact_person_phone = $request->contact_person_phone;
         $organisation->poilicy_no = $request->poilicy_no;
         $organisation->e_card_no = $request->e_card_no;
-        if ($request->hasFile('e_card_upload')) {
+        // Handle file upload
+        if ($request->hasFile('e_card_upload')) {       
             $file = $request->file('e_card_upload');
             $filename = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('uploads/e_cards'), $filename);
-            $organisation->e_card_upload = $filename;
+            $organisation->e_card_upload = 'uploads/e_cards/' . $filename;  
         }
+
         $organisation->save();
 
         return redirect()->route('tpamanagement')->with('success', 'TPA added successfully.');
@@ -82,10 +84,11 @@ class TpamanagmentController extends Controller
             'contact_person_phone' => 'required|string|max:15|different:contact_no',
             'poilicy_no' => 'required|string|max:255',
             'e_card_no' => 'required|string|max:255',
-            'e_card_upload' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'e_card_upload' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
         $organisation = Organisation::findOrFail($request->id);
+
         $organisation->update([
             'organisation_name' => $request->organisation_name,
             'code' => $request->code,
@@ -95,6 +98,12 @@ class TpamanagmentController extends Controller
             'contact_person_phone' => $request->contact_person_phone,
             'poilicy_no' => $request->poilicy_no,
             'e_card_no' => $request->e_card_no,
+            'e_card_upload' => $request->hasFile('e_card_upload') ? function() use ($request) {
+                $file = $request->file('e_card_upload');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('uploads/e_cards'), $filename);
+                return 'uploads/e_cards/' . $filename;
+            } : $organisation->e_card_upload,
         ]);
 
         return redirect()->route('tpamanagement')->with('success', 'TPA updated successfully.');
