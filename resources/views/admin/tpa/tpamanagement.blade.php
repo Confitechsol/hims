@@ -133,6 +133,9 @@
         ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => true,'size'=>'12'],
         ['name' => 'contact_person_name', 'label' => 'Contact Person Name', 'type' => 'text', 'required' => true,'size'=>'6'],
         ['name' => 'contact_person_phone', 'label' => 'Contact Person Phone', 'type' => 'text', 'required' => true,'size'=>'6'],
+        ['name' => 'poilicy_no', 'label' => 'Poilicy No', 'type' => 'text', 'required' => true,'size'=>'6'],
+        ['name' => 'e_card_no', 'label' => 'E Card No', 'type' => 'text', 'required' => true,'size'=>'6'],
+        ['name' => 'e_card_upload', 'label' => 'E Card Upload', 'type' => 'file', 'required' => true,'size'=>'12'],
         ]" :columns="3" />
  <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Company Name"
     action="{{route('tpamanagement.update')}}" :fields="[
