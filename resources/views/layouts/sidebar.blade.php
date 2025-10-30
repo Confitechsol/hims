@@ -9,12 +9,12 @@
                 </a>
 
                 <!-- Logo Small -->
-                <a href="index.html" class="logo-small">
+                <a href="{{ route('dashboard') }}" class="logo-small">
                     <img src="assets/img/logo-small.svg" alt="Logo">
                 </a>
 
                 <!-- Logo Dark -->
-                <a href="index.html" class="dark-logo">
+                <a href="{{ route('dashboard') }}" class="dark-logo">
                     <!-- <img src="assets/img/logo-white.svg" alt="Logo"> -->
                     <h2>LOGO</h2>
                 </a>
@@ -100,10 +100,10 @@
                                 <ul>
                                     <li><a href="{{ route('dashboard') }}" class="active">Admin
                                             Dashboard</a></li>
-                                    <li><a href="doctor-dashboard.html">Doctor
+                                    <!--<li><a href="doctor-dashboard.html">Doctor
                                             Dashboard</a></li>
                                     <li><a href="patient-dashboard.html">Patient
-                                            Dashboard</a></li>
+                                            Dashboard</a></li>-->
                                 </ul>
                             </li>
                             <li>
@@ -162,7 +162,7 @@
                     <li class="menu-title"><span>Clinic</span></li>
                     <li>
                         <ul>
-                            <li class="submenu">
+                            <!--<li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-user-plus"></i><span>Doctors</span>
                                     <span class="menu-arrow"></span>
@@ -195,7 +195,7 @@
 
 
                                 </ul>
-                            </li>
+                            </li>-->
                             <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-calendar-check"></i><span>Appointments</span>
@@ -239,10 +239,18 @@
                                     <i class="ti ti-map-pin"></i><span>Front Office</span>
                                 </a>
                             </li>
-                            <li>
-                                <a href="#">
-                                    <i class="ti ti-map-pin"></i><span>Duty Roster</span>
+                            <li class="submenu">
+                                <a href="javascript:void(0);" class="active subdrop">
+                                    <i class="ti ti-layout-dashboard"></i><span>Duty Roster</span>
+                                    <span class="menu-arrow"></span>
                                 </a>
+                                <ul>
+                                    <li><a href="index.html" class="active">Staff
+                                            </a></li>
+                                    <li><a href="doctor-dashboard.html">Doctors
+                                            </a></li>
+                                    
+                                </ul>
                             </li>
                             <li>
                                 <a href="#">
@@ -286,8 +294,25 @@
                                 </a>
                             </li> -->
                         </ul>
+                    </li> 
+                    <li>
+                        <ul>
+                    <li class="submenu">
+                                <a href="javascript:void(0);" class="active subdrop">
+                                    <i class="ti ti-layout-dashboard"></i><span>Finance</span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <ul>
+                                    <li><a href="index.html" class="active">Income
+                                            </a></li>
+                                    <li><a href="doctor-dashboard.html">Expenses
+                                            </a></li>
+                                    
+                                </ul>
+                            </li>
+                            </ul>
                     </li>
-                    <li class="menu-title"><span>Finance &
+                    <!--<li class="menu-title"><span>Finance &
                             Accounts</span></li>
                     <li>
                         <ul>
@@ -302,6 +327,7 @@
                                             Category</a></li>
                                 </ul>
                             </li>
+                            
                             <li>
                                 <a href="income.html">
                                     <i class="ti ti-coins"></i><span>Income</span>
@@ -329,7 +355,7 @@
                                 </a>
                             </li>
                         </ul>
-                    </li>
+                    </li>-->
                     <li class="menu-title"><span>Administration & HRM</span></li>
                     <li>
                         <ul>
