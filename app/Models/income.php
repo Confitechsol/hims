@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 
 class Income extends Model
 {
@@ -25,4 +27,8 @@ class Income extends Model
         'generated_by',
         'is_active',
     ];
+
+    public function incomeHead(): BelongsTo{
+        return $this->belongsTo(IncomeHead::class,"inc_head_id");
+    }
 }
