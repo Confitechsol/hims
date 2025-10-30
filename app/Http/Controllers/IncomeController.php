@@ -87,9 +87,9 @@ class IncomeController extends Controller
             // Remove old document if it exists and is local
             if (!empty($income->documents)) {
                 $oldPath = str_replace(url('/'), public_path(), $income->documents);
-                dd($oldPath);
-                if (file_exists($oldPath)) {
-                    @unlink($oldPath);
+                $path = url('/').$oldPath;
+                if (file_exists($path)) {
+                    @unlink($path);
                 }
             }
     
@@ -97,9 +97,9 @@ class IncomeController extends Controller
             $file = $request->file('document');
             $fileName = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('uploads'), $fileName);
-    
+
             // Save full dynamic URL
-            $income->documents = url('uploads/' . $fileName);
+            $income->documents = '/uploads/' . $fileName;
         }
     
         // Update other fields

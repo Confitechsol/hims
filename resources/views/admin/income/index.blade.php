@@ -87,7 +87,14 @@
                                                             <div class="d-flex">
                                                                 <button
                                                                     class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
-                                                                    data-id="">
+                                                                    data-id="{{$income->id}}"
+                                                                    data-name="{{$income->name}}"
+                                                                    data-invoice_no="{{$income->invoice_no}}"
+                                                                    data-date="{{$income->date}}"
+                                                                    data-note="{{$income->note}}"
+                                                                    data-income_head_id="{{$income->incomeHead->id ?? '-'}}"
+                                                                    data-amount="{{$income->amount}}"
+                                                                    >
                                                                     <i class="ti ti-pencil"></i>
                                                                 </button>
                                                                 <form method="POST" action="{{route('income.destroy')}}" onsubmit="return confirm('Are you Sure?')">
@@ -210,7 +217,7 @@
             
         ]" :columns="2" />
     <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Company Name"
-        action="{{ route('income') }}" :fields="[
+        action="{{ route('income.update') }}" :fields="[
             ['name' => 'id', 'type' => 'hidden', 'required' => true],
             [
                 'name' => 'income_head_id',
