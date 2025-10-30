@@ -502,3 +502,6 @@ Route::get('/visit_details', function () {
 Route::get('/opd_view', function () {
     return view('admin.opd.opd_view');
 })->name('opd_view');
+Route::get('/certificate', function () {
+    return view('admin.certificate.certificate');
+})->name('certificate');
