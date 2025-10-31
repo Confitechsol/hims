@@ -21,6 +21,9 @@ return new class extends Migration
             $table->string('address', 300)->index();
             $table->string('contact_person_name', 200)->index();
             $table->string('contact_person_phone', 20)->index();
+            $table->string('poilicy_no', 200)->index();
+            $table->string('e_card_no', 200)->index();
+            $table->string('e_card_upload', 200)->index();
             $table->timestamps();
         });
     }

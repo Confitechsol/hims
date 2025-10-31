@@ -20,6 +20,9 @@ class Organisation extends Model
         'address',
         'contact_person_name',
         'contact_person_phone',
+        'poilicy_no',
+        'e_card_no',
+        'e_card_upload',
     ];
 
     public $timestamps = false;

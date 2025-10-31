@@ -31,7 +31,7 @@
     <!-- Page Title -->
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    @extends('layouts.admincdns')
+    @include('layouts.admincdns')
     <style>
         .settings-wrapper .card .card-body label:has(input:checked) .card {
             border: 2px solid #CB6CE6;
@@ -676,6 +676,9 @@
 
                 function initSelect($el) {
                     if ($el.data('select2-inited')) return;
+
+                    // skip selects that are hidden (like inside a hidden modal)
+                    if (!$el.is(':visible')) return;
 
                     //skip which are inside edit modal
                     if ($el.closest('#edit_modal').length > 0) return;

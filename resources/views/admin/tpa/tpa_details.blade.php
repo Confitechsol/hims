@@ -36,8 +36,8 @@
 
         <!-- page header start -->
         <div class="mb-4">
-            <h6 class="fw-bold mb-0 d-flex align-items-center"> <a href="patients.html" class="text-dark"> <i
-                        class="ti ti-chevron-left me-1"></i>TPA Details</a></h6>
+            <h6 class="fw-bold mb-0 d-flex align-items-center"> <a href="{{ route('tpamanagement') }}" class="text-dark"> <i
+                        class="ti ti-chevron-left me-1"></i>TPA</a></h6>
         </div>
         <!-- page header end -->
 
@@ -222,19 +222,4 @@
         .select2-container .select2-search--dropdown { display: block !important; }
         .select2-container .select2-search__field { display: block !important; }
     </style>
-
-    <script>
-        $(document).ready(function () {
-            $('#charge-type').select2({
-                width: '100%',
-                placeholder: 'Select',
-                allowClear: true,
-                dropdownParent: $('#charge_type_form'),
-                // always show the search box even for small option sets
-                minimumResultsForSearch: 0
-
-            });
-        });
-    </script>
-
 @endsection

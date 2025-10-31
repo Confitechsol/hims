@@ -87,12 +87,20 @@
                                                             <div class="d-flex">
                                                                 <button
                                                                     class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
-                                                                    data-id="">
+                                                                    data-id="{{$income->id}}"
+                                                                    data-name="{{$income->name}}"
+                                                                    data-invoice_no="{{$income->invoice_no}}"
+                                                                    data-date="{{$income->date}}"
+                                                                    data-note="{{$income->note}}"
+                                                                    data-income_head_id="{{$income->incomeHead->id ?? '-'}}"
+                                                                    data-amount="{{$income->amount}}"
+                                                                    >
                                                                     <i class="ti ti-pencil"></i>
                                                                 </button>
-                                                                <form method="POST" action="">
-
-                                                                    <input type="hidden" name="id" value="">
+                                                                <form method="POST" action="{{route('income.destroy')}}" onsubmit="return confirm('Are you Sure?')">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <input type="hidden" name="id" value="{{$income->id}}">
                                                                     <button type="submit"
                                                                         class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
                                                                         <i class="ti ti-trash"></i>
@@ -157,61 +165,138 @@
     </div>
     </div>
     </div>
-    <x-modals.form-modal type="add" id="createModal" title="Add TPA" action="{{ route('tpamanagement.store') }}"
+    @php
+    $options = $incomeHeads->mapWithKeys(function ($item) {
+        return [$item->id => $item->income_category];
+    })->toArray();
+    @endphp
+    <x-modals.form-modal type="add" id="createModal" title="Add Income" action="{{ route('income.create') }}"
         :fields="[
             [
-                'name' => 'organisation_name',
-                'label' => 'organisation Name',
-                'type' => 'text',
+                'name' => 'income_head_id',
+                'label' => 'Income Head',
+                'type' => 'select',
+                'options'=>$options,
                 'required' => true,
-                'size' => '5',
-            ],
-            ['name' => 'code', 'label' => 'Code', 'type' => 'text', 'required' => true, 'size' => '3'],
-            ['name' => 'contact_no', 'label' => 'Phone', 'type' => 'text', 'required' => true, 'size' => '4'],
-            ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => true, 'size' => '12'],
-            [
-                'name' => 'contact_person_name',
-                'label' => 'Contact Person Name',
-                'type' => 'text',
-                'required' => true,
-                'size' => '6',
             ],
             [
-                'name' => 'contact_person_phone',
-                'label' => 'Contact Person Phone',
+                'name' => 'name',
+                'label' => 'Name',
                 'type' => 'text',
                 'required' => true,
-                'size' => '6',
             ],
-        ]" :columns="3" />
+            [
+                'name' => 'invoice_no',
+                'label' => 'Invoice Number',
+                'type' => 'text',
+            ],
+            [
+                'name' => 'date',
+                'label' => 'Date',
+                'type' => 'date',
+                'required' => true,
+            ],
+            [
+                'name' => 'amount',
+                'label' => 'Amount (INR)',
+                'type' => 'text',
+                'required' => true,
+            ],
+            [
+                'name' => 'document',
+                'label' => 'Attach Document',
+                'type' => 'file',
+            ],
+            [
+                'name' => 'note',
+                'label' => 'Description',
+                'type' => 'textarea',
+                'required' => true,
+                'size' => '12',
+            ],
+            
+        ]" :columns="2" />
     <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Company Name"
-        action="{{ route('tpamanagement.update') }}" :fields="[
+        action="{{ route('income.update') }}" :fields="[
             ['name' => 'id', 'type' => 'hidden', 'required' => true],
             [
-                'name' => 'organisation_name',
-                'label' => 'organisation Name',
-                'type' => 'text',
+                'name' => 'income_head_id',
+                'label' => 'Income Head',
+                'type' => 'select',
+                'options'=>$options,
                 'required' => true,
-                'size' => '5',
-            ],
-            ['name' => 'code', 'label' => 'Code', 'type' => 'text', 'required' => true, 'size' => '3'],
-            ['name' => 'contact_no', 'label' => 'Phone', 'type' => 'text', 'required' => true, 'size' => '4'],
-            ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => true, 'size' => '12'],
-            [
-                'name' => 'contact_person_name',
-                'label' => 'Contact Person Name',
-                'type' => 'text',
-                'required' => true,
-                'size' => '6',
             ],
             [
-                'name' => 'contact_person_phone',
-                'label' => 'Contact Person Phone',
+                'name' => 'name',
+                'label' => 'Name',
                 'type' => 'text',
                 'required' => true,
-                'size' => '6',
             ],
-        ]" :columns="3" />
+            [
+                'name' => 'invoice_no',
+                'label' => 'Invoice Number',
+                'type' => 'text',
+            ],
+            [
+                'name' => 'date',
+                'label' => 'Date',
+                'type' => 'date',
+                'required' => true,
+            ],
+            [
+                'name' => 'amount',
+                'label' => 'Amount (INR)',
+                'type' => 'text',
+                'required' => true,
+            ],
+            [
+                'name' => 'document',
+                'label' => 'Attach Document',
+                'type' => 'file',
+            ],
+            [
+                'name' => 'note',
+                'label' => 'Description',
+                'type' => 'textarea',
+                'required' => true,
+                'size' => '12',
+            ],
+        ]" :columns="2" />
 
-
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+createAjaxTable({
+    apiUrl: "{{ route('income') }}",
+    tableSelector: "#income",
+    paginationSelector: "#pagination-wrapper",
+    searchInputSelector: "#search-input",
+    perPageSelector: "#perPage",
+    rowRenderer: function (item) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${item.name}</td>
+            <td>${item.invoice_no}</td>
+            <td>${item.date}</td>
+            <td>${item.note}</td>
+            <td>${item.income_head.income_category}</td>
+            <td>${item.amount}</td>
+            <td>
+                <button class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill" data-bs-toggle="modal" data-bs-target="#editModal"
+                    data-id="${item.id}"
+                    data-name="${item.name}">
+                    <i class="ti ti-pencil"></i>
+                </button>
+                <button class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill" data-bs-toggle="modal"
+                data-bs-target="#deleteModal" data-id="${item.id}"
+                data-name="${item.name}">
+                <i class="ti ti-trash"></i>
+                </button>
+            </form>
+            </td>
+        `;
+        return row;
+    }
+    });  
+}); 
+</script>
 @endsection()
