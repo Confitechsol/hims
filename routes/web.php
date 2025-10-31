@@ -44,6 +44,7 @@ use App\Http\Controllers\Setup\UsersController;
 use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\TpamanagmentController;
 use App\Http\Controllers\VitalController;
+use App\Http\Controllers\DutyRosterController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -502,3 +503,18 @@ Route::get('/visit_details', function () {
 Route::get('/opd_view', function () {
     return view('admin.opd.opd_view');
 })->name('opd_view');
+
+Route::prefix('dutyroster')->group(function () {
+    Route::get('/', [DutyRosterController::class, 'rosterListDetails'])->name('dutyroster');
+    Route::post('/addRoster', [DutyRosterController::class, 'addRoster'])->name('dutyroster.addRoster');
+    Route::get('/edit/{id}', [DutyRosterController::class, 'edit'])->name('dutyroster.edit');
+    Route::put('/update/{id}', [DutyRosterController::class, 'update'])->name('dutyroster.update');
+    Route::delete('destroy/{id}', [DutyRosterController::class, 'destroy'])->name('dutyroster.destroy');
+    Route::get('/addShift', [DutyRosterController::class, 'addShift'])->name('dutyroster.addShift');
+    Route::get('/doctor', [DutyRosterController::class, 'doctorRoster'])->name('dutyroster.doctor');
+    Route::get('/staff', [DutyRosterController::class, 'staffRoster'])->name('dutyroster.staff');
+    Route::post('/store', [DutyRosterController::class, 'store'])->name('dutyroster.store');
+    Route::put('/update', [DutyRosterController::class, 'update'])->name('dutyroster.update');
+    Route::delete('/destroy', [DutyRosterController::class, 'destroy'])->name('dutyroster.destroy');
+    Route::get('/show/{id}', [DutyRosterController::class, 'show'])->name('dutyroster.show');
+});

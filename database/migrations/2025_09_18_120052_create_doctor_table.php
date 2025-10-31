@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('hospital_id', 8);
             $table->string('branch_id', 8);
             $table->string('doctor_id', 200)->unique()->nullable();
-            $table->string('branch_id', 200)->unique()->nullable();
+            $table->string('branch_id', 200)->nullable();
 
             // Basic info
             $table->string('name', 200);

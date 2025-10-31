@@ -25,6 +25,7 @@ class DutyRosterAssign extends Model
         'floor_id',
         'department_id',
         'staff_id',
+        'doctor_id',
         'duty_roster_list_id',
     ];
 
@@ -49,6 +50,11 @@ class DutyRosterAssign extends Model
     {
         return $this->belongsTo(Staff::class, 'staff_id');
     }
+
+        public function doctor()
+        {
+            return $this->belongsTo(Doctor::class, 'doctor_id');
+        }
 
     // Each roster assignment belongs to a duty roster list
     public function dutyRosterList()
