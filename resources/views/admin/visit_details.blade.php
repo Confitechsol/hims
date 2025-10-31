@@ -2170,7 +2170,7 @@
                                                                             <a href="javascript: void(0);"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
                                                                                 <i class="ti ti-trash" data-bs-toggle="tooltip"
-                                                                                    title="Show"></i></a>
+                                                                                    title="Delete"></i></a>
                                                                         </div>
                                                                     </td>
                                                                 </tr>

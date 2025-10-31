@@ -519,3 +519,15 @@ Route::get('/generate_certificate', function () {
 Route::get('/certificate', function () {
     return view('admin.certificate.certificate');
 })->name('certificate');
+Route::get('/generate_patient_id', function () {
+    return view('admin.certificate.generate_patient_id');
+})->name('generate_patient_id');
+Route::get('/patient_id', function () {
+    return view('admin.certificate.patient_id');
+})->name('patient_id');
+Route::get('/generate_staff_id', function () {
+    return view('admin.certificate.generate_staff_id');
+})->name('generate_staff_id');
+Route::get('/staff_id', function () {
+    return view('admin.certificate.staff_id');
+})->name('staff_id');
