@@ -32,8 +32,14 @@ class PathologyBillingController extends Controller
     public function create()
     {
         $patients = Patient::select('id', 'patient_name', 'mobileno')->get();
-        $doctors = Doctor::select('id', 'name', 'surname', 'doctor_id')->where('is_active', 'yes')->get();
-        $tests = Pathology::with(['category', 'charge'])->get();
+        $doctors = Doctor::select('id', 'name', 'surname', 'doctor_id')
+            ->where(function($query) {
+                $query->where('is_active', true)
+                      ->orWhere('is_active', 1)
+                      ->orWhere('is_active', 'yes');
+            })
+            ->get();
+        $tests = Pathology::with(['category', 'charge.taxCategory'])->get();
         
         return view('admin.pathology.billing.create', compact('patients', 'doctors', 'tests'));
     }
@@ -131,8 +137,14 @@ class PathologyBillingController extends Controller
     {
         $bill = PathologyBilling::with(['patient', 'doctor', 'reports.pathology'])->findOrFail($id);
         $patients = Patient::select('id', 'patient_name', 'mobileno')->get();
-        $doctors = Doctor::select('id', 'name', 'surname', 'doctor_id')->where('is_active', 'yes')->get();
-        $tests = Pathology::with(['category', 'charge'])->get();
+        $doctors = Doctor::select('id', 'name', 'surname', 'doctor_id')
+            ->where(function($query) {
+                $query->where('is_active', true)
+                      ->orWhere('is_active', 1)
+                      ->orWhere('is_active', 'yes');
+            })
+            ->get();
+        $tests = Pathology::with(['category', 'charge.taxCategory'])->get();
         
         return view('admin.pathology.billing.edit', compact('bill', 'patients', 'doctors', 'tests'));
     }

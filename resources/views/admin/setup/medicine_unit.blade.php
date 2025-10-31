@@ -5,9 +5,9 @@
     <div class="card shadow-sm">
         <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0" style="color: #750096">Medicine Category List</h5>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
-                    <i class="ti ti-plus"></i> Add Medicine Category
+                <h5 class="mb-0" style="color: #750096">Unit List</h5>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUnitModal">
+                    <i class="ti ti-plus"></i> Add Unit
                 </button>
             </div>
         </div>
@@ -23,19 +23,21 @@
                 <table class="table table-bordered datatable">
                     <thead class="table-light">
                         <tr>
-                            <th>Category Name</th>
+                            <th>Database ID</th>
+                            <th>Unit Name</th>
                             <th width="150">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($categories as $category)
+                        @forelse($units as $unit)
                         <tr>
-                            <td>{{ $category->category_name }}</td>
+                            <td>{{ $unit->id }}</td>
+                            <td>{{ $unit->unit_name }}</td>
                             <td>
-                                <button class="btn btn-sm btn-info" onclick="editCategory({{ $category->id }}, '{{ $category->category_name }}')">
+                                <button class="btn btn-sm btn-info" onclick="editUnit({{ $unit->id }}, '{{ $unit->unit_name }}')">
                                     <i class="ti ti-pencil"></i>
                                 </button>
-                                <form action="{{ route('medicine-category.destroy', $category->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Are you sure you want to delete this category?')">
+                                <form action="{{ route('medicine-unit.destroy', $unit->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Are you sure?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger">
@@ -46,7 +48,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="2" class="text-center">No categories found</td>
+                            <td colspan="3" class="text-center">No units found</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -56,55 +58,51 @@
     </div>
 </div>
 
-<!-- Add Category Modal -->
-<div class="modal fade" id="addCategoryModal" tabindex="-1">
+<!-- Add Unit Modal -->
+<div class="modal fade" id="addUnitModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header" style="background: #CB6CE6; color: white;">
-                <h5 class="modal-title">Add Medicine Category</h5>
+                <h5 class="modal-title">Add Unit</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ route('medicine-category.store') }}" method="POST">
+            <form action="{{ route('medicine-unit.store') }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Category Name <span class="text-danger">*</span></label>
-                        <input type="text" name="category_name" class="form-control" required>
+                        <label class="form-label">Unit Name <span class="text-danger">*</span></label>
+                        <input type="text" name="unit_name" class="form-control" required>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="ti ti-check"></i> Save
-                    </button>
+                    <button type="submit" class="btn btn-primary"><i class="ti ti-check"></i> Save</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- Edit Category Modal -->
-<div class="modal fade" id="editCategoryModal" tabindex="-1">
+<!-- Edit Unit Modal -->
+<div class="modal fade" id="editUnitModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header" style="background: #CB6CE6; color: white;">
-                <h5 class="modal-title">Edit Medicine Category</h5>
+                <h5 class="modal-title">Edit Unit</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <form id="editCategoryForm" method="POST">
+            <form id="editUnitForm" method="POST">
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Category Name <span class="text-danger">*</span></label>
-                        <input type="text" name="category_name" id="edit_category_name" class="form-control" required>
+                        <label class="form-label">Unit Name <span class="text-danger">*</span></label>
+                        <input type="text" name="unit_name" id="edit_unit_name" class="form-control" required>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="ti ti-check"></i> Update
-                    </button>
+                    <button type="submit" class="btn btn-primary"><i class="ti ti-check"></i> Update</button>
                 </div>
             </form>
         </div>
@@ -112,10 +110,11 @@
 </div>
 
 <script>
-function editCategory(id, name) {
-    document.getElementById('edit_category_name').value = name;
-    document.getElementById('editCategoryForm').action = "{{ url('setup/medicine-category/update') }}/" + id;
-    new bootstrap.Modal(document.getElementById('editCategoryModal')).show();
+function editUnit(id, name) {
+    document.getElementById('edit_unit_name').value = name;
+    document.getElementById('editUnitForm').action = "{{ url('setup/medicine-unit/update') }}/" + id;
+    new bootstrap.Modal(document.getElementById('editUnitModal')).show();
 }
 </script>
 @endsection
+

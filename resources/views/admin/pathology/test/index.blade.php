@@ -77,7 +77,7 @@
                                                                 <a href="{{ route('pathology.test.edit', $test->id) }}" class="btn btn-sm btn-warning text-white" title="Edit">
                                                                     <i class="ti ti-edit"></i>
                                                                 </a>
-                                                                <form action="{{ route('pathology.test.destroy', $test->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this test?');">
+                                                                <form action="{{ route('pathology.test.destroy', $test->id) }}" method="POST" class="d-inline" onsubmit="return confirmDeleteForm(event, 'Delete Test?', 'Are you sure you want to delete this test?');">
                                                                     @csrf
                                                                     @method('DELETE')
                                                                     <button type="submit" class="btn btn-sm btn-danger text-white" title="Delete">

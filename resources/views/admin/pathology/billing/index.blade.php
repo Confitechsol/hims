@@ -66,7 +66,7 @@
                                                 <a href="{{ route('pathology.billing.edit', $bill->id) }}" class="btn btn-sm btn-warning text-white" title="Edit">
                                                     <i class="ti ti-edit"></i>
                                                 </a>
-                                                <form action="{{ route('pathology.billing.destroy', $bill->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure?');">
+                                                <form action="{{ route('pathology.billing.destroy', $bill->id) }}" method="POST" class="d-inline" onsubmit="return confirmDeleteForm(event, 'Delete Billing?', 'Are you sure you want to delete this billing record?');">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-danger text-white" title="Delete">

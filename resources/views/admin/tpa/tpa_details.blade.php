@@ -187,13 +187,12 @@
                                                 >
                                                 <i class="ti ti-pencil" data-bs-toggle="tooltip" title="Show"></i>
                                             </button>
-                                            <form method="POST" action="{{ route('tpa_details.destroy') }}">
+                                            <form method="POST" action="{{ route('tpa_details.destroy') }}" onsubmit="return confirmDeleteForm(event, 'Delete Item?', 'Are you sure you want to delete this item?');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <input type="hidden" name="id" value="{{ $item->id }}">
                                                 <button type="submit"
-                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
-                                                    onclick="return confirm('Are you sure you want to delete this item?');">
+                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
                                                     <i class="ti ti-trash"></i>
                                                 </button>
                                             </form>

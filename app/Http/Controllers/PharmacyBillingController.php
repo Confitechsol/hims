@@ -61,7 +61,13 @@ class PharmacyBillingController extends Controller
         $groups = MedicineGroup::all();
         $units = Unit::all();
         $patients = Patient::select('id', 'patient_name', 'mobileno')->get();
-        $doctors = Doctor::select('id', 'name', 'surname', 'doctor_id')->where('is_active', 'yes')->get();
+        $doctors = Doctor::select('id', 'name', 'surname', 'doctor_id')
+            ->where(function($query) {
+                $query->where('is_active', true)
+                      ->orWhere('is_active', 1)
+                      ->orWhere('is_active', 'yes');
+            })
+            ->get();
         $caseReferences = CaseReference::all();
 
         return view('admin.pharmacy.billing.create', compact(
@@ -164,7 +170,13 @@ class PharmacyBillingController extends Controller
         $groups = MedicineGroup::all();
         $units = Unit::all();
         $patients = Patient::select('id', 'patient_name', 'mobileno')->get();
-        $doctors = Doctor::select('id', 'name', 'surname', 'doctor_id')->where('is_active', 'yes')->get();
+        $doctors = Doctor::select('id', 'name', 'surname', 'doctor_id')
+            ->where(function($query) {
+                $query->where('is_active', true)
+                      ->orWhere('is_active', 1)
+                      ->orWhere('is_active', 'yes');
+            })
+            ->get();
         $caseReferences = CaseReference::all();
 
         return view('admin.pharmacy.billing.edit', compact(

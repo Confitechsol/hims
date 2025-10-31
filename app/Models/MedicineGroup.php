@@ -9,19 +9,9 @@ class MedicineGroup extends Model
 {
     use HasFactory;
 
-    protected $table = 'medicine_group';
-    public $timestamps = false;
     protected $fillable = [
         'hospital_id',
         'branch_id',
         'group_name',
     ];
-
-    /**
-     * Relations
-     */
-    public function medicines()
-    {
-        return $this->hasMany(Medicine::class, 'group_id');
-    }
 }

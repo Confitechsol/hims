@@ -9,24 +9,14 @@ class MedicineSupplier extends Model
 {
     use HasFactory;
 
-    protected $table = 'medicine_supplier';
-    public $timestamps = false;
     protected $fillable = [
         'hospital_id',
         'branch_id',
-        'supplier',
-        'contact',
-        'supplier_person',
-        'supplier_person_contact',
-        'supplier_drug_licence',
+        'supplier_name',
+        'supplier_contact',
+        'contact_person_name',
+        'contact_person_phone',
+        'drug_license_number',
         'address',
     ];
-
-    /**
-     * Relations
-     */
-    public function medicineBatches()
-    {
-        return $this->hasMany(MedicineBatchDetails::class, 'supplier_id');
-    }
 }

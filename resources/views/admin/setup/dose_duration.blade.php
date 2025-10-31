@@ -5,9 +5,9 @@
     <div class="card shadow-sm">
         <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0" style="color: #750096">Medicine Category List</h5>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
-                    <i class="ti ti-plus"></i> Add Medicine Category
+                <h5 class="mb-0" style="color: #750096">Dosage Duration List</h5>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDurationModal">
+                    <i class="ti ti-plus"></i> Add Dosage Duration
                 </button>
             </div>
         </div>
@@ -23,19 +23,19 @@
                 <table class="table table-bordered datatable">
                     <thead class="table-light">
                         <tr>
-                            <th>Category Name</th>
+                            <th>Name</th>
                             <th width="150">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($categories as $category)
+                        @forelse($durations as $duration)
                         <tr>
-                            <td>{{ $category->category_name }}</td>
+                            <td>{{ $duration->duration }}</td>
                             <td>
-                                <button class="btn btn-sm btn-info" onclick="editCategory({{ $category->id }}, '{{ $category->category_name }}')">
+                                <button class="btn btn-sm btn-info" onclick="editDuration({{ $duration->id }}, '{{ $duration->duration }}')">
                                     <i class="ti ti-pencil"></i>
                                 </button>
-                                <form action="{{ route('medicine-category.destroy', $category->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Are you sure you want to delete this category?')">
+                                <form action="{{ route('dose-duration.destroy', $duration->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Are you sure?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger">
@@ -46,7 +46,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="2" class="text-center">No categories found</td>
+                            <td colspan="2" class="text-center">No durations found</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -56,55 +56,51 @@
     </div>
 </div>
 
-<!-- Add Category Modal -->
-<div class="modal fade" id="addCategoryModal" tabindex="-1">
+<!-- Add Duration Modal -->
+<div class="modal fade" id="addDurationModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header" style="background: #CB6CE6; color: white;">
-                <h5 class="modal-title">Add Medicine Category</h5>
+                <h5 class="modal-title">Add Dosage Duration</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ route('medicine-category.store') }}" method="POST">
+            <form action="{{ route('dose-duration.store') }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Category Name <span class="text-danger">*</span></label>
-                        <input type="text" name="category_name" class="form-control" required>
+                        <label class="form-label">Duration <span class="text-danger">*</span></label>
+                        <input type="text" name="duration" class="form-control" required>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="ti ti-check"></i> Save
-                    </button>
+                    <button type="submit" class="btn btn-primary"><i class="ti ti-check"></i> Save</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- Edit Category Modal -->
-<div class="modal fade" id="editCategoryModal" tabindex="-1">
+<!-- Edit Duration Modal -->
+<div class="modal fade" id="editDurationModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header" style="background: #CB6CE6; color: white;">
-                <h5 class="modal-title">Edit Medicine Category</h5>
+                <h5 class="modal-title">Edit Dosage Duration</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <form id="editCategoryForm" method="POST">
+            <form id="editDurationForm" method="POST">
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Category Name <span class="text-danger">*</span></label>
-                        <input type="text" name="category_name" id="edit_category_name" class="form-control" required>
+                        <label class="form-label">Duration <span class="text-danger">*</span></label>
+                        <input type="text" name="duration" id="edit_duration" class="form-control" required>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="ti ti-check"></i> Update
-                    </button>
+                    <button type="submit" class="btn btn-primary"><i class="ti ti-check"></i> Update</button>
                 </div>
             </form>
         </div>
@@ -112,10 +108,11 @@
 </div>
 
 <script>
-function editCategory(id, name) {
-    document.getElementById('edit_category_name').value = name;
-    document.getElementById('editCategoryForm').action = "{{ url('setup/medicine-category/update') }}/" + id;
-    new bootstrap.Modal(document.getElementById('editCategoryModal')).show();
+function editDuration(id, duration) {
+    document.getElementById('edit_duration').value = duration;
+    document.getElementById('editDurationForm').action = "{{ url('setup/dose-duration/update') }}/" + id;
+    new bootstrap.Modal(document.getElementById('editDurationModal')).show();
 }
 </script>
 @endsection
+

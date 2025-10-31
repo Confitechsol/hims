@@ -5,18 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class MedicineCategory extends Model
+class MedicineCompany extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'hospital_id',
         'branch_id',
-        'category_name',
+        'company_name',
     ];
-
-    public function dosages()
-    {
-        return $this->hasMany(MedicineDosage::class);
-    }
 }

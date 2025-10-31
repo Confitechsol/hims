@@ -31,14 +31,18 @@
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Reference Doctor</label>
+                            <label class="form-label">Reference Doctor ({{ count($doctors ?? []) }} found)</label>
                             <select name="doctor_id" id="doctor_id" class="form-select">
                                 <option value="">Select Doctor</option>
-                                @foreach($doctors as $doctor)
-                                    <option value="{{ $doctor->id }}">
-                                        Dr. {{ $doctor->name }} {{ $doctor->surname }}
-                                    </option>
-                                @endforeach
+                                @if(isset($doctors) && count($doctors) > 0)
+                                    @foreach($doctors as $doctor)
+                                        <option value="{{ $doctor->id }}">
+                                            Dr. {{ $doctor->name }} {{ $doctor->surname }}
+                                        </option>
+                                    @endforeach
+                                @else
+                                    <option disabled>No doctors found</option>
+                                @endif
                             </select>
                         </div>
                         <div class="col-md-3">
@@ -55,7 +59,7 @@
                                 <table class="table table-bordered" id="testTable">
                                     <thead class="table-light">
                                         <tr>
-                                            <th width="30%">Test Name <span class="text-danger">*</span></th>
+                                            <th width="30%">Test Name ({{ count($tests ?? []) }} tests) <span class="text-danger">*</span></th>
                                             <th width="12%">Report Days</th>
                                             <th width="18%">Report Date <span class="text-danger">*</span></th>
                                             <th width="12%">Tax (%)</th>
@@ -68,14 +72,18 @@
                                             <td>
                                                 <select name="tests[0][pathology_id]" class="form-select test_name" required>
                                                     <option value="">Select Test</option>
-                                                    @foreach($tests as $test)
-                                                        <option value="{{ $test->id }}" 
-                                                            data-report-days="{{ $test->report_days }}" 
-                                                            data-tax="{{ $test->charge && $test->charge->taxCategory ? $test->charge->taxCategory->percentage : 0 }}" 
-                                                            data-amount="{{ $test->amount }}">
-                                                            {{ $test->test_name }} - ₹{{ number_format($test->amount, 2) }}
-                                                        </option>
-                                                    @endforeach
+                                                    @if(isset($tests) && count($tests) > 0)
+                                                        @foreach($tests as $test)
+                                                            <option value="{{ $test->id }}" 
+                                                                data-report-days="{{ $test->report_days ?? 0 }}" 
+                                                                data-tax="{{ $test->charge && $test->charge->taxCategory ? $test->charge->taxCategory->percentage : 0 }}" 
+                                                                data-amount="{{ $test->amount ?? ($test->charge ? $test->charge->standard_charge : 0) }}">
+                                                                {{ $test->test_name }} - ₹{{ number_format($test->amount ?? ($test->charge ? $test->charge->standard_charge : 0), 2) }}
+                                                            </option>
+                                                        @endforeach
+                                                    @else
+                                                        <option disabled>No tests found</option>
+                                                    @endif
                                                 </select>
                                             </td>
                                             <td>
@@ -217,40 +225,62 @@ let patientData = @json($patients);
 let prescriptionData = [];
 
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Page loaded! JavaScript is working. Version: 2.0');
+    console.log('Data passed to view:', {
+        doctors: @json($doctors->count()),
+        tests: @json($tests->count())
+    });
+    
     const today = new Date().toISOString().split('T')[0];
     document.querySelector('.report_date').value = today;
     
     initPatientAutocomplete();
     initPrescriptionAutocomplete();
     
-    // Test selection handler
-    document.addEventListener('change', function(e) {
-        if (e.target.classList.contains('test_name')) {
-            const selectedOption = e.target.options[e.target.selectedIndex];
-            const row = e.target.closest('tr');
+    // Check if test select exists
+    const testSelect = document.querySelector('.test_name');
+    console.log('Test select found:', testSelect);
+    console.log('Select2 is applied:', testSelect.classList.contains('select2-hidden-accessible'));
+    
+    // Test selection handler - Using jQuery with Select2
+    $(document).on('change', '.test_name', function(e) {
+        console.log('Test dropdown changed! (Select2 event)');
+        
+        const selectedOption = this.options[this.selectedIndex];
+        const row = $(this).closest('tr');
+        
+        console.log('Selected option:', selectedOption.text);
+        console.log('Data attributes:', {
+            days: selectedOption.getAttribute('data-report-days'),
+            tax: selectedOption.getAttribute('data-tax'),
+            amount: selectedOption.getAttribute('data-amount')
+        });
+        
+        if (this.value) {
+            const reportDays = selectedOption.getAttribute('data-report-days') || 0;
+            const tax = selectedOption.getAttribute('data-tax') || 0;
+            const amount = selectedOption.getAttribute('data-amount') || 0;
             
-            if (selectedOption.value) {
-                const reportDays = selectedOption.dataset.reportDays || 0;
-                const tax = selectedOption.dataset.tax || 0;
-                const amount = selectedOption.dataset.amount || 0;
-                
-                row.querySelector('.report_days').value = reportDays;
-                row.querySelector('.tax_percentage').value = tax;
-                row.querySelector('.test_amount').value = amount;
-                
-                // Calculate report date
-                const reportingDate = new Date(document.getElementById('date').value);
-                reportingDate.setDate(reportingDate.getDate() + parseInt(reportDays));
-                row.querySelector('.report_date').value = reportingDate.toISOString().split('T')[0];
-            } else {
-                row.querySelector('.report_days').value = 0;
-                row.querySelector('.tax_percentage').value = 0;
-                row.querySelector('.test_amount').value = 0;
-                row.querySelector('.report_date').value = today;
-            }
+            console.log('Setting values - Days:', reportDays, 'Tax:', tax, 'Amount:', amount);
             
-            calculateTotals();
+            row.find('.report_days').val(reportDays);
+            row.find('.tax_percentage').val(tax);
+            row.find('.test_amount').val(amount);
+            
+            // Calculate report date
+            const reportingDate = new Date(document.getElementById('date').value);
+            reportingDate.setDate(reportingDate.getDate() + parseInt(reportDays));
+            row.find('.report_date').val(reportingDate.toISOString().split('T')[0]);
+            
+            console.log('Values set successfully!');
+        } else {
+            row.find('.report_days').val(0);
+            row.find('.tax_percentage').val(0);
+            row.find('.test_amount').val(0);
+            row.find('.report_date').val(today);
         }
+        
+        calculateTotals();
     });
 
     // Discount handler
@@ -267,10 +297,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <option value="">Select Test</option>
                     @foreach($tests as $test)
                         <option value="{{ $test->id }}" 
-                            data-report-days="{{ $test->report_days }}" 
+                            data-report-days="{{ $test->report_days ?? 0 }}" 
                             data-tax="{{ $test->charge && $test->charge->taxCategory ? $test->charge->taxCategory->percentage : 0 }}" 
-                            data-amount="{{ $test->amount }}">
-                            {{ $test->test_name }} - ₹{{ number_format($test->amount, 2) }}
+                            data-amount="{{ $test->amount ?? ($test->charge ? $test->charge->standard_charge : 0) }}">
+                            {{ $test->test_name }} - ₹{{ number_format($test->amount ?? ($test->charge ? $test->charge->standard_charge : 0), 2) }}
                         </option>
                     @endforeach
                 </select>

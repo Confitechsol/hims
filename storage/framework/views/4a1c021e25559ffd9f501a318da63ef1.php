@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>">
 
 <!-- Mirrored from megaone.acrothemes.com/index-medical.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 28 Aug 2025 09:28:40 GMT -->
 <!-- Added by HTTrack -->
@@ -7,7 +7,7 @@
 
 <head>
 
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
 
     <!-- Meta Tags -->
     <meta charset="utf-8">
@@ -29,9 +29,9 @@
     <link rel="stylesheet" href="assets/css/custom.css">
 
     <!-- Page Title -->
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title><?php echo e(config('app.name', 'Laravel')); ?></title>
 
-    @extends('layouts.admincdns')
+    
     <style>
         .settings-wrapper .card .card-body label:has(input:checked) .card {
             border: 2px solid #CB6CE6;
@@ -127,7 +127,7 @@
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             z-index: 9998;
-            background-image: url("{{ asset('/assets/images/bot.png') }}");
+            background-image: url("<?php echo e(asset('/assets/images/bot.png')); ?>");
             background-size: 50%;
             background-repeat: no-repeat;
             background-position: center;
@@ -146,7 +146,7 @@
 
         /* When active, change icon */
         .chatbot-button.active {
-            background-image: url("{{ asset('/assets/images/cross.png') }}");
+            background-image: url("<?php echo e(asset('/assets/images/cross.png')); ?>");
             /* Example: close icon */
         }
 
@@ -293,7 +293,7 @@
                     <!-- Settings -->
                     <div class="header-item">
                         <div class="dropdown me-2">
-                            <a href="{{ route('profile') }}" class="btn topbar-link"><i
+                            <a href="<?php echo e(route('profile')); ?>" class="btn topbar-link"><i
                                     class="ti ti-settings-2"></i></a>
                         </div>
                     </div>
@@ -509,7 +509,7 @@
                             </div>
 
                             <!-- Item-->
-                            <a href="{{ route('profile') }}" class="dropdown-item">
+                            <a href="<?php echo e(route('profile')); ?>" class="dropdown-item">
                                 <i class="ti ti-user-circle me-1 align-middle"></i>
                                 <span class="align-middle">Profile
                                     Settings</span>
@@ -538,18 +538,15 @@
 
                             <!-- Item-->
                             <div class="pt-2 mt-2 border-top">
-                                <form action="{{ route('logout') }}" method="POST" class="dropdown-item text-danger"
+                                <form action="<?php echo e(route('logout')); ?>" method="POST" class="dropdown-item text-danger"
                                     style="cursor: pointer">
-                                    @csrf
+                                    <?php echo csrf_field(); ?>
                                     <button type="submit" class="btn w-100 justify-content-start p-0">
                                         <i class="ti ti-logout me-1 fs-17 align-middle text-danger fw-bold"></i>
                                         <span class="align-middle text-danger fw-bold">Log Out</span>
                                     </button>
                                 </form>
-                                {{-- <a href="{{ route('logout') }}" class="dropdown-item text-danger">
-                                    <i class="ti ti-logout me-1 fs-17 align-middle"></i>
-                                    <span class="align-middle">Log Out</span>
-                                </a> --}}
+                                
                             </div>
                         </div>
                     </div>
@@ -576,10 +573,10 @@
         </div>
 
         <!-- Sidenav Menu Start -->
-        @include('layouts.sidebar')
+        <?php echo $__env->make('layouts.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
         <div class="page-wrapper">
             <!-- Sidenav Menu End -->
-            @yield('content')
+            <?php echo $__env->yieldContent('content'); ?>
             <!-- Footer Start -->
             <div class="footer text-center bg-white p-2 border-top">
                 <button id="chatbotButton" class="chatbot-button" onclick="toggleChatbot()"></button>
@@ -602,9 +599,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <!-- Print.js for printing functionality -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/print-js/1.6.0/print.min.js"></script>
-    @unless(request()->is('beds','bed-status'))
-        <script src="{{ asset('assets/js/custom.js') }}"></script>
-    @endunless
+    <?php if (! (request()->is('beds','bed-status'))): ?>
+        <script src="<?php echo e(asset('assets/js/custom.js')); ?>"></script>
+    <?php endif; ?>
    <!-- JavaScript -->
 <script>
     function toggleChatbot() {
@@ -720,3 +717,4 @@
     </script>
 </body>
 </html>
+<?php echo $__env->make('layouts.admincdns', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\xampp-8.2\htdocs\hims\resources\views/layouts/adminLayout.blade.php ENDPATH**/ ?>

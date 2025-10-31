@@ -27,7 +27,14 @@ use App\Http\Controllers\RolesController;
 use App\Http\Controllers\Setup\CompanyListController;
 use App\Http\Controllers\Setup\DosageDurationController;
 use App\Http\Controllers\Setup\DoseIntervalController;
+use App\Http\Controllers\Setup\DoseDurationController;
 use App\Http\Controllers\Setup\FindingsController;
+use App\Http\Controllers\Setup\MedicineCategoryController as SetupMedicineCategoryController;
+use App\Http\Controllers\Setup\MedicineCompanyController as SetupMedicineCompanyController;
+use App\Http\Controllers\Setup\MedicineDosageController as SetupMedicineDosageController;
+use App\Http\Controllers\Setup\MedicineGroupController as SetupMedicineGroupController;
+use App\Http\Controllers\Setup\MedicineSupplierController as SetupMedicineSupplierController;
+use App\Http\Controllers\Setup\MedicineUnitController as SetupMedicineUnitController;
 use App\Http\Controllers\Setup\HospitalChargeCategoryController;
 use App\Http\Controllers\Setup\HospitalChargesController;
 use App\Http\Controllers\Setup\HospitalChargeTypeController;
@@ -607,4 +614,55 @@ Route::prefix('pathology/billing')->group(function () {
 Route::prefix('pathology/billing/api')->group(function () {
     Route::get('/patient-prescriptions/{patientId}', [PathologyBillingController::class, 'getPatientPrescriptions'])->name('pathology.billing.api.patient-prescriptions');
     Route::get('/test-details', [PathologyBillingController::class, 'getTestDetails'])->name('pathology.billing.api.test-details');
+});
+
+// Pharmacy Masters Routes
+Route::prefix('setup')->group(function () {
+    // Medicine Category
+    Route::get('/medicine-category', [SetupMedicineCategoryController::class, 'index'])->name('medicine-category');
+    Route::post('/medicine-category/store', [SetupMedicineCategoryController::class, 'store'])->name('medicine-category.store');
+    Route::put('/medicine-category/update/{id}', [SetupMedicineCategoryController::class, 'update'])->name('medicine-category.update');
+    Route::delete('/medicine-category/destroy/{id}', [SetupMedicineCategoryController::class, 'destroy'])->name('medicine-category.destroy');
+
+    // Medicine Supplier
+    Route::get('/medicine-supplier', [SetupMedicineSupplierController::class, 'index'])->name('medicine-supplier');
+    Route::post('/medicine-supplier/store', [SetupMedicineSupplierController::class, 'store'])->name('medicine-supplier.store');
+    Route::put('/medicine-supplier/update/{id}', [SetupMedicineSupplierController::class, 'update'])->name('medicine-supplier.update');
+    Route::delete('/medicine-supplier/destroy/{id}', [SetupMedicineSupplierController::class, 'destroy'])->name('medicine-supplier.destroy');
+
+    // Medicine Dosage
+    Route::get('/medicine-dosage', [SetupMedicineDosageController::class, 'index'])->name('medicine-dosage');
+    Route::post('/medicine-dosage/store', [SetupMedicineDosageController::class, 'store'])->name('medicine-dosage.store');
+    Route::put('/medicine-dosage/update/{id}', [SetupMedicineDosageController::class, 'update'])->name('medicine-dosage.update');
+    Route::delete('/medicine-dosage/destroy/{id}', [SetupMedicineDosageController::class, 'destroy'])->name('medicine-dosage.destroy');
+
+    // Dose Interval
+    Route::get('/dose-interval', [DoseIntervalController::class, 'index'])->name('dose-interval');
+    Route::post('/dose-interval/store', [DoseIntervalController::class, 'store'])->name('dose-interval.store');
+    Route::put('/dose-interval/update/{id}', [DoseIntervalController::class, 'update'])->name('dose-interval.update');
+    Route::delete('/dose-interval/destroy/{id}', [DoseIntervalController::class, 'destroy'])->name('dose-interval.destroy');
+
+    // Dose Duration
+    Route::get('/dose-duration', [DoseDurationController::class, 'index'])->name('dose-duration');
+    Route::post('/dose-duration/store', [DoseDurationController::class, 'store'])->name('dose-duration.store');
+    Route::put('/dose-duration/update/{id}', [DoseDurationController::class, 'update'])->name('dose-duration.update');
+    Route::delete('/dose-duration/destroy/{id}', [DoseDurationController::class, 'destroy'])->name('dose-duration.destroy');
+
+    // Medicine Unit
+    Route::get('/medicine-unit', [SetupMedicineUnitController::class, 'index'])->name('medicine-unit');
+    Route::post('/medicine-unit/store', [SetupMedicineUnitController::class, 'store'])->name('medicine-unit.store');
+    Route::put('/medicine-unit/update/{id}', [SetupMedicineUnitController::class, 'update'])->name('medicine-unit.update');
+    Route::delete('/medicine-unit/destroy/{id}', [SetupMedicineUnitController::class, 'destroy'])->name('medicine-unit.destroy');
+
+    // Medicine Company
+    Route::get('/medicine-company', [SetupMedicineCompanyController::class, 'index'])->name('medicine-company');
+    Route::post('/medicine-company/store', [SetupMedicineCompanyController::class, 'store'])->name('medicine-company.store');
+    Route::put('/medicine-company/update/{id}', [SetupMedicineCompanyController::class, 'update'])->name('medicine-company.update');
+    Route::delete('/medicine-company/destroy/{id}', [SetupMedicineCompanyController::class, 'destroy'])->name('medicine-company.destroy');
+
+    // Medicine Group
+    Route::get('/medicine-group', [SetupMedicineGroupController::class, 'index'])->name('medicine-group');
+    Route::post('/medicine-group/store', [SetupMedicineGroupController::class, 'store'])->name('medicine-group.store');
+    Route::put('/medicine-group/update/{id}', [SetupMedicineGroupController::class, 'update'])->name('medicine-group.update');
+    Route::delete('/medicine-group/destroy/{id}', [SetupMedicineGroupController::class, 'destroy'])->name('medicine-group.destroy');
 });

@@ -66,11 +66,11 @@
                                                             data-company_name="{{$item->company_name}}">
                                                             <i class="ti ti-pencil"></i>
                                                         </button>
-                                                        <form action="{{ route('company-list.destroy')}}" method="POST" style="display:inline-block;">
+                                                        <form action="{{ route('company-list.destroy')}}" method="POST" style="display:inline-block;" onsubmit="return confirmDeleteForm(event, 'Delete Company?', 'Are you sure you want to delete this company?');">
                                                             @csrf
                                                             @method('DELETE')
                                                                 <input type="hidden" name="id" value="{{$item->id}}">
-                                                                <button onclick="return confirm('Are you sure?')" class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                                <button type="submit" class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
                                                                 <i class="ti ti-trash"></i>
                                                                 </button>
                                                         </form>
@@ -159,11 +159,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     <i class="ti ti-pencil"></i>
                 </button>
                 <form action="{{ route('company-list.destroy')}}"
-                method="POST" style="display:inline-block;">
+                method="POST" style="display:inline-block;" onsubmit="return confirmDeleteForm(event, 'Delete Company?', 'Are you sure you want to delete this company?');">
                 @csrf
                 @method('DELETE')
                 <input type="hidden" name="id" value="${item.id}">
-                <button onclick="return confirm('Are you sure?')"
+                <button type="submit"
                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"><i
                 class="ti ti-trash"></i></button>
             </form>

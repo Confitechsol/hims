@@ -1,6 +1,4 @@
-@extends('layouts.adminLayout')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="container-fluid px-4 mt-4">
     <div class="card shadow-sm">
         <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
@@ -12,12 +10,13 @@
             </div>
         </div>
         <div class="card-body">
-            @if(session('success'))
+            <?php if(session('success')): ?>
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ session('success') }}
+                    <?php echo e(session('success')); ?>
+
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
-            @endif
+            <?php endif; ?>
 
             <div class="table-responsive">
                 <table class="table table-bordered datatable">
@@ -30,29 +29,29 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($dosages as $dosage)
+                        <?php $__empty_1 = true; $__currentLoopData = $dosages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $dosage): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                         <tr>
-                            <td>{{ $dosage->category->category_name ?? 'N/A' }}</td>
-                            <td>{{ $dosage->dosage }}</td>
-                            <td>{{ $dosage->unit->unit_name ?? 'N/A' }}</td>
+                            <td><?php echo e($dosage->category->category_name ?? 'N/A'); ?></td>
+                            <td><?php echo e($dosage->dosage); ?></td>
+                            <td><?php echo e($dosage->unit->unit_name ?? 'N/A'); ?></td>
                             <td>
-                                <button class="btn btn-sm btn-info" onclick="editDosage({{ json_encode($dosage) }})">
+                                <button class="btn btn-sm btn-info" onclick="editDosage(<?php echo e(json_encode($dosage)); ?>)">
                                     <i class="ti ti-pencil"></i>
                                 </button>
-                                <form action="{{ route('medicine-dosage.destroy', $dosage->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Are you sure?')">
-                                    @csrf
-                                    @method('DELETE')
+                                <form action="<?php echo e(route('medicine-dosage.destroy', $dosage->id)); ?>" method="POST" style="display:inline" onsubmit="return confirm('Are you sure?')">
+                                    <?php echo csrf_field(); ?>
+                                    <?php echo method_field('DELETE'); ?>
                                     <button type="submit" class="btn btn-sm btn-danger">
                                         <i class="ti ti-trash"></i>
                                     </button>
                                 </form>
                             </td>
                         </tr>
-                        @empty
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <tr>
                             <td colspan="4" class="text-center">No dosages found</td>
                         </tr>
-                        @endforelse
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
@@ -68,16 +67,16 @@
                 <h5 class="modal-title">Add Medicine Dosage</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ route('medicine-dosage.store') }}" method="POST">
-                @csrf
+            <form action="<?php echo e(route('medicine-dosage.store')); ?>" method="POST">
+                <?php echo csrf_field(); ?>
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Medicine Category <span class="text-danger">*</span></label>
                         <select name="medicine_category_id" class="form-select" required>
                             <option value="">Select</option>
-                            @foreach($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->category_name }}</option>
-                            @endforeach
+                            <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($category->id); ?>"><?php echo e($category->category_name); ?></option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
                     <div class="mb-3">
@@ -88,9 +87,9 @@
                         <label class="form-label">Unit <span class="text-danger">*</span></label>
                         <select name="unit_id" class="form-select" required>
                             <option value="">Select</option>
-                            @foreach($units as $unit)
-                                <option value="{{ $unit->id }}">{{ $unit->unit_name }}</option>
-                            @endforeach
+                            <?php $__currentLoopData = $units; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $unit): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($unit->id); ?>"><?php echo e($unit->unit_name); ?></option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
                 </div>
@@ -112,16 +111,16 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form id="editDosageForm" method="POST">
-                @csrf
-                @method('PUT')
+                <?php echo csrf_field(); ?>
+                <?php echo method_field('PUT'); ?>
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Medicine Category <span class="text-danger">*</span></label>
                         <select name="medicine_category_id" id="edit_category_id" class="form-select" required>
                             <option value="">Select</option>
-                            @foreach($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->category_name }}</option>
-                            @endforeach
+                            <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($category->id); ?>"><?php echo e($category->category_name); ?></option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
                     <div class="mb-3">
@@ -132,9 +131,9 @@
                         <label class="form-label">Unit <span class="text-danger">*</span></label>
                         <select name="unit_id" id="edit_unit_id" class="form-select" required>
                             <option value="">Select</option>
-                            @foreach($units as $unit)
-                                <option value="{{ $unit->id }}">{{ $unit->unit_name }}</option>
-                            @endforeach
+                            <?php $__currentLoopData = $units; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $unit): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($unit->id); ?>"><?php echo e($unit->unit_name); ?></option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
                 </div>
@@ -152,8 +151,10 @@ function editDosage(dosage) {
     document.getElementById('edit_category_id').value = dosage.medicine_category_id;
     document.getElementById('edit_dosage').value = dosage.dosage;
     document.getElementById('edit_unit_id').value = dosage.unit_id;
-    document.getElementById('editDosageForm').action = "{{ url('setup/medicine-dosage/update') }}/" + dosage.id;
+    document.getElementById('editDosageForm').action = "<?php echo e(url('setup/medicine-dosage/update')); ?>/" + dosage.id;
     new bootstrap.Modal(document.getElementById('editDosageModal')).show();
 }
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\xampp-8.2\htdocs\hims\resources\views/admin/setup/medicine_dosage.blade.php ENDPATH**/ ?>

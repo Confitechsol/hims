@@ -61,11 +61,11 @@
                                                             data-id="{{ $item["id"] }}" data-name="{{ $item["name"] }}">
                                                             <i class="ti ti-pencil"></i></button>
                                                         <form action="{{ route('dosage-duration.destroy')}}" method="POST"
-                                                            style="display:inline-block;">
+                                                            style="display:inline-block;" onsubmit="return confirmDeleteForm(event, 'Delete Duration?', 'Are you sure you want to delete this duration?');">
                                                             @csrf
                                                             @method('DELETE')
                                                             <input type="hidden" name="id" value="{{$item->id}}">
-                                                            <button onclick="return confirm('Are you sure?')"
+                                                            <button type="submit"
                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"><i
                                                                     class="ti ti-trash"></i></button>
                                                         </form>
@@ -155,11 +155,11 @@
                     <i class="ti ti-pencil"></i>
                 </button>
                 <form action="{{ route('dosage-duration.destroy')}}"
-                method="POST" style="display:inline-block;">
+                method="POST" style="display:inline-block;" onsubmit="return confirmDeleteForm(event, 'Delete Duration?', 'Are you sure you want to delete this duration?');">
                 @csrf
                 @method('DELETE')
                 <input type="hidden" name="id" value="${item.id}">
-                <button onclick="return confirm('Are you sure?')"
+                <button type="submit"
                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"><i
                 class="ti ti-trash"></i></button>
             </form>

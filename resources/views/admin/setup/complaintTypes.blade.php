@@ -101,7 +101,7 @@
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
                                                             data-bs-toggle="tooltip" 
                                                             title="Delete"
-                                                            onclick="if(confirm('Are you sure you want to delete this complaint type ?')) { document.getElementById('delete-complaint-type-{{ $complaintType->id }}').submit(); }">
+                                                            onclick="confirmDelete('delete-complaint-type-{{ $complaintType->id }}', 'Delete Complaint Type?', 'Are you sure you want to delete this complaint type?')">
                                                             <i class="ti ti-trash"></i>
                                                         </a>
 
