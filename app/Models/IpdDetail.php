@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -26,7 +25,9 @@ class IpdDetail extends Model
         'bed_group_id',
         'case_type',
         'casualty',
-        'symptoms',
+        'symptoms_description',
+        'symptoms_type',
+        'symptoms_title',
         'known_allergies',
         'patient_old',
         'note',
@@ -37,9 +38,14 @@ class IpdDetail extends Model
         'payment_mode',
         'date',
         'discharged',
+        'discharged_date',
+        'net_amount',
+        'tax',
+        'amount',
         'live_consult',
         'generated_by',
         'is_antenatal',
+        'ipd_no',
     ];
 
     /**
@@ -55,7 +61,7 @@ class IpdDetail extends Model
         return $this->belongsTo(CaseReference::class, 'case_reference_id');
     }
 
-    public function bed()
+    public function bedDetail()
     {
         return $this->belongsTo(Bed::class, 'bed');
     }
@@ -78,5 +84,10 @@ class IpdDetail extends Model
     public function generatedBy()
     {
         return $this->belongsTo(User::class, 'generated_by');
+    }
+    public function patients()
+    {
+        return $this->belongsToMany(Patient::class, 'ipd_patient', 'ipd_id', 'patient_id')->withPivot('doctor_id')
+            ->withTimestamps();
     }
 }

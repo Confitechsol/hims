@@ -632,10 +632,10 @@
 </style>
 
 <!-- Modal -->
-<div class="modal fade" id="createOpdModal" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
+<div class="modal fade" id="createIpdModal" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
-            <form action="{{ route('opd.store') }}" id="opdForm" method="POST">
+            <form action="{{ route('ipd.store') }}" id="ipdForm" method="POST">
                 @csrf
                 <!-- Modal Header -->
                 <div class="modal-header align-items-start">
@@ -833,6 +833,30 @@
 
                         <div class="row g-3">
                             <div class="col-md-6">
+                                <label class="form-label">Credit Limit (INR) <span class="required">*</span></label>
+                                <input type="number" class="form-control" name="credit_limit" id="credit_limit"
+                                    value="20000" placeholder="0.00">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Live Consultation</label>
+                                <select class="form-select" name="live_consultation">
+                                    <option value="No" selected>No</option>
+                                    <option value="Yes">Yes</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Bed Group <span class="required">*</span></label>
+                                <select class="form-select" name="bed_group" id="bed_group_select">
+                                    <option value="">Loading...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Bed Number <span class="required">*</span></label>
+                                <select class="form-select" name="bed_number" id="bed_number_select">
+                                    <option value="">Loading...</option>
+                                </select>
+                            </div>
+                            {{-- <div class="col-md-6">
                                 <label class="form-label">Charge Category</label>
                                 <select class="form-select" name="charge_category" id="charge_category_select">
                                     <option value="">Loading...</option>
@@ -895,14 +919,8 @@
                                 </label>
                                 <input type="date" name="payment_date" id="payment_date" class="form-control"
                                     required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Live Consultation</label>
-                                <select class="form-select" name="live_consultation">
-                                    <option value="No" selected>No</option>
-                                    <option value="Yes">Yes</option>
-                                </select>
-                            </div>
+                            </div> --}}
+
                         </div>
                     </div>
 
@@ -995,13 +1013,13 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-4">
+                            {{-- <div class="col-md-4">
                                 <label class="form-label">Any Known Allergies</label>
                                 <textarea class="form-control" name="allergies" rows="1" placeholder="Enter allergies"></textarea>
-                            </div>
-                            <div class="col-md-12">
+                            </div> --}}
+                            <div class="col-md-4">
                                 <label class="form-label">Symptoms Description</label>
-                                <textarea class="form-control" name="symptoms_description" rows="3"
+                                <textarea class="form-control" name="symptoms_description" rows="1"
                                     placeholder="Enter detailed symptoms description"></textarea>
                             </div>
                             <div class="col-md-12">
@@ -1038,13 +1056,13 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const addPatientBtn = document.getElementById("openAddPatientBtn");
-        const createOpdModal = document.getElementById("createOpdModal");
+        const createIpdModal = document.getElementById("createIpdModal");
         const addPatientModal = document.getElementById("add_patient");
 
         addPatientBtn.addEventListener("click", function() {
             // Keep the first modal open
-            const opdModalInstance = bootstrap.Modal.getInstance(createOpdModal);
-            opdModalInstance._element.classList.add('modal-stacked');
+            const ipdModalInstance = bootstrap.Modal.getInstance(createIpdModal);
+            ipdModalInstance._element.classList.add('modal-stacked');
 
             // Open the second modal manually (no new backdrop)
             const newModal = new bootstrap.Modal(addPatientModal, {
@@ -1073,7 +1091,7 @@
             document.body.classList.add('modal-open');
 
             // Reset first modal’s stacking class
-            createOpdModal.classList.remove('modal-stacked');
+            createIpdModal.classList.remove('modal-stacked');
         });
     });
 </script>
@@ -1167,20 +1185,20 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const doctorSelect = document.getElementById('doctor_select');
-        const chargeCategorySelect = document.getElementById('charge_category_select');
-        const chargeSelect = document.getElementById('charge_select');
+        const bedGroupSelect = document.getElementById('bed_group_select');
+        const bedNumberSelect = document.getElementById('bed_number_select');
 
-        const standardCharge = document.getElementById('standard_charge');
-        const appliedCharge = document.getElementById('applied_charge');
-        const discount = document.getElementById('discount');
-        const tax = document.getElementById('tax');
-        const amount = document.getElementById('amount');
-        const paidAmount = document.getElementById('paid_amount');
+        // const standardCharge = document.getElementById('standard_charge');
+        // const appliedCharge = document.getElementById('applied_charge');
+        // const discount = document.getElementById('discount');
+        // const tax = document.getElementById('tax');
+        // const amount = document.getElementById('amount');
+        // const paidAmount = document.getElementById('paid_amount');
         const symptomTypesSelect = document.getElementById('symptoms_type');
 
         doctorSelect.innerHTML = '<option value="">Loading...</option>';
-        chargeCategorySelect.innerHTML = '<option value="">Loading...</option>';
-        chargeSelect.innerHTML = '<option value="">Loading...</option>';
+        bedGroupSelect.innerHTML = '<option value="">Loading...</option>';
+        bedNumberSelect.innerHTML = '<option value="">Loading...</option>';
         symptomTypesSelect.innerHTML = '<option value="">Loading...</option>';
 
         //doctor
@@ -1205,79 +1223,86 @@
             });
 
         //charge category
-        fetch("{{ route('getChargeCategories') }}")
+        fetch("{{ route('getBedGroups') }}")
             .then(response => response.json())
             .then(data => {
-                window.chargeCategoryData = data;
-                chargeCategorySelect.innerHTML = '<option value="">Select</option>';
-                data.forEach(category => {
+                window.bedGroupData = data;
+                bedGroupSelect.innerHTML = '<option value="">Select</option>';
+                data.forEach(bedGroup => {
                     const option = document.createElement('option');
-                    option.value = category.id;
-                    option.textContent = category.name;
-                    if ("{{ old('charge_category') }}" == category.id) {
+                    option.value = bedGroup.id;
+                    console.log();
+                    option.textContent = bedGroup.name + ' - ' + bedGroup.floor_detail.name;
+                    if ("{{ old('bed_group') }}" == bedGroup.id) {
                         option.selected = true;
                     }
-                    chargeCategorySelect.appendChild(option);
+                    bedGroupSelect.appendChild(option);
                 });
             })
             .catch(error => {
-                console.error('Error fetching charge categories:', error);
-                chargeCategorySelect.innerHTML = '<option value="">Error loading options</option>';
+                console.error('Error fetching bed groups:', error);
+                bedGroupSelect.innerHTML = '<option value="">Error loading options</option>';
             });
 
         // Listen for Charge Category dropdown change
-        chargeCategorySelect.addEventListener('change', function() {
+        bedGroupSelect.addEventListener('change', function() {
             const selectedId = this.value;
-            const baseUrl = "{{ route('getCharges', ['id' => 'ID']) }}";
+            const baseUrl = "{{ route('getBedNumbers', ['id' => 'ID']) }}";
             const finalUrl = baseUrl.replace('ID', selectedId);
             fetch(finalUrl)
                 .then(response => response.json())
                 .then(data => {
-                    window.chargeData = data;
-                    chargeSelect.innerHTML = '<option value="">Select</option>';
-                    data.forEach(charge => {
-                        const option = document.createElement('option');
-                        option.value = charge.id;
-                        option.textContent = charge.name;
-                        if ("{{ old('charge') }}" == charge.id) {
-                            option.selected = true;
-                        }
-                        chargeSelect.appendChild(option);
-                    });
+                    window.bedNumberData = data;
+                    bedNumberSelect.innerHTML = '<option value="">Select</option>';
+                    bedNumberSelect.disabled = false
+                    if (data.length <= 0) {
+                        bedNumberSelect.innerHTML = '<option value="">No Bed Available</option>';
+                        bedNumberSelect.disabled = true
+                    } else {
+                        data.forEach(bedNumber => {
+                            const option = document.createElement('option');
+                            option.value = bedNumber.id;
+                            option.textContent = bedNumber.name;
+                            if ("{{ old('bed_number') }}" == bedNumber.id) {
+                                option.selected = true;
+                            }
+                            bedNumberSelect.appendChild(option);
+                        });
+                    }
                 })
                 .catch(error => {
-                    console.error('Error fetching Charges:', error);
-                    chargeSelect.innerHTML = '<option value="">Error loading options</option>';
+                    console.error('Error fetching Bed Numbers:', error);
+                    bedNumberSelect.innerHTML = '<option value="">Error loading options</option>';
                 });
 
-            chargeSelect.addEventListener('change', function() {
-                const selectedCharge = window.chargeData[0];
-                standardCharge.value = selectedCharge.standard_charge
-                appliedCharge.value = selectedCharge.standard_charge
-                tax.value = selectedCharge.tax_category.percentage
-                calculateAmount();
-            })
-            if (!appliedCharge || !tax || !discount || !amount) {
-                console.error("❌ One or more required input fields are missing in the DOM.");
-                return;
-            }
-            [appliedCharge, tax, discount].forEach(field => {
-                field.addEventListener('input', calculateAmount);
-            });
+            // bedNumberSelect.addEventListener('change', function() {
+            //     const selectedCharge = window.bedNumberData[0];
+            //     standardCharge.value = selectedCharge.standard_charge
+            //     appliedCharge.value = selectedCharge.standard_charge
+            //     tax.value = selectedCharge.tax_category.percentage
+            //     calculateAmount();
+            // })
+            // if (!appliedCharge || !tax || !discount || !amount) {
+            //     console.error("❌ One or more required input fields are missing in the DOM.");
+            //     return;
+            // }
+            // [appliedCharge, tax, discount].forEach(field => {
+            //     field.addEventListener('input', calculateAmount);
+            // });
 
-            function calculateAmount() {
-                const appliedChargeValue = parseFloat(appliedCharge.value) || 0;
-                const taxValue = parseFloat(tax.value) || 0;
-                const discountValue = parseFloat(discount.value) || 0;
+            // function calculateAmount() {
+            //     const appliedChargeValue = parseFloat(appliedCharge.value) || 0;
+            //     const taxValue = parseFloat(tax.value) || 0;
+            //     const discountValue = parseFloat(discount.value) || 0;
 
-                // Formula: Amount = (AppliedCharge + Tax%) - Discount%
-                const taxAmount = appliedChargeValue * (taxValue / 100);
-                const discountAmount = appliedChargeValue * (discountValue / 100);
-                const totalAmount = appliedChargeValue + taxAmount - discountAmount;
+            //     // Formula: Amount = (AppliedCharge + Tax%) - Discount%
+            //     const taxAmount = appliedChargeValue * (taxValue / 100);
+            //     const discountAmount = appliedChargeValue * (discountValue / 100);
+            //     const totalAmount = appliedChargeValue + taxAmount - discountAmount;
 
-                amount.value = totalAmount.toFixed(2);
-                paidAmount.value = totalAmount.toFixed(2);
-            }
+            //     amount.value = totalAmount.toFixed(2);
+            //     paidAmount.value = totalAmount.toFixed(2);
+            // }
         });
 
 
@@ -1307,222 +1332,7 @@
 
 
 {{-- symptoms type multiselect --}}
-{{-- <script>
-    document.addEventListener('shown.bs.modal', function() {
-        const selectElement = document.getElementById('symptoms_type');
-        const wrapper = selectElement.closest('.custom-multiselect-wrapper');
-        const customSelect = wrapper.querySelector('.custom-multiselect');
-        const selectedBox = customSelect.querySelector('.multiselect-selected');
-        const dropdown = customSelect.querySelector('.multiselect-dropdown');
-        const optionsContainer = customSelect.querySelector('.multiselect-options');
-        const searchInput = customSelect.querySelector('.multiselect-search input');
-        const selectAllBtn = customSelect.querySelector('.select-all');
-        const clearAllBtn = customSelect.querySelector('.clear-all');
 
-        let selectedValues = [];
-
-        // Initialize options
-        function initializeOptions() {
-            optionsContainer.innerHTML = '';
-            const options = Array.prototype.slice.call(selectElement?.options || []);
-            console.log(window.symptomTypesData);
-
-            options.forEach(option => {
-                if (!option.value) return; // Skip empty options
-
-                const optionElement = document.createElement('div');
-                optionElement.className = 'multiselect-option';
-                optionElement.dataset.value = option.value;
-                optionElement.innerHTML = `
-                    <div class="multiselect-checkbox">
-                        <i class="bi bi-check"></i>
-                    </div>
-                    <span>${option.text}</span>
-                `;
-
-                optionElement.addEventListener('click', () => toggleOption(option.value));
-                optionsContainer.appendChild(optionElement);
-            });
-        }
-
-        // Toggle option selection
-        function toggleOption(value) {
-            const index = selectedValues.indexOf(value);
-
-            if (index > -1) {
-                selectedValues.splice(index, 1);
-            } else {
-                selectedValues.push(value);
-            }
-
-            updateUI();
-            updateNativeSelect();
-            updateSelectedDisplay();
-        }
-
-        // Update UI to reflect selected values
-        function updateUI() {
-            const placeholder = selectedBox.querySelector('.multiselect-placeholder');
-            const existingChips = selectedBox.querySelectorAll('.multiselect-chip');
-            existingChips.forEach(chip => chip.remove());
-
-            if (selectedValues.length === 0) {
-                placeholder.style.display = 'block';
-            } else {
-                placeholder.style.display = 'none';
-
-                selectedValues.forEach(value => {
-                    const option = selectElement.querySelector(`option[value="${value}"]`);
-                    if (option) {
-                        const chip = document.createElement('div');
-                        chip.className = 'multiselect-chip';
-                        chip.innerHTML = `
-                            <span>${option.text}</span>
-                            <div class="multiselect-chip-remove" data-value="${value}">
-                                <i class="bi bi-x"></i>
-                            </div>
-                        `;
-
-                        chip.querySelector('.multiselect-chip-remove').addEventListener('click', (
-                            e) => {
-                            e.stopPropagation();
-                            toggleOption(value);
-                        });
-
-                        selectedBox.insertBefore(chip, selectedBox.querySelector('.multiselect-arrow'));
-                    }
-                });
-            }
-
-            // Update option checkboxes
-            const allOptions = optionsContainer.querySelectorAll('.multiselect-option');
-            allOptions.forEach(opt => {
-                if (selectedValues.includes(opt.dataset.value)) {
-                    opt.classList.add('selected');
-                } else {
-                    opt.classList.remove('selected');
-                }
-            });
-        }
-
-        // Update native select element
-        function updateNativeSelect() {
-            Array.from(selectElement.options).forEach(option => {
-                option.selected = selectedValues.includes(option.value);
-            });
-        }
-
-        // Toggle dropdown
-        function toggleDropdown(show) {
-            if (show) {
-                dropdown.classList.add('show');
-                selectedBox.classList.add('active');
-                searchInput.focus();
-            } else {
-                dropdown.classList.remove('show');
-                selectedBox.classList.remove('active');
-                searchInput.value = '';
-                filterOptions('');
-            }
-        }
-
-        // Filter options based on search
-        function filterOptions(searchTerm) {
-            const options = optionsContainer.querySelectorAll('.multiselect-option');
-            const term = searchTerm.toLowerCase();
-            let hasResults = false;
-
-            options.forEach(option => {
-                const text = option.textContent.toLowerCase();
-                if (text.includes(term)) {
-                    option.style.display = 'flex';
-                    hasResults = true;
-                } else {
-                    option.style.display = 'none';
-                }
-            });
-
-            // Show no results message
-            let noResultsMsg = optionsContainer.querySelector('.multiselect-no-results');
-            if (!hasResults) {
-                if (!noResultsMsg) {
-                    noResultsMsg = document.createElement('div');
-                    noResultsMsg.className = 'multiselect-no-results';
-                    noResultsMsg.textContent = 'No results found';
-                    optionsContainer.appendChild(noResultsMsg);
-                }
-            } else if (noResultsMsg) {
-                noResultsMsg.remove();
-            }
-        }
-
-        // Select all options
-        function selectAll() {
-            const visibleOptions = Array.from(optionsContainer.querySelectorAll('.multiselect-option'))
-                .filter(opt => opt.style.display !== 'none');
-
-            visibleOptions.forEach(opt => {
-                if (!selectedValues.includes(opt.dataset.value)) {
-                    selectedValues.push(opt.dataset.value);
-                }
-            });
-
-            updateUI();
-            updateNativeSelect();
-            updateSelectedDisplay();
-        }
-
-        // Clear all options
-        function clearAll() {
-            selectedValues = [];
-            updateUI();
-            updateNativeSelect();
-            updateSelectedDisplay();
-        }
-
-        // Event listeners
-        selectedBox.addEventListener('click', () => {
-            toggleDropdown(!dropdown.classList.contains('show'));
-        });
-
-        searchInput.addEventListener('input', (e) => {
-            filterOptions(e.target.value);
-        });
-
-        searchInput.addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
-
-        selectAllBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            selectAll();
-        });
-
-        clearAllBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            clearAll();
-        });
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!customSelect.contains(e.target)) {
-                toggleDropdown(false);
-            }
-        });
-
-        // Keyboard support
-        selectedBox.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                toggleDropdown(!dropdown.classList.contains('show'));
-            }
-        });
-
-        // Initialize
-        initializeOptions();
-
-    });
-</script> --}}
 
 <script>
     class CustomMultiSelect {
@@ -1823,7 +1633,7 @@
 
     // Initialize the application
     document.addEventListener('DOMContentLoaded', function() {
-        const createOpdModal = document.getElementById('createOpdModal');
+        const createOpdModal = document.getElementById('createIpdModal');
         const closeButton = createOpdModal.querySelector('.button-close');
         const cancelButton = document.getElementById('button-close');
 
@@ -1894,37 +1704,6 @@
                             '<div class="multiselect-no-results">Error loading titles. Please try again.</div>';
                     });
             }
-
-            // const form = document.querySelector('#opdForm'); // Replace with your actual form ID
-            // form.addEventListener('submit', function(e) {
-            //     // Before submitting, inject hidden inputs for both multi-select fields
-            //     const existingHiddenInputs = form.querySelectorAll(
-            //         'input[name="symptoms_type[]"], input[name="symptoms_title[]"]');
-            //     existingHiddenInputs.forEach(input => input.remove()); // Clear old ones
-
-            //     const selectedTypes = symptomTypeSelect.getSelectedValues();
-            //     const selectedTitles = symptomTitleSelect.getSelectedValues();
-
-            //     // Add symptom types
-            //     selectedTypes.forEach(value => {
-            //         const hiddenInput = document.createElement('input');
-            //         hiddenInput.type = 'hidden';
-            //         hiddenInput.name = 'symptoms_type[]';
-            //         hiddenInput.value = value;
-            //         form.appendChild(hiddenInput);
-            //     });
-
-            //     // Add symptom titles
-            //     selectedTitles.forEach(value => {
-            //         const hiddenInput = document.createElement('input');
-            //         hiddenInput.type = 'hidden';
-            //         hiddenInput.name = 'symptoms_title[]';
-            //         hiddenInput.value = value;
-            //         form.appendChild(hiddenInput);
-            //     });
-
-            //     // Form continues submitting normally
-            // });
 
         });
 

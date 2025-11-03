@@ -13,8 +13,8 @@
                     </h5>
                     <div class="d-flex align-items-center flex-wrap gap-2">
                         <div class="text-end d-flex">
-                            <a href="certificate" class="btn btn-light text-primary ms-2 btn-md"><i
-                                    class="fa-regular fa-newspaper pe-1"></i> Certificate Template</a>
+                            <a href="staff_id" class="btn btn-light text-primary ms-2 btn-md"><i
+                                    class="fa-regular fa-newspaper pe-1"></i> ID Card Template</a>
                         </div>
 
                     </div>
@@ -27,30 +27,20 @@
 
                                     <form action="">
                                         <div class="row">
-                                            <div class="col-md-4">
-                                                <label for="module" class="form-label">Module <span
+                                            <div class="col-md-6">
+                                                <label for="role" class="form-label">Role <span
                                                         class="text-danger">*</span></label>
-                                                <select name="module" id="module" class="form-select shadow-sm">
+                                                <select name="role" id="role" class="form-select shadow-sm" required>
                                                     <option value="0" selected disabled>Select</option>
-                                                    <option value="opd">OPD</option>
-                                                    <option value="ipd">IPD</option>
+                                                    <option value="admin">Admin</option>
                                                 </select>
                                             </div>
-                                            <div class="col-md-4">
-                                                <label for="patient_status" class="form-label">Patient Status</label>
-                                                <select name="patient_status" id="patient_status"
-                                                    class="form-select shadow-sm">
+                                            <div class="col-md-6">
+                                                <label for="staff_id_temp" class="form-label">ID Card Template <span class="text-danger">*</span></label>
+                                                <select name="staff_id_temp" id="staff_id_temp"
+                                                    class="form-select shadow-sm" required>
                                                     <option value="0" selected disabled>Select</option>
-                                                    <option value="not_discharged">Not Discharged</option>
-                                                    <option value="discharged">Discharged</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label for="certificate" class="form-label">Certificate Template <span
-                                                        class="text-danger">*</span></label>
-                                                <select name="certificate" id="certificate" class="form-select shadow-sm">
-                                                    <option value="0" selected disabled>Select</option>
-                                                    <option value="sample">Sample Patient File Cover</option>
+                                                    <option value="sample_staff">Sample Staff ID Card</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -62,6 +52,7 @@
                                             Search</a>
 
                                     </div>
+
                                 </div>
                             </div>
                         </div>
@@ -111,15 +102,24 @@
                                                     <th>
                                                         <input type="checkbox" name="" id="">
                                                     </th>
-                                                    <th>OPD/IPD No</th>
-                                                    <th>Patient Name</th>
-                                                    <th>Gender</th>
-                                                    <th>Mobile Number</th>
-                                                    <th>Discharged</th>
+                                                    <th>Staff ID</th>
+                                                    <th>Name</th>
+                                                    <th>Designation</th>
+                                                    <th>Department	</th>
+                                                    <th>Father Name	</th>
+                                                    <th>Mother Name</th>
+                                                    <th>Date Of Joining	</th>
+                                                    <th>Address</th>
+                                                    <th>Phone</th>
+                                                    <th>Date Of Birth</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
                                                     <td></td>
                                                     <td></td>
                                                     <td></td>

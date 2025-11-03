@@ -64,6 +64,10 @@ class Patient extends Model
     {
         return $this->belongsTo(Organisation::class, 'organisation_id');
     }
+    public function bloodGroup()
+    {
+        return $this->belongsTo(BloodBankProduct::class, 'blood_group');
+    }
 
     /**
      * Relation: A patient may have many pathology reports.
@@ -94,10 +98,14 @@ class Patient extends Model
         return $this->belongsToMany(OpdDetail::class, 'opd_patient', 'patient_id', 'opd_id')->withPivot('doctor_id')->orderBy('created_at', 'desc')
             ->withTimestamps();
     }
+    public function ipds()
+    {
+        return $this->belongsToMany(IpdDetail::class, 'ipd_patient', 'patient_id', 'ipd_id')->withPivot('doctor_id')->orderBy('created_at', 'desc')
+            ->withTimestamps();
+    }
     public function appointments()
     {
         return $this->hasMany(Appointment::class, 'patient_id');
     }
 
-    
 }
