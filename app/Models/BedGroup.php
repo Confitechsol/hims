@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,7 +8,7 @@ class BedGroup extends Model
 {
     use HasFactory;
 
-    protected $table = 'bed_group';
+    protected $table   = 'bed_group';
     public $timestamps = false; // since only created_at exists and no updated_at
 
     protected $fillable = [
@@ -24,8 +23,13 @@ class BedGroup extends Model
     ];
 
     protected $casts = [
-        'bed_cost' => 'decimal:2',
+        'bed_cost'  => 'decimal:2',
         'is_active' => 'boolean',
-        'floor' => 'integer',
+        'floor'     => 'integer',
     ];
+
+    public function floorDetail()
+    {
+        return $this->belongsTo(Floor::class, 'floor');
+    }
 }

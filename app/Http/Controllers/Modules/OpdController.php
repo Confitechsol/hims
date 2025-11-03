@@ -148,6 +148,7 @@ class OpdController extends Controller
             // dd($opd->id);
             $opdPatient->patient_id = $request->patient_id ?? null;
             $opdPatient->opd_id     = $opd->id ?? null;
+            $opdPatient->doctor_id  = $request->doctor_id ?? null;
 
             $opdPatient->save();
 

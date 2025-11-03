@@ -15,6 +15,7 @@ use App\Http\Controllers\FrontOfficeController;
 use App\Http\Controllers\InventoriesController;
 use App\Http\Controllers\MedicineCategoryController;
 use App\Http\Controllers\MedicineGroupController;
+use App\Http\Controllers\Modules\IpdController;
 use App\Http\Controllers\Modules\OpdController;
 use App\Http\Controllers\OperationController;
 use App\Http\Controllers\PathologyController;
@@ -440,6 +441,12 @@ Route::get('/getCharges/{id}', [OpdController::class, 'getCharges'])->name('getC
 Route::get('/getSymptomsTypes', [OpdController::class, 'getSymptomsType'])->name('getSymptomsTypes');
 Route::post('/getSymptoms', [OpdController::class, 'getSymptoms'])->name('getSymptoms');
 
+Route::get('/ipd', [IpdController::class, 'index'])->name('ipd');
+Route::post('/ipd/store', [IpdController::class, 'store'])->name('ipd.store');
+Route::get('/ipd/edit/{id}', [IpdController::class, 'edit'])->name('ipd.edit');
+Route::put('/ipd/update/{id}', [IpdController::class, 'update'])->name('ipd.update');
+Route::get('/getBedGroups', [IpdController::class, 'getBedGroups'])->name('getBedGroups');
+Route::get('/getBedNumbers/{id}', [IpdController::class, 'getBedNumbers'])->name('getBedNumbers');
 Route::get('/billing', function () {
     return view('admin.billing.billing');
 })->name('billing');

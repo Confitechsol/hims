@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -32,8 +31,8 @@ class IpdPrescriptionTest extends Model
         return $this->belongsTo(Pathology::class, 'pathology_id');
     }
 
-    public function radiology()
-    {
-        return $this->belongsTo(Radiology::class, 'radiology_id');
-    }
+    // public function radiology()
+    // {
+    //     return $this->belongsTo(Radiology::class, 'radiology_id');
+    // }
 }
