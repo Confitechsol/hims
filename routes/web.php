@@ -9,9 +9,11 @@ use App\Http\Controllers\BedTypeController;
 use App\Http\Controllers\BloodBankController;
 use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\EmailController;
+use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\FloorController;
 use App\Http\Controllers\FrontOfficeController;
+use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\InventoriesController;
 use App\Http\Controllers\MedicineCategoryController;
 use App\Http\Controllers\MedicineGroupController;
@@ -267,6 +269,13 @@ Route::middleware(['admin'])->group(function () {
     Route::delete('/tpa_details/destroy', [TpamanagmentController::class, 'destroyTpaDetails'])->name('tpa_details.destroy');
     Route::put('/tpa_details/update', [TpamanagmentController::class, 'updateTpaDetails'])->name('tpa_details.update');
 
+    Route::get('/income', [IncomeController::class, 'index'])->name('income');
+    Route::post('/income/create', [IncomeController::class, 'create'])->name('income.create');
+    Route::put('/income/update', [IncomeController::class, 'update'])->name('income.update');
+    Route::delete('/income/destroy', [IncomeController::class, 'destroy'])->name('income.destroy');
+
+    Route::get('/expense', [ExpenseController::class, 'index']);
+
 });
 
 // Route::get('/medicine-group', function () {
@@ -470,15 +479,32 @@ Route::prefix('/appointment-details')->group(function () {
     Route::post('/doctor-wise/search', [AppointmentsController::class, 'searchAppointments'])->name('appointments.search');
     Route::get('/queue', function () {return view('admin.appointments.queue');})->name('appointments.queue');
     Route::get('/queue', function () {return view('admin.appointments.queue');})->name('appointments.queue');
+    Route::get('patient-view/{patient_id}', [AppointmentsController::class, 'show'])->name('patient.view');
 
 });
 
 Route::prefix('/inventory')->group(function () {
     Route::get('/', [InventoriesController::class, 'index'])->name('inventory-details');
     Route::get('/get-items/{categoryId}', [InventoriesController::class, 'getItems'])->name('get.items');
-    Route::post('/store', [InventoriesController::class, 'store'])->name('items.store');
-    Route::get('/edit', [InventoriesController::class, 'store'])->name('itemstock.edit');
+    Route::post('/store', [InventoriesController::class, 'store'])->name('itemstock.store');
+    Route::get('/edit/{id}', [InventoriesController::class, 'edit'])->name('itemstock.edit');
+    Route::get('/update', [InventoriesController::class, 'update'])->name('itemstock.update');
     Route::get('/destroy', [InventoriesController::class, 'destroy'])->name('itemstock.destroy');
+
+    Route::get('/items', [InventoriesController::class, 'items'])->name('items');
+    Route::post('/item-store', [InventoriesController::class, 'storeItem'])->name('items.store');
+    Route::get('/item-edit/{id}', [InventoriesController::class, 'editItem'])->name('items.edit');
+    Route::get('/item-update', [InventoriesController::class, 'updateItem'])->name('items.update');
+    Route::delete('/item-destroy/{id}', [InventoriesController::class, 'destroyItem'])->name('items.destroy');
+
+    Route::get('/get-staff-by-department', [InventoriesController::class, 'getStaffByDepartment'])->name('get-staff-by-department');
+
+    Route::get('/issue-items', [InventoriesController::class, 'issueItems'])->name('issue-items');
+    Route::post('/issue-store', [InventoriesController::class, 'storeIssuedItem'])->name('issue-items.store');
+    Route::get('/issue-edit/{id}', [InventoriesController::class, 'editIssuedItem'])->name('issue-items.edit');
+    Route::get('/get-items-by-category', [InventoriesController::class, 'getItemsByCategory'])->name('get-items-by-category');
+    Route::get('/issue-update/{id}', [InventoriesController::class, 'updateIssuedItem'])->name('issue-items.update');
+    Route::delete('/issue-destroy/{id}', [InventoriesController::class, 'destroyIssuedItem'])->name('issue-items.destroy');
 });
 
 Route::get('/opd-billing', function () {
@@ -487,3 +513,24 @@ Route::get('/opd-billing', function () {
 Route::get('/visit_details', function () {
     return view('admin.visit_details');
 })->name('visit_details');
+Route::get('/opd_view', function () {
+    return view('admin.opd.opd_view');
+})->name('opd_view');
+Route::get('/generate_certificate', function () {
+    return view('admin.certificate.generate_certificate');
+})->name('generate_certificate');
+Route::get('/certificate', function () {
+    return view('admin.certificate.certificate');
+})->name('certificate');
+Route::get('/generate_patient_id', function () {
+    return view('admin.certificate.generate_patient_id');
+})->name('generate_patient_id');
+Route::get('/patient_id', function () {
+    return view('admin.certificate.patient_id');
+})->name('patient_id');
+Route::get('/generate_staff_id', function () {
+    return view('admin.certificate.generate_staff_id');
+})->name('generate_staff_id');
+Route::get('/staff_id', function () {
+    return view('admin.certificate.staff_id');
+})->name('staff_id');

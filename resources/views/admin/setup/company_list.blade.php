@@ -41,78 +41,8 @@
                                             {{session('success')}}
                                         </div>
                                     @endif
-                                    <div
-                                        class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
-
-                                        <div class="input-icon-start position-relative me-2">
-                                            <span class="input-icon-addon">
-                                                <i class="ti ti-search"></i>
-                                            </span>
-                                            <input type="text" class="form-control shadow-sm" placeholder="Search">
-
-                                        </div>
-                                        <div class="page_btn d-flex">
-                                            <div class="text-end d-flex">
-                                                <a href="javascript:void(0);"
-                                                    class="btn btn-primary text-white ms-2 fs-13 btn-md"
-                                                    data-bs-toggle="modal" data-bs-target="#add_company"><i
-                                                        class="ti ti-plus me-1"></i>Add Company</a>
-                                            </div>
-                                            <!-- Modal -->
-                                            <div class="modal fade" id="--add_company" tabindex="-1" aria-hidden="true">
-                                                <div class="modal-dialog modal-dialog-centered">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header rounded-0"
-                                                            style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                                            <h5 class="modal-title" id="addSpecializationLabel">Add Company
-                                                            </h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                                aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <form action="" method="POST">
-                                                                @csrf
-
-                                                                <div id="company_fields">
-                                                                    <div class="row gy-3 company-row mb-2">
-
-                                                                        <!-- Operation Name -->
-                                                                        <div class="col-md-11">
-                                                                            <label for="company_name" class="form-label">Company
-                                                                                Name <span
-                                                                                    class="text-danger">*</span></label>
-                                                                            <input type="text" name="company_name"
-                                                                                id="company_name" class="form-control" />
-                                                                        </div>
-
-                                                                        <div class="col-md-1 d-flex align-items-end">
-                                                                            <button type="button"
-                                                                                class="btn btn-danger remove-btn"
-                                                                                style="display:none;"><i
-                                                                                    class="ti ti-trash"></i></button>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-
-                                                                <!-- Add button -->
-                                                                <div class="mt-3">
-                                                                    <button type="button" id="addBtn"
-                                                                        class="btn btn-primary">Add</button>
-                                                                </div>
-
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="submit" class="btn btn-primary">Save</button>
-                                                        </div>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="table-responsive">
+                                    <x-table-actions.actions id="company" name="Company" /> 
+                                    <div class="table-responsive" id="company">
                                         <table class="table mb-0">
                                             <thead>
                                                 <tr>
@@ -150,6 +80,45 @@
                                             </tbody>
                                         </table>
                                     </div>
+                                    {{-- Pagination Links --}}
+                                <div class="mt-3" id="pagination-wrapper">
+                                    @php
+                                        $currentPage = $companys->currentPage();
+                                        $lastPage = $companys->lastPage();
+                                    @endphp
+
+                                    {{-- Previous --}}
+                                    @if ($companys->onFirstPage())
+                                        <button class="btn btn-outline-secondary btn-sm me-1" disabled>« Prev</button>
+                                    @else
+                                        <a href="{{ $companys->previousPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                                            class="btn btn-outline-secondary btn-sm me-1">
+                                            « Prev
+                                        </a>
+                                    @endif
+
+                                    {{-- Page numbers --}}
+                                    @for ($page = 1; $page <= $lastPage; $page++)
+                                        @if ($page == $currentPage)
+                                            <button class="btn btn-primary btn-sm me-1">{{ $page }}</button>
+                                        @else
+                                            <a href="{{ $companys->url($page) }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                                                class="btn btn-outline-secondary btn-sm me-1">
+                                                {{ $page }}
+                                            </a>
+                                        @endif
+                                    @endfor
+
+                                    {{-- Next --}}
+                                    @if ($companys->hasMorePages())
+                                        <a href="{{ $companys->nextPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                                            class="btn btn-outline-secondary btn-sm">
+                                            Next »
+                                        </a>
+                                    @else
+                                        <button class="btn btn-outline-secondary btn-sm" disabled>Next »</button>
+                                    @endif
+                                </div>
 
                                 </div> <!-- end card-body -->
                             </div> <!-- end card -->
@@ -161,7 +130,7 @@
             </div>
         </div>
     </div>
-    <x-modals.form-modal type="add" id="add_company" title="Add company" action="{{route('company-list.store')}}" :repeatable_group="[
+    <x-modals.form-modal type="add" id="createModal" title="Add company" action="{{route('company-list.store')}}" :repeatable_group="[
         ['name' => 'company_name', 'label' => 'Company Name', 'type' => 'text', 'required' => true,'size'=>'11']
         ]" :columns="2" />
     <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Company Name"
@@ -170,30 +139,39 @@
         ['name' => 'company_name', 'label' => 'Unit Name', 'type' => 'text', 'required' => true, 'size' => '12']
     ]" :columns="2" />
     <script>
-        const addBtn = document.getElementById("addBtn");
-        const operationFields = document.getElementById("company_fields");
-
-        addBtn.addEventListener("click", function () {
-            // Clone the first row
-            let firstRow = operationFields.querySelector(".company-row");
-            let newRow = firstRow.cloneNode(true);
-
-            // Clear input values
-            newRow.querySelectorAll("input, select").forEach(el => el.value = "");
-
-            // Show remove button
-            newRow.querySelector(".remove-btn").style.display = "inline-block";
-
-            // Append new row
-            operationFields.appendChild(newRow);
-
-            // Add remove functionality
-            newRow.querySelector(".remove-btn").addEventListener("click", function () {
-                newRow.remove();
-            });
-        });
+document.addEventListener('DOMContentLoaded', function () {    
+    createAjaxTable({
+    apiUrl: "{{ route('company-list') }}",
+    tableSelector: "#company",
+    paginationSelector: "#pagination-wrapper",
+    searchInputSelector: "#search-input",
+    perPageSelector: "#perPage",
+    rowRenderer: function (item) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td><h6 class="mb-0 fs-14 fw-semibold">${item.id}</h6></td>
+            <td>${item.company_name}</td>
+            <td>
+            <button
+                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
+                    data-id="${item.id}"
+                    data-company_name="${item.company_name}">
+                    <i class="ti ti-pencil"></i>
+                </button>
+                <form action="{{ route('company-list.destroy')}}"
+                method="POST" style="display:inline-block;">
+                @csrf
+                @method('DELETE')
+                <input type="hidden" name="id" value="${item.id}">
+                <button onclick="return confirm('Are you sure?')"
+                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"><i
+                class="ti ti-trash"></i></button>
+            </form>
+            </td>
+        `;
+        return row;
+    }
+    });
+});
     </script>
-
-
-
 @endsection

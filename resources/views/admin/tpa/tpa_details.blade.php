@@ -36,8 +36,8 @@
 
         <!-- page header start -->
         <div class="mb-4">
-            <h6 class="fw-bold mb-0 d-flex align-items-center"> <a href="patients.html" class="text-dark"> <i
-                        class="ti ti-chevron-left me-1"></i>TPA Details</a></h6>
+            <h6 class="fw-bold mb-0 d-flex align-items-center"> <a href="{{ route('tpamanagement') }}" class="text-dark"> <i
+                        class="ti ti-chevron-left me-1"></i>TPA</a></h6>
         </div>
         <!-- page header end -->
 
@@ -218,20 +218,9 @@
         ['name' => 'org_charge', 'label' => 'TPA Charge (INR)', 'type' => 'text', 'required' => true,'size'=>'12']
     ]" :columns="1" />
     <!-- end madal -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/js/select2.min.js"></script>
-
-    <script>
-        $(document).ready(function () {
-            $('#charge-type').select2({
-                width: '100%',
-                placeholder: 'Select',
-                allowClear: true,
-                dropdownParent: $('#charge_type_form')
-
-            });
-        });
-    </script>
-
+    <style>
+        /* Ensure Select2 dropdown search input is visible (overrides theme rules) */
+        .select2-container .select2-search--dropdown { display: block !important; }
+        .select2-container .select2-search__field { display: block !important; }
+    </style>
 @endsection

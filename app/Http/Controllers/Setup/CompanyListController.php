@@ -9,9 +9,23 @@ use Illuminate\Support\Facades\Auth;
 
 class CompanyListController extends Controller
 {
-    function index () {
+    function index (Request $request) {
     
-        $companys = PharmacyCompany::get();
+        $companys = PharmacyCompany::query();
+        $perPage = intval($request->input('perPage', 5));
+        if ($perPage <= 0) {        
+              $perPage = 5;
+          } 
+
+        if($request->has('search')){
+            $search_term = $request->search;
+            $companys->where(function ($query) use ($search_term) {
+                $query->where('company_name', 'like', "%{$search_term}%");
+            });
+            $companys = $companys->paginate($perPage);
+            return array("result"=>$companys);
+        }
+        $companys = $companys->paginate($perPage);
         //dd($company);
 
         return view('admin.setup.company_list', compact('companys'));

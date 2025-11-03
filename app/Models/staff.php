@@ -71,6 +71,11 @@ class Staff extends Model
         'local_identification_number',
     ];
 
+    public function department()
+    {
+        return $this->belongsTo(Department::class, 'department_id', 'id');
+    }
+
     // public function user()
     // {
     //     return $this->belongsTo(User::class, 'user_id', 'user_id');

@@ -7,9 +7,22 @@ use App\Models\MedicineGroup;
 
 class MedicineGroupController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $categories = MedicineGroup::get();
+        $categoriesQuery = MedicineGroup::query();
+        $perPage = intval($request->input('perPage', 5));
+        if ($perPage <= 0) {
+            $perPage = 5;
+        }
+        if ($request->has('search')) {
+            $search_term = $request->search;
+            $categoriesQuery->where(function ($query) use ($search_term) {
+                $query->where('group_name', 'like', "%{$search_term}%");
+            });
+            $categories = $categoriesQuery->paginate($perPage);
+            return response()->json(array("result"=>$categories));
+        }
+        $categories = $categoriesQuery->paginate($perPage);
         return view('admin.setup.medicine_group', compact('categories'));
     }
     public function storeMultiple(Request $request)

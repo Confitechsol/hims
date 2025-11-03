@@ -340,5 +340,39 @@
             const selectedOrg = window.organizationsData.find(org => org.id == selectedId);
             tpaIdInput.value = selectedOrg ? selectedOrg.code : '';
         });
+    //auto calculate age..............................................................................
+    const birthDateInput = document.getElementById('birth_date');
+    const ageYearInput = document.getElementById('age_year');
+    const ageMonthInput = document.getElementById('age_month');
+    const ageDayInput = document.getElementById('age_day');
+
+    birthDateInput.addEventListener('change', function() {
+        const birthDate = new Date(this.value);
+        if (!this.value || isNaN(birthDate)) {
+            ageYearInput.value = '';
+            ageMonthInput.value = '';
+            ageDayInput.value = '';
+            return;
+        }
+
+        const today = new Date();
+        let years = today.getFullYear() - birthDate.getFullYear();
+        let months = today.getMonth() - birthDate.getMonth();
+        let days = today.getDate() - birthDate.getDate();
+
+        if (days < 0) {
+            months--;
+            const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+            days += prevMonth.getDate();
+        }
+
+        if (months < 0) {
+            years--;
+            months += 12;
+        }
+        ageYearInput.value = years;
+        ageMonthInput.value = months;
+        ageDayInput.value = days;
+    });
     });
 </script>

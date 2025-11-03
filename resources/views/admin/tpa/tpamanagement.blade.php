@@ -71,6 +71,9 @@
                                                 <th>Address</th>
                                                 <th>Contact Person Name</th>
                                                 <th>Contact Person Phone</th>
+                                                <th>Poilicy No</th>
+                                                <th>E Card no</th>
+                                                <th>E Card Image</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -83,6 +86,30 @@
                                                 <td>{{$item->address}}</td>
                                                 <td>{{$item->contact_person_name}}</td>
                                                 <td>{{$item->contact_person_phone}}</td>
+                                                <td>{{$item->poilicy_no}}</td>
+                                                <td>{{$item->e_card_no}}</td>
+                                                <td>
+                                                    @if($item->e_card_upload)
+                                                        <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#ecardModal{{ $item->id }}">
+                                                            <img src="{{ asset($item->e_card_upload) }}" alt="E Card" width="100" style="cursor:pointer" class="img-thumbnail">
+                                                        </a>
+
+                                                        <div class="modal fade" id="ecardModal{{ $item->id }}" tabindex="-1" aria-labelledby="ecardModalLabel{{ $item->id }}" aria-hidden="true">
+                                                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title" id="ecardModalLabel{{ $item->id }}">E Card - {{ $item->organisation_name }}</h5>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                    </div>
+                                                                    <div class="modal-body text-center">
+                                                                        <img src="{{ asset($item->e_card_upload) }}" alt="E Card" class="img-fluid">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @else
+                                                        N/A
+                                                    @endif
                                                 <td>
                                                     <div class="d-flex">
                                                         <a href="{{ route('tpa_details.show', $item->id) }}"
@@ -97,7 +124,11 @@
                                                             data-contact_no="{{$item->contact_no}}"
                                                             data-address="{{$item->address}}"
                                                             data-contact_person_name="{{$item->contact_person_name}}"
-                                                            data-contact_person_phone="{{$item->contact_person_phone}}">
+                                                            data-contact_person_phone="{{$item->contact_person_phone}}"
+                                                            data-poilicy_no="{{$item->poilicy_no}}"
+                                                            data-e_card_no="{{$item->e_card_no}}"
+                                                            data-e_card_image="/{{$item->e_card_upload}}"
+                                                            data-e_card_upload="">
                                                             <i class="ti ti-pencil"></i>
                                                         </button>
                                                         <form method="POST" action="{{ route('tpamanagement.destroy') }}">
@@ -133,6 +164,9 @@
         ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => true,'size'=>'12'],
         ['name' => 'contact_person_name', 'label' => 'Contact Person Name', 'type' => 'text', 'required' => true,'size'=>'6'],
         ['name' => 'contact_person_phone', 'label' => 'Contact Person Phone', 'type' => 'text', 'required' => true,'size'=>'6'],
+        ['name' => 'poilicy_no', 'label' => 'Poilicy No', 'type' => 'text', 'required' => true,'size'=>'6'],
+        ['name' => 'e_card_no', 'label' => 'E Card No', 'type' => 'text', 'required' => true,'size'=>'6'],
+        ['name' => 'e_card_upload', 'label' => 'E Card Upload', 'type' => 'file', 'required' => true,'size'=>'12'],
         ]" :columns="3" />
  <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Company Name"
     action="{{route('tpamanagement.update')}}" :fields="[
@@ -143,6 +177,10 @@
         ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => true,'size'=>'12'],
         ['name' => 'contact_person_name', 'label' => 'Contact Person Name', 'type' => 'text', 'required' => true,'size'=>'6'],
         ['name' => 'contact_person_phone', 'label' => 'Contact Person Phone', 'type' => 'text', 'required' => true,'size'=>'6'],
+        ['name' => 'poilicy_no', 'label' => 'Poilicy No', 'type' => 'text', 'required' => true,'size'=>'6'],
+        ['name' => 'e_card_no', 'label' => 'E Card No', 'type' => 'text', 'required' => true,'size'=>'6'],
+        ['name' => 'e_card_image', 'label' => 'E Card Current Image', 'type' => 'img', 'required' => true,'size'=>'12'],
+        ['name' => 'e_card_upload', 'label' => 'E Card Image Update', 'type' => 'file', 'required' => false ,'size'=>'12'],
     ]" :columns="3" />
     
    

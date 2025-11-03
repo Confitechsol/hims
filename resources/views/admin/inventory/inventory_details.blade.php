@@ -21,10 +21,10 @@
                                 </a>
                             </div>
 
-                            <a href="#" class="btn btn-outline-primary d-inline-flex align-items-center">
+                            <a href="{{ route('issue-items')}}" class="btn btn-outline-primary d-inline-flex align-items-center">
                                 <i class="ti ti-menu me-1"></i>Issue Item
                             </a>
-                            <a href="#" class="btn btn-outline-primary d-inline-flex align-items-center">
+                            <a href="{{ route('items')}}" class="btn btn-outline-primary d-inline-flex align-items-center">
                                 <i class="ti ti-menu me-1"></i>Item
                             </a>
                         </div>

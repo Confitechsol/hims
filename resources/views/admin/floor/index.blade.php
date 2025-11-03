@@ -167,6 +167,33 @@
                 document.getElementById('delete-id').value = button.getAttribute('data-id');
                 document.getElementById('delete-name').textContent = button.getAttribute('data-name');
             });
+    createAjaxTable({
+    apiUrl: "{{ route('floors.index') }}",
+    tableSelector: "#floors",
+    paginationSelector: "#pagination-wrapper",
+    searchInputSelector: "#search-input",
+    perPageSelector: "#perPage",
+    rowRenderer: function (item) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${item.name}</td>
+            <td>
+                <button class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill" data-bs-toggle="modal" data-bs-target="#editModal"
+                    data-id="${item.id}"
+                    data-name="${item.name}">
+                    <i class="ti ti-pencil"></i>
+                </button>
+                <button class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill" data-bs-toggle="modal"
+                data-bs-target="#deleteModal" data-id="${item.id}"
+                data-name="${item.name}">
+                <i class="ti ti-trash"></i>
+                </button>
+            </form>
+            </td>
+        `;
+        return row;
+    }
+    });   
         });
     </script>
 @endsection

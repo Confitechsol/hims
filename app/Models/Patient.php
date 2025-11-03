@@ -103,4 +103,9 @@ class Patient extends Model
         return $this->belongsToMany(IpdDetail::class, 'ipd_patient', 'patient_id', 'ipd_id')->withPivot('doctor_id')->orderBy('created_at', 'desc')
             ->withTimestamps();
     }
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class, 'patient_id');
+    }
+
 }

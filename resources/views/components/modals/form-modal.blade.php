@@ -7,12 +7,13 @@
     'columns' => 1, // Number of columns (default: 1)
     'repeatable_group' => [],
     'type',
+    'fileTypes'
 ])
 
 <div class="modal fade" id="{{ $id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
-            <form action="{{ $action }}" method="POST" id="{{ $id }}-form">
+            <form action="{{ $action }}" method="POST" id="{{ $id }}-form" enctype="multipart/form-data">
                 @csrf
                 @if (in_array(strtoupper($method), ['PUT', 'PATCH', 'DELETE']))
                     @method($method)
@@ -59,11 +60,13 @@
                                     @elseif($field['type'] === 'textarea')
                                         <textarea name="{{ $field['name'] }}" id="{{ $field['name'] }}" class="form-control"
                                             data-field="{{ $field['name'] }}" rows="3">{{ $field['value'] ?? old($field['name']) }}</textarea>
+                                    @elseif($field['type'] === 'img')
+                                    <img src="" data-field="{{ $field['name'] }}" alt="">        
                                     @else
                                         <input type="{{ $field['type'] ?? 'text' }}" name="{{ $field['name'] }}"
                                             data-field="{{ $field['name'] }}" id="{{ $field['name'] }}"
                                             value="{{ $field['value'] ?? old($field['name']) }}" class="form-control"
-                                            @if (!empty($field['required'])) required @endif>
+                                            @if (!empty($field['required'])) required @endif @if(isset($field['fileTypes']))accept="{{$field['fileTypes']}}"@endif>
                                     @endif
                                 </div>
                             </div>
@@ -129,8 +132,11 @@
             const form = document.getElementById('edit_modal-form');
 
             // Loop through all edit buttons
-            editButtons.forEach(button => {
-                button.addEventListener('click', function() {
+            // editButtons.forEach(button => {
+            //     button.addEventListener('click', function() {
+        document.addEventListener('click', function(e) {
+            const button = e.target.closest('.edit-btn');
+            if (!button) return;
                     // Get the ID from the button
                     // const id = this.getAttribute('data-id');
 
@@ -142,21 +148,32 @@
 
                     // Loop through each input field
                     inputFields.forEach(input => {
-                        const fieldName = input.getAttribute(
-                        'data-field'); // Get the field name from data-field attribute
-                        const fieldValue = this.getAttribute(
-                        `data-${fieldName}`); // Get corresponding data-* attribute from button
+                        const fieldName = input.getAttribute('data-field'); // Get the field name from data-field attribute
+                        // const fieldValue = this.getAttribute(`data-${fieldName}`); // Get corresponding data-* attribute from button
+                        const fieldValue = button.getAttribute(`data-${fieldName}`);
 
                         // Set the input field's value dynamically
+                        if(input.tagName === 'SELECT') {
+                            $(input).select2(); 
+                            $(input).val(fieldValue).trigger('change.select2');
+                        } else{
+                            const isImage = /\.(png|jpg|jpeg)$/i.test(fieldValue);
                         if (fieldValue !== null) {
-                            input.value = fieldValue;
+                        if (isImage) {
+                         // Set image source if input is an <img> element
+                         input.src = "{{url('/')}}"+fieldValue;
+                         } else {
+                        // Otherwise, just set the value
+                        input.value = fieldValue;
+                            }
+                        }
                         }
                     });
 
                     // Show the modal
                     modal.show();
                 });
-            });
+            // });
         });
     </script>
 @endif
