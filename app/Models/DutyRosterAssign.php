@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class DutyRosterAssign extends Model
 {
@@ -17,6 +18,10 @@ class DutyRosterAssign extends Model
     /**
      * The attributes that are mass assignable.
      */
+
+    use SoftDeletes;
+    protected $dates = ['deleted_at'];
+
     protected $fillable = [
         'hospital_id',
         'branch_id',

@@ -43,7 +43,7 @@
                                             </div>
                                             <div class="mt-3">
                                                 <label for="shift_hour" class="form-label">Shift Hour</label>
-                                                <input type="number" name="shift_hour" id="shift_hour" class="form-control" required>
+                                                <input type="text" name="shift_hour" id="shift_hour" class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="modal-footer">
@@ -60,7 +60,7 @@
             </div>
 
             <div class="card-body">
-                @if($rosters->isEmpty())
+                @if($shifts->isEmpty())
                     <p class="text-center">No roster details found.</p>
                 @else
                     <div class="table-responsive table-nowrap">
@@ -71,62 +71,38 @@
                                     <th>Shift Start</th>
                                     <th>Shift End</th>
                                     <th>Shift Hours</th>
-                                    
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody class="text-center">
-                                @foreach($rosters as $roster)
+                                @forelse($shifts as $shift)
                                     <tr>
-                                        <td>{{ $roster->dutyRosterShift->shift_name }}</td>
-                                        <td>{{ date('h:i A', strtotime($roster->dutyRosterShift->shift_start)) }}</td>
-                                        <td>{{ date('h:i A', strtotime($roster->dutyRosterShift->shift_end)) }}</td>
-                                        <td>{{ $roster->dutyRosterShift->shift_hour }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($roster->duty_roster_start_date)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($roster->duty_roster_end_date)->format('d/m/Y') }}</td>
-                                        <td>{{ $roster->duty_roster_total_day }}</td>
+                                        <td>{{ $shift->shift_name }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($shift->shift_start)->format('h:i A') }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($shift->shift_end)->format('h:i A') }}</td>
+                                        <td>{{ $shift->shift_hour }}</td>
                                         <td>
-                                            <a href="javascript:void(0);"
-                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
-                                                                onclick=""
-                                                                >
-                                                                <i class="ti ti-pencil"></i>
-                                                            </a>
+                                            <a href="javascript:void(0);" 
+                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                onclick="openEditModal({{ $shift->id }}, '{{ $shift->shift_name }}', '{{ $shift->shift_start }}', '{{ $shift->shift_end }}', '{{ $shift->shift_hour }}')">
+                                                <i class="ti ti-pencil"></i>
+                                            </a>
 
-                                                            <a href="javascript:void(0);" 
-                                                                onclick=""
-                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                <i class="ti ti-trash"></i>
-                                                            </a>
-                                            <!-- <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#viewShift{{ $roster->id }}">
-                                                View Shift
-                                            </button> -->
-
-                                            <!-- View Shift Modal -->
-                                            <div class="modal fade" id="viewShift{{ $roster->id }}" tabindex="-1" aria-hidden="true">
-                                                <div class="modal-dialog modal-dialog-centered modal-sm">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header bg-info text-white">
-                                                            <h5 class="modal-title">Shift Details</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                        </div>
-                                                        <div class="modal-body text-start">
-                                                            <p><strong>Name:</strong> {{ $roster->dutyRosterShift->shift_name }}</p>
-                                                            <p><strong>Start:</strong> {{ date('h:i A', strtotime($roster->dutyRosterShift->shift_start)) }}</p>
-                                                            <p><strong>End:</strong> {{ date('h:i A', strtotime($roster->dutyRosterShift->shift_end)) }}</p>
-                                                            <p><strong>Hours:</strong> {{ $roster->dutyRosterShift->shift_hour }}</p>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <!-- End View Shift Modal -->
+                                            <a href="javascript:void(0);" 
+                                                onclick="confirmDelete('{{ route('dutyroster.destroyShift', $shift->id) }}')" 
+                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                <i class="ti ti-trash"></i>
+                                            </a>
                                         </td>
                                     </tr>
-                                @endforeach
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">No shifts available</td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
+
                     </div>
                 @endif
             </div>
@@ -134,4 +110,240 @@
 
     </div>
 </div>
+<!-- Edit Shift Modal -->
+<div class="modal fade" id="edit_shift" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content">
+            <form id="editShiftForm" method="POST" >
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="shift_id" id="edit_shift_id">
+
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Edit Duty Roster Shift</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="edit_shift_name" class="form-label">Shift Name</label>
+                        <input type="text" name="shift_name" id="edit_shift_name" class="form-control" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="edit_shift_start" class="form-label">Shift Start</label>
+                            <input type="time" name="shift_start" id="edit_shift_start" class="form-control" required>
+                        </div>
+                        <div class="col">
+                            <label for="edit_shift_end" class="form-label">Shift End</label>
+                            <input type="time" name="shift_end" id="edit_shift_end" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <label for="edit_shift_hour" class="form-label">Shift Hour</label>
+                        <input type="text" name="shift_hour" id="edit_shift_hour" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Update Shift</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const startInput = document.getElementById('shift_start');
+        const endInput = document.getElementById('shift_end');
+        const hourInput = document.getElementById('shift_hour');
+
+        function calculateShiftHours() {
+            const startTime = startInput.value;
+            const endTime = endInput.value;
+
+            if (startTime && endTime) {
+                const start = new Date(`1970-01-01T${startTime}:00`);
+                const end = new Date(`1970-01-01T${endTime}:00`);
+
+                let diff = (end - start) / (1000 * 60 * 60); // difference in hours
+
+                // If end time is earlier (e.g., overnight shift)
+                if (diff < 0) {
+                    diff += 24;
+                }
+
+                // Round to 2 decimal places if needed
+                hourInput.value = diff.toFixed(2);
+            }
+        }
+
+        startInput.addEventListener('change', calculateShiftHours);
+        endInput.addEventListener('change', calculateShiftHours);
+    });
+</script> -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const startInput = document.getElementById('shift_start');
+    const endInput = document.getElementById('shift_end');
+    const hourInput = document.getElementById('shift_hour');
+
+    function calculateShiftHours() {
+        const startTime = startInput.value.trim();
+        const endTime = endInput.value.trim();
+
+        console.log("🕒 Start:", startTime, "End:", endTime);
+
+        if (startTime && endTime) {
+            // Ensure both are valid times (HH:mm:ss or HH:mm)
+            let startParts = startTime.split(':').map(Number);
+            let endParts = endTime.split(':').map(Number);
+
+            // Normalize to HH:mm:ss
+            if (startParts.length === 2) startParts.push(0);
+            if (endParts.length === 2) endParts.push(0);
+
+            // Create date objects for same base date
+            const start = new Date(1970, 0, 1, startParts[0], startParts[1], startParts[2]);
+            const end = new Date(1970, 0, 1, endParts[0], endParts[1], endParts[2]);
+
+            let diff = (end - start) / (1000 * 60 * 60);
+
+            // Handle overnight shifts (e.g. 22:00 to 06:00)
+            if (diff < 0) diff += 24;
+
+            console.log("✅ Calculated Hours:", diff);
+
+            // Convert to HH:mm:ss format
+            let totalSeconds = Math.round(diff * 3600);
+            let hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+            let minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+            let seconds = String(totalSeconds % 60).padStart(2, '0');
+
+            hourInput.value = `${hours}:${minutes}:${seconds}`;
+        }
+    }
+
+    startInput.addEventListener('change', calculateShiftHours);
+    endInput.addEventListener('change', calculateShiftHours);
+});
+</script>
+
+
+<!-- End Edit Shift Modal -->
+
+<script>
+   function openEditModal(id, name, start, end, hour) {
+    console.log({ id, name, start, end, hour });
+
+    let hourValue = 0;
+    if (hour) {
+        const parts = hour.split(':');
+        hourValue = parseInt(parts[0]) + parseInt(parts[1]) / 60;
+    }
+    // Populate modal fields
+    document.getElementById('edit_shift_id').value = id;
+    document.getElementById('edit_shift_name').value = name;
+    document.getElementById('edit_shift_start').value = start;
+    document.getElementById('edit_shift_end').value = end;
+    document.getElementById('edit_shift_hour').value = hourValue; // corrected ID
+
+    // Dynamically set form action
+    let form = document.getElementById('editShiftForm');
+    form.action = "{{ route('dutyroster.updateShift', ':id') }}".replace(':id', id);
+
+    // Show modal
+    $('#edit_shift').modal('show'); // corrected modal ID
+    }
+
+
+    function confirmDelete(url) {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "This shift will be deleted permanently.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // ✅ Create and submit a form using DELETE method
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = url;
+
+            const csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = '_token';
+            csrf.value = '{{ csrf_token() }}';
+
+            const method = document.createElement('input');
+            method.type = 'hidden';
+            method.name = '_method';
+            method.value = 'DELETE';
+
+            form.appendChild(csrf);
+            form.appendChild(method);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
+}
+
+
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const startInput = document.getElementById('edit_shift_start');
+    const endInput = document.getElementById('edit_shift_end');
+    const hourInput = document.getElementById('edit_shift_hour');
+
+    function calculateShiftHours() {
+        const startTime = startInput.value.trim();
+        const endTime = endInput.value.trim();
+
+        console.log("🕒 Start:", startTime, "End:", endTime);
+
+        if (startTime && endTime) {
+            // Ensure both are valid times (HH:mm:ss or HH:mm)
+            let startParts = startTime.split(':').map(Number);
+            let endParts = endTime.split(':').map(Number);
+
+            // Normalize to HH:mm:ss
+            if (startParts.length === 2) startParts.push(0);
+            if (endParts.length === 2) endParts.push(0);
+
+            // Create date objects for same base date
+            const start = new Date(1970, 0, 1, startParts[0], startParts[1], startParts[2]);
+            const end = new Date(1970, 0, 1, endParts[0], endParts[1], endParts[2]);
+
+            let diff = (end - start) / (1000 * 60 * 60);
+
+            // Handle overnight shifts (e.g. 22:00 to 06:00)
+            if (diff < 0) diff += 24;
+
+            console.log("✅ Calculated Hours:", diff);
+
+            // Convert to HH:mm:ss format
+            let totalSeconds = Math.round(diff * 3600);
+            let hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+            let minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+            let seconds = String(totalSeconds % 60).padStart(2, '0');
+
+            hourInput.value = `${hours}:${minutes}:${seconds}`;
+        }
+    }
+
+    startInput.addEventListener('change', calculateShiftHours);
+    endInput.addEventListener('change', calculateShiftHours);
+});
+</script>
+
+
 @endsection

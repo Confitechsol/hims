@@ -21,7 +21,7 @@
                         <div class="modal fade" id="add_appointment" tabindex="-1" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered modal-xl">
                                 <div class="modal-content">
-                                    <form method="POST" action="{{ route('dutyroster.store') }}">
+                                    <form method="POST" action="{{ route('dutyroster.assignStaff') }}">
                                         @csrf
                                         <div class="modal-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                                             <div class="row w-100 align-items-center">
@@ -130,42 +130,179 @@
 
             </div>
             <div class="card-body">
-                @if($rosterSummary->isEmpty())
-                    <p class="text-center">No roster assignments found.</p>
-                @else
-                    <div class="table-responsive table-nowrap">
-                        <table class="table border">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th>Staff</th>
-                                    <th>Floor</th>
-                                    <th>Department</th>
-                                    <th>Roster</th>
-                                    <th>Start Date - End Date</th>
-                                    <th>Shift Start - Shift End</th>
-                                    
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($rosterSummary as $staff)
-                                    <tr>
-                                        <td>{{ $staff['staff_name'] }}</td>
-                                        <td>{{ $staff['floor'] }}</td>
-                                        <td>{{ $staff['department'] }}</td>
-                                        <td>{{ $staff['shift'] }}</td>
-                                        <td>{{ $staff['shift_time'] }}</td>
-                                        <td>{{ $staff['period'] }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @endif 
-            </div>
+    @if($rosterSummary->isEmpty())
+        <p class="text-center">No roster assignments found.</p>
+    @else
+        <div class="table-responsive table-nowrap">
+            <table class="table border">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Staff</th>
+                        <th>Floor</th>
+                        <th>Department</th>
+                        <th>Shift</th>
+                        <th>Shift Time</th>
+                        <th>Start Date - End Date</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($rosterSummary as $roster)
+                        <tr>
+                            <td>{{ $roster['staff_name'] }}</td>
+                            <td>{{ $roster['floor'] }}</td>
+                            <td>{{ $roster['department'] }}</td>
+                            <td>{{ $roster['shift'] }}</td>
+                            <td>{{ $roster['shift_time'] }}</td>
+                            <td>{{ $roster['period'] }}</td>
+                            <td class="text-center">
+                                <!-- Edit Button -->
+                                
+                                <a href="javascript:void(0);"
+                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill editRosterBtn"
+                                    data-id="{{ $roster['id'] }}"
+                                    data-code="{{ $roster['code'] }}"
+                                    data-staff="{{ $roster['staff_id'] }}"
+                                    data-floor="{{ $roster['floor_id'] ?? '' }}"
+                                    data-department="{{ $roster['department_id'] ?? '' }}"
+                                    data-shift="{{ trim($roster['shift']) }}"
+                                    data-period="{{ $roster['period'] }}">
+                                    <i class="ti ti-pencil"></i>
+                                </a>
+                                <!-- Delete Button -->
+                                <a href="javascript:void(0);"
+                                   onclick="confirmDelete('{{ route('dutyroster.destroyStaffRoster', ['code' => $roster['code'] ?? 0]) }}')"
+                                   class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                    <i class="ti ti-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif 
+</div>
+
+
         </div>
 
     </div>
+    <div class="modal fade" id="editRosterModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <form method="POST" id="editRosterForm" action="{{ route('dutyroster.updateStaffRoster') }}">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="modal-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                        <div class="row w-100 align-items-center">
+                            <div class="col-md-7">
+                                <h4>Edit Roster</h4>
+                            </div>
+                            <div class="col-md-5 text-end">
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <div class="row align-items-center gy-3">
+
+                                {{-- SHIFT SELECTION --}}
+                                <div class="col-sm-12">
+                                    <label>Shift</label>
+                                    <ul class="stepradiolist row gy-0">
+                                        @foreach($shifts as $shift)
+                                            <li class="col-sm-4">
+                                                <label>
+                                                    <input type="radio" class="edit_shift" name="shift_id" value="{{ $shift->id }}">
+                                                    <div class="stepimage">
+                                                        {{ $shift->shift_name }}<br>
+                                                        {{ date('h:i A', strtotime($shift->shift_start_time)) }} - {{ date('h:i A', strtotime($shift->shift_end_time)) }}
+                                                    </div>
+                                                </label>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+
+                                {{-- DUTY PERIOD --}}
+                                <div class="col-sm-12">
+                                    <label>Shift Date <small class="req">*</small></label>
+                                    <select class="form-control" id="edit_duty_roster_list_id" name="duty_roster_list_id" required>
+                                        <option value="">Select</option>
+                                        @foreach($dutyRosterLists as $roster)
+                                            <option value="{{ $roster->id }}">
+                                                {{ date('d/m/Y', strtotime($roster->duty_roster_start_date)) }} - {{ date('d/m/Y', strtotime($roster->duty_roster_end_date)) }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                {{-- STAFF --}}
+                                <div class="col-sm-12">
+                                    <label>Staff <small class="req">*</small></label>
+                                    <div class="p-2 select2-full-width">
+                                        <select class="form-control select2" id="edit_staff_id" name="staff_id" required>
+                                            <option value="">Select</option>
+                                            @foreach($staffList as $staff)
+                                                <option value="{{ $staff->id }}">{{ $staff->name }} ({{ $staff->employee_id }})</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {{-- FLOOR --}}
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Floor</label>
+                                        <select class="form-control" id="edit_floor_id" name="floor_id">
+                                            <option value="">Select</option>
+                                            @foreach($floors as $floor)
+                                                <option value="{{ $floor->id }}">{{ $floor->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {{-- DEPARTMENT --}}
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Department</label>
+                                        <select class="form-control" id="edit_department_id" name="department_id">
+                                            <option value="">Select</option>
+                                            @foreach($departments as $dept)
+                                                <option value="{{ $dept->id }}">{{ $dept->department_name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {{-- HIDDEN ID FIELD --}}
+                                <input type="hidden" id="edit_roster_id" name="id">
+                                 {{-- HIDDEN ID FIELD --}}
+                                <input type="hidden" id="edit_roster_code" name="code">
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <div class="pull-right">
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
 </div>
+
 <script>
     $(document).ready(function() {
         $('.select2').select2({
@@ -174,4 +311,92 @@
         });
     });
 </script>
+
+
+<script>
+    document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.editRosterBtn');
+    if (!btn) return;
+
+    // Debug
+    console.log('Editing roster:', btn.dataset);
+
+    // Fill hidden field
+    const rosterId = document.getElementById('edit_roster_id');
+    if (rosterId) rosterId.value = btn.dataset.id || '';
+
+    // Fill hidden field
+    const rosterCode = document.getElementById('edit_roster_code');
+    if (rosterCode) rosterCode.value = btn.dataset.code || '';
+
+    // Prefill selects
+    const staffSelect = document.getElementById('edit_staff_id');
+    if (staffSelect) staffSelect.value = btn.dataset.staff || '';
+
+    const floorSelect = document.getElementById('edit_floor_id');
+    if (floorSelect) floorSelect.value = btn.dataset.floor || '';
+
+    const deptSelect = document.getElementById('edit_department_id');
+    if (deptSelect) deptSelect.value = btn.dataset.department || '';
+
+    const periodSelect = document.getElementById('edit_duty_roster_list_id');
+    if (periodSelect) {
+        Array.from(periodSelect.options).forEach(opt => {
+            opt.selected = opt.textContent.trim() === btn.dataset.period?.trim();
+        });
+    }
+
+    // Prefill shift radio
+    const selectedShift = btn.dataset.shift?.trim();
+    document.querySelectorAll('.edit_shift').forEach(radio => {
+        const labelText = radio.closest('label')?.textContent.trim() || '';
+        radio.checked = labelText.includes(selectedShift);
+    });
+
+    // Refresh Select2 (if used)
+    if (window.jQuery && $('.select2').length) $('.select2').trigger('change');
+
+    // Show modal
+    const modalEl = document.getElementById('editRosterModal');
+    if (modalEl) new bootstrap.Modal(modalEl).show();
+});
+
+</script>
+<script>
+    function confirmDelete(url) {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "This roster will be marked as deleted (soft delete).",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = url;
+
+            const csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = '_token';
+            csrf.value = '{{ csrf_token() }}';
+            form.appendChild(csrf);
+
+            const method = document.createElement('input');
+            method.type = 'hidden';
+            method.name = '_method';
+            method.value = 'DELETE';
+            form.appendChild(method);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
+}
+</script>
+
+
+
 @endsection

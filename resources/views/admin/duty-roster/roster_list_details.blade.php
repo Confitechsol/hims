@@ -119,7 +119,7 @@
                                             </a>
 
                                             <!-- Edit Roster Modal -->
-                                                <div class="modal fade" id="editRosterModal" tabindex="-1" aria-hidden="true">
+                                                <div class="modal fade" id="editRosterModal" tabindex="-1" aria-hidden="true" style="padding-left: 0px;">
                                                     <div class="modal-dialog modal-dialog-centered modal-md">
                                                         <div class="modal-content">
                                                             <form id="editRosterForm" method="POST">
@@ -135,21 +135,24 @@
 
                                                                     <div class="mb-3">
                                                                         <label for="edit_duty_roster_shift_id" class="form-label">Select Shift</label>
-                                                                        <select id="edit_duty_roster_shift_id" name="duty_roster_shift_id" class="form-select" required>
+                                                                        <select id="edit_duty_roster_shift_id" name="duty_roster_shift_id" class="form-control" required>
                                                                             @foreach($shifts as $shift)
                                                                                 <option value="{{ $shift->id }}">{{ $shift->shift_name }}</option>
                                                                             @endforeach
                                                                         </select>
                                                                     </div>
+                                                                    {{-- START & END DATE --}}
+                                                                    <div class="row">
 
-                                                                    <div class="mb-3">
-                                                                        <label class="form-label">Start Date</label>
-                                                                        <input type="date" id="edit_duty_roster_start_date" name="duty_roster_start_date" class="form-control" required>
-                                                                    </div>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label class="form-label">Start Date</label>
+                                                                            <input type="date" id="edit_duty_roster_start_date" name="duty_roster_start_date" class="form-control" required>
+                                                                        </div>
 
-                                                                    <div class="mb-3">
-                                                                        <label class="form-label">End Date</label>
-                                                                        <input type="date" id="edit_duty_roster_end_date" name="duty_roster_end_date" class="form-control" required>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label class="form-label">End Date</label>
+                                                                            <input type="date" id="edit_duty_roster_end_date" name="duty_roster_end_date" class="form-control" required>
+                                                                        </div>
                                                                     </div>
 
                                                                     <div class="mb-3">
@@ -219,38 +222,53 @@ function openEditModal(id, shiftId, startDate, endDate, totalDays) {
 </script>
 <!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
 <script>
-    function confirmDelete(url) {
-        Swal.fire({
-            title: "Are you sure?",
-            text: "This roster will be marked as deleted (soft delete).",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, delete it!"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Create and submit a hidden form dynamically
-                let form = document.createElement('form');
-                form.action = url;
-                form.method = 'POST';
 
-                let csrf = document.createElement('input');
-                csrf.type = 'hidden';
-                csrf.name = '_token';
-                csrf.value = '{{ csrf_token() }}';
-                form.appendChild(csrf);
+function confirmDelete(url) {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "This roster will be marked as deleted (soft delete).",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Create and submit a hidden form dynamically
+            let form = document.createElement('form');
+            form.action = url;
+            form.method = 'POST';
 
-                let method = document.createElement('input');
-                method.type = 'hidden';
-                method.name = '_method';
-                method.value = 'DELETE';
-                form.appendChild(method);
+            // Add CSRF token
+            let csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = '_token';
+            csrf.value = '{{ csrf_token() }}';
+            form.appendChild(csrf);
 
-                document.body.appendChild(form);
-                form.submit();
-            }
-        });
-    }
+            // Spoof DELETE method
+            let method = document.createElement('input');
+            method.type = 'hidden';
+            method.name = '_method';
+            method.value = 'DELETE';
+            form.appendChild(method);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
+}
+
+
 </script>
+@if(session('success'))
+<script>
+Swal.fire({
+    icon: 'success',
+    title: '{{ session('success') }}',
+    showConfirmButton: false,
+    timer: 1500
+});
+</script>
+@endif
 @endsection

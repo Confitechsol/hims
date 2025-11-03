@@ -45,6 +45,8 @@ use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\TpamanagmentController;
 use App\Http\Controllers\VitalController;
 use App\Http\Controllers\DutyRosterController;
+use App\Http\Controllers\IncomeController;
+use App\Http\Controllers\ExpenseController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -266,6 +268,15 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/tpa_details/{id?}', [TpamanagmentController::class, 'detailsshow'])->name('tpa_details.chragetype');
     Route::delete('/tpa_details/destroy', [TpamanagmentController::class, 'destroyTpaDetails'])->name('tpa_details.destroy');
     Route::put('/tpa_details/update', [TpamanagmentController::class, 'updateTpaDetails'])->name('tpa_details.update');
+
+    Route::get('/income', [IncomeController::class, 'index'])->name('income');
+    Route::post('/income/create', [IncomeController::class, 'create'])->name('income.create');
+    Route::put('/income/update', [IncomeController::class, 'update'])->name('income.update');
+    Route::delete('/income/destroy', [IncomeController::class, 'destroy'])->name('income.destroy');
+
+
+    Route::get('/expense', [ExpenseController::class, 'index']);
+
 
 });
 
@@ -507,14 +518,25 @@ Route::get('/opd_view', function () {
 Route::prefix('dutyroster')->group(function () {
     Route::get('/', [DutyRosterController::class, 'rosterListDetails'])->name('dutyroster');
     Route::post('/addRoster', [DutyRosterController::class, 'addRoster'])->name('dutyroster.addRoster');
-    Route::get('/edit/{id}', [DutyRosterController::class, 'edit'])->name('dutyroster.edit');
-    Route::put('/update/{id}', [DutyRosterController::class, 'update'])->name('dutyroster.update');
-    Route::delete('destroy/{id}', [DutyRosterController::class, 'destroy'])->name('dutyroster.destroy');
-    Route::get('/addShift', [DutyRosterController::class, 'addShift'])->name('dutyroster.addShift');
+    Route::put('/update/{id}', [DutyRosterController::class, 'updateRoster'])->name('dutyroster.update');
+    Route::delete('/destroy/{id}', [DutyRosterController::class, 'destroyRoster'])->name('dutyroster.destroy');
+    Route::get('/rosterShift', [DutyRosterController::class, 'showShift'])->name('dutyroster.Shift');
+    Route::post('/addShift', [DutyRosterController::class, 'addShift'])->name('dutyroster.addShift');
+     Route::put('/updateShift/{id}', [DutyRosterController::class, 'updateShift'])->name('dutyroster.updateShift');
+     Route::delete('/destroyShift/{id}', [DutyRosterController::class, 'destroyShift'])->name('dutyroster.destroyShift');
     Route::get('/doctor', [DutyRosterController::class, 'doctorRoster'])->name('dutyroster.doctor');
     Route::get('/staff', [DutyRosterController::class, 'staffRoster'])->name('dutyroster.staff');
-    Route::post('/store', [DutyRosterController::class, 'store'])->name('dutyroster.store');
-    Route::put('/update', [DutyRosterController::class, 'update'])->name('dutyroster.update');
-    Route::delete('/destroy', [DutyRosterController::class, 'destroy'])->name('dutyroster.destroy');
-    Route::get('/show/{id}', [DutyRosterController::class, 'show'])->name('dutyroster.show');
+    Route::post('/assignStaff', [DutyRosterController::class, 'assignStaff'])->name('dutyroster.assignStaff');
+    Route::put('/updateStaffRoster', [DutyRosterController::class, 'updateStaffRoster'])->name('dutyroster.updateStaffRoster');
+Route::delete('/destroyStaffRoster/{code}', [DutyRosterController::class, 'destroyStaffRoster'])->name('dutyroster.destroyStaffRoster');
+
+    // Route::put('/update/{id}', [DutyRosterController::class, 'update'])->name('dutyroster.update');
+    // Route::delete('/destroy', [DutyRosterController::class, 'destroy'])->name('dutyroster.destroy');
+    // Route::get('/show/{id}', [DutyRosterController::class, 'show'])->name('dutyroster.show');
 });
+Route::get('/generate_certificate', function () {
+    return view('admin.certificate.generate_certificate');
+})->name('generate_certificate');
+Route::get('/certificate', function () {
+    return view('admin.certificate.certificate');
+})->name('certificate');
