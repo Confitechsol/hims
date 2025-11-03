@@ -117,7 +117,7 @@
                                                     </div>
                                                     <div class="col-md-12">
                                                         <label for="toggleField" class="form-label">
-                                                             Name</label>
+                                                            Name</label>
                                                         <label class="switch form-label">
                                                             <input type="checkbox" id="toggleField">
                                                             <span class="slider form-control"></span>
@@ -141,7 +141,7 @@
                                                     </div>
                                                     <div class="col-md-12">
                                                         <label for="toggleField" class="form-label">
-                                                           Department</label>
+                                                            Department</label>
                                                         <label class="switch form-label">
                                                             <input type="checkbox" id="toggleField">
                                                             <span class="slider form-control"></span>
@@ -157,7 +157,7 @@
                                                     </div>
                                                     <div class="col-md-12">
                                                         <label for="toggleField" class="form-label">
-                                                          Mother Name</label>
+                                                            Mother Name</label>
                                                         <label class="switch form-label">
                                                             <input type="checkbox" id="toggleField">
                                                             <span class="slider form-control"></span>
@@ -165,7 +165,7 @@
                                                     </div>
                                                     <div class="col-md-12">
                                                         <label for="toggleField" class="form-label">
-                                                           Date Of Joining</label>
+                                                            Date Of Joining</label>
                                                         <label class="switch form-label">
                                                             <input type="checkbox" id="toggleField">
                                                             <span class="slider form-control"></span>
@@ -197,7 +197,7 @@
                                                     </div>
                                                     <div class="col-md-12">
                                                         <label for="toggleField" class="form-label">
-                                                           Barcode / QR Code</label>
+                                                            Barcode / QR Code</label>
                                                         <label class="switch form-label">
                                                             <input type="checkbox" id="toggleField">
                                                             <span class="slider form-control"></span>
@@ -337,7 +337,7 @@
                                                                                                 <div class="col-md-4">
                                                                                                     <p
                                                                                                         class="text-primary fs-13 fw-medium mb-0">
-                                                                                                    Designation</p>
+                                                                                                        Designation</p>
                                                                                                     <p class="fs-13">
                                                                                                         Administator
                                                                                                     </p>
@@ -374,7 +374,7 @@
                                                                 </div>
                                                             </td>
                                                             <td>
-                                                                <img src="" alt="">
+                                                                <img src="" alt="Background Image">
                                                             </td>
                                                             <td>
                                                                 <div class="d-flex gap-2">

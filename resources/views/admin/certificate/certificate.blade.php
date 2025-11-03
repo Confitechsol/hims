@@ -471,7 +471,7 @@
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <img src="" alt="">
+                                                        <img src="" alt="Background Image">
                                                     </td>
                                                     <td>
                                                         <div class="d-flex gap-2">
