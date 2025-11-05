@@ -528,10 +528,16 @@ Route::prefix('dutyroster')->group(function () {
      Route::put('/updateShift/{id}', [DutyRosterController::class, 'updateShift'])->name('dutyroster.updateShift');
      Route::delete('/destroyShift/{id}', [DutyRosterController::class, 'destroyShift'])->name('dutyroster.destroyShift');
     Route::get('/doctor', [DutyRosterController::class, 'doctorRoster'])->name('dutyroster.doctor');
+     Route::post('/assignDoctor', [DutyRosterController::class, 'assignDoctor'])->name('dutyroster.assignDoctor');
+    Route::put('/updateDoctorRoster', [DutyRosterController::class, 'updateDoctorRoster'])->name('dutyroster.updateDoctorRoster');
+    Route::delete('/destroyDoctorRoster/{code}', [DutyRosterController::class, 'destroyDoctorRoster'])->name('dutyroster.destroyDoctorRoster');
     Route::get('/staff', [DutyRosterController::class, 'staffRoster'])->name('dutyroster.staff');
     Route::post('/assignStaff', [DutyRosterController::class, 'assignStaff'])->name('dutyroster.assignStaff');
     Route::put('/updateStaffRoster', [DutyRosterController::class, 'updateStaffRoster'])->name('dutyroster.updateStaffRoster');
-Route::delete('/destroyStaffRoster/{code}', [DutyRosterController::class, 'destroyStaffRoster'])->name('dutyroster.destroyStaffRoster');
+    Route::delete('/destroyStaffRoster/{code}', [DutyRosterController::class, 'destroyStaffRoster'])->name('dutyroster.destroyStaffRoster');
+
+    Route::get('/dutyroster/getDatesByShift', [DutyRosterController::class, 'getDatesByShift'])
+    ->name('dutyroster.getDatesByShift');
 
     // Route::put('/update/{id}', [DutyRosterController::class, 'update'])->name('dutyroster.update');
     // Route::delete('/destroy', [DutyRosterController::class, 'destroy'])->name('dutyroster.destroy');

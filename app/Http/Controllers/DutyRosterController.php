@@ -154,156 +154,186 @@ class DutyRosterController extends Controller
     }
 
 
-     public function doctorRoster()
-    {
-        $rosters = DutyRosterList::with([
-            'dutyRosterShift',
-            'dutyRosterAssigns' => function ($q) {
-                $q->with('department', 'floor');
-            }
-        ])->get();
-
-        $doctors = Doctor::select('id', 'name', 'specialization')->get();
-
-        return view('admin.duty-roster.doctor_roster', compact('rosters', 'doctors'));
-    }
-
-    // // ✅ Staff roster view
-    // public function staffRoster()
-    // {
-
-    //     $assignments = DutyRosterAssign::with([ 'staff', 'floor','department','dutyRosterList.dutyRosterShift'])->get();
-    //     // Group by staff_id
-    //     $grouped = $assignments->groupBy('staff_id');
-    //     $shifts = DutyRosterShift::all();
-    //     $dutyRosterLists = DutyRosterList::all();
-    //     $staffList = Staff::all();
-    //     $floors = Floor::all();
-    //     $departments = Department::all();
-
-    //     // Build one summary per staff
-    //     $rosterSummary = $grouped->map(function ($records) {
-    //         $first = $records->first(); // first record for that staff
-    //         $staff = $first->staff;
-
-    //         return [
-    //             'staff_name' => $staff->name ?? 'N/A',
-
-    //             'floor' => $records->map(function ($r) {
-    //                 return optional($r->floor)->floor_name;
-    //             })->filter()->unique()->implode(', ') ?: 'N/A',
-
-    //             'department' => $records->map(function ($r) {
-    //                 return optional($r->department)->department_name;
-    //             })->filter()->unique()->implode(', ') ?: 'N/A',
-
-    //             'shift' => $records->map(function ($r) {
-    //                 return optional($r->dutyRosterList->dutyRosterShift)->shift_name;
-    //             })->filter()->unique()->implode(', ') ?: 'N/A',
-
-    //             'period' => $records->map(function ($r) {
-    //                 if ($r->dutyRosterList) {
-    //                     return date('d/m/Y', strtotime($r->dutyRosterList->duty_roster_start_date)) . 
-    //                         ' - ' . 
-    //                         date('d/m/Y', strtotime($r->dutyRosterList->duty_roster_end_date));
-    //                 }
-    //                 return null;
-    //             })->filter()->unique()->implode(', ') ?: 'N/A',
-
-    //             'shift_time' => $records->map(function ($r) {
-    //                 if ($r->dutyRosterList && $r->dutyRosterList->dutyRosterShift) {
-    //                     return date('h:i A', strtotime($r->dutyRosterList->dutyRosterShift->shift_start_time)) . 
-    //                         ' - ' . 
-    //                         date('h:i A', strtotime($r->dutyRosterList->dutyRosterShift->shift_end_time));
-    //                 }
-    //                 return null;
-    //             })->filter()->unique()->implode(', ') ?: 'N/A',
-    //         ];
-    //     });
-       
-
-    //     return view('admin.duty-roster.staff_roster', compact('rosterSummary','shifts','dutyRosterLists','staffList','floors','departments'));
-    // }
+    
 
     public function staffRoster()
+    {
+        $assignments = DutyRosterAssign::with([
+            'staff',
+            'floor',
+            'department',
+            'dutyRosterList.dutyRosterShift'
+        ])->whereNotNull('staff_id')->whereNull('doctor_id')->get();
+
+        // Group by staff_id and roster period (start + end)
+        $grouped = $assignments->groupBy(function ($item) {
+            if ($item->dutyRosterList && $item->staff_id) {
+                return $item->staff_id . '|' . 
+                    $item->dutyRosterList->duty_roster_start_date . '|' . 
+                    $item->dutyRosterList->duty_roster_end_date;
+            }
+            return 'N/A';
+        });
+
+        $shifts = DutyRosterShift::all();
+        $dutyRosterLists = DutyRosterList::all();
+        $staffList = Staff::all();
+        $floors = Floor::all();
+        $departments = Department::all();
+
+        // Build one summary per staff per date range
+        $rosterSummary = $grouped->map(function ($records, $key) {
+            $first = $records->first();
+
+            // Split key to extract staff_id and date range
+            $parts = explode('|', $key);
+            $staff_id = $parts[0] ?? null;
+
+            $startDate = $parts[1] ?? null;
+            $endDate = $parts[2] ?? null;
+        
+
+            $staff = $first->staff;
+
+            return [
+                'id' => $first->id, // <-- Add this to get DutyRosterAssign ID
+                'staff_id' => $staff_id,
+                'code' => $first->code ?? ($first->dutyRosterList->code ?? 'N/A'),
+                'staff_name' => $staff->name ?? 'N/A',
+                'floor' => $records->map(function ($r) {
+                    return optional($r->floor)->name;
+                })->filter()->unique()->implode(', ') ?: 'N/A',
+                'floor_id' => $records->map(fn($r) => $r->floor_id)->filter()->unique()->implode(',') ?: '',
+        'department_id' => $records->map(fn($r) => $r->department_id)->filter()->unique()->implode(',') ?: '',
+
+                'department' => $records->map(function ($r) {
+                    return optional($r->department)->department_name;
+                })->filter()->unique()->implode(', ') ?: 'N/A',
+                'shift' => $records->map(function ($r) {
+                    return optional($r->dutyRosterList->dutyRosterShift)->shift_name;
+                })->filter()->unique()->implode(', ') ?: 'N/A',
+                'shift_time' => $records->map(function ($r) {
+                    if ($r->dutyRosterList && $r->dutyRosterList->dutyRosterShift) {
+                        return date('h:i A', strtotime($r->dutyRosterList->dutyRosterShift->shift_start)) .
+                            ' - ' .
+                            date('h:i A', strtotime($r->dutyRosterList->dutyRosterShift->shift_end));
+                    }
+                    return null;
+                })->filter()->unique()->implode(', ') ?: 'N/A',
+                'period' => $startDate && $endDate
+                    ? date('d/m/Y', strtotime($startDate)) . ' - ' . date('d/m/Y', strtotime($endDate))
+                    : 'N/A',
+            ];
+        });
+
+        return view('admin.duty-roster.staff_roster', compact(
+            'rosterSummary',
+            'shifts',
+            'dutyRosterLists',
+            'staffList',
+            'floors',
+            'departments'
+        ));
+    }
+public function getDatesByShift(Request $request)
 {
-    $assignments = DutyRosterAssign::with([
-        'staff',
-        'floor',
-        'department',
-        'dutyRosterList.dutyRosterShift'
-    ])->get();
+    $shiftId = $request->shift_id;
 
-    // Group by staff_id and roster period (start + end)
-    $grouped = $assignments->groupBy(function ($item) {
-        if ($item->dutyRosterList && $item->staff_id) {
-            return $item->staff_id . '|' . 
-                $item->dutyRosterList->duty_roster_start_date . '|' . 
-                $item->dutyRosterList->duty_roster_end_date;
-        }
-        return 'N/A';
-    });
+    $rosters = DutyRosterList::where('duty_roster_shift_id', $shiftId)
+        ->select('id', 'duty_roster_start_date', 'duty_roster_end_date')
+        ->orderBy('duty_roster_start_date', 'asc')
+        ->get()
+        ->map(function ($r) {
+            return [
+                'id' => $r->id,
+                'start_date' => date('d/m/Y', strtotime($r->duty_roster_start_date)),
+                'end_date' => date('d/m/Y', strtotime($r->duty_roster_end_date))
+            ];
+        });
 
-    $shifts = DutyRosterShift::all();
-    $dutyRosterLists = DutyRosterList::all();
-    $staffList = Staff::all();
-    $floors = Floor::all();
-    $departments = Department::all();
-
-    // Build one summary per staff per date range
-    $rosterSummary = $grouped->map(function ($records, $key) {
-        $first = $records->first();
-
-        // Split key to extract staff_id and date range
-        $parts = explode('|', $key);
-        $staff_id = $parts[0] ?? null;
-
-        $startDate = $parts[1] ?? null;
-        $endDate = $parts[2] ?? null;
-       
-
-        $staff = $first->staff;
-
-        return [
-            'id' => $first->id, // <-- Add this to get DutyRosterAssign ID
-            'staff_id' => $staff_id,
-            'code' => $first->code ?? ($first->dutyRosterList->code ?? 'N/A'),
-            'staff_name' => $staff->name ?? 'N/A',
-            'floor' => $records->map(function ($r) {
-                return optional($r->floor)->name;
-            })->filter()->unique()->implode(', ') ?: 'N/A',
-            'floor_id' => $records->map(fn($r) => $r->floor_id)->filter()->unique()->implode(',') ?: '',
-    'department_id' => $records->map(fn($r) => $r->department_id)->filter()->unique()->implode(',') ?: '',
-
-            'department' => $records->map(function ($r) {
-                return optional($r->department)->department_name;
-            })->filter()->unique()->implode(', ') ?: 'N/A',
-            'shift' => $records->map(function ($r) {
-                return optional($r->dutyRosterList->dutyRosterShift)->shift_name;
-            })->filter()->unique()->implode(', ') ?: 'N/A',
-            'shift_time' => $records->map(function ($r) {
-                if ($r->dutyRosterList && $r->dutyRosterList->dutyRosterShift) {
-                    return date('h:i A', strtotime($r->dutyRosterList->dutyRosterShift->shift_start_time)) .
-                        ' - ' .
-                        date('h:i A', strtotime($r->dutyRosterList->dutyRosterShift->shift_end_time));
-                }
-                return null;
-            })->filter()->unique()->implode(', ') ?: 'N/A',
-            'period' => $startDate && $endDate
-                ? date('d/m/Y', strtotime($startDate)) . ' - ' . date('d/m/Y', strtotime($endDate))
-                : 'N/A',
-        ];
-    });
-
-    return view('admin.duty-roster.staff_roster', compact(
-        'rosterSummary',
-        'shifts',
-        'dutyRosterLists',
-        'staffList',
-        'floors',
-        'departments'
-    ));
+    return response()->json($rosters);
 }
+
+    public function doctorRoster()
+    {
+        $assignments = DutyRosterAssign::with([
+            'doctor', // relation to Doctor model
+            'floor',
+            'department',
+            'dutyRosterList.dutyRosterShift'
+        ])->whereNotNull('doctor_id')->whereNull('staff_id')->get();
+
+        // Group by doctor_id and roster period (start + end)
+        $grouped = $assignments->groupBy(function ($item) {
+            if ($item->dutyRosterList && $item->doctor_id) {
+                return $item->doctor_id . '|' . 
+                    $item->dutyRosterList->duty_roster_start_date . '|' . 
+                    $item->dutyRosterList->duty_roster_end_date;
+            }
+            return 'N/A';
+        });
+
+        $shifts = DutyRosterShift::all();
+        $dutyRosterLists = DutyRosterList::all();
+        $doctorList = Doctor::all();
+        $floors = Floor::all();
+        $departments = Department::all();
+
+        // Build one summary per doctor per date range
+        $rosterSummary = $grouped->map(function ($records, $key) {
+            $first = $records->first();
+
+            // Split key to extract doctor_id and date range
+            $parts = explode('|', $key);
+            $doctor_id = $parts[0] ?? null;
+
+            $startDate = $parts[1] ?? null;
+            $endDate = $parts[2] ?? null;
+
+            $doctor = $first->doctor;
+
+            return [
+                'id' => $first->id, // DutyRosterAssign ID
+                'doctor_id' => $doctor_id,
+                'code' => $first->code ?? ($first->dutyRosterList->code ?? 'N/A'),
+                'doctor_name' => $doctor->name ?? 'N/A',
+                'floor' => $records->map(function ($r) {
+                    return optional($r->floor)->name;
+                })->filter()->unique()->implode(', ') ?: 'N/A',
+                'floor_id' => $records->map(fn($r) => $r->floor_id)->filter()->unique()->implode(',') ?: '',
+                'department_id' => $records->map(fn($r) => $r->department_id)->filter()->unique()->implode(',') ?: '',
+                'department' => $records->map(function ($r) {
+                    return optional($r->department)->department_name;
+                })->filter()->unique()->implode(', ') ?: 'N/A',
+                'shift' => $records->map(function ($r) {
+                    return optional($r->dutyRosterList->dutyRosterShift)->shift_name;
+                })->filter()->unique()->implode(', ') ?: 'N/A',
+                'shift_time' => $records->map(function ($r) {
+                    if ($r->dutyRosterList && $r->dutyRosterList->dutyRosterShift) {
+                        return date('h:i A', strtotime($r->dutyRosterList->dutyRosterShift->shift_start)) .
+                            ' - ' .
+                            date('h:i A', strtotime($r->dutyRosterList->dutyRosterShift->shift_end));
+                    }
+                    return null;
+                })->filter()->unique()->implode(', ') ?: 'N/A',
+                'period' => $startDate && $endDate
+                    ? date('d/m/Y', strtotime($startDate)) . ' - ' . date('d/m/Y', strtotime($endDate))
+                    : 'N/A',
+            ];
+        });
+
+        //dd($rosterSummary);
+
+        return view('admin.duty-roster.doctor_roster', compact(
+            'rosterSummary',
+            'shifts',
+            'dutyRosterLists',
+            'doctorList',
+            'floors',
+            'departments'
+        ));
+    }
+
 
     public function assignStaff(Request $request)
     {
@@ -335,8 +365,7 @@ class DutyRosterController extends Controller
             foreach ($rosterDates as $date) {
 
                 // 🔹 Step 3: Find last code for the same staff & date
-                $lastCode = DutyRosterAssign::where('staff_id', $request->staff_id)
-                    ->whereDate('roster_duty_date', $date)
+                $lastCode = DutyRosterAssign::whereDate('roster_duty_date', $date)
                     ->max('code');
 
                 $newCode = $lastCode ? $lastCode + 1 : 1;
@@ -364,6 +393,60 @@ class DutyRosterController extends Controller
 
         
     }
+    public function assignDoctor(Request $request)
+{
+    $request->validate([
+        'duty_roster_list_id' => 'required|integer',
+        'doctor_id' => 'required|integer',
+        'floor_id' => 'nullable|integer',
+        'department_id' => 'nullable|integer',
+        'shift_id' => 'required|integer',
+    ]);
+
+    try {
+        // 🔹 Step 1: Fetch roster period details
+        $rosterList = DutyRosterList::findOrFail($request->duty_roster_list_id);
+
+        // 🔹 Step 2: Determine the date range
+        $startDate = $rosterList->duty_roster_start_date;
+        $endDate = $rosterList->duty_roster_end_date;
+
+        $rosterDates = [];
+        $currentDate = Carbon::parse($startDate);
+
+        while ($currentDate->lte($endDate)) {
+            $rosterDates[] = $currentDate->format('Y-m-d');
+            $currentDate->addDay();
+        }
+
+        foreach ($rosterDates as $date) {
+    // 🔹 Step 1: Get global unique code
+    $lastCode = DutyRosterAssign::whereDate('roster_duty_date', $date)->max('code');
+    $newCode = $lastCode ? $lastCode + 1 : 1;
+
+    // 🔹 Step 2: Create new record
+    DutyRosterAssign::create([
+        'hospital_id' => auth()->user()->hospital_id ?? 1,
+        'branch_id' => auth()->user()->branch_id ?? 1,
+        'code' => $newCode,
+        'roster_duty_date' => $date,
+        'floor_id' => $request->floor_id,
+        'department_id' => $request->department_id,
+        'staff_id' => $request->staff_id ?? null,
+        'doctor_id' => $request->doctor_id ?? null,
+        'duty_roster_list_id' => $request->duty_roster_list_id,
+    ]);
+}
+
+        return redirect()->back()->with('success', 'Doctor roster assigned successfully.');
+
+    } catch (\Exception $e) {
+        dd($e->getMessage());
+        return redirect()->back()->with('error', 'Something went wrong: ' . $e->getMessage());
+    }
+}
+
+
     public function updateStaffRoster(Request $request)
     {
         // Validate input
@@ -391,15 +474,51 @@ class DutyRosterController extends Controller
 
         return redirect()->back()->with('success', 'Roster updated successfully for all matching records.');
     }
+    public function updateDoctorRoster(Request $request)
+{
+    // Validate input
+    $request->validate([
+        'code' => 'required|exists:duty_roster_assign,code',
+        'doctor_id' => 'required|exists:doctor,id',
+        'floor_id' => 'nullable|exists:floor,id',
+        'department_id' => 'nullable|exists:department,id',
+        'shift_id' => 'required|exists:duty_roster_shift,id',
+        'duty_roster_list_id' => 'required|exists:duty_roster_list,id',
+    ]);
+
+    // ✅ Update all duty roster assignments with same code
+    DutyRosterAssign::where('code', $request->code)->update([
+        'doctor_id' => $request->doctor_id,
+        'floor_id' => $request->floor_id,
+        'department_id' => $request->department_id,
+        'duty_roster_list_id' => $request->duty_roster_list_id,
+    ]);
+
+    // ✅ Update the related DutyRosterList shift
+    $dutyRosterList = DutyRosterList::findOrFail($request->duty_roster_list_id);
+    $dutyRosterList->duty_roster_shift_id = $request->shift_id;
+    $dutyRosterList->save();
+
+    return redirect()->back()->with('success', 'Doctor roster updated successfully for all matching records.');
+}
+
     public function destroyStaffRoster($code)
     {
         DutyRosterAssign::where('code', $code)->delete();
 
-return redirect()->back()->with('success', 'All roster records for this code deleted successfully.');
+    return redirect()->back()->with('success', 'All roster records for this code deleted successfully.');
 
 
         return redirect()->back()->with('success', 'Roster deleted successfully.');
     }
+
+    public function destroyDoctorRoster($code)
+{
+    DutyRosterAssign::where('code', $code)->delete();
+
+    return redirect()->back()->with('success', 'All doctor roster records for this code deleted successfully.');
+}
+
 
 
 

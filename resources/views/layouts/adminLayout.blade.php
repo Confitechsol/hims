@@ -29,7 +29,7 @@
     <link rel="stylesheet" href="assets/css/custom.css">
 
     <!-- Page Title -->
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'HIMS') }}</title>
 
     @include('layouts.admincdns')
     <style>

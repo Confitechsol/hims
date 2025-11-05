@@ -44,10 +44,11 @@
                                                             @foreach($shifts as $shift)
                                                                 <li class="col-sm-4">
                                                                     <label>
-                                                                        <input type="radio" name="shift_id" value="{{ $shift->id }}" {{ $loop->first ? 'checked' : '' }}>
+                                                                        <input type="radio" name="shift_id" value="{{ $shift->id }}" class="shift-radio" {{ $loop->first ? 'checked' : '' }} >
                                                                         <div class="stepimage">
                                                                             {{ $shift->shift_name }}<br>
-                                                                            {{ date('h:i A', strtotime($shift->shift_start_time)) }} - {{ date('h:i A', strtotime($shift->shift_end_time)) }}
+                                                                            {{ \Carbon\Carbon::parse($shift->shift_start)->format('h:i A') }} -
+                                                                            {{ \Carbon\Carbon::parse($shift->shift_end)->format('h:i A') }}
                                                                         </div>
                                                                     </label>
                                                                 </li>
@@ -59,12 +60,7 @@
                                                     <div class="col-sm-12">
                                                         <label>Shift Date <small class="req">*</small></label>
                                                         <select class="form-control" id="duty_roster_list_id" name="duty_roster_list_id" required>
-                                                            <option value="">Select</option>
-                                                            @foreach($dutyRosterLists as $roster)
-                                                                <option value="{{ $roster->id }}">
-                                                                    {{ date('d/m/Y', strtotime($roster->duty_roster_start_date)) }} - {{ date('d/m/Y', strtotime($roster->duty_roster_end_date)) }}
-                                                                </option>
-                                                            @endforeach
+                                                            <option value="">Select Shift First</option>
                                                         </select>
                                                     </div>
 
@@ -217,7 +213,7 @@
                                         @foreach($shifts as $shift)
                                             <li class="col-sm-4">
                                                 <label>
-                                                    <input type="radio" class="edit_shift" name="shift_id" value="{{ $shift->id }}">
+                                                    <input type="radio" class="edit_shift" name="shift_id" value="{{ $shift->id }}" >
                                                     <div class="stepimage">
                                                         {{ $shift->shift_name }}<br>
                                                         {{ date('h:i A', strtotime($shift->shift_start_time)) }} - {{ date('h:i A', strtotime($shift->shift_end_time)) }}
@@ -397,6 +393,43 @@
 }
 </script>
 
+{{-- 🔹 AJAX Script --}}
+<script>
+$(document).ready(function() {
+    $('.shift-radio').on('change', function() {
+        let shiftId = $(this).val();
+        let $select = $('#duty_roster_list_id');
 
+        $select.html('<option>Loading...</option>');
+
+        $.ajax({
+            url: "{{ route('dutyroster.getDatesByShift') }}",
+            type: "GET",
+            data: { shift_id: shiftId },
+            success: function(response) {
+                $select.empty();
+                if (response.length > 0) {
+                    $select.append('<option value="">Select</option>');
+                    $.each(response, function(index, roster) {
+                        $select.append(
+                            `<option value="${roster.id}">
+                                ${roster.start_date} - ${roster.end_date}
+                             </option>`
+                        );
+                    });
+                } else {
+                    $select.append('<option value="">No dates available</option>');
+                }
+            },
+            error: function() {
+                $select.html('<option>Error fetching data</option>');
+            }
+        });
+    });
+
+    // Trigger change for the first checked shift on load
+    $('.shift-radio:checked').trigger('change');
+});
+</script>
 
 @endsection
