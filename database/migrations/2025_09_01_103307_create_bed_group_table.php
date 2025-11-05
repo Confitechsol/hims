@@ -22,6 +22,10 @@ return new class extends Migration
             $table->decimal('bed_cost', 10, 2)->default(0.00);
             $table->boolean('is_active')->default(1); // active/inactive
             $table->timestamps();
+
+            $table->foreign('floor')
+                ->references('id')->on('floor')
+                ->onDelete('cascade')->onUpdate('cascade');
         });
     }
 

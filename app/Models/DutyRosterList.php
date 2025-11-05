@@ -4,10 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 
 class DutyRosterList extends Model
 {
     use HasFactory;
+
+    use SoftDeletes;
+
+    protected $dates = ['deleted_at'];
 
     /**
      * The table associated with the model.
@@ -33,7 +39,7 @@ class DutyRosterList extends Model
     // Each duty roster list belongs to a shift
     public function dutyRosterShift()
     {
-        return $this->belongsTo(DutyRosterShift::class, 'duty_roster_shift_id');
+        return $this->belongsTo(DutyRosterShift::class, 'duty_roster_shift_id', 'id');
     }
 
     // A duty roster list can have many assignments

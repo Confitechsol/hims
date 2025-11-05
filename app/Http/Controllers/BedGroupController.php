@@ -3,26 +3,26 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\BedGroup;
-use Illuminate\Http\Request;
 use App\Models\Floor;
+use Illuminate\Http\Request;
 
 class BedGroupController extends Controller
 {
     public function index(Request $request)
     {
         $bedGroups = BedGroup::query();
-        $floors = Floor::all();
-        $perPage = intval($request->input('perPage', 5));
+        $floors    = Floor::all();
+        $perPage   = intval($request->input('perPage', 5));
         if ($perPage <= 0) {
-           $perPage = 5;
+            $perPage = 5;
         }
-        if($request->has('search')){
+        if ($request->has('search')) {
             $search_term = $request->search;
             $bedGroups->where(function ($query) use ($search_term) {
                 $query->where('name', 'like', "%{$search_term}%");
             });
             $bedGroups = $bedGroups->paginate($perPage);
-            return array("result"=>$bedGroups);
+            return ["result" => $bedGroups];
         }
         $bedGroups = $bedGroups->paginate($perPage);
         return view('admin.bed-group.index', compact('bedGroups', 'floors'));
@@ -31,18 +31,18 @@ class BedGroupController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:bed_group,name',
-            'floor' => 'required',
-            'bed_cost' => 'required'
+            'name'     => 'required|string|max:255|unique:bed_group,name',
+            'floor'    => 'required',
+            'bed_cost' => 'required',
         ]);
 
         BedGroup::create([
-            'name' => $request->name, 
-            'floor' => $request->floor,
-            'color' => $request->color,
-            'bed_cost'=>$request->bed_cost,
-            'description'=>$request->description ?? "",
-            'is_active'=>0
+            'name'        => $request->name,
+            'floor'       => $request->floor,
+            'color'       => $request->color,
+            'bed_cost'    => $request->bed_cost,
+            'description' => $request->description ?? "",
+            'is_active'   => 0,
         ]);
 
         return redirect()->back()->with('success', 'Bed group created successfully.');
@@ -50,14 +50,16 @@ class BedGroupController extends Controller
 
     public function update(Request $request)
     {
+        // dd($request->all());
         $request->validate([
-            'id' => 'required|exists:bed_group,id',
-            'name' => 'required|string|max:255|unique:bed_group,name,' . $request->id,
-            'floor' => 'required'
+            'id'    => 'required|exists:bed_group,id',
+            'name'  => 'required|string|max:255|unique:bed_group,name,' . $request->id,
+            'floor' => 'required',
         ]);
 
-        $group = BedGroup::findOrFail($request->id);
-        $group->name = $request->name;
+        $group        = BedGroup::findOrFail($request->id);
+        $group->name  = $request->name;
+        $group->color = $request->color;
         $group->save();
 
         return redirect()->back()->with('success', 'Bed group updated successfully.');

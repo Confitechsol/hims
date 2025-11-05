@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('ipd_details', function (Blueprint $table) {
             $table->id();
             $table->string('hospital_id', 8);
-            $table->string('branch_id', 8);
+            $table->string('branch_id', 8)->nullable();
+            $table->string('ipd_no', 255);
             $table->unsignedBigInteger('patient_id')->nullable()->index();
             $table->unsignedBigInteger('case_reference_id')->nullable()->index();
             $table->string('height', 5)->nullable();
@@ -27,7 +28,9 @@ return new class extends Migration
             $table->unsignedBigInteger('bed_group_id')->nullable()->index();
             $table->string('case_type', 100);
             $table->string('casualty', 100);
-            $table->longText('symptoms');
+            $table->text('symptoms');
+            $table->text('symptoms_type');
+            $table->text('symptoms_title');
             $table->string('known_allergies', 200)->nullable();
             $table->string('patient_old', 50);
             $table->text('note')->nullable();
@@ -38,6 +41,10 @@ return new class extends Migration
             $table->string('payment_mode', 100);
             $table->dateTime('date')->nullable();
             $table->string('discharged', 200);
+            $table->date('discharged_date')->nullable();
+            $table->decimal('net_amount', 10, 2);
+            $table->decimal('tax', 10, 2);
+            $table->decimal('amount', 10, 2);
             $table->string('live_consult', 50)->nullable();
             $table->unsignedBigInteger('generated_by')->nullable();
             $table->integer('is_antenatal')->nullable();

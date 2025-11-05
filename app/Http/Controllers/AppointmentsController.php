@@ -55,11 +55,7 @@ class AppointmentsController extends Controller
         ]);
 
         $latestAppointment = Appointment::orderBy('id', 'desc')->first();
-        if ($latestAppointment && preg_match('/APPID(\d+)/', $latestAppointment->appointment_id, $matches)) {
-            $number = (int)$matches[1] + 1;
-        } else {
-            $number = 1;
-        }
+
             // ✅ Fetch dynamic prefix
         $prefix = Prefix::where('type', 'appointment')->value('prefix') ?? 'APPID';
 
@@ -96,6 +92,8 @@ class AppointmentsController extends Controller
         $appointment->is_opd = 'Yes';
         $appointment->is_ipd = 'No'; 
         $appointment->save();
+
+        
 
         return redirect()->back()->with('success', 'Appointment created successfully!');
     }
