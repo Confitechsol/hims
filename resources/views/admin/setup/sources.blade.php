@@ -101,7 +101,7 @@
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
                                                             data-bs-toggle="tooltip" 
                                                             title="Delete"
-                                                            onclick="if(confirm('Are you sure you want to delete this source ?')) { document.getElementById('delete-source-{{ $source->id }}').submit(); }">
+                                                            onclick="confirmDelete('delete-source-{{ $source->id }}', 'Delete Source?', 'Are you sure you want to delete this source?')">
                                                             <i class="ti ti-trash"></i>
                                                         </a>
 

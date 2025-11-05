@@ -132,7 +132,7 @@
                                                                     class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
                                                                     data-bs-toggle="tooltip" 
                                                                     title="Delete"
-                                                                    onclick="if(confirm('Are you sure you want to delete this role?')) { document.getElementById('delete-role-{{ $role->id }}').submit(); }">
+                                                                    onclick="confirmDelete('delete-role-{{ $role->id }}', 'Delete Role?', 'Are you sure you want to delete this role?')">
                                                                         <i class="ti ti-trash"></i>
                                                                     </a>
 

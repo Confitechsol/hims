@@ -9,19 +9,9 @@ class SupplierBillBasic extends Model
 {
     use HasFactory;
 
-    // Explicit table name
     protected $table = 'supplier_bill_basic';
 
-    // Primary key
-    protected $primaryKey = 'id';
-
-    // No updated_at column, only created_at
-    public $timestamps = false;
-
-    // Fillable columns
     protected $fillable = [
-        'hospital_id',
-         'branch_id',
         'invoice_no',
         'date',
         'supplier_id',
@@ -39,10 +29,8 @@ class SupplierBillBasic extends Model
         'attachment',
         'attachment_name',
         'payment_note',
-        'created_at',
     ];
 
-    // Casts
     protected $casts = [
         'date' => 'datetime',
         'cheque_date' => 'date',
@@ -51,20 +39,65 @@ class SupplierBillBasic extends Model
         'tax' => 'float',
         'discount' => 'float',
         'net_amount' => 'float',
-        'created_at' => 'datetime',
     ];
 
     /**
-     * Relationships
+     * Relationship: A bill belongs to a supplier
      */
     public function supplier()
     {
-        return $this->belongsTo(Supplier::class, 'supplier_id');
+        return $this->belongsTo(MedicineSupplier::class, 'supplier_id');
     }
 
+    /**
+     * Relationship: A bill received by a user
+     */
     public function receivedBy()
     {
-        // Assuming "received_by" refers to a Staff/User table
-        return $this->belongsTo(Staff::class, 'received_by');
+        return $this->belongsTo(User::class, 'received_by');
+    }
+
+    /**
+     * Relationship: A bill has many medicine batches
+     */
+    public function batches()
+    {
+        return $this->hasMany(MedicineBatchDetail::class, 'supplier_bill_basic_id');
+    }
+
+    /**
+     * Check if bill is paid
+     */
+    public function isPaid()
+    {
+        return !empty($this->payment_mode) && !empty($this->payment_date);
+    }
+
+    /**
+     * Scope: Get paid bills
+     */
+    public function scopePaid($query)
+    {
+        return $query->whereNotNull('payment_mode')
+                     ->whereNotNull('payment_date');
+    }
+
+    /**
+     * Scope: Get unpaid bills
+     */
+    public function scopeUnpaid($query)
+    {
+        return $query->where(function ($q) {
+            $q->whereNull('payment_mode')
+              ->orWhereNull('payment_date');
+        });
+    }
+
+    /**
+     * Scope: Filter by date range
+     */
+    public function scopeDateRange($query, $startDate, $endDate)
+    {
+        return $query->whereBetween('date', [$startDate, $endDate]);
     }
 }

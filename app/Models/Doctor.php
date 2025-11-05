@@ -30,6 +30,11 @@ class Doctor extends Model
         'is_active',
     ];
 
+    protected $casts = [
+        'is_active' => 'boolean',
+        'dob' => 'date',
+    ];
+
     /**
      * Relationships
      */

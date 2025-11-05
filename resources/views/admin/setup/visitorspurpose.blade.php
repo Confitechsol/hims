@@ -113,12 +113,12 @@
                                                                     class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
                                                                     data-bs-toggle="tooltip" 
                                                                     title="Delete"
-                                                                    onclick="if(confirm('Are you sure you want to delete this purpose ?')) { document.getElementById('delete-purpose -{{ $purpose ->id }}').submit(); }">
+                                                                    onclick="confirmDelete('delete-purpose-{{ $purpose->id }}', 'Delete Purpose?', 'Are you sure you want to delete this purpose?')">
                                                                         <i class="ti ti-trash"></i>
                                                                     </a>
 
-                                                                    <form id="delete-purpose -{{ $purpose ->id }}" 
-                                                                        action="{{ route('purposes.destroy', $purpose ->id) }}" 
+                                                                    <form id="delete-purpose-{{ $purpose->id }}" 
+                                                                        action="{{ route('purposes.destroy', $purpose->id) }}" 
                                                                         method="POST" style="display: none;">
                                                                         @csrf
                                                                         @method('DELETE')
