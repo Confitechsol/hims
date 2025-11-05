@@ -10,6 +10,9 @@ use App\Models\Prefix;
 use App\Models\GlobalShift;
 use App\Models\DoctorShiftTime;
 use App\Models\DoctorGlobalShift;
+use App\Models\OpdDetail;
+use App\Models\OpdPatient;
+use App\Models\AppointPriority;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Auth;
 
@@ -35,11 +38,13 @@ class AppointmentsController extends Controller
         //dd($appointments->first()->doctorUser);
         $doctors  = Doctor::all();
         $patients = Patient::all();
-        return view('admin.appointments.appointment_details', compact('appointments','doctors', 'patients'));
+        $priorities = AppointPriority::select('id', 'appoint_priority')->get();
+        return view('admin.appointments.appointment_details', compact('appointments','doctors', 'patients','priorities'));
     }
     
     public function store(Request $request)
     {
+        
         $request->validate([
             'patient_id' => 'required',
             'doctor' => 'required',
@@ -78,7 +83,7 @@ class AppointmentsController extends Controller
         $appointment->appointment_id = $appointmentId;
         $appointment->patient_id = $request->patient_id;
         $appointment->doctor = $request->doctor;
-        $appointment->amount = $request->doctor_fees;
+        // $appointment->amount = $request->doctor_fees;
         $appointment->doctor_global_shift_id = $request->shift;
         $appointment->date = $request->appointment_date;
         $appointment->doctor_shift_time_id = $request->slot;
@@ -92,6 +97,61 @@ class AppointmentsController extends Controller
         $appointment->is_opd = 'Yes';
         $appointment->is_ipd = 'No'; 
         $appointment->save();
+
+         $opdPrefix = Prefix::where('type', 'opd_no')->value('prefix') ?? 'OPD';
+
+        $lastOpd = OpdDetail::where('opd_no', 'like', $opdPrefix . '%')
+        ->orderBy('id', 'desc')
+        ->first();
+
+        $nextOpdNumber = $lastOpd
+        ? ((int) str_replace($opdPrefix, '', $lastOpd->opd_no) + 1)
+        : 1;
+
+    $opdNo = $opdPrefix . str_pad($nextOpdNumber, 3, '0', STR_PAD_LEFT);
+
+    /**
+     * ======================
+     * ✅ Store OPD Details
+     * ======================
+     */
+    $opd = new OpdDetail();
+    $opdPatient = new OpdPatient();
+    $opd->hospital_id = auth()->user()->hospital_id ?? null;
+    $opd->branch_id = auth()->user()->branch_id ?? null;
+    $opd->opd_no = $opdNo;
+    $opd->patient_id = $request->patient_id;
+    $opd->appointment_date = $request->appointment_date;
+    $opd->case_type = $request->case_type;
+    $opd->apply_tpa = 'No';
+    $opd->casualty = 'No';
+    $opd->reference = null;
+    $opd->doctor_id = $request->doctor;
+    $opd->charge_category_id = '1';
+    $opd->charge_id = '1';
+    $opd->standard_charge = $request->doctor_fees;
+    $opd->applied_charge = $request->doctor_fees;
+    $opd->discount = $request->discount_percentage ?? 0;
+    $opd->tax = 0;
+    $opd->amount = $request->doctor_fees;
+    $opd->payment_mode = $request->payment_method ?? 'Cash';
+    $opd->paid_amount = $request->doctor_fees;
+    $opd->payment_date = now();
+    $opd->live_consultation = $request->live_con ?? 'No';
+    $opd->symptoms_type = '';
+    $opd->symptoms_title = '';
+    $opd->allergies = '';
+    $opd->symptoms_description = '';
+    $opd->note = $request->message ?? null;
+    $opd->status = $request->status;
+    $opd->created_by = auth()->id();
+    $opd->save();
+
+    // dd($opd->id);
+    $opdPatient->patient_id = $request->patient_id ?? null;
+    $opdPatient->opd_id     = $opd->id ?? null;
+    $opdPatient->doctor_id  = $request->doctor ?? null;
+    $opdPatient->save();
 
         
 
@@ -179,8 +239,12 @@ class AppointmentsController extends Controller
         // Fetch the patient details
         $appointment = Appointment::with(['patient'])->where('patient_id', $patient_id)->firstOrFail();
 
+        $visitDetails = OpdDetail::where('patient_id', $patient_id)->get();
+
+        //dd($visitDetails);
+
         // Return to patient details view
-        return view('admin.appointments.patient_view', compact('appointment'));
+        return view('admin.appointments.patient_view', compact('appointment','visitDetails'));
     }
 
 

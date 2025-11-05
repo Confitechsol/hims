@@ -473,6 +473,7 @@ Route::prefix('/appointment-details')->group(function () {
     Route::get('/get-doctor-shifts/{id}', [AppointmentController::class, 'getDoctorShifts'])->name('doctor.shifts');
     Route::get('/get-doctor-slots/{doctorId}/{shiftId}', [AppointmentController::class, 'getDoctorSlots'])->name('doctor.slots');
     Route::get('/get-appointment-priorities', [AppointmentController::class, 'getAppointmentPriorities'])->name('appointment.priorities');
+   Route::get('/get-doctor-fees', [AppointmentController::class, 'getDoctorFees'])->name('appointments.getDoctorFees');
 
     Route::get('/appointments/{id}/edit', [AppointmentsController::class, 'edit'])->name('appointments.edit');
     Route::put('/appointments/{id}', [AppointmentsController::class, 'update'])->name('appointments.update');

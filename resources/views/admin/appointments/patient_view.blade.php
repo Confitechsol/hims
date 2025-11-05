@@ -176,20 +176,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- <div class="row">
-                                                                                                                                                                                                    <div class="col-sm-5">
-
-                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                    <div class="col-sm-7">
-
-                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                    <div class="col-sm-5">
-
-                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                    <div class="col-sm-7">
-
-                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                </div> -->
+                                                                                                                                                                                                                                       
                                 </div>
                                 <hr>
                                 <div class="d-flex align-items-center mb-3">
