@@ -226,10 +226,18 @@
                                     <li><a href="{{ route('pharmacy.billing.index') }}">Pharmacy Billing</a></li>                                    
                                 </ul>
                             </li>
-                            <li>
-                                <a href="#">
+                            <li class="submenu">
+                                <a href="javascript:void(0);">
                                     <i class="ti ti-map-pin"></i><span>Pathology</span>
+                                    <span class="menu-arrow"></span>
                                 </a>
+                                <ul>
+                                    <li><a href="{{ route('pathology-category') }}">Pathology Category</a></li>
+                                    <li><a href="{{ route('pathology-unit') }}">Pathology Unit</a></li>
+                                    <li><a href="{{ route('pathology-parameter') }}">Pathology Parameter</a></li>
+                                    <li><a href="{{ route('pathology.test.index') }}">Pathology Test</a></li>
+                                    <li><a href="{{ route('pathology.billing.index') }}">Pathology Billing</a></li>
+                                </ul>
                             </li>
                             <li>
                                 <a href="#">

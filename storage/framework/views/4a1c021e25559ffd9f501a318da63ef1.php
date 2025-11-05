@@ -29,7 +29,7 @@
     <link rel="stylesheet" href="assets/css/custom.css">
 
     <!-- Page Title -->
-    <title><?php echo e(config('app.name', 'Laravel')); ?></title>
+    <title><?php echo e(config('app.name', 'HIMS')); ?></title>
 
     <?php echo $__env->make('layouts.admincdns', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <style>
