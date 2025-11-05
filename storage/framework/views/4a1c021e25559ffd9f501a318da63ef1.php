@@ -31,7 +31,7 @@
     <!-- Page Title -->
     <title><?php echo e(config('app.name', 'Laravel')); ?></title>
 
-    
+    <?php echo $__env->make('layouts.admincdns', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <style>
         .settings-wrapper .card .card-body label:has(input:checked) .card {
             border: 2px solid #CB6CE6;
@@ -674,6 +674,9 @@
                 function initSelect($el) {
                     if ($el.data('select2-inited')) return;
 
+                    // skip selects that are hidden (like inside a hidden modal)
+                    if (!$el.is(':visible')) return;
+
                     //skip which are inside edit modal
                     if ($el.closest('#edit_modal').length > 0) return;
                 
@@ -716,5 +719,4 @@
         })();
     </script>
 </body>
-</html>
-<?php echo $__env->make('layouts.admincdns', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\xampp-8.2\htdocs\hims\resources\views/layouts/adminLayout.blade.php ENDPATH**/ ?>
+</html><?php /**PATH D:\xampp-8.2\htdocs\hims\resources\views/layouts/adminLayout.blade.php ENDPATH**/ ?>

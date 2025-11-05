@@ -9,6 +9,8 @@ class MedicineUnit extends Model
 {
     use HasFactory;
 
+    protected $table = 'unit';
+
     protected $fillable = [
         'hospital_id',
         'branch_id',
@@ -17,6 +19,6 @@ class MedicineUnit extends Model
 
     public function dosages()
     {
-        return $this->hasMany(MedicineDosage::class, 'unit_id');
+        return $this->hasMany(MedicineDosage::class, 'units_id');
     }
 }

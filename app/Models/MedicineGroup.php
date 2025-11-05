@@ -9,6 +9,8 @@ class MedicineGroup extends Model
 {
     use HasFactory;
 
+    protected $table = 'medicine_group';
+
     protected $fillable = [
         'hospital_id',
         'branch_id',

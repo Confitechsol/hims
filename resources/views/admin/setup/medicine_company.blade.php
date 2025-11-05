@@ -37,7 +37,7 @@
                                 <button class="btn btn-sm btn-info" onclick="editCompany({{ $company->id }}, '{{ $company->company_name }}')">
                                     <i class="ti ti-pencil"></i>
                                 </button>
-                                <form action="{{ route('medicine-company.destroy', $company->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Are you sure?')">
+                                <form action="{{ route('setup.medicine-company.destroy', $company->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Are you sure?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger">
@@ -66,7 +66,7 @@
                 <h5 class="modal-title">Add Company</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ route('medicine-company.store') }}" method="POST">
+            <form action="{{ route('setup.medicine-company.store') }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">

@@ -8,9 +8,9 @@ use App\Models\PharmacyBillDetail;
 use App\Models\Pharmacy;
 use App\Models\MedicineBatchDetail;
 use App\Models\MedicineCategory;
-use App\Models\PharmacyCompany;
+use App\Models\MedicineCompany;
 use App\Models\MedicineGroup;
-use App\Models\Unit;
+use App\Models\MedicineUnit;
 use App\Models\Patient;
 use App\Models\Doctor;
 use App\Models\CaseReference;
@@ -57,9 +57,9 @@ class PharmacyBillingController extends Controller
     public function create()
     {
         $categories = MedicineCategory::all();
-        $companies = PharmacyCompany::all();
+        $companies = MedicineCompany::all();
         $groups = MedicineGroup::all();
-        $units = Unit::all();
+        $units = MedicineUnit::all();
         $patients = Patient::select('id', 'patient_name', 'mobileno')->get();
         $doctors = Doctor::select('id', 'name', 'surname', 'doctor_id')
             ->where(function($query) {
@@ -166,9 +166,9 @@ class PharmacyBillingController extends Controller
     {
         $bill = PharmacyBillBasic::with(['billDetails.medicineBatch.pharmacy'])->findOrFail($id);
         $categories = MedicineCategory::all();
-        $companies = PharmacyCompany::all();
+        $companies = MedicineCompany::all();
         $groups = MedicineGroup::all();
-        $units = Unit::all();
+        $units = MedicineUnit::all();
         $patients = Patient::select('id', 'patient_name', 'mobileno')->get();
         $doctors = Doctor::select('id', 'name', 'surname', 'doctor_id')
             ->where(function($query) {

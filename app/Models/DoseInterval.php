@@ -9,6 +9,8 @@ class DoseInterval extends Model
 {
     use HasFactory;
 
+    protected $table = 'dose_interval';
+
     protected $fillable = [
         'hospital_id',
         'branch_id',

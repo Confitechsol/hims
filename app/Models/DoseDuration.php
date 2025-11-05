@@ -9,9 +9,11 @@ class DoseDuration extends Model
 {
     use HasFactory;
 
+    protected $table = 'dose_duration';
+
     protected $fillable = [
         'hospital_id',
         'branch_id',
-        'duration',
+        'name',
     ];
 }

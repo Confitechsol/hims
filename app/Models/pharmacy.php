@@ -45,7 +45,7 @@ class Pharmacy extends Model
      */
     public function company()
     {
-        return $this->belongsTo(PharmacyCompany::class, 'medicine_company');
+        return $this->belongsTo(MedicineCompany::class, 'medicine_company');
     }
 
     /**
@@ -61,7 +61,7 @@ class Pharmacy extends Model
      */
     public function unitRelation()
     {
-        return $this->belongsTo(Unit::class, 'unit');
+        return $this->belongsTo(MedicineUnit::class, 'unit');
     }
 
     /**

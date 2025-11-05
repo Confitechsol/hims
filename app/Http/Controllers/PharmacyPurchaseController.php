@@ -9,6 +9,7 @@ use App\Models\SupplierBillBasic;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class PharmacyPurchaseController extends Controller
 {
@@ -17,11 +18,19 @@ class PharmacyPurchaseController extends Controller
      */
     public function index()
     {
-        $purchases = SupplierBillBasic::with(['supplier', 'receivedBy'])
-            ->orderBy('date', 'desc')
-            ->paginate(20);
+        try {
+            // Test if we can reach this controller
+            \Log::info('PharmacyPurchaseController@index called');
+            
+            $purchases = SupplierBillBasic::with(['supplier', 'receivedBy'])
+                ->orderBy('date', 'desc')
+                ->paginate(20);
 
-        return view('admin.pharmacy.purchase.index', compact('purchases'));
+            return view('admin.pharmacy.purchase.index', compact('purchases'));
+        } catch (\Exception $e) {
+            \Log::error('Purchase index error: ' . $e->getMessage());
+            return response('Error: ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine(), 500);
+        }
     }
 
     /**
@@ -31,8 +40,14 @@ class PharmacyPurchaseController extends Controller
     {
         $suppliers = MedicineSupplier::all();
         $medicines = Pharmacy::active()->get();
+        $categories = \App\Models\MedicineCategory::all();
 
-        return view('admin.pharmacy.purchase.create', compact('suppliers', 'medicines'));
+        // Debug logging
+        \Log::info('Purchase Create - Suppliers: ' . $suppliers->count());
+        \Log::info('Purchase Create - Medicines: ' . $medicines->count());
+        \Log::info('Purchase Create - Categories: ' . $categories->count());
+
+        return view('admin.pharmacy.purchase.create', compact('suppliers', 'medicines', 'categories'));
     }
 
     /**
@@ -47,11 +62,12 @@ class PharmacyPurchaseController extends Controller
             'medicines' => 'required|array|min:1',
             'medicines.*.pharmacy_id' => 'required|exists:pharmacy,id',
             'medicines.*.batch_no' => 'required|string|max:100',
-            'medicines.*.expiry' => 'required|date',
+            'medicines.*.expiry' => 'required|string', // Month format: YYYY-MM
             'medicines.*.quantity' => 'required|numeric|min:1',
             'medicines.*.purchase_price' => 'required|numeric|min:0',
             'medicines.*.mrp' => 'required|numeric|min:0',
             'medicines.*.sale_rate' => 'required|numeric|min:0',
+            'medicines.*.batch_amount' => 'nullable|numeric|min:0',
             'medicines.*.tax' => 'nullable|numeric|min:0',
             'discount' => 'nullable|numeric|min:0',
             'payment_mode' => 'nullable|string|max:30',
@@ -110,13 +126,17 @@ class PharmacyPurchaseController extends Controller
 
             // Create medicine batches
             foreach ($validated['medicines'] as $medicine) {
-                $batchAmount = $medicine['quantity'] * $medicine['purchase_price'];
+                $batchAmount = $medicine['batch_amount'] ?? ($medicine['quantity'] * $medicine['purchase_price']);
+                
+                // Convert month format (YYYY-MM) to last day of month
+                $expiryDate = $medicine['expiry'] . '-01'; // First convert to YYYY-MM-01
+                $expiryDate = date('Y-m-t', strtotime($expiryDate)); // Then get last day of month
 
                 MedicineBatchDetail::create([
                     'supplier_bill_basic_id' => $supplierBill->id,
                     'pharmacy_id' => $medicine['pharmacy_id'],
                     'inward_date' => $validated['date'],
-                    'expiry' => $medicine['expiry'],
+                    'expiry' => $expiryDate,
                     'batch_no' => $medicine['batch_no'],
                     'packing_qty' => '1', // Default
                     'purchase_rate_packing' => $medicine['purchase_price'],
@@ -162,8 +182,9 @@ class PharmacyPurchaseController extends Controller
         $purchase = SupplierBillBasic::with(['batches'])->findOrFail($id);
         $suppliers = MedicineSupplier::all();
         $medicines = Pharmacy::active()->get();
+        $categories = \App\Models\MedicineCategory::all();
 
-        return view('admin.pharmacy.purchase.edit', compact('purchase', 'suppliers', 'medicines'));
+        return view('admin.pharmacy.purchase.edit', compact('purchase', 'suppliers', 'medicines', 'categories'));
     }
 
     /**
@@ -177,27 +198,105 @@ class PharmacyPurchaseController extends Controller
             'invoice_no' => 'nullable|string|max:100',
             'date' => 'required|date',
             'supplier_id' => 'required|exists:medicine_supplier,id',
-            'payment_mode' => 'nullable|string|max:30',
-            'payment_date' => 'nullable|date',
-            'cheque_no' => 'nullable|string|max:255',
-            'cheque_date' => 'nullable|date',
+            'medicines' => 'required|array|min:1',
+            'medicines.*.pharmacy_id' => 'required|exists:pharmacy,id',
+            'medicines.*.batch_no' => 'required|string|max:100',
+            'medicines.*.expiry' => 'required|string',
+            'medicines.*.quantity' => 'required|numeric|min:1',
+            'medicines.*.purchase_price' => 'required|numeric|min:0',
+            'medicines.*.mrp' => 'required|numeric|min:0',
+            'medicines.*.sale_rate' => 'required|numeric|min:0',
+            'medicines.*.batch_amount' => 'nullable|numeric|min:0',
+            'medicines.*.tax' => 'nullable|numeric|min:0',
+            'discount' => 'nullable|numeric|min:0',
+            'total' => 'required|numeric|min:0',
+            'tax' => 'nullable|numeric|min:0',
+            'net_amount' => 'required|numeric|min:0',
             'note' => 'nullable|string',
-            'payment_note' => 'nullable|string',
         ]);
 
         try {
+            DB::beginTransaction();
+
             // Handle file upload
             if ($request->hasFile('attachment')) {
+                // Delete old file
+                if ($purchase->attachment) {
+                    Storage::disk('public')->delete($purchase->attachment);
+                }
+                
                 $file = $request->file('attachment');
                 $validated['attachment'] = $file->store('purchase_attachments', 'public');
                 $validated['attachment_name'] = $file->getClientOriginalName();
             }
 
-            $purchase->update($validated);
+            // Update purchase basic info
+            $purchase->update([
+                'invoice_no' => $validated['invoice_no'],
+                'supplier_id' => $validated['supplier_id'],
+                'total' => $validated['total'],
+                'discount' => $validated['discount'] ?? 0,
+                'tax' => $validated['tax'] ?? 0,
+                'net_amount' => $validated['net_amount'],
+                'note' => $validated['note'],
+                'attachment' => $validated['attachment'] ?? $purchase->attachment,
+                'attachment_name' => $validated['attachment_name'] ?? $purchase->attachment_name,
+            ]);
+
+            // Get existing batch IDs from request
+            $existingBatchIds = [];
+            foreach ($validated['medicines'] as $medicine) {
+                if (isset($medicine['batch_id']) && $medicine['batch_id']) {
+                    $existingBatchIds[] = $medicine['batch_id'];
+                }
+            }
+
+            // Delete batches that were removed
+            MedicineBatchDetail::where('supplier_bill_basic_id', $purchase->id)
+                ->whereNotIn('id', $existingBatchIds)
+                ->delete();
+
+            // Update or create medicine batches
+            foreach ($validated['medicines'] as $medicine) {
+                $batchAmount = $medicine['batch_amount'] ?? ($medicine['quantity'] * $medicine['purchase_price']);
+                
+                // Convert month format to date
+                $expiryDate = $medicine['expiry'] . '-01';
+                $expiryDate = date('Y-m-t', strtotime($expiryDate));
+
+                $batchData = [
+                    'pharmacy_id' => $medicine['pharmacy_id'],
+                    'batch_no' => $medicine['batch_no'],
+                    'expiry' => $expiryDate,
+                    'mrp' => $medicine['mrp'],
+                    'sale_rate' => $medicine['sale_rate'],
+                    'purchase_price' => $medicine['purchase_price'],
+                    'quantity' => $medicine['quantity'],
+                    'available_quantity' => $medicine['quantity'],
+                    'tax' => $medicine['tax'] ?? 0,
+                    'batch_amount' => $batchAmount,
+                    'amount' => $medicine['quantity'] * $medicine['purchase_price'],
+                    'packing_qty' => $medicine['packing_qty'] ?? '1',
+                    'purchase_rate_packing' => $medicine['purchase_price'],
+                ];
+
+                if (isset($medicine['batch_id']) && $medicine['batch_id']) {
+                    // Update existing batch
+                    MedicineBatchDetail::where('id', $medicine['batch_id'])->update($batchData);
+                } else {
+                    // Create new batch
+                    $batchData['supplier_bill_basic_id'] = $purchase->id;
+                    $batchData['inward_date'] = $validated['date'];
+                    MedicineBatchDetail::create($batchData);
+                }
+            }
+
+            DB::commit();
 
             return redirect()->route('pharmacy.purchase.show', $purchase->id)
                 ->with('success', 'Purchase order updated successfully!');
         } catch (\Exception $e) {
+            DB::rollBack();
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Failed to update purchase order: ' . $e->getMessage());
@@ -249,6 +348,21 @@ class PharmacyPurchaseController extends Controller
         $purchases = $query->orderBy('date', 'desc')->paginate(20);
 
         return view('admin.pharmacy.purchase.index', compact('purchases'));
+    }
+
+    /**
+     * Get medicines by category (AJAX)
+     */
+    public function getMedicinesByCategory(Request $request)
+    {
+        $categoryId = $request->input('category_id');
+        
+        $medicines = Pharmacy::where('medicine_category_id', $categoryId)
+            ->where('is_active', 'yes')
+            ->select('id', 'medicine_name')
+            ->get();
+
+        return response()->json($medicines);
     }
 }
 

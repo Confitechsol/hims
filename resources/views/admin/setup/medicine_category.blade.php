@@ -30,12 +30,12 @@
                     <tbody>
                         @forelse($categories as $category)
                         <tr>
-                            <td>{{ $category->category_name }}</td>
+                            <td>{{ $category->medicine_category }}</td>
                             <td>
-                                <button class="btn btn-sm btn-info" onclick="editCategory({{ $category->id }}, '{{ $category->category_name }}')">
+                                <button class="btn btn-sm btn-info" onclick="editCategory({{ $category->id }}, '{{ $category->medicine_category }}')">
                                     <i class="ti ti-pencil"></i>
                                 </button>
-                                <form action="{{ route('medicine-category.destroy', $category->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Are you sure you want to delete this category?')">
+                                <form action="{{ route('setup.medicine-category.destroy', $category->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Are you sure you want to delete this category?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger">
@@ -64,12 +64,12 @@
                 <h5 class="modal-title">Add Medicine Category</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ route('medicine-category.store') }}" method="POST">
+            <form action="{{ route('setup.medicine-category.store') }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Category Name <span class="text-danger">*</span></label>
-                        <input type="text" name="category_name" class="form-control" required>
+                        <input type="text" name="medicine_category" class="form-control" required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -97,7 +97,7 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Category Name <span class="text-danger">*</span></label>
-                        <input type="text" name="category_name" id="edit_category_name" class="form-control" required>
+                        <input type="text" name="medicine_category" id="edit_category_name" class="form-control" required>
                     </div>
                 </div>
                 <div class="modal-footer">

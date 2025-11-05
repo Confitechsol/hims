@@ -35,7 +35,7 @@
                                 <button class="btn btn-sm btn-info" onclick="editInterval({{ $interval->id }}, '{{ $interval->name }}')">
                                     <i class="ti ti-pencil"></i>
                                 </button>
-                                <form action="{{ route('dose-interval.destroy', $interval->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Are you sure?')">
+                                <form action="{{ route('setup.dose-interval.destroy', $interval->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Are you sure?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger">
@@ -64,7 +64,7 @@
                 <h5 class="modal-title">Add Dosage Interval</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ route('dose-interval.store') }}" method="POST">
+            <form action="{{ route('setup.dose-interval.store') }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">

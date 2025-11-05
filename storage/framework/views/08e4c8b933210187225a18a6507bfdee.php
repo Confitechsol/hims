@@ -1,8 +1,8 @@
-{{-- resources/views/admin/pharmacy/index.blade.php --}}
-@extends('layouts.adminLayout')
-@section('content')
+
+
+<?php $__env->startSection('content'); ?>
     <div class="row justify-content-center">
-        {{-- Pharmacy Medicine List --}}
+        
         <div class="col-md-11">
             <div class="card shadow-sm border-0 mt-4">
                 <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
@@ -26,31 +26,31 @@
 
                                         <div class="page_btn d-flex">
                                             <div class="text-end d-flex">
-                                                <a href="{{ route('pharmacy.create') }}"
+                                                <a href="<?php echo e(route('pharmacy.create')); ?>"
                                                     class="btn btn-primary text-white ms-2 fs-13 btn-md">
                                                     <i class="ti ti-plus me-1"></i>Add Medicine
                                                 </a>
                                             </div>
                                             <div class="text-end d-flex">
-                                                <a href="{{ route('pharmacy.import') }}"
+                                                <a href="<?php echo e(route('pharmacy.import')); ?>"
                                                     class="btn btn-primary text-white ms-2 fs-13 btn-md">
                                                     <i class="ti ti-download me-1"></i>Import Medicines
                                                 </a>
                                             </div>
                                             <div class="text-end d-flex">
-                                                <a href="{{ route('pharmacy.purchase.index') }}"
+                                                <a href="<?php echo e(route('pharmacy.purchase.index')); ?>"
                                                     class="btn btn-success text-white ms-2 fs-13 btn-md">
                                                     <i class="ti ti-shopping-cart me-1"></i>Purchase
                                                 </a>
                                             </div>
                                             <div class="text-end d-flex">
-                                                <a href="{{ route('pharmacy.below-min-level') }}"
+                                                <a href="<?php echo e(route('pharmacy.below-min-level')); ?>"
                                                     class="btn btn-warning text-white ms-2 fs-13 btn-md">
                                                     <i class="ti ti-alert-triangle me-1"></i>Below Min Level
                                                 </a>
                                             </div>
                                             <div class="text-end d-flex">
-                                                <a href="{{ route('pharmacy.needs-reorder') }}"
+                                                <a href="<?php echo e(route('pharmacy.needs-reorder')); ?>"
                                                     class="btn btn-info text-white ms-2 fs-13 btn-md">
                                                     <i class="ti ti-package me-1"></i>Needs Reorder
                                                 </a>
@@ -58,13 +58,13 @@
                                         </div>
                                     </div>
 
-                                    @if (session('success'))
-                                        <div class="alert alert-success">{{ session('success') }}</div>
-                                    @endif
+                                    <?php if(session('success')): ?>
+                                        <div class="alert alert-success"><?php echo e(session('success')); ?></div>
+                                    <?php endif; ?>
 
-                                    @if (session('error'))
-                                        <div class="alert alert-danger">{{ session('error') }}</div>
-                                    @endif
+                                    <?php if(session('error')): ?>
+                                        <div class="alert alert-danger"><?php echo e(session('error')); ?></div>
+                                    <?php endif; ?>
 
                                     <div class="table-responsive">
                                         <table class="table mb-0">
@@ -84,39 +84,39 @@
                                                 </tr>
                                             </thead>
                                             <tbody id="medicineTableBody">
-                                                @forelse($medicines as $medicine)
+                                                <?php $__empty_1 = true; $__currentLoopData = $medicines; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $medicine): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                                     <tr>
-                                                        <td>{{ $medicine->id }}</td>
+                                                        <td><?php echo e($medicine->id); ?></td>
                                                         <td>
                                                             <div class="d-flex align-items-center">
-                                                                @if($medicine->medicine_image)
-                                                                    <img src="{{ asset('storage/' . $medicine->medicine_image) }}" 
-                                                                         alt="{{ $medicine->medicine_name }}" 
+                                                                <?php if($medicine->medicine_image): ?>
+                                                                    <img src="<?php echo e(asset('storage/' . $medicine->medicine_image)); ?>" 
+                                                                         alt="<?php echo e($medicine->medicine_name); ?>" 
                                                                          class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
-                                                                @endif
-                                                                <span class="fw-bold">{{ $medicine->medicine_name }}</span>
+                                                                <?php endif; ?>
+                                                                <span class="fw-bold"><?php echo e($medicine->medicine_name); ?></span>
                                                             </div>
                                                         </td>
-                                                        <td>{{ $medicine->medicineCategory->medicine_category ?? '-' }}</td>
-                                                        <td>{{ $medicine->company->company_name ?? '-' }}</td>
-                                                        <td>{{ $medicine->medicine_composition ?? '-' }}</td>
-                                                        <td>{{ $medicine->medicineGroup->group_name ?? '-' }}</td>
-                                                        <td>{{ $medicine->unitRelation->unit_name ?? '-' }}</td>
+                                                        <td><?php echo e($medicine->medicineCategory->medicine_category ?? '-'); ?></td>
+                                                        <td><?php echo e($medicine->company->company_name ?? '-'); ?></td>
+                                                        <td><?php echo e($medicine->medicine_composition ?? '-'); ?></td>
+                                                        <td><?php echo e($medicine->medicineGroup->group_name ?? '-'); ?></td>
+                                                        <td><?php echo e($medicine->unitRelation->unit_name ?? '-'); ?></td>
                                                         <td>
-                                                            @php
+                                                            <?php
                                                                 $totalQty = $medicine->total_quantity ?? 0;
                                                                 $minLevel = $medicine->min_level ?? 0;
                                                                 $badgeClass = $totalQty <= $minLevel ? 'bg-danger' : ($totalQty <= $medicine->reorder_level ? 'bg-warning' : 'bg-success');
-                                                            @endphp
-                                                            <span class="badge {{ $badgeClass }}">{{ $totalQty }}</span>
+                                                            ?>
+                                                            <span class="badge <?php echo e($badgeClass); ?>"><?php echo e($totalQty); ?></span>
                                                         </td>
-                                                        <td>{{ $medicine->min_level ?? '-' }}</td>
+                                                        <td><?php echo e($medicine->min_level ?? '-'); ?></td>
                                                         <td>
-                                                            @if($medicine->is_active === 'yes')
+                                                            <?php if($medicine->is_active === 'yes'): ?>
                                                                 <span class="badge bg-success">Active</span>
-                                                            @else
+                                                            <?php else: ?>
                                                                 <span class="badge bg-secondary">Inactive</span>
-                                                            @endif
+                                                            <?php endif; ?>
                                                         </td>
                                                         <td>
                                                             <div class="dropdown">
@@ -127,22 +127,22 @@
                                                                 </button>
                                                                 <ul class="dropdown-menu">
                                                                     <li>
-                                                                        <a class="dropdown-item" href="{{ route('pharmacy.show', $medicine->id) }}">
+                                                                        <a class="dropdown-item" href="<?php echo e(route('pharmacy.show', $medicine->id)); ?>">
                                                                             <i class="ti ti-eye me-2"></i>View
                                                                         </a>
                                                                     </li>
                                                                     <li>
-                                                                        <a class="dropdown-item" href="{{ route('pharmacy.edit', $medicine->id) }}">
+                                                                        <a class="dropdown-item" href="<?php echo e(route('pharmacy.edit', $medicine->id)); ?>">
                                                                             <i class="ti ti-edit me-2"></i>Edit
                                                                         </a>
                                                                     </li>
                                                                     <li>
-                                                                        <form action="{{ route('pharmacy.destroy', $medicine->id) }}" 
+                                                                        <form action="<?php echo e(route('pharmacy.destroy', $medicine->id)); ?>" 
                                                                               method="POST" 
                                                                               class="d-inline"
                                                                               onsubmit="return confirm('Are you sure you want to delete this medicine?')">
-                                                                            @csrf
-                                                                            @method('DELETE')
+                                                                            <?php echo csrf_field(); ?>
+                                                                            <?php echo method_field('DELETE'); ?>
                                                                             <button type="submit" class="dropdown-item text-danger">
                                                                                 <i class="ti ti-trash me-2"></i>Delete
                                                                             </button>
@@ -152,21 +152,22 @@
                                                             </div>
                                                         </td>
                                                     </tr>
-                                                @empty
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                                     <tr>
                                                         <td colspan="11" class="text-center text-muted py-4">
                                                             <i class="ti ti-package-off" style="font-size: 3rem;"></i>
                                                             <p class="mt-2">No medicines found</p>
                                                         </td>
                                                     </tr>
-                                                @endforelse
+                                                <?php endif; ?>
                                             </tbody>
                                         </table>
                                     </div>
 
-                                    {{-- Pagination --}}
+                                    
                                     <div class="mt-3">
-                                        {{ $medicines->links() }}
+                                        <?php echo e($medicines->links()); ?>
+
                                     </div>
                                 </div>
                             </div>
@@ -177,7 +178,7 @@
         </div>
     </div>
 
-    @push('scripts')
+    <?php $__env->startPush('scripts'); ?>
     <script>
         $(document).ready(function() {
             // Search functionality
@@ -189,6 +190,8 @@
             });
         });
     </script>
-    @endpush
-@endsection
+    <?php $__env->stopPush(); ?>
+<?php $__env->stopSection(); ?>
 
+
+<?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\xampp-8.2\htdocs\hims\resources\views/admin/pharmacy/index.blade.php ENDPATH**/ ?>

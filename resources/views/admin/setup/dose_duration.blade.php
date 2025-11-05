@@ -30,12 +30,12 @@
                     <tbody>
                         @forelse($durations as $duration)
                         <tr>
-                            <td>{{ $duration->duration }}</td>
+                            <td>{{ $duration->name }}</td>
                             <td>
-                                <button class="btn btn-sm btn-info" onclick="editDuration({{ $duration->id }}, '{{ $duration->duration }}')">
+                                <button class="btn btn-sm btn-info" onclick="editDuration({{ $duration->id }}, '{{ $duration->name }}')">
                                     <i class="ti ti-pencil"></i>
                                 </button>
-                                <form action="{{ route('dose-duration.destroy', $duration->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Are you sure?')">
+                                <form action="{{ route('setup.dose-duration.destroy', $duration->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Are you sure?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger">
@@ -64,12 +64,12 @@
                 <h5 class="modal-title">Add Dosage Duration</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ route('dose-duration.store') }}" method="POST">
+            <form action="{{ route('setup.dose-duration.store') }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Duration <span class="text-danger">*</span></label>
-                        <input type="text" name="duration" class="form-control" required>
+                        <input type="text" name="name" class="form-control" required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -95,7 +95,7 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Duration <span class="text-danger">*</span></label>
-                        <input type="text" name="duration" id="edit_duration" class="form-control" required>
+                        <input type="text" name="name" id="edit_duration" class="form-control" required>
                     </div>
                 </div>
                 <div class="modal-footer">

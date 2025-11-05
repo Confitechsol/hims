@@ -37,7 +37,7 @@
                                 <button class="btn btn-sm btn-info" onclick="editGroup({{ $group->id }}, '{{ $group->group_name }}')">
                                     <i class="ti ti-pencil"></i>
                                 </button>
-                                <form action="{{ route('medicine-group.destroy', $group->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Are you sure?')">
+                                <form action="{{ route('setup.medicine-group.destroy', $group->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Are you sure?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger">
@@ -66,7 +66,7 @@
                 <h5 class="modal-title">Add Medicine Group</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ route('medicine-group.store') }}" method="POST">
+            <form action="{{ route('setup.medicine-group.store') }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">

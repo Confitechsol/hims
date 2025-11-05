@@ -17,17 +17,17 @@ class MedicineSupplierController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'supplier_name' => 'required|string|max:255'
+            'supplier' => 'required|string|max:255'
         ]);
 
         MedicineSupplier::create([
             'hospital_id' => session('hospital_id', '1'),
             'branch_id' => session('branch_id', '1'),
-            'supplier_name' => $request->supplier_name,
-            'supplier_contact' => $request->supplier_contact,
-            'contact_person_name' => $request->contact_person_name,
-            'contact_person_phone' => $request->contact_person_phone,
-            'drug_license_number' => $request->drug_license_number,
+            'supplier' => $request->supplier,
+            'contact' => $request->contact,
+            'supplier_person' => $request->supplier_person,
+            'supplier_person_contact' => $request->supplier_person_contact,
+            'supplier_drug_licence' => $request->supplier_drug_licence,
             'address' => $request->address,
         ]);
 
@@ -37,16 +37,16 @@ class MedicineSupplierController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'supplier_name' => 'required|string|max:255'
+            'supplier' => 'required|string|max:255'
         ]);
 
         $supplier = MedicineSupplier::findOrFail($id);
         $supplier->update([
-            'supplier_name' => $request->supplier_name,
-            'supplier_contact' => $request->supplier_contact,
-            'contact_person_name' => $request->contact_person_name,
-            'contact_person_phone' => $request->contact_person_phone,
-            'drug_license_number' => $request->drug_license_number,
+            'supplier' => $request->supplier,
+            'contact' => $request->contact,
+            'supplier_person' => $request->supplier_person,
+            'supplier_person_contact' => $request->supplier_person_contact,
+            'supplier_drug_licence' => $request->supplier_drug_licence,
             'address' => $request->address,
         ]);
 

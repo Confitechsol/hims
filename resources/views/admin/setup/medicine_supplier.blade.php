@@ -35,17 +35,17 @@
                     <tbody>
                         @forelse($suppliers as $supplier)
                         <tr>
-                            <td>{{ $supplier->supplier_name }}</td>
-                            <td>{{ $supplier->supplier_contact }}</td>
-                            <td>{{ $supplier->contact_person_name }}</td>
-                            <td>{{ $supplier->contact_person_phone }}</td>
-                            <td>{{ $supplier->drug_license_number }}</td>
+                            <td>{{ $supplier->supplier }}</td>
+                            <td>{{ $supplier->contact }}</td>
+                            <td>{{ $supplier->supplier_person }}</td>
+                            <td>{{ $supplier->supplier_person_contact }}</td>
+                            <td>{{ $supplier->supplier_drug_licence }}</td>
                             <td>{{ $supplier->address }}</td>
                             <td>
                                 <button class="btn btn-sm btn-info" onclick="editSupplier({{ json_encode($supplier) }})">
                                     <i class="ti ti-pencil"></i>
                                 </button>
-                                <form action="{{ route('medicine-supplier.destroy', $supplier->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Are you sure?')">
+                                <form action="{{ route('setup.medicine-supplier.destroy', $supplier->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Are you sure?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger">
@@ -74,29 +74,29 @@
                 <h5 class="modal-title">Add Supplier</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ route('medicine-supplier.store') }}" method="POST">
+            <form action="{{ route('setup.medicine-supplier.store') }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Supplier Name <span class="text-danger">*</span></label>
-                            <input type="text" name="supplier_name" class="form-control" required>
+                            <input type="text" name="supplier" class="form-control" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Supplier Contact</label>
-                            <input type="text" name="supplier_contact" class="form-control">
+                            <input type="text" name="contact" class="form-control">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Contact Person Name</label>
-                            <input type="text" name="contact_person_name" class="form-control">
+                            <input type="text" name="supplier_person" class="form-control">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Contact Person Phone</label>
-                            <input type="text" name="contact_person_phone" class="form-control">
+                            <input type="text" name="supplier_person_contact" class="form-control">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Drug License Number</label>
-                            <input type="text" name="drug_license_number" class="form-control">
+                            <input type="text" name="supplier_drug_licence" class="form-control">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Address</label>
@@ -128,23 +128,23 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Supplier Name <span class="text-danger">*</span></label>
-                            <input type="text" name="supplier_name" id="edit_supplier_name" class="form-control" required>
+                            <input type="text" name="supplier" id="edit_supplier_name" class="form-control" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Supplier Contact</label>
-                            <input type="text" name="supplier_contact" id="edit_supplier_contact" class="form-control">
+                            <input type="text" name="contact" id="edit_supplier_contact" class="form-control">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Contact Person Name</label>
-                            <input type="text" name="contact_person_name" id="edit_contact_person_name" class="form-control">
+                            <input type="text" name="supplier_person" id="edit_contact_person_name" class="form-control">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Contact Person Phone</label>
-                            <input type="text" name="contact_person_phone" id="edit_contact_person_phone" class="form-control">
+                            <input type="text" name="supplier_person_contact" id="edit_contact_person_phone" class="form-control">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Drug License Number</label>
-                            <input type="text" name="drug_license_number" id="edit_drug_license_number" class="form-control">
+                            <input type="text" name="supplier_drug_licence" id="edit_drug_license_number" class="form-control">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Address</label>
@@ -163,11 +163,11 @@
 
 <script>
 function editSupplier(supplier) {
-    document.getElementById('edit_supplier_name').value = supplier.supplier_name;
-    document.getElementById('edit_supplier_contact').value = supplier.supplier_contact || '';
-    document.getElementById('edit_contact_person_name').value = supplier.contact_person_name || '';
-    document.getElementById('edit_contact_person_phone').value = supplier.contact_person_phone || '';
-    document.getElementById('edit_drug_license_number').value = supplier.drug_license_number || '';
+    document.getElementById('edit_supplier_name').value = supplier.supplier;
+    document.getElementById('edit_supplier_contact').value = supplier.contact || '';
+    document.getElementById('edit_contact_person_name').value = supplier.supplier_person || '';
+    document.getElementById('edit_contact_person_phone').value = supplier.supplier_person_contact || '';
+    document.getElementById('edit_drug_license_number').value = supplier.supplier_drug_licence || '';
     document.getElementById('edit_address').value = supplier.address || '';
     document.getElementById('editSupplierForm').action = "{{ url('setup/medicine-supplier/update') }}/" + supplier.id;
     new bootstrap.Modal(document.getElementById('editSupplierModal')).show();

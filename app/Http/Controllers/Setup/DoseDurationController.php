@@ -17,13 +17,13 @@ class DoseDurationController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'duration' => 'required|string|max:255'
+            'name' => 'required|string|max:255'
         ]);
 
         DoseDuration::create([
             'hospital_id' => session('hospital_id', '1'),
             'branch_id' => session('branch_id', '1'),
-            'duration' => $request->duration
+            'name' => $request->name
         ]);
 
         return redirect()->back()->with('success', 'Dose Duration added successfully!');
@@ -32,12 +32,12 @@ class DoseDurationController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'duration' => 'required|string|max:255'
+            'name' => 'required|string|max:255'
         ]);
 
         $duration = DoseDuration::findOrFail($id);
         $duration->update([
-            'duration' => $request->duration
+            'name' => $request->name
         ]);
 
         return redirect()->back()->with('success', 'Dose Duration updated successfully!');

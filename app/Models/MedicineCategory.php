@@ -9,10 +9,12 @@ class MedicineCategory extends Model
 {
     use HasFactory;
 
+    protected $table = 'medicine_category';
+
     protected $fillable = [
         'hospital_id',
         'branch_id',
-        'category_name',
+        'medicine_category',
     ];
 
     public function dosages()

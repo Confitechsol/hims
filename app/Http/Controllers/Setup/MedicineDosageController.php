@@ -21,9 +21,9 @@ class MedicineDosageController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'medicine_category_id' => 'required|exists:medicine_categories,id',
+            'medicine_category_id' => 'required|exists:medicine_category,id',
             'dosage' => 'required|string|max:255',
-            'unit_id' => 'required|exists:medicine_units,id'
+            'units_id' => 'required|exists:unit,id'
         ]);
 
         MedicineDosage::create([
@@ -31,7 +31,7 @@ class MedicineDosageController extends Controller
             'branch_id' => session('branch_id', '1'),
             'medicine_category_id' => $request->medicine_category_id,
             'dosage' => $request->dosage,
-            'unit_id' => $request->unit_id
+            'units_id' => $request->units_id
         ]);
 
         return redirect()->back()->with('success', 'Medicine Dosage added successfully!');
@@ -40,16 +40,16 @@ class MedicineDosageController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'medicine_category_id' => 'required|exists:medicine_categories,id',
+            'medicine_category_id' => 'required|exists:medicine_category,id',
             'dosage' => 'required|string|max:255',
-            'unit_id' => 'required|exists:medicine_units,id'
+            'units_id' => 'required|exists:unit,id'
         ]);
 
         $dosage = MedicineDosage::findOrFail($id);
         $dosage->update([
             'medicine_category_id' => $request->medicine_category_id,
             'dosage' => $request->dosage,
-            'unit_id' => $request->unit_id
+            'units_id' => $request->units_id
         ]);
 
         return redirect()->back()->with('success', 'Medicine Dosage updated successfully!');

@@ -39,7 +39,7 @@
                                 <button class="btn btn-sm btn-info" onclick="editDosage({{ json_encode($dosage) }})">
                                     <i class="ti ti-pencil"></i>
                                 </button>
-                                <form action="{{ route('medicine-dosage.destroy', $dosage->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Are you sure?')">
+                                <form action="{{ route('setup.medicine-dosage.destroy', $dosage->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Are you sure?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger">
@@ -68,7 +68,7 @@
                 <h5 class="modal-title">Add Medicine Dosage</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ route('medicine-dosage.store') }}" method="POST">
+            <form action="{{ route('setup.medicine-dosage.store') }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
@@ -86,7 +86,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Unit <span class="text-danger">*</span></label>
-                        <select name="unit_id" class="form-select" required>
+                        <select name="units_id" class="form-select" required>
                             <option value="">Select</option>
                             @foreach($units as $unit)
                                 <option value="{{ $unit->id }}">{{ $unit->unit_name }}</option>
@@ -130,7 +130,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Unit <span class="text-danger">*</span></label>
-                        <select name="unit_id" id="edit_unit_id" class="form-select" required>
+                        <select name="units_id" id="edit_unit_id" class="form-select" required>
                             <option value="">Select</option>
                             @foreach($units as $unit)
                                 <option value="{{ $unit->id }}">{{ $unit->unit_name }}</option>
@@ -151,7 +151,7 @@
 function editDosage(dosage) {
     document.getElementById('edit_category_id').value = dosage.medicine_category_id;
     document.getElementById('edit_dosage').value = dosage.dosage;
-    document.getElementById('edit_unit_id').value = dosage.unit_id;
+    document.getElementById('edit_unit_id').value = dosage.units_id;
     document.getElementById('editDosageForm').action = "{{ url('setup/medicine-dosage/update') }}/" + dosage.id;
     new bootstrap.Modal(document.getElementById('editDosageModal')).show();
 }

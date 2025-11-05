@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\MedicineCategory;
 use App\Models\MedicineGroup;
 use App\Models\Pharmacy;
-use App\Models\PharmacyCompany;
-use App\Models\Unit;
+use App\Models\MedicineCompany;
+use App\Models\MedicineUnit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -32,9 +32,9 @@ class PharmacyController extends Controller
     public function create()
     {
         $categories = MedicineCategory::all();
-        $companies = PharmacyCompany::all();
+        $companies = MedicineCompany::all();
         $groups = MedicineGroup::all();
-        $units = Unit::all();
+        $units = MedicineUnit::all();
 
         return view('admin.pharmacy.create', compact('categories', 'companies', 'groups', 'units'));
     }
@@ -46,7 +46,7 @@ class PharmacyController extends Controller
     {
         $validated = $request->validate([
             'medicine_name' => 'required|string|max:200',
-            'medicine_category_id' => 'required|exists:medicine_categories,id',
+            'medicine_category_id' => 'required|exists:medicine_category,id',
             'medicine_company' => 'nullable|exists:pharmacy_company,id',
             'medicine_composition' => 'nullable|string|max:100',
             'medicine_group' => 'nullable|exists:medicine_group,id',
@@ -105,9 +105,9 @@ class PharmacyController extends Controller
     {
         $medicine = Pharmacy::findOrFail($id);
         $categories = MedicineCategory::all();
-        $companies = PharmacyCompany::all();
+        $companies = MedicineCompany::all();
         $groups = MedicineGroup::all();
-        $units = Unit::all();
+        $units = MedicineUnit::all();
 
         return view('admin.pharmacy.edit', compact('medicine', 'categories', 'companies', 'groups', 'units'));
     }
@@ -121,7 +121,7 @@ class PharmacyController extends Controller
 
         $validated = $request->validate([
             'medicine_name' => 'required|string|max:200',
-            'medicine_category_id' => 'required|exists:medicine_categories,id',
+            'medicine_category_id' => 'required|exists:medicine_category,id',
             'medicine_company' => 'nullable|exists:pharmacy_company,id',
             'medicine_composition' => 'nullable|string|max:100',
             'medicine_group' => 'nullable|exists:medicine_group,id',

@@ -9,12 +9,14 @@ class MedicineDosage extends Model
 {
     use HasFactory;
 
+    protected $table = 'medicine_dosage';
+
     protected $fillable = [
         'hospital_id',
         'branch_id',
         'medicine_category_id',
         'dosage',
-        'unit_id',
+        'units_id',
     ];
 
     public function category()
@@ -24,6 +26,6 @@ class MedicineDosage extends Model
 
     public function unit()
     {
-        return $this->belongsTo(MedicineUnit::class, 'unit_id');
+        return $this->belongsTo(MedicineUnit::class, 'units_id');
     }
 }

@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -11,6 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Temporarily disable foreign key checks
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        
         Schema::create('supplier_bill_basic', function (Blueprint $table) {
             $table->id();
             $table->string('invoice_no', 100)->nullable();
@@ -34,7 +38,7 @@ return new class extends Migration
 
             // Foreign key constraints
             $table->foreign('supplier_id')
-                ->references('id')->on('medicine_supplier')
+                ->references('id')->on('medicine_suppliers')
                 ->onDelete('cascade');
             
             $table->foreign('received_by')
@@ -46,6 +50,9 @@ return new class extends Migration
             $table->index('payment_mode');
             $table->index('payment_date');
         });
+        
+        // Re-enable foreign key checks
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 
     /**

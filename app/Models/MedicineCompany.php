@@ -9,6 +9,8 @@ class MedicineCompany extends Model
 {
     use HasFactory;
 
+    protected $table = 'pharmacy_company';
+
     protected $fillable = [
         'hospital_id',
         'branch_id',
