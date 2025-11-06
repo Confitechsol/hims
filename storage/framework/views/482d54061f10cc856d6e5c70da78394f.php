@@ -1,6 +1,4 @@
-{{-- resources/views/settings.blade.php --}}
-@extends('layouts.adminLayout')
-@section('content')
+<?php $__env->startSection('content'); ?>
 
     <style>
         .module_billing {
@@ -1719,6 +1717,7 @@
         });
     </script>
 
-  @include('components.modals.add-prescription-modal')
+  <?php echo $__env->make('components.modals.add-prescription-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp82\htdocs\hims\resources\views/admin/patient_details.blade.php ENDPATH**/ ?>
