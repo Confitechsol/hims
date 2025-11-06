@@ -11,16 +11,15 @@ class PharmacyCompany extends Model
 
     protected $table = 'pharmacy_company';
 
-    public $timestamps = false; // only created_at exists
-
     protected $fillable = [
-        'hospital_id',
-        'branch_id',
         'company_name',
-        'created_at',
     ];
 
-    protected $casts = [
-        'created_at' => 'datetime',
-    ];
+    /**
+     * Relationship: A company has many medicines
+     */
+    public function medicines()
+    {
+        return $this->hasMany(Pharmacy::class, 'medicine_company');
+    }
 }

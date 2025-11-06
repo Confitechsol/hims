@@ -244,10 +244,20 @@
     </script>
 
     <script>
-        function deleteOperation(id) {
-            if (confirm("Are you sure you want to delete this operation?")) {
+    function deleteOperation(id) {
+        Swal.fire({
+            title: 'Delete Operation?',
+            text: 'Are you sure you want to delete this operation?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#750096',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
                 let form = document.getElementById("deleteOperationForm");
-                form.action = "{{ url('operations/destroy') }}/" + id; // adjust route if needed
+                form.action = "{{ url('operations/destroy') }}/" + id;
                 form.submit();
             }
         }
