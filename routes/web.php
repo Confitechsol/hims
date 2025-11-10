@@ -59,6 +59,8 @@ use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\TpamanagmentController;
 use App\Http\Controllers\VitalController;
 use App\Http\Controllers\DutyRosterController;
+use App\Http\Controllers\BirthController;
+use App\Http\Controllers\DeathController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -287,6 +289,13 @@ Route::middleware(['admin'])->group(function () {
     Route::delete('/income/destroy', [IncomeController::class, 'destroy'])->name('income.destroy');
 
     Route::get('/expense', [ExpenseController::class, 'index']);
+
+    Route::get('/birth', [BirthController::class, 'index']);
+
+    Route::get('/death', [DeathController::class, 'index']);
+
+
+
 
 });
 

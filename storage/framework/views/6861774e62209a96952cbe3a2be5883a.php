@@ -34,6 +34,7 @@
                     <div class="alert alert-danger alert-dismissible fade show"><?php echo e(session('error')); ?></div>
                 <?php endif; ?>
                 
+<<<<<<< HEAD
                  <div class="table-responsive">
                     <table class="table table-bordered" id="floors">
                         <thead>
@@ -105,6 +106,37 @@
                         <button class="btn btn-outline-secondary btn-sm" disabled>Next »</button>
                     <?php endif; ?>
                 </div>
+=======
+                <table class="table table-bordered" id="floors">
+                    <thead>
+                        <tr>
+                            <th>Floor Name</th>
+                            <th width="180">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php $__currentLoopData = $floors; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $floor): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <tr>
+                                <td><?php echo e($floor->name); ?></td>
+                                <td>
+                                    
+                                    <button class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill" data-bs-toggle="modal" data-bs-target="#editModal"
+                                        data-id="<?php echo e($floor->id); ?>" data-name="<?php echo e($floor->name); ?>">
+                                        <i class="ti ti-pencil"></i>
+                                    </button>
+
+                                    
+                                    <button class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill" data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal" data-id="<?php echo e($floor->id); ?>"
+                                        data-name="<?php echo e($floor->name); ?>">
+                                        <i class="ti ti-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </tbody>
+                </table>
+>>>>>>> 53ad2ac1640d46f4ef6740dd073a2ce3bbdd7ea7
             </div>
         </div>
     </div>
@@ -185,6 +217,7 @@
                 document.getElementById('delete-id').value = button.getAttribute('data-id');
                 document.getElementById('delete-name').textContent = button.getAttribute('data-name');
             });
+<<<<<<< HEAD
     createAjaxTable({
     apiUrl: "<?php echo e(route('floors.index')); ?>",
     tableSelector: "#floors",
@@ -212,6 +245,8 @@
         return row;
     }
     });   
+=======
+>>>>>>> 53ad2ac1640d46f4ef6740dd073a2ce3bbdd7ea7
         });
     </script>
 <?php $__env->stopSection(); ?>
