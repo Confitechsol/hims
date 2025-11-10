@@ -1,3 +1,9 @@
+<<<<<<< HEAD
+<?php if (isset($component)) { $__componentOriginal74daf2d0a9c625ad90327a6043d15980 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal74daf2d0a9c625ad90327a6043d15980 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'laravel-exceptions-renderer::components.card','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('laravel-exceptions-renderer::card'); ?>
+=======
 <?php $attributes ??= new \Illuminate\View\ComponentAttributeBag;
 
 $__newAttributes = [];
@@ -52,11 +58,55 @@ unset($__defined_vars, $__key, $__value); ?>
 <?php if (isset($attributes)) { $__attributesOriginal0bc865510ef3ecddbe48edc4e8cc9ddb = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'laravel-exceptions-renderer::components.badge','data' => ['type' => 'error']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('laravel-exceptions-renderer::badge'); ?>
+>>>>>>> 53ad2ac1640d46f4ef6740dd073a2ce3bbdd7ea7
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
+<<<<<<< HEAD
+<?php $component->withAttributes([]); ?>
+    <div class="md:flex md:items-center md:justify-between md:gap-2">
+        <div class="min-w-0">
+            <div class="inline-block rounded-full bg-red-500/20 px-3 py-2 max-w-full text-sm font-bold leading-5 text-red-500 truncate lg:text-base dark:bg-red-500/20">
+                <span class="hidden md:inline">
+                    <?php echo e($exception->class()); ?>
+
+                </span>
+                <span class="md:hidden">
+                    <?php echo e(implode(' ', array_slice(explode('\\', $exception->class()), -1))); ?>
+
+                </span>
+            </div>
+            <div class="mt-4 text-lg font-semibold text-gray-900 break-words dark:text-white lg:text-2xl">
+                <?php echo e($exception->message()); ?>
+
+            </div>
+        </div>
+
+        <div class="hidden text-right shrink-0 md:block md:min-w-64 md:max-w-80">
+            <div>
+                <span class="inline-block rounded-full bg-gray-200 px-3 py-2 text-sm leading-5 text-gray-900 max-w-full truncate dark:bg-gray-800 dark:text-white">
+                    <?php echo e($exception->request()->method()); ?> <?php echo e($exception->request()->httpHost()); ?>
+
+                </span>
+            </div>
+            <div class="px-4">
+                <span class="text-sm text-gray-500 dark:text-gray-400">PHP <?php echo e(PHP_VERSION); ?> — Laravel <?php echo e(app()->version()); ?></span>
+            </div>
+        </div>
+    </div>
+ <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal74daf2d0a9c625ad90327a6043d15980)): ?>
+<?php $attributes = $__attributesOriginal74daf2d0a9c625ad90327a6043d15980; ?>
+<?php unset($__attributesOriginal74daf2d0a9c625ad90327a6043d15980); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal74daf2d0a9c625ad90327a6043d15980)): ?>
+<?php $component = $__componentOriginal74daf2d0a9c625ad90327a6043d15980; ?>
+<?php unset($__componentOriginal74daf2d0a9c625ad90327a6043d15980); ?>
+<?php endif; ?>
+=======
 <?php $component->withAttributes(['type' => 'error']); ?>
             <?php if (isset($component)) { $__componentOriginalebc8ec9a834a8051f56913d6745a7050 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalebc8ec9a834a8051f56913d6745a7050 = $attributes; } ?>
@@ -134,4 +184,5 @@ unset($__defined_vars, $__key, $__value); ?>
 <?php unset($__componentOriginalb581a7e3a55d371fae986833ecafa668); ?>
 <?php endif; ?>
 </div>
+>>>>>>> 53ad2ac1640d46f4ef6740dd073a2ce3bbdd7ea7
 <?php /**PATH C:\xampp\htdocs\hims\vendor\laravel\framework\src\Illuminate\Foundation\Providers/../resources/exceptions/renderer/components/header.blade.php ENDPATH**/ ?>

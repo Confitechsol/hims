@@ -209,6 +209,7 @@
                                 
                             </li>-->
                             </ul>
+<<<<<<< HEAD
                             <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-map-pin"></i><span>Pharmacy</span>
@@ -238,6 +239,28 @@
                                     <li><a href="<?php echo e(route('pathology.test.index')); ?>">Pathology Test</a></li>
                                     <li><a href="<?php echo e(route('pathology.billing.index')); ?>">Pathology Billing</a></li>
                                 </ul>
+=======
+                            <li>
+                                <a href="#">
+                                    <i class="ti ti-map-pin"></i><span>Pharmacy</span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <ul style="display: none;">
+                                    <li><a href="<?php echo e(route('setup.medicine-category')); ?>">Medicine Category</a></li>
+                                    <li><a href="<?php echo e(route('setup.medicine-supplier')); ?>">Medicine Supplier</a></li>
+                                    <li><a href="<?php echo e(route('setup.medicine-dosage')); ?>">Medicine Dosage</a></li>
+                                    <li><a href="<?php echo e(route('setup.medicine-group')); ?>">Medicine Group</a></li>
+                                    <li><a href="<?php echo e(route('setup.medicine-unit')); ?>">Medicine Unit</a></li>
+                                    <li><a href="<?php echo e(route('setup.dose-duration')); ?>">Dose Duration</a></li>
+                                    <li><a href="<?php echo e(route('setup.dose-interval')); ?>">Dose Interval</a></li>
+                                    <li><a href="<?php echo e(route('setup.medicine-company')); ?>">Medicine Company</a></li>
+                                    <li><a href="<?php echo e(route('pharmacy.billing.index')); ?>">Pharmacy Billing</a></li>                                    
+                                </ul>
+                            </li>
+                            <li class="submenu">
+                                <a href="javascript:void(0);">
+                                    <i class="ti ti-map-pin"></i><span>Pathology</span>
+                                </a>
                             </li>
                             <li>
                                 <a href="#">
@@ -563,6 +586,26 @@
                                 </ul>
                             </li>
                             
+                            <li class="submenu">
+                                <a href="javascript:void(0);">
+                                    <i class="ti ti-world-cog"></i><span>Pharmacy
+                                        </span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <ul>
+                                    <li><a href="<?php echo e(route('medicine-category')); ?>">Medicine Category</a></li>
+                                    <li><a href="<?php echo e(route('supplier')); ?>">Supplier</a></li>
+                                    <li><a href="<?php echo e(route('medicine-dosage')); ?>">Medicine Dosage</a></li>
+                                    <li><a href="<?php echo e(route('dosage-interval')); ?>">Dose
+                                            Interval</a></li>
+                                    <li><a href="<?php echo e(route('dosage-duration')); ?>">Dose Duration</a></li>
+                                    <li><a href="<?php echo e(route('unit-list')); ?>">Unit
+                                            </a></li>
+                                    <li><a href="<?php echo e(route('company-list')); ?>">Company
+                                            </a></li>
+                                    <li><a href="<?php echo e(route('medicine-group')); ?>">Mediccine Group</a></li>
+                                </ul>
+                            </li>
                             
                             <li class="submenu">
                                 <a href="javascript:void(0);">
@@ -801,53 +844,6 @@
                 </ul>
             </div>
         </div>
-
-<script>
-// Ensure submenu expand/collapse works
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Initializing sidebar submenu functionality...');
-    
-    // Get all submenu links
-    const submenuLinks = document.querySelectorAll('.sidebar-menu .submenu > a');
-    
-    console.log('Found ' + submenuLinks.length + ' submenu items');
-    
-    submenuLinks.forEach(function(link) {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            const parentLi = this.parentElement;
-            const submenuUl = this.nextElementSibling;
-            
-            console.log('Clicked submenu:', this.querySelector('span').textContent.trim());
-            
-            // Check if already open
-            if (this.classList.contains('subdrop')) {
-                // Close this submenu
-                this.classList.remove('subdrop');
-                submenuUl.style.display = 'none';
-                console.log('Closing submenu');
-            } else {
-                // Close all other submenus at same level
-                const siblings = parentLi.parentElement.querySelectorAll('.submenu > a.subdrop');
-                siblings.forEach(function(sibling) {
-                    if (sibling !== link) {
-                        sibling.classList.remove('subdrop');
-                        sibling.nextElementSibling.style.display = 'none';
-                    }
-                });
-                
-                // Open this submenu
-                this.classList.add('subdrop');
-                submenuUl.style.display = 'block';
-                console.log('Opening submenu');
-            }
-        });
-    });
-    
-    console.log('Sidebar submenu functionality initialized!');
-});
-</script>
 
     </div>
 <?php /**PATH C:\xampp\htdocs\hims\resources\views/layouts/sidebar.blade.php ENDPATH**/ ?>

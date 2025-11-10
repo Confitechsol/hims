@@ -1,6 +1,4 @@
-{{-- resources/views/settings.blade.php --}}
-@extends('layouts.adminLayout')
-@section('content')
+<?php $__env->startSection('content'); ?>
 
     <style>
         .module_billing {
@@ -89,7 +87,7 @@
                         <div class="card shadow-sm border-0 mt-2">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> {{ $appointment->patient->patient_name }}
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Virat Kohli (13)
                                 </h5>
                             </div>
                             <div class="card-body">
@@ -106,7 +104,7 @@
                                                     class="fa-solid fa-phone text-primary"></i></span>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">Phone :</h6>
-                                                <p class="patient_data mb-0">{{ $appointment->patient->mobileno }}</p>
+                                                <p class="patient_data mb-0">8910245678</p>
                                             </div>
                                         </div>
 
@@ -115,7 +113,7 @@
                                                     class="fa-solid fa-calendar-days text-primary"></i></span>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">Age :</h6>
-                                                <p class="patient_data mb-0"> {{ $appointment->patient->age }}
+                                                <p class="patient_data mb-0">22 Year 9 Month 5 Days (As Of Date 10/06/2025)
                                                 </p>
                                             </div>
                                         </div>
@@ -124,7 +122,7 @@
                                                     class="fa-solid fa-hands-holding-child text-primary"></i></span>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">Guardian Name :</h6>
-                                                <p class="patient_data mb-0">{{ $appointment->patient->	guardian_name }}</p>
+                                                <p class="patient_data mb-0">--</p>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-3">
@@ -132,7 +130,7 @@
                                                     class="fa-solid fa-mars-and-venus text-primary"></i></span>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">Gender :</h6>
-                                                <p class="patient_data mb-0">{{ $appointment->patient->gender }}</p>
+                                                <p class="patient_data mb-0">Male</p>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-3">
@@ -176,7 +174,20 @@
                                             </div>
                                         </div>
                                     </div>
-                                                                                                                                                                                                                                       
+                                    <!-- <div class="row">
+                                                                                                                                                                                                    <div class="col-sm-5">
+
+                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                    <div class="col-sm-7">
+
+                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                    <div class="col-sm-5">
+
+                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                    <div class="col-sm-7">
+
+                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                </div> -->
                                 </div>
                                 <hr>
                                 <div class="d-flex align-items-center mb-3">
@@ -184,7 +195,7 @@
                                             class="fa-solid fa-tag text-primary"></i></span>
                                     <div class="d-flex align-items-center gap-2">
                                         <h6 class="about_patient fs-13 fw-bold mb-1"> Known Allergies :</h6>
-                                        <p class="patient_data mb-0">{{ $appointment->patient->known_allergies ?? 'N/A'}}</p>
+                                        <p class="patient_data mb-0">--</p>
                                     </div>
                                 </div>
                                 <div class="d-flex align-items-center mb-3">
@@ -202,13 +213,9 @@
                                         <h6 class=" fs-13 fw-bold mb-1"> Symptoms :</h6>
                                         <p class=" mb-0">
                                         <ul>
-                                            @forelse($symptomTitles as $title)
-                                                <li>
-                                                    <i class="fa-regular fa-circle-check text-primary"></i> {{ $title }}
-                                                </li>
-                                            @empty
-                                                <li><i class="fa-regular fa-circle-xmark text-danger"></i> No symptoms recorded</li>
-                                            @endforelse
+                                            <li><i class="fa-regular fa-circle-check text-primary"></i> Fever Chest Pain
+                                            </li>
+                                            <li><i class="fa-regular fa-circle-check text-primary"></i> Fever Fever</li>
                                         </ul>
                                         </p>
                                     </div>
@@ -224,7 +231,19 @@
                             </div>
                             <div class="card-body">
 
-                               
+                                <div>
+                                    <a href="#">
+                                        <div class="d-flex align-items-center mb-3 gap-2">
+                                            <div class="patient_img">
+                                                <img src="assets/img/patient.png" alt="product" class="rounded">
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="fs-13 fw-bold mb-1">Anirban Ghosh (D010)</h6>
+                                            </div>
+                                        </div>
+                                    </a>
+
+                                </div>
                                 <hr>
                                 <div>
                                     <a href="#">
@@ -233,7 +252,7 @@
                                                 <img src="assets/img/patient.png" alt="product" class="rounded">
                                             </div>
                                             <div class="d-flex align-items-center gap-2">
-                                                <h6 class="fs-13 fw-bold mb-1">{{ $appointment->doctorUser->name ?? 'N/A' }}</h6>
+                                                <h6 class="fs-13 fw-bold mb-1">Anjali Rao (D011)</h6>
                                             </div>
                                         </div>
                                     </a>
@@ -266,7 +285,7 @@
                                     </div>
                                     <div class="card-body">
                                         <div class="chartjs-wrapper-demo">
-                                            <canvas id="AppointchartLine1" class="h-300"></canvas>
+                                            <canvas id="chartLine1" class="h-300"></canvas>
                                         </div>
                                     </div><!-- end card body -->
                                 </div><!-- end card -->
@@ -293,35 +312,16 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                             @forelse($opdDetails as $opd)
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="fs-14 mb-1">
-                                                            <a href="#" class="fw-semibold">{{ $opd->opd_no ?? '-' }}</a>
-                                                        </h6>
-                                                    </td>
-                                                    <td>{{ $opd->case_id ?? '-' }}</td>
-                                                    <td>
-                                                        @if($opd->appointment_date)
-                                                            {{ \Carbon\Carbon::parse($opd->appointment_date)->format('d/m/Y h:i A') }}
-                                                        @else
-                                                            -
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        {{ $opd->doctor->name ?? $opd->consultant_name ?? '-' }}
-                                                        @if(!empty($opd->doctor->employee_id))
-                                                            ({{ $opd->doctor->employee_id }})
-                                                        @endif
-                                                    </td>
-                                                    <td>{{ $opd->reference ?? '-' }}</td>
-                                                    <td>{{ $opd->symptom_titles ?? '-' }}</td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="6" class="text-center">No OPD records found</td>
-                                                </tr>
-                                            @endforelse
+                                            <tr>
+                                                <td>
+                                                    <h6 class="fs-14 mb-1"><a href="#" class="fw-semibold">OPDN28</a></h6>
+                                                </td>
+                                                <td>33</td>
+                                                <td>10/09/2025 12:30 PM </td>
+                                                <td>Anirban Ghosh (D010)</td>
+                                                <td></td>
+                                                <td>Fever</td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -349,32 +349,17 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse($labInvestigations as $investigation)
-                                                <tr>
-                                                    <td>{{ $investigation->pathology->test_name ?? '-' }}</td>
-                                                    <td>{{ $investigation->case_id ?? '-' }}</td>
-                                                    <td>{{ $investigation->lab_name ?? 'Pathology' }}</td>
-                                                    <td>
-                                                        @if(!empty($investigation->collection_date))
-                                                            {{ \Carbon\Carbon::parse($investigation->collection_date)->format('d/m/Y') }}
-                                                        @else
-                                                            -
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        @if(!empty($investigation->reporting_date))
-                                                            {{ \Carbon\Carbon::parse($investigation->reporting_date)->format('d/m/Y') }}
-                                                        @else
-                                                            -
-                                                        @endif
-                                                    </td>
-                                                    <td>{{ $investigation->approved_by ?? 'Admin' }}</td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="6" class="text-center text-muted">No lab investigations found</td>
-                                                </tr>
-                                            @endforelse
+                                            <tr>
+                                                <td>
+                                                    Lipid Profile
+                                                    (Lipid Profile)
+                                                </td>
+                                                <td></td>
+                                                <td>Pathology</td>
+                                                <td></td>
+                                                <td>09/21/2025</td>
+                                                <td></td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -402,36 +387,16 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse($opdDetails as $opd)
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="fs-14 mb-1">
-                                                            <a href="#" class="fw-semibold">{{ $opd->opd_no ?? '-' }}</a>
-                                                        </h6>
-                                                    </td>
-                                                    <td>{{ $opd->case_id ?? '-' }}</td>
-                                                    <td>
-                                                        @if($opd->appointment_date)
-                                                            {{ \Carbon\Carbon::parse($opd->appointment_date)->format('d/m/Y h:i A') }}
-                                                        @else
-                                                            -
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        {{ $opd->doctor->name ?? $opd->consultant_name ?? '-' }}
-                                                        @if(!empty($opd->doctor->employee_id))
-                                                            ({{ $opd->doctor->employee_id }})
-                                                        @endif
-                                                    </td>
-                                                    <td>{{ $opd->reference ?? '-' }}</td>
-                                                    <td>{{ $opd->symptom_titles ?? '-' }}</td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="6" class="text-center">No OPD records found</td>
-                                                </tr>
-                                            @endforelse
-                                            
+                                            <tr>
+                                                <td>
+                                                    <h6 class="fs-14 mb-1"><a href="#" class="fw-semibold">OPDN28</a></h6>
+                                                </td>
+                                                <td>33</td>
+                                                <td>10/09/2025 12:30 PM </td>
+                                                <td>Anirban Ghosh (D010)</td>
+                                                <td></td>
+                                                <td>Fever</td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -1166,30 +1131,17 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @forelse($opdDetails as $opd)
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="fs-14 mb-1">
-                                                            <a href="#" class="fw-semibold">{{ $opd->opd_no ?? '-' }}</a>
-                                                        </h6>
-                                                    </td>
-                                                    <td>{{ $opd->case_id ?? '-' }}</td>
-                                                    <td>
-                                                        @if($opd->appointment_date)
-                                                            {{ \Carbon\Carbon::parse($opd->appointment_date)->format('d/m/Y h:i A') }}
-                                                        @else
-                                                            -
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        {{ $opd->doctor->name ?? $opd->consultant_name ?? '-' }}
-                                                        @if(!empty($opd->doctor->employee_id))
-                                                            ({{ $opd->doctor->employee_id }})
-                                                        @endif
-                                                    </td>
-                                                    <td>{{ $opd->reference ?? '-' }}</td>
-                                                    <td>{{ $opd->symptom_titles ?? '-' }}</td>
-                                                    <td>
+                                                            <tr>
+                                                                <td>
+                                                                    <h6 class="fs-14 mb-1"><a href="#"
+                                                                            class="fw-semibold">OPDN25</a></h6>
+                                                                </td>
+                                                                <td>30</td>
+                                                                <td>10/21/2025 01:44 PM</td>
+                                                                <td>Anirban Ghosh (D010)</td>
+                                                                <td></td>
+                                                                <td>Fever</td>
+                                                                <td>
                                                                     <div class="d-flex gap-2">
                                                                         <a href="javascript: void(0);"
                                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
@@ -1217,13 +1169,7 @@
                                                                                 title="Move in IPD"></i></a>
                                                                     </div>
                                                                 </td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="6" class="text-center">No OPD records found</td>
-                                                </tr>
-                                            @endforelse
-                                                            
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1278,32 +1224,25 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @forelse($labInvestigations as $investigation)
-                                                <tr>
-                                                    <td>{{ $investigation->pathology->test_name ?? '-' }}</td>
-                                                    <td>{{ $investigation->case_id ?? '-' }}</td>
-                                                    <td>{{ $investigation->lab_name ?? 'Pathology' }}</td>
-                                                    <td>
-                                                        @if(!empty($investigation->collection_date))
-                                                            {{ \Carbon\Carbon::parse($investigation->collection_date)->format('d/m/Y') }}
-                                                        @else
-                                                            -
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        @if(!empty($investigation->reporting_date))
-                                                            {{ \Carbon\Carbon::parse($investigation->reporting_date)->format('d/m/Y') }}
-                                                        @else
-                                                            -
-                                                        @endif
-                                                    </td>
-                                                    <td>{{ $investigation->approved_by ?? 'Admin' }}</td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="6" class="text-center text-muted">No lab investigations found</td>
-                                                </tr>
-                                            @endforelse
+                                                            <tr>
+                                                                <td>
+                                                                    <h6 class="fs-14 mb-1">Lipid Profile
+                                                                        (Lipid Profile)</h6>
+                                                                </td>
+                                                                <td></td>
+                                                                <td>Pathology</td>
+                                                                <td>Pathology Center :</td>
+                                                                <td>09/21/2025</td>
+                                                                <td></td>
+                                                                <td>
+                                                                    <div class="d-flex gap-2">
+                                                                        <a href="javascript: void(0);"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
+                                                                            <i class="ti ti-menu" data-bs-toggle="tooltip"
+                                                                                title="Show"></i></a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1357,46 +1296,26 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-
-                                                        @forelse($opdDetails as $opd)
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="fs-14 mb-1">
-                                                            <a href="#" class="fw-semibold">{{ $opd->opd_no ?? '-' }}</a>
-                                                        </h6>
-                                                    </td>
-                                                    <td>{{ $opd->case_id ?? '-' }}</td>
-                                                    <td>
-                                                        @if($opd->appointment_date)
-                                                            {{ \Carbon\Carbon::parse($opd->appointment_date)->format('d/m/Y h:i A') }}
-                                                        @else
-                                                            -
-                                                        @endif
-                                                    </td>
-                                                    <td>{{ $opd->symptom_titles ?? '-' }}</td>
-                                                    <td>
-                                                        {{ $opd->doctor->name ?? $opd->consultant_name ?? '-' }}
-                                                        @if(!empty($opd->doctor->employee_id))
-                                                            ({{ $opd->doctor->employee_id }})
-                                                        @endif
-                                                    </td>
-                                                    
-                                                    
-                                                    <td>
+                                                            <tr>
+                                                                <td>
+                                                                    <h6 class="fs-14 mb-1"><a href="#"
+                                                                            class="fw-semibold">OPDN14</a></h6>
+                                                                </td>
+                                                                <td>18</td>
+                                                                <td> 09/17/2025 12:49 PM</td>
+                                                                <td>Fever
+                                                                </td>
+                                                                <td>Anjali Rao (D011)
+                                                                </td>
+                                                                <td>
                                                                     <div class="d-flex gap-2">
                                                                         <a href="javascript: void(0);"
                                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
                                                                             <i class="ti ti-menu" data-bs-toggle="tooltip"
                                                                                 title="Show"></i></a>
                                                                     </div>
-                                                    </td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="6" class="text-center">No OPD records found</td>
-                                                </tr>
-                                            @endforelse
-                                                            
+                                                                </td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1458,74 +1377,55 @@
                                                                             data-bs-dismiss="modal"></button>
 
                                                                     </div>
-                                                                    <form method="POST" action="{{ isset($timeline) ? route('patient-timeline.update', $timeline->id) : route('patient-timeline.store') }}" enctype="multipart/form-data">
-    @csrf
-    @if(isset($timeline))
-        @method('PUT')
-    @endif
 
-    <input type="hidden" name="patient_id" value="{{ $appointment->patient_id ?? '' }}">
+                                                                    <div class="modal-body">
 
-    <div class="modal-body">
-        <div class="row gy-3">
-            <!-- Title -->
-            <div class="col-md-12">
-                <label for="title" class="form-label">
-                    Title <span class="text-danger">*</span>
-                </label>
-                <input type="text" name="title" id="title" class="form-control"
-                    value="{{ old('title', $timeline->title ?? '') }}" required>
-            </div>
+                                                                        <div class="row gy-3">
 
-            <!-- Date -->
-            <div class="col-md-12">
-                <label for="date" class="form-label">
-                    Date <span class="text-danger">*</span>
-                </label>
-                <input type="date" name="date" id="date" class="form-control"
-                    value="{{ old('date', isset($timeline->date) ? \Carbon\Carbon::parse($timeline->date)->format('Y-m-d') : '') }}" required>
-            </div>
+                                                                            <div class="col-md-12">
+                                                                                <label for="title" class="form-label">Title
+                                                                                    <span class="text-danger">*</span>
+                                                                                </label>
+                                                                                <input type="text" name="title" id="title"
+                                                                                    class="form-control">
+                                                                            </div>
+                                                                            <div class="col-md-12">
+                                                                                <label for="date" class="form-label">Date
+                                                                                    <span class="text-danger">*</span>
+                                                                                </label>
+                                                                                <input type="date" name="date" id="date"
+                                                                                    class="form-control">
+                                                                            </div>
+                                                                            <div class="col-md-12">
+                                                                                <label for="description"
+                                                                                    class="form-label">Description
+                                                                                </label>
+                                                                                <textarea name="description"
+                                                                                    id="description"
+                                                                                    class="form-control"></textarea>
+                                                                            </div>
+                                                                            <div class="col-md-12">
+                                                                                <label for="attch_doc"
+                                                                                    class="form-label">Attach Document
+                                                                                </label>
+                                                                                <input type="file" name="attch_doc"
+                                                                                    id="date" class="form-control">
+                                                                            </div>
+                                                                            <div class="col-md-12">
+                                                                                <label for="visible_person"
+                                                                                    class="form-check-label">Visible to this
+                                                                                    person
+                                                                                </label>
+                                                                                <input type="checkbox" name="visible_person"
+                                                                                    id="date" class="form-check-input">
+                                                                            </div>
+                                                                        </div>
 
-            <!-- Description -->
-            <div class="col-md-12">
-                <label for="description" class="form-label">
-                    Description
-                </label>
-                <textarea name="description" id="description" class="form-control" rows="3">{{ old('description', $timeline->description ?? '') }}</textarea>
-            </div>
-
-            <!-- Attach Document -->
-            <div class="col-md-12">
-                <label for="attch_doc" class="form-label">
-                    Attach Document
-                </label>
-                <input type="file" name="attch_doc" id="attch_doc" class="form-control">
-                @if(isset($timeline) && $timeline->attch_doc)
-                    <small class="text-muted d-block mt-1">
-                        Current File:
-                        <a href="{{ asset('storage/timeline_docs/' . $timeline->attch_doc) }}" target="_blank">
-                            View Document
-                        </a>
-                    </small>
-                @endif
-            </div>
-
-            <!-- Visible to Person -->
-            <div class="col-md-12 form-check">
-                <input type="checkbox" name="visible_person" id="visible_person" class="form-check-input"
-                    {{ old('visible_person', $timeline->visible_person ?? false) ? 'checked' : '' }}>
-                <label for="visible_person" class="form-check-label">Visible to this person</label>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-footer">
-        <button type="submit" class="btn btn-primary">
-            {{ isset($timeline) ? 'Update' : 'Save' }}
-        </button>
-    </div>
-</form>
-
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="submit"
+                                                                            class="btn btn-primary">Save</button>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -1536,48 +1436,35 @@
                                                     <table class="table border">
                                                         <thead class="thead-light">
                                                             <tr>
-                                                                
-                                                                <th>Patient Name</th>
+                                                                <th>OPD No</th>
+                                                                <th>Case ID</th>
+                                                                <th>Appointment Date</th>
                                                                 <th>Title</th>
-                                                                <th>Description</th>
-                                                                <th>Timeline Date</th>
+                                                                <th>Date</th>
                                                                 <th>Action</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                             @forelse($PatientTimelines as $timeline)
-                <tr>
-                    <td>
-                        <h6 class="fs-14 mb-1">
-                            <a href="#" class="fw-semibold">{{ $timeline->patient->patient_name ?? '-' }}</a>
-                        </h6>
-                    </td>
-                    
-                    
-                    <td>{{ $timeline->title ?? '-' }}</td>
-                    <td>{{ $timeline->description ?? '-' }}</td>
-                    <td>
-                        @if(!empty($timeline->timeline_date))
-                            {{ \Carbon\Carbon::parse($timeline->timeline_date)->format('d/m/Y h:i A') }}
-                        @else
-                            -
-                        @endif
-                    </td>
-                    <td>
-                        <div class="d-flex gap-2">
-                            <a href="#"
-                               class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
-                               data-bs-toggle="tooltip" title="Show">
-                                <i class="ti ti-menu"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="6" class="text-center text-muted">No timeline records found</td>
-                </tr>
-            @endforelse
+                                                            <tr>
+                                                                <td>
+                                                                    <h6 class="fs-14 mb-1"><a href="#"
+                                                                            class="fw-semibold">OPDN14</a></h6>
+                                                                </td>
+                                                                <td>18</td>
+                                                                <td> 09/17/2025 12:49 PM</td>
+                                                                <td>xyz
+                                                                </td>
+                                                                <td>09/17/2025 12:49 PM
+                                                                </td>
+                                                                <td>
+                                                                    <div class="d-flex gap-2">
+                                                                        <a href="javascript: void(0);"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
+                                                                            <i class="ti ti-menu" data-bs-toggle="tooltip"
+                                                                                title="Show"></i></a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1639,57 +1526,63 @@
                                                                             data-bs-dismiss="modal"></button>
 
                                                                     </div>
-                                                                    <form method="POST" action="{{ route('patient-vitals.store') }}">
-                                                                        @csrf
-                                                                            <input type="hidden" name="patient_id" value="{{ $appointment->patient_id }}">
-                                                                        <div class="modal-body">
-                                                                            <div id="vitalFields">
-                                                                                <div class="row gy-3 vital-row mb-2">
-                                                                                    <!-- Vital Name -->
-                                                                                      
-                                                                                    <div class="col-md-4">
-                                                                                        <label for="vital_name" class="form-label">Vital Name</label>
-                                                                                        <select class="form-select" name="vital_name[]" id="vital_name">
-                                                                                            <option value="">Select</option>
-                                                                                            @foreach($vitals as $vital)
-                                                                                                <option value="{{ $vital->id }}">{{ $vital->name . ' (' . $vital->reference_range . ')' }} </option>
-                                                                                            @endforeach
-                                                                                        </select>
-                                                                                    </div>
 
-                                                                                    <!-- Vital Value -->
-                                                                                    <div class="col-md-3">
-                                                                                        <label for="vital_value" class="form-label">Vital Value</label>
-                                                                                        <input type="text" name="vital_value[]" id="vital_value" class="form-control" />
-                                                                                    </div>
+                                                                    <div class="modal-body">
 
-                                                                                    <!-- Date -->
-                                                                                    <div class="col-md-4">
-                                                                                        <label for="date" class="form-label">Date</label>
-                                                                                        <input type="date" name="date[]" id="date" class="form-control" />
-                                                                                    </div>
 
-                                                                                    <!-- Remove -->
-                                                                                    <div class="col-md-1 d-flex align-items-end">
-                                                                                        <button type="button" class="btn btn-danger remove-btn" style="display:none;">
-                                                                                            <i class="ti ti-trash"></i>
-                                                                                        </button>
-                                                                                    </div>
+
+                                                                        <div id="vitalFields">
+                                                                            <div class="row gy-3 vital-row mb-2">
+                                                                                <!-- Vital Name -->
+                                                                                <div class="col-md-4">
+                                                                                    <label for="vital_name"
+                                                                                        class="form-label">Vital
+                                                                                        Name</label>
+                                                                                    <select class="form-select"
+                                                                                        name="vital_name[]" id="vital_name">
+                                                                                        <option value="">Select</option>
+                                                                                        <option value="1">1</option>
+                                                                                    </select>
+                                                                                </div>
+                                                                                <!-- Vital Value -->
+                                                                                <div class="col-md-3">
+                                                                                    <label for="vital_value"
+                                                                                        class="form-label">Vital
+                                                                                        Value</label>
+                                                                                    <input type="text" name="vital_value[]"
+                                                                                        id="vital_value"
+                                                                                        class="form-control" />
+                                                                                </div>
+                                                                                <!-- Date -->
+                                                                                <div class="col-md-4">
+                                                                                    <label for="date"
+                                                                                        class="form-label">Date</label>
+                                                                                    <input type="date" name="date[]"
+                                                                                        id="date" class="form-control" />
+                                                                                </div>
+                                                                                <!-- Remove -->
+                                                                                <div
+                                                                                    class="col-md-1 d-flex align-items-end">
+                                                                                    <button type="button"
+                                                                                        class="btn btn-danger remove-btn"
+                                                                                        style="display:none;">
+                                                                                        <i class="ti ti-trash"></i>
+                                                                                    </button>
                                                                                 </div>
                                                                             </div>
-
-                                                                            <div class="mt-2">
-                                                                                <button type="button" class="btn btn-primary" id="addBtn">
-                                                                                    <i class="ti ti-plus"></i> Add Vital
-                                                                                </button>
-                                                                            </div>
                                                                         </div>
-
-                                                                        <div class="modal-footer">
-                                                                            <button type="submit" class="btn btn-primary">Save</button>
+                                                                        <div class="mt-2">
+                                                                            <button type="button" class="btn btn-primary"
+                                                                                id="addBtn">
+                                                                                <i class="ti ti-plus"></i> Add Operation
+                                                                            </button>
                                                                         </div>
-                                                                    </form>
+                                                                    </div>
 
+                                                                    <div class="modal-footer">
+                                                                        <button type="submit"
+                                                                            class="btn btn-primary">Save</button>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -1700,57 +1593,37 @@
                                                     <table class="table border">
                                                         <thead class="thead-light">
                                                             <tr>
-                                                                
-                                                                <th>Messure Date</th>
-                                                                 {{-- Dynamically generate vital headers --}}
-                                                                @foreach($vitals as $vital)
-                                                                    <th>{{ $vital->name }}</th>
-                                                                @endforeach
-                                                                <!-- <th>Action</th> -->
+                                                                <th>OPD No</th>
+                                                                <th>Case ID</th>
+                                                                <th>Appointment Date</th>
+                                                                <th>Vital Name</th>
+                                                                <th>Vital Value</th>
+                                                                <th>Date</th>
+                                                                <th>Action</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                              @forelse($vitalDetails->groupBy('patient_id') as $caseId => $caseVitals)
-            @php
-                $firstRecord = $caseVitals->first();
-            @endphp
-            <tr>
-
-                <td>
-                    @if(!empty($firstRecord->messure_date))
-                        {{ \Carbon\Carbon::parse($firstRecord->messure_date)->format('d/m/Y h:i A') }}
-                    @else
-                        -
-                    @endif
-                </td>
-
-                {{-- Loop through all vitals dynamically --}}
-                @foreach($vitals as $vital)
-                    @php
-                        $record = $caseVitals->where('vital_id', $vital->id)->first();
-                    @endphp
-                    <td>
-                        {{ $record->reference_range ?? '-' }}
-                    </td>
-                @endforeach
-
-                <!-- <td>
-                    <div class="d-flex gap-2">
-                        <a href="#"
-                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
-                            data-bs-toggle="tooltip" title="Show">
-                            <i class="ti ti-menu"></i>
-                        </a>
-                    </div>
-                </td> -->
-            </tr>
-        @empty
-            <tr>
-                <td colspan="{{ 4 + $vitals->count() }}" class="text-center text-muted">
-                    No vital records found
-                </td>
-            </tr>
-        @endforelse
+                                                            <tr>
+                                                                <td>
+                                                                    <h6 class="fs-14 mb-1"><a href="#"
+                                                                            class="fw-semibold">OPDN14</a></h6>
+                                                                </td>
+                                                                <td>18</td>
+                                                                <td> 09/17/2025 12:49 PM</td>
+                                                                <td>xyz
+                                                                <td>3
+                                                                </td>
+                                                                <td>09/17/2025 12:49 PM
+                                                                </td>
+                                                                <td>
+                                                                    <div class="d-flex gap-2">
+                                                                        <a href="javascript: void(0);"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
+                                                                            <i class="ti ti-menu" data-bs-toggle="tooltip"
+                                                                                title="Show"></i></a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1770,105 +1643,46 @@
     </div>
     <!-- tab content end -->
     </div>
- <!-- Chart.js Scripts -->
-<script src="{{ asset('assets/plugins/chartjs/chart.min.js') }}"></script>
-<script src="{{ asset('assets/plugins/chartjs/chart-data.js') }}"></script>
+    <!-- Chart JS -->
+    <script src="assets/plugins/chartjs/chart.min.js"></script>
+    <script src="assets/plugins/chartjs/chart-data.js"></script>
 
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        if (window.Chart) {
-            // Fetch data dynamically from Laravel controller
-            fetch("{{ route('chart.data') }}") // Laravel route returning JSON
-                .then(response => response.json())
-                .then(data => {
-                    // Render chart dynamically with fetched data
-                    var ctx = document.getElementById('AppointchartLine1').getContext('2d');
-
-                    new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: data.labels,   // e.g. ['Jan', 'Feb', ...]
-                            datasets: [{
-                                label: data.label,  // e.g. 'Patients'
-                                data: data.values,  // e.g. [10, 15, 8, ...]
-                                borderColor: 'rgba(171,0,219,1)',
-                                backgroundColor: 'rgba(171,0,219,0.2)',
-                                fill: true,
-                                tension: 0.4
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            plugins: {
-                                legend: { display: true },
-                                tooltip: { mode: 'index', intersect: false }
-                            },
-                            scales: {
-                                x: { display: true },
-                                y: { display: true, beginAtZero: true }
+    <!-- Chart.js -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (window.Chart) {
+                var ctx = document.getElementById('chartLine1').getContext('2d');
+                var chartLine1 = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Patients',
+                            data: [12, 19, 3, 5, 2, 3],
+                            borderColor: 'rgba(171,0,219,1)',
+                            backgroundColor: 'rgba(171,0,219,0.2)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: true
                             }
+                        },
+                        scales: {
+                            x: { display: true },
+                            y: { display: true }
                         }
-                    });
-                })
-                .catch(error => console.error('Error loading chart data:', error));
-        }
-    });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const addBtn = document.getElementById('addBtn');
-        const vitalFields = document.getElementById('vitalFields');
-
-        addBtn.addEventListener('click', function () {
-            const newRow = document.createElement('div');
-            newRow.classList.add('row', 'gy-3', 'vital-row', 'mb-2');
-            newRow.innerHTML = `
-                <div class="col-md-4">
-                    <label class="form-label">Vital Name</label>
-                    <select class="form-select" name="vital_name[]">
-                        <option value="">Select</option>
-                        @foreach($vitals as $vital)
-                            <option value="{{ $vital->id }}">{{ $vital->name . ' (' . $vital->reference_range . ')' }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Vital Value</label>
-                    <input type="text" name="vital_value[]" class="form-control" />
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Date</label>
-                    <input type="date" name="date[]" class="form-control" />
-                </div>
-                <div class="col-md-1 d-flex align-items-end">
-                    <button type="button" class="btn btn-danger remove-btn">
-                        <i class="ti ti-trash"></i>
-                    </button>
-                </div>
-            `;
-            vitalFields.appendChild(newRow);
-
-            updateRemoveButtons();
-        });
-
-        function updateRemoveButtons() {
-            const rows = document.querySelectorAll('.vital-row');
-            rows.forEach((row, index) => {
-                const removeBtn = row.querySelector('.remove-btn');
-                removeBtn.style.display = rows.length > 1 ? 'block' : 'none';
-                removeBtn.addEventListener('click', function () {
-                    row.remove();
-                    updateRemoveButtons();
+                    }
                 });
-            });
-        }
+            }
+        });
+    </script>
 
-        updateRemoveButtons();
-    });
-</script>
-
-    <!-- <script>
+    <script>
         document.addEventListener("DOMContentLoaded", function () {
             const addBtn = document.getElementById("addBtn");
             const vitalFields = document.getElementById("vitalFields");
@@ -1901,6 +1715,7 @@
                 vitalFields.appendChild(newRow);
             });
         });
-    </script> -->
+    </script>
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\hims\resources\views/admin/patient_details.blade.php ENDPATH**/ ?>

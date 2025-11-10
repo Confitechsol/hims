@@ -36,6 +36,170 @@
         }
     </style>
 
+
+    <!-- Stepper timeline (styled to match provided screenshot) -->
+    <style>
+        .timeline-wrapper {
+            position: relative;
+            padding-left: 170px;
+            padding-right: 20px;
+            margin-top: 80px;
+        }
+
+        /* vertical line */
+        .timeline-wrapper::before {
+            content: "";
+            position: absolute;
+            left: 118px;
+            top: -30px;
+            bottom: -45px;
+            width: 4px;
+            background: #e6edf8;
+            border-radius: 2px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 65px;
+            display: flex;
+            gap: 18px;
+            align-items: flex-start;
+        }
+
+        /* date badge on the left */
+        .timeline-date {
+            position: absolute;
+            left: -110px;
+            top: -50px;
+            width: 140px;
+            display: inline-block;
+        }
+
+        .timeline-date .date-badge {
+            display: inline-block;
+            background: #750096;
+            color: #fff;
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 12px;
+            box-shadow: 0 2px 6px rgba(11, 113, 199, 0.15);
+        }
+
+        .timeline-date .date-badge .time {
+            font-weight: 500;
+            font-size: 11px;
+            opacity: 0.95;
+        }
+
+        /* round node that sits on the line */
+        .timeline-node {
+            position: absolute;
+            left: -68px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(11, 113, 199, 0.15);
+            top: 50px;
+            z-index: 3;
+        }
+
+        /* card on right */
+        .timeline-card {
+            background: #f7f8fb;
+            border-radius: 8px;
+            padding: 12px 14px;
+            border: 1px solid #eceff6;
+            flex: 1;
+        }
+
+        .timeline-card .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .timeline-card .title {
+            font-weight: 700;
+            color: #212529;
+            margin: 0;
+            font-size: 15px;
+        }
+
+        .timeline-card .time {
+            color: #6c757d;
+            font-size: 12px;
+        }
+
+        .timeline-actions i {
+            cursor: pointer;
+        }
+
+        .timeline-body {
+            margin-top: 8px;
+            color: #4b5563;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        /* final clock marker */
+        .timeline-end {
+            position: relative;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+
+        .timeline-end .node-end {
+            position: absolute;
+            left: -70px;
+            top: -25px;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: #ffffff;
+            color: #750096;
+            border: 2px solid #e9e9e9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3;
+        }
+
+        /* small responsive tweak */
+        @media (max-width: 768px) {
+            .timeline-wrapper {
+                padding-left: 120px;
+            }
+
+            .timeline-wrapper::before {
+                left: 84px;
+            }
+
+            .timeline-node {
+                left: 72px;
+            }
+
+            .timeline-date {
+                left: 0;
+                width: 100px;
+            }
+
+            .timeline-card {
+                margin-left: 22px;
+            }
+
+            .timeline-end .node-end {
+                left: 72px;
+            }
+        }
+    </style>
+
+
     <div class="p-4">
 
         <!-- tab start -->
@@ -95,7 +259,7 @@
                             <div class="card-body">
                                 <div class="d-sm-flex position-relative z-0 overflow-hidden p-2">
                                     <!-- <img src="assets/img/icons/shape-01.svg" alt="img"
-                                                                                                                                                                                                                class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
+                                                                                                                                                                                                                                                    class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
                                     <a href="javascript:void(0);"
                                         class="avatar avatar-xxxl patient-avatar me-2 flex-shrink-0">
                                         <img src="assets/img/patient.png" alt="product" class="rounded">
@@ -177,19 +341,19 @@
                                         </div>
                                     </div>
                                     <!-- <div class="row">
-                                                                                                                                                                                                    <div class="col-sm-5">
+                                                                                                                                                                                                                                        <div class="col-sm-5">
 
-                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                    <div class="col-sm-7">
+                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                        <div class="col-sm-7">
 
-                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                    <div class="col-sm-5">
+                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                        <div class="col-sm-5">
 
-                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                    <div class="col-sm-7">
+                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                        <div class="col-sm-7">
 
-                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                </div> -->
+                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                    </div> -->
                                 </div>
                                 <hr>
                                 <div class="d-flex align-items-center mb-3">
@@ -1152,7 +1316,8 @@
                                                                                 title="Print Bill"></i></a>
                                                                         <a href="javascript: void(0);"
                                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
-                                                                            data-bs-toggle="modal" data-bs-target="#addPrescriptionModal">
+                                                                            data-bs-toggle="modal"
+                                                                            data-bs-target="#addPrescriptionModal">
                                                                             <i class="fa-solid fa-prescription"
                                                                                 data-bs-toggle="tooltip"
                                                                                 title="Add Prescription"></i></a>
@@ -1355,7 +1520,6 @@
                                                         </span>
                                                         <input type="text" class="form-control shadow-sm"
                                                             placeholder="Search">
-
                                                     </div>
                                                     <div class="d-flex align-items-center flex-wrap gap-2">
                                                         <div class="text-end d-flex">
@@ -1364,66 +1528,68 @@
                                                                 data-bs-toggle="modal" data-bs-target="#add_timeline"><i
                                                                     class="ti ti-plus me-1"></i>Add Timeline</a>
                                                         </div>
-                                                        <!-- First Modal -->
+                                                        <!-- Add Timeline Modal -->
                                                         <div class="modal fade" id="add_timeline" tabindex="-1"
                                                             aria-hidden="true">
                                                             <div class="modal-dialog modal-dialog-centered">
                                                                 <div class="modal-content">
-
                                                                     <div class="modal-header"
                                                                         style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-
                                                                         <h5 class="modal-title" id="addSpecializationLabel">
                                                                             Add Timeline
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
                                                                             data-bs-dismiss="modal"></button>
-
                                                                     </div>
-
                                                                     <div class="modal-body">
-
-                                                                        <div class="row gy-3">
-
-                                                                            <div class="col-md-12">
-                                                                                <label for="title" class="form-label">Title
-                                                                                    <span class="text-danger">*</span>
-                                                                                </label>
-                                                                                <input type="text" name="title" id="title"
-                                                                                    class="form-control">
+                                                                        <form>
+                                                                            <div class="row gy-3">
+                                                                                <div class="col-md-12">
+                                                                                    <label for="timeline_title"
+                                                                                        class="form-label">Title
+                                                                                        <span class="text-danger">*</span>
+                                                                                    </label>
+                                                                                    <input type="text" name="title"
+                                                                                        id="timeline_title"
+                                                                                        class="form-control">
+                                                                                </div>
+                                                                                <div class="col-md-12">
+                                                                                    <label for="timeline_date"
+                                                                                        class="form-label">Date
+                                                                                        <span class="text-danger">*</span>
+                                                                                    </label>
+                                                                                    <input type="date" name="date"
+                                                                                        id="timeline_date"
+                                                                                        class="form-control">
+                                                                                </div>
+                                                                                <div class="col-md-12">
+                                                                                    <label for="timeline_description"
+                                                                                        class="form-label">Description
+                                                                                    </label>
+                                                                                    <textarea name="description"
+                                                                                        id="timeline_description"
+                                                                                        class="form-control"></textarea>
+                                                                                </div>
+                                                                                <div class="col-md-12">
+                                                                                    <label for="timeline_attach"
+                                                                                        class="form-label">Attach Document
+                                                                                    </label>
+                                                                                    <input type="file" name="attch_doc"
+                                                                                        id="timeline_attach"
+                                                                                        class="form-control">
+                                                                                </div>
+                                                                                <div
+                                                                                    class="col-md-12 d-flex align-items-center gap-2">
+                                                                                    <input type="checkbox"
+                                                                                        name="visible_person"
+                                                                                        id="visible_person"
+                                                                                        class="form-check-input">
+                                                                                    <label for="visible_person"
+                                                                                        class="form-check-label">Visible to
+                                                                                        this person</label>
+                                                                                </div>
                                                                             </div>
-                                                                            <div class="col-md-12">
-                                                                                <label for="date" class="form-label">Date
-                                                                                    <span class="text-danger">*</span>
-                                                                                </label>
-                                                                                <input type="date" name="date" id="date"
-                                                                                    class="form-control">
-                                                                            </div>
-                                                                            <div class="col-md-12">
-                                                                                <label for="description"
-                                                                                    class="form-label">Description
-                                                                                </label>
-                                                                                <textarea name="description"
-                                                                                    id="description"
-                                                                                    class="form-control"></textarea>
-                                                                            </div>
-                                                                            <div class="col-md-12">
-                                                                                <label for="attch_doc"
-                                                                                    class="form-label">Attach Document
-                                                                                </label>
-                                                                                <input type="file" name="attch_doc"
-                                                                                    id="date" class="form-control">
-                                                                            </div>
-                                                                            <div class="col-md-12">
-                                                                                <label for="visible_person"
-                                                                                    class="form-check-label">Visible to this
-                                                                                    person
-                                                                                </label>
-                                                                                <input type="checkbox" name="visible_person"
-                                                                                    id="date" class="form-check-input">
-                                                                            </div>
-                                                                        </div>
-
+                                                                        </form>
                                                                     </div>
                                                                     <div class="modal-footer">
                                                                         <button type="submit"
@@ -1434,47 +1600,134 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <!-- Table start -->
-                                                <div class="table-responsive table-nowrap">
-                                                    <table class="table border">
-                                                        <thead class="thead-light">
-                                                            <tr>
-                                                                <th>OPD No</th>
-                                                                <th>Case ID</th>
-                                                                <th>Appointment Date</th>
-                                                                <th>Title</th>
-                                                                <th>Date</th>
-                                                                <th>Action</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td>
-                                                                    <h6 class="fs-14 mb-1"><a href="#"
-                                                                            class="fw-semibold">OPDN14</a></h6>
-                                                                </td>
-                                                                <td>18</td>
-                                                                <td> 09/17/2025 12:49 PM</td>
-                                                                <td>xyz
-                                                                </td>
-                                                                <td>09/17/2025 12:49 PM
-                                                                </td>
-                                                                <td>
-                                                                    <div class="d-flex gap-2">
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                            <i class="ti ti-menu" data-bs-toggle="tooltip"
-                                                                                title="Show"></i></a>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
+
+                                                <div class="timeline-wrapper">
+
+                                                    <!-- Step 1 (Completed) -->
+                                                    <div class="timeline-item">
+                                                        <div class="timeline-date">
+                                                            <div class="date-badge">
+                                                                11/13/2025
+                                                                <span class="time">04:57 AM</span>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="timeline-node bg-primary" title="Completed">
+                                                            <i class="fa-solid fa-file-lines"></i>
+                                                        </div>
+
+                                                        <div class="timeline-card">
+                                                            <div class="card-header">
+                                                                <div>
+                                                                    <h5 class="title">Test</h5>
+
+                                                                </div>
+                                                                <div class="timeline-actions"
+                                                                    aria-label="Edit or delete step">
+                                                                    <a href="javascript: void(0);"
+                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-info rounded-pill">
+                                                                        <i class="ti ti-pencil" data-bs-toggle="tooltip"
+                                                                            title="Edit"></i></a>
+                                                                    <a href="javascript: void(0);"
+                                                                        class="fs-18 btn btn-icon btn-sm btn-danger rounded-pill">
+                                                                        <i class="ti ti-trash text" data-bs-toggle="tooltip"
+                                                                            title="Delete"></i></a>
+
+                                                                </div>
+                                                            </div>
+                                                            <div class="timeline-body">
+                                                                test description
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Step 2 (In progress) -->
+                                                    <!-- <div class="timeline-item">
+                                                                        <div class="timeline-date">
+                                                                            <div class="date-badge">
+                                                                                11/13/2025
+                                                                                <span class="time">04:56 AM</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="timeline-node" title="In progress" style="background:#00a5ff;">
+                                                                            <i class="fa-solid fa-vials"></i>
+                                                                        </div>
+
+                                                                        <div class="timeline-card">
+                                                                            <div class="card-header">
+                                                                                <div>
+                                                                                    <h5 class="title">Lab Investigation Requested</h5>
+                                                                                    <div class="time">11/13/2025 04:56 AM</div>
+                                                                                </div>
+                                                                                <div class="timeline-actions" aria-label="Edit or delete step">
+                                                                                    <i class="fas fa-pen" title="Edit"></i>
+                                                                                    <i class="fas fa-trash" title="Delete"></i>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="timeline-body">
+                                                                                Blood tests &amp; lipid profile sample collected. Awaiting results. Documents attached.
+                                                                            </div>
+                                                                        </div>
+                                                                    </div> -->
+
+
+
+                                                    <!-- Final clock marker -->
+                                                    <div class="timeline-end">
+                                                        <div class="node-end" aria-hidden="true">
+                                                            <i class="fas fa-clock"></i>
+                                                        </div>
+                                                    </div>
+
                                                 </div>
-                                                <!-- Table end -->
+
                                             </div>
                                         </div>
                                     </div>
+
+
+                                    <!-- Table start -->
+                                    <!-- <div class="table-responsive table-nowrap">
+                                                                                        <table class="table border">
+                                                                                            <thead class="thead-light">
+                                                                                                <tr>
+                                                                                                    <th>OPD No</th>
+                                                                                                    <th>Case ID</th>
+                                                                                                    <th>Appointment Date</th>
+                                                                                                    <th>Title</th>
+                                                                                                    <th>Date</th>
+                                                                                                    <th>Action</th>
+                                                                                                </tr>
+                                                                                            </thead>
+                                                                                            <tbody>
+                                                                                                <tr>
+                                                                                                    <td>
+                                                                                                        <h6 class="fs-14 mb-1"><a href="#"
+                                                                                                                class="fw-semibold">OPDN14</a></h6>
+                                                                                                    </td>
+                                                                                                    <td>18</td>
+                                                                                                    <td> 09/17/2025 12:49 PM</td>
+                                                                                                    <td>xyz
+                                                                                                    </td>
+                                                                                                    <td>09/17/2025 12:49 PM
+                                                                                                    </td>
+                                                                                                    <td>
+                                                                                                        <div class="d-flex gap-2">
+                                                                                                            <a href="javascript: void(0);"
+                                                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
+                                                                                                                <i class="ti ti-menu" data-bs-toggle="tooltip"
+                                                                                                                    title="Show"></i></a>
+                                                                                                        </div>
+                                                                                                    </td>
+                                                                                                </tr>
+                                                                                            </tbody>
+                                                                                        </table>
+                                                                                    </div> -->
+                                    <!-- Table end -->
+
+
+
                                 </div>
                             </div>
                         </div>
@@ -1640,11 +1893,19 @@
                     </div>
                 </div>
             </div>
-            <!-- row end -->
         </div>
+    </div>
+    </div>
+    <!-- row end -->
+    </div>
     </div>
     <!-- tab content end -->
     </div>
+
+    <!-- FontAwesome for icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+
     <!-- Chart JS -->
     <script src="assets/plugins/chartjs/chart.min.js"></script>
     <script src="assets/plugins/chartjs/chart-data.js"></script>
@@ -1719,6 +1980,8 @@
         });
     </script>
 
-  @include('components.modals.add-prescription-modal')
+
+
+    @include('components.modals.add-prescription-modal')
 
 @endsection

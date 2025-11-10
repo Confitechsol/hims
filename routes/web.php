@@ -498,6 +498,7 @@ Route::prefix('/appointment-details')->group(function () {
     Route::get('/get-doctor-shifts/{id}', [AppointmentController::class, 'getDoctorShifts'])->name('doctor.shifts');
     Route::get('/get-doctor-slots/{doctorId}/{shiftId}', [AppointmentController::class, 'getDoctorSlots'])->name('doctor.slots');
     Route::get('/get-appointment-priorities', [AppointmentController::class, 'getAppointmentPriorities'])->name('appointment.priorities');
+   Route::get('/get-doctor-fees', [AppointmentController::class, 'getDoctorFees'])->name('appointments.getDoctorFees');
 
     Route::get('/appointments/{id}/edit', [AppointmentsController::class, 'edit'])->name('appointments.edit');
     Route::put('/appointments/{id}', [AppointmentsController::class, 'update'])->name('appointments.update');
@@ -506,6 +507,10 @@ Route::prefix('/appointment-details')->group(function () {
     Route::get('/queue', function () {return view('admin.appointments.queue');})->name('appointments.queue');
     Route::get('/queue', function () {return view('admin.appointments.queue');})->name('appointments.queue');
     Route::get('patient-view/{patient_id}', [AppointmentsController::class, 'show'])->name('patient.view');
+     Route::post('/store-patient-vitals', [AppointmentsController::class, 'storePatientVitals'])->name('patient-vitals.store');
+     Route::post('/store-patient-timeline', [AppointmentsController::class, 'storePatientTimeline'])->name('patient-timeline.store');
+     Route::post('/update-patient-timeline', [AppointmentsController::class, 'updatePatientTimeline'])->name('patient-timeline.update');
+Route::get('/chart-data', [AppointmentsController::class, 'getChartData'])->name('chart.data');
 
 });
 

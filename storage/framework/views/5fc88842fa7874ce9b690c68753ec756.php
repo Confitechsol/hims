@@ -1,11 +1,9 @@
-@extends('layouts.adminLayout')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
     <!-- ========================
         Start Page Content
     ========================= -->
 
-    {{-- <div class="page-wrapper"> --}}
+    
 
         <style>
             .modal-backdrop.show:nth-of-type(2) {
@@ -43,19 +41,20 @@
                                     <div class="modal fade" id="add_appointment" tabindex="-1" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered modal-xl">
                                             <div class="modal-content">
-                                                <form method="POST" action="{{ route('appointments.store') }}">
-                                                    @csrf
+                                                <form method="POST" action="<?php echo e(route('appointments.store')); ?>">
+                                                    <?php echo csrf_field(); ?>
                                                     <div class="modal-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                                                         <div class="row w-100 align-items-center">
                                                             <div class="col-md-7">
                                                                 <select class="form-select select2" id="patient_id" name="patient_id"
                                                                     data-placeholder="Enter Patient Name or Id…" required>
                                                                     <option value="">Select Patient</option>
-                                                                    @foreach($patients as $patient)
-                                                                        <option value="{{ $patient->id }}" >
-                                                                            {{ $patient->patient_name }}
+                                                                    <?php $__currentLoopData = $patients; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $patient): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                        <option value="<?php echo e($patient->id); ?>" >
+                                                                            <?php echo e($patient->patient_name); ?>
+
                                                                         </option>
-                                                                    @endforeach
+                                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                 
                                                                 </select>
                                                             </div>
@@ -77,11 +76,12 @@
                                                                 <label for="doctor" class="form-label">Doctor <span class="text-danger">*</span></label>
                                                                 <select class="form-select js-example-basic-single" id="doctor" name="doctor" required>
                                                                     <option value="">Select Doctor</option>
-                                                                    @foreach($doctors as $doctor)
-                                                                        <option value="{{ $doctor->id }}" >
-                                                                            {{ $doctor->name }}
+                                                                    <?php $__currentLoopData = $doctors; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $doctor): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                        <option value="<?php echo e($doctor->id); ?>" >
+                                                                            <?php echo e($doctor->name); ?>
+
                                                                         </option>
-                                                                    @endforeach
+                                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                 </select>
                                                             </div>
 
@@ -121,11 +121,12 @@
                                                                 <label for="appointment_priority" class="form-label">Appointment Priority</label>
                                                                 <select class="form-select" id="appointment_priority" name="appointment_priority">
                                                                     <option value="">Select Priority</option>
-                                                                        @foreach($priorities as $priority)
-                                                                            <option value="{{ $priority->id }}" >
-                                                                                {{ $priority->appoint_priority }}
+                                                                        <?php $__currentLoopData = $priorities; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $priority): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                            <option value="<?php echo e($priority->id); ?>" >
+                                                                                <?php echo e($priority->appoint_priority); ?>
+
                                                                             </option>
-                                                                        @endforeach
+                                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                 </select>
                                                                 
                                                             </div>
@@ -182,10 +183,10 @@
 
 
                                     
-                                    <a href="{{ route('appointments.doctor-wise') }}"
+                                    <a href="<?php echo e(route('appointments.doctor-wise')); ?>"
                                         class="btn btn-outline-primary d-inline-flex align-items-center"><i
                                             class="ti ti-menu me-1"></i>Doctor Wise</a>
-                                    <!-- <a href="{{ route('appointments.queue') }}"
+                                    <!-- <a href="<?php echo e(route('appointments.queue')); ?>"
                                         class="btn btn-outline-primary d-inline-flex align-items-center"><i
                                             class="ti ti-menu me-1"></i>Queue</a> -->
                                 </div>
@@ -213,48 +214,49 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @forelse($appointments as $appointment)
+                                        <?php $__empty_1 = true; $__currentLoopData = $appointments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $appointment): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                         <tr>
                                             <td>
                                                 <h6 class="fs-14 mb-1">
-                                                     <a href="{{ route('patient.view', $appointment->patient_id) }}" 
+                                                     <a href="<?php echo e(route('patient.view', $appointment->patient_id)); ?>" 
                                                         class="fw-semibold text-primary">
-                                                            {{ $appointment->patient->patient_name ?? 'N/A' }} ({{ $appointment->patient_id }})
+                                                            <?php echo e($appointment->patient->patient_name ?? 'N/A'); ?> (<?php echo e($appointment->patient_id); ?>)
                                                     </a>
                                                 </h6>
                                             </td>
 
-                                            <td>{{ $appointment->appointment_id ?? 'N/A' }}</td>
+                                            <td><?php echo e($appointment->appointment_id ?? 'N/A'); ?></td>
 
                                             <td>
-                                                {{ \Carbon\Carbon::parse($appointment->date)->format('d/m/Y') }}
-                                                <!-- {{ $appointment->slot->start_time ?? '' }} -->
+                                                <?php echo e(\Carbon\Carbon::parse($appointment->date)->format('d/m/Y')); ?>
+
+                                                <!-- <?php echo e($appointment->slot->start_time ?? ''); ?> -->
                                             </td>
 
-                                            <td>{{ $appointment->patient->contact_no ?? '-' }}</td>
+                                            <td><?php echo e($appointment->patient->contact_no ?? '-'); ?></td>
 
-                                            <td>{{ ucfirst($appointment->patient->gender ?? 'N/A') }}</td>
+                                            <td><?php echo e(ucfirst($appointment->patient->gender ?? 'N/A')); ?></td>
 
-                                            <td>{{ $appointment->doctorUser->name ?? 'N/A' }} ({{ $appointment->doctorUser->doctor_id ?? '' }})</td>
+                                            <td><?php echo e($appointment->doctorUser->name ?? 'N/A'); ?> (<?php echo e($appointment->doctorUser->doctor_id ?? ''); ?>)</td>
 
-                                            <td>{{ ucfirst($appointment->source ?? 'Offline') }}</td>
+                                            <td><?php echo e(ucfirst($appointment->source ?? 'Offline')); ?></td>
 
-                                            <td>{{ $appointment->priority }}</td>
+                                            <td><?php echo e($appointment->priority); ?></td>
 
-                                            <td>{{ ucfirst($appointment->live_consult ?? 'No') }}</td>
+                                            <td><?php echo e(ucfirst($appointment->live_consult ?? 'No')); ?></td>
 
-                                            <td>{{ number_format($appointment->discount_percentage ?? 0, 2) }}</td>
+                                            <td><?php echo e(number_format($appointment->discount_percentage ?? 0, 2)); ?></td>
 
-                                            <td>{{ number_format($appointment->amount ?? 0, 2) }}</td>
+                                            <td><?php echo e(number_format($appointment->amount ?? 0, 2)); ?></td>
 
                                             <td>
-                                                @if($appointment->appointment_status === 'confirmed')
+                                                <?php if($appointment->appointment_status === 'confirmed'): ?>
                                                     <span class="badge fs-13 py-1 badge-soft-success border border-success rounded text-success fw-medium">Confirmed</span>
-                                                @elseif($appointment->appointment_status === 'pending')
+                                                <?php elseif($appointment->appointment_status === 'pending'): ?>
                                                     <span class="badge fs-13 py-1 badge-soft-warning border border-warning rounded text-warning fw-medium">Pending</span>
-                                                @elseif($appointment->appointment_status === 'rescheduled')
+                                                <?php elseif($appointment->appointment_status === 'rescheduled'): ?>
                                                     <span class="badge fs-13 py-1 badge-soft-secondary border border-secondary rounded text-secondary fw-medium">Rescheduled</span>
-                                                @endif
+                                                <?php endif; ?>
                                             </td>
 
                                             <td>
@@ -275,27 +277,27 @@
                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill reschedule-btn"
                                                 data-bs-toggle="tooltip" 
                                                 title="Reschedule"
-                                                data-id="{{ $appointment->id }}"
-                                                data-patient="{{ $appointment->patient->patient_name ?? '' }}"
-                                                data-patientid="{{ $appointment->patient_id }}"
-                                                data-doctor="{{ $appointment->doctor->name ?? '' }}"
-                                                data-doctorid="{{ $appointment->doctor_id }}"
-                                                data-fees="{{ $appointment->doctor_fees ?? '' }}"
-                                                data-date="{{ $appointment->appointment_date }}"
-                                                data-shift="{{ $appointment->shift_id }}"
-                                                data-slot="{{ $appointment->slot_id }}"
-                                                data-priority="{{ $appointment->appointment_priority }}"
-                                                data-status="{{ $appointment->status }}"
-                                                data-payment="{{ $appointment->payment_method }}"
-                                                data-discount="{{ $appointment->discount_percentage }}"
-                                                data-message="{{ $appointment->message }}"
-                                                data-live="{{ $appointment->live_con }}">
+                                                data-id="<?php echo e($appointment->id); ?>"
+                                                data-patient="<?php echo e($appointment->patient->patient_name ?? ''); ?>"
+                                                data-patientid="<?php echo e($appointment->patient_id); ?>"
+                                                data-doctor="<?php echo e($appointment->doctor->name ?? ''); ?>"
+                                                data-doctorid="<?php echo e($appointment->doctor_id); ?>"
+                                                data-fees="<?php echo e($appointment->doctor_fees ?? ''); ?>"
+                                                data-date="<?php echo e($appointment->appointment_date); ?>"
+                                                data-shift="<?php echo e($appointment->shift_id); ?>"
+                                                data-slot="<?php echo e($appointment->slot_id); ?>"
+                                                data-priority="<?php echo e($appointment->appointment_priority); ?>"
+                                                data-status="<?php echo e($appointment->status); ?>"
+                                                data-payment="<?php echo e($appointment->payment_method); ?>"
+                                                data-discount="<?php echo e($appointment->discount_percentage); ?>"
+                                                data-message="<?php echo e($appointment->message); ?>"
+                                                data-live="<?php echo e($appointment->live_con); ?>">
                                                     <i class="ti ti-calendar-time"></i>
                                                 </a> -->
 
                                                 <a href="javascript:void(0);" 
                                                     class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill rescheduleBtn" 
-                                                    data-id="{{ $appointment->id }}" 
+                                                    data-id="<?php echo e($appointment->id); ?>" 
                                                     data-bs-toggle="tooltip" 
                                                     title="Reschedule">
                                                         <i class="ti ti-calendar-time"></i>
@@ -305,11 +307,11 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                    @empty
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                         <tr>
                                             <td colspan="13" class="text-center text-muted">No appointments found.</td>
                                         </tr>
-                                    @endforelse
+                                    <?php endif; ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -321,14 +323,14 @@
             <!-- row end -->
         </div>
 
-        @include('components.modals.add-patients-modal')
+        <?php echo $__env->make('components.modals.add-patients-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
          <!-- Edit Modal (nested) -->
         <div class="modal fade" id="rescheduleModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-xl">
                 <div class="modal-content">
                     <form id="rescheduleForm" method="POST">
-                        @csrf
-                        @method('PUT')
+                        <?php echo csrf_field(); ?>
+                        <?php echo method_field('PUT'); ?>
 
                         <div class="modal-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                             <h5 class="mb-0 text-dark fw-bold">Reschedule Appointment</h5>
@@ -337,42 +339,42 @@
 
                         <div class="modal-body">
                             <div class="row gy-3">
-                                {{-- Patient Name --}}
+                                
                                 <div class="col-md-3">
                                     <label>Patient</label>
                                     <input type="text" id="reschedule_patient" class="form-control" readonly>
                                 </div>
 
-                                {{-- Doctor --}}
+                                
                                 <div class="col-md-3">
                                     <label>Doctor</label>
                                     <input type="text" id="reschedule_doctor" class="form-control" readonly>
                                 </div>
 
-                                {{-- Fees --}}
+                                
                                 <div class="col-md-3">
                                     <label>Doctor Fees (INR)</label>
                                     <input type="text" id="reschedule_fees" class="form-control" readonly>
                                 </div>
 
-                                {{-- Shift --}}
+                                
                                 <div class="col-md-3">
                                     <label>Shift</label>
                                     <select id="reschedule_shift" name="shift" class="form-select" required></select>
                                 </div>
 
-                                {{-- Date --}}
+                                
                                 <div class="col-md-3">
                                     <label>Date</label>
                                     <input type="date" id="reschedule_date" name="appointment_date" class="form-control" required>
                                 </div>
 
-                                {{-- Slot --}}
+                                
                                 <div class="col-md-3">
                                     <label>Slot</label>
                                     <select id="reschedule_slot" name="slot" class="form-select" required></select>
                                 </div>
-                                {{-- Status --}}
+                                
                                 <div class="col-md-3">
                                     <label>Status</label>
                                     <select id="reschedule_status" name="status" class="form-select">
@@ -403,14 +405,14 @@
                 btn.addEventListener('click', function() {
                     const id = this.dataset.id;
 
-                    fetch(`{{ url('appointment-details/appointments') }}/${id}/edit`)
+                    fetch(`<?php echo e(url('appointment-details/appointments')); ?>/${id}/edit`)
                         .then(response => response.json())
                         .then(data => {
                             const appointment = data.appointment;
 
                             // Set form action dynamically
                             const form = document.getElementById('rescheduleForm');
-                            form.action = `{{ url('appointment-details/appointments') }}/${appointment.id}`;
+                            form.action = `<?php echo e(url('appointment-details/appointments')); ?>/${appointment.id}`;
 
                             // Fill modal fields
                             document.getElementById('reschedule_patient').value = appointment.patient.patient_name;
@@ -534,7 +536,7 @@
                     }
 
                     $.ajax({
-                        url: '{{ route("doctor.shifts", ":doctorId") }}'.replace(':doctorId', doctorId),
+                        url: '<?php echo e(route("doctor.shifts", ":doctorId")); ?>'.replace(':doctorId', doctorId),
                         type: 'GET',
                         success: function(response) {
                             let options = '<option value="">Select Shift</option>';
@@ -561,7 +563,7 @@
                     }
 
                     $.ajax({
-                        url: '{{ route("doctor.slots", [":doctorId", ":shiftId"]) }}'
+                        url: '<?php echo e(route("doctor.slots", [":doctorId", ":shiftId"])); ?>'
                             .replace(':doctorId', doctorId)
                             .replace(':shiftId', shiftId),
                         type: 'GET',
@@ -591,7 +593,7 @@ $(document).ready(function() {
         alert('hi');
         // When doctor is selected, get default charge_category_id = 1
         $.ajax({
-            url: '{{ route("appointments.getDoctorFees") }}',
+            url: '<?php echo e(route("appointments.getDoctorFees")); ?>',
             type: 'GET',
             success: function (response) {
                 if (response.fees) {
@@ -612,4 +614,5 @@ $(document).ready(function() {
 
 
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\hims\resources\views/admin/appointments/appointment_details.blade.php ENDPATH**/ ?>
