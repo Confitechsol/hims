@@ -243,10 +243,22 @@
                             <li>
                                 <a href="#">
                                     <i class="ti ti-map-pin"></i><span>Pharmacy</span>
+                                    <span class="menu-arrow"></span>
                                 </a>
+                                <ul style="display: none;">
+                                    <li><a href="<?php echo e(route('setup.medicine-category')); ?>">Medicine Category</a></li>
+                                    <li><a href="<?php echo e(route('setup.medicine-supplier')); ?>">Medicine Supplier</a></li>
+                                    <li><a href="<?php echo e(route('setup.medicine-dosage')); ?>">Medicine Dosage</a></li>
+                                    <li><a href="<?php echo e(route('setup.medicine-group')); ?>">Medicine Group</a></li>
+                                    <li><a href="<?php echo e(route('setup.medicine-unit')); ?>">Medicine Unit</a></li>
+                                    <li><a href="<?php echo e(route('setup.dose-duration')); ?>">Dose Duration</a></li>
+                                    <li><a href="<?php echo e(route('setup.dose-interval')); ?>">Dose Interval</a></li>
+                                    <li><a href="<?php echo e(route('setup.medicine-company')); ?>">Medicine Company</a></li>
+                                    <li><a href="<?php echo e(route('pharmacy.billing.index')); ?>">Pharmacy Billing</a></li>                                    
+                                </ul>
                             </li>
-                            <li>
-                                <a href="#">
+                            <li class="submenu">
+                                <a href="javascript:void(0);">
                                     <i class="ti ti-map-pin"></i><span>Pathology</span>
                                 </a>
  

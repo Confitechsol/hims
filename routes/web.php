@@ -61,6 +61,7 @@ use App\Http\Controllers\VitalController;
 use App\Http\Controllers\DutyRosterController;
 use App\Http\Controllers\BirthController;
 use App\Http\Controllers\DeathController;
+use App\Http\Controllers\VisitorsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -293,6 +294,10 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/birth', [BirthController::class, 'index']);
 
     Route::get('/death', [DeathController::class, 'index']);
+
+    Route::get('/visitors', [VisitorsController::class, 'index']);
+
+
 
 
 

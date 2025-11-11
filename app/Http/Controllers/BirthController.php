@@ -23,7 +23,7 @@ class BirthController extends Controller
         });
     }
     $birthReports = $query->paginate($perPage);
-    //return response()->json($birthReports, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
+    //return response()->json($birthReports, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);~
      return view('admin.birthordeath.index', compact('birthReports'));
     }
 }
