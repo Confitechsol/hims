@@ -151,18 +151,32 @@
     </div>
     </div>
     </div>
-    <x-modals.birth-modal type="add" id="createModal" title="Add Birth Record" action="{{ route('tpamanagement.store') }}"
+    <x-modals.birth-modal type="add" id="createModal" class="modal-fullscreen" title="Add Birth Record" action="{{ route('tpamanagement.store') }}"
         :fields="[
             [
-                'name' => 'organisation_name',
-                'label' => 'organisation Name',
+                'name' => 'child_name',
+                'label' => 'Child Name',
                 'type' => 'text',
                 'required' => true,
                 'size' => '5',
             ],
-            ['name' => 'code', 'label' => 'Code', 'type' => 'text', 'required' => true, 'size' => '3'],
-            ['name' => 'contact_no', 'label' => 'Phone', 'type' => 'text', 'required' => true, 'size' => '4'],
-            ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => true, 'size' => '12'],
+            [ 'name' => 'gender', 'label' => 'Gender', 'type' => 'select', 'required' => true, 'options' => [     'Male' => 'Male',   'Female' => 'Female' ], 'size' => '3'],
+
+            ['name' => 'weight', 'label' => 'Weight', 'type' => 'text', 'required' => true, 'size' => '4'],
+            
+            ['name' => 'baby_image', 'label' => 'Child Photo', 'type' => 'file', 'required' => false, 'size' => '6',],
+            ['name' => 'birth_date', 'label' => 'Birth Date', 'type' => 'date', 'required' => true, 'size' => '4'],
+            ['name' => 'contact_person_phone', 'label' => 'Phone', 'type' => 'text',  'size' => '6'],
+            ['name' => 'address', 'label' => 'Address', 'type' => 'text',  'size' => '12'],
+            ['name' => 'caseId', 'label' => 'Case Id', 'type' => 'text',  'size' => '6'],
+           [
+                'name' => 'mother_name',
+                'label' => 'Mother Name ',
+                'type' => 'text',
+                'required' => true,
+                'size' => '5',
+            ],
+            ['name' => 'mother_image', 'label' => 'Mother Photo', 'type' => 'file', 'required' => false, 'size' => '6',],
             [
                 'name' => 'contact_person_name',
                 'label' => 'Contact Person Name',
@@ -171,13 +185,23 @@
                 'size' => '6',
             ],
             [
-                'name' => 'contact_person_phone',
-                'label' => 'Contact Person Phone',
+                'name' => 'father_name',
+                'label' => 'Father Name ',
                 'type' => 'text',
                 'required' => true,
-                'size' => '6',
+                'size' => '5',
             ],
-        ]" :columns="3" />
+            ['name' => 'father_image', 'label' => 'Father Photo', 'type' => 'file', 'required' => false, 'size' => '6',],
+            
+            [
+                'name' => 'report',
+                'label' => 'Report',
+                'type' => 'text',
+                'size' => '5',
+            ],
+           ['name' => 'report_image', 'label' => 'Attach Document Photo', 'type' => 'file', 'required' => false, 'size' => '6',],
+           
+        ]" :columns="4" />
     <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Company Name"
         action="{{ route('tpamanagement.update') }}" :fields="[
             ['name' => 'id', 'type' => 'hidden', 'required' => true],
