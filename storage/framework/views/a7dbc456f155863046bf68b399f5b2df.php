@@ -29,15 +29,11 @@
     <link rel="stylesheet" href="assets/css/custom.css">
 
     <!-- Page Title -->
-<<<<<<< HEAD
+ 
     <title><?php echo e(config('app.name', 'HIMS')); ?></title>
-=======
-<<<<<<< HEAD
-    <title><?php echo e(config('app.name', 'HIMS')); ?></title>
-=======
+ 
     <title><?php echo e(config('app.name', 'Laravel')); ?></title>
->>>>>>> 53ad2ac1640d46f4ef6740dd073a2ce3bbdd7ea7
->>>>>>> e849383f3227909c8b4fcf2eb4658fe1efab8edf
+ 
 
     <?php echo $__env->make('layouts.admincdns', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <style>
@@ -619,10 +615,7 @@
         chatbot.classList.toggle('active');
         button.classList.toggle('active');
     }
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> e849383f3227909c8b4fcf2eb4658fe1efab8edf
+ 
 
     // Global SweetAlert Delete Confirmation Function
     function confirmDelete(formId, title = 'Are you sure?', text = 'You won\'t be able to revert this!') {
@@ -677,8 +670,7 @@
 <<<<<<< HEAD
 =======
 =======
->>>>>>> 53ad2ac1640d46f4ef6740dd073a2ce3bbdd7ea7
->>>>>>> e849383f3227909c8b4fcf2eb4658fe1efab8edf
+ 
 </script>
     <!-- Resilient global Select2 initializer: waits for Select2 then initializes all selects -->
     <script>

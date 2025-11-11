@@ -286,7 +286,7 @@
                                         <thead class="thead-light">
                                             <tr>
                                                 <th>OPD No</th>
-                                                <th>Case ID</th>
+                                                <th>Patient Name</th>
                                                 <th>Appointment Date</th>
                                                 <th>Consultant</th>
                                                 <th>Reference</th>
@@ -294,14 +294,14 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                             <?php $__empty_1 = true; $__currentLoopData = $opdDetails; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opd): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                             <?php $__empty_1 = true; $__currentLoopData = $visitDetails; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opd): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                                 <tr>
                                                     <td>
                                                         <h6 class="fs-14 mb-1">
-                                                            <a href="#" class="fw-semibold"><?php echo e($opd->opd_no ?? '-'); ?></a>
+                                                            <a href="#" class="fw-semibold"><?php echo e($opd->opd_details_id ?? '-'); ?></a>
                                                         </h6>
                                                     </td>
-                                                    <td><?php echo e($opd->case_id ?? '-'); ?></td>
+                                                    <td><?php echo e($opd->opdDetail->patient->patient_name ?? '-'); ?></td>
                                                     <td>
                                                         <?php if($opd->appointment_date): ?>
                                                             <?php echo e(\Carbon\Carbon::parse($opd->appointment_date)->format('d/m/Y h:i A')); ?>
@@ -311,11 +311,11 @@
                                                         <?php endif; ?>
                                                     </td>
                                                     <td>
-                                                        <?php echo e($opd->doctor->name ?? $opd->consultant_name ?? '-'); ?>
+                                                        <?php echo e($opd->doctor->name ?? $opd->cons_doctor ?? '-'); ?>
 
-                                                        <?php if(!empty($opd->doctor->employee_id)): ?>
+                                                        <!-- <?php if(!empty($opd->doctor->employee_id)): ?>
                                                             (<?php echo e($opd->doctor->employee_id); ?>)
-                                                        <?php endif; ?>
+                                                        <?php endif; ?> -->
                                                     </td>
                                                     <td><?php echo e($opd->reference ?? '-'); ?></td>
                                                     <td><?php echo e($opd->symptom_titles ?? '-'); ?></td>
@@ -489,8 +489,7 @@
                                                                 class="modal-dialog modal-dialog-centered modal-full-width">
                                                                 <div class="modal-content">
 
-                                                                    <div class="modal-header"
-                                                                        style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                                                    <div class="modal-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
                                                                         <h5 class="modal-title" id="addSpecializationLabel">
                                                                             Patient Details
@@ -508,27 +507,28 @@
                                                                                 <div class="row gy-3">
                                                                                     <div class="col-md-10">
                                                                                         <h3>
-                                                                                            Shreya Bhattacharyya (29)
+                                                                                            <?php echo e($appointment->patient->patient_name); ?>
+
                                                                                         </h3>
-                                                                                        <p>Guardian : --</p>
-                                                                                        <p>Gender : Female</p>
-                                                                                        <p>Blood Group : </p>
-                                                                                        <p>Marital Status: </p>
-                                                                                        <p>Age: 22 Year 9 Month 5 Days
-                                                                                            (As Of Date
-                                                                                            10/06/2025)</p>
-                                                                                        <p>Phone: 8910245678</p>
-                                                                                        <p>Email: abs.shrey@gmail.com
+                                                                                        <p>Guardian : <?php echo e($appointment->patient->guardian_name); ?></p>
+                                                                                        <p>Gender : <?php echo e($appointment->patient->gender); ?></p>
+                                                                                        <p>Blood Group : <?php echo e($appointment->patient->blood_group); ?></p>
+                                                                                        <p>Marital Status: <?php echo e($appointment->patient->marital_status); ?></p>
+                                                                                        <p>Age: <?php echo e($appointment->patient->age); ?></p>
+                                                                                        <p>Phone: <?php echo e($appointment->patient->mobileno); ?></p>
+                                                                                        <p>Email: <?php echo e($appointment->patient->email); ?>
+
                                                                                         </p>
-                                                                                        <p>Address: m,nm,nm,nm,</p>
-                                                                                        <p>Any Known Allergies: No</p>
-                                                                                        <p>Remarks: m,nmnmn</p>
-                                                                                        <p>TPA : MedoLogi TPA Pvt. Ltd.
+                                                                                        <p>Address: <?php echo e($appointment->patient->address); ?></p>
+                                                                                        <p>Any Known Allergies: <?php echo e($appointment->patient->known_allergies); ?></p>
+                                                                                        <p>Remarks: <?php echo e($appointment->patient->note_remark); ?></p>
+                                                                                        <p>TPA : <?php echo e($appointment->patient->note_remark); ?>
+
                                                                                         </p>
-                                                                                        <p>TPA ID : TPA005</p>
-                                                                                        <p>TPA Validity : 07/22/2021</p>
+                                                                                        <p>TPA ID : <?php echo e($appointment->patient->note_remark); ?> </p>
+                                                                                        <p>TPA Validity : <?php echo e($appointment->patient->note_remark); ?></p>
                                                                                         <p>National Identification
-                                                                                            Number : --</p>
+                                                                                            Number :  <?php echo e($appointment->patient->note_remark); ?></p>
                                                                                     </div>
                                                                                     <div class="col-md-2">
                                                                                         <img src="assets/img/patient.png"
@@ -1161,26 +1161,25 @@
                                                 <!-- Table start -->
                                                 <div class="table-responsive table-nowrap">
                                                     <table class="table border">
-                                                        <thead class="thead-light">
-                                                            <tr>
-                                                                <th>OPD No</th>
-                                                                <th>Case ID</th>
-                                                                <th>Appointment Date</th>
-                                                                <th>Consultant Doctor</th>
-                                                                <th>Reference</th>
-                                                                <th>Symptoms</th>
-                                                                <th>Action</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <?php $__empty_1 = true; $__currentLoopData = $opdDetails; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opd): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>OPD No</th>
+                                                <th>Patient Name</th>
+                                                <th>Appointment Date</th>
+                                                <th>Consultant</th>
+                                                <th>Reference</th>
+                                                <th>Symptoms</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                             <?php $__empty_1 = true; $__currentLoopData = $visitDetails; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opd): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                                 <tr>
                                                     <td>
                                                         <h6 class="fs-14 mb-1">
-                                                            <a href="#" class="fw-semibold"><?php echo e($opd->opd_no ?? '-'); ?></a>
+                                                            <a href="#" class="fw-semibold"><?php echo e($opd->opd_details_id ?? '-'); ?></a>
                                                         </h6>
                                                     </td>
-                                                    <td><?php echo e($opd->case_id ?? '-'); ?></td>
+                                                    <td><?php echo e($opd->opdDetail->patient->patient_name ?? '-'); ?></td>
                                                     <td>
                                                         <?php if($opd->appointment_date): ?>
                                                             <?php echo e(\Carbon\Carbon::parse($opd->appointment_date)->format('d/m/Y h:i A')); ?>
@@ -1190,51 +1189,23 @@
                                                         <?php endif; ?>
                                                     </td>
                                                     <td>
-                                                        <?php echo e($opd->doctor->name ?? $opd->consultant_name ?? '-'); ?>
+                                                        <?php echo e($opd->doctor->name ?? $opd->cons_doctor ?? '-'); ?>
 
-                                                        <?php if(!empty($opd->doctor->employee_id)): ?>
+                                                        <!-- <?php if(!empty($opd->doctor->employee_id)): ?>
                                                             (<?php echo e($opd->doctor->employee_id); ?>)
-                                                        <?php endif; ?>
+                                                        <?php endif; ?> -->
                                                     </td>
                                                     <td><?php echo e($opd->reference ?? '-'); ?></td>
                                                     <td><?php echo e($opd->symptom_titles ?? '-'); ?></td>
-                                                    <td>
-                                                                    <div class="d-flex gap-2">
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
-                                                                            <i class="fa-solid fa-print"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Print Bill"></i></a>
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                                            <i class="fa-solid fa-prescription"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Add Prescription"></i></a>
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
-                                                                            <i class="fa-solid fa-file-prescription"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Manual Prescription"></i></a>
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                            <i class="ti ti-menu" data-bs-toggle="tooltip"
-                                                                                title="Show"></i></a>
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-warning rounded-pill">
-                                                                            <i class="fa-solid fa-arrow-right-from-bracket"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Move in IPD"></i></a>
-                                                                    </div>
-                                                                </td>
                                                 </tr>
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                                 <tr>
                                                     <td colspan="6" class="text-center">No OPD records found</td>
                                                 </tr>
                                             <?php endif; ?>
-                                                            
-                                                        </tbody>
-                                                    </table>
+                                        </tbody>
+                                    </table>
+                                                    
                                                 </div>
                                                 <!-- Table end -->
                                             </div>
@@ -1787,6 +1758,8 @@
     </div>
     <!-- tab content end -->
     </div>
+
+        <?php echo $__env->make('components.modals.add-prescription-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
  <!-- Chart.js Scripts -->
 <script src="<?php echo e(asset('assets/plugins/chartjs/chart.min.js')); ?>"></script>
 <script src="<?php echo e(asset('assets/plugins/chartjs/chart-data.js')); ?>"></script>

@@ -1320,7 +1320,8 @@
                                                                             data-bs-target="#addPrescriptionModal">
                                                                             <i class="fa-solid fa-prescription"
                                                                                 data-bs-toggle="tooltip"
-                                                                                title="Add Prescription"></i></a>
+                                                                                title="Add Prescription"></i>
+                                                                        </a>
                                                                         <a href="javascript: void(0);"
                                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
                                                                             <i class="fa-solid fa-file-prescription"

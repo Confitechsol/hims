@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+ 
 <div class="hidden overflow-x-auto sm:col-span-1 lg:block">
     <div
         class="h-[35.5rem] scrollbar-hidden trace text-sm text-gray-400 dark:text-gray-300"
@@ -64,7 +64,7 @@
 <?php if (isset($attributes)) { $__attributesOriginal14b1cc5db95fcca4a0f06445821cff39 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'laravel-exceptions-renderer::components.icons.chevron-up','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('laravel-exceptions-renderer::icons.chevron-up'); ?>
-=======
+ 
 <?php $attributes ??= new \Illuminate\View\ComponentAttributeBag;
 
 $__newAttributes = [];
@@ -102,13 +102,13 @@ unset($__defined_vars, $__key, $__value); ?>
 <?php if (isset($attributes)) { $__attributesOriginalebc8ec9a834a8051f56913d6745a7050 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'laravel-exceptions-renderer::components.icons.alert','data' => ['class' => 'w-2.5 h-2.5 text-blue-500 dark:text-emerald-500']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('laravel-exceptions-renderer::icons.alert'); ?>
->>>>>>> 53ad2ac1640d46f4ef6740dd073a2ce3bbdd7ea7
+ 
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<<<<<<< HEAD
+ 
 <?php $component->withAttributes([]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
@@ -200,7 +200,7 @@ unset($__defined_vars, $__key, $__value); ?>
                 <?php endif; ?>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
-=======
+ 
 <?php $component->withAttributes(['class' => 'w-2.5 h-2.5 text-blue-500 dark:text-emerald-500']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
@@ -264,7 +264,7 @@ unset($__defined_vars, $__key, $__value); ?>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             <?php endif; ?>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
->>>>>>> 53ad2ac1640d46f4ef6740dd073a2ce3bbdd7ea7
+ 
     </div>
 </div>
 <?php /**PATH C:\xampp\htdocs\hims\vendor\laravel\framework\src\Illuminate\Foundation\Providers/../resources/exceptions/renderer/components/trace.blade.php ENDPATH**/ ?>

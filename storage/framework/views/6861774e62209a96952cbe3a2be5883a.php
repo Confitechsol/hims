@@ -34,7 +34,7 @@
                     <div class="alert alert-danger alert-dismissible fade show"><?php echo e(session('error')); ?></div>
                 <?php endif; ?>
                 
-<<<<<<< HEAD
+ 
                  <div class="table-responsive">
                     <table class="table table-bordered" id="floors">
                         <thead>
@@ -106,7 +106,7 @@
                         <button class="btn btn-outline-secondary btn-sm" disabled>Next »</button>
                     <?php endif; ?>
                 </div>
-=======
+ 
                 <table class="table table-bordered" id="floors">
                     <thead>
                         <tr>
@@ -136,7 +136,7 @@
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </tbody>
                 </table>
->>>>>>> 53ad2ac1640d46f4ef6740dd073a2ce3bbdd7ea7
+ 
             </div>
         </div>
     </div>
@@ -217,7 +217,7 @@
                 document.getElementById('delete-id').value = button.getAttribute('data-id');
                 document.getElementById('delete-name').textContent = button.getAttribute('data-name');
             });
-<<<<<<< HEAD
+ 
     createAjaxTable({
     apiUrl: "<?php echo e(route('floors.index')); ?>",
     tableSelector: "#floors",
@@ -245,8 +245,8 @@
         return row;
     }
     });   
-=======
->>>>>>> 53ad2ac1640d46f4ef6740dd073a2ce3bbdd7ea7
+ 
+ 
         });
     </script>
 <?php $__env->stopSection(); ?>

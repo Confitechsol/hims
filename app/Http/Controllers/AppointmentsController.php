@@ -18,6 +18,7 @@ use App\Models\Symptom;
 use App\Models\SymptomsClassification;
 use App\Models\PatientVital;
 use App\Models\Vital;
+use App\Models\VisitDetail;
 use App\Models\PatientTimeline;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Auth;
@@ -247,6 +248,8 @@ class AppointmentsController extends Controller
 
         $opdDetails  = OpdDetail::with('doctor')->where('patient_id', $patient_id)->get();
 
+        $visitDetails  = VisitDetail::with('opdDetail')->where('patient_id', $patient_id)->get();
+
         $labInvestigations = PathologyReport::with('pathology')->where('patient_id', $patient_id)->get();
 
         $vitalDetails = PatientVital::with('vital')->where('patient_id', $patient_id)->get();
@@ -265,7 +268,7 @@ class AppointmentsController extends Controller
         //dd($visitDetails);
 
         // Return to patient details view
-        return view('admin.appointments.patient_view', compact('appointment','PatientTimelines','opdDetails','symptomTitles','labInvestigations','vitalDetails','vitals'));
+        return view('admin.appointments.patient_view', compact('appointment','PatientTimelines','opdDetails','symptomTitles','labInvestigations','vitalDetails','vitals','visitDetails'));
     }
     public function storePatientVitals(Request $request)
 {
