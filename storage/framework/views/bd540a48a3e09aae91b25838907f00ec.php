@@ -209,7 +209,7 @@
                                 
                             </li>-->
                             </ul>
-<<<<<<< HEAD
+ 
                             <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-map-pin"></i><span>Pharmacy</span>
@@ -239,7 +239,7 @@
                                     <li><a href="<?php echo e(route('pathology.test.index')); ?>">Pathology Test</a></li>
                                     <li><a href="<?php echo e(route('pathology.billing.index')); ?>">Pathology Billing</a></li>
                                 </ul>
-=======
+ 
                             <li>
                                 <a href="#">
                                     <i class="ti ti-map-pin"></i><span>Pharmacy</span>
@@ -249,7 +249,7 @@
                                 <a href="#">
                                     <i class="ti ti-map-pin"></i><span>Pathology</span>
                                 </a>
->>>>>>> 53ad2ac1640d46f4ef6740dd073a2ce3bbdd7ea7
+ 
                             </li>
                             <li>
                                 <a href="#">
@@ -575,8 +575,8 @@
                                 </ul>
                             </li>
                             
-<<<<<<< HEAD
-=======
+ 
+ 
                             <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-world-cog"></i><span>Pharmacy
@@ -597,7 +597,7 @@
                                     <li><a href="<?php echo e(route('medicine-group')); ?>">Mediccine Group</a></li>
                                 </ul>
                             </li>
->>>>>>> 53ad2ac1640d46f4ef6740dd073a2ce3bbdd7ea7
+ 
                             
                             <li class="submenu">
                                 <a href="javascript:void(0);">
@@ -837,7 +837,7 @@
             </div>
         </div>
 
-<<<<<<< HEAD
+ 
 <script>
 // Ensure submenu expand/collapse works
 document.addEventListener('DOMContentLoaded', function() {
@@ -885,7 +885,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-=======
->>>>>>> 53ad2ac1640d46f4ef6740dd073a2ce3bbdd7ea7
+ 
+ 
     </div>
 <?php /**PATH C:\xampp\htdocs\hims\resources\views/layouts/sidebar.blade.php ENDPATH**/ ?>

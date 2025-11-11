@@ -285,7 +285,7 @@
                                         <thead class="thead-light">
                                             <tr>
                                                 <th>OPD No</th>
-                                                <th>Case ID</th>
+                                                <th>Patient Name</th>
                                                 <th>Appointment Date</th>
                                                 <th>Consultant</th>
                                                 <th>Reference</th>
@@ -293,14 +293,14 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                             @forelse($opdDetails as $opd)
+                                             @forelse($visitDetails as $opd)
                                                 <tr>
                                                     <td>
                                                         <h6 class="fs-14 mb-1">
-                                                            <a href="#" class="fw-semibold">{{ $opd->opd_no ?? '-' }}</a>
+                                                            <a href="#" class="fw-semibold">{{ $opd->opd_details_id ?? '-' }}</a>
                                                         </h6>
                                                     </td>
-                                                    <td>{{ $opd->case_id ?? '-' }}</td>
+                                                    <td>{{ $opd->opdDetail->patient->patient_name ?? '-' }}</td>
                                                     <td>
                                                         @if($opd->appointment_date)
                                                             {{ \Carbon\Carbon::parse($opd->appointment_date)->format('d/m/Y h:i A') }}
@@ -309,10 +309,10 @@
                                                         @endif
                                                     </td>
                                                     <td>
-                                                        {{ $opd->doctor->name ?? $opd->consultant_name ?? '-' }}
-                                                        @if(!empty($opd->doctor->employee_id))
+                                                        {{ $opd->doctor->name ?? $opd->cons_doctor ?? '-' }}
+                                                        <!-- @if(!empty($opd->doctor->employee_id))
                                                             ({{ $opd->doctor->employee_id }})
-                                                        @endif
+                                                        @endif -->
                                                     </td>
                                                     <td>{{ $opd->reference ?? '-' }}</td>
                                                     <td>{{ $opd->symptom_titles ?? '-' }}</td>
@@ -482,8 +482,7 @@
                                                                 class="modal-dialog modal-dialog-centered modal-full-width">
                                                                 <div class="modal-content">
 
-                                                                    <div class="modal-header"
-                                                                        style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                                                    <div class="modal-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
                                                                         <h5 class="modal-title" id="addSpecializationLabel">
                                                                             Patient Details
@@ -501,27 +500,23 @@
                                                                                 <div class="row gy-3">
                                                                                     <div class="col-md-10">
                                                                                         <h3>
-                                                                                            Shreya Bhattacharyya (29)
+                                                                                            {{ $appointment->patient->patient_name }}
                                                                                         </h3>
-                                                                                        <p>Guardian : --</p>
-                                                                                        <p>Gender : Female</p>
-                                                                                        <p>Blood Group : </p>
-                                                                                        <p>Marital Status: </p>
-                                                                                        <p>Age: 22 Year 9 Month 5 Days
-                                                                                            (As Of Date
-                                                                                            10/06/2025)</p>
-                                                                                        <p>Phone: 8910245678</p>
-                                                                                        <p>Email: abs.shrey@gmail.com
+                                                                                        <p>Guardian : {{ $appointment->patient->guardian_name }}</p>
+                                                                                        <p>Gender : {{ $appointment->patient->gender }}</p>
+                                                                                        <p>Blood Group : {{ $appointment->patient->blood_group }}</p>
+                                                                                        <p>Marital Status: {{ $appointment->patient->marital_status }}</p>
+                                                                                        <p>Age: {{ $appointment->patient->age }}</p>
+                                                                                        <p>Phone: {{ $appointment->patient->mobileno }}</p>
+                                                                                        <p>Email: {{$appointment->patient->email }}
                                                                                         </p>
-                                                                                        <p>Address: m,nm,nm,nm,</p>
-                                                                                        <p>Any Known Allergies: No</p>
-                                                                                        <p>Remarks: m,nmnmn</p>
-                                                                                        <p>TPA : MedoLogi TPA Pvt. Ltd.
-                                                                                        </p>
-                                                                                        <p>TPA ID : TPA005</p>
-                                                                                        <p>TPA Validity : 07/22/2021</p>
-                                                                                        <p>National Identification
-                                                                                            Number : --</p>
+                                                                                        <p>Address: {{$appointment->patient->address }}</p>
+                                                                                        <p>Any Known Allergies: {{$appointment->patient->known_allergies}}</p>
+                                                                                        <p>Remarks: {{$appointment->patient->note_remark}}</p>
+                                                                                        <p>TPA : {{$appointment->patient->note_remark}}</p>
+                                                                                        <p>TPA ID : {{$appointment->patient->note_remark}} </p>
+                                                                                        <p>TPA Validity : {{$appointment->patient->note_remark}}</p>
+                                                                                        <p>National Identification Number :  {{$appointment->patient->note_remark}}</p>
                                                                                     </div>
                                                                                     <div class="col-md-2">
                                                                                         <img src="assets/img/patient.png"
@@ -1154,26 +1149,25 @@
                                                 <!-- Table start -->
                                                 <div class="table-responsive table-nowrap">
                                                     <table class="table border">
-                                                        <thead class="thead-light">
-                                                            <tr>
-                                                                <th>OPD No</th>
-                                                                <th>Case ID</th>
-                                                                <th>Appointment Date</th>
-                                                                <th>Consultant Doctor</th>
-                                                                <th>Reference</th>
-                                                                <th>Symptoms</th>
-                                                                <th>Action</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @forelse($opdDetails as $opd)
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>OPD No</th>
+                                                <th>Patient Name</th>
+                                                <th>Appointment Date</th>
+                                                <th>Consultant</th>
+                                                <th>Reference</th>
+                                                <th>Symptoms</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                             @forelse($visitDetails as $opd)
                                                 <tr>
                                                     <td>
                                                         <h6 class="fs-14 mb-1">
-                                                            <a href="#" class="fw-semibold">{{ $opd->opd_no ?? '-' }}</a>
+                                                            <a href="#" class="fw-semibold">{{ $opd->opd_details_id ?? '-' }}</a>
                                                         </h6>
                                                     </td>
-                                                    <td>{{ $opd->case_id ?? '-' }}</td>
+                                                    <td>{{ $opd->opdDetail->patient->patient_name ?? '-' }}</td>
                                                     <td>
                                                         @if($opd->appointment_date)
                                                             {{ \Carbon\Carbon::parse($opd->appointment_date)->format('d/m/Y h:i A') }}
@@ -1182,50 +1176,22 @@
                                                         @endif
                                                     </td>
                                                     <td>
-                                                        {{ $opd->doctor->name ?? $opd->consultant_name ?? '-' }}
-                                                        @if(!empty($opd->doctor->employee_id))
+                                                        {{ $opd->doctor->name ?? $opd->cons_doctor ?? '-' }}
+                                                        <!-- @if(!empty($opd->doctor->employee_id))
                                                             ({{ $opd->doctor->employee_id }})
-                                                        @endif
+                                                        @endif -->
                                                     </td>
                                                     <td>{{ $opd->reference ?? '-' }}</td>
                                                     <td>{{ $opd->symptom_titles ?? '-' }}</td>
-                                                    <td>
-                                                                    <div class="d-flex gap-2">
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
-                                                                            <i class="fa-solid fa-print"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Print Bill"></i></a>
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                                            <i class="fa-solid fa-prescription"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Add Prescription"></i></a>
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
-                                                                            <i class="fa-solid fa-file-prescription"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Manual Prescription"></i></a>
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                            <i class="ti ti-menu" data-bs-toggle="tooltip"
-                                                                                title="Show"></i></a>
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-warning rounded-pill">
-                                                                            <i class="fa-solid fa-arrow-right-from-bracket"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Move in IPD"></i></a>
-                                                                    </div>
-                                                                </td>
                                                 </tr>
                                             @empty
                                                 <tr>
                                                     <td colspan="6" class="text-center">No OPD records found</td>
                                                 </tr>
                                             @endforelse
-                                                            
-                                                        </tbody>
-                                                    </table>
+                                        </tbody>
+                                    </table>
+                                                    
                                                 </div>
                                                 <!-- Table end -->
                                             </div>
@@ -1770,6 +1736,8 @@
     </div>
     <!-- tab content end -->
     </div>
+
+        @include('components.modals.add-prescription-modal')
  <!-- Chart.js Scripts -->
 <script src="{{ asset('assets/plugins/chartjs/chart.min.js') }}"></script>
 <script src="{{ asset('assets/plugins/chartjs/chart-data.js') }}"></script>

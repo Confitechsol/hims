@@ -1,5 +1,5 @@
 <?php $__env->startSection('content'); ?>
-<<<<<<< HEAD
+ 
     <div class="row justify-content-center">
         
         <div class="col-md-11">
@@ -134,7 +134,7 @@
                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
                                                                 <i class="ti ti-dots-vertical" data-bs-toggle="tooltip"
                                                                     title="Assign Permission"></i></a>
-=======
+ 
 
 <div class="row justify-content-center">
     
@@ -838,12 +838,12 @@ unset($__errorArgs, $__bag); ?>
                                                         <td><?php echo e($patient->is_dead == "yes" ? 'Yes' : 'No'); ?></td>
                                                         <td>
                                                             <div class="d-flex">
->>>>>>> 53ad2ac1640d46f4ef6740dd073a2ce3bbdd7ea7
+ 
                                                             <a href="javascript: void(0);"
                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
                                                                 <i class="ti ti-menu" data-bs-toggle="tooltip"
                                                                     title="Assign Permission"></i></a>
-<<<<<<< HEAD
+ 
                                                         </td>
                                                     </tr> -->
                                                 </tbody>
@@ -877,7 +877,7 @@ unset($__errorArgs, $__bag); ?>
     </script>
 <?php $__env->stopSection(); ?>
 
-=======
+ 
                                                             <a href="javascript: void(0);"
                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
                                                                 <i class="ti ti-dots-vertical" data-bs-toggle="tooltip"
@@ -943,5 +943,5 @@ unset($__errorArgs, $__bag); ?>
 </script>
 
 <?php $__env->stopSection(); ?>
->>>>>>> 53ad2ac1640d46f4ef6740dd073a2ce3bbdd7ea7
+ 
 <?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\hims\resources\views/admin/setup/patient.blade.php ENDPATH**/ ?>
