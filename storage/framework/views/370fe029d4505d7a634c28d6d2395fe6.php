@@ -1,6 +1,4 @@
-@extends('layouts.adminLayout')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 
     <style>
         .stepradiolist {
@@ -43,8 +41,8 @@
                         <div class="modal fade" id="add_appointment" tabindex="-1" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered modal-lg">
                                 <div class="modal-content">
-                                    <form method="POST" action="{{ route('dutyroster.assignStaff') }}">
-                                        @csrf
+                                    <form method="POST" action="<?php echo e(route('dutyroster.assignStaff')); ?>">
+                                        <?php echo csrf_field(); ?>
                                         <div class="modal-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                                             <div class="row w-100 align-items-center">
                                                 <div class="col-md-7">
@@ -59,26 +57,27 @@
                                         <div class="modal-body">
                                             <div class="form-group">
                                                 <div class="row align-items-center gy-3">
-                                                    {{-- SHIFT SELECTION --}}
+                                                    
                                                     <div class="col-sm-12">
                                                         <label>Shift</label>
                                                         <ul class="stepradiolist row gy-3">
-                                                            @foreach($shifts as $shift)
+                                                            <?php $__currentLoopData = $shifts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $shift): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                 <li class="col-sm-3">
                                                                     <label>
-                                                                        <input type="radio" name="shift_id" value="{{ $shift->id }}" class="shift-radio" {{ $loop->first ? 'checked' : '' }} >
+                                                                        <input type="radio" name="shift_id" value="<?php echo e($shift->id); ?>" class="shift-radio" <?php echo e($loop->first ? 'checked' : ''); ?> >
                                                                         <div class="stepimage">
-                                                                            {{ $shift->shift_name }}<br>
-                                                                            {{ \Carbon\Carbon::parse($shift->shift_start)->format('h:i A') }} -
-                                                                            {{ \Carbon\Carbon::parse($shift->shift_end)->format('h:i A') }}
+                                                                            <?php echo e($shift->shift_name); ?><br>
+                                                                            <?php echo e(\Carbon\Carbon::parse($shift->shift_start)->format('h:i A')); ?> -
+                                                                            <?php echo e(\Carbon\Carbon::parse($shift->shift_end)->format('h:i A')); ?>
+
                                                                         </div>
                                                                     </label>
                                                                 </li>
-                                                            @endforeach
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                         </ul>
                                                     </div>
 
-                                                    {{-- DUTY PERIOD --}}
+                                                    
                                                     <div class="col-sm-12">
                                                         <label>Shift Date <small class="req">*</small></label>
                                                         <select class="form-control" id="duty_roster_list_id" name="duty_roster_list_id" required>
@@ -86,43 +85,43 @@
                                                         </select>
                                                     </div>
 
-                                                    {{-- STAFF --}}
+                                                    
                                                     <div class="col-sm-12">
                                                         <label>Staff <small class="req">*</small></label>
                                                         <div class="p-2 select2-full-width">
                                                             <select class="form-control select2" id="duty_roster_staff" name="staff_id" required>
                                                                 <option value="">Select</option>
-                                                                @foreach($staffList as $staff)
-                                                                    <option value="{{ $staff->id }}">
-                                                                        {{ $staff->name }} ({{ $staff->employee_id }})
+                                                                <?php $__currentLoopData = $staffList; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $staff): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                    <option value="<?php echo e($staff->id); ?>">
+                                                                        <?php echo e($staff->name); ?> (<?php echo e($staff->employee_id); ?>)
                                                                     </option>
-                                                                @endforeach
+                                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                             </select>
                                                         </div>
                                                     </div>
 
-                                                    {{-- FLOOR --}}
+                                                    
                                                     <div class="col-sm-6">
                                                         <div class="form-group">
                                                             <label>Floor</label>
                                                             <select class="form-control" id="duty_roster_floor" name="floor_id">
                                                                 <option value="">Select</option>
-                                                                @foreach($floors as $floor)
-                                                                    <option value="{{ $floor->id }}">{{ $floor->name }}</option>
-                                                                @endforeach
+                                                                <?php $__currentLoopData = $floors; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $floor): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                    <option value="<?php echo e($floor->id); ?>"><?php echo e($floor->name); ?></option>
+                                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                             </select>
                                                         </div>
                                                     </div>
 
-                                                    {{-- DEPARTMENT --}}
+                                                    
                                                     <div class="col-sm-6">
                                                         <div class="form-group">
                                                             <label>Department</label>
                                                             <select class="form-control" id="duty_roster_department" name="department_id">
                                                                 <option value="">Select</option>
-                                                                @foreach($departments as $dept)
-                                                                    <option value="{{ $dept->id }}">{{ $dept->department_name }}</option>
-                                                                @endforeach
+                                                                <?php $__currentLoopData = $departments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $dept): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                    <option value="<?php echo e($dept->id); ?>"><?php echo e($dept->department_name); ?></option>
+                                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                             </select>
                                                         </div>
                                                     </div>
@@ -148,9 +147,9 @@
 
             </div>
             <div class="card-body">
-    @if($rosterSummary->isEmpty())
+    <?php if($rosterSummary->isEmpty()): ?>
         <p class="text-center">No roster assignments found.</p>
-    @else
+    <?php else: ?>
         <div class="table-responsive table-nowrap">
             <table class="table border">
                 <thead class="thead-light">
@@ -165,41 +164,41 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($rosterSummary as $roster)
+                    <?php $__currentLoopData = $rosterSummary; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $roster): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <tr>
-                            <td>{{ $roster['staff_name'] }}</td>
-                            <td>{{ $roster['floor'] }}</td>
-                            <td>{{ $roster['department'] }}</td>
-                            <td>{{ $roster['shift'] }}</td>
-                            <td>{{ $roster['shift_time'] }}</td>
-                            <td>{{ $roster['period'] }}</td>
+                            <td><?php echo e($roster['staff_name']); ?></td>
+                            <td><?php echo e($roster['floor']); ?></td>
+                            <td><?php echo e($roster['department']); ?></td>
+                            <td><?php echo e($roster['shift']); ?></td>
+                            <td><?php echo e($roster['shift_time']); ?></td>
+                            <td><?php echo e($roster['period']); ?></td>
                             <td class="text-center">
                                 <!-- Edit Button -->
                                 
                                 <a href="javascript:void(0);"
                                     class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill editRosterBtn"
-                                    data-id="{{ $roster['id'] }}"
-                                    data-code="{{ $roster['code'] }}"
-                                    data-staff="{{ $roster['staff_id'] }}"
-                                    data-floor="{{ $roster['floor_id'] ?? '' }}"
-                                    data-department="{{ $roster['department_id'] ?? '' }}"
-                                    data-shift="{{ trim($roster['shift']) }}"
-                                    data-period="{{ $roster['period'] }}">
+                                    data-id="<?php echo e($roster['id']); ?>"
+                                    data-code="<?php echo e($roster['code']); ?>"
+                                    data-staff="<?php echo e($roster['staff_id']); ?>"
+                                    data-floor="<?php echo e($roster['floor_id'] ?? ''); ?>"
+                                    data-department="<?php echo e($roster['department_id'] ?? ''); ?>"
+                                    data-shift="<?php echo e(trim($roster['shift'])); ?>"
+                                    data-period="<?php echo e($roster['period']); ?>">
                                     <i class="ti ti-pencil"></i>
                                 </a>
                                 <!-- Delete Button -->
                                 <a href="javascript:void(0);"
-                                   onclick="confirmDelete('{{ route('dutyroster.destroyStaffRoster', ['code' => $roster['code'] ?? 0]) }}')"
+                                   onclick="confirmDelete('<?php echo e(route('dutyroster.destroyStaffRoster', ['code' => $roster['code'] ?? 0])); ?>')"
                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
                                     <i class="ti ti-trash"></i>
                                 </a>
                             </td>
                         </tr>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </tbody>
             </table>
         </div>
-    @endif 
+    <?php endif; ?> 
 </div>
 
 
@@ -209,9 +208,9 @@
     <div class="modal fade" id="editRosterModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
-                <form method="POST" id="editRosterForm" action="{{ route('dutyroster.updateStaffRoster') }}">
-                    @csrf
-                    @method('PUT')
+                <form method="POST" id="editRosterForm" action="<?php echo e(route('dutyroster.updateStaffRoster')); ?>">
+                    <?php echo csrf_field(); ?>
+                    <?php echo method_field('PUT'); ?>
 
                     <div class="modal-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                         <div class="row w-100 align-items-center">
@@ -228,79 +227,81 @@
                         <div class="form-group">
                             <div class="row align-items-center gy-3">
 
-                                {{-- SHIFT SELECTION --}}
+                                
                                 <div class="col-sm-12">
                                     <label>Shift</label>
                                     <ul class="stepradiolist row gy-0">
-                                        @foreach($shifts as $shift)
+                                        <?php $__currentLoopData = $shifts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $shift): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <li class="col-sm-4">
                                                 <label>
-                                                    <input type="radio" class="edit_shift" name="shift_id" value="{{ $shift->id }}" >
+                                                    <input type="radio" class="edit_shift" name="shift_id" value="<?php echo e($shift->id); ?>" >
                                                     <div class="stepimage">
-                                                        {{ $shift->shift_name }}<br>
-                                                        {{ date('h:i A', strtotime($shift->shift_start_time)) }} - {{ date('h:i A', strtotime($shift->shift_end_time)) }}
+                                                        <?php echo e($shift->shift_name); ?><br>
+                                                        <?php echo e(date('h:i A', strtotime($shift->shift_start_time))); ?> - <?php echo e(date('h:i A', strtotime($shift->shift_end_time))); ?>
+
                                                     </div>
                                                 </label>
                                             </li>
-                                        @endforeach
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </ul>
                                 </div>
 
-                                {{-- DUTY PERIOD --}}
+                                
                                 <div class="col-sm-12">
                                     <label>Shift Date <small class="req">*</small></label>
                                     <select class="form-control" id="edit_duty_roster_list_id" name="duty_roster_list_id" required>
                                         <option value="">Select</option>
-                                        @foreach($dutyRosterLists as $roster)
-                                            <option value="{{ $roster->id }}">
-                                                {{ date('d/m/Y', strtotime($roster->duty_roster_start_date)) }} - {{ date('d/m/Y', strtotime($roster->duty_roster_end_date)) }}
+                                        <?php $__currentLoopData = $dutyRosterLists; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $roster): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <option value="<?php echo e($roster->id); ?>">
+                                                <?php echo e(date('d/m/Y', strtotime($roster->duty_roster_start_date))); ?> - <?php echo e(date('d/m/Y', strtotime($roster->duty_roster_end_date))); ?>
+
                                             </option>
-                                        @endforeach
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </select>
                                 </div>
 
-                                {{-- STAFF --}}
+                                
                                 <div class="col-sm-12">
                                     <label>Staff <small class="req">*</small></label>
                                     <div class="p-2 select2-full-width">
                                         <select class="form-control select2" id="edit_staff_id" name="staff_id" required>
                                             <option value="">Select</option>
-                                            @foreach($staffList as $staff)
-                                                <option value="{{ $staff->id }}">{{ $staff->name }} ({{ $staff->employee_id }})</option>
-                                            @endforeach
+                                            <?php $__currentLoopData = $staffList; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $staff): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <option value="<?php echo e($staff->id); ?>"><?php echo e($staff->name); ?> (<?php echo e($staff->employee_id); ?>)</option>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </select>
                                     </div>
                                 </div>
 
-                                {{-- FLOOR --}}
+                                
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Floor</label>
                                         <select class="form-control" id="edit_floor_id" name="floor_id">
                                             <option value="">Select</option>
-                                            @foreach($floors as $floor)
-                                                <option value="{{ $floor->id }}">{{ $floor->name }}</option>
-                                            @endforeach
+                                            <?php $__currentLoopData = $floors; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $floor): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <option value="<?php echo e($floor->id); ?>"><?php echo e($floor->name); ?></option>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </select>
                                     </div>
                                 </div>
 
-                                {{-- DEPARTMENT --}}
+                                
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Department</label>
                                         <select class="form-control" id="edit_department_id" name="department_id">
                                             <option value="">Select</option>
-                                            @foreach($departments as $dept)
-                                                <option value="{{ $dept->id }}">{{ $dept->department_name }}</option>
-                                            @endforeach
+                                            <?php $__currentLoopData = $departments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $dept): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <option value="<?php echo e($dept->id); ?>"><?php echo e($dept->department_name); ?></option>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </select>
                                     </div>
                                 </div>
 
-                                {{-- HIDDEN ID FIELD --}}
+                                
                                 <input type="hidden" id="edit_roster_id" name="id">
-                                 {{-- HIDDEN ID FIELD --}}
+                                 
                                 <input type="hidden" id="edit_roster_code" name="code">
 
                             </div>
@@ -399,7 +400,7 @@
             const csrf = document.createElement('input');
             csrf.type = 'hidden';
             csrf.name = '_token';
-            csrf.value = '{{ csrf_token() }}';
+            csrf.value = '<?php echo e(csrf_token()); ?>';
             form.appendChild(csrf);
 
             const method = document.createElement('input');
@@ -415,7 +416,7 @@
 }
 </script>
 
-{{-- 🔹 AJAX Script --}}
+
 <script>
 $(document).ready(function() {
     $('.shift-radio').on('change', function() {
@@ -425,7 +426,7 @@ $(document).ready(function() {
         $select.html('<option>Loading...</option>');
 
         $.ajax({
-            url: "{{ route('dutyroster.getDatesByShift') }}",
+            url: "<?php echo e(route('dutyroster.getDatesByShift')); ?>",
             type: "GET",
             data: { shift_id: shiftId },
             success: function(response) {
@@ -454,4 +455,6 @@ $(document).ready(function() {
 });
 </script>
 
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp82\htdocs\hims\resources\views/admin/duty-roster/staff_roster.blade.php ENDPATH**/ ?>

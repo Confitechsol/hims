@@ -767,3 +767,4 @@ Route::prefix('setup')->group(function () {
     Route::put('/medicine-group/update/{id}', [SetupMedicineGroupController::class, 'update'])->name('setup.medicine-group.update');
     Route::delete('/medicine-group/destroy/{id}', [SetupMedicineGroupController::class, 'destroy'])->name('setup.medicine-group.destroy');
 });
+
