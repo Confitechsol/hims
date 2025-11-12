@@ -107,7 +107,7 @@
                                                 @foreach ($opd as $opdDetails)
                                                     <tr>
                                                         <td>{{ $loop->iteration }}</td>
-                                                        <td><a href="#"
+                                                        <td><a href="{{ route('opd.show', [$opdDetails->id]) }}"
                                                                 class="text-primary">{{ $opdDetails->opd_no }}</a>
                                                         </td>
                                                         <td>{{ $opdDetails->patient->patient_name }}</td>

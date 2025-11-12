@@ -5,8 +5,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Charge;
 use App\Models\ChargeCategory;
 use App\Models\Doctor;
+use App\Models\MedicationReport;
+use App\Models\OpdCharges;
 use App\Models\OpdDetail;
 use App\Models\OpdPatient;
+use App\Models\OpdVisits;
+use App\Models\OperationTheatre;
+use App\Models\PathologyReport;
 use App\Models\Patient;
 use App\Models\Prefix;
 use App\Models\Symptom;
@@ -23,7 +28,7 @@ class OpdController extends Controller
         $doctors     = Doctor::all();
         $opdSymptoms = [];
         if ($isOpdTab) {
-            $opdDetails = OpdDetail::with('patient', 'doctor', 'chargeCategory', 'charge')->get();
+            $opdDetails = OpdDetail::with('patient.bloodGroup', 'doctor', 'chargeCategory', 'charge')->get();
             foreach ($opdDetails as $opdDetail) {
                 // Split comma-separated symptom IDs and clean up
                 $symptomIds = array_filter(
@@ -107,6 +112,8 @@ class OpdController extends Controller
             // 🔹 Create OPD record
             $opd        = new OpdDetail();
             $opdPatient = new OpdPatient();
+            $opdVistis  = new OpdVisits();
+            $opdCharge  = new OpdCharges();
             // dd($opd);
             $opd->hospital_id = $user->hospital_id;
             // Patient Details
@@ -149,8 +156,28 @@ class OpdController extends Controller
             $opdPatient->patient_id = $request->patient_id ?? null;
             $opdPatient->opd_id     = $opd->id ?? null;
             $opdPatient->doctor_id  = $request->doctor_id ?? null;
-
             $opdPatient->save();
+
+            $opdCharge->opd_id         = $opd->id;
+            $opdCharge->charge_id      = $opd->charge_id;
+            $opdCharge->discount       = $opd->discount;
+            $opdCharge->charge_type_id = $opd->charge_category_id;
+            $opdCharge->save();
+
+            $lastVisit = OpdVisits::orderBy('id', 'desc')->first();
+            if ($lastVisit && preg_match('/OCID(\d+)/', $lastVisit->visit_id, $matches)) {
+                $lastNumber = intval($matches[1]);
+            } else {
+                $lastNumber = 0;
+            }
+            $visitPrefix = Prefix::where("type", 'opd_checkup_id')->firstOrFail();
+            $nextNumber  = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+            $visitNo     = $visitPrefix->prefix . $nextNumber;
+
+            $opdVistis->visit_id   = $visitNo ?? null;
+            $opdVistis->patient_id = $request->patient_id ?? null;
+            $opdVistis->opd_id     = $opd->id ?? null;
+            $opdVistis->save();
 
             DB::commit();
 
@@ -291,6 +318,44 @@ class OpdController extends Controller
         // dd($symptoms);
 
         return response()->json($symptoms, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
+    }
+
+    public function showOpd(Request $request, $id)
+    {
+        $opd        = OpdDetail::with('patient.bloodGroup', 'patient.organisation', 'doctor', 'chargeCategory', 'charge')->where('id', $id)->firstOrFail();
+        $symptomIds = array_filter(
+            explode(',', $opd->symptoms_title),
+            fn($id) => $id !== null && trim($id) !== ''
+        );
+
+        // Fetch symptoms related to this OPD
+        $symptoms = ! empty($symptomIds)
+            ? Symptom::whereIn('id', $symptomIds)->get()
+            : collect();
+
+        $medicationReport  = MedicationReport::with('medicineDosage.unit', 'pharmacy', 'generatedBy.userRole')->where('opd_details_id', $id)->get();
+        $operationDetail   = OperationTheatre::with('operation.category')->where('opd_details_id', $id)->get();
+        $opdCharges        = OpdCharges::with('opd', 'charge.taxCategory', 'chargeCategory.chargeType')->where('opd_id', $id)->get();
+        $labInvestigations = PathologyReport::with('pathology')->where('patient_id', $opd->patient->id)->get();
+        $opdVisits         = OpdVisits::with('patient', 'opd.doctor')->where('opd_id', $id)->get();
+        $opdSymptoms       = [];
+        foreach ($opdVisits as $opdDetail) {
+            // Split comma-separated symptom IDs and clean up
+            $symptomIds = array_filter(
+                explode(',', $opdDetail->opd->symptoms_title),
+                fn($id) => $id !== null && trim($id) !== ''
+            );
+
+            // Fetch symptoms related to this OPD
+            $symptoms = ! empty($symptomIds)
+                ? Symptom::whereIn('id', $symptomIds)->get()
+                : collect();
+
+            // Store in array using OPD number as key
+            $opdSymptoms[$opdDetail->opd->opd_no] = $symptoms;
+        }
+        // Store in array using OPD number as key
+        return view('admin.opd.opd_view', compact('opd', 'symptoms', 'medicationReport', 'operationDetail', 'opdCharges', 'labInvestigations', 'opdVisits', 'opdSymptoms'));
     }
 
 }
