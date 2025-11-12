@@ -29,7 +29,7 @@
     <link rel="stylesheet" href="assets/css/custom.css">
 
     <!-- Page Title -->
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'HIMS') }}</title>
 
     @include('layouts.admincdns')
     <style>
@@ -614,6 +614,57 @@
         chatbot.classList.toggle('active');
         button.classList.toggle('active');
     }
+
+    // Global SweetAlert Delete Confirmation Function
+    function confirmDelete(formId, title = 'Are you sure?', text = 'You won\'t be able to revert this!') {
+        Swal.fire({
+            title: title,
+            text: text,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#750096',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel',
+            buttonsStyling: true,
+            reverseButtons: true,
+            customClass: {
+                popup: 'swal2-popup-custom'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Submit the form
+                document.getElementById(formId).submit();
+            }
+        });
+        return false; // Prevent default action
+    }
+
+    // SweetAlert for form onsubmit (returns promise-based confirmation)
+    function confirmDeleteForm(event, title = 'Are you sure?', text = 'You won\'t be able to revert this!') {
+        event.preventDefault(); // Stop form submission
+        
+        Swal.fire({
+            title: title,
+            text: text,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#750096',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel',
+            buttonsStyling: true,
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Submit the form
+                event.target.submit();
+            }
+        });
+        
+        return false;
+    }
+
 </script>
     <!-- Resilient global Select2 initializer: waits for Select2 then initializes all selects -->
     <script>

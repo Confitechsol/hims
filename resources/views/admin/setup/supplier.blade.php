@@ -92,12 +92,12 @@
                                                             >
                                                             <i class="ti ti-pencil"></i></button>
                                                         <form action="{{ route('supplier.destroy')}}" method="POST"
-                                                            style="display:inline-block;">
+                                                            style="display:inline-block;" onsubmit="return confirmDeleteForm(event, 'Delete Supplier?', 'Are you sure you want to delete this supplier?');">
                                                             @csrf
                                                             @method('DELETE')
                                                             <input type="hidden" name="id"
                                                                 value="{{$medicineSupplier->id}}">
-                                                            <button onclick="return confirm('Are you sure?')"
+                                                            <button type="submit"
                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"><i
                                                                     class="ti ti-trash"></i></button>
                                                         </form>
@@ -277,10 +277,10 @@ document.addEventListener('DOMContentLoaded', function () {
         >
             <i class="ti ti-pencil"></i>
         </button>
-        <form action="{{ route('supplier.destroy')}}" method="POST" style="display:inline-block;">
+        <form action="{{ route('supplier.destroy')}}" method="POST" style="display:inline-block;" onsubmit="return confirmDeleteForm(event, 'Delete Supplier?', 'Are you sure you want to delete this supplier?');">
             <input type="hidden" name="_method" value="DELETE">
             <input type="hidden" name="id" value="${item.id}">
-            <button onclick="return confirm('Are you sure?')"
+            <button type="submit"
                     class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
                 <i class="ti ti-trash"></i>
             </button>

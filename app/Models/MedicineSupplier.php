@@ -10,7 +10,7 @@ class MedicineSupplier extends Model
     use HasFactory;
 
     protected $table = 'medicine_supplier';
-    public $timestamps = false;
+
     protected $fillable = [
         'hospital_id',
         'branch_id',
@@ -21,12 +21,4 @@ class MedicineSupplier extends Model
         'supplier_drug_licence',
         'address',
     ];
-
-    /**
-     * Relations
-     */
-    public function medicineBatches()
-    {
-        return $this->hasMany(MedicineBatchDetails::class, 'supplier_id');
-    }
 }

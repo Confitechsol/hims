@@ -1,193 +1,159 @@
-{{-- resources/views/settings.blade.php --}}
 @extends('layouts.adminLayout')
+
 @section('content')
-
-<div class="row justify-content-center">
-    {{-- Settings Form --}}
-    <div class="col-md-11">
-        <div class="card shadow-sm border-0 mt-4">
-            <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Medicine Dosage List</h5>
+<div class="container-fluid px-4 mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0" style="color: #750096">Medicine Dosage List</h5>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDosageModal">
+                    <i class="ti ti-plus"></i> Add Medicine Dosage
+                </button>
             </div>
-
-            <div class="card-body">
-                @if ($errors->any())
-                    @foreach ($errors->all() as $error)
-                        <div class="alert alert-danger">
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endforeach
-                @endif
-                @if(session('success'))
-                    <div class="alert alert-success">
-                        {{session('success')}}
-                    </div>
-                @endif
-
-                {{-- Hospital Name & Code --}}
-                <div class="row">
-
-                    <div class="col-lg-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <x-table-actions.actions id="medicine-dosage" name="Medicine Dosage" /> 
-                                <div class="table-responsive">
-                                    <table class="table mb-0" id="medicine-dosage">
-                                        <thead>
-                                            <tr>
-                                                <th>Category Name</th>
-                                                <th>Dosage</th>
-                                                <th>Unit</th>
-                                                <th style="width: 200px;">Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($medicineDosage as $item)
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="mb-0 fs-14 fw-semibold">
-                                                            {{$item->category["medicine_category"]}}</h6>
-                                                    </td>
-
-                                                    <td>{{$item["dosage"]}}</td>
-                                                    <td>{{$item["unit"]->unit_name}}</td>
-                                                    <td>
-                                                        <button
-                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
-                                                            data-id="{{ $item["id"] }}"
-                                                            data-medicine_category="{{$item->category["id"]}}"
-                                                            data-dosage="{{$item['dosage']}}"
-                                                            data-unit="{{$item["unit"]->id}}">
-                                                            <i class="ti ti-pencil"></i></button>
-                                                            <form action="{{ route('medicine-dosage.destroy')}}"
-                                                            method="POST" style="display:inline-block;">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <input type="hidden" name="id" value="{{$item->id}}">
-                                                            <button onclick="return confirm('Are you sure?')"
-                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"><i
-                                                                    class="ti ti-trash"></i></button>
-                                                        </form>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                                {{-- Pagination Links --}}
-                                <div class="mt-3" id="pagination-wrapper">
-                                    @php
-                                        $currentPage = $medicineDosage->currentPage();
-                                        $lastPage = $medicineDosage->lastPage();
-                                    @endphp
-
-                                    {{-- Previous --}}
-                                    @if ($medicineDosage->onFirstPage())
-                                        <button class="btn btn-outline-secondary btn-sm me-1" disabled>« Prev</button>
-                                    @else
-                                        <a href="{{ $medicineDosage->previousPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
-                                            class="btn btn-outline-secondary btn-sm me-1">
-                                            « Prev
-                                        </a>
-                                    @endif
-
-                                    {{-- Page numbers --}}
-                                    @for ($page = 1; $page <= $lastPage; $page++)
-                                        @if ($page == $currentPage)
-                                            <button class="btn btn-primary btn-sm me-1">{{ $page }}</button>
-                                        @else
-                                            <a href="{{ $medicineDosage->url($page) }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
-                                                class="btn btn-outline-secondary btn-sm me-1">
-                                                {{ $page }}
-                                            </a>
-                                        @endif
-                                    @endfor
-
-                                    {{-- Next --}}
-                                    @if ($medicineDosage->hasMorePages())
-                                        <a href="{{ $medicineDosage->nextPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
-                                            class="btn btn-outline-secondary btn-sm">
-                                            Next »
-                                        </a>
-                                    @else
-                                        <button class="btn btn-outline-secondary btn-sm" disabled>Next »</button>
-                                    @endif
-                                </div>
-                            </div> <!-- end card-body -->
-                        </div> <!-- end card -->
-                    </div> <!-- end col -->
-
+        </div>
+        <div class="card-body">
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
+            @endif
 
+            <div class="table-responsive">
+                <table class="table table-bordered datatable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Category Name</th>
+                            <th>Dosage</th>
+                            <th>Unit</th>
+                            <th width="150">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($dosages as $dosage)
+                        <tr>
+                            <td>{{ $dosage->category->category_name ?? 'N/A' }}</td>
+                            <td>{{ $dosage->dosage }}</td>
+                            <td>{{ $dosage->unit->unit_name ?? 'N/A' }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-info" onclick="editDosage({{ json_encode($dosage) }})">
+                                    <i class="ti ti-pencil"></i>
+                                </button>
+                                <form action="{{ route('setup.medicine-dosage.destroy', $dosage->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Are you sure?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="ti ti-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="4" class="text-center">No dosages found</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
-@php
-    $options = $units->mapWithKeys(function ($item) {
-        return [$item->id => $item->unit_name];
-    })->toArray();
 
-    $categories = $medicineCategories->mapWithKeys(function ($item) {
-        return [$item->id => $item->medicine_category];
-    })->toArray();
-@endphp
-
-<x-modals.form-modal type="add" id="createModal" title="Add Medicine Dosage"
-    action="{{route('medicine-dosage.store')}}" :fields="[
-        ['name' => 'medicine_category', 'label' => 'Medicine Category', 'options' => $categories, 'type' => 'select', 'required' => true, 'size' => '12']
-    ]" :repeatable_group="[
-        ['name' => 'dosage', 'label' => 'Dose', 'type' => 'text', 'required' => true,'size'=>'5'],
-        ['name' => 'unit', 'label' => 'Unit', 'type' => 'select','options'=>$options, 'required' => true,'size'=>'6']
-        ]" :columns="2" />
-<x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Medicine Dosage"
-    action="{{route('medicine-dosage.update')}}" :fields="[
-        ['name' => 'id', 'type' => 'hidden', 'required' => true],
-        ['name' => 'medicine_category', 'label' => 'Medicine Category', 'options' => $categories, 'type' => 'select', 'required' => true, 'size' => '12'],
-        ['name' => 'dosage', 'label' => 'Dose', 'type' => 'text', 'required' => true, 'size' => '5'],
-        ['name' => 'unit', 'label' => 'Unit', 'type' => 'select', 'options' => $options, 'required' => true, 'size' => '6'],
-    ]" :columns="2" />
-<script>
-document.addEventListener('DOMContentLoaded', function () {    
-    createAjaxTable({
-    apiUrl: "{{ route('medicine-dosage') }}",
-    tableSelector: "#medicine-dosage",
-    paginationSelector: "#pagination-wrapper",
-    searchInputSelector: "#search-input",
-    perPageSelector: "#perPage",
-    rowRenderer: function (item) {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td><h6 class="mb-0 fs-14 fw-semibold">${item.category.medicine_category}</h6></td>
-            <td>${item.dosage}</td>
-            <td>${item.unit.unit_name}</td>
-            <td>
-            <button
-                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
-                    data-id="${item.id}"
-                    data-medicine_category="${item.category.id}"
-                    data-dosage="${item.dosage}"
-                    data-unit="${item.unit.id}">
-                    <i class="ti ti-pencil"></i>
-                </button>
-                <form action="{{ route('medicine-dosage.destroy')}}"
-                method="POST" style="display:inline-block;">
+<!-- Add Dosage Modal -->
+<div class="modal fade" id="addDosageModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: #CB6CE6; color: white;">
+                <h5 class="modal-title">Add Medicine Dosage</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('setup.medicine-dosage.store') }}" method="POST">
                 @csrf
-                @method('DELETE')
-                <input type="hidden" name="id" value="${item.id}">
-                <button onclick="return confirm('Are you sure?')"
-                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"><i
-                class="ti ti-trash"></i></button>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Medicine Category <span class="text-danger">*</span></label>
+                        <select name="medicine_category_id" class="form-select" required>
+                            <option value="">Select</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->category_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Dose <span class="text-danger">*</span></label>
+                        <input type="text" name="dosage" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Unit <span class="text-danger">*</span></label>
+                        <select name="units_id" class="form-select" required>
+                            <option value="">Select</option>
+                            @foreach($units as $unit)
+                                <option value="{{ $unit->id }}">{{ $unit->unit_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary"><i class="ti ti-check"></i> Save</button>
+                </div>
             </form>
-            </td>
-        `;
-        return row;
-    }
-    });
-});
+        </div>
+    </div>
+</div>
+
+<!-- Edit Dosage Modal -->
+<div class="modal fade" id="editDosageModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: #CB6CE6; color: white;">
+                <h5 class="modal-title">Edit Medicine Dosage</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editDosageForm" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Medicine Category <span class="text-danger">*</span></label>
+                        <select name="medicine_category_id" id="edit_category_id" class="form-select" required>
+                            <option value="">Select</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->category_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Dose <span class="text-danger">*</span></label>
+                        <input type="text" name="dosage" id="edit_dosage" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Unit <span class="text-danger">*</span></label>
+                        <select name="units_id" id="edit_unit_id" class="form-select" required>
+                            <option value="">Select</option>
+                            @foreach($units as $unit)
+                                <option value="{{ $unit->id }}">{{ $unit->unit_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary"><i class="ti ti-check"></i> Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function editDosage(dosage) {
+    document.getElementById('edit_category_id').value = dosage.medicine_category_id;
+    document.getElementById('edit_dosage').value = dosage.dosage;
+    document.getElementById('edit_unit_id').value = dosage.units_id;
+    document.getElementById('editDosageForm').action = "{{ url('setup/medicine-dosage/update') }}/" + dosage.id;
+    new bootstrap.Modal(document.getElementById('editDosageModal')).show();
+}
 </script>
 @endsection

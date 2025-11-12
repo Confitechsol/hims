@@ -13,7 +13,7 @@ class VisitDetail extends Model
 
     protected $fillable = [
         'hospital_id',
-         'branch_id',
+        'branch_id',
         'opd_details_id',
         'organisation_id',
         'patient_charge_id',

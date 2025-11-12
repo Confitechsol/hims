@@ -9,21 +9,16 @@ class MedicineCategory extends Model
 {
     use HasFactory;
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
     protected $table = 'medicine_category';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'hospital_id',
         'branch_id',
         'medicine_category',
     ];
+
+    public function dosages()
+    {
+        return $this->hasMany(MedicineDosage::class);
+    }
 }

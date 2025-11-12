@@ -337,14 +337,17 @@
                                                                                                     <p
                                                                                                         class="text-primary fs-13 fw-medium mb-0">
                                                                                                         Email</p>
-                                                                                                    <p class="fs-13">[email&#160;protected]</a>
+                                                                                                    <p class="fs-13">
+                                                                                                        [email&#160;protected]</a>
                                                                                                     </p>
                                                                                                 </div><!-- end col -->
                                                                                                 <div class="col-md-8">
                                                                                                     <p
                                                                                                         class="text-primary fs-13 fw-medium mb-0">
                                                                                                         Addresss</p>
-                                                                                                    <p class="fs-13">Near Railway Station Jabalpur
+                                                                                                    <p class="fs-13">Near
+                                                                                                        Railway Station
+                                                                                                        Jabalpur
                                                                                                     </p>
                                                                                                 </div><!-- end col -->
                                                                                             </div>
@@ -360,7 +363,7 @@
                                                                 </div>
                                                             </td>
                                                             <td>
-                                                                <img src="" alt="">
+                                                                <img src="" alt="Background Image">
                                                             </td>
                                                             <td>
                                                                 <div class="d-flex gap-2">

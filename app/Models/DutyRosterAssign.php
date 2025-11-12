@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class DutyRosterAssign extends Model
 {
@@ -17,6 +18,10 @@ class DutyRosterAssign extends Model
     /**
      * The attributes that are mass assignable.
      */
+
+    use SoftDeletes;
+    protected $dates = ['deleted_at'];
+
     protected $fillable = [
         'hospital_id',
         'branch_id',
@@ -25,6 +30,7 @@ class DutyRosterAssign extends Model
         'floor_id',
         'department_id',
         'staff_id',
+        'doctor_id',
         'duty_roster_list_id',
     ];
 
@@ -49,6 +55,11 @@ class DutyRosterAssign extends Model
     {
         return $this->belongsTo(Staff::class, 'staff_id');
     }
+
+        public function doctor()
+        {
+            return $this->belongsTo(Doctor::class, 'doctor_id');
+        }
 
     // Each roster assignment belongs to a duty roster list
     public function dutyRosterList()

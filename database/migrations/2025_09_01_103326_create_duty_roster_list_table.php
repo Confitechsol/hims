@@ -22,7 +22,9 @@ return new class extends Migration
             $table->date('duty_roster_end_date')->index();
 
             $table->integer('duty_roster_total_day');
-            $table->timestamps();
+            $table->timestamps();  
+            $table->softDeletes();
+
 
             //$table->foreign('duty_roster_shift_id')->references('id')->on('duty_roster_shift')->onDelete('cascade');
         });

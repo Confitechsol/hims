@@ -24,7 +24,9 @@ return new class extends Migration
             $table->time('shift_hour')->index();
 
             $table->integer('is_active')->default(1);
-            $table->timestamps();
+            $table->timestamps();  
+            $table->softDeletes();
+
         });
     }
 

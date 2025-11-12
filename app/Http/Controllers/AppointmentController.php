@@ -170,7 +170,17 @@ class AppointmentController extends Controller
         return response()->json($charges);
     }
 
-    
+    public function getDoctorFees()
+    {
+        
+        $charge = Charge::with('taxCategory')->where('charge_category_id', 1)->first();
+         //dd($charge);
+        if ($charge) {
+            return response()->json(['fees' => $charge->standard_charge]);
+        }
+
+        return response()->json(['fees' => 0]);
+    }
 
 
     // public function searchSlots(Request $request)
