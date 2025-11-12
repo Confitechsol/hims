@@ -1,15 +1,17 @@
 <?php
 
-use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AppointmentsController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BedController;
 use App\Http\Controllers\BedGroupController;
 use App\Http\Controllers\BedTypeController;
+use App\Http\Controllers\BirthController;
 use App\Http\Controllers\BloodBankController;
 use App\Http\Controllers\BloodDonorController;
 use App\Http\Controllers\DatabaseController;
+use App\Http\Controllers\DeathController;
+use App\Http\Controllers\DutyRosterController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FinanceController;
@@ -22,24 +24,18 @@ use App\Http\Controllers\MedicineGroupController;
 use App\Http\Controllers\Modules\IpdController;
 use App\Http\Controllers\Modules\OpdController;
 use App\Http\Controllers\OperationController;
+use App\Http\Controllers\PathologyBillingController;
 use App\Http\Controllers\PathologyController;
 use App\Http\Controllers\PathologyTestController;
-use App\Http\Controllers\PathologyBillingController;
 use App\Http\Controllers\PatientController;
-use App\Http\Controllers\PharmacyCompanyController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\PharmacyCompanyController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\Setup\CompanyListController;
 use App\Http\Controllers\Setup\DosageDurationController;
-use App\Http\Controllers\Setup\DoseIntervalController;
 use App\Http\Controllers\Setup\DoseDurationController;
+use App\Http\Controllers\Setup\DoseIntervalController;
 use App\Http\Controllers\Setup\FindingsController;
-use App\Http\Controllers\Setup\MedicineCategoryController as SetupMedicineCategoryController;
-use App\Http\Controllers\Setup\MedicineCompanyController as SetupMedicineCompanyController;
-use App\Http\Controllers\Setup\MedicineDosageController as SetupMedicineDosageController;
-use App\Http\Controllers\Setup\MedicineGroupController as SetupMedicineGroupController;
-use App\Http\Controllers\Setup\MedicineSupplierController as SetupMedicineSupplierController;
-use App\Http\Controllers\Setup\MedicineUnitController as SetupMedicineUnitController;
 use App\Http\Controllers\Setup\HospitalChargeCategoryController;
 use App\Http\Controllers\Setup\HospitalChargesController;
 use App\Http\Controllers\Setup\HospitalChargeTypeController;
@@ -49,8 +45,14 @@ use App\Http\Controllers\Setup\HrController;
 use App\Http\Controllers\Setup\InventoryController;
 use App\Http\Controllers\Setup\LanguagesController;
 use App\Http\Controllers\Setup\LetterHeadController;
+use App\Http\Controllers\Setup\MedicineCategoryController as SetupMedicineCategoryController;
+use App\Http\Controllers\Setup\MedicineCompanyController as SetupMedicineCompanyController;
 use App\Http\Controllers\Setup\MedicineDosageController;
+use App\Http\Controllers\Setup\MedicineDosageController as SetupMedicineDosageController;
+use App\Http\Controllers\Setup\MedicineGroupController as SetupMedicineGroupController;
 use App\Http\Controllers\Setup\MedicineSupplierController;
+use App\Http\Controllers\Setup\MedicineSupplierController as SetupMedicineSupplierController;
+use App\Http\Controllers\Setup\MedicineUnitController as SetupMedicineUnitController;
 use App\Http\Controllers\Setup\PrefixesController;
 use App\Http\Controllers\Setup\ProfileController;
 use App\Http\Controllers\Setup\RadiologyController;
@@ -58,11 +60,8 @@ use App\Http\Controllers\Setup\UnitController;
 use App\Http\Controllers\Setup\UsersController;
 use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\TpamanagmentController;
-use App\Http\Controllers\VitalController;
-use App\Http\Controllers\DutyRosterController;
-use App\Http\Controllers\BirthController;
-use App\Http\Controllers\DeathController;
 use App\Http\Controllers\VisitorsController;
+use App\Http\Controllers\VitalController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -298,11 +297,6 @@ Route::middleware(['admin'])->group(function () {
 
     Route::get('/visitors', [VisitorsController::class, 'index']);
 
-
-
-
-
-
 });
 
 // Route::get('/medicine-group', function () {
@@ -476,6 +470,7 @@ Route::get('/getChargeCategories', [OpdController::class, 'getChargeCategories']
 Route::get('/getCharges/{id}', [OpdController::class, 'getCharges'])->name('getCharges');
 Route::get('/getSymptomsTypes', [OpdController::class, 'getSymptomsType'])->name('getSymptomsTypes');
 Route::post('/getSymptoms', [OpdController::class, 'getSymptoms'])->name('getSymptoms');
+Route::get('/opd_view/{id}', [OpdController::class, 'showOpd'])->name('opd.show');
 
 Route::get('/ipd', [IpdController::class, 'index'])->name('ipd');
 Route::post('/ipd/store', [IpdController::class, 'store'])->name('ipd.store');
@@ -499,7 +494,7 @@ Route::prefix('/appointment-details')->group(function () {
     Route::get('/get-doctor-shifts/{id}', [AppointmentController::class, 'getDoctorShifts'])->name('doctor.shifts');
     Route::get('/get-doctor-slots/{doctorId}/{shiftId}', [AppointmentController::class, 'getDoctorSlots'])->name('doctor.slots');
     Route::get('/get-appointment-priorities', [AppointmentController::class, 'getAppointmentPriorities'])->name('appointment.priorities');
-   Route::get('/get-doctor-fees', [AppointmentController::class, 'getDoctorFees'])->name('appointments.getDoctorFees');
+    Route::get('/get-doctor-fees', [AppointmentController::class, 'getDoctorFees'])->name('appointments.getDoctorFees');
 
     Route::get('/appointments/{id}/edit', [AppointmentsController::class, 'edit'])->name('appointments.edit');
     Route::put('/appointments/{id}', [AppointmentsController::class, 'update'])->name('appointments.update');
@@ -508,10 +503,10 @@ Route::prefix('/appointment-details')->group(function () {
     Route::get('/queue', function () {return view('admin.appointments.queue');})->name('appointments.queue');
     Route::get('/queue', function () {return view('admin.appointments.queue');})->name('appointments.queue');
     Route::get('patient-view/{patient_id}', [AppointmentsController::class, 'show'])->name('patient.view');
-     Route::post('/store-patient-vitals', [AppointmentsController::class, 'storePatientVitals'])->name('patient-vitals.store');
-     Route::post('/store-patient-timeline', [AppointmentsController::class, 'storePatientTimeline'])->name('patient-timeline.store');
-     Route::post('/update-patient-timeline', [AppointmentsController::class, 'updatePatientTimeline'])->name('patient-timeline.update');
-Route::get('/chart-data', [AppointmentsController::class, 'getChartData'])->name('chart.data');
+    Route::post('/store-patient-vitals', [AppointmentsController::class, 'storePatientVitals'])->name('patient-vitals.store');
+    Route::post('/store-patient-timeline', [AppointmentsController::class, 'storePatientTimeline'])->name('patient-timeline.store');
+    Route::post('/update-patient-timeline', [AppointmentsController::class, 'updatePatientTimeline'])->name('patient-timeline.update');
+    Route::get('/chart-data', [AppointmentsController::class, 'getChartData'])->name('chart.data');
 
 });
 
@@ -556,10 +551,10 @@ Route::prefix('dutyroster')->group(function () {
     Route::delete('/destroy/{id}', [DutyRosterController::class, 'destroyRoster'])->name('dutyroster.destroy');
     Route::get('/rosterShift', [DutyRosterController::class, 'showShift'])->name('dutyroster.Shift');
     Route::post('/addShift', [DutyRosterController::class, 'addShift'])->name('dutyroster.addShift');
-     Route::put('/updateShift/{id}', [DutyRosterController::class, 'updateShift'])->name('dutyroster.updateShift');
-     Route::delete('/destroyShift/{id}', [DutyRosterController::class, 'destroyShift'])->name('dutyroster.destroyShift');
+    Route::put('/updateShift/{id}', [DutyRosterController::class, 'updateShift'])->name('dutyroster.updateShift');
+    Route::delete('/destroyShift/{id}', [DutyRosterController::class, 'destroyShift'])->name('dutyroster.destroyShift');
     Route::get('/doctor', [DutyRosterController::class, 'doctorRoster'])->name('dutyroster.doctor');
-     Route::post('/assignDoctor', [DutyRosterController::class, 'assignDoctor'])->name('dutyroster.assignDoctor');
+    Route::post('/assignDoctor', [DutyRosterController::class, 'assignDoctor'])->name('dutyroster.assignDoctor');
     Route::put('/updateDoctorRoster', [DutyRosterController::class, 'updateDoctorRoster'])->name('dutyroster.updateDoctorRoster');
     Route::delete('/destroyDoctorRoster/{code}', [DutyRosterController::class, 'destroyDoctorRoster'])->name('dutyroster.destroyDoctorRoster');
     Route::get('/staff', [DutyRosterController::class, 'staffRoster'])->name('dutyroster.staff');
@@ -568,14 +563,14 @@ Route::prefix('dutyroster')->group(function () {
     Route::delete('/destroyStaffRoster/{code}', [DutyRosterController::class, 'destroyStaffRoster'])->name('dutyroster.destroyStaffRoster');
 
     Route::get('/dutyroster/getDatesByShift', [DutyRosterController::class, 'getDatesByShift'])
-    ->name('dutyroster.getDatesByShift');
+        ->name('dutyroster.getDatesByShift');
 
     // Route::put('/update/{id}', [DutyRosterController::class, 'update'])->name('dutyroster.update');
     // Route::delete('/destroy', [DutyRosterController::class, 'destroy'])->name('dutyroster.destroy');
     // Route::get('/show/{id}', [DutyRosterController::class, 'show'])->name('dutyroster.show');
 });
 Route::prefix('ambulance')->group(function () {
-    });
+});
 Route::prefix('bloodBank')->group(function () {
 
     Route::get('/donors', [BloodDonorController::class, 'index'])->name('donors.index');
@@ -598,7 +593,7 @@ Route::prefix('certificate')->group(function () {
     Route::get('/generate_certificate', function () {
         return view('admin.certificate.generate_certificate');
     })->name('generate_certificate');
-    
+
     Route::get('/generate_patient_id', function () {
         return view('admin.certificate.generate_patient_id');
     })->name('generate_patient_id');
@@ -616,15 +611,15 @@ Route::prefix('certificate')->group(function () {
 Route::prefix('pharmacy')->group(function () {
     // Medicine Management - Index route
     Route::get('/', [App\Http\Controllers\PharmacyController::class, 'index'])->name('pharmacy.index');
-    
+
     // Purchase Routes - MUST BE BEFORE {id} CATCH-ALL ROUTE
     Route::prefix('purchase')->group(function () {
-        Route::get('/debug', function() {
+        Route::get('/debug', function () {
             return 'Purchase route is working! Route order fixed.';
         });
-        Route::get('/test-create', function() {
-            $suppliers = \App\Models\MedicineSupplier::all();
-            $medicines = \App\Models\Pharmacy::where('is_active', 'yes')->get();
+        Route::get('/test-create', function () {
+            $suppliers  = \App\Models\MedicineSupplier::all();
+            $medicines  = \App\Models\Pharmacy::where('is_active', 'yes')->get();
             $categories = \App\Models\MedicineCategory::all();
             return view('admin.pharmacy.purchase.test', compact('suppliers', 'medicines', 'categories'));
         });
@@ -638,22 +633,22 @@ Route::prefix('pharmacy')->group(function () {
         Route::put('/{id}', [App\Http\Controllers\PharmacyPurchaseController::class, 'update'])->name('pharmacy.purchase.update');
         Route::get('/{id}/print', [App\Http\Controllers\PharmacyPurchaseController::class, 'print'])->name('pharmacy.purchase.print');
     });
-    
+
     // Stock Management - BEFORE {id} CATCH-ALL
     Route::get('/stock/below-min-level', [App\Http\Controllers\PharmacyController::class, 'belowMinLevel'])->name('pharmacy.below-min-level');
     Route::get('/stock/needs-reorder', [App\Http\Controllers\PharmacyController::class, 'needsReorder'])->name('pharmacy.needs-reorder');
     Route::get('/stock/info/{id}', [App\Http\Controllers\PharmacyController::class, 'getStockInfo'])->name('pharmacy.stock-info');
-    
+
     // Import - BEFORE {id} CATCH-ALL
     Route::get('/import/medicines', [App\Http\Controllers\PharmacyController::class, 'import'])->name('pharmacy.import');
     Route::post('/import/medicines', [App\Http\Controllers\PharmacyController::class, 'import'])->name('pharmacy.import.store');
-    
+
     // API Routes - BEFORE {id} CATCH-ALL
     Route::get('/api/medicines', [App\Http\Controllers\PharmacyController::class, 'getMedicines'])->name('pharmacy.api.medicines');
     Route::get('/api/batches/{pharmacyId}', [App\Http\Controllers\PharmacyBillingController::class, 'getMedicineBatches'])->name('pharmacy.api.batches');
     Route::get('/api/batch-details', [App\Http\Controllers\PharmacyBillingController::class, 'getBatchDetails'])->name('pharmacy.api.batch-details');
     Route::get('/api/patient-prescriptions/{patientId}', [App\Http\Controllers\PharmacyBillingController::class, 'getPatientPrescriptions'])->name('pharmacy.api.patient-prescriptions');
-    
+
     // Medicine Management
     Route::get('/create', [App\Http\Controllers\PharmacyController::class, 'create'])->name('pharmacy.create');
     Route::post('/store', [App\Http\Controllers\PharmacyController::class, 'store'])->name('pharmacy.store');
@@ -663,23 +658,23 @@ Route::prefix('pharmacy')->group(function () {
     Route::delete('/{id}', [App\Http\Controllers\PharmacyController::class, 'destroy'])->name('pharmacy.destroy');
 });
 
-    // Test routes
-    Route::get('/test-pharmacy', function () {
-        return 'Pharmacy test route working!';
-    });
-    
-    Route::get('/test-pharmacy-controller', [App\Http\Controllers\PharmacyBillingController::class, 'test']);
+// Test routes
+Route::get('/test-pharmacy', function () {
+    return 'Pharmacy test route working!';
+});
 
-    // Pharmacy Billing Routes - Simplified
-    Route::get('/pharmacy-billing', [App\Http\Controllers\PharmacyBillingController::class, 'index'])->name('pharmacy.billing.index');
-    Route::get('/pharmacy-billing/create', [App\Http\Controllers\PharmacyBillingController::class, 'create'])->name('pharmacy.billing.create');
-    Route::post('/pharmacy-billing/store', [App\Http\Controllers\PharmacyBillingController::class, 'store'])->name('pharmacy.billing.store');
-    Route::get('/pharmacy-billing/{id}', [App\Http\Controllers\PharmacyBillingController::class, 'show'])->name('pharmacy.billing.show');
-    Route::get('/pharmacy-billing/{id}/edit', [App\Http\Controllers\PharmacyBillingController::class, 'edit'])->name('pharmacy.billing.edit');
-    Route::put('/pharmacy-billing/{id}', [App\Http\Controllers\PharmacyBillingController::class, 'update'])->name('pharmacy.billing.update');
-    Route::delete('/pharmacy-billing/{id}', [App\Http\Controllers\PharmacyBillingController::class, 'destroy'])->name('pharmacy.billing.destroy');
-    Route::get('/pharmacy-billing/{id}/print', [App\Http\Controllers\PharmacyBillingController::class, 'print'])->name('pharmacy.billing.print');
-    Route::get('/pharmacy-billing-search', [App\Http\Controllers\PharmacyBillingController::class, 'search'])->name('pharmacy.billing.search');
+Route::get('/test-pharmacy-controller', [App\Http\Controllers\PharmacyBillingController::class, 'test']);
+
+// Pharmacy Billing Routes - Simplified
+Route::get('/pharmacy-billing', [App\Http\Controllers\PharmacyBillingController::class, 'index'])->name('pharmacy.billing.index');
+Route::get('/pharmacy-billing/create', [App\Http\Controllers\PharmacyBillingController::class, 'create'])->name('pharmacy.billing.create');
+Route::post('/pharmacy-billing/store', [App\Http\Controllers\PharmacyBillingController::class, 'store'])->name('pharmacy.billing.store');
+Route::get('/pharmacy-billing/{id}', [App\Http\Controllers\PharmacyBillingController::class, 'show'])->name('pharmacy.billing.show');
+Route::get('/pharmacy-billing/{id}/edit', [App\Http\Controllers\PharmacyBillingController::class, 'edit'])->name('pharmacy.billing.edit');
+Route::put('/pharmacy-billing/{id}', [App\Http\Controllers\PharmacyBillingController::class, 'update'])->name('pharmacy.billing.update');
+Route::delete('/pharmacy-billing/{id}', [App\Http\Controllers\PharmacyBillingController::class, 'destroy'])->name('pharmacy.billing.destroy');
+Route::get('/pharmacy-billing/{id}/print', [App\Http\Controllers\PharmacyBillingController::class, 'print'])->name('pharmacy.billing.print');
+Route::get('/pharmacy-billing-search', [App\Http\Controllers\PharmacyBillingController::class, 'search'])->name('pharmacy.billing.search');
 
 // Pharmacy Company Routes
 Route::prefix('pharmacy/company')->group(function () {
@@ -773,3 +768,8 @@ Route::prefix('setup')->group(function () {
     Route::put('/medicine-group/update/{id}', [SetupMedicineGroupController::class, 'update'])->name('setup.medicine-group.update');
     Route::delete('/medicine-group/destroy/{id}', [SetupMedicineGroupController::class, 'destroy'])->name('setup.medicine-group.destroy');
 });
+
+
+    Route::get('/blood_bank_status', function () {
+        return view('admin.blood-bank-doner.blood_bank_status');
+    })->name('blood_bank_status');

@@ -1,20 +1,17 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
-use Spatie\Permission\Models\Role as SpatieRole; // extend Spatie’s Role model
-
+// extend Spatie’s Role model
 
 class Role extends Model
 {
     use HasFactory;
 
     // Table name
-    protected $table = 'roles';
-    public $timestamps = false;  
+    protected $table   = 'roles';
+    public $timestamps = false;
 
     // Mass assignable attributes
     protected $fillable = [
@@ -31,8 +28,7 @@ class Role extends Model
      * Relationships
      */
 
-
-     public function hospital()
+    public function hospital()
     {
         return $this->belongsTo(Hospital::class, 'hospital_id');
     }
@@ -46,7 +42,7 @@ class Role extends Model
     // Role has many permissions
     public function permissions()
     {
-        return $this->belongsToMany(Permission::class, 'role_permissions', 'role_id', 'permission_id')
-                    ->withTimestamps();
+        return $this->belongsToMany(RolesPermission::class, 'role_permissions', 'role_id', 'permission_id')
+            ->withTimestamps();
     }
 }

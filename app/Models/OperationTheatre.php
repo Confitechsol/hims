@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -30,6 +29,7 @@ class OperationTheatre extends Model
         'result',
         'remark',
         'generated_by',
+        'reference_no',
     ];
 
     /**
@@ -45,7 +45,7 @@ class OperationTheatre extends Model
      */
     public function consultant()
     {
-        return $this->belongsTo(Staff::class, 'consultant_doctor');
+        return $this->belongsTo(Doctor::class, 'consultant_doctor');
     }
 
     /**

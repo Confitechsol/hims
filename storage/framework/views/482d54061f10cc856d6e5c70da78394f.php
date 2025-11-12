@@ -39,7 +39,7 @@
     <style>
         .timeline-wrapper {
             position: relative;
-            padding-left: 170px;
+            padding-left: 110px;
             padding-right: 20px;
             margin-top: 80px;
         }
@@ -48,7 +48,7 @@
         .timeline-wrapper::before {
             content: "";
             position: absolute;
-            left: 118px;
+            left: 58px;
             top: -30px;
             bottom: -45px;
             width: 4px;
@@ -102,7 +102,7 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 4px 10px rgba(11, 113, 199, 0.15);
-            top: 50px;
+            top: 20px;
             z-index: 3;
         }
 
@@ -1639,38 +1639,6 @@
                                                         </div>
                                                     </div>
 
-                                                    <!-- Step 2 (In progress) -->
-                                                    <!-- <div class="timeline-item">
-                                                                        <div class="timeline-date">
-                                                                            <div class="date-badge">
-                                                                                11/13/2025
-                                                                                <span class="time">04:56 AM</span>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div class="timeline-node" title="In progress" style="background:#00a5ff;">
-                                                                            <i class="fa-solid fa-vials"></i>
-                                                                        </div>
-
-                                                                        <div class="timeline-card">
-                                                                            <div class="card-header">
-                                                                                <div>
-                                                                                    <h5 class="title">Lab Investigation Requested</h5>
-                                                                                    <div class="time">11/13/2025 04:56 AM</div>
-                                                                                </div>
-                                                                                <div class="timeline-actions" aria-label="Edit or delete step">
-                                                                                    <i class="fas fa-pen" title="Edit"></i>
-                                                                                    <i class="fas fa-trash" title="Delete"></i>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="timeline-body">
-                                                                                Blood tests &amp; lipid profile sample collected. Awaiting results. Documents attached.
-                                                                            </div>
-                                                                        </div>
-                                                                    </div> -->
-
-
-
                                                     <!-- Final clock marker -->
                                                     <div class="timeline-end">
                                                         <div class="node-end" aria-hidden="true">
@@ -1683,47 +1651,6 @@
                                             </div>
                                         </div>
                                     </div>
-
-
-                                    <!-- Table start -->
-                                    <!-- <div class="table-responsive table-nowrap">
-                                                                                        <table class="table border">
-                                                                                            <thead class="thead-light">
-                                                                                                <tr>
-                                                                                                    <th>OPD No</th>
-                                                                                                    <th>Case ID</th>
-                                                                                                    <th>Appointment Date</th>
-                                                                                                    <th>Title</th>
-                                                                                                    <th>Date</th>
-                                                                                                    <th>Action</th>
-                                                                                                </tr>
-                                                                                            </thead>
-                                                                                            <tbody>
-                                                                                                <tr>
-                                                                                                    <td>
-                                                                                                        <h6 class="fs-14 mb-1"><a href="#"
-                                                                                                                class="fw-semibold">OPDN14</a></h6>
-                                                                                                    </td>
-                                                                                                    <td>18</td>
-                                                                                                    <td> 09/17/2025 12:49 PM</td>
-                                                                                                    <td>xyz
-                                                                                                    </td>
-                                                                                                    <td>09/17/2025 12:49 PM
-                                                                                                    </td>
-                                                                                                    <td>
-                                                                                                        <div class="d-flex gap-2">
-                                                                                                            <a href="javascript: void(0);"
-                                                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                                                                <i class="ti ti-menu" data-bs-toggle="tooltip"
-                                                                                                                    title="Show"></i></a>
-                                                                                                        </div>
-                                                                                                    </td>
-                                                                                                </tr>
-                                                                                            </tbody>
-                                                                                        </table>
-                                                                                    </div> -->
-                                    <!-- Table end -->
-
 
 
                                 </div>
