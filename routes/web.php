@@ -8,6 +8,7 @@ use App\Http\Controllers\BedController;
 use App\Http\Controllers\BedGroupController;
 use App\Http\Controllers\BedTypeController;
 use App\Http\Controllers\BloodBankController;
+use App\Http\Controllers\BloodDonorController;
 use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\ExpenseController;
@@ -61,6 +62,7 @@ use App\Http\Controllers\VitalController;
 use App\Http\Controllers\DutyRosterController;
 use App\Http\Controllers\BirthController;
 use App\Http\Controllers\DeathController;
+use App\Http\Controllers\VisitorsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -294,6 +296,10 @@ Route::middleware(['admin'])->group(function () {
 
     Route::get('/death', [DeathController::class, 'index']);
 
+    Route::get('/visitors', [VisitorsController::class, 'index']);
+
+
+
 
 
 
@@ -493,6 +499,7 @@ Route::prefix('/appointment-details')->group(function () {
     Route::get('/get-doctor-shifts/{id}', [AppointmentController::class, 'getDoctorShifts'])->name('doctor.shifts');
     Route::get('/get-doctor-slots/{doctorId}/{shiftId}', [AppointmentController::class, 'getDoctorSlots'])->name('doctor.slots');
     Route::get('/get-appointment-priorities', [AppointmentController::class, 'getAppointmentPriorities'])->name('appointment.priorities');
+   Route::get('/get-doctor-fees', [AppointmentController::class, 'getDoctorFees'])->name('appointments.getDoctorFees');
 
     Route::get('/appointments/{id}/edit', [AppointmentsController::class, 'edit'])->name('appointments.edit');
     Route::put('/appointments/{id}', [AppointmentsController::class, 'update'])->name('appointments.update');
@@ -501,6 +508,10 @@ Route::prefix('/appointment-details')->group(function () {
     Route::get('/queue', function () {return view('admin.appointments.queue');})->name('appointments.queue');
     Route::get('/queue', function () {return view('admin.appointments.queue');})->name('appointments.queue');
     Route::get('patient-view/{patient_id}', [AppointmentsController::class, 'show'])->name('patient.view');
+     Route::post('/store-patient-vitals', [AppointmentsController::class, 'storePatientVitals'])->name('patient-vitals.store');
+     Route::post('/store-patient-timeline', [AppointmentsController::class, 'storePatientTimeline'])->name('patient-timeline.store');
+     Route::post('/update-patient-timeline', [AppointmentsController::class, 'updatePatientTimeline'])->name('patient-timeline.update');
+Route::get('/chart-data', [AppointmentsController::class, 'getChartData'])->name('chart.data');
 
 });
 
@@ -563,25 +574,38 @@ Route::prefix('dutyroster')->group(function () {
     // Route::delete('/destroy', [DutyRosterController::class, 'destroy'])->name('dutyroster.destroy');
     // Route::get('/show/{id}', [DutyRosterController::class, 'show'])->name('dutyroster.show');
 });
-Route::get('/generate_certificate', function () {
-    return view('admin.certificate.generate_certificate');
-})->name('generate_certificate');
-Route::get('/certificate', function () {
-    return view('admin.certificate.certificate');
-})->name('certificate');
-Route::get('/generate_patient_id', function () {
-    return view('admin.certificate.generate_patient_id');
-})->name('generate_patient_id');
-Route::get('/patient_id', function () {
-    return view('admin.certificate.patient_id');
-})->name('patient_id');
-Route::get('/generate_staff_id', function () {
-    return view('admin.certificate.generate_staff_id');
-})->name('generate_staff_id');
-Route::get('/staff_id', function () {
-    return view('admin.certificate.staff_id');
-})->name('staff_id');
+Route::prefix('ambulance')->group(function () {
+    });
+Route::prefix('bloodBank')->group(function () {
 
+    Route::get('/donors', [BloodDonorController::class, 'index'])->name('donors.index');
+    Route::post('/addDonors', [BloodDonorController::class, 'addDonors'])->name('bloodBank.addDoner');
+    Route::put('/edit/{id}', [BloodDonorController::class, 'editDoner'])->name('bloodBank.editDoner');
+    Route::put('/update/{id}', [BloodDonorController::class, 'updateRoster'])->name('bloodBank.updateDoner');
+    Route::delete('/destroy/{id}', [BloodDonorController::class, 'destroyRoster'])->name('bloodBank.deleteDoner');
+
+});
+Route::prefix('certificate')->group(function () {
+    Route::get('/', function () {
+        return view('admin.certificate.certificate');
+    })->name('certificate');
+    Route::get('/generate_certificate', function () {
+        return view('admin.certificate.generate_certificate');
+    })->name('generate_certificate');
+    
+    Route::get('/generate_patient_id', function () {
+        return view('admin.certificate.generate_patient_id');
+    })->name('generate_patient_id');
+    Route::get('/patient_id', function () {
+        return view('admin.certificate.patient_id');
+    })->name('patient_id');
+    Route::get('/generate_staff_id', function () {
+        return view('admin.certificate.generate_staff_id');
+    })->name('generate_staff_id');
+    Route::get('/staff_id', function () {
+        return view('admin.certificate.staff_id');
+    })->name('staff_id');
+});
 // Pharmacy Routes
 Route::prefix('pharmacy')->group(function () {
     // Medicine Management - Index route

@@ -72,6 +72,9 @@
                                                 <th>Address</th>
                                                 <th>Contact Person Name</th>
                                                 <th>Contact Person Phone</th>
+                                                <th>Poilicy No</th>
+                                                <th>E Card no</th>
+                                                <th>E Card Image</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -84,6 +87,30 @@
                                                 <td><?php echo e($item->address); ?></td>
                                                 <td><?php echo e($item->contact_person_name); ?></td>
                                                 <td><?php echo e($item->contact_person_phone); ?></td>
+                                                <td><?php echo e($item->poilicy_no); ?></td>
+                                                <td><?php echo e($item->e_card_no); ?></td>
+                                                <td>
+                                                    <?php if($item->e_card_upload): ?>
+                                                        <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#ecardModal<?php echo e($item->id); ?>">
+                                                            <img src="<?php echo e(asset($item->e_card_upload)); ?>" alt="E Card" width="100" style="cursor:pointer" class="img-thumbnail">
+                                                        </a>
+
+                                                        <div class="modal fade" id="ecardModal<?php echo e($item->id); ?>" tabindex="-1" aria-labelledby="ecardModalLabel<?php echo e($item->id); ?>" aria-hidden="true">
+                                                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title" id="ecardModalLabel<?php echo e($item->id); ?>">E Card - <?php echo e($item->organisation_name); ?></h5>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                    </div>
+                                                                    <div class="modal-body text-center">
+                                                                        <img src="<?php echo e(asset($item->e_card_upload)); ?>" alt="E Card" class="img-fluid">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    <?php else: ?>
+                                                        N/A
+                                                    <?php endif; ?>
                                                 <td>
                                                     <div class="d-flex">
                                                         <a href="<?php echo e(route('tpa_details.show', $item->id)); ?>"
@@ -98,7 +125,11 @@
                                                             data-contact_no="<?php echo e($item->contact_no); ?>"
                                                             data-address="<?php echo e($item->address); ?>"
                                                             data-contact_person_name="<?php echo e($item->contact_person_name); ?>"
-                                                            data-contact_person_phone="<?php echo e($item->contact_person_phone); ?>">
+                                                            data-contact_person_phone="<?php echo e($item->contact_person_phone); ?>"
+                                                            data-poilicy_no="<?php echo e($item->poilicy_no); ?>"
+                                                            data-e_card_no="<?php echo e($item->e_card_no); ?>"
+                                                            data-e_card_image="/<?php echo e($item->e_card_upload); ?>"
+                                                            data-e_card_upload="">
                                                             <i class="ti ti-pencil"></i>
                                                         </button>
                                                         <form method="POST" action="<?php echo e(route('tpamanagement.destroy')); ?>">
@@ -136,6 +167,9 @@
         ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => true,'size'=>'12'],
         ['name' => 'contact_person_name', 'label' => 'Contact Person Name', 'type' => 'text', 'required' => true,'size'=>'6'],
         ['name' => 'contact_person_phone', 'label' => 'Contact Person Phone', 'type' => 'text', 'required' => true,'size'=>'6'],
+        ['name' => 'poilicy_no', 'label' => 'Poilicy No', 'type' => 'text', 'required' => true,'size'=>'6'],
+        ['name' => 'e_card_no', 'label' => 'E Card No', 'type' => 'text', 'required' => true,'size'=>'6'],
+        ['name' => 'e_card_upload', 'label' => 'E Card Upload', 'type' => 'file', 'required' => true,'size'=>'12'],
         ],'columns' => 3]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('modals.form-modal'); ?>
 <?php if ($component->shouldRender()): ?>
@@ -150,6 +184,9 @@
         ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => true,'size'=>'12'],
         ['name' => 'contact_person_name', 'label' => 'Contact Person Name', 'type' => 'text', 'required' => true,'size'=>'6'],
         ['name' => 'contact_person_phone', 'label' => 'Contact Person Phone', 'type' => 'text', 'required' => true,'size'=>'6'],
+        ['name' => 'poilicy_no', 'label' => 'Poilicy No', 'type' => 'text', 'required' => true,'size'=>'6'],
+        ['name' => 'e_card_no', 'label' => 'E Card No', 'type' => 'text', 'required' => true,'size'=>'6'],
+        ['name' => 'e_card_upload', 'label' => 'E Card Upload', 'type' => 'file', 'required' => true,'size'=>'12'],
         ]),'columns' => 3]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
@@ -171,6 +208,10 @@
         ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => true,'size'=>'12'],
         ['name' => 'contact_person_name', 'label' => 'Contact Person Name', 'type' => 'text', 'required' => true,'size'=>'6'],
         ['name' => 'contact_person_phone', 'label' => 'Contact Person Phone', 'type' => 'text', 'required' => true,'size'=>'6'],
+        ['name' => 'poilicy_no', 'label' => 'Poilicy No', 'type' => 'text', 'required' => true,'size'=>'6'],
+        ['name' => 'e_card_no', 'label' => 'E Card No', 'type' => 'text', 'required' => true,'size'=>'6'],
+        ['name' => 'e_card_image', 'label' => 'E Card Current Image', 'type' => 'img', 'required' => true,'size'=>'12'],
+        ['name' => 'e_card_upload', 'label' => 'E Card Image Update', 'type' => 'file', 'required' => false ,'size'=>'12'],
     ],'columns' => 3]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('modals.form-modal'); ?>
 <?php if ($component->shouldRender()): ?>
@@ -186,6 +227,10 @@
         ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => true,'size'=>'12'],
         ['name' => 'contact_person_name', 'label' => 'Contact Person Name', 'type' => 'text', 'required' => true,'size'=>'6'],
         ['name' => 'contact_person_phone', 'label' => 'Contact Person Phone', 'type' => 'text', 'required' => true,'size'=>'6'],
+        ['name' => 'poilicy_no', 'label' => 'Poilicy No', 'type' => 'text', 'required' => true,'size'=>'6'],
+        ['name' => 'e_card_no', 'label' => 'E Card No', 'type' => 'text', 'required' => true,'size'=>'6'],
+        ['name' => 'e_card_image', 'label' => 'E Card Current Image', 'type' => 'img', 'required' => true,'size'=>'12'],
+        ['name' => 'e_card_upload', 'label' => 'E Card Image Update', 'type' => 'file', 'required' => false ,'size'=>'12'],
     ]),'columns' => 3]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
