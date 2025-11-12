@@ -768,3 +768,7 @@ Route::prefix('setup')->group(function () {
     Route::delete('/medicine-group/destroy/{id}', [SetupMedicineGroupController::class, 'destroy'])->name('setup.medicine-group.destroy');
 });
 
+
+    Route::get('/blood_bank_status', function () {
+        return view('admin.blood-bank-doner.blood_bank_status');
+    })->name('blood_bank_status');
