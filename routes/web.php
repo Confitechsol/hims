@@ -8,6 +8,7 @@ use App\Http\Controllers\BedController;
 use App\Http\Controllers\BedGroupController;
 use App\Http\Controllers\BedTypeController;
 use App\Http\Controllers\BloodBankController;
+use App\Http\Controllers\BloodDonorController;
 use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\ExpenseController;
@@ -573,25 +574,38 @@ Route::prefix('dutyroster')->group(function () {
     // Route::delete('/destroy', [DutyRosterController::class, 'destroy'])->name('dutyroster.destroy');
     // Route::get('/show/{id}', [DutyRosterController::class, 'show'])->name('dutyroster.show');
 });
-Route::get('/generate_certificate', function () {
-    return view('admin.certificate.generate_certificate');
-})->name('generate_certificate');
-Route::get('/certificate', function () {
-    return view('admin.certificate.certificate');
-})->name('certificate');
-Route::get('/generate_patient_id', function () {
-    return view('admin.certificate.generate_patient_id');
-})->name('generate_patient_id');
-Route::get('/patient_id', function () {
-    return view('admin.certificate.patient_id');
-})->name('patient_id');
-Route::get('/generate_staff_id', function () {
-    return view('admin.certificate.generate_staff_id');
-})->name('generate_staff_id');
-Route::get('/staff_id', function () {
-    return view('admin.certificate.staff_id');
-})->name('staff_id');
+Route::prefix('ambulance')->group(function () {
+    });
+Route::prefix('bloodBank')->group(function () {
 
+    Route::get('/donors', [BloodDonorController::class, 'index'])->name('donors.index');
+    Route::post('/addDonors', [BloodDonorController::class, 'addDonors'])->name('bloodBank.addDoner');
+    Route::put('/edit/{id}', [BloodDonorController::class, 'editDoner'])->name('bloodBank.editDoner');
+    Route::put('/update/{id}', [BloodDonorController::class, 'updateRoster'])->name('bloodBank.updateDoner');
+    Route::delete('/destroy/{id}', [BloodDonorController::class, 'destroyRoster'])->name('bloodBank.deleteDoner');
+
+});
+Route::prefix('certificate')->group(function () {
+    Route::get('/', function () {
+        return view('admin.certificate.certificate');
+    })->name('certificate');
+    Route::get('/generate_certificate', function () {
+        return view('admin.certificate.generate_certificate');
+    })->name('generate_certificate');
+    
+    Route::get('/generate_patient_id', function () {
+        return view('admin.certificate.generate_patient_id');
+    })->name('generate_patient_id');
+    Route::get('/patient_id', function () {
+        return view('admin.certificate.patient_id');
+    })->name('patient_id');
+    Route::get('/generate_staff_id', function () {
+        return view('admin.certificate.generate_staff_id');
+    })->name('generate_staff_id');
+    Route::get('/staff_id', function () {
+        return view('admin.certificate.staff_id');
+    })->name('staff_id');
+});
 // Pharmacy Routes
 Route::prefix('pharmacy')->group(function () {
     // Medicine Management - Index route
