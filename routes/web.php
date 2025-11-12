@@ -449,6 +449,7 @@ Route::get('/getChargeCategories', [OpdController::class, 'getChargeCategories']
 Route::get('/getCharges/{id}', [OpdController::class, 'getCharges'])->name('getCharges');
 Route::get('/getSymptomsTypes', [OpdController::class, 'getSymptomsType'])->name('getSymptomsTypes');
 Route::post('/getSymptoms', [OpdController::class, 'getSymptoms'])->name('getSymptoms');
+Route::get('/opd_view/{id}', [OpdController::class, 'showOpd'])->name('opd.show');
 
 Route::get('/ipd', [IpdController::class, 'index'])->name('ipd');
 Route::post('/ipd/store', [IpdController::class, 'store'])->name('ipd.store');
@@ -513,9 +514,7 @@ Route::get('/opd-billing', function () {
 Route::get('/visit_details', function () {
     return view('admin.visit_details');
 })->name('visit_details');
-Route::get('/opd_view', function () {
-    return view('admin.opd.opd_view');
-})->name('opd_view');
+
 Route::get('/generate_certificate', function () {
     return view('admin.certificate.generate_certificate');
 })->name('generate_certificate');
