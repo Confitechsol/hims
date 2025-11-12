@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\BloodDonor;
 use App\Models\BloodBankProduct;
+use App\Models\BloodIssue;
 
 class BloodDonorController extends Controller
 {
@@ -42,4 +43,47 @@ class BloodDonorController extends Controller
 
         return redirect()->back()->with('success', 'Donor added successfully!');
     }
+    public function updateDonor(Request $request, $id)
+    {
+        $request->validate([
+            'doner_name' => 'required|string|max:255',
+            'dob' => 'required|date',
+            'blood_group' => 'required',
+            'gender' => 'required|string',
+            'father_name' => 'required|string|max:255',
+            'contact_no' => 'required|string|max:15',
+            'address' => 'required|string|max:255',
+        ]);
+
+        $donor = BloodDonor::findOrFail($id);
+        $donor->donor_name = $request->doner_name;
+        $donor->date_of_birth = $request->dob;
+        $donor->blood_bank_product_id = $request->blood_group;
+        $donor->gender = $request->gender;
+        $donor->father_name = $request->father_name;
+        $donor->contact_no = $request->contact_no;
+        $donor->address = $request->address;
+        $donor->save();
+
+        return redirect()->back()->with('success', 'Donor details updated successfully!');
+    }
+
+    public function destroyDonor($id)
+    {
+        $donor = BloodDonor::findOrFail($id);
+        $donor->delete(); // Soft delete
+        return redirect()->back()->with('success', 'Donor deleted successfully!');
+    }
+    public function bloodIssues()
+    {
+        // Fetch all blood issues with related donor info (if relationship exists)
+        $bloodissues = BloodIssue::with(['donorCycle', 'patient']) // optional relation if exists
+            ->orderBy('date_of_issue', 'desc')
+            ->get();
+
+        // Pass data to Blade view
+        return view('admin.blood-bank-doner.blood-issue', compact('bloodissues'));
+    }
+
+
 }

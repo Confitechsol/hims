@@ -581,8 +581,14 @@ Route::prefix('bloodBank')->group(function () {
     Route::get('/donors', [BloodDonorController::class, 'index'])->name('donors.index');
     Route::post('/addDonors', [BloodDonorController::class, 'addDonors'])->name('bloodBank.addDoner');
     Route::put('/edit/{id}', [BloodDonorController::class, 'editDoner'])->name('bloodBank.editDoner');
-    Route::put('/update/{id}', [BloodDonorController::class, 'updateRoster'])->name('bloodBank.updateDoner');
-    Route::delete('/destroy/{id}', [BloodDonorController::class, 'destroyRoster'])->name('bloodBank.deleteDoner');
+    Route::put('/update/{id}', [BloodDonorController::class, 'updateDonor'])->name('bloodBank.updateDoner');
+    Route::delete('/destroy/{id}', [BloodDonorController::class, 'destroyDonor'])->name('bloodBank.deleteDoner');
+
+    Route::get('/issue', [BloodDonorController::class, 'bloodIssues'])->name('issue-blood.index');
+    Route::post('/addDonors', [BloodDonorController::class, 'addDonors'])->name('bloodBank.addDoner');
+    Route::put('/edit/{id}', [BloodDonorController::class, 'editDoner'])->name('bloodBank.editDoner');
+    Route::put('/update/{id}', [BloodDonorController::class, 'updateDonor'])->name('bloodBank.updateDoner');
+    Route::delete('/destroy/{id}', [BloodDonorController::class, 'destroyDonor'])->name('bloodBank.deleteDoner');
 
 });
 Route::prefix('certificate')->group(function () {

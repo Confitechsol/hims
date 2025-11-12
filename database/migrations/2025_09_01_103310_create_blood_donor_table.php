@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('contact_no', 20)->nullable()->index();   // contact_no varchar(20) YES MUL
 
             $table->timestamp('created_at')->useCurrent();
+             $table->softDeletes();
         });
     }
 
@@ -35,5 +36,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('blood_donor');
+        
     }
 };
