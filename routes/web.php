@@ -290,11 +290,20 @@ Route::middleware(['admin'])->group(function () {
     Route::put('/income/update', [IncomeController::class, 'update'])->name('income.update');
     Route::delete('/income/destroy', [IncomeController::class, 'destroy'])->name('income.destroy');
 
-    Route::get('/expense', [ExpenseController::class, 'index']);
+    Route::get('/expense', [ExpenseController::class, 'index'])->name('expense');
+    Route::post('/expense/create', [ExpenseController::class, 'create'])->name('expense.create');
+    Route::put('/expense/update', [ExpenseController::class, 'update'])->name('expense.update');
+    Route::delete('/expense/delete', [ExpenseController::class, 'delete'])->name('expense.delete');
 
-    Route::get('/birth', [BirthController::class, 'index']);
+    Route::get('/birth', [BirthController::class, 'index'])->name('birth');
+    Route::post('/birth/create', [BirthController::class, 'create'])->name('birth.create');
+    Route::put('/birth/update', [BirthController::class, 'update'])->name('birth.update');
+    Route::delete('/birth/delete', [BirthController::class, 'delete'])->name('birth.delete');
 
-    Route::get('/death', [DeathController::class, 'index']);
+    Route::get('/death', [DeathController::class, 'index'])->name('death');
+    Route::post('/death/create', [DeathController::class, 'create'])->name('death.create');
+    Route::put('/death/update', [DeathController::class, 'update'])->name('death.update');
+    Route::delete('/death/delete', [DeathController::class, 'delete'])->name('death.delete');
 
     Route::get('/visitors', [VisitorsController::class, 'index']);
 
@@ -582,8 +591,14 @@ Route::prefix('bloodBank')->group(function () {
     Route::get('/donors', [BloodDonorController::class, 'index'])->name('donors.index');
     Route::post('/addDonors', [BloodDonorController::class, 'addDonors'])->name('bloodBank.addDoner');
     Route::put('/edit/{id}', [BloodDonorController::class, 'editDoner'])->name('bloodBank.editDoner');
-    Route::put('/update/{id}', [BloodDonorController::class, 'updateRoster'])->name('bloodBank.updateDoner');
-    Route::delete('/destroy/{id}', [BloodDonorController::class, 'destroyRoster'])->name('bloodBank.deleteDoner');
+    Route::put('/update/{id}', [BloodDonorController::class, 'updateDonor'])->name('bloodBank.updateDoner');
+    Route::delete('/destroy/{id}', [BloodDonorController::class, 'destroyDonor'])->name('bloodBank.deleteDoner');
+
+    Route::get('/issue', [BloodDonorController::class, 'bloodIssues'])->name('issue-blood.index');
+    Route::post('/addDonors', [BloodDonorController::class, 'addDonors'])->name('bloodBank.addDoner');
+    Route::put('/edit/{id}', [BloodDonorController::class, 'editDoner'])->name('bloodBank.editDoner');
+    Route::put('/update/{id}', [BloodDonorController::class, 'updateDonor'])->name('bloodBank.updateDoner');
+    Route::delete('/destroy/{id}', [BloodDonorController::class, 'destroyDonor'])->name('bloodBank.deleteDoner');
 
 });
 Route::prefix('certificate')->group(function () {
@@ -767,10 +782,14 @@ Route::prefix('setup')->group(function () {
     Route::post('/medicine-group/store', [SetupMedicineGroupController::class, 'store'])->name('setup.medicine-group.store');
     Route::put('/medicine-group/update/{id}', [SetupMedicineGroupController::class, 'update'])->name('setup.medicine-group.update');
     Route::delete('/medicine-group/destroy/{id}', [SetupMedicineGroupController::class, 'destroy'])->name('setup.medicine-group.destroy');
-
-    Route::get('/getMedicineCategories', [MedicineController::class, 'getCategories'])->name('getMedicineCategories');
-    Route::get('/getMedicines/{categoryId}', [MedicineController::class, 'getMedicines'])->name('getMedicines');
-    Route::get('/getDoses/{categoryId}', [MedicineController::class, 'getDoses'])->name('getDoses');
-    Route::get('/getDoseIntervals', [MedicineController::class, 'getIntervals'])->name('getDoseIntervals');
-    Route::get('/getDoseDurations', [MedicineController::class, 'getDurations'])->name('getDoseDurations');
 });
+
+Route::get('/getMedicineCategories', [MedicineController::class, 'getCategories'])->name('getMedicineCategories');
+Route::get('/getMedicines/{categoryId}', [MedicineController::class, 'getMedicines'])->name('getMedicines');
+Route::get('/getDoses/{categoryId}', [MedicineController::class, 'getDoses'])->name('getDoses');
+Route::get('/getDoseIntervals', [MedicineController::class, 'getIntervals'])->name('getDoseIntervals');
+Route::get('/getDoseDurations', [MedicineController::class, 'getDurations'])->name('getDoseDurations');
+
+Route::get('/blood_bank_status', function () {
+    return view('admin.blood-bank-doner.blood_bank_status');
+})->name('blood_bank_status');
