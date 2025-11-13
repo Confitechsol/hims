@@ -6,7 +6,7 @@
         <div class="col-12 d-flex">
             <div class="card shadow-sm flex-fill w-100">
                 <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                    <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Birth List</h5>
+                    <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Death List</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -60,7 +60,7 @@
                                     </div>
 
                                 </div> --}}
-                                    <x-table-actions.actions id="birth" name="Birth Record" />
+                                    <x-table-actions.actions id="death" name="Death Record" />
                                     <!-- Table start -->
                                     <div class="table-responsive table-nowrap">
                                         <table class="table" id="birth">
@@ -150,60 +150,51 @@
     </div>
     </div>
     </div>
-    <x-modals.birth-modal type="add" id="createModal" title="Add Birth Record" action="{{ route('tpamanagement.store') }}"
+    <x-modals.birth-modal type="add" id="createModal" title="Add Death Record" action="{{ route('tpamanagement.store') }}"
         :fields="[
             [
-                'name' => 'organisation_name',
-                'label' => 'organisation Name',
+                'name' => 'case_id',
+                'label' => 'Case ID',
                 'type' => 'text',
                 'required' => true,
-                'size' => '5',
+                
             ],
-            ['name' => 'code', 'label' => 'Code', 'type' => 'text', 'required' => true, 'size' => '3'],
-            ['name' => 'contact_no', 'label' => 'Phone', 'type' => 'text', 'required' => true, 'size' => '4'],
-            ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => true, 'size' => '12'],
+            ['name' => 'patient_name', 'label' => 'Patient Name', 'type' => 'text', 'required' => true, 'size' => '3'],
+            ['name' => 'death_date', 'label' => 'Death Date', 'type' => 'text', 'required' => true, 'size' => '4'],
+            ['name' => 'guardian_name', 'label' => 'Guardian Name ', 'type' => 'text', 'required' => true, 'size' => '12'],
             [
-                'name' => 'contact_person_name',
-                'label' => 'Contact Person Name',
+                'name' => 'Report',
+                'label' => 'report',
                 'type' => 'text',
                 'required' => true,
                 'size' => '6',
             ],
-            [
-                'name' => 'contact_person_phone',
-                'label' => 'Contact Person Phone',
-                'type' => 'text',
-                'required' => true,
-                'size' => '6',
-            ],
+         ['name' => 'attachment', 'label' => 'Attachment', 'type' => 'file', 'required' => false, 'size' => '6',],
+
         ]" :columns="3" />
-    <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Company Name"
+    <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Death Name"
         action="{{ route('tpamanagement.update') }}" :fields="[
             ['name' => 'id', 'type' => 'hidden', 'required' => true],
-            [
-                'name' => 'organisation_name',
-                'label' => 'organisation Name',
+
+              [
+                'name' => 'case_id',
+                'label' => 'Case ID',
                 'type' => 'text',
                 'required' => true,
-                'size' => '5',
+                
             ],
-            ['name' => 'code', 'label' => 'Code', 'type' => 'text', 'required' => true, 'size' => '3'],
-            ['name' => 'contact_no', 'label' => 'Phone', 'type' => 'text', 'required' => true, 'size' => '4'],
-            ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => true, 'size' => '12'],
+            ['name' => 'patient_name', 'label' => 'Patient Name', 'type' => 'text', 'required' => true, 'size' => '3'],
+            ['name' => 'death_date', 'label' => 'Death Date', 'type' => 'text', 'required' => true, 'size' => '4'],
+            ['name' => 'guardian_name', 'label' => 'Guardian Name ', 'type' => 'text', 'required' => true, 'size' => '12'],
             [
-                'name' => 'contact_person_name',
-                'label' => 'Contact Person Name',
-                'type' => 'text',
-                'required' => true,
-                'size' => '6',
-            ],
-            [
-                'name' => 'contact_person_phone',
-                'label' => 'Contact Person Phone',
+                'name' => 'Report',
+                'label' => 'report',
                 'type' => 'text',
                 'required' => true,
                 'size' => '6',
             ],
+         ['name' => 'attachment', 'label' => 'Attachment', 'type' => 'file', 'required' => false, 'size' => '6',],
+           
         ]" :columns="3" />
 
 

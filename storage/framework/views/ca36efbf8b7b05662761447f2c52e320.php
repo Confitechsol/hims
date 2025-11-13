@@ -156,27 +156,38 @@
     </div>
     <?php if (isset($component)) { $__componentOriginal66ca70ec79ff22faa62f501a1b49a88a = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal66ca70ec79ff22faa62f501a1b49a88a = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.modals.form-modal','data' => ['type' => 'add','id' => 'createModal','title' => 'Add TPA','action' => ''.e(route('tpamanagement.store')).'','fields' => [
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.modals.form-modal','data' => ['type' => 'add','id' => 'createModal','title' => 'Add Expense','action' => ''.e(route('tpamanagement.store')).'','fields' => [
             [
-                'name' => 'organisation_name',
-                'label' => 'organisation Name',
+                'name' => 'expense_name',
+                'label' => 'Expense Head',
                 'type' => 'text',
                 'required' => true,
                 'size' => '5',
             ],
-            ['name' => 'code', 'label' => 'Code', 'type' => 'text', 'required' => true, 'size' => '3'],
-            ['name' => 'contact_no', 'label' => 'Phone', 'type' => 'text', 'required' => true, 'size' => '4'],
-            ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => true, 'size' => '12'],
+            ['name' => 'name', 'label' => 'Name', 'type' => 'text', 'required' => true, 'size' => '3'],
+            ['name' => 'invoice_number', 'label' => 'Invoice Number', 'type' => 'text', 'required' => true, 'size' => '4'],
+           
+           [
+    'name' => 'date',
+    'label' => 'Date',
+    'type' => 'date',
+    'required' => true,
+    'size' => '12'
+         ],
+
+           
             [
-                'name' => 'contact_person_name',
-                'label' => 'Contact Person Name',
+                'name' => 'amount',
+                'label' => 'Amount (INR) ',
                 'type' => 'text',
                 'required' => true,
                 'size' => '6',
             ],
+            ['name' => 'attach_document', 'label' => 'Attach Document', 'type' => 'file', 'required' => false, 'size' => '6',],
+
             [
-                'name' => 'contact_person_phone',
-                'label' => 'Contact Person Phone',
+                'name' => 'description',
+                'label' => 'Description',
                 'type' => 'text',
                 'required' => true,
                 'size' => '6',
@@ -188,27 +199,38 @@
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['type' => 'add','id' => 'createModal','title' => 'Add TPA','action' => ''.e(route('tpamanagement.store')).'','fields' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute([
+<?php $component->withAttributes(['type' => 'add','id' => 'createModal','title' => 'Add Expense','action' => ''.e(route('tpamanagement.store')).'','fields' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute([
             [
-                'name' => 'organisation_name',
-                'label' => 'organisation Name',
+                'name' => 'expense_name',
+                'label' => 'Expense Head',
                 'type' => 'text',
                 'required' => true,
                 'size' => '5',
             ],
-            ['name' => 'code', 'label' => 'Code', 'type' => 'text', 'required' => true, 'size' => '3'],
-            ['name' => 'contact_no', 'label' => 'Phone', 'type' => 'text', 'required' => true, 'size' => '4'],
-            ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => true, 'size' => '12'],
+            ['name' => 'name', 'label' => 'Name', 'type' => 'text', 'required' => true, 'size' => '3'],
+            ['name' => 'invoice_number', 'label' => 'Invoice Number', 'type' => 'text', 'required' => true, 'size' => '4'],
+           
+           [
+    'name' => 'date',
+    'label' => 'Date',
+    'type' => 'date',
+    'required' => true,
+    'size' => '12'
+         ],
+
+           
             [
-                'name' => 'contact_person_name',
-                'label' => 'Contact Person Name',
+                'name' => 'amount',
+                'label' => 'Amount (INR) ',
                 'type' => 'text',
                 'required' => true,
                 'size' => '6',
             ],
+            ['name' => 'attach_document', 'label' => 'Attach Document', 'type' => 'file', 'required' => false, 'size' => '6',],
+
             [
-                'name' => 'contact_person_phone',
-                'label' => 'Contact Person Phone',
+                'name' => 'description',
+                'label' => 'Description',
                 'type' => 'text',
                 'required' => true,
                 'size' => '6',
@@ -226,30 +248,40 @@
 <?php endif; ?>
     <?php if (isset($component)) { $__componentOriginal66ca70ec79ff22faa62f501a1b49a88a = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal66ca70ec79ff22faa62f501a1b49a88a = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.modals.form-modal','data' => ['method' => 'put','type' => 'edit','id' => 'edit_modal','title' => 'Edit Company Name','action' => ''.e(route('tpamanagement.update')).'','fields' => [
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.modals.form-modal','data' => ['method' => 'put','type' => 'edit','id' => 'edit_modal','title' => 'Edit Expense','action' => ''.e(route('tpamanagement.update')).'','fields' => [
             ['name' => 'id', 'type' => 'hidden', 'required' => true],
             [
-                'name' => 'organisation_name',
-                'label' => 'organisation Name',
+                'name' => 'expense_name',
+                'label' => 'Expense Head',
                 'type' => 'text',
                 'required' => true,
                 'size' => '5',
             ],
-            ['name' => 'code', 'label' => 'Code', 'type' => 'text', 'required' => true, 'size' => '3'],
-            ['name' => 'contact_no', 'label' => 'Phone', 'type' => 'text', 'required' => true, 'size' => '4'],
-            ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => true, 'size' => '12'],
+            ['name' => 'name', 'label' => 'Name', 'type' => 'text', 'required' => true, 'size' => '3'],
+            ['name' => 'invoice_number', 'label' => 'Invoice Number', 'type' => 'text', 'required' => true, 'size' => '4'],
+           
+           [
+    'name' => 'date',
+    'label' => 'Date',
+    'type' => 'date',
+    'required' => true,
+    'size' => '12'
+         ],
+
+           
             [
-                'name' => 'contact_person_name',
-                'label' => 'Contact Person Name',
+                'name' => 'amount',
+                'label' => 'Amount (INR) ',
                 'type' => 'text',
                 'required' => true,
                 'size' => '6',
             ],
+            ['name' => 'attach_document', 'label' => 'Attach Document', 'type' => 'file', 'required' => false, 'size' => '6',],
+
             [
-                'name' => 'contact_person_phone',
-                'label' => 'Contact Person Phone',
+                'name' => 'description',
+                'label' => 'Description',
                 'type' => 'text',
-                'required' => true,
                 'size' => '6',
             ],
         ],'columns' => 3]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -259,30 +291,40 @@
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['method' => 'put','type' => 'edit','id' => 'edit_modal','title' => 'Edit Company Name','action' => ''.e(route('tpamanagement.update')).'','fields' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute([
+<?php $component->withAttributes(['method' => 'put','type' => 'edit','id' => 'edit_modal','title' => 'Edit Expense','action' => ''.e(route('tpamanagement.update')).'','fields' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute([
             ['name' => 'id', 'type' => 'hidden', 'required' => true],
             [
-                'name' => 'organisation_name',
-                'label' => 'organisation Name',
+                'name' => 'expense_name',
+                'label' => 'Expense Head',
                 'type' => 'text',
                 'required' => true,
                 'size' => '5',
             ],
-            ['name' => 'code', 'label' => 'Code', 'type' => 'text', 'required' => true, 'size' => '3'],
-            ['name' => 'contact_no', 'label' => 'Phone', 'type' => 'text', 'required' => true, 'size' => '4'],
-            ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => true, 'size' => '12'],
+            ['name' => 'name', 'label' => 'Name', 'type' => 'text', 'required' => true, 'size' => '3'],
+            ['name' => 'invoice_number', 'label' => 'Invoice Number', 'type' => 'text', 'required' => true, 'size' => '4'],
+           
+           [
+    'name' => 'date',
+    'label' => 'Date',
+    'type' => 'date',
+    'required' => true,
+    'size' => '12'
+         ],
+
+           
             [
-                'name' => 'contact_person_name',
-                'label' => 'Contact Person Name',
+                'name' => 'amount',
+                'label' => 'Amount (INR) ',
                 'type' => 'text',
                 'required' => true,
                 'size' => '6',
             ],
+            ['name' => 'attach_document', 'label' => 'Attach Document', 'type' => 'file', 'required' => false, 'size' => '6',],
+
             [
-                'name' => 'contact_person_phone',
-                'label' => 'Contact Person Phone',
+                'name' => 'description',
+                'label' => 'Description',
                 'type' => 'text',
-                'required' => true,
                 'size' => '6',
             ],
         ]),'columns' => 3]); ?>

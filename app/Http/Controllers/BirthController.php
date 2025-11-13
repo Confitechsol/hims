@@ -30,7 +30,7 @@ class BirthController extends Controller
     function store(Request $request)
     {
         $request->validate([
-            'organisation_name' => 'required|string|max:255',
+            'child_name' => 'required|string|max:255',
             'code' => 'required|string|max:100|unique:organisation,code',
             'contact_no' => 'required|string|max:15|different:contact_person_phone',
             'address' => 'required|string|max:500',
@@ -41,25 +41,53 @@ class BirthController extends Controller
             'e_card_upload' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
-        $organisation = new Organisation();
-        $organisation->organisation_name = $request->organisation_name;
-        $organisation->code = $request->code;
-        $organisation->contact_no = $request->contact_no;
-        $organisation->address = $request->address;
-        $organisation->contact_person_name = $request->contact_person_name;
-        $organisation->contact_person_phone = $request->contact_person_phone;
-        $organisation->poilicy_no = $request->poilicy_no;
-        $organisation->e_card_no = $request->e_card_no;
+        $birth = new BirthReport();
+        $birth->child_name = $request->child_name;
+        $birth->gender = $request->gender;
+        $birth->weight = $request->weight;
+        
+      if ($request->hasFile('baby_image')) {
+       $file = $request->file('baby_image');
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $file->move(public_path('uploads/baby_image'), $filename);
+      $birth->baby_image = 'uploads/baby_image/' . $filename;  
+     }
+
+
+        $birth->contact_person_phone = $request->contact_person_phone;
+        $birth->address = $request->address;
+        $birth->caseId = $request->caseId;
+        $birth->mother_name = $request->mother_name;
+
+         if ($request->hasFile('mother_image')) {
+       $file = $request->file('mother_image');
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $file->move(public_path('uploads/mother_image'), $filename);
+      $birth->mother_image = 'uploads/mother_image/' . $filename;  
+     }
+
+
+        $birth->father_name = $request->father_name;
+
+        
+       if ($request->hasFile('father_image')) {
+       $file = $request->file('father_image');
+       $filename = time() . '_' . $file->getClientOriginalName();
+       $file->move(public_path('uploads/father_image'), $filename);
+      $birth->father_image = 'uploads/father_image/' . $filename;  
+       }
+
+        $birth->report = $request->report;
         // Handle file upload
-        if ($request->hasFile('e_card_upload')) {       
-            $file = $request->file('e_card_upload');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads/e_cards'), $filename);
-            $organisation->e_card_upload = 'uploads/e_cards/' . $filename;  
-        }
+        if ($request->hasFile('report_image')) {
+       $file = $request->file('report_image');
+       $filename = time() . '_' . $file->getClientOriginalName();
+       $file->move(public_path('uploads/report_image'), $filename);
+       $birth->report_image = 'uploads/report_image/' . $filename;  
+       }
+        
+        $birth->save();
 
-        $organisation->save();
-
-        return redirect()->route('tpamanagement')->with('success', 'TPA added successfully.');
+        return redirect()->route('birthordeath')->with('success', 'Birth added successfully.');
     }
 }

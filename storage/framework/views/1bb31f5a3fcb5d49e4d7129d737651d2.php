@@ -267,18 +267,32 @@
 <?php endif; ?>
     <?php if (isset($component)) { $__componentOriginal66ca70ec79ff22faa62f501a1b49a88a = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal66ca70ec79ff22faa62f501a1b49a88a = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.modals.form-modal','data' => ['method' => 'put','type' => 'edit','id' => 'edit_modal','title' => 'Edit Company Name','action' => ''.e(route('tpamanagement.update')).'','fields' => [
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.modals.form-modal','data' => ['method' => 'put','type' => 'edit','id' => 'edit_modal','title' => 'Edit Birth','action' => ''.e(route('tpamanagement.update')).'','fields' => [
             ['name' => 'id', 'type' => 'hidden', 'required' => true],
             [
-                'name' => 'organisation_name',
-                'label' => 'organisation Name',
+                'name' => 'child_name',
+                'label' => 'Child Name',
                 'type' => 'text',
                 'required' => true,
                 'size' => '5',
             ],
-            ['name' => 'code', 'label' => 'Code', 'type' => 'text', 'required' => true, 'size' => '3'],
-            ['name' => 'contact_no', 'label' => 'Phone', 'type' => 'text', 'required' => true, 'size' => '4'],
-            ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => true, 'size' => '12'],
+            [ 'name' => 'gender', 'label' => 'Gender', 'type' => 'select', 'required' => true, 'options' => [     'Male' => 'Male',   'Female' => 'Female' ], 'size' => '3'],
+
+            ['name' => 'weight', 'label' => 'Weight', 'type' => 'text', 'required' => true, 'size' => '4'],
+            
+            ['name' => 'baby_image', 'label' => 'Child Photo', 'type' => 'file', 'required' => false, 'size' => '6',],
+            ['name' => 'birth_date', 'label' => 'Birth Date', 'type' => 'date', 'required' => true, 'size' => '4'],
+            ['name' => 'contact_person_phone', 'label' => 'Phone', 'type' => 'text',  'size' => '6'],
+            ['name' => 'address', 'label' => 'Address', 'type' => 'text',  'size' => '12'],
+            ['name' => 'caseId', 'label' => 'Case Id', 'type' => 'text',  'size' => '6'],
+           [
+                'name' => 'mother_name',
+                'label' => 'Mother Name ',
+                'type' => 'text',
+                'required' => true,
+                'size' => '5',
+            ],
+            ['name' => 'mother_image', 'label' => 'Mother Photo', 'type' => 'file', 'required' => false, 'size' => '6',],
             [
                 'name' => 'contact_person_name',
                 'label' => 'Contact Person Name',
@@ -287,12 +301,21 @@
                 'size' => '6',
             ],
             [
-                'name' => 'contact_person_phone',
-                'label' => 'Contact Person Phone',
+                'name' => 'father_name',
+                'label' => 'Father Name ',
                 'type' => 'text',
                 'required' => true,
-                'size' => '6',
+                'size' => '5',
             ],
+            ['name' => 'father_image', 'label' => 'Father Photo', 'type' => 'file', 'required' => false, 'size' => '6',],
+            
+            [
+                'name' => 'report',
+                'label' => 'Report',
+                'type' => 'text',
+                'size' => '5',
+            ],
+           
         ],'columns' => 3]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('modals.form-modal'); ?>
 <?php if ($component->shouldRender()): ?>
@@ -300,18 +323,32 @@
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['method' => 'put','type' => 'edit','id' => 'edit_modal','title' => 'Edit Company Name','action' => ''.e(route('tpamanagement.update')).'','fields' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute([
+<?php $component->withAttributes(['method' => 'put','type' => 'edit','id' => 'edit_modal','title' => 'Edit Birth','action' => ''.e(route('tpamanagement.update')).'','fields' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute([
             ['name' => 'id', 'type' => 'hidden', 'required' => true],
             [
-                'name' => 'organisation_name',
-                'label' => 'organisation Name',
+                'name' => 'child_name',
+                'label' => 'Child Name',
                 'type' => 'text',
                 'required' => true,
                 'size' => '5',
             ],
-            ['name' => 'code', 'label' => 'Code', 'type' => 'text', 'required' => true, 'size' => '3'],
-            ['name' => 'contact_no', 'label' => 'Phone', 'type' => 'text', 'required' => true, 'size' => '4'],
-            ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => true, 'size' => '12'],
+            [ 'name' => 'gender', 'label' => 'Gender', 'type' => 'select', 'required' => true, 'options' => [     'Male' => 'Male',   'Female' => 'Female' ], 'size' => '3'],
+
+            ['name' => 'weight', 'label' => 'Weight', 'type' => 'text', 'required' => true, 'size' => '4'],
+            
+            ['name' => 'baby_image', 'label' => 'Child Photo', 'type' => 'file', 'required' => false, 'size' => '6',],
+            ['name' => 'birth_date', 'label' => 'Birth Date', 'type' => 'date', 'required' => true, 'size' => '4'],
+            ['name' => 'contact_person_phone', 'label' => 'Phone', 'type' => 'text',  'size' => '6'],
+            ['name' => 'address', 'label' => 'Address', 'type' => 'text',  'size' => '12'],
+            ['name' => 'caseId', 'label' => 'Case Id', 'type' => 'text',  'size' => '6'],
+           [
+                'name' => 'mother_name',
+                'label' => 'Mother Name ',
+                'type' => 'text',
+                'required' => true,
+                'size' => '5',
+            ],
+            ['name' => 'mother_image', 'label' => 'Mother Photo', 'type' => 'file', 'required' => false, 'size' => '6',],
             [
                 'name' => 'contact_person_name',
                 'label' => 'Contact Person Name',
@@ -320,12 +357,21 @@
                 'size' => '6',
             ],
             [
-                'name' => 'contact_person_phone',
-                'label' => 'Contact Person Phone',
+                'name' => 'father_name',
+                'label' => 'Father Name ',
                 'type' => 'text',
                 'required' => true,
-                'size' => '6',
+                'size' => '5',
             ],
+            ['name' => 'father_image', 'label' => 'Father Photo', 'type' => 'file', 'required' => false, 'size' => '6',],
+            
+            [
+                'name' => 'report',
+                'label' => 'Report',
+                'type' => 'text',
+                'size' => '5',
+            ],
+           
         ]),'columns' => 3]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>

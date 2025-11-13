@@ -289,11 +289,24 @@ Route::middleware(['admin'])->group(function () {
     Route::put('/income/update', [IncomeController::class, 'update'])->name('income.update');
     Route::delete('/income/destroy', [IncomeController::class, 'destroy'])->name('income.destroy');
 
-    Route::get('/expense', [ExpenseController::class, 'index']);
+    Route::get('/expense', [ExpenseController::class, 'index'])->name('expense');
+    Route::post('/expense/create', [ExpenseController::class, 'create'])->name('expense.create');
+    Route::put('/expense/update', [ExpenseController::class, 'update'])->name('expense.update');
+    Route::delete('/expense/delete', [ExpenseController::class, 'delete'])->name('expense.delete');
 
-    Route::get('/birth', [BirthController::class, 'index']);
 
-    Route::get('/death', [DeathController::class, 'index']);
+    Route::get('/birth', [BirthController::class, 'index'])->name('birth');
+    Route::post('/birth/create', [BirthController::class, 'create'])->name('birth.create');
+    Route::put('/birth/update', [BirthController::class, 'update'])->name('birth.update');
+    Route::delete('/birth/delete', [BirthController::class, 'delete'])->name('birth.delete');
+
+
+
+
+    Route::get('/death', [DeathController::class, 'index'])->name('death');
+    Route::post('/death/create', [DeathController::class, 'create'])->name('death.create');
+    Route::put('/death/update', [DeathController::class, 'update'])->name('death.update');
+    Route::delete('/death/delete', [DeathController::class, 'delete'])->name('death.delete');
 
     Route::get('/visitors', [VisitorsController::class, 'index']);
 
