@@ -20,6 +20,7 @@ use App\Http\Controllers\FrontOfficeController;
 use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\InventoriesController;
 use App\Http\Controllers\MedicineCategoryController;
+use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\MedicineGroupController;
 use App\Http\Controllers\Modules\IpdController;
 use App\Http\Controllers\Modules\OpdController;
@@ -315,6 +316,7 @@ Route::prefix('/pathology-unit')->group(function () {
     Route::post('/store', [PathologyController::class, 'storeUnit'])->name('pathology-unit.store');
     Route::put('/update/{id}', [PathologyController::class, 'updateUnit'])->name('pathology-unit.update');
     Route::delete('/destroy/{id}', [PathologyController::class, 'destroyUnit'])->name('pathology-unit.destroy');
+    Route::get('/get_pathologies', [PathologyController::class, 'getPathologies'])->name('getPathologies');
 });
 Route::prefix('/pathology-parameter')->group(function () {
     Route::get('/', [PathologyController::class, 'pathologyParameters'])->name('pathology-parameter');
@@ -328,6 +330,7 @@ Route::post('/radiology-category/store', [RadiologyController::class, 'store'])-
 Route::put('/radiology-category/update', [RadiologyController::class, 'update'])->name('radiology-category.update');
 Route::post('/radiology-category/updateStatus/{id}', [RadiologyController::class, 'updateStatus'])->name('radiology-category.updateStatus');
 Route::delete('/radiology-category/delete/{id}', [RadiologyController::class, 'delete'])->name('radiology-category.delete');
+Route::get('/get_radiologies', [RadiologyController::class, 'getRadiologies'])->name('getRadiologies');
 
 Route::get('/radiology-unit', [RadiologyController::class, 'radiologyUnitIndex'])->name('radiology-unit');
 Route::post('/radiology-unit/store', [RadiologyController::class, 'storeUnit'])->name('radiology-unit.store');
@@ -366,6 +369,8 @@ Route::get('/finding-category', [FindingsController::class, 'indexCategory'])->n
 Route::post('/finding-category/storeCategory', [FindingsController::class, 'storeCategory'])->name('finding-category.storeCategory');
 Route::put('/finding-category/updateCategory', [FindingsController::class, 'updateCategory'])->name('finding-category.updateCategory');
 Route::delete('/finding-category/deleteCategory/{id}', [FindingsController::class, 'deleteCategory'])->name('finding-category.deleteCategory');
+Route::get('/get_finding_categories', [FindingsController::class, 'getFindingCategories'])->name('getFindingCategories');
+Route::post('/get_findings', [FindingsController::class, 'getFindings'])->name('getFindings');
 
 Route::prefix('/vital')->group(function () {
     Route::get('/', [VitalController::class, 'index'])->name('vitals');
@@ -471,6 +476,7 @@ Route::get('/getCharges/{id}', [OpdController::class, 'getCharges'])->name('getC
 Route::get('/getSymptomsTypes', [OpdController::class, 'getSymptomsType'])->name('getSymptomsTypes');
 Route::post('/getSymptoms', [OpdController::class, 'getSymptoms'])->name('getSymptoms');
 Route::get('/opd_view/{id}', [OpdController::class, 'showOpd'])->name('opd.show');
+Route::post('/add_prescription', [OpdController::class, 'storePrescription'])->name('opd.addPrescription');
 
 Route::get('/ipd', [IpdController::class, 'index'])->name('ipd');
 Route::post('/ipd/store', [IpdController::class, 'store'])->name('ipd.store');
@@ -761,4 +767,10 @@ Route::prefix('setup')->group(function () {
     Route::post('/medicine-group/store', [SetupMedicineGroupController::class, 'store'])->name('setup.medicine-group.store');
     Route::put('/medicine-group/update/{id}', [SetupMedicineGroupController::class, 'update'])->name('setup.medicine-group.update');
     Route::delete('/medicine-group/destroy/{id}', [SetupMedicineGroupController::class, 'destroy'])->name('setup.medicine-group.destroy');
+
+    Route::get('/getMedicineCategories', [MedicineController::class, 'getCategories'])->name('getMedicineCategories');
+    Route::get('/getMedicines/{categoryId}', [MedicineController::class, 'getMedicines'])->name('getMedicines');
+    Route::get('/getDoses/{categoryId}', [MedicineController::class, 'getDoses'])->name('getDoses');
+    Route::get('/getDoseIntervals', [MedicineController::class, 'getIntervals'])->name('getDoseIntervals');
+    Route::get('/getDoseDurations', [MedicineController::class, 'getDurations'])->name('getDoseDurations');
 });

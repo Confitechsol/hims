@@ -39,7 +39,7 @@
     }
 
     .patient-search {
-        background: rgba(255, 255, 255, 0.15);
+        /* background: rgba(255, 255, 255, 0.15); */
         border: 1px solid rgba(255, 255, 255, 0.3);
         /* color: white; */
         border-radius: 8px;
@@ -51,7 +51,7 @@
     }
 
     .patient-search:focus {
-        background: rgba(255, 255, 255, 0.25);
+        /* background: rgba(255, 255, 255, 0.25); */
         border-color: rgba(255, 255, 255, 0.5);
         color: black;
         box-shadow: none;
@@ -640,8 +640,9 @@
                 <!-- Modal Header -->
                 <div class="modal-header align-items-start">
                     <div class="flex-grow-1">
-                        <h5 class="modal-title mb-3">Patient Appointment</h5>
-                        <div class="d-flex gap-3 align-items-center">
+                        <h5 class="modal-title mb-3" id="patient-header">Patient Appointment</h5>
+                        
+                        <div class="d-flex gap-3 align-items-center" id="patient-loader">
                             <select type="text" class="form-select patient-search flex-grow-1"
                                 placeholder="Search patient by name or ID..." id="patient_select" name="patient_id">
                                 <option value="">Loading...</option>
@@ -1033,14 +1034,71 @@
 
 <?php echo $__env->make('components.modals.add-patients-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
+    function populatePatientDetails(selected) {
+        
+        document.getElementById('patient_name_value').textContent =
+            `${selected.patient_name} (${selected.id})`;
+        document.getElementById('patient_gender_value').textContent = selected
+            .gender || 'N/A';
+        document.getElementById('patient_age_value').textContent = selected.age +
+            " Year " +
+            selected.month + " Month " + selected.day + " Days " || 'N/A';
+        document.getElementById('patient_marital_status_value').textContent =
+            selected
+            .marital_status || 'N/A';
+        document.getElementById('patient_blood_value').textContent = selected
+            .blood_group.name ||
+            'N/A';
+        document.getElementById('patient_phone_value').textContent = selected
+            .mobileno || 'N/A';
+        document.getElementById('patient_location_value').textContent = selected
+            .address ||
+            'N/A';
+
+        document.getElementById('patient_tpa_value').textContent = selected
+            .organisation
+            .organisation_name || 'N/A';
+        document.getElementById('patient_tpa_code_value').textContent = selected
+            .organisation
+            .code ||
+            'N/A';
+        document.getElementById('patient_tpa_validity_value').textContent = selected
+            .tpa_validity || 'N/A';
+        document.getElementById('patient_identification_value').textContent =
+            selected
+            .identification_number || 'N/A';
+    }
+</script>
+<script>
     document.addEventListener("DOMContentLoaded", function() {
+
         const addPatientBtn = document.getElementById("openAddPatientBtn");
         const createOpdModal = document.getElementById("createOpdModal");
         const addPatientModal = document.getElementById("add_patient");
 
+        createOpdModal.addEventListener('show.bs.modal', function(event) {
+            var button = event.relatedTarget; // Button that triggered the modal
+            var isHidden = button.getAttribute('data-is-hidden');
+            const patient = JSON.parse(button.getAttribute('data-patient'));
+
+
+
+
+            var patientLoader = document.getElementById('patient-loader')
+            var patientHeader = document.getElementById('patient-header')
+            // const patientSection = document.querySelector(".patient-card")
+            if (isHidden) {
+                // patientSection.style.setProperty('display', 'block', 'important')
+                patientHeader.classList.remove('mb-3')
+                patientLoader.style.setProperty('display', 'none', 'important')
+                window.selectedPatient = patient
+                populatePatientDetails(patient)
+            }
+
+
+        })
         addPatientBtn.addEventListener("click", function() {
             // Keep the first modal open
             const opdModalInstance = bootstrap.Modal.getInstance(createOpdModal);
@@ -1079,87 +1137,70 @@
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const patientSection = document.querySelector(".patient-card")
-        patientSection.style.display = "none"
-        const patientSelect = document.getElementById('patient_select');
-        const photo = document.getElementById('patient_photo');
-        patientSelect.innerHTML = '<option value="">Loading...</option>';
+        const createOpdModal = document.getElementById("createOpdModal");
+        createOpdModal.addEventListener('show.bs.modal', function(event) {
+            const patientSection = document.querySelector(".patient-card")
+            patientSection.style.display = window.selectedPatient ? "block" : "none"
+            const patientSelect = document.getElementById('patient_select');
+            const photo = document.getElementById('patient_photo');
+            patientSelect.innerHTML = '<option value="">Loading...</option>';
 
-        fetch("<?php echo e(route('getPatients')); ?>")
-            .then(response => {
-                return response.json()
-            })
-            .then(data => {
-                window.patientsData = data;
-                patientSelect.innerHTML = '<option value="">Select</option>';
-                data.forEach(patient => {
-                    const option = document.createElement('option');
-                    option.value = patient.id;
-                    option.textContent = patient.patient_name;
-                    if ("<?php echo e(old('patient_select')); ?>" == patient.id) {
-                        option.selected = true;
-                    }
-                    patientSelect.appendChild(option);
+            fetch("<?php echo e(route('getPatients')); ?>")
+                .then(response => {
+                    return response.json()
+                })
+                .then(data => {
+                    window.patientsData = data;
+                    patientSelect.innerHTML = '<option value="">Select</option>';
+                    data.forEach(patient => {
+                        const option = document.createElement('option');
+                        option.value = patient.id;
+                        option.textContent = patient.patient_name;
+                        if ("<?php echo e(old('patient_select')); ?>" == patient.id) {
+                            option.selected = true;
+                        }
+                        patientSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching patients:', error);
+                    patientSelect.innerHTML = '<option value="">Error loading options</option>';
                 });
-            })
-            .catch(error => {
-                console.error('Error fetching patients:', error);
-                patientSelect.innerHTML = '<option value="">Error loading options</option>';
-            });
-        // When patient is selected
-        patientSelect.addEventListener('change', function() {
-            const selected = window.patientsData.find(p => p.id == this.value);
+            // When patient is selected
 
-            if (selected) {
-                patientSection.style.display = 'block'
-                document.getElementById('patient_name_value').textContent =
-                    `${selected.patient_name} (${selected.id})`;
-                document.getElementById('patient_gender_value').textContent = selected.gender || 'N/A';
-                document.getElementById('patient_age_value').textContent = selected.age + " Year " +
-                    selected.month + " Month " + selected.day + " Days " || 'N/A';
-                document.getElementById('patient_marital_status_value').textContent = selected
-                    .marital_status || 'N/A';
-                document.getElementById('patient_blood_value').textContent = selected.blood_group ||
-                    'N/A';
-                document.getElementById('patient_phone_value').textContent = selected.mobileno || 'N/A';
-                document.getElementById('patient_location_value').textContent = selected.address ||
-                    'N/A';
 
-                document.getElementById('patient_tpa_value').textContent = selected.organisation
-                    .organisation_name || 'N/A';
-                document.getElementById('patient_tpa_code_value').textContent = selected.organisation
-                    .code ||
-                    'N/A';
-                document.getElementById('patient_tpa_validity_value').textContent = selected
-                    .tpa_validity || 'N/A';
-                document.getElementById('patient_identification_value').textContent = selected
-                    .identification_number || 'N/A';
+            patientSelect.addEventListener('change', function() {
+                const selected = window.patientsData.find(p => p.id == this.value);
 
-                // Handle photo display
-                if (selected.photo_path) {
-                    photo.src = selected.image;
-                    photo.style.display = 'block';
-                    noImagePlaceholder.style.display = 'none';
+                if (selected) {
+                    patientSection.style.display = 'block'
+                    populatePatientDetails(selected, patientSection)
+
+                    // Handle photo display
+                    if (selected.photo_path) {
+                        photo.src = selected.image;
+                        photo.style.display = 'block';
+                        // noImagePlaceholder.style.display = 'none';
+                    } else {
+                        photo.style.display = 'none';
+                        // noImagePlaceholder.style.display = 'block';
+                    }
                 } else {
+                    // Reset if none selected
+                    [
+                        'patient_name_value', 'patient_gender_value', 'patient_age_value',
+                        'patient_marital_status_value', 'patient_blood_value',
+                        'patient_phone_value', 'patient_location_value',
+                        'patient_tpa_value', 'patient_tpa_code_value',
+                        'patient_tpa_validity_value', 'patient_identification_value'
+                    ].forEach(id => document.getElementById(id).textContent = '—');
+
+                    patientSection.style.display = 'none';
                     photo.style.display = 'none';
-                    noImagePlaceholder.style.display = 'block';
+                    // noImagePlaceholder.style.display = 'block';
                 }
-            } else {
-                // Reset if none selected
-                [
-                    'patient_name_value', 'patient_gender_value', 'patient_age_value',
-                    'patient_marital_status_value', 'patient_blood_value',
-                    'patient_phone_value', 'patient_location_value',
-                    'patient_tpa_value', 'patient_tpa_code_value',
-                    'patient_tpa_validity_value', 'patient_identification_value'
-                ].forEach(id => document.getElementById(id).textContent = '—');
-
-                patientSection.style.display = 'none';
-                photo.style.display = 'none';
-                noImagePlaceholder.style.display = 'block';
-            }
-        });
-
+            });
+        })
     });
 </script>
 

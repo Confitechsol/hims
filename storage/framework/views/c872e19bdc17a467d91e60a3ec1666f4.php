@@ -361,315 +361,546 @@
             </div>
 
             <!-- Modal Body -->
-            <div class="modal-body">
+            <form action="<?php echo e(route('opd.addPrescription')); ?>" method="post" enctype="multipart/form-data"><?php echo csrf_field(); ?>
+                <div class="modal-body">
 
-                <div class="row p-4">
-                    <div class="col-sm-9">
-                        <div class="ptt10">
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <label class="form-label">Header Note</label>
-                                        <div class="toolbar" id="toolbar">
-                                            <select id="formatBlock">
-                                                <option value="p">Normal text</option>
-                                                <option value="h1">Heading 1</option>
-                                                <option value="h2">Heading 2</option>
-                                                <option value="h3">Heading 3</option>
-                                            </select>
-
-                                            <button data-cmd="bold"><b>Bold</b></button>
-                                            <button data-cmd="italic"><i>Italic</i></button>
-                                            <button data-cmd="underline"><u>Underline</u></button>
-                                            <button data-cmd="small"><small>Small</small></button>
-
-                                            <button data-cmd="formatBlock" data-value="blockquote">❝</button>
-                                            <button data-cmd="insertUnorderedList">• List</button>
-                                            <button data-cmd="insertOrderedList">1. List</button>
-
-                                            <button data-cmd="justifyLeft">⬅</button>
-                                            <button data-cmd="justifyCenter">⬍</button>
-                                            <button data-cmd="justifyRight">➡</button>
-
-                                            <button data-cmd="removeFormat">↺</button>
-                                        </div>
-
-                                        <div id="editor" contenteditable="true" class="editor-area"></div>
-                                        <hr>
-                                    </div>
+                    <div class="row p-4">
+                        <div class="col-sm-9">
+                            <div class="ptt10">
+                                <div class="row">
                                     <div class="col-sm-12">
-                                        <div class="row">
-                                            <div class="col-md-3">
-                                                <label for="finding_type" class="form-label">Finding
-                                                    Category</label>
-                                                <select class="form-control multiselect2 select2-hidden-accessible"
-                                                    name="finding_type[]" id="finding_type" multiple>
-                                                    <option value="1">General Examination</option>
-                                                    <option value="2">Vitals</option>
-                                                    <option value="3">Cardiovascular System</option>
-                                                    <option value="4">Gynecological</option>
-                                                    <option value="5">ENT / Oral Cavity</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <label for="filterinput" class="form-label">
-                                                    Finding List</label>
-                                                <input class="form-control filterinput height-33" type="text">
-                                            </div>
-                                            <div class="col-md-3">
-                                                <label for="finding_description" class="form-label">Finding
-                                                    Description</label>
-                                                <textarea name="finding_description" id="finding_description"
-                                                    class="form-control" rows="3"></textarea>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <label for="finding_print" class="form-label">Finding Print
-                                                </label><br><input type="checkbox" name="finding_print"
-                                                    id="finding_print" rows="15" value="yes" checked="">
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-
-                                    <div class="medicine-row row mt-3" data-row="1" id="row1">
-                                        <div class="col-lg-2 col-md-4 col-sm-6 col-xs-6">
-                                            <div>
-                                                <label class="form-label">Medicine Category</label>
-                                                <select class="form-control select2 medicine_category"
-                                                    style="width:100%" name="medicine_cat_1">
-                                                    <option value="">Select</option>
-                                                    <option value="1">Antibiotic</option>
-                                                    <option value="2">Analgesic</option>
-                                                    <option value="3">Antipyretic</option>
-                                                    <option value="4">Antacid</option>
-                                                    <option value="5">Antiseptic</option>
-                                                    <option value="6">Antihistamine</option>
-                                                    <option value="7">Antidiabetic</option>
-                                                    <option value="8">Respiratory</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-lg-2 col-md-4 col-sm-6 col-xs-6">
-                                            <div>
-                                                <label class="form-label">Medicine</label>
-                                                <select class="form-control select2 medicine_name" data-rowid="1"
-                                                    style="width:100%" name="medicine_1">
-                                                    <option value="">Select</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-lg-2 col-md-4 col-sm-6 col-xs-6">
-                                            <div>
-                                                <label class="form-label">Dose</label>
-                                                <select class="form-control select2 medicine_dosage" style="width:100%"
-                                                    name="dosage_1">
-                                                    <option value="">Select</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-lg-2 col-md-4 col-sm-6 col-xs-6">
-                                            <div>
-                                                <label class="form-label">Dose Interval</label>
-                                                <select class="form-control select2 interval_dosage"
-                                                    id="interval_dosage_1" name="interval_dosage_1" style="width:100%">
-                                                    <option value="">Select</option>
-                                                    <option value="1">Once daily (every 24 hours) for 3–5 days</option>
-                                                    <option value="2">Every 6 hours (max 4 doses/day)</option>
-                                                    <option value="3">Every 6–8 hours as needed (max 4/day)</option>
-                                                    <option value="4">Once daily before breakfast</option>
-                                                    <option value="5">Apply 1–2 times daily on affected area</option>
-                                                    <option value="6">Once daily (preferably at night)</option>
-                                                    <option value="7">Twice daily with meals (morning and evening)
-                                                    </option>
-                                                    <option value="8">Twice daily (morning and night)</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-lg-2 col-md-4 col-sm-6 col-xs-6">
-                                            <div>
-                                                <label class="form-label">Dose Duration</label>
-                                                <select class="form-control select2 duration_dosage"
-                                                    id="duration_dosage_1" name="duration_dosage_1" style="width:100%">
-                                                    <option value="">Select</option>
-                                                    <option value="1">3 to 5 days</option>
-                                                    <option value="2">Until fever/pain subsides (max 5–7 days)</option>
-                                                    <option value="3">Short-term, 3–5 days</option>
-                                                    <option value="4">4–8 weeks (gastritis/GERD)</option>
-                                                    <option value="5">3–7 days for allergies, can be extended</option>
-                                                    <option value="6">Long-term / chronic use</option>
-                                                    <option value="7">Long-term / chronic use</option>
-                                                    <option value="8">Until wound heals (3–10 days)</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
-                                            <div>
-                                                <label class="form-label">Instruction</label>
-                                                <textarea name="instruction_1" style="height:28px;"
-                                                    class="form-control"></textarea>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 d-flex align-items-center">
-                                            <div>
-                                                <button type="button" class="btn btn-sm btn-danger delete_row"
-                                                    data-row-id="1" autocomplete="off"><i
-                                                        class="fa fa-remove"></i></button>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-sm-12 mt-2">
-                                            <a class="btn btn-primary btn-sm add-record addplus-xs" data-added="0"><i
-                                                    class="fa fa-plus"></i> Add Medicine</a>
-
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12 mt-2">
-                                        <label class="form-label">Attachment</label>
-                                        <input type="file" data-height="30" class="filestyle form-control"
-                                            name="document" autocomplete="off">
-                                        <hr>
-                                    </div>
-                                    <div>
-                                    </div>
-                                    <div class="col-sm-12">
+                                        <input type="hidden" id="opd_id" name="opd_id">
                                         <div class="form-group">
-                                            <label class="form-label">Footer Note</label>
-                                            <div class="toolbar" data-editor="footer" id="toolbar-footer">
-                                                <select id="formatBlock-footer">
+                                            <label class="form-label">Header Note</label>
+                                            <div class="toolbar" id="toolbar">
+                                                <select id="formatBlock">
                                                     <option value="p">Normal text</option>
                                                     <option value="h1">Heading 1</option>
                                                     <option value="h2">Heading 2</option>
                                                     <option value="h3">Heading 3</option>
                                                 </select>
+
                                                 <button data-cmd="bold"><b>Bold</b></button>
                                                 <button data-cmd="italic"><i>Italic</i></button>
                                                 <button data-cmd="underline"><u>Underline</u></button>
                                                 <button data-cmd="small"><small>Small</small></button>
+
                                                 <button data-cmd="formatBlock" data-value="blockquote">❝</button>
                                                 <button data-cmd="insertUnorderedList">• List</button>
                                                 <button data-cmd="insertOrderedList">1. List</button>
+
                                                 <button data-cmd="justifyLeft">⬅</button>
                                                 <button data-cmd="justifyCenter">⬍</button>
                                                 <button data-cmd="justifyRight">➡</button>
+
                                                 <button data-cmd="removeFormat">↺</button>
                                             </div>
-                                            <div id="editor-footer" contenteditable="true" class="editor-area"></div>
+
+                                            <textarea id="editor" contenteditable="true" class="editor-area w-100" name="header_note"></textarea>
+                                            <hr>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <label for="finding_type" class="form-label">Finding
+                                                        Category</label>
+                                                    <select class="form-control multiselect2 select2-hidden-accessible"
+                                                        name="finding_type[]" id="finding_type" multiple>
+                                                        <option value="1">General Examination</option>
+                                                        <option value="2">Vitals</option>
+                                                        <option value="3">Cardiovascular System</option>
+                                                        <option value="4">Gynecological</option>
+                                                        <option value="5">ENT / Oral Cavity</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label for="filterinput" class="form-label">
+                                                        Finding List</label>
+                                                    <select class="form-control multiselect2 select2-hidden-accessible"
+                                                        name="findings[]" id="finding" multiple>
+                                                        <option value="1">General Examination</option>
+                                                        <option value="2">Vitals</option>
+                                                        <option value="3">Cardiovascular System</option>
+                                                        <option value="4">Gynecological</option>
+                                                        <option value="5">ENT / Oral Cavity</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label for="finding_description" class="form-label">Finding
+                                                        Description</label>
+                                                    <textarea name="finding_description" id="finding_description" class="form-control" rows="3"></textarea>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label for="finding_print" class="form-label">Finding Print
+                                                    </label><br><input type="checkbox" name="finding_print"
+                                                        id="finding_print" rows="15" value="yes" checked="">
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <div id="medicineContainer">
+                                            <div class="medicine-row row mt-3" data-row="1" id="row1">
+                                                <div class="col-lg-2 col-md-4 col-sm-6 col-xs-6">
+                                                    <div>
+                                                        <label class="form-label">Medicine Category</label>
+                                                        <select class="form-control select2 medicine_category"
+                                                            style="width:100%" name="medicine_categories[]">
+                                                            <option value="">Select</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-2 col-md-4 col-sm-6 col-xs-6">
+                                                    <div>
+                                                        <label class="form-label">Medicine</label>
+                                                        <select class="form-control select2 medicine_name"
+                                                            data-rowid="1" style="width:100%" name="medicines[]">
+                                                            <option value="">Select</option>
+
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-2 col-md-4 col-sm-6 col-xs-6">
+                                                    <div>
+                                                        <label class="form-label">Dose</label>
+                                                        <select class="form-control select2 medicine_dosage"
+                                                            style="width:100%" name="dosages[]">
+                                                            <option value="">Select</option>
+
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-2 col-md-4 col-sm-6 col-xs-6">
+                                                    <div>
+                                                        <label class="form-label">Dose Interval</label>
+                                                        <select class="form-control select2 interval_dosage"
+                                                            id="interval_dosage_1" name="interval_dosages[]"
+                                                            style="width:100%">
+                                                            <option value="">Select</option>
+
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-2 col-md-4 col-sm-6 col-xs-6">
+                                                    <div>
+                                                        <label class="form-label">Dose Duration</label>
+                                                        <select class="form-control select2 duration_dosage"
+                                                            id="duration_dosage_1" name="duration_dosages[]"
+                                                            style="width:100%">
+                                                            <option value="">Select</option>
+
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                                                    <div>
+                                                        <label class="form-label">Instruction</label>
+                                                        <textarea name="instructions[]" style="height:28px;" class="form-control"></textarea>
+                                                    </div>
+                                                </div>
+
+                                                <div
+                                                    class="col-lg-1 col-md-1 col-sm-1 col-xs-1 d-flex align-items-center">
+                                                    <div>
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-danger delete_row" data-row-id="1"
+                                                            autocomplete="off"><i class="fa fa-remove"></i></button>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="col-md-6 mt-2" id="addMedicineContainer">
+                                                <a class="btn btn-primary btn-sm add-record" data-added="0"
+                                                    id="addMedicineBtn"><i class="fa fa-plus"></i> Add Medicine</a>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12 mt-2">
+                                            <label class="form-label">Attachment</label>
+                                            <input type="file" data-height="30" class="filestyle form-control"
+                                                name="document" autocomplete="off">
+                                            <hr>
+                                        </div>
+                                        <div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label class="form-label">Footer Note</label>
+                                                <div class="toolbar" data-editor="footer" id="toolbar-footer">
+                                                    <select id="formatBlock-footer">
+                                                        <option value="p">Normal text</option>
+                                                        <option value="h1">Heading 1</option>
+                                                        <option value="h2">Heading 2</option>
+                                                        <option value="h3">Heading 3</option>
+                                                    </select>
+                                                    <button data-cmd="bold"><b>Bold</b></button>
+                                                    <button data-cmd="italic"><i>Italic</i></button>
+                                                    <button data-cmd="underline"><u>Underline</u></button>
+                                                    <button data-cmd="small"><small>Small</small></button>
+                                                    <button data-cmd="formatBlock" data-value="blockquote">❝</button>
+                                                    <button data-cmd="insertUnorderedList">• List</button>
+                                                    <button data-cmd="insertOrderedList">1. List</button>
+                                                    <button data-cmd="justifyLeft">⬅</button>
+                                                    <button data-cmd="justifyCenter">⬍</button>
+                                                    <button data-cmd="justifyRight">➡</button>
+                                                    <button data-cmd="removeFormat">↺</button>
+                                                </div>
+                                                <textarea id="editor-footer" contenteditable="true" class="editor-area w-100" name="footer_note">
+                                                </textarea>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="row gy-3">
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <label class="form-label">
-                                        Pathology</label>
+                        <div class="col-sm-3">
+                            <div class="row gy-3">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            Pathology</label>
 
-                                    <select class="form-control multiselect2 select2-hidden-accessible"
-                                        style="width: 100%" name="pathology[]" multiple="" id="pathologyOpt"
-                                        tabindex="-1" aria-hidden="true">
+                                        <select class="form-control multiselect2 select2-hidden-accessible"
+                                            style="width: 100%" name="pathology[]" multiple="" id="pathologyOpt"
+                                            tabindex="-1" aria-hidden="true">
 
-                                        <option value="5"> (Lipid Profile) Lipid Profile </option>
-                                    </select>
+                                            <option value="5"> (Lipid Profile) Lipid Profile </option>
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <label class="form-label">
-                                        Radiology</label>
-                                    <select class="form-control multiselect2 select2-hidden-accessible"
-                                        style="width: 100%" name="radiology[]" id="radiologyOpt" multiple=""
-                                        tabindex="-1" aria-hidden="true">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            Radiology</label>
+                                        <select class="form-control multiselect2 select2-hidden-accessible"
+                                            style="width: 100%" name="radiology[]" id="radiologyOpt" multiple=""
+                                            tabindex="-1" aria-hidden="true">
 
-                                        <option value="4"> (X-Ray) X-Ray </option>
-                                    </select>
+                                            <option value="4"> (X-Ray) X-Ray </option>
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-sm-12 mt-3">
-                                <div class="ptt10">
-                                    <label for="exampleInputEmail1" class="form-label">Notification To</label>
-                                    <div class="checkbox">
-                                        <label class="form-label"><input type="checkbox" name="visible[]" value="1">
-                                            <b>Admin</b>
-                                        </label>
-                                    </div>
-                                    <div class="checkbox">
-                                        <label class="form-label"><input type="checkbox" name="visible[]" value="2">
-                                            <b>Accountant</b>
-                                        </label>
-                                    </div>
-                                    <div class="checkbox">
-                                        <label class="form-label"><input type="checkbox" name="visible[]" value="3">
-                                            <b>Doctor</b>
-                                        </label>
-                                    </div>
-                                    <div class="checkbox">
-                                        <label class="form-label"><input type="checkbox" name="visible[]" value="4">
-                                            <b>Pharmacist</b>
-                                        </label>
-                                    </div>
-                                    <div class="checkbox">
-                                        <label class="form-label"><input type="checkbox" name="visible[]" value="5">
-                                            <b>Pathologist</b>
-                                        </label>
-                                    </div>
-                                    <div class="checkbox">
-                                        <label class="form-label"><input type="checkbox" name="visible[]" value="6">
-                                            <b>Radiologist</b>
-                                        </label>
-                                    </div>
-                                    <div class="checkbox">
-                                        <label class="form-label"><input type="checkbox" name="visible[]" value="7"
-                                                checked="" onclick="return false;"> <b>Super Admin</b> </label>
-                                    </div>
-                                    <div class="checkbox">
-                                        <label class="form-label"><input type="checkbox" name="visible[]" value="8">
-                                            <b>Receptionist</b>
-                                        </label>
-                                    </div>
-                                    <div class="checkbox">
-                                        <label class="form-label"><input type="checkbox" name="visible[]" value="9">
-                                            <b>Nurse</b>
-                                        </label>
-                                    </div>
-                                    <div class="checkbox">
-                                        <label class="form-label"><input type="checkbox" name="visible[]" value="10">
-                                            <b>Clinical
-                                                staff</b>
-                                        </label>
+                                <div class="col-sm-12 mt-3">
+                                    <div class="ptt10">
+                                        <label for="exampleInputEmail1" class="form-label">Notification To</label>
+                                        <div class="checkbox">
+                                            <label class="form-label"><input type="checkbox" name="visible[]"
+                                                    value="1">
+                                                <b>Admin</b>
+                                            </label>
+                                        </div>
+                                        <div class="checkbox">
+                                            <label class="form-label"><input type="checkbox" name="visible[]"
+                                                    value="2">
+                                                <b>Accountant</b>
+                                            </label>
+                                        </div>
+                                        <div class="checkbox">
+                                            <label class="form-label"><input type="checkbox" name="visible[]"
+                                                    value="3">
+                                                <b>Doctor</b>
+                                            </label>
+                                        </div>
+                                        <div class="checkbox">
+                                            <label class="form-label"><input type="checkbox" name="visible[]"
+                                                    value="4">
+                                                <b>Pharmacist</b>
+                                            </label>
+                                        </div>
+                                        <div class="checkbox">
+                                            <label class="form-label"><input type="checkbox" name="visible[]"
+                                                    value="5">
+                                                <b>Pathologist</b>
+                                            </label>
+                                        </div>
+                                        <div class="checkbox">
+                                            <label class="form-label"><input type="checkbox" name="visible[]"
+                                                    value="6">
+                                                <b>Radiologist</b>
+                                            </label>
+                                        </div>
+                                        <div class="checkbox">
+                                            <label class="form-label"><input type="checkbox" name="visible[]"
+                                                    value="7" checked="" onclick="return false;"> <b>Super
+                                                    Admin</b> </label>
+                                        </div>
+                                        <div class="checkbox">
+                                            <label class="form-label"><input type="checkbox" name="visible[]"
+                                                    value="8">
+                                                <b>Receptionist</b>
+                                            </label>
+                                        </div>
+                                        <div class="checkbox">
+                                            <label class="form-label"><input type="checkbox" name="visible[]"
+                                                    value="9">
+                                                <b>Nurse</b>
+                                            </label>
+                                        </div>
+                                        <div class="checkbox">
+                                            <label class="form-label"><input type="checkbox" name="visible[]"
+                                                    value="10">
+                                                <b>Clinical
+                                                    staff</b>
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
                     </div>
 
+                    <!-- Modal Footer -->
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary btn-sm" data-bs-dismiss="modal">
+                            Save & Print
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-sm" data-bs-dismiss="modal">
+                            Save
+                        </button>
+                    </div>
                 </div>
-
-                <!-- Modal Footer -->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal">
-                        Save & Print
-                    </button>
-                    <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal">
-                        Save
-                    </button>
-                </div>
-            </div>
+            </form>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const createPrescriptionModal = document.getElementById("addPrescriptionModal");
+            const findingCategorySelect = document.getElementById('finding_type');
+            const findingsSelect = document.getElementById('finding');
+            const pathologySelect = document.getElementById('pathologyOpt');
+            const radiologySelect = document.getElementById('radiologyOpt');
+            findingCategorySelect.innerHTML = '<option value="">Loading...</option>';
+            findingsSelect.innerHTML = '<option value="">Loading...</option>';
+            pathologySelect.innerHTML = '<option value="">Loading...</option>';
+            radiologySelect.innerHTML = '<option value="">Loading...</option>';
+
+            createPrescriptionModal.addEventListener('show.bs.modal', function(event) {
+                const opdIdField = document.getElementById('opd_id');
+
+                var button = event.relatedTarget; // Button that triggered the modal
+
+                var opd_id = button.getAttribute('data-id');
+                opdIdField.value = opd_id ?? null;
+
+                const container = document.getElementById("medicineContainer");
+                const addButton = document.getElementById("addMedicineBtn");
+                const addButtonContainer = document.getElementById("addMedicineContainer");
+
+                // 🔹 Fetch base dropdown data once
+                Promise.all([
+                    fetch("<?php echo e(route('getMedicineCategories')); ?>").then(res => res.json()),
+                    fetch("<?php echo e(route('getDoseIntervals')); ?>").then(res => res.json()),
+                    fetch("<?php echo e(route('getDoseDurations')); ?>").then(res => res.json())
+                ]).then(([categories, intervals, durations]) => {
+                    window.medicineCategories = categories;
+                    window.doseIntervals = intervals;
+                    window.doseDurations = durations;
+
+                    // Initialize first row
+                    initRow(container.querySelector(".medicine-row"));
+
+                    addButton.addEventListener("click", function(e) {
+                        e.preventDefault();
+                        addNewRow();
+                    });
+                });
+
+                function initRow(row) {
+                    // Load base options
+                    fillSelect(row.querySelector(".medicine_category"), window.medicineCategories,
+                        "medicine_category");
+                    fillSelect(row.querySelector(".interval_dosage"), window.doseIntervals, "name");
+                    fillSelect(row.querySelector(".duration_dosage"), window.doseDurations, "name");
+
+                    // Category change → fetch medicines
+                    row.querySelector(".medicine_category").addEventListener("change", function() {
+                        const categoryId = this.value;
+                        const medicineSelect = row.querySelector(".medicine_name");
+                        const doseSelect = row.querySelector(".medicine_dosage");
+                        const baseUrl = "<?php echo e(route('getMedicines', ['categoryId' => 'ID'])); ?>";
+                        const finalUrl = baseUrl.replace('ID', categoryId);
+                        fetch(finalUrl)
+                            .then(res => res.json())
+                            .then(data => fillSelect(medicineSelect, data, "medicine_name"));
+
+                        const baseUrlDose = "<?php echo e(route('getDoses', ['categoryId' => 'ID'])); ?>";
+                        const finalUrlDose = baseUrlDose.replace('ID', categoryId);
+                        fetch(finalUrlDose)
+                            .then(res => res.json())
+                            .then(data => fillSelect(doseSelect, data, "dosage"));
+                    });
+
+                    // // Medicine change → fetch doses
+                    // row.querySelector(".medicine_name").addEventListener("change", function() {
+                    //     const medicineId = this.value;
+                    //     const doseSelect = row.querySelector(".medicine_dosage");
+                    //     fetch(`/getDoses/${medicineId}`)
+                    //         .then(res => res.json())
+                    //         .then(data => fillSelect(doseSelect, data, "dose"));
+                    // });
+
+                    // Delete button
+                    const deleteBtn = row.querySelector(".delete_row");
+                    deleteBtn.addEventListener("click", function() {
+                        const allRows = container.querySelectorAll(".medicine-row");
+                        if (allRows.length > 1) row.remove();
+                        else alert("At least one medicine must remain.");
+                    });
+
+                    // Reinitialize select2
+                    if (window.jQuery && $.fn.select2) {
+                        $(row).find(".select2").select2({
+                            width: "100%"
+                        });
+                    }
+                }
+
+                function fillSelect(selectElement, data, textKey) {
+                    selectElement.innerHTML = `<option value="">Select</option>`;
+                    data.forEach(item => {
+                        const opt = document.createElement("option");
+                        opt.value = item.id;
+                        opt.textContent = textKey == 'dosage' ? item[textKey] + " " + item['unit'][
+                            'unit_name'
+                        ] : item[textKey];
+                        selectElement.appendChild(opt);
+                    });
+                }
+
+                function addNewRow() {
+
+                    const rows = container.querySelectorAll(".medicine-row");
+                    if (rows.length === 0) {
+                        console.error("No .medicine-row found in the container.");
+                        return;
+                    }
+                    const lastRow = rows[rows.length - 1];
+                    const newRow = lastRow.cloneNode(true);
+
+                    // Clear previous selections
+                    newRow.querySelectorAll("select").forEach(s => (s.selectedIndex = 0));
+                    newRow.querySelectorAll("textarea").forEach(t => (t.value = ""));
+
+                    // Insert before button
+                    container.insertBefore(newRow, addButtonContainer);
+                    // container.appendChild(newRow);
+                    initRow(newRow);
+                }
+
+            })
+
+            fetch("<?php echo e(route('getFindingCategories')); ?>")
+                .then(response => response.json())
+                .then(data => {
+                    window.findingCategoryData = data;
+                    findingCategorySelect.innerHTML = '<option value="">Select</option>';
+                    data.forEach(category => {
+                        const option = document.createElement('option');
+                        option.value = category.id;
+                        option.textContent = category.category;
+                        if ("<?php echo e(old('finding_type[]')); ?>" == category.id) {
+                            option.selected = true;
+                        }
+                        findingCategorySelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching finding categories:', error);
+                    findingCategorySelect.innerHTML = '<option value="">Error loading options</option>';
+                });
+
+            findingCategorySelect.addEventListener('change', function() {
+                // ✅ Collect all selected IDs
+                const selectedIds = Array.from(this.selectedOptions).map(opt => opt.value);
+
+                // ✅ Clear current findings
+                findingsSelect.innerHTML = '<option value="">Loading...</option>';
+
+                if (selectedIds.length === 0) {
+                    findingsSelect.innerHTML = '<option value="">Select a category first</option>';
+                    return;
+                }
+
+                // ✅ Fetch findings for all selected categories
+                fetch("<?php echo e(route('getFindings')); ?>", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({
+                            category_ids: selectedIds
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        window.findingData = data;
+                        findingsSelect.innerHTML = '<option value="">Select</option>';
+                        data.forEach(finding => {
+                            const option = document.createElement('option');
+                            option.value = finding.id;
+                            option.textContent = finding.name;
+                            if ("<?php echo e(old('finding[]')); ?>" == finding.id) {
+                                option.selected = true;
+                            }
+                            findingsSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching Findings:', error);
+                        findingsSelect.innerHTML = '<option value="">Error loading options</option>';
+                    });
+            });
+            fetch("<?php echo e(route('getPathologies')); ?>")
+                .then(response => response.json())
+                .then(data => {
+                    window.pathologyData = data;
+                    pathologySelect.innerHTML = '<option value="">Select</option>';
+                    data.forEach(patho => {
+                        const option = document.createElement('option');
+                        option.value = patho.id;
+                        option.textContent = patho.test_name + "(" + patho.short_name + ")";
+                        if ("<?php echo e(old('pathology[]')); ?>" == patho.id) {
+                            option.selected = true;
+                        }
+                        pathologySelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching Pathologies:', error);
+                    pathologySelect.innerHTML = '<option value="">Error loading options</option>';
+                });
+            fetch("<?php echo e(route('getRadiologies')); ?>")
+                .then(response => response.json())
+                .then(data => {
+                    window.radiologyData = data;
+                    radiologySelect.innerHTML = '<option value="">Select</option>';
+                    data.forEach(radio => {
+                        const option = document.createElement('option');
+                        option.value = radio.id;
+                        option.textContent = radio.test_name + "(" + radio.short_name + ")";
+                        if ("<?php echo e(old('radiology[]')); ?>" == radio.id) {
+                            option.selected = true;
+                        }
+                        radiologySelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching Radiologies:', error);
+                    radiologySelect.innerHTML = '<option value="">Error loading options</option>';
+                });
+        })
+    </script>
 
     <script>
         // Ensure jQuery + select2 are loaded
-        $(function () {
+        $(function() {
             // initialize select2 on multiselect elements
             $('#finding_type, .multiselect2').select2({
                 placeholder: 'Select',
@@ -704,67 +935,71 @@
             }
 
             // initial adjust for all existing multiselects
-            $('#finding_type, .multiselect2').each(function () {
+            $('#finding_type, .multiselect2').each(function() {
                 adjustSelectSize($(this));
             });
 
             // adjust on change / select2 events
-            $(document).on('change', '#finding_type, .multiselect2', function () {
+            $(document).on('change', '#finding_type, .multiselect2', function() {
                 adjustSelectSize($(this));
             });
             // also catch select2 specific events for better responsiveness
-            $(document).on('select2:select select2:unselect', '#finding_type, .multiselect2', function () {
+            $(document).on('select2:select select2:unselect', '#finding_type, .multiselect2', function() {
                 adjustSelectSize($(this));
             });
 
             // Remove medicine row
-            $(document).on('click', '.delete_row', function () {
-                var $tr = $(this).closest('tr');
-                $tr.remove();
-            });
+            // $(document).on('click', '.delete_row', function() {
+            //     var $tr = $(this).closest('tr');
+            //     $tr.remove();
+            // });
 
             // Add medicine row (simple clone of last row)
-            $('.add-record').on('click', function (e) {
-                e.preventDefault();
-                var $last = $('#tableID tbody tr:last');
-                var $clone = $last.clone(true, true);
-                // update hidden row index and any name attributes (simple increment)
-                var lastIndex = $('#tableID tbody tr').length;
-                var newIndex = lastIndex + 1;
-                $clone.attr('id', 'row' + newIndex);
-                $clone.find('input[name="rows[]"]').val(newIndex);
-                $clone.find('[name]').each(function () {
-                    var name = $(this).attr('name');
-                    if (!name) return;
-                    // replace trailing digits with newIndex (basic)
-                    var newName = name.replace(/(\d+)(?!.*\d)/, newIndex);
-                    $(this).attr('name', newName);
-                });
-                // clear values in cloned inputs/selects
-                $clone.find('input[type!="hidden"], textarea').val('');
-                $clone.find('select').val(null).trigger('change');
+            // $('.add-record').on('click', function(e) {
+            //     e.preventDefault();
+            //     var $last = $('#tableID tbody tr:last');
+            //     var $clone = $last.clone(true, true);
+            //     // update hidden row index and any name attributes (simple increment)
+            //     var lastIndex = $('#tableID tbody tr').length;
+            //     var newIndex = lastIndex + 1;
+            //     $clone.attr('id', 'row' + newIndex);
+            //     $clone.find('input[name="rows[]"]').val(newIndex);
+            //     $clone.find('[name]').each(function() {
+            //         var name = $(this).attr('name');
+            //         if (!name) return;
+            //         // replace trailing digits with newIndex (basic)
+            //         var newName = name.replace(/(\d+)(?!.*\d)/, newIndex);
+            //         $(this).attr('name', newName);
+            //     });
+            //     // clear values in cloned inputs/selects
+            //     $clone.find('input[type!="hidden"], textarea').val('');
+            //     $clone.find('select').val(null).trigger('change');
 
-                // If cloned selects are using select2, destroy and re-init to avoid duplicate containers
-                $clone.find('select').each(function () {
-                    var $s = $(this);
-                    if ($s.hasClass('select2-hidden-accessible')) {
-                        try { $s.select2('destroy'); } catch (e) { /* ignore */ }
-                        $s.select2({
-                            placeholder: 'Select',
-                            width: '100%'
-                        });
-                        adjustSelectSize($s);
-                    }
-                });
+            //     // If cloned selects are using select2, destroy and re-init to avoid duplicate containers
+            //     $clone.find('select').each(function() {
+            //         var $s = $(this);
+            //         if ($s.hasClass('select2-hidden-accessible')) {
+            //             try {
+            //                 $s.select2('destroy');
+            //             } catch (e) {
+            //                 /* ignore */
+            //             }
+            //             $s.select2({
+            //                 placeholder: 'Select',
+            //                 width: '100%'
+            //             });
+            //             adjustSelectSize($s);
+            //         }
+            //     });
 
-                $('#tableID tbody').append($clone);
-            });
+            //     $('#tableID tbody').append($clone);
+            // });
         });
     </script>
 
     <script>
         // Shorter JS: single global add button, clone rows multiple times, safe select2 re-init
-        $(function () {
+        $(function() {
             var $modal = $('#addPrescriptionModal');
             var $body = $modal.length ? $modal : $('body');
 
@@ -774,25 +1009,44 @@
             }
 
             function initSelect($s) {
-                try { if ($s.hasClass('select2-hidden-accessible')) $s.select2('destroy'); } catch (e) { }
-                $s.select2({ placeholder: 'Select', width: '100%' });
+                try {
+                    if ($s.hasClass('select2-hidden-accessible')) $s.select2('destroy');
+                } catch (e) {}
+                $s.select2({
+                    placeholder: 'Select',
+                    width: '100%'
+                });
             }
 
             function populateMedicines(cat, $med, idx) {
                 $med.prop('disabled', true).empty().append('<option>Loading...</option>');
-                $.get('/api/medicines', { category: cat })
-                    .done(function (data) {
-                        $med.empty().append('<option value="">Select</option>');
-                        (data || []).forEach(function (m) { $med.append($('<option>').val(m.id).text(m.text).data('stock', m.stock)); });
+                $.get('/api/medicines', {
+                        category: cat
                     })
-                    .fail(function () {
-                        var samples = [{ id: '101', text: 'Amoxicillin', stock: 12 }, { id: '102', text: 'Paracetamol', stock: 50 }];
+                    .done(function(data) {
                         $med.empty().append('<option value="">Select</option>');
-                        samples.forEach(function (m) { $med.append($('<option>').val(m.id).text(m.text).data('stock', m.stock)); });
+                        (data || []).forEach(function(m) {
+                            $med.append($('<option>').val(m.id).text(m.text).data('stock', m.stock));
+                        });
                     })
-                    .always(function () {
+                    .fail(function() {
+                        var samples = [{
+                            id: '101',
+                            text: 'Amoxicillin',
+                            stock: 12
+                        }, {
+                            id: '102',
+                            text: 'Paracetamol',
+                            stock: 50
+                        }];
+                        $med.empty().append('<option value="">Select</option>');
+                        samples.forEach(function(m) {
+                            $med.append($('<option>').val(m.id).text(m.text).data('stock', m.stock));
+                        });
+                    })
+                    .always(function() {
                         $med.prop('disabled', false).trigger('change');
-                        $med.off('change.stock').on('change.stock', function () {
+                        $med.off('change.stock').on('change.stock', function() {
                             var st = $med.find('option:selected').data('stock');
                             $('#stock_info_' + idx).text(st !== undefined ? (st + ' in stock') : '');
                         });
@@ -801,8 +1055,10 @@
 
             function initRow($row) {
                 var idx = $row.data('row') || $('.medicine-row').length;
-                $row.find('select').each(function () { initSelect($(this)); });
-                $row.off('change.cat').on('change.cat', '.medicine_category', function () {
+                $row.find('select').each(function() {
+                    initSelect($(this));
+                });
+                $row.off('change.cat').on('change.cat', '.medicine_category', function() {
                     populateMedicines($(this).val(), $row.find('.medicine_name'), idx);
                 });
                 $row.find('input[type!="hidden"], textarea').val('');
@@ -811,13 +1067,17 @@
             }
 
             function reindex() {
-                $('.medicine-row').each(function (i) {
-                    var idx = i + 1, $r = $(this);
+                $('.medicine-row').each(function(i) {
+                    var idx = i + 1,
+                        $r = $(this);
                     $r.attr('data-row', idx).attr('id', 'row' + idx);
-                    $r.find('[name]').each(function () {
-                        var $el = $(this), n = $el.attr('name'), id = $el.attr('id');
+                    $r.find('[name]').each(function() {
+                        var $el = $(this),
+                            n = $el.attr('name'),
+                            id = $el.attr('id');
                         if (n) $el.attr('name', replaceIndex(n, idx));
-                        if (id) $el.attr('id', /\d+$/.test(id) ? id.replace(/\d+$/, idx) : id + '_' + idx);
+                        if (id) $el.attr('id', /\d+$/.test(id) ? id.replace(/\d+$/, idx) : id +
+                            '_' + idx);
                         if ($el.hasClass('medicine_name')) $el.attr('data-rowid', idx);
                     });
                     $r.find('[id^=stock_info_]').attr('id', 'stock_info_' + idx);
@@ -838,17 +1098,23 @@
             }
 
             // initial setup: set data-row and init rows
-            $('.medicine-row').each(function (i) { $(this).attr('data-row', i + 1); initRow($(this)); });
+            $('.medicine-row').each(function(i) {
+                $(this).attr('data-row', i + 1);
+                initRow($(this));
+            });
             reindex();
 
             // add new row using the single add button
-            $body.on('click', '.add-record', function (e) {
+            $body.on('click', '.add-record', function(e) {
                 e.preventDefault();
                 var $last = $('.medicine-row').last();
 
                 // destroy select2 on last before cloning to avoid cloning select2 markup
-                $last.find('select').each(function () {
-                    try { if ($(this).hasClass('select2-hidden-accessible')) $(this).select2('destroy'); } catch (err) { }
+                $last.find('select').each(function() {
+                    try {
+                        if ($(this).hasClass('select2-hidden-accessible')) $(this).select2(
+                            'destroy');
+                    } catch (err) {}
                 });
 
                 var $new = $last.clone(false, false); // shallow clone to avoid copying handlers
@@ -872,7 +1138,7 @@
             });
 
             // delete row
-            $body.on('click', '.delete_row', function (e) {
+            $body.on('click', '.delete_row', function(e) {
                 e.preventDefault();
                 var $row = $(this).closest('.medicine-row');
                 if ($('.medicine-row').length <= 1) {
@@ -918,6 +1184,5 @@
         // Initialize both editors
         initEditor('toolbar-header', 'editor-header', 'formatBlock-header');
         initEditor('toolbar-footer', 'editor-footer', 'formatBlock-footer');
-
-
-    </script><?php /**PATH C:\xampp\htdocs\hims\resources\views/components/modals/add-prescription-modal.blade.php ENDPATH**/ ?>
+    </script>
+<?php /**PATH C:\xampp\htdocs\hims\resources\views/components/modals/add-prescription-modal.blade.php ENDPATH**/ ?>

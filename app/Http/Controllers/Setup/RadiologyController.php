@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Setup;
 
 use App\Http\Controllers\Controller;
+use App\Models\Radio;
 use App\Models\RadiologyCategory;
 use App\Models\RadiologyParameter;
 use App\Models\RadiologyUnit;
@@ -205,5 +206,13 @@ class RadiologyController extends Controller
             return redirect()->back()->with('error', 'Unauthorized!');
         }
         return redirect()->back()->with('success', 'Radiology Parameter Successfully Deleted');
+    }
+
+    public function getRadiologies(Request $request)
+    {
+        // dd($id);
+        $radios = Radio::all();
+        // dd($bedNumbers);
+        return response()->json($radios, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
     }
 }

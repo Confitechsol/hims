@@ -105,7 +105,7 @@
                                                 <?php $__currentLoopData = $opd; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opdDetails): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                     <tr>
                                                         <td><?php echo e($loop->iteration); ?></td>
-                                                        <td><a href="#"
+                                                        <td><a href="<?php echo e(route('opd.show', [$opdDetails->id])); ?>"
                                                                 class="text-primary"><?php echo e($opdDetails->opd_no); ?></a>
                                                         </td>
                                                         <td><?php echo e($opdDetails->patient->patient_name); ?></td>

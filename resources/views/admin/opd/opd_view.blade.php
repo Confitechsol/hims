@@ -338,6 +338,24 @@
     </style>
 
     <div class="p-4">
+        @if (session('success'))
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: "{{ session('alertTitle') ?? 'Success' }}",
+                    text: "{{ session('success') }}",
+                });
+            </script>
+        @endif
+        @if (session('error'))
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: "{{ session('alertTitle') ?? 'Error' }}",
+                    text: "{{ session('error') }}",
+                });
+            </script>
+        @endif
 
         <!-- tab start -->
         <ul class="nav nav-tabs nav-bordered mb-3 flex-nowrap">
@@ -865,7 +883,7 @@
                                                     <td>
                                                         {{ $lab->pathology->test_name .
                                                             "
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    (" .
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            (" .
                                                             $lab->pathology->short_name .
                                                             ')' }}
                                                     </td>
@@ -1800,7 +1818,10 @@
                                                                             <a href="javascript: void(0);"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
                                                                                 <i class="fa-solid fa-prescription"
-                                                                                    data-bs-toggle="tooltip"
+                                                                                    {{-- data-bs-toggle="tooltip" --}}
+                                                                                    data-bs-toggle="modal"
+                                                                                    data-bs-target="#addPrescriptionModal"
+                                                                                    data-id="{{ $opd->id }}"
                                                                                     title="Add Prescription"></i></a>
                                                                             <a href="javascript: void(0);"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
@@ -3274,6 +3295,8 @@
     </div>
     <!-- tab content end -->
     </div>
+    @include('components.modals.add-prescription-modal')
+
     <!-- Chart JS -->
     <script src="assets/plugins/chartjs/chart.min.js"></script>
     <script src="assets/plugins/chartjs/chart-data.js"></script>
