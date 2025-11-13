@@ -1,6 +1,28 @@
 @extends('layouts.adminLayout')
 
 @section('content')
+
+    <style>
+        .stepradiolist {
+            margin-top: 0;
+        }
+
+        .stepradiolist li label>input {
+            display: none;
+        }
+
+        .stepradiolist li label>input:checked+.stepimage {
+            color: #8616a6;
+            border: 2px solid #8616a6;
+            background: #f9e6ff;
+        }
+
+        .stepradiolist li label .stepimage {
+            padding: 10px;
+            border: 2px solid #cacaca;
+            border-radius: 4px;
+        }
+    </style>
 <!-- row start -->
 <div class="row px-5 py-4">
     <div class="col-12 d-flex">
@@ -19,7 +41,7 @@
                         </div>
                         <!-- First Modal -->
                         <div class="modal fade" id="add_appointment" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered modal-xl">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
                                 <div class="modal-content">
                                     <form method="POST" action="{{ route('dutyroster.assignStaff') }}">
                                         @csrf
@@ -40,9 +62,9 @@
                                                     {{-- SHIFT SELECTION --}}
                                                     <div class="col-sm-12">
                                                         <label>Shift</label>
-                                                        <ul class="stepradiolist row gy-0">
+                                                        <ul class="stepradiolist row gy-3">
                                                             @foreach($shifts as $shift)
-                                                                <li class="col-sm-4">
+                                                                <li class="col-sm-3">
                                                                     <label>
                                                                         <input type="radio" name="shift_id" value="{{ $shift->id }}" class="shift-radio" {{ $loop->first ? 'checked' : '' }} >
                                                                         <div class="stepimage">

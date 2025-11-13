@@ -1,0 +1,284 @@
+@extends('layouts.adminLayout')
+
+@section('content')
+<div class="row px-5 py-4">
+    <div class="col-12 d-flex">
+
+        <div class="card shadow-sm flex-fill w-100">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-sm-center justify-content-between flex-wrap gap-2 w-100">
+                    <div>
+                        <h4 class="fw-bold mb-0">Donor List Details</h4>
+                    </div>
+                    <div class="d-flex align-items-center flex-wrap gap-2">
+                        <a href="javascript:void(0);" class="btn btn-primary text-white ms-2 btn-md"
+                            data-bs-toggle="modal" data-bs-target="#add_shift">
+                            <i class="ti ti-plus me-1"></i> Add Doner
+                        </a>
+
+                        <!-- Add Shift Modal -->
+                        <div class="modal fade" id="add_shift" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-md">
+                                <div class="modal-content">
+                                    <form method="POST" action="{{ route('bloodBank.addDoner') }}">
+                                        @csrf
+                                        <div class="modal-header bg-primary text-white">
+                                            <h5 class="modal-title">Add Donor Details</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label for="doner_name" class="form-label">Donor Name</label>
+                                                <input type="text" name="doner_name" id="doner_name" class="form-control" required>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col">
+                                                    <label for="dob" class="form-label">DOB</label>
+                                                    <input type="date" name="dob" id="dob" class="form-control" required>
+                                                </div>
+
+                                                <div class="col">
+                                                    <label for="blood_group" class="form-label">Blood Group</label>
+                                                    <select name="blood_group" id="blood_group" class="form-select" required>
+                                                        <option value="">Select Blood Group</option>
+                                                        @foreach ($bloodGroups as $group)
+                                                            <option value="{{ $group->id }}">{{ $group->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="mt-3">
+                                                <label for="gender" class="form-label">Gender</label>
+                                                <select name="gender" id="gender" class="form-select" required>
+                                                    <option value="">Select Gender</option>
+                                                    <option value="Male">Male</option>
+                                                    <option value="Female">Female</option>
+                                                    <option value="Other">Other</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="mt-3">
+                                                <label for="father_name" class="form-label">Father's Name</label>
+                                                <input type="text" name="father_name" id="father_name" class="form-control" required>
+                                            </div>
+
+                                            <div class="mt-3">
+                                                <label for="contact_no" class="form-label">Contact No.</label>
+                                                <input type="text" name="contact_no" id="contact_no" class="form-control" required>
+                                            </div>
+
+                                            <div class="mt-3">
+                                                <label for="address" class="form-label">Address</label>
+                                                <input type="text" name="address" id="address" class="form-control" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-primary">Save Donor</button>
+                                        </div>
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Add Shift Modal -->
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+               @if($donors->isEmpty())
+    <p class="text-center">No Donor List found.</p>
+@else
+    <div class="table-responsive table-nowrap">
+        <table class="table border table-striped align-middle">
+            <thead class="thead-light text-center">
+                <tr>
+                    <th>#</th>
+                    <th>Donor Name</th>
+                    <th>DOB</th>
+                    <th>Blood Group</th>
+                    <th>Gender</th>
+                    <th>Contact No.</th>
+                    <th>Father's Name</th>
+                    <th>Address</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody class="text-center">
+                @foreach ($donors as $index => $donor)
+                    <tr>
+                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $donor->donor_name }}</td>
+                        <td>{{ \Carbon\Carbon::parse($donor->date_of_birth)->format('d-m-Y') }}</td>
+                        <td>{{ $donor->bloodBankProduct->name ?? 'N/A'  }}</td>
+                        <td>{{ $donor->gender }}</td>
+                        <td>{{ $donor->contact_no }}</td>
+                        <td>{{ $donor->father_name }}</td>
+                        <td>{{ $donor->address }}</td>
+                        <td>
+                            <div class="d-flex justify-content-center gap-2">
+                                <!-- Edit Button -->
+                               <a href="javascript:void(0);" 
+                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"  
+                                    onclick="openEditModal({{ $donor->id }}, '{{ $donor->donor_name }}', '{{ $donor->date_of_birth }}', '{{ $donor->blood_group_id }}', '{{ $donor->gender }}', '{{ $donor->father_name }}', '{{ $donor->contact_no }}', '{{ $donor->address }}')">
+                                    <i class="ti ti-pencil"></i>
+                                </a>
+                               <a href="javascript:void(0);" 
+                                    onclick="confirmDelete('{{ route('bloodBank.deleteDoner', $donor->id) }}')" 
+                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                    <i class="ti ti-trash"></i>
+                                </a> 
+
+                                            
+
+                               
+                            </div>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+@endif
+
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- Edit Donor Modal -->
+<div class="modal fade" id="edit_donor" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content">
+            <form method="POST" id="editDonorForm">
+                @csrf
+                @method('PUT')
+
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Edit Donor Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" id="edit_donor_id" name="id">
+
+                    <div class="mb-3">
+                        <label for="edit_doner_name" class="form-label">Donor Name</label>
+                        <input type="text" name="doner_name" id="edit_doner_name" class="form-control" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="edit_dob" class="form-label">DOB</label>
+                            <input type="date" name="dob" id="edit_dob" class="form-control" required>
+                        </div>
+
+                        <div class="col">
+                            <label for="edit_blood_group" class="form-label">Blood Group</label>
+                            <select name="blood_group" id="edit_blood_group" class="form-select" required>
+                                <option value="">Select Blood Group</option>
+                                @foreach ($bloodGroups as $group)
+                                    <option value="{{ $group->id }}">{{ $group->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <label for="edit_gender" class="form-label">Gender</label>
+                        <select name="gender" id="edit_gender" class="form-select" required>
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="mt-3">
+                        <label for="edit_father_name" class="form-label">Father's Name</label>
+                        <input type="text" name="father_name" id="edit_father_name" class="form-control" required>
+                    </div>
+
+                    <div class="mt-3">
+                        <label for="edit_contact_no" class="form-label">Contact No.</label>
+                        <input type="text" name="contact_no" id="edit_contact_no" class="form-control" required>
+                    </div>
+
+                    <div class="mt-3">
+                        <label for="edit_address" class="form-label">Address</label>
+                        <input type="text" name="address" id="edit_address" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Update Donor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+function openEditModal(id, name, dob, bloodGroupId, gender, fatherName, contactNo, address) {
+    // Fill form fields
+    document.getElementById('edit_donor_id').value = id;
+    document.getElementById('edit_doner_name').value = name;
+    document.getElementById('edit_dob').value = dob;
+    document.getElementById('edit_blood_group').value = bloodGroupId;
+    document.getElementById('edit_gender').value = gender;
+    document.getElementById('edit_father_name').value = fatherName;
+    document.getElementById('edit_contact_no').value = contactNo;
+    document.getElementById('edit_address').value = address;
+
+    // Set dynamic action URL
+    document.getElementById('editDonorForm').action = "{{ route('bloodBank.updateDoner', ['id' => ':id']) }}".replace(':id', id);
+
+    // Show modal
+    var modal = new bootstrap.Modal(document.getElementById('edit_donor'));
+    modal.show();
+}
+</script>
+<script>
+    function confirmDelete(url) {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "This donor will be deleted permanently.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, delete it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // ✅ Create and submit a form using DELETE method
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = url;
+
+                const csrf = document.createElement('input');
+                csrf.type = 'hidden';
+                csrf.name = '_token';
+                csrf.value = '{{ csrf_token() }}';
+
+                const method = document.createElement('input');
+                method.type = 'hidden';
+                method.name = '_method';
+                method.value = 'DELETE';
+
+                form.appendChild(csrf);
+                form.appendChild(method);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    }
+</script>
+
+@endsection

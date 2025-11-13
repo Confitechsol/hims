@@ -263,38 +263,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     function confirmDelete(url) {
-    Swal.fire({
-        title: "Are you sure?",
-        text: "This shift will be deleted permanently.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "Yes, delete it!"
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // ✅ Create and submit a form using DELETE method
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = url;
+        Swal.fire({
+            title: "Are you sure?",
+            text: "This shift will be deleted permanently.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, delete it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // ✅ Create and submit a form using DELETE method
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = url;
 
-            const csrf = document.createElement('input');
-            csrf.type = 'hidden';
-            csrf.name = '_token';
-            csrf.value = '{{ csrf_token() }}';
+                const csrf = document.createElement('input');
+                csrf.type = 'hidden';
+                csrf.name = '_token';
+                csrf.value = '{{ csrf_token() }}';
 
-            const method = document.createElement('input');
-            method.type = 'hidden';
-            method.name = '_method';
-            method.value = 'DELETE';
+                const method = document.createElement('input');
+                method.type = 'hidden';
+                method.name = '_method';
+                method.value = 'DELETE';
 
-            form.appendChild(csrf);
-            form.appendChild(method);
-            document.body.appendChild(form);
-            form.submit();
-        }
-    });
-}
+                form.appendChild(csrf);
+                form.appendChild(method);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    }
 
 
 </script>

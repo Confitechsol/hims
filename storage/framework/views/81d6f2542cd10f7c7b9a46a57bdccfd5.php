@@ -44,12 +44,12 @@
                     <span>Overview</span>
                 </a>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
                 <a href="#visits" data-bs-toggle="tab" aria-expanded="true" class="nav-link bg-transparent"><i
                         class="fa-regular fa-square-caret-down text-primary"></i>
                     <span>Visits</span>
                 </a>
-            </li>
+            </li> -->
             <li class="nav-item">
                 <a href="#lab_investigation" data-bs-toggle="tab" aria-expanded="true" class="nav-link bg-transparent"><i
                         class="fa-solid fa-flask text-primary"></i>
@@ -273,14 +273,14 @@
                                 </div><!-- end card -->
                             </div>
                         </div>
-                        <div class="card shadow-sm border-0 mt-2">
+                        <!-- <div class="card shadow-sm border-0 mt-2">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                                 <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Visit Details
                                 </h5>
                             </div>
                             <div class="card-body">
-                                <!-- Table start -->
+                                
                                 <div class="table-responsive table-nowrap">
                                     <table class="table border">
                                         <thead class="thead-light">
@@ -326,11 +326,11 @@
                                                 </tr>
                                             <?php endif; ?>
                                         </tbody>
-                                    </table>
+                                    <!-- </table>
                                 </div>
-                                <!-- Table end -->
+                                
                             </div>
-                        </div>
+                        </div> --> 
                         <div class="card shadow-sm border-0 mt-2">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
@@ -522,13 +522,10 @@
                                                                                         <p>Address: <?php echo e($appointment->patient->address); ?></p>
                                                                                         <p>Any Known Allergies: <?php echo e($appointment->patient->known_allergies); ?></p>
                                                                                         <p>Remarks: <?php echo e($appointment->patient->note_remark); ?></p>
-                                                                                        <p>TPA : <?php echo e($appointment->patient->note_remark); ?>
-
-                                                                                        </p>
+                                                                                        <p>TPA : <?php echo e($appointment->patient->note_remark); ?></p>
                                                                                         <p>TPA ID : <?php echo e($appointment->patient->note_remark); ?> </p>
                                                                                         <p>TPA Validity : <?php echo e($appointment->patient->note_remark); ?></p>
-                                                                                        <p>National Identification
-                                                                                            Number :  <?php echo e($appointment->patient->note_remark); ?></p>
+                                                                                        <p>National Identification Number :  <?php echo e($appointment->patient->note_remark); ?></p>
                                                                                     </div>
                                                                                     <div class="col-md-2">
                                                                                         <img src="assets/img/patient.png"

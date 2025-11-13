@@ -5,7 +5,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Organisation;
 use App\Models\Patient;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 
 class PatientController extends Controller
 {
@@ -174,7 +173,7 @@ class PatientController extends Controller
     }
     public function getPatients()
     {
-        $patients = Patient::with('organisation')->get();
+        $patients = Patient::with('organisation', 'bloodGroup')->get();
         // dd($patients);
         return response()->json($patients, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
     }
