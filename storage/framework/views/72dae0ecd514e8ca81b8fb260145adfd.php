@@ -361,7 +361,7 @@
             </div>
 
             <!-- Modal Body (scrollable area provided by modal-dialog-scrollable) -->
-            <form action="{{ route('opd.addPrescription') }}" method="post" enctype="multipart/form-data">@csrf
+            <form action="<?php echo e(route('opd.addPrescription')); ?>" method="post" enctype="multipart/form-data"><?php echo csrf_field(); ?>
                 <div class="modal-body" style="max-height: calc(100vh - 160px); overflow-x:hiden;">
                     <div class="row p-4 mx-1">
                         <div class="col-sm-9">
@@ -689,9 +689,9 @@
 
             // 🔹 Fetch base dropdown data once
             Promise.all([
-                fetch("{{ route('getMedicineCategories') }}").then(res => res.json()),
-                fetch("{{ route('getDoseIntervals') }}").then(res => res.json()),
-                fetch("{{ route('getDoseDurations') }}").then(res => res.json())
+                fetch("<?php echo e(route('getMedicineCategories')); ?>").then(res => res.json()),
+                fetch("<?php echo e(route('getDoseIntervals')); ?>").then(res => res.json()),
+                fetch("<?php echo e(route('getDoseDurations')); ?>").then(res => res.json())
             ]).then(([categories, intervals, durations]) => {
                 window.medicineCategories = categories;
                 window.doseIntervals = intervals;
@@ -718,13 +718,13 @@
                     const categoryId = this.value;
                     const medicineSelect = row.querySelector(".medicine_name");
                     const doseSelect = row.querySelector(".medicine_dosage");
-                    const baseUrl = "{{ route('getMedicines', ['categoryId' => 'ID']) }}";
+                    const baseUrl = "<?php echo e(route('getMedicines', ['categoryId' => 'ID'])); ?>";
                     const finalUrl = baseUrl.replace('ID', categoryId);
                     fetch(finalUrl)
                         .then(res => res.json())
                         .then(data => fillSelect(medicineSelect, data, "medicine_name"));
 
-                    const baseUrlDose = "{{ route('getDoses', ['categoryId' => 'ID']) }}";
+                    const baseUrlDose = "<?php echo e(route('getDoses', ['categoryId' => 'ID'])); ?>";
                     const finalUrlDose = baseUrlDose.replace('ID', categoryId);
                     fetch(finalUrlDose)
                         .then(res => res.json())
@@ -790,7 +790,7 @@
 
         })
 
-        fetch("{{ route('getFindingCategories') }}")
+        fetch("<?php echo e(route('getFindingCategories')); ?>")
             .then(response => response.json())
             .then(data => {
                 window.findingCategoryData = data;
@@ -799,7 +799,7 @@
                     const option = document.createElement('option');
                     option.value = category.id;
                     option.textContent = category.category;
-                    if ("{{ old('finding_type[]') }}" == category.id) {
+                    if ("<?php echo e(old('finding_type[]')); ?>" == category.id) {
                         option.selected = true;
                     }
                     findingCategorySelect.appendChild(option);
@@ -823,7 +823,7 @@
             }
 
             // ✅ Fetch findings for all selected categories
-            fetch("{{ route('getFindings') }}", {
+            fetch("<?php echo e(route('getFindings')); ?>", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -841,7 +841,7 @@
                         const option = document.createElement('option');
                         option.value = finding.id;
                         option.textContent = finding.name;
-                        if ("{{ old('finding[]') }}" == finding.id) {
+                        if ("<?php echo e(old('finding[]')); ?>" == finding.id) {
                             option.selected = true;
                         }
                         findingsSelect.appendChild(option);
@@ -852,7 +852,7 @@
                     findingsSelect.innerHTML = '<option value="">Error loading options</option>';
                 });
         });
-        fetch("{{ route('getPathologies') }}")
+        fetch("<?php echo e(route('getPathologies')); ?>")
             .then(response => response.json())
             .then(data => {
                 window.pathologyData = data;
@@ -861,7 +861,7 @@
                     const option = document.createElement('option');
                     option.value = patho.id;
                     option.textContent = patho.test_name + "(" + patho.short_name + ")";
-                    if ("{{ old('pathology[]') }}" == patho.id) {
+                    if ("<?php echo e(old('pathology[]')); ?>" == patho.id) {
                         option.selected = true;
                     }
                     pathologySelect.appendChild(option);
@@ -871,7 +871,7 @@
                 console.error('Error fetching Pathologies:', error);
                 pathologySelect.innerHTML = '<option value="">Error loading options</option>';
             });
-        fetch("{{ route('getRadiologies') }}")
+        fetch("<?php echo e(route('getRadiologies')); ?>")
             .then(response => response.json())
             .then(data => {
                 window.radiologyData = data;
@@ -880,7 +880,7 @@
                     const option = document.createElement('option');
                     option.value = radio.id;
                     option.textContent = radio.test_name + "(" + radio.short_name + ")";
-                    if ("{{ old('radiology[]') }}" == radio.id) {
+                    if ("<?php echo e(old('radiology[]')); ?>" == radio.id) {
                         option.selected = true;
                     }
                     radiologySelect.appendChild(option);
@@ -1179,4 +1179,4 @@
     // Initialize both editors
     initEditor('toolbar-header', 'editor-header', 'formatBlock-header');
     initEditor('toolbar-footer', 'editor-footer', 'formatBlock-footer');
-</script>
+</script><?php /**PATH C:\xampp82\htdocs\hims\resources\views/components/modals/add-prescription-modal.blade.php ENDPATH**/ ?>
