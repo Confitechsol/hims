@@ -143,16 +143,16 @@
                                 </ul>
                             </li>
                             <li class="submenu">
-                                <a href="javascript:void(0);" class="active subdrop">
+                                <a href="<?php echo e(route('certificate')); ?>" class="active subdrop">
                                     <i class="ti ti-layout-dashboard"></i><span>Certificate</span>
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="index.html" class="active">Certificate
+                                    <li><a href="<?php echo e(route('certificate')); ?>" class="active">Certificate
                                             </a></li>
-                                    <li><a href="doctor-dashboard.html">Patient ID Card
+                                    <li><a href="<?php echo e(route('generate_patient_id')); ?>">Patient ID Card
                                             </a></li>
-                                    <li><a href="patient-dashboard.html">Staff ID Card
+                                    <li><a href="<?php echo e(route('generate_patient_id')); ?>">Staff ID Card
                                             </a></li>
                                 </ul>
                             </li>
