@@ -453,285 +453,289 @@
                                 </h5>
                             </div> --}}
                             {{-- <div class="card-body"> --}}
-                            <div class="patient-info-card">
-                                <!-- Header Section -->
-                                <div class="patient-header">
-                                    <div class="header-content">
-                                        <div class="patient-avatar-wrapper">
-                                            <div class="patient-avatar">
-                                                <img src="{{ asset('assets/img/patient.png') }}" alt="Patient Photo">
+                                <div class="patient-info-card">
+                                    <!-- Header Section -->
+                                    <div class="patient-header">
+                                        <div class="header-content">
+                                            <div class="patient-avatar-wrapper">
+                                                <div class="patient-avatar">
+                                                    <img src="{{ asset('assets/img/patient.png') }}" alt="Patient Photo">
+                                                </div>
+                                                <div class="avatar-badge">
+                                                    <i class="fas fa-user-check"></i>
+                                                </div>
                                             </div>
-                                            <div class="avatar-badge">
-                                                <i class="fas fa-user-check"></i>
-                                            </div>
-                                        </div>
 
-                                        <div class="patient-name-section">
-                                            <div class="patient-id">
-                                                <i class="fas fa-id-card me-1"></i> OPD ID: {{ $opd->opd_no }}
-                                            </div>
-                                            <h2 class="patient-name">{{ $opd->patient->patient_name }}</h2>
-                                            <div class="patient-quick-info">
-                                                <div class="quick-info-item">
-                                                    <i class="fas fa-mars"></i>
-                                                    <span>{{ $opd->patient->gender }}</span>
+                                            <div class="patient-name-section">
+                                                <div class="patient-id">
+                                                    <i class="fas fa-id-card me-1"></i> OPD ID: {{ $opd->opd_no }}
                                                 </div>
-                                                <div class="quick-info-item">
-                                                    <i class="fas fa-birthday-cake"></i>
-                                                    <span>{{ \Carbon\Carbon::parse($opd->patient->dob)->format('d-M-Y') }}</span>
-                                                </div>
-                                                <div class="quick-info-item">
-                                                    <i class="fas fa-droplet"></i>
-                                                    <span>{{ $opd->patient->bloodGroup->name }}</span>
+                                                <h2 class="patient-name">{{ $opd->patient->patient_name }}</h2>
+                                                <div class="patient-quick-info">
+                                                    <div class="quick-info-item">
+                                                        <i class="fas fa-mars"></i>
+                                                        <span>{{ $opd->patient->gender }}</span>
+                                                    </div>
+                                                    <div class="quick-info-item">
+                                                        <i class="fas fa-birthday-cake"></i>
+                                                        <span>{{ \Carbon\Carbon::parse($opd->patient->dob)->format('d-M-Y') }}</span>
+                                                    </div>
+                                                    <div class="quick-info-item">
+                                                        <i class="fas fa-droplet"></i>
+                                                        <span>{{ $opd->patient->bloodGroup->name }}</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+
+                                    <!-- Body Section -->
+                                    <div class="patient-body">
+                                        <!-- Contact Information -->
+                                        <div class="info-grid">
+                                            <div class="info-item">
+                                                <div class="info-icon">
+                                                    <i class="fa-solid fa-phone text-primary"></i>
+                                                </div>
+                                                <div class="info-content">
+                                                    <div class="info-label">Phone</div>
+                                                    <div class="info-value">{{ $opd->patient->mobileno ?? '--' }}</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="info-item">
+                                                <div class="info-icon">
+                                                    <i class="fa-solid fa-calendar-days text-primary"></i>
+                                                </div>
+                                                <div class="info-content">
+                                                    <div class="info-label">Age</div>
+                                                    <div class="info-value">{{ $opd->patient->age }} Year
+                                                        {{ $opd->patient->month }} Month {{ $opd->patient->day }} Days (As
+                                                        Of
+                                                        {{ \Carbon\Carbon::parse($opd->patient->as_of_date)->format('d/m/Y') }})
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="info-item">
+                                                <div class="info-icon">
+                                                    <i class="fa-solid fa-hands-holding-child text-primary"></i>
+                                                </div>
+                                                <div class="info-content">
+                                                    <div class="info-label">Guardian Name</div>
+                                                    <div class="info-value empty">{{ $opd->patient->guardian_name ?? '--' }}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="info-item">
+                                                <div class="info-icon">
+                                                    <i class="fa-solid fa-mars-and-venus text-primary"></i>
+                                                </div>
+                                                <div class="info-content">
+                                                    <div class="info-label">Gender</div>
+                                                    <div class="info-value">{{ $opd->patient->gender }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Insurance & Medical Information -->
+                                        <div class="section-divider">
+                                            <span class="section-title">Insurance & Medical Information</span>
+                                        </div>
+
+                                        <div class="info-grid">
+                                            <div class="info-item">
+                                                <div class="info-icon">
+                                                    <i class="fa-solid fa-users-gear text-primary"></i>
+                                                </div>
+                                                <div class="info-content">
+                                                    <div class="info-label">TPA</div>
+                                                    <div class="info-value empty">
+                                                        {{ $opd->patient->organisation->organisation_name ?? '--' }}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="info-item">
+                                                <div class="info-icon">
+                                                    <i class="fa-solid fa-id-badge text-primary"></i>
+                                                </div>
+                                                <div class="info-content">
+                                                    <div class="info-label">TPA ID</div>
+                                                    <div class="info-value empty">
+                                                        {{ $opd->patient->organisation->code ?? '--' }}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="info-item">
+                                                <div class="info-icon">
+                                                    <i class="fa-solid fa-user-check text-primary"></i>
+                                                </div>
+                                                <div class="info-content">
+                                                    <div class="info-label">TPA Validity</div>
+                                                    <div class="info-value empty">{{ $opd->patient->tpa_validity ?? '--' }}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="info-item">
+                                                <div class="info-icon">
+                                                    <i class="fa-solid fa-barcode text-primary"></i>
+                                                </div>
+                                                <div class="info-content">
+                                                    <div class="info-label">Barcode</div>
+                                                    <div class="info-value empty">--</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="info-item">
+                                                <div class="info-icon">
+                                                    <i class="fa-solid fa-qrcode text-primary"></i>
+                                                </div>
+                                                <div class="info-content">
+                                                    <div class="info-label">QR Code</div>
+                                                    <div class="info-value empty">--</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="d-flex align-items-center mb-3 px-3">
+                                        <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                class="fa-solid fa-tag text-primary"></i></span>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <h6 class="about_patient fs-13 fw-bold mb-1"> Known Allergies :</h6>
+                                            <p class="patient_data mb-0">{{ $opd->allergies ?? '--' }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-3 px-3">
+                                        <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                class="fa-solid fa-tag text-primary"></i></span>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <h6 class="about_patient fs-13 fw-bold mb-1"> Findings :</h6>
+                                            <p class="patient_data mb-0">--</p>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-3 px-3">
+                                        <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                class="fa-solid fa-tag text-primary"></i></span>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <h6 class=" fs-13 fw-bold mb-1"> Symptoms :</h6>
+                                            <p class=" mb-0">
+                                            <ul class="m-0">
+                                                @foreach ($symptoms as $symptom)
+                                                    <li><i class="fa-regular fa-circle-check text-primary"></i>
+                                                        {{ $symptom->symptoms_title }}</li>
+                                                @endforeach
+                                            </ul>
+                                            </p>
+                                        </div>
+                                    </div>
+
                                 </div>
-
-                                <!-- Body Section -->
-                                <div class="patient-body">
-                                    <!-- Contact Information -->
-                                    <div class="info-grid">
-                                        <div class="info-item">
-                                            <div class="info-icon">
-                                                <i class="fa-solid fa-phone text-primary"></i>
-                                            </div>
-                                            <div class="info-content">
-                                                <div class="info-label">Phone</div>
-                                                <div class="info-value">{{ $opd->patient->mobileno ?? '--' }}</div>
-                                            </div>
-                                        </div>
-
-                                        <div class="info-item">
-                                            <div class="info-icon">
-                                                <i class="fa-solid fa-calendar-days text-primary"></i>
-                                            </div>
-                                            <div class="info-content">
-                                                <div class="info-label">Age</div>
-                                                <div class="info-value">{{ $opd->patient->age }} Year
-                                                    {{ $opd->patient->month }} Month {{ $opd->patient->day }} Days (As Of
-                                                    {{ \Carbon\Carbon::parse($opd->patient->as_of_date)->format('d/m/Y') }})
-                                                </div>
+                                {{-- <div class="d-sm-flex position-relative z-0 overflow-hidden p-2">
+                                    <!-- <img src="assets/img/icons/shape-01.svg" alt="img"
+                                                                                                                                                                                                                                                                                                                                                                class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
+                                    <a href="javascript:void(0);"
+                                        class="avatar avatar-xxxl patient-avatar me-2 flex-shrink-0">
+                                        <img src="{{ asset('assets/img/patient.png') }}" alt="product" class="rounded">
+                                    </a>
+                                    <div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-phone text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">Phone :</h6>
+                                                <p class="patient_data mb-0">8910245678</p>
                                             </div>
                                         </div>
 
-                                        <div class="info-item">
-                                            <div class="info-icon">
-                                                <i class="fa-solid fa-hands-holding-child text-primary"></i>
-                                            </div>
-                                            <div class="info-content">
-                                                <div class="info-label">Guardian Name</div>
-                                                <div class="info-value empty">{{ $opd->patient->guardian_name ?? '--' }}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="info-item">
-                                            <div class="info-icon">
-                                                <i class="fa-solid fa-mars-and-venus text-primary"></i>
-                                            </div>
-                                            <div class="info-content">
-                                                <div class="info-label">Gender</div>
-                                                <div class="info-value">{{ $opd->patient->gender }}</div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-calendar-days text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">Age :</h6>
+                                                <p class="patient_data mb-0">22 Year 9 Month 5 Days (As Of Date 10/06/2025)
+                                                </p>
                                             </div>
                                         </div>
-                                    </div>
-
-                                    <!-- Insurance & Medical Information -->
-                                    <div class="section-divider">
-                                        <span class="section-title">Insurance & Medical Information</span>
-                                    </div>
-
-                                    <div class="info-grid">
-                                        <div class="info-item">
-                                            <div class="info-icon">
-                                                <i class="fa-solid fa-users-gear text-primary"></i>
-                                            </div>
-                                            <div class="info-content">
-                                                <div class="info-label">TPA</div>
-                                                <div class="info-value empty">
-                                                    {{ $opd->patient->organisation->organisation_name ?? '--' }}</div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-hands-holding-child text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">Guardian Name :</h6>
+                                                <p class="patient_data mb-0">--</p>
                                             </div>
                                         </div>
-
-                                        <div class="info-item">
-                                            <div class="info-icon">
-                                                <i class="fa-solid fa-id-badge text-primary"></i>
-                                            </div>
-                                            <div class="info-content">
-                                                <div class="info-label">TPA ID</div>
-                                                <div class="info-value empty">
-                                                    {{ $opd->patient->organisation->code ?? '--' }}</div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-mars-and-venus text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">Gender :</h6>
+                                                <p class="patient_data mb-0">Male</p>
                                             </div>
                                         </div>
-
-                                        <div class="info-item">
-                                            <div class="info-icon">
-                                                <i class="fa-solid fa-user-check text-primary"></i>
-                                            </div>
-                                            <div class="info-content">
-                                                <div class="info-label">TPA Validity</div>
-                                                <div class="info-value empty">{{ $opd->patient->tpa_validity ?? '--' }}
-                                                </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-users-gear text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">TPA :</h6>
+                                                <p class="patient_data mb-0">--</p>
                                             </div>
                                         </div>
-
-                                        <div class="info-item">
-                                            <div class="info-icon">
-                                                <i class="fa-solid fa-barcode text-primary"></i>
-                                            </div>
-                                            <div class="info-content">
-                                                <div class="info-label">Barcode</div>
-                                                <div class="info-value empty">--</div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-id-badge text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">TPA ID :</h6>
+                                                <p class="patient_data mb-0">--</p>
                                             </div>
                                         </div>
-
-                                        <div class="info-item">
-                                            <div class="info-icon">
-                                                <i class="fa-solid fa-qrcode text-primary"></i>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-user-check text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">TPA Validity :</h6>
+                                                <p class="patient_data mb-0">--</p>
                                             </div>
-                                            <div class="info-content">
-                                                <div class="info-label">QR Code</div>
-                                                <div class="info-value empty">--</div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-barcode text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">Barcode :</h6>
+                                                <p class="patient_data mb-0">--</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-qrcode text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">QR Code :</h6>
+                                                <p class="patient_data mb-0">--</p>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <hr>
-                                <div class="d-flex align-items-center mb-3 px-3">
-                                    <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                            class="fa-solid fa-tag text-primary"></i></span>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <h6 class="about_patient fs-13 fw-bold mb-1"> Known Allergies :</h6>
-                                        <p class="patient_data mb-0">{{ $opd->allergies ?? '--' }}</p>
-                                    </div>
-                                </div>
-                                <div class="d-flex align-items-center mb-3 px-3">
-                                    <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                            class="fa-solid fa-tag text-primary"></i></span>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <h6 class="about_patient fs-13 fw-bold mb-1"> Findings :</h6>
-                                        <p class="patient_data mb-0">--</p>
-                                    </div>
-                                </div>
-                                <div class="d-flex align-items-center mb-3 px-3">
-                                    <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                            class="fa-solid fa-tag text-primary"></i></span>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <h6 class=" fs-13 fw-bold mb-1"> Symptoms :</h6>
-                                        <p class=" mb-0">
-                                        <ul class="m-0">
-                                            @foreach ($symptoms as $symptom)
-                                                <li><i class="fa-regular fa-circle-check text-primary"></i>
-                                                    {{ $symptom->symptoms_title }}</li>
-                                            @endforeach
-                                        </ul>
-                                        </p>
-                                    </div>
-                                </div>
+                                    <!-- <div class="row">
+                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-5">
 
-                            </div>
-                            {{-- <div class="d-sm-flex position-relative z-0 overflow-hidden p-2">
-                                        <!-- <img src="assets/img/icons/shape-01.svg" alt="img"
-                                                                                                                                                                                                                                                                                                                                                class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
-                                        <a href="javascript:void(0);"
-                                            class="avatar avatar-xxxl patient-avatar me-2 flex-shrink-0">
-                                            <img src="{{ asset('assets/img/patient.png') }}" alt="product" class="rounded">
-                                        </a>
-                                        <div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-phone text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">Phone :</h6>
-                                                    <p class="patient_data mb-0">8910245678</p>
-                                                </div>
-                                            </div>
+                                                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-7">
 
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-calendar-days text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">Age :</h6>
-                                                    <p class="patient_data mb-0">22 Year 9 Month 5 Days (As Of Date 10/06/2025)
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-hands-holding-child text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">Guardian Name :</h6>
-                                                    <p class="patient_data mb-0">--</p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-mars-and-venus text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">Gender :</h6>
-                                                    <p class="patient_data mb-0">Male</p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-users-gear text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">TPA :</h6>
-                                                    <p class="patient_data mb-0">--</p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-id-badge text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">TPA ID :</h6>
-                                                    <p class="patient_data mb-0">--</p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-user-check text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">TPA Validity :</h6>
-                                                    <p class="patient_data mb-0">--</p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-barcode text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">Barcode :</h6>
-                                                    <p class="patient_data mb-0">--</p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-qrcode text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">QR Code :</h6>
-                                                    <p class="patient_data mb-0">--</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!-- <div class="row">
-                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-5">
+                                                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-5">
 
-                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-7">
+                                                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-7">
 
-                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-5">
+                                                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                                                </div> -->
+                                </div> --}}
 
-                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-7">
-
-                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                </div> -->
-                                    </div> --}}
-
-                            {{-- </div> --}}
+                                {{--
+                            </div> --}}
                         </div>
 
                         <div class="card shadow-sm border-0 mt-2">
@@ -845,7 +849,8 @@
                                                     <td>{{ $medication->date }}</td>
                                                     <td>{{ $medication->pharmacy->medicine_name }}</td>
                                                     <td>{{ $medication->medicineDosage->dosage }}
-                                                        {{ $medication->medicineDosage->unit->unit_name }}</td>
+                                                        {{ $medication->medicineDosage->unit->unit_name }}
+                                                    </td>
                                                     <td>{{ $medication->time }}</td>
                                                     <td>{{ $medication->remark }}</td>
                                                 </tr>
@@ -879,20 +884,20 @@
                                         </thead>
                                         <tbody>
                                             @foreach ($labInvestigations as $lab)
-                                                <tr>
-                                                    <td>
-                                                        {{ $lab->pathology->test_name .
-                                                            "
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    (" .
-                                                            $lab->pathology->short_name .
-                                                            ')' }}
-                                                    </td>
-                                                    <td>Pathology</td>
-                                                    <td>{{ '--' }}</td>
-                                                    <td>{{ \Carbon\Carbon::today()->copy()->addDays(intval($lab->pathology->report_days))->format('d-M-Y') }}
-                                                    </td>
-                                                    <td>{{ $lab->approved_by ?? '--' }}</td>
-                                                </tr>
+                                                                                <tr>
+                                                                                    <td>
+                                                                                        {{ $lab->pathology->test_name .
+                                                "
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            (" .
+                                                $lab->pathology->short_name .
+                                                ')' }}
+                                                                                    </td>
+                                                                                    <td>Pathology</td>
+                                                                                    <td>{{ '--' }}</td>
+                                                                                    <td>{{ \Carbon\Carbon::today()->copy()->addDays(intval($lab->pathology->report_days))->format('d-M-Y') }}
+                                                                                    </td>
+                                                                                    <td>{{ $lab->approved_by ?? '--' }}</td>
+                                                                                </tr>
                                             @endforeach
                                         </tbody>
                                     </table>
@@ -969,7 +974,8 @@
                                                         {{ $charge->charge->name }}
                                                     </td>
                                                     <td style="text-transform: capitalize;">
-                                                        {{ $charge->chargeCategory->chargeType->charge_type }}</td>
+                                                        {{ $charge->chargeCategory->chargeType->charge_type }}
+                                                    </td>
                                                     <td class="text-right">{{ $charge->charge->standard_charge }}</td>
                                                     <td class="text-right">
                                                         ({{ $charge->charge->taxCategory->percentage }}%)
@@ -1080,7 +1086,7 @@
                                                         <div class="text-end d-flex">
                                                             <a href="javascript:void(0);"
                                                                 class="btn btn-primary text-white ms-2 btn-md"
-                                                                data-bs-toggle="modal" data-is-hidden = "true"
+                                                                data-bs-toggle="modal" data-is-hidden="true"
                                                                 data-bs-target="#createOpdModal"
                                                                 data-patient='@json($opd->patient)'><i
                                                                     class="ti ti-plus me-1"></i>New Checkup</a>
@@ -1096,8 +1102,7 @@
                                                                     <div class="modal-header"
                                                                         style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
-                                                                        <h5 class="modal-title"
-                                                                            id="addSpecializationLabel">
+                                                                        <h5 class="modal-title" id="addSpecializationLabel">
                                                                             Patient Details
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
@@ -1165,18 +1170,23 @@
                                                                                         <label for="symptoms_des"
                                                                                             class="form-label">Symptoms
                                                                                         </label>
-                                                                                        <textarea name="symptoms" id="symptoms" class="form-control"></textarea>
+                                                                                        <textarea name="symptoms"
+                                                                                            id="symptoms"
+                                                                                            class="form-control"></textarea>
                                                                                     </div>
                                                                                     <div class="col-md-6">
                                                                                         <label for="note"
                                                                                             class="form-label">Note</label>
-                                                                                        <textarea name="note" id="note" class="form-control"></textarea>
+                                                                                        <textarea name="note" id="note"
+                                                                                            class="form-control"></textarea>
                                                                                     </div>
                                                                                     <div class="col-md-6">
                                                                                         <label for="allergies"
                                                                                             class="form-label">Any Known
                                                                                             Allergies</label>
-                                                                                        <textarea name="allergies" id="allergies" class="form-control"></textarea>
+                                                                                        <textarea name="allergies"
+                                                                                            id="allergies"
+                                                                                            class="form-control"></textarea>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
@@ -1196,9 +1206,8 @@
                                                                                     <div class="col-md-6">
                                                                                         <label for="case"
                                                                                             class="form-label">Case</label>
-                                                                                        <input type="text"
-                                                                                            name="case" id="case"
-                                                                                            class="form-control">
+                                                                                        <input type="text" name="case"
+                                                                                            id="case" class="form-control">
                                                                                     </div>
                                                                                     <div class="col-md-6">
                                                                                         <label for="casualty"
@@ -1226,8 +1235,7 @@
                                                                                     <div class="col-md-6">
                                                                                         <label for="reference"
                                                                                             class="form-label">Reference</label>
-                                                                                        <input type="text"
-                                                                                            name="reference"
+                                                                                        <input type="text" name="reference"
                                                                                             id="reference"
                                                                                             class="form-control">
                                                                                     </div>
@@ -1289,12 +1297,10 @@
                                                                                         <label for="standard_charge"
                                                                                             class="form-label">Standard
                                                                                             Charge (INR)</label>
-                                                                                        <input type="text"
-                                                                                            readonly="true"
+                                                                                        <input type="text" readonly="true"
                                                                                             name="standard_charge"
                                                                                             id="standard_charge"
-                                                                                            class="form-control"
-                                                                                            value=""
+                                                                                            class="form-control" value=""
                                                                                             autocomplete="off" disabled>
                                                                                     </div>
                                                                                     <div class="col-md-6">
@@ -1302,8 +1308,7 @@
                                                                                             class="form-label">Applied
                                                                                             Charge (INR) <span
                                                                                                 class="text-danger">*</span></label>
-                                                                                        <input type="text"
-                                                                                            name="amount"
+                                                                                        <input type="text" name="amount"
                                                                                             id="apply_charge"
                                                                                             class="form-control">
                                                                                     </div>
@@ -1328,10 +1333,8 @@
                                                                                         <div class="input-group">
                                                                                             <input type="text"
                                                                                                 class="form-control discount_percentage"
-                                                                                                name="tax"
-                                                                                                id="tax"
-                                                                                                value="0"
-                                                                                                autocomplete="off"
+                                                                                                name="tax" id="tax"
+                                                                                                value="0" autocomplete="off"
                                                                                                 readonly="true" disabled>
                                                                                             <span
                                                                                                 class="input-group-addon ">
@@ -1343,11 +1346,9 @@
                                                                                             class="form-label">Amount
                                                                                             (INR) <span
                                                                                                 class="text-danger">*</span></label>
-                                                                                        <input type="text"
-                                                                                            readonly="true" name="amount"
-                                                                                            id="amount"
-                                                                                            class="form-control"
-                                                                                            value=""
+                                                                                        <input type="text" readonly="true"
+                                                                                            name="amount" id="amount"
+                                                                                            class="form-control" value=""
                                                                                             autocomplete="off" disabled>
                                                                                     </div>
                                                                                     <div class="col-md-6">
@@ -1371,8 +1372,7 @@
                                                                                         <input type="text"
                                                                                             name="paid_amount"
                                                                                             id="paid_amount"
-                                                                                            class="form-control"
-                                                                                            value=""
+                                                                                            class="form-control" value=""
                                                                                             autocomplete="off">
                                                                                     </div>
                                                                                     <div class="col-md-6">
@@ -1395,8 +1395,7 @@
 
                                                                     </div>
                                                                     <div class="modal-footer">
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary">Save &
+                                                                        <button type="submit" class="btn btn-primary">Save &
                                                                             Print</button>
                                                                         <button type="submit"
                                                                             class="btn btn-primary">Save</button>
@@ -1427,11 +1426,9 @@
                                                                                             class="form-label">Name</label><span
                                                                                             class="text-danger">
                                                                                             *</span>
-                                                                                        <input id="name"
-                                                                                            name="name" placeholder=""
-                                                                                            type="text"
-                                                                                            class="form-control"
-                                                                                            value=""
+                                                                                        <input id="name" name="name"
+                                                                                            placeholder="" type="text"
+                                                                                            class="form-control" value=""
                                                                                             autocomplete="off">
                                                                                         <span class="text-danger"></span>
                                                                                     </div>
@@ -1484,8 +1481,7 @@
                                                                                                 <label
                                                                                                     class="form-label">Age
                                                                                                     (yy-mm-dd)
-                                                                                                </label><small
-                                                                                                    class="req">
+                                                                                                </label><small class="req">
                                                                                                     *</small>
                                                                                                 <div
                                                                                                     style="clear: both;overflow: hidden;">
@@ -1559,11 +1555,9 @@
                                                                                                         Select</option>
                                                                                                     <option value="Single">
                                                                                                         Single</option>
-                                                                                                    <option
-                                                                                                        value="Married">
+                                                                                                    <option value="Married">
                                                                                                         Married</option>
-                                                                                                    <option
-                                                                                                        value="Widowed">
+                                                                                                    <option value="Widowed">
                                                                                                         Widowed</option>
                                                                                                     <option
                                                                                                         value="Separated">
@@ -1595,8 +1589,7 @@
                                                                                                         <p class="mb-0">
                                                                                                             Drop files
                                                                                                             here</p>
-                                                                                                        <input
-                                                                                                            type="file"
+                                                                                                        <input type="file"
                                                                                                             class="position-absolute top-0 start-0 opacity-0 w-100 h-100">
                                                                                                     </div>
                                                                                                 </div>
@@ -1614,8 +1607,7 @@
                                                                                             autocomplete="off"
                                                                                             name="mobileno" type="text"
                                                                                             placeholder=""
-                                                                                            class="form-control"
-                                                                                            value="">
+                                                                                            class="form-control" value="">
                                                                                         <span class="text-danger"></span>
                                                                                     </div>
                                                                                 </div>
@@ -1623,10 +1615,9 @@
                                                                                     <div class="form-group">
                                                                                         <label
                                                                                             class="form-label">Email</label>
-                                                                                        <input type="text"
-                                                                                            placeholder=""
-                                                                                            id="addformemail"
-                                                                                            value="" name="email"
+                                                                                        <input type="text" placeholder=""
+                                                                                            id="addformemail" value=""
+                                                                                            name="email"
                                                                                             class="form-control">
                                                                                         <span class="text-danger"></span>
                                                                                     </div>
@@ -1635,8 +1626,7 @@
                                                                                     <div class="form-group">
                                                                                         <label for="address"
                                                                                             class="form-label">Address</label>
-                                                                                        <input name="address"
-                                                                                            placeholder=""
+                                                                                        <input name="address" placeholder=""
                                                                                             class="form-control">
                                                                                     </div>
                                                                                 </div>
@@ -1644,7 +1634,8 @@
                                                                                     <div class="form-group">
                                                                                         <label for="pwd"
                                                                                             class="form-label">Remarks</label>
-                                                                                        <textarea name="note" id="note" class="form-control"></textarea>
+                                                                                        <textarea name="note" id="note"
+                                                                                            class="form-control"></textarea>
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="col-sm-6">
@@ -1652,7 +1643,9 @@
                                                                                         <label for="email"
                                                                                             class="form-label">Any Known
                                                                                             Allergies</label>
-                                                                                        <textarea name="known_allergies" id="" placeholder="" class="form-control"></textarea>
+                                                                                        <textarea name="known_allergies"
+                                                                                            id="" placeholder=""
+                                                                                            class="form-control"></textarea>
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="col-sm-4">
@@ -1716,8 +1709,8 @@
                                                                                     <div class="form-group">
                                                                                         <label for="height"
                                                                                             class="form-label">Height</label>
-                                                                                        <input type="text"
-                                                                                            id="height" name="height"
+                                                                                        <input type="text" id="height"
+                                                                                            name="height"
                                                                                             class="form-control"
                                                                                             placeholder="Height (cm)"
                                                                                             value="">
@@ -1727,8 +1720,8 @@
                                                                                     <div class="form-group">
                                                                                         <label for="weight"
                                                                                             class="form-label">Weight</label>
-                                                                                        <input type="text"
-                                                                                            id="weight" name="weight"
+                                                                                        <input type="text" id="weight"
+                                                                                            name="weight"
                                                                                             class="form-control"
                                                                                             placeholder="Weight (kg)"
                                                                                             value="">
@@ -1738,8 +1731,7 @@
                                                                                     <div class="form-group">
                                                                                         <label for="temperature"
                                                                                             class="form-label">Temperature</label>
-                                                                                        <input type="text"
-                                                                                            id="temperature"
+                                                                                        <input type="text" id="temperature"
                                                                                             name="temperature"
                                                                                             class="form-control"
                                                                                             placeholder="Temperature (°C)"
@@ -1817,22 +1809,30 @@
 
                                                                             <a href="javascript: void(0);"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                                                <i class="fa-solid fa-prescription"
-                                                                                    {{-- data-bs-toggle="tooltip" --}}
+                                                                                <i class="fa-solid fa-prescription" {{--
+                                                                                    data-bs-toggle="tooltip" --}}
                                                                                     data-bs-toggle="modal"
                                                                                     data-bs-target="#addPrescriptionModal"
                                                                                     data-id="{{ $opd->id }}"
                                                                                     title="Add Prescription"></i></a>
+
+
                                                                             <a href="javascript: void(0);"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
                                                                                 <i class="fa-solid fa-print"
-                                                                                    data-bs-toggle="tooltip"
+                                                                                    data-bs-toggle="modal"
+                                                                                    data-bs-target="#showPrescriptionModal"
                                                                                     title="Manual Prescription"></i></a>
+
+
+
                                                                             <a href="javascript: void(0);"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                                <i class="ti ti-menu"
-                                                                                    data-bs-toggle="tooltip"
+                                                                                <i class="ti ti-menu" data-bs-toggle="tooltip"
                                                                                     title="Show"></i></a>
+
+
+
                                                                         </div>
                                                                     </td>
                                                                 </tr>
@@ -1891,8 +1891,7 @@
                                                                     <div class="modal-header"
                                                                         style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
-                                                                        <h5 class="modal-title"
-                                                                            id="addSpecializationLabel">
+                                                                        <h5 class="modal-title" id="addSpecializationLabel">
                                                                             Add Medication Dose
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
@@ -2018,13 +2017,11 @@
                                                                         <div class="d-flex gap-2">
                                                                             <a href="javascript: void(0);"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
-                                                                                <i class="ti ti-pencil"
-                                                                                    data-bs-toggle="tooltip"
+                                                                                <i class="ti ti-pencil" data-bs-toggle="tooltip"
                                                                                     title="Show"></i></a>
                                                                             <a href="javascript: void(0);"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                                <i class="ti ti-trash"
-                                                                                    data-bs-toggle="tooltip"
+                                                                                <i class="ti ti-trash" data-bs-toggle="tooltip"
                                                                                     title="Show"></i></a>
                                                                         </div>
                                                                     </td>
@@ -2100,8 +2097,7 @@
                                                                         <div class="d-flex gap-2">
                                                                             <a href="javascript: void(0);"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                                <i class="ti ti-menu"
-                                                                                    data-bs-toggle="tooltip"
+                                                                                <i class="ti ti-menu" data-bs-toggle="tooltip"
                                                                                     title="Show"></i></a>
                                                                         </div>
                                                                     </td>
@@ -2165,7 +2161,8 @@
                                                                 <tr>
                                                                     <td>
                                                                         <h6 class="fs-14 mb-1">
-                                                                            {{ $operation->reference_no }}</h6>
+                                                                            {{ $operation->reference_no }}
+                                                                        </h6>
                                                                     </td>
                                                                     <td>{{ $operation->date }}</td>
                                                                     <td>{{ $operation->operation->operation }}</td>
@@ -2176,13 +2173,11 @@
                                                                         <div class="d-flex gap-2">
                                                                             <a href="javascript: void(0);"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
-                                                                                <i class="ti ti-pencil"
-                                                                                    data-bs-toggle="tooltip"
+                                                                                <i class="ti ti-pencil" data-bs-toggle="tooltip"
                                                                                     title="Show"></i></a>
                                                                             <a href="javascript: void(0);"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                                <i class="ti ti-trash"
-                                                                                    data-bs-toggle="tooltip"
+                                                                                <i class="ti ti-trash" data-bs-toggle="tooltip"
                                                                                     title="Show"></i></a>
                                                                         </div>
                                                                     </td>
@@ -2296,8 +2291,7 @@
                                                                                     </div>
                                                                                     <div class="col-sm-2">
                                                                                         <div class="form-group">
-                                                                                            <label
-                                                                                                class="form-label">Charge
+                                                                                            <label class="form-label">Charge
                                                                                                 Category</label><small
                                                                                                 class="req"> *</small>
                                                                                             <select name="charge_category2"
@@ -2314,8 +2308,7 @@
                                                                                     </div>
                                                                                     <div class="col-sm-2">
                                                                                         <div class="form-group">
-                                                                                            <label
-                                                                                                class="form-label">Charge
+                                                                                            <label class="form-label">Charge
                                                                                                 Name</label><small
                                                                                                 class="req"> *</small>
                                                                                             <select name="charge_id"
@@ -2336,8 +2329,7 @@
                                                                                                 class="form-label">Standard
                                                                                                 Charge
                                                                                                 (INR)</label>
-                                                                                            <input type="text"
-                                                                                                readonly=""
+                                                                                            <input type="text" readonly=""
                                                                                                 name="standard_charge"
                                                                                                 id="addstandard_charge"
                                                                                                 class="form-control reset_value standard_charge"
@@ -2350,8 +2342,7 @@
                                                                                         <div class="form-group">
                                                                                             <label class="form-label">TPA
                                                                                                 Charge (INR)</label>
-                                                                                            <input type="text"
-                                                                                                readonly=""
+                                                                                            <input type="text" readonly=""
                                                                                                 name="schedule_charge"
                                                                                                 id="addscd_charge"
                                                                                                 placeholder=""
@@ -2366,8 +2357,7 @@
                                                                                             <label
                                                                                                 class="form-label">Qty</label><small
                                                                                                 class="req"> *</small>
-                                                                                            <input type="text"
-                                                                                                name="qty"
+                                                                                            <input type="text" name="qty"
                                                                                                 id="qty"
                                                                                                 class="form-control qty"
                                                                                                 value="1">
@@ -2387,8 +2377,7 @@
                                                                                                     <td width="60%"
                                                                                                         colspan="2"
                                                                                                         class="text-right ipdbilltable">
-                                                                                                        <input
-                                                                                                            type="text"
+                                                                                                        <input type="text"
                                                                                                             placeholder="Total"
                                                                                                             value="0"
                                                                                                             name="apply_charge"
@@ -2406,8 +2395,7 @@
                                                                                                         <h4
                                                                                                             style="float: right;font-size: 12px; padding-left: 5px;">
                                                                                                             %</h4>
-                                                                                                        <input
-                                                                                                            type="text"
+                                                                                                        <input type="text"
                                                                                                             value="0"
                                                                                                             placeholder="Discount Percentage"
                                                                                                             name="discount_percentage"
@@ -2417,8 +2405,7 @@
                                                                                                     </td>
                                                                                                     <td
                                                                                                         class="text-right ipdbilltable">
-                                                                                                        <input
-                                                                                                            type="text"
+                                                                                                        <input type="text"
                                                                                                             placeholder="Discount Percentage"
                                                                                                             name="discount_percentage_amount"
                                                                                                             value="0"
@@ -2435,8 +2422,7 @@
                                                                                                         <h4
                                                                                                             style="float: right;font-size: 12px; padding-left: 5px;">
                                                                                                             %</h4>
-                                                                                                        <input
-                                                                                                            type="text"
+                                                                                                        <input type="text"
                                                                                                             placeholder="Tax"
                                                                                                             name="charge_tax"
                                                                                                             id="charge_tax"
@@ -2446,8 +2432,7 @@
                                                                                                     </td>
                                                                                                     <td
                                                                                                         class="text-right ipdbilltable">
-                                                                                                        <input
-                                                                                                            type="text"
+                                                                                                        <input type="text"
                                                                                                             placeholder="Tax"
                                                                                                             name="tax"
                                                                                                             value="0"
@@ -2462,8 +2447,7 @@
                                                                                                     </th>
                                                                                                     <td colspan="2"
                                                                                                         class="text-right ipdbilltable">
-                                                                                                        <input
-                                                                                                            type="text"
+                                                                                                        <input type="text"
                                                                                                             placeholder="Net Amount"
                                                                                                             value="0"
                                                                                                             name="amount"
@@ -2483,7 +2467,10 @@
                                                                                                     <label for=""
                                                                                                         class="form-label">Charge
                                                                                                         Note</label>
-                                                                                                    <textarea name="note" id="edit_note" rows="3" class="form-control edit_charge_note"></textarea>
+                                                                                                    <textarea name="note"
+                                                                                                        id="edit_note"
+                                                                                                        rows="3"
+                                                                                                        class="form-control edit_charge_note"></textarea>
                                                                                                 </div>
                                                                                             </div>
                                                                                         </div>
@@ -2495,15 +2482,13 @@
                                                                                             <small class="req">
                                                                                                 *</small>
                                                                                             <input id="charge_date"
-                                                                                                name="date"
-                                                                                                placeholder=""
+                                                                                                name="date" placeholder=""
                                                                                                 type="text"
                                                                                                 class="form-control datetime">
                                                                                         </div>
                                                                                         <button type="submit"
                                                                                             data-loading-text="Processing..."
-                                                                                            name="charge_data"
-                                                                                            value="add"
+                                                                                            name="charge_data" value="add"
                                                                                             class="btn btn-primary pull-right"><i
                                                                                                 class="fa fa-check-circle"></i>
                                                                                             Add</button>
@@ -2583,26 +2568,29 @@
                                                         </thead>
                                                         <tbody>
                                                             {{-- @php
-                                                    $taxAmount =
-                                                        ($charge->charge->standard_charge *
+                                                            $taxAmount =
+                                                            ($charge->charge->standard_charge *
                                                             $charge->charge->taxCategory->percentage) /
-                                                        100;
-                                                    $amount = $charge->charge->standard_charge + $taxAmount;
-                                                @endphp
-                                                <tr>
-                                                    <td>
-                                                        {{ $charge->charge->name }}
-                                                    </td>
-                                                    <td style="text-transform: capitalize;">
-                                                        {{ $charge->chargeCategory->chargeType->charge_type }}</td>
-                                                    <td class="text-right">{{ $charge->charge->standard_charge }}</td>
-                                                    <td class="text-right">
-                                                        ({{ $charge->charge->taxCategory->percentage }}%)
-                                                        {{ $taxAmount }}
-                                                    </td>
-                                                    <td class="text-right">{{ $charge->charge->standard_charge }}</td>
-                                                    <td class="text-right">{{ $amount }}</td>
-                                                </tr> --}}
+                                                            100;
+                                                            $amount = $charge->charge->standard_charge + $taxAmount;
+                                                            @endphp
+                                                            <tr>
+                                                                <td>
+                                                                    {{ $charge->charge->name }}
+                                                                </td>
+                                                                <td style="text-transform: capitalize;">
+                                                                    {{ $charge->chargeCategory->chargeType->charge_type }}
+                                                                </td>
+                                                                <td class="text-right">{{ $charge->charge->standard_charge
+                                                                    }}</td>
+                                                                <td class="text-right">
+                                                                    ({{ $charge->charge->taxCategory->percentage }}%)
+                                                                    {{ $taxAmount }}
+                                                                </td>
+                                                                <td class="text-right">{{ $charge->charge->standard_charge
+                                                                    }}</td>
+                                                                <td class="text-right">{{ $amount }}</td>
+                                                            </tr> --}}
                                                             @foreach ($opdCharges as $charge)
                                                                 @php
                                                                     $taxAmount =
@@ -2645,14 +2633,12 @@
                                                                                     title="Print"></i></a>
                                                                             <a href="javascript: void(0);"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                                                <i class="ti ti-pencil"
-                                                                                    data-bs-toggle="tooltip"
+                                                                                <i class="ti ti-pencil" data-bs-toggle="tooltip"
                                                                                     title="Edit"></i></a>
 
                                                                             <a href="javascript: void(0);"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                                <i class="ti ti-trash"
-                                                                                    data-bs-toggle="tooltip"
+                                                                                <i class="ti ti-trash" data-bs-toggle="tooltip"
                                                                                     title="Delete"></i></a>
                                                                         </div>
                                                                     </td>
@@ -2712,8 +2698,7 @@
                                                                     <div class="modal-header"
                                                                         style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
-                                                                        <h5 class="modal-title"
-                                                                            id="addSpecializationLabel">
+                                                                        <h5 class="modal-title" id="addSpecializationLabel">
                                                                             Add Payment
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
@@ -2726,22 +2711,19 @@
                                                                         <div class="row gy-3">
 
                                                                             <div class="col-md-6">
-                                                                                <label for="date"
-                                                                                    class="form-label">Date
+                                                                                <label for="date" class="form-label">Date
                                                                                     <span class="text-danger">*</span>
                                                                                 </label>
-                                                                                <input type="date" name="date"
-                                                                                    id="date" class="form-control"
-                                                                                    required>
+                                                                                <input type="date" name="date" id="date"
+                                                                                    class="form-control" required>
                                                                             </div>
                                                                             <div class="col-md-6">
                                                                                 <label for="amount"
                                                                                     class="form-label">Amount (INR)
                                                                                     <span class="text-danger">*</span>
                                                                                 </label>
-                                                                                <input type="text" name="amount"
-                                                                                    id="amount" class="form-control"
-                                                                                    required>
+                                                                                <input type="text" name="amount" id="amount"
+                                                                                    class="form-control" required>
                                                                             </div>
                                                                             <div class="col-md-6">
                                                                                 <label for="payment_mode"
@@ -2755,10 +2737,10 @@
                                                                                 </select>
                                                                             </div>
                                                                             <div class="col-md-6">
-                                                                                <label for="note"
-                                                                                    class="form-label">Note
+                                                                                <label for="note" class="form-label">Note
                                                                                 </label>
-                                                                                <textarea name="note" id="note" class="form-control"></textarea>
+                                                                                <textarea name="note" id="note"
+                                                                                    class="form-control"></textarea>
                                                                             </div>
                                                                         </div>
 
@@ -2804,13 +2786,11 @@
                                                                                 title="Print"></i></a>
                                                                         <a href="javascript: void(0);"
                                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
-                                                                            <i class="ti ti-pencil"
-                                                                                data-bs-toggle="tooltip"
+                                                                            <i class="ti ti-pencil" data-bs-toggle="tooltip"
                                                                                 title="Show"></i></a>
                                                                         <a href="javascript: void(0);"
                                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                            <i class="ti ti-trash"
-                                                                                data-bs-toggle="tooltip"
+                                                                            <i class="ti ti-trash" data-bs-toggle="tooltip"
                                                                                 title="Show"></i></a>
                                                                     </div>
                                                                 </td>
@@ -2939,8 +2919,7 @@
                                                                     <div class="modal-header"
                                                                         style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
-                                                                        <h5 class="modal-title"
-                                                                            id="addSpecializationLabel">
+                                                                        <h5 class="modal-title" id="addSpecializationLabel">
                                                                             Add Timeline
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
@@ -2953,26 +2932,26 @@
                                                                         <div class="row gy-3">
 
                                                                             <div class="col-md-12">
-                                                                                <label for="title"
-                                                                                    class="form-label">Title
+                                                                                <label for="title" class="form-label">Title
                                                                                     <span class="text-danger">*</span>
                                                                                 </label>
-                                                                                <input type="text" name="title"
-                                                                                    id="title" class="form-control">
+                                                                                <input type="text" name="title" id="title"
+                                                                                    class="form-control">
                                                                             </div>
                                                                             <div class="col-md-12">
-                                                                                <label for="date"
-                                                                                    class="form-label">Date
+                                                                                <label for="date" class="form-label">Date
                                                                                     <span class="text-danger">*</span>
                                                                                 </label>
-                                                                                <input type="date" name="date"
-                                                                                    id="date" class="form-control">
+                                                                                <input type="date" name="date" id="date"
+                                                                                    class="form-control">
                                                                             </div>
                                                                             <div class="col-md-12">
                                                                                 <label for="description"
                                                                                     class="form-label">Description
                                                                                 </label>
-                                                                                <textarea name="description" id="description" class="form-control"></textarea>
+                                                                                <textarea name="description"
+                                                                                    id="description"
+                                                                                    class="form-control"></textarea>
                                                                             </div>
                                                                             <div class="col-md-12">
                                                                                 <label for="attch_doc"
@@ -2987,9 +2966,8 @@
                                                                                     this
                                                                                     person
                                                                                 </label>
-                                                                                <input type="checkbox"
-                                                                                    name="visible_person" id="date"
-                                                                                    class="form-check-input">
+                                                                                <input type="checkbox" name="visible_person"
+                                                                                    id="date" class="form-check-input">
                                                                             </div>
                                                                         </div>
 
@@ -3032,8 +3010,7 @@
                                                                     <div class="d-flex gap-2">
                                                                         <a href="javascript: void(0);"
                                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                            <i class="ti ti-menu"
-                                                                                data-bs-toggle="tooltip"
+                                                                            <i class="ti ti-menu" data-bs-toggle="tooltip"
                                                                                 title="Show"></i></a>
                                                                     </div>
                                                                 </td>
@@ -3115,8 +3092,7 @@
                                                                     <div class="d-flex gap-2">
                                                                         <a href="javascript: void(0);"
                                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                            <i class="ti ti-menu"
-                                                                                data-bs-toggle="tooltip"
+                                                                            <i class="ti ti-menu" data-bs-toggle="tooltip"
                                                                                 title="Show"></i></a>
                                                                     </div>
                                                                 </td>
@@ -3175,8 +3151,7 @@
                                                                     <div class="modal-header"
                                                                         style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
-                                                                        <h5 class="modal-title"
-                                                                            id="addSpecializationLabel">
+                                                                        <h5 class="modal-title" id="addSpecializationLabel">
                                                                             Add Vitals
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
@@ -3196,8 +3171,7 @@
                                                                                         class="form-label">Vital
                                                                                         Name</label>
                                                                                     <select class="form-select"
-                                                                                        name="vital_name[]"
-                                                                                        id="vital_name">
+                                                                                        name="vital_name[]" id="vital_name">
                                                                                         <option value="">Select
                                                                                         </option>
                                                                                         <option value="1">1</option>
@@ -3208,8 +3182,7 @@
                                                                                     <label for="vital_value"
                                                                                         class="form-label">Vital
                                                                                         Value</label>
-                                                                                    <input type="text"
-                                                                                        name="vital_value[]"
+                                                                                    <input type="text" name="vital_value[]"
                                                                                         id="vital_value"
                                                                                         class="form-control" />
                                                                                 </div>
@@ -3218,8 +3191,7 @@
                                                                                     <label for="date"
                                                                                         class="form-label">Date</label>
                                                                                     <input type="date" name="date[]"
-                                                                                        id="date"
-                                                                                        class="form-control" />
+                                                                                        id="date" class="form-control" />
                                                                                 </div>
                                                                                 <!-- Remove -->
                                                                                 <div
@@ -3233,8 +3205,8 @@
                                                                             </div>
                                                                         </div>
                                                                         <div class="mt-2">
-                                                                            <button type="button"
-                                                                                class="btn btn-primary" id="addBtn">
+                                                                            <button type="button" class="btn btn-primary"
+                                                                                id="addBtn">
                                                                                 <i class="ti ti-plus"></i> Add Operation
                                                                             </button>
                                                                         </div>
@@ -3280,8 +3252,7 @@
                                                                     <div class="d-flex gap-2">
                                                                         <a href="javascript: void(0);"
                                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                            <i class="ti ti-menu"
-                                                                                data-bs-toggle="tooltip"
+                                                                            <i class="ti ti-menu" data-bs-toggle="tooltip"
                                                                                 title="Show"></i></a>
                                                                     </div>
                                                                 </td>
@@ -3306,15 +3277,16 @@
     <!-- tab content end -->
     </div>
     @include('components.modals.add-prescription-modal')
+    @include('components.modals.show-prescription-modal')
 
     <!-- Chart JS -->
     <script src="assets/plugins/chartjs/chart.min.js"></script>
     <script src="assets/plugins/chartjs/chart-data.js"></script>
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Re-initialize Select2 every time the modal is shown
-            $('#add_medication').on('shown.bs.modal', function() {
+            $('#add_medication').on('shown.bs.modal', function () {
                 $('#med_cat, #med_name, #dosage').select2({
                     width: '100%',
                     placeholder: 'Select',
@@ -3327,7 +3299,7 @@
 
     <!-- Chart.js -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             if (window.Chart) {
                 var ctx = document.getElementById('chartLine1').getContext('2d');
                 var chartLine1 = new Chart(ctx, {
@@ -3365,18 +3337,18 @@
     </script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             const addBtn = document.getElementById("addBtn");
             const vitalFields = document.getElementById("vitalFields");
 
             // Attach remove event to existing remove buttons
-            vitalFields.querySelectorAll(".remove-btn").forEach(function(btn) {
-                btn.addEventListener("click", function() {
+            vitalFields.querySelectorAll(".remove-btn").forEach(function (btn) {
+                btn.addEventListener("click", function () {
                     btn.closest(".vital-row").remove();
                 });
             });
 
-            addBtn.addEventListener("click", function() {
+            addBtn.addEventListener("click", function () {
                 // Clone the first row
                 let firstRow = vitalFields.querySelector(".vital-row");
                 let newRow = firstRow.cloneNode(true);
@@ -3389,7 +3361,7 @@
                 removeBtn.style.display = "inline-block";
 
                 // Attach remove event to the new button
-                removeBtn.addEventListener("click", function() {
+                removeBtn.addEventListener("click", function () {
                     newRow.remove();
                 });
 
