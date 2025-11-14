@@ -1,5 +1,6 @@
 {{-- resources/views/settings.blade.php --}}
 @extends('layouts.adminLayout')
+
 @section('content')
 
     <style>
@@ -201,7 +202,6 @@
 
 
     <div class="p-4">
-
         <!-- tab start -->
         <ul class="nav nav-tabs nav-bordered mb-3">
             <li class="nav-item">
@@ -259,7 +259,7 @@
                             <div class="card-body">
                                 <div class="d-sm-flex position-relative z-0 overflow-hidden p-2">
                                     <!-- <img src="assets/img/icons/shape-01.svg" alt="img"
-                                                                                                                                                                                                                                                    class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
+                                                                                                                                                                                                                                                        class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
                                     <a href="javascript:void(0);"
                                         class="avatar avatar-xxxl patient-avatar me-2 flex-shrink-0">
                                         <img src="assets/img/patient.png" alt="product" class="rounded">
@@ -341,19 +341,19 @@
                                         </div>
                                     </div>
                                     <!-- <div class="row">
-                                                                                                                                                                                                                                        <div class="col-sm-5">
+                                                                                                                                                                                                                                            <div class="col-sm-5">
 
-                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                        <div class="col-sm-7">
+                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                            <div class="col-sm-7">
 
-                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                        <div class="col-sm-5">
+                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                            <div class="col-sm-5">
 
-                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                        <div class="col-sm-7">
+                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                            <div class="col-sm-7">
 
-                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                    </div> -->
+                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                        </div> -->
                                 </div>
                                 <hr>
                                 <div class="d-flex align-items-center mb-3">
@@ -626,7 +626,7 @@
 
                                                                     <div class="modal-body">
 
-                                                                        <div class="row gy-3">
+                                                                        <div class="row p-4 mx-1 gy-3">
 
                                                                             <div class="col-md-8 border-end">
                                                                                 <div class="row gy-3">
@@ -939,7 +939,7 @@
 
                                                                     <div class="modal-body">
                                                                         <form>
-                                                                            <div class="row align-items-center gy-3">
+                                                                            <div class="row p-4 mx-1 align-items-center gy-3">
                                                                                 <div class="col-lg-6 col-md-6 col-sm-6">
                                                                                     <div class="form-group">
                                                                                         <label
@@ -1351,6 +1351,7 @@
                         </div>
                     </div>
                 </div>
+                @include('components.modals.add-prescription-modal')
             </div>
             <div class="tab-pane" id="lab_investigation">
                 <!-- row start -->
@@ -1544,7 +1545,7 @@
                                                                     </div>
                                                                     <div class="modal-body">
                                                                         <form>
-                                                                            <div class="row gy-3">
+                                                                            <div class="row p-4 mx-1 gy-3">
                                                                                 <div class="col-md-12">
                                                                                     <label for="timeline_title"
                                                                                         class="form-label">Title
@@ -1716,7 +1717,7 @@
 
 
                                                                         <div id="vitalFields">
-                                                                            <div class="row gy-3 vital-row mb-2">
+                                                                            <div class="row gy-3 vital-row mb-2 p-4 mx-1">
                                                                                 <!-- Vital Name -->
                                                                                 <div class="col-md-4">
                                                                                     <label for="vital_name"
@@ -1822,12 +1823,9 @@
                 </div>
             </div>
         </div>
-    </div>
-    </div>
-    <!-- row end -->
-    </div>
-    </div>
-    <!-- tab content end -->
+
+    {{-- @include('components.modals.add-prescription-modal') --}}
+
     </div>
 
     <!-- FontAwesome for icons -->
@@ -1908,8 +1906,5 @@
         });
     </script>
 
-
-
-    @include('components.modals.add-prescription-modal')
 
 @endsection

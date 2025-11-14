@@ -20,6 +20,7 @@ use App\Http\Controllers\FrontOfficeController;
 use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\InventoriesController;
 use App\Http\Controllers\MedicineCategoryController;
+use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\MedicineGroupController;
 use App\Http\Controllers\Modules\IpdController;
 use App\Http\Controllers\Modules\OpdController;
@@ -290,11 +291,20 @@ Route::middleware(['admin'])->group(function () {
     Route::put('/income/update', [IncomeController::class, 'update'])->name('income.update');
     Route::delete('/income/destroy', [IncomeController::class, 'destroy'])->name('income.destroy');
 
-    Route::get('/expense', [ExpenseController::class, 'index'])->name('expenses');
+    Route::get('/expense', [ExpenseController::class, 'index'])->name('expense');
+    Route::post('/expense/create', [ExpenseController::class, 'create'])->name('expense.create');
+    Route::put('/expense/update', [ExpenseController::class, 'update'])->name('expense.update');
+    Route::delete('/expense/delete', [ExpenseController::class, 'delete'])->name('expense.delete');
 
     Route::get('/birth', [BirthController::class, 'index'])->name('birth');
+    Route::post('/birth/create', [BirthController::class, 'create'])->name('birth.create');
+    Route::put('/birth/update', [BirthController::class, 'update'])->name('birth.update');
+    Route::delete('/birth/delete', [BirthController::class, 'delete'])->name('birth.delete');
 
     Route::get('/death', [DeathController::class, 'index'])->name('death');
+    Route::post('/death/create', [DeathController::class, 'create'])->name('death.create');
+    Route::put('/death/update', [DeathController::class, 'update'])->name('death.update');
+    Route::delete('/death/delete', [DeathController::class, 'delete'])->name('death.delete');
 
     Route::get('/visitors', [VisitorsController::class, 'index'])->name('visitors');
 
@@ -316,6 +326,7 @@ Route::prefix('/pathology-unit')->group(function () {
     Route::post('/store', [PathologyController::class, 'storeUnit'])->name('pathology-unit.store');
     Route::put('/update/{id}', [PathologyController::class, 'updateUnit'])->name('pathology-unit.update');
     Route::delete('/destroy/{id}', [PathologyController::class, 'destroyUnit'])->name('pathology-unit.destroy');
+    Route::get('/get_pathologies', [PathologyController::class, 'getPathologies'])->name('getPathologies');
 });
 Route::prefix('/pathology-parameter')->group(function () {
     Route::get('/', [PathologyController::class, 'pathologyParameters'])->name('pathology-parameter');
@@ -329,6 +340,7 @@ Route::post('/radiology-category/store', [RadiologyController::class, 'store'])-
 Route::put('/radiology-category/update', [RadiologyController::class, 'update'])->name('radiology-category.update');
 Route::post('/radiology-category/updateStatus/{id}', [RadiologyController::class, 'updateStatus'])->name('radiology-category.updateStatus');
 Route::delete('/radiology-category/delete/{id}', [RadiologyController::class, 'delete'])->name('radiology-category.delete');
+Route::get('/get_radiologies', [RadiologyController::class, 'getRadiologies'])->name('getRadiologies');
 
 Route::get('/radiology-unit', [RadiologyController::class, 'radiologyUnitIndex'])->name('radiology-unit');
 Route::post('/radiology-unit/store', [RadiologyController::class, 'storeUnit'])->name('radiology-unit.store');
@@ -367,6 +379,8 @@ Route::get('/finding-category', [FindingsController::class, 'indexCategory'])->n
 Route::post('/finding-category/storeCategory', [FindingsController::class, 'storeCategory'])->name('finding-category.storeCategory');
 Route::put('/finding-category/updateCategory', [FindingsController::class, 'updateCategory'])->name('finding-category.updateCategory');
 Route::delete('/finding-category/deleteCategory/{id}', [FindingsController::class, 'deleteCategory'])->name('finding-category.deleteCategory');
+Route::get('/get_finding_categories', [FindingsController::class, 'getFindingCategories'])->name('getFindingCategories');
+Route::post('/get_findings', [FindingsController::class, 'getFindings'])->name('getFindings');
 
 Route::prefix('/vital')->group(function () {
     Route::get('/', [VitalController::class, 'index'])->name('vitals');
@@ -472,6 +486,7 @@ Route::get('/getCharges/{id}', [OpdController::class, 'getCharges'])->name('getC
 Route::get('/getSymptomsTypes', [OpdController::class, 'getSymptomsType'])->name('getSymptomsTypes');
 Route::post('/getSymptoms', [OpdController::class, 'getSymptoms'])->name('getSymptoms');
 Route::get('/opd_view/{id}', [OpdController::class, 'showOpd'])->name('opd.show');
+Route::post('/add_prescription', [OpdController::class, 'storePrescription'])->name('opd.addPrescription');
 
 Route::get('/ipd', [IpdController::class, 'index'])->name('ipd');
 Route::post('/ipd/store', [IpdController::class, 'store'])->name('ipd.store');
@@ -770,15 +785,12 @@ Route::prefix('setup')->group(function () {
     Route::delete('/medicine-group/destroy/{id}', [SetupMedicineGroupController::class, 'destroy'])->name('setup.medicine-group.destroy');
 });
 
+Route::get('/getMedicineCategories', [MedicineController::class, 'getCategories'])->name('getMedicineCategories');
+Route::get('/getMedicines/{categoryId}', [MedicineController::class, 'getMedicines'])->name('getMedicines');
+Route::get('/getDoses/{categoryId}', [MedicineController::class, 'getDoses'])->name('getDoses');
+Route::get('/getDoseIntervals', [MedicineController::class, 'getIntervals'])->name('getDoseIntervals');
+Route::get('/getDoseDurations', [MedicineController::class, 'getDurations'])->name('getDoseDurations');
 
-    Route::get('/blood_bank_status', function () {
-        return view('admin.blood-bank-doner.blood_bank_status');
-    })->name('blood_bank_status');
-
-    Route::prefix('staffs')->group(function () {
-         Route::get('/', [StaffController::class, 'index'])->name('staffs');
-         Route::get('/create', [StaffController::class, 'create'])->name('staffs');
-         Route::get('/import', [StaffController::class, 'index'])->name('Staff-import');
-          Route::get('/bulk-delete', [StaffController::class, 'index'])->name('Staffs.bulkDelete');
-    
-    });
+Route::get('/blood_bank_status', function () {
+    return view('admin.blood-bank-doner.blood_bank_status');
+})->name('blood_bank_status');

@@ -134,4 +134,19 @@ class FindingsController extends Controller
         }
         return redirect()->back()->with('success', 'Finding Category Successfully Deleted');
     }
+
+    public function getFindingCategories(Request $request)
+    {
+        // dd($id);
+        $categories = FindingCategory::all();
+        // dd($bedNumbers);
+        return response()->json($categories, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
+    }
+    public function getFindings(Request $request)
+    {
+        $categoryIds = $request->input('category_ids', []);
+        $findings    = Finding::whereIn('finding_category_id', $categoryIds)->get();
+        // dd($bedNumbers);
+        return response()->json($findings, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
+    }
 }

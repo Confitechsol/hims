@@ -1179,4 +1179,4 @@
     // Initialize both editors
     initEditor('toolbar-header', 'editor-header', 'formatBlock-header');
     initEditor('toolbar-footer', 'editor-footer', 'formatBlock-footer');
-</script><?php /**PATH C:\xampp\htdocs\hims\resources\views/components/modals/add-prescription-modal.blade.php ENDPATH**/ ?>
+</script><?php /**PATH C:\xampp82\htdocs\hims\resources\views/components/modals/add-prescription-modal.blade.php ENDPATH**/ ?>

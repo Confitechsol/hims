@@ -157,58 +157,79 @@
     </div>
     </div>
     </div>
-    <x-modals.form-modal type="add" id="createModal" title="Add TPA" action="{{ route('tpamanagement.store') }}"
+    <x-modals.form-modal type="add" id="createModal" title="Add Expense" action="{{ route('tpamanagement.store') }}"
         :fields="[
             [
-                'name' => 'organisation_name',
-                'label' => 'organisation Name',
+                'name' => 'expense_name',
+                'label' => 'Expense Head',
                 'type' => 'text',
                 'required' => true,
                 'size' => '5',
             ],
-            ['name' => 'code', 'label' => 'Code', 'type' => 'text', 'required' => true, 'size' => '3'],
-            ['name' => 'contact_no', 'label' => 'Phone', 'type' => 'text', 'required' => true, 'size' => '4'],
-            ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => true, 'size' => '12'],
+            ['name' => 'name', 'label' => 'Name', 'type' => 'text', 'required' => true, 'size' => '3'],
+            ['name' => 'invoice_number', 'label' => 'Invoice Number', 'type' => 'text', 'required' => true, 'size' => '4'],
+           
+           [
+    'name' => 'date',
+    'label' => 'Date',
+    'type' => 'date',
+    'required' => true,
+    'size' => '12'
+         ],
+
+           
             [
-                'name' => 'contact_person_name',
-                'label' => 'Contact Person Name',
+                'name' => 'amount',
+                'label' => 'Amount (INR) ',
                 'type' => 'text',
                 'required' => true,
                 'size' => '6',
             ],
+            ['name' => 'attach_document', 'label' => 'Attach Document', 'type' => 'file', 'required' => false, 'size' => '6',],
+
             [
-                'name' => 'contact_person_phone',
-                'label' => 'Contact Person Phone',
+                'name' => 'description',
+                'label' => 'Description',
                 'type' => 'text',
                 'required' => true,
                 'size' => '6',
             ],
         ]" :columns="3" />
-    <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Company Name"
+    <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Expense"
         action="{{ route('tpamanagement.update') }}" :fields="[
             ['name' => 'id', 'type' => 'hidden', 'required' => true],
             [
-                'name' => 'organisation_name',
-                'label' => 'organisation Name',
+                'name' => 'expense_name',
+                'label' => 'Expense Head',
                 'type' => 'text',
                 'required' => true,
                 'size' => '5',
             ],
-            ['name' => 'code', 'label' => 'Code', 'type' => 'text', 'required' => true, 'size' => '3'],
-            ['name' => 'contact_no', 'label' => 'Phone', 'type' => 'text', 'required' => true, 'size' => '4'],
-            ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => true, 'size' => '12'],
+            ['name' => 'name', 'label' => 'Name', 'type' => 'text', 'required' => true, 'size' => '3'],
+            ['name' => 'invoice_number', 'label' => 'Invoice Number', 'type' => 'text', 'required' => true, 'size' => '4'],
+           
+           [
+    'name' => 'date',
+    'label' => 'Date',
+    'type' => 'date',
+    'required' => true,
+    'size' => '12'
+         ],
+
+           
             [
-                'name' => 'contact_person_name',
-                'label' => 'Contact Person Name',
+                'name' => 'amount',
+                'label' => 'Amount (INR) ',
                 'type' => 'text',
                 'required' => true,
                 'size' => '6',
             ],
+            ['name' => 'attach_document', 'label' => 'Attach Document', 'type' => 'file', 'required' => false, 'size' => '6',],
+
             [
-                'name' => 'contact_person_phone',
-                'label' => 'Contact Person Phone',
+                'name' => 'description',
+                'label' => 'Description',
                 'type' => 'text',
-                'required' => true,
                 'size' => '6',
             ],
         ]" :columns="3" />
