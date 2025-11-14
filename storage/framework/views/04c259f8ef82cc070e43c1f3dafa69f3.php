@@ -1,6 +1,4 @@
-{{-- resources/views/settings.blade.php --}}
-@extends('layouts.adminLayout')
-@section('content')
+<?php $__env->startSection('content'); ?>
     <style>
         .module_billing {
             border-radius: 8px;
@@ -338,24 +336,24 @@
     </style>
 
     <div class="p-4">
-        @if (session('success'))
+        <?php if(session('success')): ?>
             <script>
                 Swal.fire({
                     icon: 'success',
-                    title: "{{ session('alertTitle') ?? 'Success' }}",
-                    text: "{{ session('success') }}",
+                    title: "<?php echo e(session('alertTitle') ?? 'Success'); ?>",
+                    text: "<?php echo e(session('success')); ?>",
                 });
             </script>
-        @endif
-        @if (session('error'))
+        <?php endif; ?>
+        <?php if(session('error')): ?>
             <script>
                 Swal.fire({
                     icon: 'error',
-                    title: "{{ session('alertTitle') ?? 'Error' }}",
-                    text: "{{ session('error') }}",
+                    title: "<?php echo e(session('alertTitle') ?? 'Error'); ?>",
+                    text: "<?php echo e(session('error')); ?>",
                 });
             </script>
-        @endif
+        <?php endif; ?>
 
         <!-- tab start -->
         <ul class="nav nav-tabs nav-bordered mb-3 flex-nowrap">
@@ -447,19 +445,15 @@
                     <div class="col-md-6">
 
                         <div class="card shadow-sm border-0 mt-2" style="border-radius: 16px;">
-                            {{-- <div class="card-header"
-                                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Virat Kohli (13)
-                                </h5>
-                            </div> --}}
-                            {{-- <div class="card-body"> --}}
+                            
+                            
                             <div class="patient-info-card">
                                 <!-- Header Section -->
                                 <div class="patient-header">
                                     <div class="header-content">
                                         <div class="patient-avatar-wrapper">
                                             <div class="patient-avatar">
-                                                <img src="{{ asset('assets/img/patient.png') }}" alt="Patient Photo">
+                                                <img src="<?php echo e(asset('assets/img/patient.png')); ?>" alt="Patient Photo">
                                             </div>
                                             <div class="avatar-badge">
                                                 <i class="fas fa-user-check"></i>
@@ -468,21 +462,22 @@
 
                                         <div class="patient-name-section">
                                             <div class="patient-id">
-                                                <i class="fas fa-id-card me-1"></i> OPD ID: {{ $opd->opd_no }}
+                                                <i class="fas fa-id-card me-1"></i> OPD ID: <?php echo e($opd->opd_no); ?>
+
                                             </div>
-                                            <h2 class="patient-name">{{ $opd->patient->patient_name }}</h2>
+                                            <h2 class="patient-name"><?php echo e($opd->patient->patient_name); ?></h2>
                                             <div class="patient-quick-info">
                                                 <div class="quick-info-item">
                                                     <i class="fas fa-mars"></i>
-                                                    <span>{{ $opd->patient->gender }}</span>
+                                                    <span><?php echo e($opd->patient->gender); ?></span>
                                                 </div>
                                                 <div class="quick-info-item">
                                                     <i class="fas fa-birthday-cake"></i>
-                                                    <span>{{ \Carbon\Carbon::parse($opd->patient->dob)->format('d-M-Y') }}</span>
+                                                    <span><?php echo e(\Carbon\Carbon::parse($opd->patient->dob)->format('d-M-Y')); ?></span>
                                                 </div>
                                                 <div class="quick-info-item">
                                                     <i class="fas fa-droplet"></i>
-                                                    <span>{{ $opd->patient->bloodGroup->name }}</span>
+                                                    <span><?php echo e($opd->patient->bloodGroup->name); ?></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -499,7 +494,7 @@
                                             </div>
                                             <div class="info-content">
                                                 <div class="info-label">Phone</div>
-                                                <div class="info-value">{{ $opd->patient->mobileno ?? '--' }}</div>
+                                                <div class="info-value"><?php echo e($opd->patient->mobileno ?? '--'); ?></div>
                                             </div>
                                         </div>
 
@@ -509,9 +504,9 @@
                                             </div>
                                             <div class="info-content">
                                                 <div class="info-label">Age</div>
-                                                <div class="info-value">{{ $opd->patient->age }} Year
-                                                    {{ $opd->patient->month }} Month {{ $opd->patient->day }} Days (As Of
-                                                    {{ \Carbon\Carbon::parse($opd->patient->as_of_date)->format('d/m/Y') }})
+                                                <div class="info-value"><?php echo e($opd->patient->age); ?> Year
+                                                    <?php echo e($opd->patient->month); ?> Month <?php echo e($opd->patient->day); ?> Days (As Of
+                                                    <?php echo e(\Carbon\Carbon::parse($opd->patient->as_of_date)->format('d/m/Y')); ?>)
                                                 </div>
                                             </div>
                                         </div>
@@ -522,7 +517,8 @@
                                             </div>
                                             <div class="info-content">
                                                 <div class="info-label">Guardian Name</div>
-                                                <div class="info-value empty">{{ $opd->patient->guardian_name ?? '--' }}
+                                                <div class="info-value empty"><?php echo e($opd->patient->guardian_name ?? '--'); ?>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -533,7 +529,7 @@
                                             </div>
                                             <div class="info-content">
                                                 <div class="info-label">Gender</div>
-                                                <div class="info-value">{{ $opd->patient->gender }}</div>
+                                                <div class="info-value"><?php echo e($opd->patient->gender); ?></div>
                                             </div>
                                         </div>
                                     </div>
@@ -551,7 +547,7 @@
                                             <div class="info-content">
                                                 <div class="info-label">TPA</div>
                                                 <div class="info-value empty">
-                                                    {{ $opd->patient->organisation->organisation_name ?? '--' }}</div>
+                                                    <?php echo e($opd->patient->organisation->organisation_name ?? '--'); ?></div>
                                             </div>
                                         </div>
 
@@ -562,7 +558,7 @@
                                             <div class="info-content">
                                                 <div class="info-label">TPA ID</div>
                                                 <div class="info-value empty">
-                                                    {{ $opd->patient->organisation->code ?? '--' }}</div>
+                                                    <?php echo e($opd->patient->organisation->code ?? '--'); ?></div>
                                             </div>
                                         </div>
 
@@ -572,7 +568,8 @@
                                             </div>
                                             <div class="info-content">
                                                 <div class="info-label">TPA Validity</div>
-                                                <div class="info-value empty">{{ $opd->patient->tpa_validity ?? '--' }}
+                                                <div class="info-value empty"><?php echo e($opd->patient->tpa_validity ?? '--'); ?>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -604,7 +601,7 @@
                                             class="fa-solid fa-tag text-primary"></i></span>
                                     <div class="d-flex align-items-center gap-2">
                                         <h6 class="about_patient fs-13 fw-bold mb-1"> Known Allergies :</h6>
-                                        <p class="patient_data mb-0">{{ $opd->allergies ?? '--' }}</p>
+                                        <p class="patient_data mb-0"><?php echo e($opd->allergies ?? '--'); ?></p>
                                     </div>
                                 </div>
                                 <div class="d-flex align-items-center mb-3 px-3">
@@ -622,116 +619,19 @@
                                         <h6 class=" fs-13 fw-bold mb-1"> Symptoms :</h6>
                                         <p class=" mb-0">
                                         <ul class="m-0">
-                                            @foreach ($symptoms as $symptom)
+                                            <?php $__currentLoopData = $symptoms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $symptom): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <li><i class="fa-regular fa-circle-check text-primary"></i>
-                                                    {{ $symptom->symptoms_title }}</li>
-                                            @endforeach
+                                                    <?php echo e($symptom->symptoms_title); ?></li>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </ul>
                                         </p>
                                     </div>
                                 </div>
 
                             </div>
-                            {{-- <div class="d-sm-flex position-relative z-0 overflow-hidden p-2">
-                                        <!-- <img src="assets/img/icons/shape-01.svg" alt="img"
-                                                                                                                                                                                                                                                                                                                                                class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
-                                        <a href="javascript:void(0);"
-                                            class="avatar avatar-xxxl patient-avatar me-2 flex-shrink-0">
-                                            <img src="{{ asset('assets/img/patient.png') }}" alt="product" class="rounded">
-                                        </a>
-                                        <div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-phone text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">Phone :</h6>
-                                                    <p class="patient_data mb-0">8910245678</p>
-                                                </div>
-                                            </div>
+                            
 
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-calendar-days text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">Age :</h6>
-                                                    <p class="patient_data mb-0">22 Year 9 Month 5 Days (As Of Date 10/06/2025)
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-hands-holding-child text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">Guardian Name :</h6>
-                                                    <p class="patient_data mb-0">--</p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-mars-and-venus text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">Gender :</h6>
-                                                    <p class="patient_data mb-0">Male</p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-users-gear text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">TPA :</h6>
-                                                    <p class="patient_data mb-0">--</p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-id-badge text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">TPA ID :</h6>
-                                                    <p class="patient_data mb-0">--</p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-user-check text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">TPA Validity :</h6>
-                                                    <p class="patient_data mb-0">--</p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-barcode text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">Barcode :</h6>
-                                                    <p class="patient_data mb-0">--</p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-qrcode text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">QR Code :</h6>
-                                                    <p class="patient_data mb-0">--</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!-- <div class="row">
-                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-5">
-
-                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-7">
-
-                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-5">
-
-                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-7">
-
-                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                </div> -->
-                                    </div> --}}
-
-                            {{-- </div> --}}
+                            
                         </div>
 
                         <div class="card shadow-sm border-0 mt-2">
@@ -747,12 +647,13 @@
                                     <a href="#">
                                         <div class="d-flex align-items-center mb-3 gap-2">
                                             <div class="patient_img">
-                                                <img src="{{ asset('assets/img/patient.png') }}" alt="product"
+                                                <img src="<?php echo e(asset('assets/img/patient.png')); ?>" alt="product"
                                                     class="rounded">
                                             </div>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="fs-13 fw-bold mb-1">
-                                                    {{ $opd->doctor->name . '(' . $opd->doctor->doctor_id . ')' ?? '--' }}
+                                                    <?php echo e($opd->doctor->name . '(' . $opd->doctor->doctor_id . ')' ?? '--'); ?>
+
                                                 </h6>
                                             </div>
                                         </div>
@@ -785,11 +686,11 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <h6 class="text-primary">OPD Payment/Billing</h6>
-                                        <span>{{ round(($opd->paid_amount / $opd->amount) * 100, 2) }}%</span>
+                                        <span><?php echo e(round(($opd->paid_amount / $opd->amount) * 100, 2)); ?>%</span>
                                         <div class="progress mb-3 mt-1" role="progressbar" aria-valuenow="68.18"
                                             aria-valuemin="0" aria-valuemax="100">
                                             <div class="progress-bar bg-gradient"
-                                                style="width: {{ ($opd->paid_amount / $opd->amount) * 100 }}%;"></div>
+                                                style="width: <?php echo e(($opd->paid_amount / $opd->amount) * 100); ?>%;"></div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -840,16 +741,17 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($medicationReport as $medication)
+                                            <?php $__currentLoopData = $medicationReport; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $medication): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <tr>
-                                                    <td>{{ $medication->date }}</td>
-                                                    <td>{{ $medication->pharmacy->medicine_name }}</td>
-                                                    <td>{{ $medication->medicineDosage->dosage }}
-                                                        {{ $medication->medicineDosage->unit->unit_name }}</td>
-                                                    <td>{{ $medication->time }}</td>
-                                                    <td>{{ $medication->remark }}</td>
+                                                    <td><?php echo e($medication->date); ?></td>
+                                                    <td><?php echo e($medication->pharmacy->medicine_name); ?></td>
+                                                    <td><?php echo e($medication->medicineDosage->dosage); ?>
+
+                                                        <?php echo e($medication->medicineDosage->unit->unit_name); ?></td>
+                                                    <td><?php echo e($medication->time); ?></td>
+                                                    <td><?php echo e($medication->remark); ?></td>
                                                 </tr>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
                                         </tbody>
                                     </table>
@@ -878,22 +780,24 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($labInvestigations as $lab)
+                                            <?php $__currentLoopData = $labInvestigations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $lab): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <tr>
                                                     <td>
-                                                        {{ $lab->pathology->test_name .
+                                                        <?php echo e($lab->pathology->test_name .
                                                             "
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     (" .
                                                             $lab->pathology->short_name .
-                                                            ')' }}
+                                                            ')'); ?>
+
                                                     </td>
                                                     <td>Pathology</td>
-                                                    <td>{{ '--' }}</td>
-                                                    <td>{{ \Carbon\Carbon::today()->copy()->addDays(intval($lab->pathology->report_days))->format('d-M-Y') }}
+                                                    <td><?php echo e('--'); ?></td>
+                                                    <td><?php echo e(\Carbon\Carbon::today()->copy()->addDays(intval($lab->pathology->report_days))->format('d-M-Y')); ?>
+
                                                     </td>
-                                                    <td>{{ $lab->approved_by ?? '--' }}</td>
+                                                    <td><?php echo e($lab->approved_by ?? '--'); ?></td>
                                                 </tr>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -920,15 +824,15 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($operationDetail as $operation)
+                                            <?php $__currentLoopData = $operationDetail; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $operation): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <tr>
-                                                    <td>{{ $operation->reference_no }}</td>
-                                                    <td>{{ $operation->date }}</td>
-                                                    <td>{{ $operation->operation->operation }}</td>
-                                                    <td>{{ $operation->operation->category->category }}</td>
-                                                    <td>{{ $operation->ot_technician }}</td>
+                                                    <td><?php echo e($operation->reference_no); ?></td>
+                                                    <td><?php echo e($operation->date); ?></td>
+                                                    <td><?php echo e($operation->operation->operation); ?></td>
+                                                    <td><?php echo e($operation->operation->category->category); ?></td>
+                                                    <td><?php echo e($operation->ot_technician); ?></td>
                                                 </tr>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -956,29 +860,31 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($opdCharges as $charge)
-                                                @php
+                                            <?php $__currentLoopData = $opdCharges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $charge): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <?php
                                                     $taxAmount =
                                                         ($charge->charge->standard_charge *
                                                             $charge->charge->taxCategory->percentage) /
                                                         100;
                                                     $amount = $charge->charge->standard_charge + $taxAmount;
-                                                @endphp
+                                                ?>
                                                 <tr>
                                                     <td>
-                                                        {{ $charge->charge->name }}
+                                                        <?php echo e($charge->charge->name); ?>
+
                                                     </td>
                                                     <td style="text-transform: capitalize;">
-                                                        {{ $charge->chargeCategory->chargeType->charge_type }}</td>
-                                                    <td class="text-right">{{ $charge->charge->standard_charge }}</td>
+                                                        <?php echo e($charge->chargeCategory->chargeType->charge_type); ?></td>
+                                                    <td class="text-right"><?php echo e($charge->charge->standard_charge); ?></td>
                                                     <td class="text-right">
-                                                        ({{ $charge->charge->taxCategory->percentage }}%)
-                                                        {{ $taxAmount }}
+                                                        (<?php echo e($charge->charge->taxCategory->percentage); ?>%)
+                                                        <?php echo e($taxAmount); ?>
+
                                                     </td>
-                                                    <td class="text-right">{{ $charge->charge->standard_charge }}</td>
-                                                    <td class="text-right">{{ $amount }}</td>
+                                                    <td class="text-right"><?php echo e($charge->charge->standard_charge); ?></td>
+                                                    <td class="text-right"><?php echo e($amount); ?></td>
                                                 </tr>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -1082,699 +988,15 @@
                                                                 class="btn btn-primary text-white ms-2 btn-md"
                                                                 data-bs-toggle="modal" data-is-hidden = "true"
                                                                 data-bs-target="#createOpdModal"
-                                                                data-patient='@json($opd->patient)'><i
+                                                                data-patient='<?php echo json_encode($opd->patient, 15, 512) ?>'><i
                                                                     class="ti ti-plus me-1"></i>New Checkup</a>
                                                         </div>
                                                         <!-- First Modal -->
-                                                        @include('components.modals.opd-create-modal')
-                                                        {{-- <div class="modal fade" id="add_appointment" tabindex="-1"
-                                                            aria-hidden="true">
-                                                            <div
-                                                                class="modal-dialog modal-dialog-centered modal-full-width">
-                                                                <div class="modal-content">
-
-                                                                    <div class="modal-header"
-                                                                        style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-
-                                                                        <h5 class="modal-title"
-                                                                            id="addSpecializationLabel">
-                                                                            Patient Details
-                                                                        </h5>
-                                                                        <button type="button" class="btn-close"
-                                                                            data-bs-dismiss="modal"></button>
-
-                                                                    </div>
-
-                                                                    <div class="modal-body">
-
-                                                                        <div class="row gy-3">
-
-                                                                            <div class="col-md-8 border-end">
-                                                                                <div class="row gy-3">
-                                                                                    <div class="col-md-10">
-                                                                                        <h3>
-                                                                                            Animesh Das (39)
-                                                                                        </h3>
-                                                                                        <p>Guardian : --</p>
-                                                                                        <p>Gender : Male</p>
-                                                                                        <p>Blood Group : A+</p>
-                                                                                        <p>Marital Status: Single</p>
-                                                                                        <p>Age: 41 Year 2 Month 27 Days (As
-                                                                                            Of Date 10/14/2025)</p>
-                                                                                        <p>Phone: --</p>
-                                                                                        <p>Email:
-                                                                                        </p>
-                                                                                        <p>Address: --</p>
-                                                                                        <p>Any Known Allergies: --</p>
-                                                                                        <p>Remarks: --</p>
-                                                                                        <p>TPA : --
-                                                                                        </p>
-                                                                                        <p>TPA ID : --</p>
-                                                                                        <p>TPA Validity : --</p>
-                                                                                        <p>National Identification
-                                                                                            Number : --</p>
-                                                                                    </div>
-                                                                                    <div class="col-md-2">
-                                                                                        <img src="assets/img/patient.png"
-                                                                                            alt="product"
-                                                                                            class="rounded thumbnail">
-                                                                                    </div>
-                                                                                    <hr>
-                                                                                    <div class="col-md-3">
-                                                                                        <label for="symptoms_type"
-                                                                                            class="form-label">Symptoms
-                                                                                            Type</label>
-                                                                                        <select class="form-select"
-                                                                                            id="symptoms_type">
-                                                                                            <option value="">Select
-                                                                                            </option>
-                                                                                            <option value="">General
-                                                                                            </option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                    <div class="col-md-3">
-                                                                                        <label for="symptoms_title"
-                                                                                            class="form-label">Symptoms
-                                                                                            Title </label>
-                                                                                        <input type="text"
-                                                                                            name="symptoms_title"
-                                                                                            id="symptoms_title"
-                                                                                            class="form-control">
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="symptoms_des"
-                                                                                            class="form-label">Symptoms
-                                                                                        </label>
-                                                                                        <textarea name="symptoms" id="symptoms" class="form-control"></textarea>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="note"
-                                                                                            class="form-label">Note</label>
-                                                                                        <textarea name="note" id="note" class="form-control"></textarea>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="allergies"
-                                                                                            class="form-label">Any Known
-                                                                                            Allergies</label>
-                                                                                        <textarea name="allergies" id="allergies" class="form-control"></textarea>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="col-md-4">
-                                                                                <div class="row gy-3">
-
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="appointment_date"
-                                                                                            class="form-label">Appointment
-                                                                                            Date <span
-                                                                                                class="text-danger">*</span></label>
-                                                                                        <input type="date"
-                                                                                            name="appointment_date"
-                                                                                            id="appointment_date"
-                                                                                            class="form-control">
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="case"
-                                                                                            class="form-label">Case</label>
-                                                                                        <input type="text"
-                                                                                            name="case" id="case"
-                                                                                            class="form-control">
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="casualty"
-                                                                                            class="form-label">Casualty</label>
-                                                                                        <select class="form-select"
-                                                                                            id="casualty">
-                                                                                            <option value="">Select
-                                                                                            </option>
-                                                                                            <option value="">No
-                                                                                            </option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="old_patient"
-                                                                                            class="form-label">Old
-                                                                                            Patient</label>
-                                                                                        <select class="form-select"
-                                                                                            id="old_patient">
-                                                                                            <option value="">Select
-                                                                                            </option>
-                                                                                            <option value="">No
-                                                                                            </option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="reference"
-                                                                                            class="form-label">Reference</label>
-                                                                                        <input type="text"
-                                                                                            name="reference"
-                                                                                            id="reference"
-                                                                                            class="form-control">
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="doctor"
-                                                                                            class="form-label">Consultant
-                                                                                            Doctor
-                                                                                            <span
-                                                                                                class="text-danger">*</span></label>
-                                                                                        <select class="form-select"
-                                                                                            id="doctor"
-                                                                                            data-placeholder="Select">
-                                                                                            <option value="">
-                                                                                            </option>
-                                                                                            <option value="1">Amitabh
-                                                                                                Kulkarni</option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <div
-                                                                                            class="form-check d-flex gap-2 mt-4">
-                                                                                            <input type="checkbox"
-                                                                                                name="tpa_check"
-                                                                                                id="tpa_check"
-                                                                                                class="form-check-input">
-                                                                                            <label for="tpa_check"
-                                                                                                class="form-check-label">Apply
-                                                                                                TPA</label>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="charge_category"
-                                                                                            class="form-label">Charge
-                                                                                            Category
-                                                                                        </label>
-                                                                                        <select class="form-select"
-                                                                                            id="charge_category"
-                                                                                            data-placeholder="Select">
-                                                                                            <option value="0">
-                                                                                            </option>
-                                                                                            <option value="1">OPD
-                                                                                                Doctor
-                                                                                                Fees</option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="charge"
-                                                                                            class="form-label">Charge
-                                                                                            <span
-                                                                                                class="text-danger">*</span></label>
-                                                                                        <select class="form-select"
-                                                                                            id="charge"
-                                                                                            data-placeholder="Select">
-                                                                                            <option value="">
-                                                                                            </option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="standard_charge"
-                                                                                            class="form-label">Standard
-                                                                                            Charge (INR)</label>
-                                                                                        <input type="text"
-                                                                                            readonly="true"
-                                                                                            name="standard_charge"
-                                                                                            id="standard_charge"
-                                                                                            class="form-control"
-                                                                                            value=""
-                                                                                            autocomplete="off" disabled>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="apply_charge"
-                                                                                            class="form-label">Applied
-                                                                                            Charge (INR) <span
-                                                                                                class="text-danger">*</span></label>
-                                                                                        <input type="text"
-                                                                                            name="amount"
-                                                                                            id="apply_charge"
-                                                                                            class="form-control">
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="discount_percentage"
-                                                                                            class="form-label">Discount</label>
-                                                                                        <div class="input-group">
-                                                                                            <input type="text"
-                                                                                                class="form-control discount_percentage"
-                                                                                                name="discount_percentage"
-                                                                                                id="discount_percentage"
-                                                                                                value="0"
-                                                                                                autocomplete="off">
-                                                                                            <span
-                                                                                                class="input-group-addon ">
-                                                                                                %</span>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="tax"
-                                                                                            class="form-label">Tax</label>
-                                                                                        <div class="input-group">
-                                                                                            <input type="text"
-                                                                                                class="form-control discount_percentage"
-                                                                                                name="tax"
-                                                                                                id="tax"
-                                                                                                value="0"
-                                                                                                autocomplete="off"
-                                                                                                readonly="true" disabled>
-                                                                                            <span
-                                                                                                class="input-group-addon ">
-                                                                                                %</span>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="amount"
-                                                                                            class="form-label">Amount
-                                                                                            (INR) <span
-                                                                                                class="text-danger">*</span></label>
-                                                                                        <input type="text"
-                                                                                            readonly="true" name="amount"
-                                                                                            id="amount"
-                                                                                            class="form-control"
-                                                                                            value=""
-                                                                                            autocomplete="off" disabled>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="payment_mode"
-                                                                                            class="form-label">Payment
-                                                                                            Mode</label>
-                                                                                        <select class="form-select"
-                                                                                            id="payment_mode">
-                                                                                            <option value="">Select
-                                                                                            </option>
-                                                                                            <option value="1">Case
-                                                                                            </option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="paid_amount"
-                                                                                            class="form-label">Paid
-                                                                                            Amount
-                                                                                            (INR) <span
-                                                                                                class="text-danger">*</span></label>
-                                                                                        <input type="text"
-                                                                                            name="paid_amount"
-                                                                                            id="paid_amount"
-                                                                                            class="form-control"
-                                                                                            value=""
-                                                                                            autocomplete="off">
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="live_con"
-                                                                                            class="form-label">Live
-                                                                                            Consultation</label>
-                                                                                        <select class="form-select"
-                                                                                            id="live_con">
-                                                                                            <option value="">Select
-                                                                                            </option>
-                                                                                            <option value="1">No
-                                                                                            </option>
-                                                                                        </select>
-                                                                                    </div>
-
-                                                                                </div>
-                                                                            </div>
-
-                                                                        </div>
-
-                                                                    </div>
-                                                                    <div class="modal-footer">
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary">Save &
-                                                                            Print</button>
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary">Save</button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div> --}}
+                                                        <?php echo $__env->make('components.modals.opd-create-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+                                                        
 
                                                         <!-- Second Modal (nested) -->
-                                                        {{-- <div class="modal fade" id="new_patient" tabindex="-1"
-                                                            aria-hidden="true">
-                                                            <div class="modal-dialog modal-dialog-centered modal-xl">
-                                                                <div class="modal-content">
-
-                                                                    <div class="modal-header"
-                                                                        style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                                                        <h5 class="modal-title">Add Patient</h5>
-                                                                        <button type="button" class="btn-close"
-                                                                            data-bs-dismiss="modal"></button>
-                                                                    </div>
-
-                                                                    <div class="modal-body">
-                                                                        <form>
-                                                                            <div class="row align-items-center gy-3">
-                                                                                <div class="col-lg-6 col-md-6 col-sm-6">
-                                                                                    <div class="form-group">
-                                                                                        <label
-                                                                                            class="form-label">Name</label><span
-                                                                                            class="text-danger">
-                                                                                            *</span>
-                                                                                        <input id="name"
-                                                                                            name="name" placeholder=""
-                                                                                            type="text"
-                                                                                            class="form-control"
-                                                                                            value=""
-                                                                                            autocomplete="off">
-                                                                                        <span class="text-danger"></span>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-lg-6 col-md-6 col-sm-6">
-                                                                                    <div class="form-group">
-                                                                                        <label class="form-label">Guardian
-                                                                                            Name</label>
-                                                                                        <input type="text"
-                                                                                            name="guardian_name"
-                                                                                            placeholder="" value=""
-                                                                                            class="form-control">
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-md-6 col-sm-12">
-                                                                                    <div class="row">
-                                                                                        <div class="col-sm-3">
-                                                                                            <div class="form-group">
-                                                                                                <label class="form-label">
-                                                                                                    Gender</label>
-                                                                                                <select class="form-select"
-                                                                                                    name="gender"
-                                                                                                    id="addformgender"
-                                                                                                    autocomplete="off">
-                                                                                                    <option value="">
-                                                                                                        Select</option>
-                                                                                                    <option value="Male">
-                                                                                                        Male</option>
-                                                                                                    <option value="Female">
-                                                                                                        Female</option>
-                                                                                                </select>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <div class="col-sm-4">
-                                                                                            <div class="form-group">
-                                                                                                <label for="dob"
-                                                                                                    class="form-label">Date
-                                                                                                    Of
-                                                                                                    Birth</label>
-                                                                                                <input type="text"
-                                                                                                    name="dob"
-                                                                                                    id="birth_date"
-                                                                                                    placeholder=""
-                                                                                                    class="form-control date patient_dob">
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <div class="col-sm-5"
-                                                                                            id="calculate">
-                                                                                            <div class="form-group">
-                                                                                                <label
-                                                                                                    class="form-label">Age
-                                                                                                    (yy-mm-dd)
-                                                                                                </label><small
-                                                                                                    class="req">
-                                                                                                    *</small>
-                                                                                                <div
-                                                                                                    style="clear: both;overflow: hidden;">
-                                                                                                    <input type="text"
-                                                                                                        placeholder="Year"
-                                                                                                        name="age[year]"
-                                                                                                        id="age_year"
-                                                                                                        value=""
-                                                                                                        class="form-control patient_age_year"
-                                                                                                        style="width: 30%; float: left;">
-
-                                                                                                    <input type="text"
-                                                                                                        id="age_month"
-                                                                                                        placeholder="Month"
-                                                                                                        name="age[month]"
-                                                                                                        value=""
-                                                                                                        class="form-control patient_age_month"
-                                                                                                        style="width: 36%;float: left; margin-left: 4px;">
-                                                                                                    <input type="text"
-                                                                                                        id="age_day"
-                                                                                                        placeholder="Day"
-                                                                                                        name="age[day]"
-                                                                                                        value=""
-                                                                                                        class="form-control patient_age_day"
-                                                                                                        style="width: 26%;float: left; margin-left: 4px;">
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div><!--./col-md-6-->
-                                                                                <div class="col-md-6 col-sm-12">
-                                                                                    <div class="row">
-                                                                                        <div class="col-sm-3">
-                                                                                            <div class="form-group">
-                                                                                                <label
-                                                                                                    class="form-label">Blood
-                                                                                                    Group</label>
-                                                                                                <select name="blood_group"
-                                                                                                    class="form-select">
-                                                                                                    <option value="">
-                                                                                                        Select</option>
-                                                                                                    <option value="1">
-                                                                                                        O+
-                                                                                                    </option>
-                                                                                                    <option value="2">
-                                                                                                        A+
-                                                                                                    </option>
-                                                                                                    <option value="3">
-                                                                                                        B+
-                                                                                                    </option>
-                                                                                                    <option value="4">
-                                                                                                        AB+</option>
-                                                                                                    <option value="5">
-                                                                                                        O-
-                                                                                                    </option>
-                                                                                                    <option value="6">
-                                                                                                        AB-</option>
-                                                                                                </select>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <div class="col-sm-3">
-                                                                                            <div class="form-group">
-                                                                                                <label for="pwd"
-                                                                                                    class="form-label">Marital
-                                                                                                    Status</label>
-                                                                                                <select
-                                                                                                    name="marital_status"
-                                                                                                    class="form-select"
-                                                                                                    autocomplete="off">
-                                                                                                    <option value="">
-                                                                                                        Select</option>
-                                                                                                    <option value="Single">
-                                                                                                        Single</option>
-                                                                                                    <option
-                                                                                                        value="Married">
-                                                                                                        Married</option>
-                                                                                                    <option
-                                                                                                        value="Widowed">
-                                                                                                        Widowed</option>
-                                                                                                    <option
-                                                                                                        value="Separated">
-                                                                                                        Separated
-                                                                                                    </option>
-                                                                                                    <option
-                                                                                                        value="Not Specified">
-                                                                                                        Not
-                                                                                                        Specified
-                                                                                                    </option>
-                                                                                                </select>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <div class="col-sm-6">
-                                                                                            <div class="form-group">
-                                                                                                <label
-                                                                                                    for="exampleInputFile"
-                                                                                                    class="form-label">
-                                                                                                    Patient Photo
-                                                                                                </label>
-                                                                                                <div>
-                                                                                                    <div
-                                                                                                        class="d-flex border rounded position-relative p-1 mb-3 text-center align-items-center">
-                                                                                                        <span
-                                                                                                            class="avatar avatar-sm bg-primary text-white me-2">
-                                                                                                            <i
-                                                                                                                class="ti ti-upload fs-16"></i>
-                                                                                                        </span>
-                                                                                                        <p class="mb-0">
-                                                                                                            Drop files
-                                                                                                            here</p>
-                                                                                                        <input
-                                                                                                            type="file"
-                                                                                                            class="position-absolute top-0 start-0 opacity-0 w-100 h-100">
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                                <span
-                                                                                                    class="text-danger"></span>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div><!--./col-md-6-->
-                                                                                <div class="col-sm-3">
-                                                                                    <div class="form-group">
-                                                                                        <label for="pwd"
-                                                                                            class="form-label">Phone</label>
-                                                                                        <input id="number"
-                                                                                            autocomplete="off"
-                                                                                            name="mobileno" type="text"
-                                                                                            placeholder=""
-                                                                                            class="form-control"
-                                                                                            value="">
-                                                                                        <span class="text-danger"></span>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-sm-3">
-                                                                                    <div class="form-group">
-                                                                                        <label
-                                                                                            class="form-label">Email</label>
-                                                                                        <input type="text"
-                                                                                            placeholder=""
-                                                                                            id="addformemail"
-                                                                                            value="" name="email"
-                                                                                            class="form-control">
-                                                                                        <span class="text-danger"></span>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-sm-6">
-                                                                                    <div class="form-group">
-                                                                                        <label for="address"
-                                                                                            class="form-label">Address</label>
-                                                                                        <input name="address"
-                                                                                            placeholder=""
-                                                                                            class="form-control">
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-sm-6">
-                                                                                    <div class="form-group">
-                                                                                        <label for="pwd"
-                                                                                            class="form-label">Remarks</label>
-                                                                                        <textarea name="note" id="note" class="form-control"></textarea>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-sm-6">
-                                                                                    <div class="form-group">
-                                                                                        <label for="email"
-                                                                                            class="form-label">Any Known
-                                                                                            Allergies</label>
-                                                                                        <textarea name="known_allergies" id="" placeholder="" class="form-control"></textarea>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-sm-4">
-                                                                                    <div class="form-group">
-                                                                                        <label for="tpa"
-                                                                                            class="form-label">TPA</label>
-                                                                                        <select class="form-select"
-                                                                                            name="organisation_id">
-                                                                                            <option value="">Select
-                                                                                            </option>
-                                                                                            <option value="5">MedoLogi
-                                                                                                TPA Pvt. Ltd.
-                                                                                            </option>
-                                                                                            <option value="4">Vidal
-                                                                                                Health TPA </option>
-                                                                                            <option value="3">
-                                                                                                Paramount
-                                                                                                Health Services
-                                                                                            </option>
-                                                                                            <option value="2">Raksha
-                                                                                                TPA
-                                                                                                Pvt. Ltd. </option>
-                                                                                            <option value="1">
-                                                                                                MediAssist
-                                                                                                TPA Pvt. Ltd.
-                                                                                            </option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-sm-4">
-                                                                                    <div class="form-group">
-                                                                                        <label for="insurance_id"
-                                                                                            class="form-label">TPA
-                                                                                            ID</label>
-                                                                                        <input name="insurance_id"
-                                                                                            placeholder=""
-                                                                                            class="form-control">
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-sm-4">
-                                                                                    <div class="form-group">
-                                                                                        <label for="validity"
-                                                                                            class="form-label">TPA
-                                                                                            Validity</label>
-                                                                                        <input name="validity"
-                                                                                            placeholder=""
-                                                                                            class="form-control date">
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-sm-4">
-                                                                                    <div class="form-group">
-                                                                                        <label class="form-label">National
-                                                                                            Identification
-                                                                                            Number</label>
-                                                                                        <input name="identification_number"
-                                                                                            placeholder=""
-                                                                                            class="form-control">
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-sm-4">
-                                                                                    <div class="form-group">
-                                                                                        <label for="height"
-                                                                                            class="form-label">Height</label>
-                                                                                        <input type="text"
-                                                                                            id="height" name="height"
-                                                                                            class="form-control"
-                                                                                            placeholder="Height (cm)"
-                                                                                            value="">
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-sm-4">
-                                                                                    <div class="form-group">
-                                                                                        <label for="weight"
-                                                                                            class="form-label">Weight</label>
-                                                                                        <input type="text"
-                                                                                            id="weight" name="weight"
-                                                                                            class="form-control"
-                                                                                            placeholder="Weight (kg)"
-                                                                                            value="">
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-sm-4">
-                                                                                    <div class="form-group">
-                                                                                        <label for="temperature"
-                                                                                            class="form-label">Temperature</label>
-                                                                                        <input type="text"
-                                                                                            id="temperature"
-                                                                                            name="temperature"
-                                                                                            class="form-control"
-                                                                                            placeholder="Temperature (°C)"
-                                                                                            value="">
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-sm-4">
-                                                                                    <div class="form-group">
-                                                                                        <label for="screen_tb"
-                                                                                            class="form-label">Screen
-                                                                                            TB</label>
-                                                                                        <select name="screen_tb"
-                                                                                            id="screen_tb"
-                                                                                            class="form-select">
-                                                                                            <option value="">Select
-                                                                                            </option>
-                                                                                            <option value="Yes">Yes
-                                                                                            </option>
-                                                                                            <option value="No">No
-                                                                                            </option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </form>
-                                                                    </div>
-                                                                    <div class="modal-footer">
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary">Save</button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div> --}}
+                                                        
                                                     </div>
                                                 </div>
                                                 <!-- Table start -->
@@ -1791,26 +1013,28 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @foreach ($opdVisits as $visit)
+                                                            <?php $__currentLoopData = $opdVisits; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $visit): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                 <tr>
                                                                     <td>
-                                                                        <h6 class="fs-14 mb-1">{{ $visit->visit_id }}
+                                                                        <h6 class="fs-14 mb-1"><?php echo e($visit->visit_id); ?>
+
                                                                         </h6>
                                                                     </td>
-                                                                    <td>{{ $visit->opd->appointment_date }}</td>
-                                                                    <td>{{ $visit->opd->doctor->name }}
-                                                                        ({{ $visit->opd->doctor->doctor_id }})
+                                                                    <td><?php echo e($visit->opd->appointment_date); ?></td>
+                                                                    <td><?php echo e($visit->opd->doctor->name); ?>
+
+                                                                        (<?php echo e($visit->opd->doctor->doctor_id); ?>)
                                                                     </td>
-                                                                    <td>{{ $visit->opd->reference }}</td>
+                                                                    <td><?php echo e($visit->opd->reference); ?></td>
                                                                     <td>
-                                                                        @if (isset($opdSymptoms[$visit->opd->opd_no]) && count($opdSymptoms[$visit->opd->opd_no]) > 0)
-                                                                            @foreach ($opdSymptoms[$visit->opd->opd_no] as $symptom)
+                                                                        <?php if(isset($opdSymptoms[$visit->opd->opd_no]) && count($opdSymptoms[$visit->opd->opd_no]) > 0): ?>
+                                                                            <?php $__currentLoopData = $opdSymptoms[$visit->opd->opd_no]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $symptom): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                                 <span
-                                                                                    class="badge bg-primary me-1">{{ $symptom->symptoms_title }}</span>
-                                                                            @endforeach
-                                                                        @else
+                                                                                    class="badge bg-primary me-1"><?php echo e($symptom->symptoms_title); ?></span>
+                                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                                        <?php else: ?>
                                                                             --
-                                                                        @endif
+                                                                        <?php endif; ?>
                                                                     </td>
                                                                     <td>
                                                                         <div class="d-flex gap-2">
@@ -1818,10 +1042,10 @@
                                                                             <a href="javascript: void(0);"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
                                                                                 <i class="fa-solid fa-prescription"
-                                                                                    {{-- data-bs-toggle="tooltip" --}}
+                                                                                    
                                                                                     data-bs-toggle="modal"
                                                                                     data-bs-target="#addPrescriptionModal"
-                                                                                    data-id="{{ $opd->id }}"
+                                                                                    data-id="<?php echo e($opd->id); ?>"
                                                                                     title="Add Prescription"></i></a>
                                                                             <a href="javascript: void(0);"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
@@ -1836,7 +1060,7 @@
                                                                         </div>
                                                                     </td>
                                                                 </tr>
-                                                            @endforeach
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1901,12 +1125,12 @@
                                                                     </div>
 
                                                                     <div class="modal-body">
-                                                                        <form action="{{ route('opd.createMedication') }}"
+                                                                        <form action="<?php echo e(route('opd.createMedication')); ?>"
                                                                             method="post">
-                                                                            @csrf
+                                                                            <?php echo csrf_field(); ?>
                                                                             <div class="row gy-3">
                                                                                 <input type="hidden" name="opd_id"
-                                                                                    value="{{ $opd->id }}">
+                                                                                    value="<?php echo e($opd->id); ?>">
                                                                                 <div class="col-md-6">
                                                                                     <label for="date"
                                                                                         class="form-label">Date
@@ -2000,19 +1224,22 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @foreach ($medicationReport as $medication)
+                                                            <?php $__currentLoopData = $medicationReport; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $medication): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                 <tr>
                                                                     <td>
                                                                         <h6 class="fs-14 mb-1">
-                                                                            {{ \Carbon\Carbon::parse($medication->date)->format('d-M-Y') }}&nbsp;{{ '(' . \Carbon\Carbon::parse($medication->date)->format('D') . ')' }}
+                                                                            <?php echo e(\Carbon\Carbon::parse($medication->date)->format('d-M-Y')); ?>&nbsp;<?php echo e('(' . \Carbon\Carbon::parse($medication->date)->format('D') . ')'); ?>
+
                                                                         </h6>
                                                                     </td>
-                                                                    <td>{{ $medication->pharmacy->medicine_name }}</td>
+                                                                    <td><?php echo e($medication->pharmacy->medicine_name); ?></td>
                                                                     <td> Time:
-                                                                        {{ \Carbon\Carbon::parse($medication->time)->format('h:i A') }}
-                                                                        {{ $medication->medicineDosage->dosage . $medication->medicineDosage->unit->unit_name }}<br>
+                                                                        <?php echo e(\Carbon\Carbon::parse($medication->time)->format('h:i A')); ?>
+
+                                                                        <?php echo e($medication->medicineDosage->dosage . $medication->medicineDosage->unit->unit_name); ?><br>
                                                                         Created By:
-                                                                        {{ $medication->generatedBy->userRole->name }}
+                                                                        <?php echo e($medication->generatedBy->userRole->name); ?>
+
                                                                     </td>
                                                                     <td>
                                                                         <div class="d-flex gap-2">
@@ -2029,7 +1256,7 @@
                                                                         </div>
                                                                     </td>
                                                                 </tr>
-                                                            @endforeach
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -2084,18 +1311,20 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @foreach ($labInvestigations as $lab)
+                                                            <?php $__currentLoopData = $labInvestigations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $lab): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                 <tr>
                                                                     <td>
                                                                         <h6 class="fs-14 mb-1">
-                                                                            {{ $lab->pathology->test_name . '(' . $lab->pathology->short_name . ')' }}
+                                                                            <?php echo e($lab->pathology->test_name . '(' . $lab->pathology->short_name . ')'); ?>
+
                                                                         </h6>
                                                                     </td>
                                                                     <td>Pathology</td>
-                                                                    <td>Pathology Center :{{ '--' }}</td>
-                                                                    <td>{{ \Carbon\Carbon::today()->copy()->addDays(intval($lab->pathology->report_days))->format('d-M-Y') }}
+                                                                    <td>Pathology Center :<?php echo e('--'); ?></td>
+                                                                    <td><?php echo e(\Carbon\Carbon::today()->copy()->addDays(intval($lab->pathology->report_days))->format('d-M-Y')); ?>
+
                                                                     </td>
-                                                                    <td>{{ $lab->approved_by ?? '--' }}</td>
+                                                                    <td><?php echo e($lab->approved_by ?? '--'); ?></td>
                                                                     <td>
                                                                         <div class="d-flex gap-2">
                                                                             <a href="javascript: void(0);"
@@ -2106,7 +1335,7 @@
                                                                         </div>
                                                                     </td>
                                                                 </tr>
-                                                            @endforeach
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -2161,17 +1390,18 @@
                                                         </thead>
                                                         <tbody>
 
-                                                            @foreach ($operationDetail as $operation)
+                                                            <?php $__currentLoopData = $operationDetail; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $operation): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                 <tr>
                                                                     <td>
                                                                         <h6 class="fs-14 mb-1">
-                                                                            {{ $operation->reference_no }}</h6>
+                                                                            <?php echo e($operation->reference_no); ?></h6>
                                                                     </td>
-                                                                    <td>{{ $operation->date }}</td>
-                                                                    <td>{{ $operation->operation->operation }}</td>
-                                                                    <td>{{ $operation->operation->category->category }}
+                                                                    <td><?php echo e($operation->date); ?></td>
+                                                                    <td><?php echo e($operation->operation->operation); ?></td>
+                                                                    <td><?php echo e($operation->operation->category->category); ?>
+
                                                                     </td>
-                                                                    <td>{{ $operation->ot_technician }}</td>
+                                                                    <td><?php echo e($operation->ot_technician); ?></td>
                                                                     <td>
                                                                         <div class="d-flex gap-2">
                                                                             <a href="javascript: void(0);"
@@ -2187,7 +1417,7 @@
                                                                         </div>
                                                                     </td>
                                                                 </tr>
-                                                            @endforeach
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -2582,29 +1812,9 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            {{-- @php
-                                                    $taxAmount =
-                                                        ($charge->charge->standard_charge *
-                                                            $charge->charge->taxCategory->percentage) /
-                                                        100;
-                                                    $amount = $charge->charge->standard_charge + $taxAmount;
-                                                @endphp
-                                                <tr>
-                                                    <td>
-                                                        {{ $charge->charge->name }}
-                                                    </td>
-                                                    <td style="text-transform: capitalize;">
-                                                        {{ $charge->chargeCategory->chargeType->charge_type }}</td>
-                                                    <td class="text-right">{{ $charge->charge->standard_charge }}</td>
-                                                    <td class="text-right">
-                                                        ({{ $charge->charge->taxCategory->percentage }}%)
-                                                        {{ $taxAmount }}
-                                                    </td>
-                                                    <td class="text-right">{{ $charge->charge->standard_charge }}</td>
-                                                    <td class="text-right">{{ $amount }}</td>
-                                                </tr> --}}
-                                                            @foreach ($opdCharges as $charge)
-                                                                @php
+                                                            
+                                                            <?php $__currentLoopData = $opdCharges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $charge): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                <?php
                                                                     $taxAmount =
                                                                         ($charge->charge->standard_charge *
                                                                             $charge->charge->taxCategory->percentage) /
@@ -2617,25 +1827,27 @@
                                                                         $charge->charge->standard_charge -
                                                                         $discountAmount +
                                                                         $taxAmount;
-                                                                @endphp
+                                                                ?>
                                                                 <tr>
                                                                     <td>
-                                                                        {{ \Carbon\Carbon::parse($charge->created_at)->format('d-M-Y') }}
+                                                                        <?php echo e(\Carbon\Carbon::parse($charge->created_at)->format('d-M-Y')); ?>
+
                                                                     </td>
-                                                                    <td>{{ $charge->charge->name }}</td>
+                                                                    <td><?php echo e($charge->charge->name); ?></td>
                                                                     <td style="text-transform: capitalize;">
-                                                                        {{ $charge->chargeCategory->chargeType->charge_type }}
+                                                                        <?php echo e($charge->chargeCategory->chargeType->charge_type); ?>
+
                                                                     </td>
-                                                                    <td>{{ $charge->chargeCategory->name }} </td>
+                                                                    <td><?php echo e($charge->chargeCategory->name); ?> </td>
                                                                     <td>1</td>
-                                                                    <td>{{ $charge->charge->standard_charge }}</td>
-                                                                    <td>{{ $charge->charge->standard_charge }}</td>
+                                                                    <td><?php echo e($charge->charge->standard_charge); ?></td>
+                                                                    <td><?php echo e($charge->charge->standard_charge); ?></td>
                                                                     <td>0.00</td>
-                                                                    <td>{{ $discountAmount }}&nbsp;({{ $charge->discount }}%)
+                                                                    <td><?php echo e($discountAmount); ?>&nbsp;(<?php echo e($charge->discount); ?>%)
                                                                     </td>
-                                                                    <td>{{ $taxAmount }}&nbsp;({{ $charge->charge->taxCategory->percentage }}%)
+                                                                    <td><?php echo e($taxAmount); ?>&nbsp;(<?php echo e($charge->charge->taxCategory->percentage); ?>%)
                                                                     </td>
-                                                                    <td>{{ $amount }}</td>
+                                                                    <td><?php echo e($amount); ?></td>
                                                                     <td>
                                                                         <div class="d-flex gap-2">
                                                                             <a href="javascript: void(0);"
@@ -2657,7 +1869,7 @@
                                                                         </div>
                                                                     </td>
                                                                 </tr>
-                                                            @endforeach
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -3095,21 +2307,22 @@
                                                             <tr>
                                                                 <td>
                                                                     <h6 class="fs-14 mb-1"><a href="#"
-                                                                            class="fw-semibold">{{ $opd->opd_no }}</a>
+                                                                            class="fw-semibold"><?php echo e($opd->opd_no); ?></a>
                                                                     </h6>
                                                                 </td>
-                                                                <td>{{ '--' }}</td>
-                                                                <td> {{ $opd->appointment_date }}</td>
+                                                                <td><?php echo e('--'); ?></td>
+                                                                <td> <?php echo e($opd->appointment_date); ?></td>
                                                                 <td>
                                                                     <ul>
-                                                                        @foreach ($symptoms as $symptom)
+                                                                        <?php $__currentLoopData = $symptoms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $symptom): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                             <li><i
                                                                                     class="fa-regular fa-circle-check text-primary"></i>
-                                                                                {{ $symptom->symptoms_title }}</li>
-                                                                        @endforeach
+                                                                                <?php echo e($symptom->symptoms_title); ?></li>
+                                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                     </ul>
                                                                 </td>
-                                                                <td>{{ $opd->doctor->name }}
+                                                                <td><?php echo e($opd->doctor->name); ?>
+
                                                                 </td>
                                                                 <td>
                                                                     <div class="d-flex gap-2">
@@ -3305,7 +2518,7 @@
     </div>
     <!-- tab content end -->
     </div>
-    @include('components.modals.add-prescription-modal')
+    <?php echo $__env->make('components.modals.add-prescription-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
     <!-- Chart JS -->
     <script src="assets/plugins/chartjs/chart.min.js"></script>
@@ -3404,7 +2617,7 @@
         medCatSelect.innerHTML = '<option value="">Loading...</option>';
         medNameSelect.innerHTML = '<option value="">Loading...</option>';
         doseSelect.innerHTML = '<option value="">Loading...</option>';
-        fetch("{{ route('getMedicineCategories') }}")
+        fetch("<?php echo e(route('getMedicineCategories')); ?>")
             .then(response => response.json())
             .then(data => {
                 window.medicineCategories = data;
@@ -3413,7 +2626,7 @@
                     const option = document.createElement('option');
                     option.value = category.id;
                     option.textContent = category.medicine_category;
-                    if ("{{ old('med_cat') }}" == category.id) {
+                    if ("<?php echo e(old('med_cat')); ?>" == category.id) {
                         option.selected = true;
                     }
                     medCatSelect.appendChild(option);
@@ -3427,7 +2640,7 @@
         // Listen for Charge Category dropdown change
         medCatSelect.addEventListener('change', function() {
             const selectedId = this.value;
-            const baseUrl = "{{ route('getMedicines', ['categoryId' => 'ID']) }}";
+            const baseUrl = "<?php echo e(route('getMedicines', ['categoryId' => 'ID'])); ?>";
             const finalUrl = baseUrl.replace('ID', selectedId);
             fetch(finalUrl)
                 .then(response => response.json())
@@ -3438,7 +2651,7 @@
                         const option = document.createElement('option');
                         option.value = charge.id;
                         option.textContent = charge.medicine_name;
-                        if ("{{ old('med_name') }}" == charge.id) {
+                        if ("<?php echo e(old('med_name')); ?>" == charge.id) {
                             option.selected = true;
                         }
                         medNameSelect.appendChild(option);
@@ -3448,7 +2661,7 @@
                     console.error('Error fetching Charges:', error);
                     medNameSelect.innerHTML = '<option value="">Error loading options</option>';
                 });
-            const baseUrlDose = "{{ route('getDoses', ['categoryId' => 'ID']) }}";
+            const baseUrlDose = "<?php echo e(route('getDoses', ['categoryId' => 'ID'])); ?>";
             const finalUrlDose = baseUrlDose.replace('ID', selectedId);
             fetch(finalUrlDose)
                 .then(response => response.json())
@@ -3459,7 +2672,7 @@
                         const option = document.createElement('option');
                         option.value = charge.id;
                         option.textContent = charge.dosage + " " + charge.unit.unit_name;
-                        if ("{{ old('dosage') }}" == charge.id) {
+                        if ("<?php echo e(old('dosage')); ?>" == charge.id) {
                             option.selected = true;
                         }
                         doseSelect.appendChild(option);
@@ -3471,4 +2684,6 @@
                 });
         })
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\hims\resources\views/admin/opd/opd_view.blade.php ENDPATH**/ ?>

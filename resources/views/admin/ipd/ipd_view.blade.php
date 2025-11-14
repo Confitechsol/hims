@@ -34,409 +34,131 @@
             width: 45px;
         }
 
-        .patient-info-card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            overflow: hidden;
-            max-width: 900px;
-            margin: 0 auto;
+        .tabs-scroll-wrapper {
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            /* smooth scroll on mobile */
         }
 
-        /* Header Section */
-        .patient-header {
-            background: linear-gradient(-90deg, #75009673 0%, #cb6ce673 100%);
-            padding: 1.5rem;
-            position: relative;
-            overflow: hidden;
+        .tabs-scroll-wrapper::-webkit-scrollbar {
+            height: 6px;
+            /* optional */
         }
 
-        .patient-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -10%;
-            width: 300px;
-            height: 300px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-        }
-
-        .patient-header::after {
-            content: '';
-            position: absolute;
-            bottom: -30%;
-            left: -5%;
-            width: 200px;
-            height: 200px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 50%;
-        }
-
-        .header-content {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        /* Patient Avatar */
-        .patient-avatar-wrapper {
-            position: relative;
-        }
-
-        .patient-avatar {
-            width: 140px;
-            height: 140px;
-            border-radius: 16px;
-            overflow: hidden;
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            background: white;
-        }
-
-        .patient-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .avatar-badge {
-            position: absolute;
-            bottom: -8px;
-            right: -8px;
-            background: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            color: var(--primary-color);
-            font-size: 1.2rem;
-        }
-
-        /* Patient Name Section */
-        .patient-name-section {
-            flex: 1;
-            color: white;
-        }
-
-        .patient-id {
-            font-size: 0.875rem;
-            opacity: 0.9;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-
-        .patient-name {
-            font-size: 1.75rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .patient-quick-info {
-            display: grid;
-            grid-template-columns: 2fr 2fr;
-            gap: 0.5rem;
-            margin-top: 0.75rem;
-        }
-
-        .quick-info-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
-            opacity: 0.95;
-        }
-
-        .quick-info-item i {
-            font-size: 1rem;
-        }
-
-        /* Body Section */
-        .patient-body {
-            padding: 1.5rem;
-        }
-
-        /* Info Grid */
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-        }
-
-        /* Info Item */
-        .info-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-            padding: 1rem;
-            background: var(--bg-light);
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            border: 1px solid transparent;
-        }
-
-        .info-item:hover {
-            background: white;
-            border-color: var(--primary-light);
-            box-shadow: 0 4px 12px rgba(233, 30, 99, 0.08);
-            transform: translateY(-2px);
-        }
-
-        /* Icon Container */
-        .info-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(203, 108, 230, 0.25);
-        }
-
-        .info-icon i {
-            color: white;
-            font-size: 1.1rem;
-        }
-
-        /* Info Content */
-        .info-content {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .info-label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.35rem;
-        }
-
-        .info-value {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-dark);
-            word-break: break-word;
-        }
-
-        .info-value.empty {
-            color: var(--text-muted);
-            font-style: italic;
-            font-weight: 400;
-        }
-
-        /* Section Divider */
-        .section-divider {
-            display: flex;
-            align-items: center;
-            margin: 2rem 0 1.5rem;
-            gap: 1rem;
-        }
-
-        .section-divider::before,
-        .section-divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: linear-gradient(to right, transparent, var(--border-color), transparent);
-        }
-
-        .section-title {
-            font-size: 0.875rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .info-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-
-            .header-content {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-
-            .patient-quick-info {
-                flex-direction: column;
-                gap: 0.75rem;
-                align-items: center;
-            }
-
-            .patient-avatar {
-                width: 120px;
-                height: 120px;
-            }
-
-            .patient-name {
-                font-size: 1.5rem;
-            }
-
-            .patient-body {
-                padding: 1.5rem;
-            }
-
-            .action-buttons {
-                flex-direction: column;
-                padding: 1rem;
-            }
-        }
-
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .info-item {
-            animation: fadeInUp 0.4s ease-out;
-        }
-
-        .info-item:nth-child(1) {
-            animation-delay: 0.05s;
-        }
-
-        .info-item:nth-child(2) {
-            animation-delay: 0.1s;
-        }
-
-        .info-item:nth-child(3) {
-            animation-delay: 0.15s;
-        }
-
-        .info-item:nth-child(4) {
-            animation-delay: 0.2s;
-        }
-
-        .info-item:nth-child(5) {
-            animation-delay: 0.25s;
-        }
-
-        .info-item:nth-child(6) {
-            animation-delay: 0.3s;
+        .tabs-scroll-wrapper::-webkit-scrollbar-thumb {
+            background: #cfcfcf;
+            border-radius: 3px;
+            /* optional */
         }
     </style>
 
     <div class="p-4">
-        @if (session('success'))
-            <script>
-                Swal.fire({
-                    icon: 'success',
-                    title: "{{ session('alertTitle') ?? 'Success' }}",
-                    text: "{{ session('success') }}",
-                });
-            </script>
-        @endif
-        @if (session('error'))
-            <script>
-                Swal.fire({
-                    icon: 'error',
-                    title: "{{ session('alertTitle') ?? 'Error' }}",
-                    text: "{{ session('error') }}",
-                });
-            </script>
-        @endif
 
         <!-- tab start -->
-        <ul class="nav nav-tabs nav-bordered mb-3 flex-nowrap">
-            <li class="nav-item">
-                <a href="#overview" data-bs-toggle="tab" aria-expanded="false"
-                    class="d-flex align-items-center justify-space-between px-2 nav-link active bg-transparent"><i
-                        class="fa-solid fa-expand text-primary pe-1"></i>
-                    <span>Overview</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#visits" data-bs-toggle="tab" aria-expanded="true"
-                    class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
-                        class="fa-regular fa-square-caret-down text-primary pe-1"></i>
-                    <span>Visits</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#medication" data-bs-toggle="tab" aria-expanded="true"
-                    class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
-                        class="fa-solid fa-suitcase-medical text-primary pe-1"></i>
-                    <span>Medication</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#lab_investigation" data-bs-toggle="tab" aria-expanded="true"
-                    class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
-                        class="fa-solid fa-flask text-primary pe-1"></i>
-                    <span>Lab Investigation</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#operations" data-bs-toggle="tab" aria-expanded="true"
-                    class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
-                        class="fa-solid fa-scissors text-primary pe-1"></i>
-                    <span>Operations</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#charges" data-bs-toggle="tab" aria-expanded="true"
-                    class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
-                        class="fa-solid fa-circle-dollar-to-slot text-primary pe-1"></i>
-                    <span>Charges</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#payments" data-bs-toggle="tab" aria-expanded="true"
-                    class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
-                        class="fa-solid fa-hand-holding-dollar text-primary pe-1"></i>
-                    <span>Payments</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#live_consultation" data-bs-toggle="tab" aria-expanded="true"
-                    class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
-                        class="fa-solid fa-hand-holding-dollar text-primary pe-1"></i>
-                    <span>Live Consultation</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#timeline" data-bs-toggle="tab" aria-expanded="true"
-                    class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
-                        class="fa-solid fa-timeline text-primary pe-1"></i>
-                    <span>Timeline</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#treatment_history" data-bs-toggle="tab" aria-expanded="true"
-                    class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
-                        class="fa-solid fa-laptop-medical text-primary pe-1"></i>
-                    <span>Treatment History</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#vitals" data-bs-toggle="tab" aria-expanded="true"
-                    class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
-                        class="fa-solid fa-heart-pulse text-primary pe-1"></i>
-                    <span>Vitals</span>
-                </a>
-            </li>
-        </ul>
+        <div class="tabs-scroll-wrapper">
+            <ul class="nav nav-tabs nav-bordered mb-3 flex-nowrap">
+                <li class="nav-item">
+                    <a href="#overview" data-bs-toggle="tab" aria-expanded="false"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link active bg-transparent"><i
+                            class="fa-solid fa-expand text-primary pe-1"></i>
+                        <span>Overview</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#nurse_notes" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-regular fa-square-caret-down text-primary pe-1"></i>
+                        <span>Nurse Notes</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#medication" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-solid fa-suitcase-medical text-primary pe-1"></i>
+                        <span>Medication</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#lab_investigation" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-solid fa-flask text-primary pe-1"></i>
+                        <span>Lab Investigation</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#operations" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-solid fa-scissors text-primary pe-1"></i>
+                        <span>Operations</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#charges" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-solid fa-circle-dollar-to-slot text-primary pe-1"></i>
+                        <span>Charges</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#payments" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-solid fa-hand-holding-dollar text-primary pe-1"></i>
+                        <span>Payments</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#live_consultation" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-solid fa-hand-holding-dollar text-primary pe-1"></i>
+                        <span>Live Consultation</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#timeline" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-solid fa-timeline text-primary pe-1"></i>
+                        <span>Timeline</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#treatment_history" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-solid fa-laptop-medical text-primary pe-1"></i>
+                        <span>Treatment History</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#prescription" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-solid fa-file-prescription text-primary pe-1"></i>
+                        <span>Prescription</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#bed_hoistory" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-solid fa-bed-pulse text-primary pe-1"></i>
+                        <span>Bed History</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#bed_issue" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-solid fa-bed text-primary pe-1"></i>
+                        <span>Bed Issue</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#vitals" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-solid fa-heart-pulse text-primary pe-1"></i>
+                        <span>Vitals</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
         <!-- tab end -->
 
         <!-- tab content start -->
@@ -446,168 +168,121 @@
                 <div class="row">
                     <div class="col-md-6">
 
-                        <div class="card shadow-sm border-0 mt-2" style="border-radius: 16px;">
-                            {{-- <div class="card-header"
+                        <div class="card shadow-sm border-0 mt-2">
+                            <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                                 <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Virat Kohli (13)
                                 </h5>
-                            </div> --}}
-                            {{-- <div class="card-body"> --}}
-                            <div class="patient-info-card">
-                                <!-- Header Section -->
-                                <div class="patient-header">
-                                    <div class="header-content">
-                                        <div class="patient-avatar-wrapper">
-                                            <div class="patient-avatar">
-                                                <img src="{{ asset('assets/img/patient.png') }}" alt="Patient Photo">
-                                            </div>
-                                            <div class="avatar-badge">
-                                                <i class="fas fa-user-check"></i>
-                                            </div>
-                                        </div>
-
-                                        <div class="patient-name-section">
-                                            <div class="patient-id">
-                                                <i class="fas fa-id-card me-1"></i> OPD ID: {{ $opd->opd_no }}
-                                            </div>
-                                            <h2 class="patient-name">{{ $opd->patient->patient_name }}</h2>
-                                            <div class="patient-quick-info">
-                                                <div class="quick-info-item">
-                                                    <i class="fas fa-mars"></i>
-                                                    <span>{{ $opd->patient->gender }}</span>
-                                                </div>
-                                                <div class="quick-info-item">
-                                                    <i class="fas fa-birthday-cake"></i>
-                                                    <span>{{ \Carbon\Carbon::parse($opd->patient->dob)->format('d-M-Y') }}</span>
-                                                </div>
-                                                <div class="quick-info-item">
-                                                    <i class="fas fa-droplet"></i>
-                                                    <span>{{ $opd->patient->bloodGroup->name }}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Body Section -->
-                                <div class="patient-body">
-                                    <!-- Contact Information -->
-                                    <div class="info-grid">
-                                        <div class="info-item">
-                                            <div class="info-icon">
-                                                <i class="fa-solid fa-phone text-primary"></i>
-                                            </div>
-                                            <div class="info-content">
-                                                <div class="info-label">Phone</div>
-                                                <div class="info-value">{{ $opd->patient->mobileno ?? '--' }}</div>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-sm-flex position-relative z-0 overflow-hidden p-2">
+                                    <!-- <img src="assets/img/icons/shape-01.svg" alt="img"
+                                                                                                                                                                                                                                                                                                                                                                    class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
+                                    <a href="javascript:void(0);"
+                                        class="avatar avatar-xxxl patient-avatar me-2 flex-shrink-0">
+                                        <img src="assets/img/patient.png" alt="product" class="rounded">
+                                    </a>
+                                    <div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-phone text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">Phone :</h6>
+                                                <p class="patient_data mb-0">8910245678</p>
                                             </div>
                                         </div>
 
-                                        <div class="info-item">
-                                            <div class="info-icon">
-                                                <i class="fa-solid fa-calendar-days text-primary"></i>
-                                            </div>
-                                            <div class="info-content">
-                                                <div class="info-label">Age</div>
-                                                <div class="info-value">{{ $opd->patient->age }} Year
-                                                    {{ $opd->patient->month }} Month {{ $opd->patient->day }} Days (As Of
-                                                    {{ \Carbon\Carbon::parse($opd->patient->as_of_date)->format('d/m/Y') }})
-                                                </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-calendar-days text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">Age :</h6>
+                                                <p class="patient_data mb-0">22 Year 9 Month 5 Days (As Of Date 10/06/2025)
+                                                </p>
                                             </div>
                                         </div>
-
-                                        <div class="info-item">
-                                            <div class="info-icon">
-                                                <i class="fa-solid fa-hands-holding-child text-primary"></i>
-                                            </div>
-                                            <div class="info-content">
-                                                <div class="info-label">Guardian Name</div>
-                                                <div class="info-value empty">{{ $opd->patient->guardian_name ?? '--' }}
-                                                </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-hands-holding-child text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">Guardian Name :</h6>
+                                                <p class="patient_data mb-0">--</p>
                                             </div>
                                         </div>
-
-                                        <div class="info-item">
-                                            <div class="info-icon">
-                                                <i class="fa-solid fa-mars-and-venus text-primary"></i>
-                                            </div>
-                                            <div class="info-content">
-                                                <div class="info-label">Gender</div>
-                                                <div class="info-value">{{ $opd->patient->gender }}</div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-mars-and-venus text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">Gender :</h6>
+                                                <p class="patient_data mb-0">Male</p>
                                             </div>
                                         </div>
-                                    </div>
-
-                                    <!-- Insurance & Medical Information -->
-                                    <div class="section-divider">
-                                        <span class="section-title">Insurance & Medical Information</span>
-                                    </div>
-
-                                    <div class="info-grid">
-                                        <div class="info-item">
-                                            <div class="info-icon">
-                                                <i class="fa-solid fa-users-gear text-primary"></i>
-                                            </div>
-                                            <div class="info-content">
-                                                <div class="info-label">TPA</div>
-                                                <div class="info-value empty">
-                                                    {{ $opd->patient->organisation->organisation_name ?? '--' }}</div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-users-gear text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">TPA :</h6>
+                                                <p class="patient_data mb-0">--</p>
                                             </div>
                                         </div>
-
-                                        <div class="info-item">
-                                            <div class="info-icon">
-                                                <i class="fa-solid fa-id-badge text-primary"></i>
-                                            </div>
-                                            <div class="info-content">
-                                                <div class="info-label">TPA ID</div>
-                                                <div class="info-value empty">
-                                                    {{ $opd->patient->organisation->code ?? '--' }}</div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-id-badge text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">TPA ID :</h6>
+                                                <p class="patient_data mb-0">--</p>
                                             </div>
                                         </div>
-
-                                        <div class="info-item">
-                                            <div class="info-icon">
-                                                <i class="fa-solid fa-user-check text-primary"></i>
-                                            </div>
-                                            <div class="info-content">
-                                                <div class="info-label">TPA Validity</div>
-                                                <div class="info-value empty">{{ $opd->patient->tpa_validity ?? '--' }}
-                                                </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-user-check text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">TPA Validity :</h6>
+                                                <p class="patient_data mb-0">--</p>
                                             </div>
                                         </div>
-
-                                        <div class="info-item">
-                                            <div class="info-icon">
-                                                <i class="fa-solid fa-barcode text-primary"></i>
-                                            </div>
-                                            <div class="info-content">
-                                                <div class="info-label">Barcode</div>
-                                                <div class="info-value empty">--</div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-barcode text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">Barcode :</h6>
+                                                <p class="patient_data mb-0">--</p>
                                             </div>
                                         </div>
-
-                                        <div class="info-item">
-                                            <div class="info-icon">
-                                                <i class="fa-solid fa-qrcode text-primary"></i>
-                                            </div>
-                                            <div class="info-content">
-                                                <div class="info-label">QR Code</div>
-                                                <div class="info-value empty">--</div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-qrcode text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">QR Code :</h6>
+                                                <p class="patient_data mb-0">--</p>
                                             </div>
                                         </div>
                                     </div>
+                                    <!-- <div class="row">
+                                                                                                                                                                                                                                                                                                                                                        <div class="col-sm-5">
+
+                                                                                                                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                                                                                                                        <div class="col-sm-7">
+
+                                                                                                                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                                                                                                                        <div class="col-sm-5">
+
+                                                                                                                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                                                                                                                        <div class="col-sm-7">
+
+                                                                                                                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                                                                                                                    </div> -->
                                 </div>
                                 <hr>
-                                <div class="d-flex align-items-center mb-3 px-3">
+                                <div class="d-flex align-items-center mb-3">
                                     <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
                                             class="fa-solid fa-tag text-primary"></i></span>
                                     <div class="d-flex align-items-center gap-2">
                                         <h6 class="about_patient fs-13 fw-bold mb-1"> Known Allergies :</h6>
-                                        <p class="patient_data mb-0">{{ $opd->allergies ?? '--' }}</p>
+                                        <p class="patient_data mb-0">--</p>
                                     </div>
                                 </div>
-                                <div class="d-flex align-items-center mb-3 px-3">
+                                <div class="d-flex align-items-center mb-3">
                                     <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
                                             class="fa-solid fa-tag text-primary"></i></span>
                                     <div class="d-flex align-items-center gap-2">
@@ -615,123 +290,21 @@
                                         <p class="patient_data mb-0">--</p>
                                     </div>
                                 </div>
-                                <div class="d-flex align-items-center mb-3 px-3">
+                                <div class="d-flex align-items-center mb-3">
                                     <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
                                             class="fa-solid fa-tag text-primary"></i></span>
                                     <div class="d-flex align-items-center gap-2">
                                         <h6 class=" fs-13 fw-bold mb-1"> Symptoms :</h6>
                                         <p class=" mb-0">
-                                        <ul class="m-0">
-                                            @foreach ($symptoms as $symptom)
-                                                <li><i class="fa-regular fa-circle-check text-primary"></i>
-                                                    {{ $symptom->symptoms_title }}</li>
-                                            @endforeach
+                                        <ul>
+                                            <li><i class="fa-regular fa-circle-check text-primary"></i> Fever Chest Pain
+                                            </li>
+                                            <li><i class="fa-regular fa-circle-check text-primary"></i> Fever Fever</li>
                                         </ul>
                                         </p>
                                     </div>
                                 </div>
-
                             </div>
-                            {{-- <div class="d-sm-flex position-relative z-0 overflow-hidden p-2">
-                                        <!-- <img src="assets/img/icons/shape-01.svg" alt="img"
-                                                                                                                                                                                                                                                                                                                                                class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
-                                        <a href="javascript:void(0);"
-                                            class="avatar avatar-xxxl patient-avatar me-2 flex-shrink-0">
-                                            <img src="{{ asset('assets/img/patient.png') }}" alt="product" class="rounded">
-                                        </a>
-                                        <div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-phone text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">Phone :</h6>
-                                                    <p class="patient_data mb-0">8910245678</p>
-                                                </div>
-                                            </div>
-
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-calendar-days text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">Age :</h6>
-                                                    <p class="patient_data mb-0">22 Year 9 Month 5 Days (As Of Date 10/06/2025)
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-hands-holding-child text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">Guardian Name :</h6>
-                                                    <p class="patient_data mb-0">--</p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-mars-and-venus text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">Gender :</h6>
-                                                    <p class="patient_data mb-0">Male</p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-users-gear text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">TPA :</h6>
-                                                    <p class="patient_data mb-0">--</p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-id-badge text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">TPA ID :</h6>
-                                                    <p class="patient_data mb-0">--</p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-user-check text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">TPA Validity :</h6>
-                                                    <p class="patient_data mb-0">--</p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-barcode text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">Barcode :</h6>
-                                                    <p class="patient_data mb-0">--</p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-qrcode text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">QR Code :</h6>
-                                                    <p class="patient_data mb-0">--</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!-- <div class="row">
-                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-5">
-
-                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-7">
-
-                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-5">
-
-                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-7">
-
-                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                </div> -->
-                                    </div> --}}
-
-                            {{-- </div> --}}
                         </div>
 
                         <div class="card shadow-sm border-0 mt-2">
@@ -747,19 +320,29 @@
                                     <a href="#">
                                         <div class="d-flex align-items-center mb-3 gap-2">
                                             <div class="patient_img">
-                                                <img src="{{ asset('assets/img/patient.png') }}" alt="product"
-                                                    class="rounded">
+                                                <img src="assets/img/patient.png" alt="product" class="rounded">
                                             </div>
                                             <div class="d-flex align-items-center gap-2">
-                                                <h6 class="fs-13 fw-bold mb-1">
-                                                    {{ $opd->doctor->name . '(' . $opd->doctor->doctor_id . ')' ?? '--' }}
-                                                </h6>
+                                                <h6 class="fs-13 fw-bold mb-1">Anirban Ghosh (D010)</h6>
                                             </div>
                                         </div>
                                     </a>
 
                                 </div>
+                                <hr>
+                                <div>
+                                    <a href="#">
+                                        <div class="d-flex align-items-center mb-3 gap-2">
+                                            <div class="patient_img">
+                                                <img src="assets/img/patient.png" alt="product" class="rounded">
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="fs-13 fw-bold mb-1">Anjali Rao (D011)</h6>
+                                            </div>
+                                        </div>
+                                    </a>
 
+                                </div>
                             </div>
                         </div>
                         <div class="card shadow-sm border-0 mt-2">
@@ -777,19 +360,18 @@
                         <div class="card shadow-sm border-0 mt-2">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> OPD Payment /
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> IPD Payment /
                                     Billing
                                 </h5>
                             </div>
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <h6 class="text-primary">OPD Payment/Billing</h6>
-                                        <span>{{ round(($opd->paid_amount / $opd->amount) * 100, 2) }}%</span>
-                                        <div class="progress mb-3 mt-1" role="progressbar" aria-valuenow="68.18"
+                                        <h6 class="text-primary">IPD Payment/Billing</h6>
+                                        <span>92.31%</span>
+                                        <div class="progress mb-3 mt-1" role="progressbar" aria-valuenow="92.31"
                                             aria-valuemin="0" aria-valuemax="100">
-                                            <div class="progress-bar bg-gradient"
-                                                style="width: {{ ($opd->paid_amount / $opd->amount) * 100 }}%;"></div>
+                                            <div class="progress-bar bg-gradient" style="width: 90%;"></div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -809,6 +391,14 @@
                                         </div>
                                     </div>
                                     <div class="col-md-6">
+                                        <h6 class="text-primary">Radiology Payment/Billing</h6>
+                                        <span>0%</span>
+                                        <div class="progress mb-3 mt-1" role="progressbar" aria-valuenow="0"
+                                            aria-valuemin="0" aria-valuemax="100">
+                                            <div class="progress-bar" style="width: 0%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
                                         <h6 class="text-primary">Blood Bank Payment/Billing</h6>
                                         <span>0%</span>
                                         <div class="progress mb-3 mt-1" role="progressbar" aria-valuenow="0"
@@ -816,7 +406,14 @@
                                             <div class="progress-bar" style="width: 0%;"></div>
                                         </div>
                                     </div>
-
+                                    <div class="col-md-6">
+                                        <h6 class="text-primary">Ambulance Payment/Billing</h6>
+                                        <span>0%</span>
+                                        <div class="progress mb-0 mt-1" role="progressbar" aria-valuenow="0"
+                                            aria-valuemin="0" aria-valuemax="100">
+                                            <div class="progress-bar" style="width: 0%;"></div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -840,17 +437,9 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($medicationReport as $medication)
-                                                <tr>
-                                                    <td>{{ $medication->date }}</td>
-                                                    <td>{{ $medication->pharmacy->medicine_name }}</td>
-                                                    <td>{{ $medication->medicineDosage->dosage }}
-                                                        {{ $medication->medicineDosage->unit->unit_name }}</td>
-                                                    <td>{{ $medication->time }}</td>
-                                                    <td>{{ $medication->remark }}</td>
-                                                </tr>
-                                            @endforeach
+                                            <tr>
 
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -878,22 +467,16 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($labInvestigations as $lab)
-                                                <tr>
-                                                    <td>
-                                                        {{ $lab->pathology->test_name .
-                                                            "
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    (" .
-                                                            $lab->pathology->short_name .
-                                                            ')' }}
-                                                    </td>
-                                                    <td>Pathology</td>
-                                                    <td>{{ '--' }}</td>
-                                                    <td>{{ \Carbon\Carbon::today()->copy()->addDays(intval($lab->pathology->report_days))->format('d-M-Y') }}
-                                                    </td>
-                                                    <td>{{ $lab->approved_by ?? '--' }}</td>
-                                                </tr>
-                                            @endforeach
+                                            <tr>
+                                                <td>
+                                                    Lipid Profile
+                                                    (Lipid Profile)
+                                                </td>
+                                                <td>Pathology</td>
+                                                <td></td>
+                                                <td>09/21/2025</td>
+                                                <td></td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -920,15 +503,9 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($operationDetail as $operation)
-                                                <tr>
-                                                    <td>{{ $operation->reference_no }}</td>
-                                                    <td>{{ $operation->date }}</td>
-                                                    <td>{{ $operation->operation->operation }}</td>
-                                                    <td>{{ $operation->operation->category->category }}</td>
-                                                    <td>{{ $operation->ot_technician }}</td>
-                                                </tr>
-                                            @endforeach
+                                            <tr>
+
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -956,29 +533,16 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($opdCharges as $charge)
-                                                @php
-                                                    $taxAmount =
-                                                        ($charge->charge->standard_charge *
-                                                            $charge->charge->taxCategory->percentage) /
-                                                        100;
-                                                    $amount = $charge->charge->standard_charge + $taxAmount;
-                                                @endphp
-                                                <tr>
-                                                    <td>
-                                                        {{ $charge->charge->name }}
-                                                    </td>
-                                                    <td style="text-transform: capitalize;">
-                                                        {{ $charge->chargeCategory->chargeType->charge_type }}</td>
-                                                    <td class="text-right">{{ $charge->charge->standard_charge }}</td>
-                                                    <td class="text-right">
-                                                        ({{ $charge->charge->taxCategory->percentage }}%)
-                                                        {{ $taxAmount }}
-                                                    </td>
-                                                    <td class="text-right">{{ $charge->charge->standard_charge }}</td>
-                                                    <td class="text-right">{{ $amount }}</td>
-                                                </tr>
-                                            @endforeach
+                                            <tr>
+                                                <td>
+                                                    Doctor Fees
+                                                </td>
+                                                <td style="text-transform: capitalize;">OPD</td>
+                                                <td class="text-right">50.00</td>
+                                                <td class="text-right">(0.00%) 0.00</td>
+                                                <td class="text-right">400.00</td>
+                                                <td class="text-right">400.00</td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -1050,7 +614,7 @@
                 </div>
 
             </div>
-            <div class="tab-pane" id="visits">
+            <div class="tab-pane" id="nurse_notes">
 
 
                 <!-- row start -->
@@ -1059,7 +623,8 @@
                         <div class="card shadow-sm flex-fill w-100">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Checkups</h5>
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Nurse Notes
+                                </h5>
                             </div>
                             <div class="card-body">
                                 <div class="row">
@@ -1080,17 +645,14 @@
                                                         <div class="text-end d-flex">
                                                             <a href="javascript:void(0);"
                                                                 class="btn btn-primary text-white ms-2 btn-md"
-                                                                data-bs-toggle="modal" data-is-hidden = "true"
-                                                                data-bs-target="#createOpdModal"
-                                                                data-patient='@json($opd->patient)'><i
-                                                                    class="ti ti-plus me-1"></i>New Checkup</a>
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#add_appointment"><i
+                                                                    class="ti ti-plus me-1"></i>Add New Note</a>
                                                         </div>
                                                         <!-- First Modal -->
-                                                        @include('components.modals.opd-create-modal')
-                                                        {{-- <div class="modal fade" id="add_appointment" tabindex="-1"
+                                                        <div class="modal fade" id="add_appointment" tabindex="-1"
                                                             aria-hidden="true">
-                                                            <div
-                                                                class="modal-dialog modal-dialog-centered modal-full-width">
+                                                            <div class="modal-dialog">
                                                                 <div class="modal-content">
 
                                                                     <div class="modal-header"
@@ -1098,7 +660,7 @@
 
                                                                         <h5 class="modal-title"
                                                                             id="addSpecializationLabel">
-                                                                            Patient Details
+                                                                            Add Nurse Note
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
                                                                             data-bs-dismiss="modal"></button>
@@ -1109,287 +671,43 @@
 
                                                                         <div class="row gy-3">
 
-                                                                            <div class="col-md-8 border-end">
-                                                                                <div class="row gy-3">
-                                                                                    <div class="col-md-10">
-                                                                                        <h3>
-                                                                                            Animesh Das (39)
-                                                                                        </h3>
-                                                                                        <p>Guardian : --</p>
-                                                                                        <p>Gender : Male</p>
-                                                                                        <p>Blood Group : A+</p>
-                                                                                        <p>Marital Status: Single</p>
-                                                                                        <p>Age: 41 Year 2 Month 27 Days (As
-                                                                                            Of Date 10/14/2025)</p>
-                                                                                        <p>Phone: --</p>
-                                                                                        <p>Email:
-                                                                                        </p>
-                                                                                        <p>Address: --</p>
-                                                                                        <p>Any Known Allergies: --</p>
-                                                                                        <p>Remarks: --</p>
-                                                                                        <p>TPA : --
-                                                                                        </p>
-                                                                                        <p>TPA ID : --</p>
-                                                                                        <p>TPA Validity : --</p>
-                                                                                        <p>National Identification
-                                                                                            Number : --</p>
-                                                                                    </div>
-                                                                                    <div class="col-md-2">
-                                                                                        <img src="assets/img/patient.png"
-                                                                                            alt="product"
-                                                                                            class="rounded thumbnail">
-                                                                                    </div>
-                                                                                    <hr>
-                                                                                    <div class="col-md-3">
-                                                                                        <label for="symptoms_type"
-                                                                                            class="form-label">Symptoms
-                                                                                            Type</label>
-                                                                                        <select class="form-select"
-                                                                                            id="symptoms_type">
-                                                                                            <option value="">Select
-                                                                                            </option>
-                                                                                            <option value="">General
-                                                                                            </option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                    <div class="col-md-3">
-                                                                                        <label for="symptoms_title"
-                                                                                            class="form-label">Symptoms
-                                                                                            Title </label>
-                                                                                        <input type="text"
-                                                                                            name="symptoms_title"
-                                                                                            id="symptoms_title"
-                                                                                            class="form-control">
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="symptoms_des"
-                                                                                            class="form-label">Symptoms
-                                                                                        </label>
-                                                                                        <textarea name="symptoms" id="symptoms" class="form-control"></textarea>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="note"
-                                                                                            class="form-label">Note</label>
-                                                                                        <textarea name="note" id="note" class="form-control"></textarea>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="allergies"
-                                                                                            class="form-label">Any Known
-                                                                                            Allergies</label>
-                                                                                        <textarea name="allergies" id="allergies" class="form-control"></textarea>
-                                                                                    </div>
-                                                                                </div>
+                                                                            <div class="col-md-6">
+                                                                                <label for="appointment_date"
+                                                                                    class="form-label">
+                                                                                    Date <span
+                                                                                        class="text-danger">*</span></label>
+                                                                                <input type="date" name="date"
+                                                                                    id="date" class="form-control">
                                                                             </div>
-                                                                            <div class="col-md-4">
-                                                                                <div class="row gy-3">
-
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="appointment_date"
-                                                                                            class="form-label">Appointment
-                                                                                            Date <span
-                                                                                                class="text-danger">*</span></label>
-                                                                                        <input type="date"
-                                                                                            name="appointment_date"
-                                                                                            id="appointment_date"
-                                                                                            class="form-control">
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="case"
-                                                                                            class="form-label">Case</label>
-                                                                                        <input type="text"
-                                                                                            name="case" id="case"
-                                                                                            class="form-control">
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="casualty"
-                                                                                            class="form-label">Casualty</label>
-                                                                                        <select class="form-select"
-                                                                                            id="casualty">
-                                                                                            <option value="">Select
-                                                                                            </option>
-                                                                                            <option value="">No
-                                                                                            </option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="old_patient"
-                                                                                            class="form-label">Old
-                                                                                            Patient</label>
-                                                                                        <select class="form-select"
-                                                                                            id="old_patient">
-                                                                                            <option value="">Select
-                                                                                            </option>
-                                                                                            <option value="">No
-                                                                                            </option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="reference"
-                                                                                            class="form-label">Reference</label>
-                                                                                        <input type="text"
-                                                                                            name="reference"
-                                                                                            id="reference"
-                                                                                            class="form-control">
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="doctor"
-                                                                                            class="form-label">Consultant
-                                                                                            Doctor
-                                                                                            <span
-                                                                                                class="text-danger">*</span></label>
-                                                                                        <select class="form-select"
-                                                                                            id="doctor"
-                                                                                            data-placeholder="Select">
-                                                                                            <option value="">
-                                                                                            </option>
-                                                                                            <option value="1">Amitabh
-                                                                                                Kulkarni</option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <div
-                                                                                            class="form-check d-flex gap-2 mt-4">
-                                                                                            <input type="checkbox"
-                                                                                                name="tpa_check"
-                                                                                                id="tpa_check"
-                                                                                                class="form-check-input">
-                                                                                            <label for="tpa_check"
-                                                                                                class="form-check-label">Apply
-                                                                                                TPA</label>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="charge_category"
-                                                                                            class="form-label">Charge
-                                                                                            Category
-                                                                                        </label>
-                                                                                        <select class="form-select"
-                                                                                            id="charge_category"
-                                                                                            data-placeholder="Select">
-                                                                                            <option value="0">
-                                                                                            </option>
-                                                                                            <option value="1">OPD
-                                                                                                Doctor
-                                                                                                Fees</option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="charge"
-                                                                                            class="form-label">Charge
-                                                                                            <span
-                                                                                                class="text-danger">*</span></label>
-                                                                                        <select class="form-select"
-                                                                                            id="charge"
-                                                                                            data-placeholder="Select">
-                                                                                            <option value="">
-                                                                                            </option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="standard_charge"
-                                                                                            class="form-label">Standard
-                                                                                            Charge (INR)</label>
-                                                                                        <input type="text"
-                                                                                            readonly="true"
-                                                                                            name="standard_charge"
-                                                                                            id="standard_charge"
-                                                                                            class="form-control"
-                                                                                            value=""
-                                                                                            autocomplete="off" disabled>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="apply_charge"
-                                                                                            class="form-label">Applied
-                                                                                            Charge (INR) <span
-                                                                                                class="text-danger">*</span></label>
-                                                                                        <input type="text"
-                                                                                            name="amount"
-                                                                                            id="apply_charge"
-                                                                                            class="form-control">
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="discount_percentage"
-                                                                                            class="form-label">Discount</label>
-                                                                                        <div class="input-group">
-                                                                                            <input type="text"
-                                                                                                class="form-control discount_percentage"
-                                                                                                name="discount_percentage"
-                                                                                                id="discount_percentage"
-                                                                                                value="0"
-                                                                                                autocomplete="off">
-                                                                                            <span
-                                                                                                class="input-group-addon ">
-                                                                                                %</span>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="tax"
-                                                                                            class="form-label">Tax</label>
-                                                                                        <div class="input-group">
-                                                                                            <input type="text"
-                                                                                                class="form-control discount_percentage"
-                                                                                                name="tax"
-                                                                                                id="tax"
-                                                                                                value="0"
-                                                                                                autocomplete="off"
-                                                                                                readonly="true" disabled>
-                                                                                            <span
-                                                                                                class="input-group-addon ">
-                                                                                                %</span>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="amount"
-                                                                                            class="form-label">Amount
-                                                                                            (INR) <span
-                                                                                                class="text-danger">*</span></label>
-                                                                                        <input type="text"
-                                                                                            readonly="true" name="amount"
-                                                                                            id="amount"
-                                                                                            class="form-control"
-                                                                                            value=""
-                                                                                            autocomplete="off" disabled>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="payment_mode"
-                                                                                            class="form-label">Payment
-                                                                                            Mode</label>
-                                                                                        <select class="form-select"
-                                                                                            id="payment_mode">
-                                                                                            <option value="">Select
-                                                                                            </option>
-                                                                                            <option value="1">Case
-                                                                                            </option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="paid_amount"
-                                                                                            class="form-label">Paid
-                                                                                            Amount
-                                                                                            (INR) <span
-                                                                                                class="text-danger">*</span></label>
-                                                                                        <input type="text"
-                                                                                            name="paid_amount"
-                                                                                            id="paid_amount"
-                                                                                            class="form-control"
-                                                                                            value=""
-                                                                                            autocomplete="off">
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="live_con"
-                                                                                            class="form-label">Live
-                                                                                            Consultation</label>
-                                                                                        <select class="form-select"
-                                                                                            id="live_con">
-                                                                                            <option value="">Select
-                                                                                            </option>
-                                                                                            <option value="1">No
-                                                                                            </option>
-                                                                                        </select>
-                                                                                    </div>
-
-                                                                                </div>
+                                                                            <div class="col-md-6">
+                                                                                <label for="nurse"
+                                                                                    class="form-label">Nurse</label>
+                                                                                <select class="form-select"
+                                                                                    id="nurse">
+                                                                                    <option value="">Select
+                                                                                    </option>
+                                                                                    <option value="1">Anjali Sarma
+                                                                                    </option>
+                                                                                    <option value="2">Puja Roy
+                                                                                    </option>
+                                                                                </select>
                                                                             </div>
+                                                                            <div class="col-md-12">
+                                                                                <label for="casualty"
+                                                                                    class="form-label">Note</label>
+                                                                                <textarea class="form-control" id="note" name='name'>
+                                                                                            
+                                                                                    </textarea>
+                                                                            </div>
+                                                                            <div class="col-md-12">
+                                                                                <label for="comment"
+                                                                                    class="form-label">Comment</label>
+                                                                                <textarea class="form-control" id="comment" name="comment"></textarea>
+                                                                            </div>
+
+
+
+
 
                                                                         </div>
 
@@ -1403,10 +721,10 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div> --}}
+                                                        </div>
 
                                                         <!-- Second Modal (nested) -->
-                                                        {{-- <div class="modal fade" id="new_patient" tabindex="-1"
+                                                        <div class="modal fade" id="new_patient" tabindex="-1"
                                                             aria-hidden="true">
                                                             <div class="modal-dialog modal-dialog-centered modal-xl">
                                                                 <div class="modal-content">
@@ -1774,7 +1092,7 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div> --}}
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <!-- Table start -->
@@ -1782,61 +1100,38 @@
                                                     <table class="table border">
                                                         <thead class="thead-light">
                                                             <tr>
-                                                                <th>OPD Checkup ID</th>
-                                                                <th>Appointment Date</th>
-                                                                <th>Consultant</th>
-                                                                <th>Reference</th>
-                                                                <th>Symptoms</th>
+                                                                <th>Nurse</th>
+                                                                <th>Date</th>
+                                                                <th>Time</th>
+                                                                <th>Note</th>
+                                                                <th>Comment</th>
                                                                 <th>Action</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @foreach ($opdVisits as $visit)
-                                                                <tr>
-                                                                    <td>
-                                                                        <h6 class="fs-14 mb-1">{{ $visit->visit_id }}
-                                                                        </h6>
-                                                                    </td>
-                                                                    <td>{{ $visit->opd->appointment_date }}</td>
-                                                                    <td>{{ $visit->opd->doctor->name }}
-                                                                        ({{ $visit->opd->doctor->doctor_id }})
-                                                                    </td>
-                                                                    <td>{{ $visit->opd->reference }}</td>
-                                                                    <td>
-                                                                        @if (isset($opdSymptoms[$visit->opd->opd_no]) && count($opdSymptoms[$visit->opd->opd_no]) > 0)
-                                                                            @foreach ($opdSymptoms[$visit->opd->opd_no] as $symptom)
-                                                                                <span
-                                                                                    class="badge bg-primary me-1">{{ $symptom->symptoms_title }}</span>
-                                                                            @endforeach
-                                                                        @else
-                                                                            --
-                                                                        @endif
-                                                                    </td>
-                                                                    <td>
-                                                                        <div class="d-flex gap-2">
+                                                            <tr>
+                                                                <td>
+                                                                    <h6 class="fs-14 mb-1">Anjali Sharma ( NUR004 )</h6>
+                                                                </td>
+                                                                <td>09/17/2025</td>
+                                                                <td>12:49 PM </td>
+                                                                <td>Every thing is normal</td>
+                                                                <td>Take rest</td>
+                                                                <td>
+                                                                    <div class="d-flex gap-2">
 
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                                                <i class="fa-solid fa-prescription"
-                                                                                    {{-- data-bs-toggle="tooltip" --}}
-                                                                                    data-bs-toggle="modal"
-                                                                                    data-bs-target="#addPrescriptionModal"
-                                                                                    data-id="{{ $opd->id }}"
-                                                                                    title="Add Prescription"></i></a>
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
-                                                                                <i class="fa-solid fa-print"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    title="Manual Prescription"></i></a>
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                                <i class="ti ti-menu"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    title="Show"></i></a>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                            @endforeach
+                                                                        <a href="javascript: void(0);"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+                                                                            <i class="fa-solid fa-pencil"
+                                                                                data-bs-toggle="tooltip"
+                                                                                title="Add Prescription"></i></a>
+                                                                        <a href="javascript: void(0);"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
+                                                                            <i class="ti ti-menu" data-bs-toggle="tooltip"
+                                                                                title="Show"></i></a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1901,88 +1196,78 @@
                                                                     </div>
 
                                                                     <div class="modal-body">
-                                                                        <form action="{{ route('opd.createMedication') }}"
-                                                                            method="post">
-                                                                            @csrf
-                                                                            <div class="row gy-3">
-                                                                                <input type="hidden" name="opd_id"
-                                                                                    value="{{ $opd->id }}">
-                                                                                <div class="col-md-6">
-                                                                                    <label for="date"
-                                                                                        class="form-label">Date
-                                                                                        <span class="text-danger">*</span>
-                                                                                    </label>
-                                                                                    <input type="date" name="date"
-                                                                                        id="date"
-                                                                                        class="form-control">
-                                                                                </div>
-                                                                                <div class="col-md-6">
-                                                                                    <label for="time"
-                                                                                        class="form-label">Time
-                                                                                        <span class="text-danger">*</span>
-                                                                                    </label>
-                                                                                    <input type="time" name="time"
-                                                                                        id="time"
-                                                                                        class="form-control">
-                                                                                </div>
-                                                                                <div class="col-md-6">
-                                                                                    <label for="medi_cat"
-                                                                                        class="form-label">Medicine
-                                                                                        Category
-                                                                                        <span class="text-danger">*</span>
-                                                                                    </label>
-                                                                                    <select name="med_cat" id="med_cat"
-                                                                                        class="form-select"
-                                                                                        data-placeholder="Enter Patient Name or Id…">
-                                                                                        <option value="0">Select
-                                                                                        </option>
-                                                                                        <option value="1">Antibiotic
-                                                                                        </option>
-                                                                                    </select>
-                                                                                </div>
-                                                                                <div class="col-md-6">
-                                                                                    <label for="med_name"
-                                                                                        class="form-label">Medicine Name
-                                                                                        <span class="text-danger">*</span>
-                                                                                    </label>
-                                                                                    <select name="med_name" id="med_name"
-                                                                                        class="form-select"
-                                                                                        data-placeholder="Enter Patient Name or Id…">
-                                                                                        <option value="0">Select
-                                                                                        </option>
-                                                                                        <option value="1">Paracetamol
-                                                                                            500mg
-                                                                                        </option>
-                                                                                    </select>
-                                                                                </div>
-                                                                                <div class="col-md-6">
-                                                                                    <label for="dosage"
-                                                                                        class="form-label">Dosage
-                                                                                        <span class="text-danger">*</span>
-                                                                                    </label>
-                                                                                    <select name="dosage" id="dosage"
-                                                                                        class="form-select"
-                                                                                        data-placeholder="Enter Patient Name or Id…">
-                                                                                        <option value="0">Select
-                                                                                        </option>
-                                                                                        <option value="1">1 Tablet
-                                                                                        </option>
-                                                                                    </select>
-                                                                                </div>
-                                                                                <div class="col-md-6">
-                                                                                    <label for="remark"
-                                                                                        class="form-label">Remarks
-                                                                                    </label>
-                                                                                    <textarea name="remark" id="remark" class="form-control"></textarea>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="modal-footer">
-                                                                                <button type="submit"
-                                                                                    class="btn btn-primary">Save</button>
-                                                                            </div>
-                                                                        </form>
-                                                                    </div>
 
+                                                                        <div class="row gy-3">
+
+                                                                            <div class="col-md-6">
+                                                                                <label for="date"
+                                                                                    class="form-label">Date
+                                                                                    <span class="text-danger">*</span>
+                                                                                </label>
+                                                                                <input type="date" name="date"
+                                                                                    id="date" class="form-control">
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <label for="time"
+                                                                                    class="form-label">Time
+                                                                                    <span class="text-danger">*</span>
+                                                                                </label>
+                                                                                <input type="time" name="time"
+                                                                                    id="time" class="form-control">
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <label for="medi_cat"
+                                                                                    class="form-label">Medicine Category
+                                                                                    <span class="text-danger">*</span>
+                                                                                </label>
+                                                                                <select name="medi_cat" id="med_cat"
+                                                                                    class="form-select"
+                                                                                    data-placeholder="Enter Patient Name or Id…">
+                                                                                    <option value="0">Select</option>
+                                                                                    <option value="1">Antibiotic
+                                                                                    </option>
+                                                                                </select>
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <label for="med_name"
+                                                                                    class="form-label">Medicine Name
+                                                                                    <span class="text-danger">*</span>
+                                                                                </label>
+                                                                                <select name="med_name" id="med_name"
+                                                                                    class="form-select"
+                                                                                    data-placeholder="Enter Patient Name or Id…">
+                                                                                    <option value="0">Select</option>
+                                                                                    <option value="1">Paracetamol
+                                                                                        500mg
+                                                                                    </option>
+                                                                                </select>
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <label for="dosage"
+                                                                                    class="form-label">Dosage
+                                                                                    <span class="text-danger">*</span>
+                                                                                </label>
+                                                                                <select name="dosage" id="dosage"
+                                                                                    class="form-select"
+                                                                                    data-placeholder="Enter Patient Name or Id…">
+                                                                                    <option value="0">Select</option>
+                                                                                    <option value="1">1 Tablet
+                                                                                    </option>
+                                                                                </select>
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <label for="remark"
+                                                                                    class="form-label">Remarks
+                                                                                </label>
+                                                                                <textarea name="remark" id="remark" class="form-control"></textarea>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="submit"
+                                                                            class="btn btn-primary">Save</button>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -2000,36 +1285,30 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @foreach ($medicationReport as $medication)
-                                                                <tr>
-                                                                    <td>
-                                                                        <h6 class="fs-14 mb-1">
-                                                                            {{ \Carbon\Carbon::parse($medication->date)->format('d-M-Y') }}&nbsp;{{ '(' . \Carbon\Carbon::parse($medication->date)->format('D') . ')' }}
-                                                                        </h6>
-                                                                    </td>
-                                                                    <td>{{ $medication->pharmacy->medicine_name }}</td>
-                                                                    <td> Time:
-                                                                        {{ \Carbon\Carbon::parse($medication->time)->format('h:i A') }}
-                                                                        {{ $medication->medicineDosage->dosage . $medication->medicineDosage->unit->unit_name }}<br>
-                                                                        Created By:
-                                                                        {{ $medication->generatedBy->userRole->name }}
-                                                                    </td>
-                                                                    <td>
-                                                                        <div class="d-flex gap-2">
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
-                                                                                <i class="ti ti-pencil"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    title="Show"></i></a>
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                                <i class="ti ti-trash"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    title="Show"></i></a>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                            @endforeach
+                                                            <tr>
+                                                                <td>
+                                                                    <h6 class="fs-14 mb-1">10/08/2025
+                                                                        (Wed)</h6>
+                                                                </td>
+                                                                <td>Paracetamol 500mg</td>
+                                                                <td> Time: 03:30 PM
+                                                                    1–2 Tablet Created By: Super Admin (9001)
+                                                                </td>
+                                                                <td>
+                                                                    <div class="d-flex gap-2">
+                                                                        <a href="javascript: void(0);"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
+                                                                            <i class="ti ti-pencil"
+                                                                                data-bs-toggle="tooltip"
+                                                                                title="Show"></i></a>
+                                                                        <a href="javascript: void(0);"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                                            <i class="ti ti-trash"
+                                                                                data-bs-toggle="tooltip"
+                                                                                title="Show"></i></a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -2084,29 +1363,24 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @foreach ($labInvestigations as $lab)
-                                                                <tr>
-                                                                    <td>
-                                                                        <h6 class="fs-14 mb-1">
-                                                                            {{ $lab->pathology->test_name . '(' . $lab->pathology->short_name . ')' }}
-                                                                        </h6>
-                                                                    </td>
-                                                                    <td>Pathology</td>
-                                                                    <td>Pathology Center :{{ '--' }}</td>
-                                                                    <td>{{ \Carbon\Carbon::today()->copy()->addDays(intval($lab->pathology->report_days))->format('d-M-Y') }}
-                                                                    </td>
-                                                                    <td>{{ $lab->approved_by ?? '--' }}</td>
-                                                                    <td>
-                                                                        <div class="d-flex gap-2">
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                                <i class="ti ti-menu"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    title="Show"></i></a>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                            @endforeach
+                                                            <tr>
+                                                                <td>
+                                                                    <h6 class="fs-14 mb-1">Lipid Profile
+                                                                        (Lipid Profile)</h6>
+                                                                </td>
+                                                                <td>Pathology</td>
+                                                                <td>Pathology Center :</td>
+                                                                <td>09/21/2025</td>
+                                                                <td></td>
+                                                                <td>
+                                                                    <div class="d-flex gap-2">
+                                                                        <a href="javascript: void(0);"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
+                                                                            <i class="ti ti-menu" data-bs-toggle="tooltip"
+                                                                                title="Show"></i></a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -2160,34 +1434,20 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <h6 class="fs-14 mb-1"></h6>
+                                                                </td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td>
+                                                                    <div class="d-flex gap-2">
 
-                                                            @foreach ($operationDetail as $operation)
-                                                                <tr>
-                                                                    <td>
-                                                                        <h6 class="fs-14 mb-1">
-                                                                            {{ $operation->reference_no }}</h6>
-                                                                    </td>
-                                                                    <td>{{ $operation->date }}</td>
-                                                                    <td>{{ $operation->operation->operation }}</td>
-                                                                    <td>{{ $operation->operation->category->category }}
-                                                                    </td>
-                                                                    <td>{{ $operation->ot_technician }}</td>
-                                                                    <td>
-                                                                        <div class="d-flex gap-2">
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
-                                                                                <i class="ti ti-pencil"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    title="Show"></i></a>
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                                <i class="ti ti-trash"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    title="Show"></i></a>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                            @endforeach
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -2582,82 +1842,41 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            {{-- @php
-                                                    $taxAmount =
-                                                        ($charge->charge->standard_charge *
-                                                            $charge->charge->taxCategory->percentage) /
-                                                        100;
-                                                    $amount = $charge->charge->standard_charge + $taxAmount;
-                                                @endphp
-                                                <tr>
-                                                    <td>
-                                                        {{ $charge->charge->name }}
-                                                    </td>
-                                                    <td style="text-transform: capitalize;">
-                                                        {{ $charge->chargeCategory->chargeType->charge_type }}</td>
-                                                    <td class="text-right">{{ $charge->charge->standard_charge }}</td>
-                                                    <td class="text-right">
-                                                        ({{ $charge->charge->taxCategory->percentage }}%)
-                                                        {{ $taxAmount }}
-                                                    </td>
-                                                    <td class="text-right">{{ $charge->charge->standard_charge }}</td>
-                                                    <td class="text-right">{{ $amount }}</td>
-                                                </tr> --}}
-                                                            @foreach ($opdCharges as $charge)
-                                                                @php
-                                                                    $taxAmount =
-                                                                        ($charge->charge->standard_charge *
-                                                                            $charge->charge->taxCategory->percentage) /
-                                                                        100;
-                                                                    $discountAmount =
-                                                                        ($charge->charge->standard_charge *
-                                                                            $charge->discount) /
-                                                                        100;
-                                                                    $amount =
-                                                                        $charge->charge->standard_charge -
-                                                                        $discountAmount +
-                                                                        $taxAmount;
-                                                                @endphp
-                                                                <tr>
-                                                                    <td>
-                                                                        {{ \Carbon\Carbon::parse($charge->created_at)->format('d-M-Y') }}
-                                                                    </td>
-                                                                    <td>{{ $charge->charge->name }}</td>
-                                                                    <td style="text-transform: capitalize;">
-                                                                        {{ $charge->chargeCategory->chargeType->charge_type }}
-                                                                    </td>
-                                                                    <td>{{ $charge->chargeCategory->name }} </td>
-                                                                    <td>1</td>
-                                                                    <td>{{ $charge->charge->standard_charge }}</td>
-                                                                    <td>{{ $charge->charge->standard_charge }}</td>
-                                                                    <td>0.00</td>
-                                                                    <td>{{ $discountAmount }}&nbsp;({{ $charge->discount }}%)
-                                                                    </td>
-                                                                    <td>{{ $taxAmount }}&nbsp;({{ $charge->charge->taxCategory->percentage }}%)
-                                                                    </td>
-                                                                    <td>{{ $amount }}</td>
-                                                                    <td>
-                                                                        <div class="d-flex gap-2">
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
-                                                                                <i class="fa-solid fa-print"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    title="Print"></i></a>
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                                                <i class="ti ti-pencil"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    title="Edit"></i></a>
+                                                            <tr>
+                                                                <td>
+                                                                    09/17/2025 12:49 PM
+                                                                </td>
+                                                                <td>Doctor Fees</td>
+                                                                <td>OPD</td>
+                                                                <td>OPD Doctor Fees </td>
+                                                                <td>1</td>
+                                                                <td>50.00</td>
+                                                                <td>400.00</td>
+                                                                <td>0.00</td>
+                                                                <td>0.00 (0.00%)</td>
+                                                                <td>0.00 (0.00%)</td>
+                                                                <td>400.00</td>
+                                                                <td>
+                                                                    <div class="d-flex gap-2">
+                                                                        <a href="javascript: void(0);"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
+                                                                            <i class="fa-solid fa-print"
+                                                                                data-bs-toggle="tooltip"
+                                                                                title="Print"></i></a>
+                                                                        <a href="javascript: void(0);"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+                                                                            <i class="ti ti-pencil"
+                                                                                data-bs-toggle="tooltip"
+                                                                                title="Edit"></i></a>
 
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                                <i class="ti ti-trash"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    title="Delete"></i></a>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                            @endforeach
+                                                                        <a href="javascript: void(0);"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
+                                                                            <i class="ti ti-trash"
+                                                                                data-bs-toggle="tooltip"
+                                                                                title="Delete"></i></a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -2749,7 +1968,9 @@
 
                                                                                 </label>
                                                                                 <select name="payment_mode"
-                                                                                    id="payment_mode" class="form-select">
+                                                                                    id="payment_mode"
+                                                                                    class="form-select"
+                                                                                    data-placeholder="Enter Patient Name or Id…">
                                                                                     <option value="0">Select</option>
                                                                                     <option value="1">Cash</option>
                                                                                 </select>
@@ -2788,10 +2009,10 @@
                                                         <tbody>
                                                             <tr>
                                                                 <td>
-                                                                    TRID95
+                                                                    TRID83
                                                                 </td>
-                                                                <td>10/14/2025 11:45 AM </td>
-                                                                <td>SmartPay Transaction ID: 528706160448
+                                                                <td>10/13/2025 06:25 PM </td>
+                                                                <td> Time:SmartPay Transaction ID: 528612554379
                                                                 </td>
                                                                 <td></td>
                                                                 <td>20.00</td>
@@ -2811,7 +2032,7 @@
                                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
                                                                             <i class="ti ti-trash"
                                                                                 data-bs-toggle="tooltip"
-                                                                                title="Show"></i></a>
+                                                                                title="Delete"></i></a>
                                                                     </div>
                                                                 </td>
                                                             </tr>
@@ -3095,21 +2316,13 @@
                                                             <tr>
                                                                 <td>
                                                                     <h6 class="fs-14 mb-1"><a href="#"
-                                                                            class="fw-semibold">{{ $opd->opd_no }}</a>
-                                                                    </h6>
+                                                                            class="fw-semibold">OPDN14</a></h6>
                                                                 </td>
-                                                                <td>{{ '--' }}</td>
-                                                                <td> {{ $opd->appointment_date }}</td>
-                                                                <td>
-                                                                    <ul>
-                                                                        @foreach ($symptoms as $symptom)
-                                                                            <li><i
-                                                                                    class="fa-regular fa-circle-check text-primary"></i>
-                                                                                {{ $symptom->symptoms_title }}</li>
-                                                                        @endforeach
-                                                                    </ul>
+                                                                <td>18</td>
+                                                                <td> 09/17/2025 12:49 PM</td>
+                                                                <td>Fever
                                                                 </td>
-                                                                <td>{{ $opd->doctor->name }}
+                                                                <td>Anjali Rao (D011)
                                                                 </td>
                                                                 <td>
                                                                     <div class="d-flex gap-2">
@@ -3305,8 +2518,6 @@
     </div>
     <!-- tab content end -->
     </div>
-    @include('components.modals.add-prescription-modal')
-
     <!-- Chart JS -->
     <script src="assets/plugins/chartjs/chart.min.js"></script>
     <script src="assets/plugins/chartjs/chart-data.js"></script>
@@ -3397,78 +2608,5 @@
                 vitalFields.appendChild(newRow);
             });
         });
-
-        const medCatSelect = document.getElementById('med_cat')
-        const medNameSelect = document.getElementById('med_name')
-        const doseSelect = document.getElementById('dosage')
-        medCatSelect.innerHTML = '<option value="">Loading...</option>';
-        medNameSelect.innerHTML = '<option value="">Loading...</option>';
-        doseSelect.innerHTML = '<option value="">Loading...</option>';
-        fetch("{{ route('getMedicineCategories') }}")
-            .then(response => response.json())
-            .then(data => {
-                window.medicineCategories = data;
-                medCatSelect.innerHTML = '<option value="">Select</option>';
-                data.forEach(category => {
-                    const option = document.createElement('option');
-                    option.value = category.id;
-                    option.textContent = category.medicine_category;
-                    if ("{{ old('med_cat') }}" == category.id) {
-                        option.selected = true;
-                    }
-                    medCatSelect.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching charge categories:', error);
-                medCatSelect.innerHTML = '<option value="">Error loading options</option>';
-            });
-
-        // Listen for Charge Category dropdown change
-        medCatSelect.addEventListener('change', function() {
-            const selectedId = this.value;
-            const baseUrl = "{{ route('getMedicines', ['categoryId' => 'ID']) }}";
-            const finalUrl = baseUrl.replace('ID', selectedId);
-            fetch(finalUrl)
-                .then(response => response.json())
-                .then(data => {
-                    window.chargeData = data;
-                    medNameSelect.innerHTML = '<option value="">Select</option>';
-                    data.forEach(charge => {
-                        const option = document.createElement('option');
-                        option.value = charge.id;
-                        option.textContent = charge.medicine_name;
-                        if ("{{ old('med_name') }}" == charge.id) {
-                            option.selected = true;
-                        }
-                        medNameSelect.appendChild(option);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching Charges:', error);
-                    medNameSelect.innerHTML = '<option value="">Error loading options</option>';
-                });
-            const baseUrlDose = "{{ route('getDoses', ['categoryId' => 'ID']) }}";
-            const finalUrlDose = baseUrlDose.replace('ID', selectedId);
-            fetch(finalUrlDose)
-                .then(response => response.json())
-                .then(data => {
-                    window.chargeData = data;
-                    doseSelect.innerHTML = '<option value="">Select</option>';
-                    data.forEach(charge => {
-                        const option = document.createElement('option');
-                        option.value = charge.id;
-                        option.textContent = charge.dosage + " " + charge.unit.unit_name;
-                        if ("{{ old('dosage') }}" == charge.id) {
-                            option.selected = true;
-                        }
-                        doseSelect.appendChild(option);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching Charges:', error);
-                    doseSelect.innerHTML = '<option value="">Error loading options</option>';
-                });
-        })
     </script>
 @endsection

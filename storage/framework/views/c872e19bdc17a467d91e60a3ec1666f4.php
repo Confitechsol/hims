@@ -344,11 +344,11 @@
         border-color: #aaa;
     }
 </style>
-</style>
 <div class="modal fade" id="addPrescriptionModal" tabindex="-1" aria-labelledby="addPrescriptionModalLabel"
     aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
+    <div class="modal-dialog modal-fullscreen ">
+        <!-- inline overflow override so .modal-content {overflow: hidden;} in global CSS doesn't block scrolling -->
+        <div class="modal-content" style="overflow: visible;">
             <!-- Modal Header -->
             <div class="modal-header">
                 <h5 class="modal-title" id="addPrescriptionModal">
@@ -360,11 +360,10 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <!-- Modal Body -->
+            <!-- Modal Body (scrollable area provided by modal-dialog-scrollable) -->
             <form action="<?php echo e(route('opd.addPrescription')); ?>" method="post" enctype="multipart/form-data"><?php echo csrf_field(); ?>
-                <div class="modal-body">
-
-                    <div class="row p-4">
+                <div class="modal-body" style="max-height: calc(100vh - 160px); overflow-x:hiden;">
+                    <div class="row p-4 mx-1">
                         <div class="col-sm-9">
                             <div class="ptt10">
                                 <div class="row">
@@ -396,7 +395,8 @@
                                                 <button data-cmd="removeFormat">↺</button>
                                             </div>
 
-                                            <textarea id="editor" contenteditable="true" class="editor-area w-100" name="header_note"></textarea>
+                                            <textarea id="editor" contenteditable="true" class="editor-area w-100"
+                                                name="header_note"></textarea>
                                             <hr>
                                         </div>
                                         <div class="col-sm-12">
@@ -404,7 +404,7 @@
                                                 <div class="col-md-3">
                                                     <label for="finding_type" class="form-label">Finding
                                                         Category</label>
-                                                    <select class="form-control multiselect2 select2-hidden-accessible"
+                                                    <select class="form-select multiselect2 select2-hidden-accessible"
                                                         name="finding_type[]" id="finding_type" multiple>
                                                         <option value="1">General Examination</option>
                                                         <option value="2">Vitals</option>
@@ -428,7 +428,8 @@
                                                 <div class="col-md-3">
                                                     <label for="finding_description" class="form-label">Finding
                                                         Description</label>
-                                                    <textarea name="finding_description" id="finding_description" class="form-control" rows="3"></textarea>
+                                                    <textarea name="finding_description" id="finding_description"
+                                                        class="form-control" rows="3"></textarea>
                                                 </div>
                                                 <div class="col-md-3">
                                                     <label for="finding_print" class="form-label">Finding Print
@@ -500,16 +501,17 @@
                                                 <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
                                                     <div>
                                                         <label class="form-label">Instruction</label>
-                                                        <textarea name="instructions[]" style="height:28px;" class="form-control"></textarea>
+                                                        <textarea name="instructions[]" style="height:28px;"
+                                                            class="form-control"></textarea>
                                                     </div>
                                                 </div>
 
                                                 <div
                                                     class="col-lg-1 col-md-1 col-sm-1 col-xs-1 d-flex align-items-center">
                                                     <div>
-                                                        <button type="button"
-                                                            class="btn btn-sm btn-danger delete_row" data-row-id="1"
-                                                            autocomplete="off"><i class="fa fa-remove"></i></button>
+                                                        <button type="button" class="btn btn-sm btn-danger delete_row"
+                                                            data-row-id="1" autocomplete="off"><i
+                                                                class="fa fa-remove"></i></button>
                                                     </div>
                                                 </div>
 
@@ -550,7 +552,8 @@
                                                     <button data-cmd="justifyRight">➡</button>
                                                     <button data-cmd="removeFormat">↺</button>
                                                 </div>
-                                                <textarea id="editor-footer" contenteditable="true" class="editor-area w-100" name="footer_note">
+                                                <textarea id="editor-footer" contenteditable="true"
+                                                    class="editor-area w-100" name="footer_note">
                                                 </textarea>
                                             </div>
                                         </div>
@@ -589,55 +592,47 @@
                                     <div class="ptt10">
                                         <label for="exampleInputEmail1" class="form-label">Notification To</label>
                                         <div class="checkbox">
-                                            <label class="form-label"><input type="checkbox" name="visible[]"
-                                                    value="1">
+                                            <label class="form-label"><input type="checkbox" name="visible[]" value="1">
                                                 <b>Admin</b>
                                             </label>
                                         </div>
                                         <div class="checkbox">
-                                            <label class="form-label"><input type="checkbox" name="visible[]"
-                                                    value="2">
+                                            <label class="form-label"><input type="checkbox" name="visible[]" value="2">
                                                 <b>Accountant</b>
                                             </label>
                                         </div>
                                         <div class="checkbox">
-                                            <label class="form-label"><input type="checkbox" name="visible[]"
-                                                    value="3">
+                                            <label class="form-label"><input type="checkbox" name="visible[]" value="3">
                                                 <b>Doctor</b>
                                             </label>
                                         </div>
                                         <div class="checkbox">
-                                            <label class="form-label"><input type="checkbox" name="visible[]"
-                                                    value="4">
+                                            <label class="form-label"><input type="checkbox" name="visible[]" value="4">
                                                 <b>Pharmacist</b>
                                             </label>
                                         </div>
                                         <div class="checkbox">
-                                            <label class="form-label"><input type="checkbox" name="visible[]"
-                                                    value="5">
+                                            <label class="form-label"><input type="checkbox" name="visible[]" value="5">
                                                 <b>Pathologist</b>
                                             </label>
                                         </div>
                                         <div class="checkbox">
-                                            <label class="form-label"><input type="checkbox" name="visible[]"
-                                                    value="6">
+                                            <label class="form-label"><input type="checkbox" name="visible[]" value="6">
                                                 <b>Radiologist</b>
                                             </label>
                                         </div>
                                         <div class="checkbox">
-                                            <label class="form-label"><input type="checkbox" name="visible[]"
-                                                    value="7" checked="" onclick="return false;"> <b>Super
+                                            <label class="form-label"><input type="checkbox" name="visible[]" value="7"
+                                                    checked="" onclick="return false;"> <b>Super
                                                     Admin</b> </label>
                                         </div>
                                         <div class="checkbox">
-                                            <label class="form-label"><input type="checkbox" name="visible[]"
-                                                    value="8">
+                                            <label class="form-label"><input type="checkbox" name="visible[]" value="8">
                                                 <b>Receptionist</b>
                                             </label>
                                         </div>
                                         <div class="checkbox">
-                                            <label class="form-label"><input type="checkbox" name="visible[]"
-                                                    value="9">
+                                            <label class="form-label"><input type="checkbox" name="visible[]" value="9">
                                                 <b>Nurse</b>
                                             </label>
                                         </div>
@@ -652,537 +647,536 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
+                </div>
 
-                    <!-- Modal Footer -->
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary btn-sm" data-bs-dismiss="modal">
-                            Save & Print
-                        </button>
-                        <button type="submit" class="btn btn-primary btn-sm" data-bs-dismiss="modal">
-                            Save
-                        </button>
-                    </div>
+                <!-- Modal Footer (moved outside modal-body so footer stays fixed) -->
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        Save & Print
+                    </button>
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        Save
+                    </button>
                 </div>
             </form>
         </div>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const createPrescriptionModal = document.getElementById("addPrescriptionModal");
-            const findingCategorySelect = document.getElementById('finding_type');
-            const findingsSelect = document.getElementById('finding');
-            const pathologySelect = document.getElementById('pathologyOpt');
-            const radiologySelect = document.getElementById('radiologyOpt');
-            findingCategorySelect.innerHTML = '<option value="">Loading...</option>';
-            findingsSelect.innerHTML = '<option value="">Loading...</option>';
-            pathologySelect.innerHTML = '<option value="">Loading...</option>';
-            radiologySelect.innerHTML = '<option value="">Loading...</option>';
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const createPrescriptionModal = document.getElementById("addPrescriptionModal");
+        const findingCategorySelect = document.getElementById('finding_type');
+        const findingsSelect = document.getElementById('finding');
+        const pathologySelect = document.getElementById('pathologyOpt');
+        const radiologySelect = document.getElementById('radiologyOpt');
+        findingCategorySelect.innerHTML = '<option value="">Loading...</option>';
+        findingsSelect.innerHTML = '<option value="">Loading...</option>';
+        pathologySelect.innerHTML = '<option value="">Loading...</option>';
+        radiologySelect.innerHTML = '<option value="">Loading...</option>';
 
-            createPrescriptionModal.addEventListener('show.bs.modal', function(event) {
-                const opdIdField = document.getElementById('opd_id');
+        createPrescriptionModal.addEventListener('show.bs.modal', function (event) {
+            const opdIdField = document.getElementById('opd_id');
 
-                var button = event.relatedTarget; // Button that triggered the modal
+            var button = event.relatedTarget; // Button that triggered the modal
 
-                var opd_id = button.getAttribute('data-id');
-                opdIdField.value = opd_id ?? null;
+            var opd_id = button.getAttribute('data-id');
+            opdIdField.value = opd_id ?? null;
 
-                const container = document.getElementById("medicineContainer");
-                const addButton = document.getElementById("addMedicineBtn");
-                const addButtonContainer = document.getElementById("addMedicineContainer");
+            const container = document.getElementById("medicineContainer");
+            const addButton = document.getElementById("addMedicineBtn");
+            const addButtonContainer = document.getElementById("addMedicineContainer");
 
-                // 🔹 Fetch base dropdown data once
-                Promise.all([
-                    fetch("<?php echo e(route('getMedicineCategories')); ?>").then(res => res.json()),
-                    fetch("<?php echo e(route('getDoseIntervals')); ?>").then(res => res.json()),
-                    fetch("<?php echo e(route('getDoseDurations')); ?>").then(res => res.json())
-                ]).then(([categories, intervals, durations]) => {
-                    window.medicineCategories = categories;
-                    window.doseIntervals = intervals;
-                    window.doseDurations = durations;
+            // 🔹 Fetch base dropdown data once
+            Promise.all([
+                fetch("<?php echo e(route('getMedicineCategories')); ?>").then(res => res.json()),
+                fetch("<?php echo e(route('getDoseIntervals')); ?>").then(res => res.json()),
+                fetch("<?php echo e(route('getDoseDurations')); ?>").then(res => res.json())
+            ]).then(([categories, intervals, durations]) => {
+                window.medicineCategories = categories;
+                window.doseIntervals = intervals;
+                window.doseDurations = durations;
 
-                    // Initialize first row
-                    initRow(container.querySelector(".medicine-row"));
+                // Initialize first row
+                initRow(container.querySelector(".medicine-row"));
 
-                    addButton.addEventListener("click", function(e) {
-                        e.preventDefault();
-                        addNewRow();
-                    });
+                addButton.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    addNewRow();
+                });
+            });
+
+            function initRow(row) {
+                // Load base options
+                fillSelect(row.querySelector(".medicine_category"), window.medicineCategories,
+                    "medicine_category");
+                fillSelect(row.querySelector(".interval_dosage"), window.doseIntervals, "name");
+                fillSelect(row.querySelector(".duration_dosage"), window.doseDurations, "name");
+
+                // Category change → fetch medicines
+                row.querySelector(".medicine_category").addEventListener("change", function () {
+                    const categoryId = this.value;
+                    const medicineSelect = row.querySelector(".medicine_name");
+                    const doseSelect = row.querySelector(".medicine_dosage");
+                    const baseUrl = "<?php echo e(route('getMedicines', ['categoryId' => 'ID'])); ?>";
+                    const finalUrl = baseUrl.replace('ID', categoryId);
+                    fetch(finalUrl)
+                        .then(res => res.json())
+                        .then(data => fillSelect(medicineSelect, data, "medicine_name"));
+
+                    const baseUrlDose = "<?php echo e(route('getDoses', ['categoryId' => 'ID'])); ?>";
+                    const finalUrlDose = baseUrlDose.replace('ID', categoryId);
+                    fetch(finalUrlDose)
+                        .then(res => res.json())
+                        .then(data => fillSelect(doseSelect, data, "dosage"));
                 });
 
-                function initRow(row) {
-                    // Load base options
-                    fillSelect(row.querySelector(".medicine_category"), window.medicineCategories,
-                        "medicine_category");
-                    fillSelect(row.querySelector(".interval_dosage"), window.doseIntervals, "name");
-                    fillSelect(row.querySelector(".duration_dosage"), window.doseDurations, "name");
+                // // Medicine change → fetch doses
+                // row.querySelector(".medicine_name").addEventListener("change", function() {
+                //     const medicineId = this.value;
+                //     const doseSelect = row.querySelector(".medicine_dosage");
+                //     fetch(`/getDoses/${medicineId}`)
+                //         .then(res => res.json())
+                //         .then(data => fillSelect(doseSelect, data, "dose"));
+                // });
 
-                    // Category change → fetch medicines
-                    row.querySelector(".medicine_category").addEventListener("change", function() {
-                        const categoryId = this.value;
-                        const medicineSelect = row.querySelector(".medicine_name");
-                        const doseSelect = row.querySelector(".medicine_dosage");
-                        const baseUrl = "<?php echo e(route('getMedicines', ['categoryId' => 'ID'])); ?>";
-                        const finalUrl = baseUrl.replace('ID', categoryId);
-                        fetch(finalUrl)
-                            .then(res => res.json())
-                            .then(data => fillSelect(medicineSelect, data, "medicine_name"));
-
-                        const baseUrlDose = "<?php echo e(route('getDoses', ['categoryId' => 'ID'])); ?>";
-                        const finalUrlDose = baseUrlDose.replace('ID', categoryId);
-                        fetch(finalUrlDose)
-                            .then(res => res.json())
-                            .then(data => fillSelect(doseSelect, data, "dosage"));
-                    });
-
-                    // // Medicine change → fetch doses
-                    // row.querySelector(".medicine_name").addEventListener("change", function() {
-                    //     const medicineId = this.value;
-                    //     const doseSelect = row.querySelector(".medicine_dosage");
-                    //     fetch(`/getDoses/${medicineId}`)
-                    //         .then(res => res.json())
-                    //         .then(data => fillSelect(doseSelect, data, "dose"));
-                    // });
-
-                    // Delete button
-                    const deleteBtn = row.querySelector(".delete_row");
-                    deleteBtn.addEventListener("click", function() {
-                        const allRows = container.querySelectorAll(".medicine-row");
-                        if (allRows.length > 1) row.remove();
-                        else alert("At least one medicine must remain.");
-                    });
-
-                    // Reinitialize select2
-                    if (window.jQuery && $.fn.select2) {
-                        $(row).find(".select2").select2({
-                            width: "100%"
-                        });
-                    }
-                }
-
-                function fillSelect(selectElement, data, textKey) {
-                    selectElement.innerHTML = `<option value="">Select</option>`;
-                    data.forEach(item => {
-                        const opt = document.createElement("option");
-                        opt.value = item.id;
-                        opt.textContent = textKey == 'dosage' ? item[textKey] + " " + item['unit'][
-                            'unit_name'
-                        ] : item[textKey];
-                        selectElement.appendChild(opt);
-                    });
-                }
-
-                function addNewRow() {
-
-                    const rows = container.querySelectorAll(".medicine-row");
-                    if (rows.length === 0) {
-                        console.error("No .medicine-row found in the container.");
-                        return;
-                    }
-                    const lastRow = rows[rows.length - 1];
-                    const newRow = lastRow.cloneNode(true);
-
-                    // Clear previous selections
-                    newRow.querySelectorAll("select").forEach(s => (s.selectedIndex = 0));
-                    newRow.querySelectorAll("textarea").forEach(t => (t.value = ""));
-
-                    // Insert before button
-                    container.insertBefore(newRow, addButtonContainer);
-                    // container.appendChild(newRow);
-                    initRow(newRow);
-                }
-
-            })
-
-            fetch("<?php echo e(route('getFindingCategories')); ?>")
-                .then(response => response.json())
-                .then(data => {
-                    window.findingCategoryData = data;
-                    findingCategorySelect.innerHTML = '<option value="">Select</option>';
-                    data.forEach(category => {
-                        const option = document.createElement('option');
-                        option.value = category.id;
-                        option.textContent = category.category;
-                        if ("<?php echo e(old('finding_type[]')); ?>" == category.id) {
-                            option.selected = true;
-                        }
-                        findingCategorySelect.appendChild(option);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching finding categories:', error);
-                    findingCategorySelect.innerHTML = '<option value="">Error loading options</option>';
+                // Delete button
+                const deleteBtn = row.querySelector(".delete_row");
+                deleteBtn.addEventListener("click", function () {
+                    const allRows = container.querySelectorAll(".medicine-row");
+                    if (allRows.length > 1) row.remove();
+                    else alert("At least one medicine must remain.");
                 });
 
-            findingCategorySelect.addEventListener('change', function() {
-                // ✅ Collect all selected IDs
-                const selectedIds = Array.from(this.selectedOptions).map(opt => opt.value);
+                // Reinitialize select2
+                if (window.jQuery && $.fn.select2) {
+                    $(row).find(".select2").select2({
+                        width: "100%"
+                    });
+                }
+            }
 
-                // ✅ Clear current findings
-                findingsSelect.innerHTML = '<option value="">Loading...</option>';
+            function fillSelect(selectElement, data, textKey) {
+                selectElement.innerHTML = `<option value="">Select</option>`;
+                data.forEach(item => {
+                    const opt = document.createElement("option");
+                    opt.value = item.id;
+                    opt.textContent = textKey == 'dosage' ? item[textKey] + " " + item['unit'][
+                        'unit_name'
+                    ] : item[textKey];
+                    selectElement.appendChild(opt);
+                });
+            }
 
-                if (selectedIds.length === 0) {
-                    findingsSelect.innerHTML = '<option value="">Select a category first</option>';
+            function addNewRow() {
+
+                const rows = container.querySelectorAll(".medicine-row");
+                if (rows.length === 0) {
+                    console.error("No .medicine-row found in the container.");
                     return;
                 }
+                const lastRow = rows[rows.length - 1];
+                const newRow = lastRow.cloneNode(true);
 
-                // ✅ Fetch findings for all selected categories
-                fetch("<?php echo e(route('getFindings')); ?>", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
-                        },
-                        body: JSON.stringify({
-                            category_ids: selectedIds
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        window.findingData = data;
-                        findingsSelect.innerHTML = '<option value="">Select</option>';
-                        data.forEach(finding => {
-                            const option = document.createElement('option');
-                            option.value = finding.id;
-                            option.textContent = finding.name;
-                            if ("<?php echo e(old('finding[]')); ?>" == finding.id) {
-                                option.selected = true;
-                            }
-                            findingsSelect.appendChild(option);
-                        });
-                    })
-                    .catch(error => {
-                        console.error('Error fetching Findings:', error);
-                        findingsSelect.innerHTML = '<option value="">Error loading options</option>';
-                    });
-            });
-            fetch("<?php echo e(route('getPathologies')); ?>")
-                .then(response => response.json())
-                .then(data => {
-                    window.pathologyData = data;
-                    pathologySelect.innerHTML = '<option value="">Select</option>';
-                    data.forEach(patho => {
-                        const option = document.createElement('option');
-                        option.value = patho.id;
-                        option.textContent = patho.test_name + "(" + patho.short_name + ")";
-                        if ("<?php echo e(old('pathology[]')); ?>" == patho.id) {
-                            option.selected = true;
-                        }
-                        pathologySelect.appendChild(option);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching Pathologies:', error);
-                    pathologySelect.innerHTML = '<option value="">Error loading options</option>';
-                });
-            fetch("<?php echo e(route('getRadiologies')); ?>")
-                .then(response => response.json())
-                .then(data => {
-                    window.radiologyData = data;
-                    radiologySelect.innerHTML = '<option value="">Select</option>';
-                    data.forEach(radio => {
-                        const option = document.createElement('option');
-                        option.value = radio.id;
-                        option.textContent = radio.test_name + "(" + radio.short_name + ")";
-                        if ("<?php echo e(old('radiology[]')); ?>" == radio.id) {
-                            option.selected = true;
-                        }
-                        radiologySelect.appendChild(option);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching Radiologies:', error);
-                    radiologySelect.innerHTML = '<option value="">Error loading options</option>';
-                });
+                // Clear previous selections
+                newRow.querySelectorAll("select").forEach(s => (s.selectedIndex = 0));
+                newRow.querySelectorAll("textarea").forEach(t => (t.value = ""));
+
+                // Insert before button
+                container.insertBefore(newRow, addButtonContainer);
+                // container.appendChild(newRow);
+                initRow(newRow);
+            }
+
         })
-    </script>
 
-    <script>
-        // Ensure jQuery + select2 are loaded
-        $(function() {
-            // initialize select2 on multiselect elements
-            $('#finding_type, .multiselect2').select2({
-                placeholder: 'Select',
-                width: '100%'
-            });
-
-            // helper: adjust visual size of a Select2 multiple box based on selected count
-            function adjustSelectSize($select) {
-                var vals = $select.val();
-                var count = Array.isArray(vals) ? vals.length : 0;
-                var $container = $select.next('.select2-container').find('.select2-selection--multiple');
-
-                if (!$container.length) return;
-
-                // Strategy:
-                // - keep one line for up to 3 tags
-                // - add another line for each additional ~3 tags
-                // - cap max height to avoid huge boxes
-                var tagsPerLine = 3;
-                var baseLineHeight = 36; // px for one-line height (approx)
-                var extraLineHeight = 28; // px per additional line
-                var lines = 1 + Math.floor(Math.max(0, count - 1) / tagsPerLine); // >=1
-                var maxLines = 6;
-                lines = Math.min(lines, maxLines);
-                var height = baseLineHeight + (lines - 1) * extraLineHeight;
-
-                $container.css({
-                    'min-height': height + 'px',
-                    'max-height': (maxLines * baseLineHeight) + 'px',
-                    'overflow-y': 'auto'
+        fetch("<?php echo e(route('getFindingCategories')); ?>")
+            .then(response => response.json())
+            .then(data => {
+                window.findingCategoryData = data;
+                findingCategorySelect.innerHTML = '<option value="">Select</option>';
+                data.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.id;
+                    option.textContent = category.category;
+                    if ("<?php echo e(old('finding_type[]')); ?>" == category.id) {
+                        option.selected = true;
+                    }
+                    findingCategorySelect.appendChild(option);
                 });
-            }
-
-            // initial adjust for all existing multiselects
-            $('#finding_type, .multiselect2').each(function() {
-                adjustSelectSize($(this));
+            })
+            .catch(error => {
+                console.error('Error fetching finding categories:', error);
+                findingCategorySelect.innerHTML = '<option value="">Error loading options</option>';
             });
 
-            // adjust on change / select2 events
-            $(document).on('change', '#finding_type, .multiselect2', function() {
-                adjustSelectSize($(this));
-            });
-            // also catch select2 specific events for better responsiveness
-            $(document).on('select2:select select2:unselect', '#finding_type, .multiselect2', function() {
-                adjustSelectSize($(this));
-            });
+        findingCategorySelect.addEventListener('change', function () {
+            // ✅ Collect all selected IDs
+            const selectedIds = Array.from(this.selectedOptions).map(opt => opt.value);
 
-            // Remove medicine row
-            // $(document).on('click', '.delete_row', function() {
-            //     var $tr = $(this).closest('tr');
-            //     $tr.remove();
-            // });
+            // ✅ Clear current findings
+            findingsSelect.innerHTML = '<option value="">Loading...</option>';
 
-            // Add medicine row (simple clone of last row)
-            // $('.add-record').on('click', function(e) {
-            //     e.preventDefault();
-            //     var $last = $('#tableID tbody tr:last');
-            //     var $clone = $last.clone(true, true);
-            //     // update hidden row index and any name attributes (simple increment)
-            //     var lastIndex = $('#tableID tbody tr').length;
-            //     var newIndex = lastIndex + 1;
-            //     $clone.attr('id', 'row' + newIndex);
-            //     $clone.find('input[name="rows[]"]').val(newIndex);
-            //     $clone.find('[name]').each(function() {
-            //         var name = $(this).attr('name');
-            //         if (!name) return;
-            //         // replace trailing digits with newIndex (basic)
-            //         var newName = name.replace(/(\d+)(?!.*\d)/, newIndex);
-            //         $(this).attr('name', newName);
-            //     });
-            //     // clear values in cloned inputs/selects
-            //     $clone.find('input[type!="hidden"], textarea').val('');
-            //     $clone.find('select').val(null).trigger('change');
-
-            //     // If cloned selects are using select2, destroy and re-init to avoid duplicate containers
-            //     $clone.find('select').each(function() {
-            //         var $s = $(this);
-            //         if ($s.hasClass('select2-hidden-accessible')) {
-            //             try {
-            //                 $s.select2('destroy');
-            //             } catch (e) {
-            //                 /* ignore */
-            //             }
-            //             $s.select2({
-            //                 placeholder: 'Select',
-            //                 width: '100%'
-            //             });
-            //             adjustSelectSize($s);
-            //         }
-            //     });
-
-            //     $('#tableID tbody').append($clone);
-            // });
-        });
-    </script>
-
-    <script>
-        // Shorter JS: single global add button, clone rows multiple times, safe select2 re-init
-        $(function() {
-            var $modal = $('#addPrescriptionModal');
-            var $body = $modal.length ? $modal : $('body');
-
-            function replaceIndex(name, idx) {
-                if (!name) return name;
-                return /_\d+$/.test(name) ? name.replace(/_\d+$/, '_' + idx) : name.replace(/(\d+)(?!.*\d)/, idx);
+            if (selectedIds.length === 0) {
+                findingsSelect.innerHTML = '<option value="">Select a category first</option>';
+                return;
             }
 
-            function initSelect($s) {
-                try {
-                    if ($s.hasClass('select2-hidden-accessible')) $s.select2('destroy');
-                } catch (e) {}
-                $s.select2({
-                    placeholder: 'Select',
-                    width: '100%'
-                });
-            }
-
-            function populateMedicines(cat, $med, idx) {
-                $med.prop('disabled', true).empty().append('<option>Loading...</option>');
-                $.get('/api/medicines', {
-                        category: cat
-                    })
-                    .done(function(data) {
-                        $med.empty().append('<option value="">Select</option>');
-                        (data || []).forEach(function(m) {
-                            $med.append($('<option>').val(m.id).text(m.text).data('stock', m.stock));
-                        });
-                    })
-                    .fail(function() {
-                        var samples = [{
-                            id: '101',
-                            text: 'Amoxicillin',
-                            stock: 12
-                        }, {
-                            id: '102',
-                            text: 'Paracetamol',
-                            stock: 50
-                        }];
-                        $med.empty().append('<option value="">Select</option>');
-                        samples.forEach(function(m) {
-                            $med.append($('<option>').val(m.id).text(m.text).data('stock', m.stock));
-                        });
-                    })
-                    .always(function() {
-                        $med.prop('disabled', false).trigger('change');
-                        $med.off('change.stock').on('change.stock', function() {
-                            var st = $med.find('option:selected').data('stock');
-                            $('#stock_info_' + idx).text(st !== undefined ? (st + ' in stock') : '');
-                        });
+            // ✅ Fetch findings for all selected categories
+            fetch("<?php echo e(route('getFindings')); ?>", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({
+                    category_ids: selectedIds
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    window.findingData = data;
+                    findingsSelect.innerHTML = '<option value="">Select</option>';
+                    data.forEach(finding => {
+                        const option = document.createElement('option');
+                        option.value = finding.id;
+                        option.textContent = finding.name;
+                        if ("<?php echo e(old('finding[]')); ?>" == finding.id) {
+                            option.selected = true;
+                        }
+                        findingsSelect.appendChild(option);
                     });
-            }
-
-            function initRow($row) {
-                var idx = $row.data('row') || $('.medicine-row').length;
-                $row.find('select').each(function() {
-                    initSelect($(this));
+                })
+                .catch(error => {
+                    console.error('Error fetching Findings:', error);
+                    findingsSelect.innerHTML = '<option value="">Error loading options</option>';
                 });
-                $row.off('change.cat').on('change.cat', '.medicine_category', function() {
-                    populateMedicines($(this).val(), $row.find('.medicine_name'), idx);
-                });
-                $row.find('input[type!="hidden"], textarea').val('');
-                $row.find('select').val(null).trigger('change');
-                $('#stock_info_' + idx).text('');
-            }
-
-            function reindex() {
-                $('.medicine-row').each(function(i) {
-                    var idx = i + 1,
-                        $r = $(this);
-                    $r.attr('data-row', idx).attr('id', 'row' + idx);
-                    $r.find('[name]').each(function() {
-                        var $el = $(this),
-                            n = $el.attr('name'),
-                            id = $el.attr('id');
-                        if (n) $el.attr('name', replaceIndex(n, idx));
-                        if (id) $el.attr('id', /\d+$/.test(id) ? id.replace(/\d+$/, idx) : id +
-                            '_' + idx);
-                        if ($el.hasClass('medicine_name')) $el.attr('data-rowid', idx);
-                    });
-                    $r.find('[id^=stock_info_]').attr('id', 'stock_info_' + idx);
-                });
-            }
-
-            // ensure single add button: detach first found, remove others, place after rows in wrapper
-            var $foundAdd = $('.add-record').first().length ? $('.add-record').first().detach() : null;
-            $('.add-record').remove();
-            var $addWrapper = $('<div class="add-record-wrapper col-sm-12 mt-2"></div>');
-            if ($foundAdd) $addWrapper.append($foundAdd);
-            // place wrapper after the last medicine-row; if none, append to a sensible container
-            var $lastRow = $('.medicine-row').last();
-            if ($lastRow.length) {
-                $lastRow.after($addWrapper);
-            } else {
-                $body.append($addWrapper);
-            }
-
-            // initial setup: set data-row and init rows
-            $('.medicine-row').each(function(i) {
-                $(this).attr('data-row', i + 1);
-                initRow($(this));
-            });
-            reindex();
-
-            // add new row using the single add button
-            $body.on('click', '.add-record', function(e) {
-                e.preventDefault();
-                var $last = $('.medicine-row').last();
-
-                // destroy select2 on last before cloning to avoid cloning select2 markup
-                $last.find('select').each(function() {
-                    try {
-                        if ($(this).hasClass('select2-hidden-accessible')) $(this).select2(
-                            'destroy');
-                    } catch (err) {}
-                });
-
-                var $new = $last.clone(false, false); // shallow clone to avoid copying handlers
-                // Remove any add button inside clone (just in case)
-                $new.find('.add-record').remove();
-
-                // Clear values
-                $new.find('input[type!="hidden"], textarea').val('');
-                $new.find('select').val(null);
-
-                // Insert new row before the add button wrapper so the add button remains single
-                $addWrapper.before($new);
-
-                // reindex and (re)init
-                reindex();
-                // init select2 for all selects in the new row
-                initRow($new);
-
-                // re-init select2 for the previous last row as cloning destroyed it
-                initRow($last);
-            });
-
-            // delete row
-            $body.on('click', '.delete_row', function(e) {
-                e.preventDefault();
-                var $row = $(this).closest('.medicine-row');
-                if ($('.medicine-row').length <= 1) {
-                    $row.find('input[type!="hidden"], textarea').val('');
-                    $row.find('select').val(null).trigger('change');
-                    $row.find('[id^=stock_info_]').text('');
-                    return;
-                }
-                $row.remove();
-                reindex();
-            });
         });
-    </script>
-
-    <script>
-        function initEditor(toolbarId, editorId, selectId) {
-            const toolbar = document.getElementById(toolbarId);
-            const editor = document.getElementById(editorId);
-            const formatBlockSelect = document.getElementById(selectId);
-
-            toolbar.addEventListener('click', (e) => {
-                const btn = e.target.closest('button');
-                if (!btn) return;
-
-                const cmd = btn.dataset.cmd;
-                const val = btn.dataset.value || null;
-
-                if (cmd === 'small') {
-                    document.execCommand('fontSize', false, '2');
-                } else {
-                    document.execCommand(cmd, false, val);
-                }
-                editor.focus();
+        fetch("<?php echo e(route('getPathologies')); ?>")
+            .then(response => response.json())
+            .then(data => {
+                window.pathologyData = data;
+                pathologySelect.innerHTML = '<option value="">Select</option>';
+                data.forEach(patho => {
+                    const option = document.createElement('option');
+                    option.value = patho.id;
+                    option.textContent = patho.test_name + "(" + patho.short_name + ")";
+                    if ("<?php echo e(old('pathology[]')); ?>" == patho.id) {
+                        option.selected = true;
+                    }
+                    pathologySelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching Pathologies:', error);
+                pathologySelect.innerHTML = '<option value="">Error loading options</option>';
             });
+        fetch("<?php echo e(route('getRadiologies')); ?>")
+            .then(response => response.json())
+            .then(data => {
+                window.radiologyData = data;
+                radiologySelect.innerHTML = '<option value="">Select</option>';
+                data.forEach(radio => {
+                    const option = document.createElement('option');
+                    option.value = radio.id;
+                    option.textContent = radio.test_name + "(" + radio.short_name + ")";
+                    if ("<?php echo e(old('radiology[]')); ?>" == radio.id) {
+                        option.selected = true;
+                    }
+                    radiologySelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching Radiologies:', error);
+                radiologySelect.innerHTML = '<option value="">Error loading options</option>';
+            });
+    })
+</script>
 
-            formatBlockSelect.addEventListener('change', (e) => {
-                const value = e.target.value;
-                document.execCommand('formatBlock', false, value);
-                editor.focus();
+<script>
+    // Ensure jQuery + select2 are loaded
+    $(function () {
+        // initialize select2 on multiselect elements
+        $('#finding_type, .multiselect2').select2({
+            placeholder: 'Select',
+            width: '100%'
+        });
+
+        // helper: adjust visual size of a Select2 multiple box based on selected count
+        function adjustSelectSize($select) {
+            var vals = $select.val();
+            var count = Array.isArray(vals) ? vals.length : 0;
+            var $container = $select.next('.select2-container').find('.select2-selection--multiple');
+
+            if (!$container.length) return;
+
+            // Strategy:
+            // - keep one line for up to 3 tags
+            // - add another line for each additional ~3 tags
+            // - cap max height to avoid huge boxes
+            var tagsPerLine = 3;
+            var baseLineHeight = 36; // px for one-line height (approx)
+            var extraLineHeight = 28; // px per additional line
+            var lines = 1 + Math.floor(Math.max(0, count - 1) / tagsPerLine); // >=1
+            var maxLines = 6;
+            lines = Math.min(lines, maxLines);
+            var height = baseLineHeight + (lines - 1) * extraLineHeight;
+
+            $container.css({
+                'min-height': height + 'px',
+                'max-height': (maxLines * baseLineHeight) + 'px',
+                'overflow-y': 'auto'
             });
         }
 
-        // Initialize both editors
-        initEditor('toolbar-header', 'editor-header', 'formatBlock-header');
-        initEditor('toolbar-footer', 'editor-footer', 'formatBlock-footer');
-    </script>
-<?php /**PATH C:\xampp\htdocs\hims\resources\views/components/modals/add-prescription-modal.blade.php ENDPATH**/ ?>
+        // initial adjust for all existing multiselects
+        $('#finding_type, .multiselect2').each(function () {
+            adjustSelectSize($(this));
+        });
+
+        // adjust on change / select2 events
+        $(document).on('change', '#finding_type, .multiselect2', function () {
+            adjustSelectSize($(this));
+        });
+        // also catch select2 specific events for better responsiveness
+        $(document).on('select2:select select2:unselect', '#finding_type, .multiselect2', function () {
+            adjustSelectSize($(this));
+        });
+
+        // Remove medicine row
+        // $(document).on('click', '.delete_row', function() {
+        //     var $tr = $(this).closest('tr');
+        //     $tr.remove();
+        // });
+
+        // Add medicine row (simple clone of last row)
+        // $('.add-record').on('click', function(e) {
+        //     e.preventDefault();
+        //     var $last = $('#tableID tbody tr:last');
+        //     var $clone = $last.clone(true, true);
+        //     // update hidden row index and any name attributes (simple increment)
+        //     var lastIndex = $('#tableID tbody tr').length;
+        //     var newIndex = lastIndex + 1;
+        //     $clone.attr('id', 'row' + newIndex);
+        //     $clone.find('input[name="rows[]"]').val(newIndex);
+        //     $clone.find('[name]').each(function() {
+        //         var name = $(this).attr('name');
+        //         if (!name) return;
+        //         // replace trailing digits with newIndex (basic)
+        //         var newName = name.replace(/(\d+)(?!.*\d)/, newIndex);
+        //         $(this).attr('name', newName);
+        //     });
+        //     // clear values in cloned inputs/selects
+        //     $clone.find('input[type!="hidden"], textarea').val('');
+        //     $clone.find('select').val(null).trigger('change');
+
+        //     // If cloned selects are using select2, destroy and re-init to avoid duplicate containers
+        //     $clone.find('select').each(function() {
+        //         var $s = $(this);
+        //         if ($s.hasClass('select2-hidden-accessible')) {
+        //             try {
+        //                 $s.select2('destroy');
+        //             } catch (e) {
+        //                 /* ignore */
+        //             }
+        //             $s.select2({
+        //                 placeholder: 'Select',
+        //                 width: '100%'
+        //             });
+        //             adjustSelectSize($s);
+        //         }
+        //     });
+
+        //     $('#tableID tbody').append($clone);
+        // });
+    });
+</script>
+
+<script>
+    // Shorter JS: single global add button, clone rows multiple times, safe select2 re-init
+    $(function () {
+        var $modal = $('#addPrescriptionModal');
+        var $body = $modal.length ? $modal : $('body');
+
+        function replaceIndex(name, idx) {
+            if (!name) return name;
+            return /_\d+$/.test(name) ? name.replace(/_\d+$/, '_' + idx) : name.replace(/(\d+)(?!.*\d)/, idx);
+        }
+
+        function initSelect($s) {
+            try {
+                if ($s.hasClass('select2-hidden-accessible')) $s.select2('destroy');
+            } catch (e) { }
+            $s.select2({
+                placeholder: 'Select',
+                width: '100%'
+            });
+        }
+
+        function populateMedicines(cat, $med, idx) {
+            $med.prop('disabled', true).empty().append('<option>Loading...</option>');
+            $.get('/api/medicines', {
+                category: cat
+            })
+                .done(function (data) {
+                    $med.empty().append('<option value="">Select</option>');
+                    (data || []).forEach(function (m) {
+                        $med.append($('<option>').val(m.id).text(m.text).data('stock', m.stock));
+                    });
+                })
+                .fail(function () {
+                    var samples = [{
+                        id: '101',
+                        text: 'Amoxicillin',
+                        stock: 12
+                    }, {
+                        id: '102',
+                        text: 'Paracetamol',
+                        stock: 50
+                    }];
+                    $med.empty().append('<option value="">Select</option>');
+                    samples.forEach(function (m) {
+                        $med.append($('<option>').val(m.id).text(m.text).data('stock', m.stock));
+                    });
+                })
+                .always(function () {
+                    $med.prop('disabled', false).trigger('change');
+                    $med.off('change.stock').on('change.stock', function () {
+                        var st = $med.find('option:selected').data('stock');
+                        $('#stock_info_' + idx).text(st !== undefined ? (st + ' in stock') : '');
+                    });
+                });
+        }
+
+        function initRow($row) {
+            var idx = $row.data('row') || $('.medicine-row').length;
+            $row.find('select').each(function () {
+                initSelect($(this));
+            });
+            $row.off('change.cat').on('change.cat', '.medicine_category', function () {
+                populateMedicines($(this).val(), $row.find('.medicine_name'), idx);
+            });
+            $row.find('input[type!="hidden"], textarea').val('');
+            $row.find('select').val(null).trigger('change');
+            $('#stock_info_' + idx).text('');
+        }
+
+        function reindex() {
+            $('.medicine-row').each(function (i) {
+                var idx = i + 1,
+                    $r = $(this);
+                $r.attr('data-row', idx).attr('id', 'row' + idx);
+                $r.find('[name]').each(function () {
+                    var $el = $(this),
+                        n = $el.attr('name'),
+                        id = $el.attr('id');
+                    if (n) $el.attr('name', replaceIndex(n, idx));
+                    if (id) $el.attr('id', /\d+$/.test(id) ? id.replace(/\d+$/, idx) : id +
+                        '_' + idx);
+                    if ($el.hasClass('medicine_name')) $el.attr('data-rowid', idx);
+                });
+                $r.find('[id^=stock_info_]').attr('id', 'stock_info_' + idx);
+            });
+        }
+
+        // ensure single add button: detach first found, remove others, place after rows in wrapper
+        var $foundAdd = $('.add-record').first().length ? $('.add-record').first().detach() : null;
+        $('.add-record').remove();
+        var $addWrapper = $('<div class="add-record-wrapper col-sm-12 mt-2"></div>');
+        if ($foundAdd) $addWrapper.append($foundAdd);
+        // place wrapper after the last medicine-row; if none, append to a sensible container
+        var $lastRow = $('.medicine-row').last();
+        if ($lastRow.length) {
+            $lastRow.after($addWrapper);
+        } else {
+            $body.append($addWrapper);
+        }
+
+        // initial setup: set data-row and init rows
+        $('.medicine-row').each(function (i) {
+            $(this).attr('data-row', i + 1);
+            initRow($(this));
+        });
+        reindex();
+
+        // add new row using the single add button
+        $body.on('click', '.add-record', function (e) {
+            e.preventDefault();
+            var $last = $('.medicine-row').last();
+
+            // destroy select2 on last before cloning to avoid cloning select2 markup
+            $last.find('select').each(function () {
+                try {
+                    if ($(this).hasClass('select2-hidden-accessible')) $(this).select2(
+                        'destroy');
+                } catch (err) { }
+            });
+
+            var $new = $last.clone(false, false); // shallow clone to avoid copying handlers
+            // Remove any add button inside clone (just in case)
+            $new.find('.add-record').remove();
+
+            // Clear values
+            $new.find('input[type!="hidden"], textarea').val('');
+            $new.find('select').val(null);
+
+            // Insert new row before the add button wrapper so the add button remains single
+            $addWrapper.before($new);
+
+            // reindex and (re)init
+            reindex();
+            // init select2 for all selects in the new row
+            initRow($new);
+
+            // re-init select2 for the previous last row as cloning destroyed it
+            initRow($last);
+        });
+
+        // delete row
+        $body.on('click', '.delete_row', function (e) {
+            e.preventDefault();
+            var $row = $(this).closest('.medicine-row');
+            if ($('.medicine-row').length <= 1) {
+                $row.find('input[type!="hidden"], textarea').val('');
+                $row.find('select').val(null).trigger('change');
+                $row.find('[id^=stock_info_]').text('');
+                return;
+            }
+            $row.remove();
+            reindex();
+        });
+    });
+</script>
+
+<script>
+    function initEditor(toolbarId, editorId, selectId) {
+        const toolbar = document.getElementById(toolbarId);
+        const editor = document.getElementById(editorId);
+        const formatBlockSelect = document.getElementById(selectId);
+
+        toolbar.addEventListener('click', (e) => {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+
+            const cmd = btn.dataset.cmd;
+            const val = btn.dataset.value || null;
+
+            if (cmd === 'small') {
+                document.execCommand('fontSize', false, '2');
+            } else {
+                document.execCommand(cmd, false, val);
+            }
+            editor.focus();
+        });
+
+        formatBlockSelect.addEventListener('change', (e) => {
+            const value = e.target.value;
+            document.execCommand('formatBlock', false, value);
+            editor.focus();
+        });
+    }
+
+    // Initialize both editors
+    initEditor('toolbar-header', 'editor-header', 'formatBlock-header');
+    initEditor('toolbar-footer', 'editor-footer', 'formatBlock-footer');
+</script><?php /**PATH C:\xampp\htdocs\hims\resources\views/components/modals/add-prescription-modal.blade.php ENDPATH**/ ?>
