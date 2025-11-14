@@ -135,9 +135,9 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="index.html" class="active">Birth Record
+                                    <li><a href="{{ route('birth') }}" class="active">Birth Record
                                             </a></li>
-                                    <li><a href="doctor-dashboard.html">Death Record
+                                    <li><a href="{{ route('death') }}">Death Record
                                             </a></li>
                                     
                                 </ul>
@@ -265,18 +265,22 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="index.html" class="active">Staff
+                                    <li><a href="{{ route('dutyroster') }}" >Duty Roster List
                                             </a></li>
-                                    <li><a href="doctor-dashboard.html">Doctors
+                                    <li><a href="{{ route('dutyroster.Shift') }}" >Duty Shift List
+                                            </a></li>
+                                    <li><a href="{{ route('dutyroster.staff') }}" >Staff Roster Details
+                                            </a></li>
+                                    <li><a href="{{ route('dutyroster.doctor') }}">Doctors Roster Details
                                             </a></li>
                                     
                                 </ul>
                             </li>
-                            <li>
+                            <!-- <li>
                                 <a href="#">
                                     <i class="ti ti-map-pin"></i><span>Annual Calender</span>
                                 </a>
-                            </li>
+                            </li> -->
                             <li>
                                 <a href="{{ route('tpamanagement') }}">
                                     <i class="ti ti-map-pin"></i><span>TPA Management</span>

@@ -62,6 +62,7 @@ use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\TpamanagmentController;
 use App\Http\Controllers\VisitorsController;
 use App\Http\Controllers\VitalController;
+use App\Http\Controllers\StaffController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -289,13 +290,13 @@ Route::middleware(['admin'])->group(function () {
     Route::put('/income/update', [IncomeController::class, 'update'])->name('income.update');
     Route::delete('/income/destroy', [IncomeController::class, 'destroy'])->name('income.destroy');
 
-    Route::get('/expense', [ExpenseController::class, 'index']);
+    Route::get('/expense', [ExpenseController::class, 'index'])->name('expenses');
 
-    Route::get('/birth', [BirthController::class, 'index']);
+    Route::get('/birth', [BirthController::class, 'index'])->name('birth');
 
-    Route::get('/death', [DeathController::class, 'index']);
+    Route::get('/death', [DeathController::class, 'index'])->name('death');
 
-    Route::get('/visitors', [VisitorsController::class, 'index']);
+    Route::get('/visitors', [VisitorsController::class, 'index'])->name('visitors');
 
 });
 
@@ -773,3 +774,11 @@ Route::prefix('setup')->group(function () {
     Route::get('/blood_bank_status', function () {
         return view('admin.blood-bank-doner.blood_bank_status');
     })->name('blood_bank_status');
+
+    Route::prefix('staffs')->group(function () {
+         Route::get('/', [StaffController::class, 'index'])->name('staffs');
+         Route::get('/create', [StaffController::class, 'create'])->name('staffs');
+         Route::get('/import', [StaffController::class, 'index'])->name('Staff-import');
+          Route::get('/bulk-delete', [StaffController::class, 'index'])->name('Staffs.bulkDelete');
+    
+    });

@@ -575,10 +575,10 @@ unset($__errorArgs, $__bag); ?>
 
                     </div>
 
-            </div>
-            <div class="modal-footer">
-                <button type="submit" class="btn btn-primary">Save Role</button>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save Role</button>
+                </div>
             </form>
         </div>
     </div>
