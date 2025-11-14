@@ -1,6 +1,4 @@
-{{-- resources/views/settings.blade.php --}}
-@extends('layouts.adminLayout')
-@section('content')
+<?php $__env->startSection('content'); ?>
     <style>
         .module_billing {
             border-radius: 8px;
@@ -2519,7 +2517,7 @@
                                                                 data-bs-target="#addPrescriptionModal"><i
                                                                     class="ti ti-plus me-1"></i>Add Prescription</a>
                                                         </div>
-                                                        @include('components.modals.add-prescription-modal')
+                                                        <?php echo $__env->make('components.modals.add-prescription-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
                                                         <!-- First Modal -->
                                                         <div class="modal fade" id="add_timeline" tabindex="-1"
                                                             aria-hidden="true">
@@ -2620,7 +2618,7 @@
                                                                                 data-bs-toggle="tooltip"
                                                                                 title="Show"></i></a>
                                                                     </div>
-                                                                    @include('components.modals.show-prescription-modal')
+                                                                    <?php echo $__env->make('components.modals.show-prescription-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
                                                                 </td>
                                                             </tr>
                                                         </tbody>
@@ -3008,4 +3006,5 @@
             });
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp82\htdocs\hims\resources\views/admin/ipd/ipd_view.blade.php ENDPATH**/ ?>
