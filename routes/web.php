@@ -487,6 +487,7 @@ Route::get('/getSymptomsTypes', [OpdController::class, 'getSymptomsType'])->name
 Route::post('/getSymptoms', [OpdController::class, 'getSymptoms'])->name('getSymptoms');
 Route::get('/opd_view/{id}', [OpdController::class, 'showOpd'])->name('opd.show');
 Route::post('/add_prescription', [OpdController::class, 'storePrescription'])->name('opd.addPrescription');
+Route::post('/opd_medication', [OpdController::class, 'createOpdMedication'])->name('opd.createMedication');
 
 Route::get('/ipd', [IpdController::class, 'index'])->name('ipd');
 Route::post('/ipd/store', [IpdController::class, 'store'])->name('ipd.store');
@@ -494,6 +495,7 @@ Route::get('/ipd/edit/{id}', [IpdController::class, 'edit'])->name('ipd.edit');
 Route::put('/ipd/update/{id}', [IpdController::class, 'update'])->name('ipd.update');
 Route::get('/getBedGroups', [IpdController::class, 'getBedGroups'])->name('getBedGroups');
 Route::get('/getBedNumbers/{id}', [IpdController::class, 'getBedNumbers'])->name('getBedNumbers');
+Route::get('/ipd_view/{id}', [IpdController::class, 'showIpd'])->name('ipd.show');
 Route::get('/billing', function () {
     return view('admin.billing.billing');
 })->name('billing');
@@ -556,9 +558,6 @@ Route::get('/opd-billing', function () {
 Route::get('/visit_details', function () {
     return view('admin.visit_details');
 })->name('visit_details');
-Route::get('/opd_view', function () {
-    return view('admin.opd.opd_view');
-})->name('opd_view');
 
 Route::prefix('dutyroster')->group(function () {
     Route::get('/', [DutyRosterController::class, 'rosterListDetails'])->name('dutyroster');
@@ -586,6 +585,21 @@ Route::prefix('dutyroster')->group(function () {
     // Route::get('/show/{id}', [DutyRosterController::class, 'show'])->name('dutyroster.show');
 });
 Route::prefix('ambulance')->group(function () {
+});
+Route::prefix('staffs')->group(function () {
+    
+    Route::get('/', [StaffController::class, 'index'])->name('staffs.index');
+    Route::get('/create', [StaffController::class, 'create'])->name('createStaff');
+    Route::post('/addStaff', [StaffController::class, 'store'])->name('staff.store');
+    
+    Route::get('/import', [StaffController::class, 'importStaff'])->name('Staff-import');
+    Route::post('/bulkimport', [StaffController::class, 'bulkImport'])->name('Staffs.import');
+    Route::get('/department/{deptId}/specialists', [DepartmentController::class, 'getSpecialists'])
+         ->name('department.specialists');
+
+    Route::put('/edit/{id}', [BloodDonorController::class, 'editDoner'])->name('bloodBank.editDoner');
+    Route::put('/update/{id}', [BloodDonorController::class, 'updateDonor'])->name('bloodBank.updateDoner');
+    Route::delete('/destroy', [BloodDonorController::class, 'destroyDonor'])->name('Staffs.bulkDelete');
 });
 Route::prefix('bloodBank')->group(function () {
 

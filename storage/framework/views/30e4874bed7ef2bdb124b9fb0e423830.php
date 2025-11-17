@@ -61,7 +61,7 @@
                         <div class="mb-3">
                             <h6 class=" mb-2 fs-14 fw-medium"> Patient Details </h6>
                             <div class="px-3 py-2 bg-light rounded d-flex align-items-center justify-content-between">
-                                <h6 class="m-0 fw-semibold fs-16"> Akash </h6>
+                                <h6 class="m-0 fw-semibold fs-16"> Abisekh Roy </h6>
                                 <div class="d-flex align-items-center  gap-3">
                                     <p class="mb-0 text-dark"> 28Y / Male </p>
                                     <p class="mb-0 text-dark"> <span class="text-body"> Blood </span> : O+ve</p>

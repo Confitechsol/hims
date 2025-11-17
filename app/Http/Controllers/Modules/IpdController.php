@@ -255,4 +255,27 @@ class IpdController extends Controller
         // dd($bedNumbers);
         return response()->json($bedNumbers, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
     }
+
+    public function showIpd(Request $request, $id)
+    {
+        // $opd        = IpdDetail::with('patient.bloodGroup', 'patient.organisation', 'doctor', 'chargeCategory', 'charge')->where('id', $id)->firstOrFail();
+        // $symptomIds = array_filter(
+        //     explode(',', $opd->symptoms_title),
+        //     fn($id) => $id !== null && trim($id) !== ''
+        // );
+
+        // // Fetch symptoms related to this OPD
+        // $symptoms = ! empty($symptomIds)
+        //     ? Symptom::whereIn('id', $symptomIds)->get()
+        //     : collect();
+
+        // $medicationReport  = MedicationReport::with('medicineDosage.unit', 'pharmacy', 'generatedBy.userRole')->where('opd_details_id', $id)->get();
+        // $operationDetail   = OperationTheatre::with('operation.category')->where('opd_details_id', $id)->get();
+        // $opdCharges        = OpdCharges::with('opd', 'charge.taxCategory', 'chargeCategory.chargeType')->where('opd_id', $id)->get();
+        // $labInvestigations = PathologyReport::with('pathology')->where('patient_id', $opd->patient->id)->get();
+        // $opdSymptoms       = [];
+
+        // Store in array using OPD number as key
+        return view('admin.ipd.ipd_view');
+    }
 }

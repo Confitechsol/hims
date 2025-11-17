@@ -1900,77 +1900,88 @@
                                                                     </div>
 
                                                                     <div class="modal-body">
-
-                                                                        <div class="row gy-3">
-
-                                                                            <div class="col-md-6">
-                                                                                <label for="date" class="form-label">Date
-                                                                                    <span class="text-danger">*</span>
-                                                                                </label>
-                                                                                <input type="date" name="date" id="date"
-                                                                                    class="form-control">
+                                                                        <form action="{{ route('opd.createMedication') }}"
+                                                                            method="post">
+                                                                            @csrf
+                                                                            <div class="row gy-3">
+                                                                                <input type="hidden" name="opd_id"
+                                                                                    value="{{ $opd->id }}">
+                                                                                <div class="col-md-6">
+                                                                                    <label for="date"
+                                                                                        class="form-label">Date
+                                                                                        <span class="text-danger">*</span>
+                                                                                    </label>
+                                                                                    <input type="date" name="date"
+                                                                                        id="date"
+                                                                                        class="form-control">
+                                                                                </div>
+                                                                                <div class="col-md-6">
+                                                                                    <label for="time"
+                                                                                        class="form-label">Time
+                                                                                        <span class="text-danger">*</span>
+                                                                                    </label>
+                                                                                    <input type="time" name="time"
+                                                                                        id="time"
+                                                                                        class="form-control">
+                                                                                </div>
+                                                                                <div class="col-md-6">
+                                                                                    <label for="medi_cat"
+                                                                                        class="form-label">Medicine
+                                                                                        Category
+                                                                                        <span class="text-danger">*</span>
+                                                                                    </label>
+                                                                                    <select name="med_cat" id="med_cat"
+                                                                                        class="form-select"
+                                                                                        data-placeholder="Enter Patient Name or Id…">
+                                                                                        <option value="0">Select
+                                                                                        </option>
+                                                                                        <option value="1">Antibiotic
+                                                                                        </option>
+                                                                                    </select>
+                                                                                </div>
+                                                                                <div class="col-md-6">
+                                                                                    <label for="med_name"
+                                                                                        class="form-label">Medicine Name
+                                                                                        <span class="text-danger">*</span>
+                                                                                    </label>
+                                                                                    <select name="med_name" id="med_name"
+                                                                                        class="form-select"
+                                                                                        data-placeholder="Enter Patient Name or Id…">
+                                                                                        <option value="0">Select
+                                                                                        </option>
+                                                                                        <option value="1">Paracetamol
+                                                                                            500mg
+                                                                                        </option>
+                                                                                    </select>
+                                                                                </div>
+                                                                                <div class="col-md-6">
+                                                                                    <label for="dosage"
+                                                                                        class="form-label">Dosage
+                                                                                        <span class="text-danger">*</span>
+                                                                                    </label>
+                                                                                    <select name="dosage" id="dosage"
+                                                                                        class="form-select"
+                                                                                        data-placeholder="Enter Patient Name or Id…">
+                                                                                        <option value="0">Select
+                                                                                        </option>
+                                                                                        <option value="1">1 Tablet
+                                                                                        </option>
+                                                                                    </select>
+                                                                                </div>
+                                                                                <div class="col-md-6">
+                                                                                    <label for="remark"
+                                                                                        class="form-label">Remarks
+                                                                                    </label>
+                                                                                    <textarea name="remark" id="remark" class="form-control"></textarea>
+                                                                                </div>
                                                                             </div>
-                                                                            <div class="col-md-6">
-                                                                                <label for="time" class="form-label">Time
-                                                                                    <span class="text-danger">*</span>
-                                                                                </label>
-                                                                                <input type="time" name="time" id="time"
-                                                                                    class="form-control">
+                                                                            <div class="modal-footer">
+                                                                                <button type="submit"
+                                                                                    class="btn btn-primary">Save</button>
                                                                             </div>
-                                                                            <div class="col-md-6">
-                                                                                <label for="medi_cat"
-                                                                                    class="form-label">Medicine Category
-                                                                                    <span class="text-danger">*</span>
-                                                                                </label>
-                                                                                <select name="medi_cat" id="med_cat"
-                                                                                    class="form-select"
-                                                                                    data-placeholder="Enter Patient Name or Id…">
-                                                                                    <option value="0">Select</option>
-                                                                                    <option value="1">Antibiotic
-                                                                                    </option>
-                                                                                </select>
-                                                                            </div>
-                                                                            <div class="col-md-6">
-                                                                                <label for="med_name"
-                                                                                    class="form-label">Medicine Name
-                                                                                    <span class="text-danger">*</span>
-                                                                                </label>
-                                                                                <select name="med_name" id="med_name"
-                                                                                    class="form-select"
-                                                                                    data-placeholder="Enter Patient Name or Id…">
-                                                                                    <option value="0">Select</option>
-                                                                                    <option value="1">Paracetamol
-                                                                                        500mg
-                                                                                    </option>
-                                                                                </select>
-                                                                            </div>
-                                                                            <div class="col-md-6">
-                                                                                <label for="dosage"
-                                                                                    class="form-label">Dosage
-                                                                                    <span class="text-danger">*</span>
-                                                                                </label>
-                                                                                <select name="dosage" id="dosage"
-                                                                                    class="form-select"
-                                                                                    data-placeholder="Enter Patient Name or Id…">
-                                                                                    <option value="0">Select</option>
-                                                                                    <option value="1">1 Tablet
-                                                                                    </option>
-                                                                                </select>
-                                                                            </div>
-                                                                            <div class="col-md-6">
-                                                                                <label for="remark"
-                                                                                    class="form-label">Remarks
-                                                                                </label>
-                                                                                <textarea name="remark" id="remark"
-                                                                                    class="form-control"></textarea>
-                                                                            </div>
-                                                                        </div>
-
+                                                                        </form>
                                                                     </div>
-                                                                    <div class="modal-footer">
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary">Save</button>
-                                                                    </div>
+
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -3358,5 +3369,78 @@
                 vitalFields.appendChild(newRow);
             });
         });
+
+        const medCatSelect = document.getElementById('med_cat')
+        const medNameSelect = document.getElementById('med_name')
+        const doseSelect = document.getElementById('dosage')
+        medCatSelect.innerHTML = '<option value="">Loading...</option>';
+        medNameSelect.innerHTML = '<option value="">Loading...</option>';
+        doseSelect.innerHTML = '<option value="">Loading...</option>';
+        fetch("{{ route('getMedicineCategories') }}")
+            .then(response => response.json())
+            .then(data => {
+                window.medicineCategories = data;
+                medCatSelect.innerHTML = '<option value="">Select</option>';
+                data.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.id;
+                    option.textContent = category.medicine_category;
+                    if ("{{ old('med_cat') }}" == category.id) {
+                        option.selected = true;
+                    }
+                    medCatSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching charge categories:', error);
+                medCatSelect.innerHTML = '<option value="">Error loading options</option>';
+            });
+
+        // Listen for Charge Category dropdown change
+        medCatSelect.addEventListener('change', function() {
+            const selectedId = this.value;
+            const baseUrl = "{{ route('getMedicines', ['categoryId' => 'ID']) }}";
+            const finalUrl = baseUrl.replace('ID', selectedId);
+            fetch(finalUrl)
+                .then(response => response.json())
+                .then(data => {
+                    window.chargeData = data;
+                    medNameSelect.innerHTML = '<option value="">Select</option>';
+                    data.forEach(charge => {
+                        const option = document.createElement('option');
+                        option.value = charge.id;
+                        option.textContent = charge.medicine_name;
+                        if ("{{ old('med_name') }}" == charge.id) {
+                            option.selected = true;
+                        }
+                        medNameSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching Charges:', error);
+                    medNameSelect.innerHTML = '<option value="">Error loading options</option>';
+                });
+            const baseUrlDose = "{{ route('getDoses', ['categoryId' => 'ID']) }}";
+            const finalUrlDose = baseUrlDose.replace('ID', selectedId);
+            fetch(finalUrlDose)
+                .then(response => response.json())
+                .then(data => {
+                    window.chargeData = data;
+                    doseSelect.innerHTML = '<option value="">Select</option>';
+                    data.forEach(charge => {
+                        const option = document.createElement('option');
+                        option.value = charge.id;
+                        option.textContent = charge.dosage + " " + charge.unit.unit_name;
+                        if ("{{ old('dosage') }}" == charge.id) {
+                            option.selected = true;
+                        }
+                        doseSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching Charges:', error);
+                    doseSelect.innerHTML = '<option value="">Error loading options</option>';
+                });
+        })
     </script>
 @endsection

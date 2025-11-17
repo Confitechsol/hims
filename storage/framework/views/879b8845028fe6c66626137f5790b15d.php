@@ -117,6 +117,10 @@
                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
                                                 <i class="ti ti-trash"></i>
                                             </a>
+                                            <form id="deleteForm" method="POST" style="display: none;">
+                                                <?php echo csrf_field(); ?>
+                                                <?php echo method_field('DELETE'); ?>
+                                            </form>
 
                                             <!-- Edit Roster Modal -->
                                                 <div class="modal fade" id="editRosterModal" tabindex="-1" aria-hidden="true" style="padding-left: 0px;">

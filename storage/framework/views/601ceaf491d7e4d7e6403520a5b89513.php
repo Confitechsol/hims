@@ -32,409 +32,131 @@
             width: 45px;
         }
 
-        .patient-info-card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            overflow: hidden;
-            max-width: 900px;
-            margin: 0 auto;
+        .tabs-scroll-wrapper {
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            /* smooth scroll on mobile */
         }
 
-        /* Header Section */
-        .patient-header {
-            background: linear-gradient(-90deg, #75009673 0%, #cb6ce673 100%);
-            padding: 1.5rem;
-            position: relative;
-            overflow: hidden;
+        .tabs-scroll-wrapper::-webkit-scrollbar {
+            height: 6px;
+            /* optional */
         }
 
-        .patient-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -10%;
-            width: 300px;
-            height: 300px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-        }
-
-        .patient-header::after {
-            content: '';
-            position: absolute;
-            bottom: -30%;
-            left: -5%;
-            width: 200px;
-            height: 200px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 50%;
-        }
-
-        .header-content {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        /* Patient Avatar */
-        .patient-avatar-wrapper {
-            position: relative;
-        }
-
-        .patient-avatar {
-            width: 140px;
-            height: 140px;
-            border-radius: 16px;
-            overflow: hidden;
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            background: white;
-        }
-
-        .patient-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .avatar-badge {
-            position: absolute;
-            bottom: -8px;
-            right: -8px;
-            background: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            color: var(--primary-color);
-            font-size: 1.2rem;
-        }
-
-        /* Patient Name Section */
-        .patient-name-section {
-            flex: 1;
-            color: white;
-        }
-
-        .patient-id {
-            font-size: 0.875rem;
-            opacity: 0.9;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-
-        .patient-name {
-            font-size: 1.75rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .patient-quick-info {
-            display: grid;
-            grid-template-columns: 2fr 2fr;
-            gap: 0.5rem;
-            margin-top: 0.75rem;
-        }
-
-        .quick-info-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
-            opacity: 0.95;
-        }
-
-        .quick-info-item i {
-            font-size: 1rem;
-        }
-
-        /* Body Section */
-        .patient-body {
-            padding: 1.5rem;
-        }
-
-        /* Info Grid */
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-        }
-
-        /* Info Item */
-        .info-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-            padding: 1rem;
-            background: var(--bg-light);
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            border: 1px solid transparent;
-        }
-
-        .info-item:hover {
-            background: white;
-            border-color: var(--primary-light);
-            box-shadow: 0 4px 12px rgba(233, 30, 99, 0.08);
-            transform: translateY(-2px);
-        }
-
-        /* Icon Container */
-        .info-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(203, 108, 230, 0.25);
-        }
-
-        .info-icon i {
-            color: white;
-            font-size: 1.1rem;
-        }
-
-        /* Info Content */
-        .info-content {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .info-label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.35rem;
-        }
-
-        .info-value {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-dark);
-            word-break: break-word;
-        }
-
-        .info-value.empty {
-            color: var(--text-muted);
-            font-style: italic;
-            font-weight: 400;
-        }
-
-        /* Section Divider */
-        .section-divider {
-            display: flex;
-            align-items: center;
-            margin: 2rem 0 1.5rem;
-            gap: 1rem;
-        }
-
-        .section-divider::before,
-        .section-divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: linear-gradient(to right, transparent, var(--border-color), transparent);
-        }
-
-        .section-title {
-            font-size: 0.875rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .info-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-
-            .header-content {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-
-            .patient-quick-info {
-                flex-direction: column;
-                gap: 0.75rem;
-                align-items: center;
-            }
-
-            .patient-avatar {
-                width: 120px;
-                height: 120px;
-            }
-
-            .patient-name {
-                font-size: 1.5rem;
-            }
-
-            .patient-body {
-                padding: 1.5rem;
-            }
-
-            .action-buttons {
-                flex-direction: column;
-                padding: 1rem;
-            }
-        }
-
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .info-item {
-            animation: fadeInUp 0.4s ease-out;
-        }
-
-        .info-item:nth-child(1) {
-            animation-delay: 0.05s;
-        }
-
-        .info-item:nth-child(2) {
-            animation-delay: 0.1s;
-        }
-
-        .info-item:nth-child(3) {
-            animation-delay: 0.15s;
-        }
-
-        .info-item:nth-child(4) {
-            animation-delay: 0.2s;
-        }
-
-        .info-item:nth-child(5) {
-            animation-delay: 0.25s;
-        }
-
-        .info-item:nth-child(6) {
-            animation-delay: 0.3s;
+        .tabs-scroll-wrapper::-webkit-scrollbar-thumb {
+            background: #cfcfcf;
+            border-radius: 3px;
+            /* optional */
         }
     </style>
 
     <div class="p-4">
-        <?php if(session('success')): ?>
-            <script>
-                Swal.fire({
-                    icon: 'success',
-                    title: "<?php echo e(session('alertTitle') ?? 'Success'); ?>",
-                    text: "<?php echo e(session('success')); ?>",
-                });
-            </script>
-        <?php endif; ?>
-        <?php if(session('error')): ?>
-            <script>
-                Swal.fire({
-                    icon: 'error',
-                    title: "<?php echo e(session('alertTitle') ?? 'Error'); ?>",
-                    text: "<?php echo e(session('error')); ?>",
-                });
-            </script>
-        <?php endif; ?>
 
         <!-- tab start -->
-        <ul class="nav nav-tabs nav-bordered mb-3 flex-nowrap">
-            <li class="nav-item">
-                <a href="#overview" data-bs-toggle="tab" aria-expanded="false"
-                    class="d-flex align-items-center justify-space-between px-2 nav-link active bg-transparent"><i
-                        class="fa-solid fa-expand text-primary pe-1"></i>
-                    <span>Overview</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#visits" data-bs-toggle="tab" aria-expanded="true"
-                    class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
-                        class="fa-regular fa-square-caret-down text-primary pe-1"></i>
-                    <span>Visits</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#medication" data-bs-toggle="tab" aria-expanded="true"
-                    class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
-                        class="fa-solid fa-suitcase-medical text-primary pe-1"></i>
-                    <span>Medication</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#lab_investigation" data-bs-toggle="tab" aria-expanded="true"
-                    class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
-                        class="fa-solid fa-flask text-primary pe-1"></i>
-                    <span>Lab Investigation</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#operations" data-bs-toggle="tab" aria-expanded="true"
-                    class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
-                        class="fa-solid fa-scissors text-primary pe-1"></i>
-                    <span>Operations</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#charges" data-bs-toggle="tab" aria-expanded="true"
-                    class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
-                        class="fa-solid fa-circle-dollar-to-slot text-primary pe-1"></i>
-                    <span>Charges</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#payments" data-bs-toggle="tab" aria-expanded="true"
-                    class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
-                        class="fa-solid fa-hand-holding-dollar text-primary pe-1"></i>
-                    <span>Payments</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#live_consultation" data-bs-toggle="tab" aria-expanded="true"
-                    class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
-                        class="fa-solid fa-hand-holding-dollar text-primary pe-1"></i>
-                    <span>Live Consultation</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#timeline" data-bs-toggle="tab" aria-expanded="true"
-                    class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
-                        class="fa-solid fa-timeline text-primary pe-1"></i>
-                    <span>Timeline</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#treatment_history" data-bs-toggle="tab" aria-expanded="true"
-                    class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
-                        class="fa-solid fa-laptop-medical text-primary pe-1"></i>
-                    <span>Treatment History</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#vitals" data-bs-toggle="tab" aria-expanded="true"
-                    class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
-                        class="fa-solid fa-heart-pulse text-primary pe-1"></i>
-                    <span>Vitals</span>
-                </a>
-            </li>
-        </ul>
+        <div class="tabs-scroll-wrapper">
+            <ul class="nav nav-tabs nav-bordered mb-3 flex-nowrap">
+                <li class="nav-item">
+                    <a href="#overview" data-bs-toggle="tab" aria-expanded="false"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link active bg-transparent"><i
+                            class="fa-solid fa-expand text-primary pe-1"></i>
+                        <span>Overview</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#nurse_notes" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-regular fa-square-caret-down text-primary pe-1"></i>
+                        <span>Nurse Notes</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#medication" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-solid fa-suitcase-medical text-primary pe-1"></i>
+                        <span>Medication</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#lab_investigation" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-solid fa-flask text-primary pe-1"></i>
+                        <span>Lab Investigation</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#operations" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-solid fa-scissors text-primary pe-1"></i>
+                        <span>Operations</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#charges" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-solid fa-circle-dollar-to-slot text-primary pe-1"></i>
+                        <span>Charges</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#payments" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-solid fa-hand-holding-dollar text-primary pe-1"></i>
+                        <span>Payments</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#live_consultation" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-solid fa-hand-holding-dollar text-primary pe-1"></i>
+                        <span>Live Consultation</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#timeline" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-solid fa-timeline text-primary pe-1"></i>
+                        <span>Timeline</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#treatment_history" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-solid fa-laptop-medical text-primary pe-1"></i>
+                        <span>Treatment History</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#prescription" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-solid fa-file-prescription text-primary pe-1"></i>
+                        <span>Prescription</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#bed_hoistory" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-solid fa-bed-pulse text-primary pe-1"></i>
+                        <span>Bed History</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#bed_issue" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-solid fa-bed text-primary pe-1"></i>
+                        <span>Bed Issue</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#vitals" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-solid fa-heart-pulse text-primary pe-1"></i>
+                        <span>Vitals</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
         <!-- tab end -->
 
         <!-- tab content start -->
@@ -444,199 +166,143 @@
                 <div class="row">
                     <div class="col-md-6">
 
-                        <div class="card shadow-sm border-0 mt-2" style="border-radius: 16px;">
-                            
-                            
-                                <div class="patient-info-card">
-                                    <!-- Header Section -->
-                                    <div class="patient-header">
-                                        <div class="header-content">
-                                            <div class="patient-avatar-wrapper">
-                                                <div class="patient-avatar">
-                                                    <img src="<?php echo e(asset('assets/img/patient.png')); ?>" alt="Patient Photo">
-                                                </div>
-                                                <div class="avatar-badge">
-                                                    <i class="fas fa-user-check"></i>
-                                                </div>
+                        <div class="card shadow-sm border-0 mt-2">
+                            <div class="card-header"
+                                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Virat Kohli (13)
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-sm-flex position-relative z-0 overflow-hidden p-2">
+                                    <!-- <img src="assets/img/icons/shape-01.svg" alt="img"
+                                                                                                                                                                                                                                                                                                                                                                    class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
+                                    <a href="javascript:void(0);"
+                                        class="avatar avatar-xxxl patient-avatar me-2 flex-shrink-0">
+                                        <img src="assets/img/patient.png" alt="product" class="rounded">
+                                    </a>
+                                    <div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-phone text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">Phone :</h6>
+                                                <p class="patient_data mb-0">8910245678</p>
                                             </div>
+                                        </div>
 
-                                            <div class="patient-name-section">
-                                                <div class="patient-id">
-                                                    <i class="fas fa-id-card me-1"></i> OPD ID: <?php echo e($opd->opd_no); ?>
-
-                                                </div>
-                                                <h2 class="patient-name"><?php echo e($opd->patient->patient_name); ?></h2>
-                                                <div class="patient-quick-info">
-                                                    <div class="quick-info-item">
-                                                        <i class="fas fa-mars"></i>
-                                                        <span><?php echo e($opd->patient->gender); ?></span>
-                                                    </div>
-                                                    <div class="quick-info-item">
-                                                        <i class="fas fa-birthday-cake"></i>
-                                                        <span><?php echo e(\Carbon\Carbon::parse($opd->patient->dob)->format('d-M-Y')); ?></span>
-                                                    </div>
-                                                    <div class="quick-info-item">
-                                                        <i class="fas fa-droplet"></i>
-                                                        <span><?php echo e($opd->patient->bloodGroup->name); ?></span>
-                                                    </div>
-                                                </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-calendar-days text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">Age :</h6>
+                                                <p class="patient_data mb-0">22 Year 9 Month 5 Days (As Of Date 10/06/2025)
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-hands-holding-child text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">Guardian Name :</h6>
+                                                <p class="patient_data mb-0">--</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-mars-and-venus text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">Gender :</h6>
+                                                <p class="patient_data mb-0">Male</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-users-gear text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">TPA :</h6>
+                                                <p class="patient_data mb-0">--</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-id-badge text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">TPA ID :</h6>
+                                                <p class="patient_data mb-0">--</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-user-check text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">TPA Validity :</h6>
+                                                <p class="patient_data mb-0">--</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-barcode text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">Barcode :</h6>
+                                                <p class="patient_data mb-0">--</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-qrcode text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">QR Code :</h6>
+                                                <p class="patient_data mb-0">--</p>
                                             </div>
                                         </div>
                                     </div>
+                                    <!-- <div class="row">
+                                                                                                                                                                                                                                                                                                                                                        <div class="col-sm-5">
 
-                                    <!-- Body Section -->
-                                    <div class="patient-body">
-                                        <!-- Contact Information -->
-                                        <div class="info-grid">
-                                            <div class="info-item">
-                                                <div class="info-icon">
-                                                    <i class="fa-solid fa-phone text-primary"></i>
-                                                </div>
-                                                <div class="info-content">
-                                                    <div class="info-label">Phone</div>
-                                                    <div class="info-value"><?php echo e($opd->patient->mobileno ?? '--'); ?></div>
-                                                </div>
-                                            </div>
+                                                                                                                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                                                                                                                        <div class="col-sm-7">
 
-                                            <div class="info-item">
-                                                <div class="info-icon">
-                                                    <i class="fa-solid fa-calendar-days text-primary"></i>
-                                                </div>
-                                                <div class="info-content">
-                                                    <div class="info-label">Age</div>
-                                                    <div class="info-value"><?php echo e($opd->patient->age); ?> Year
-                                                        <?php echo e($opd->patient->month); ?> Month <?php echo e($opd->patient->day); ?> Days (As
-                                                        Of
-                                                        <?php echo e(\Carbon\Carbon::parse($opd->patient->as_of_date)->format('d/m/Y')); ?>)
-                                                    </div>
-                                                </div>
-                                            </div>
+                                                                                                                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                                                                                                                        <div class="col-sm-5">
 
-                                            <div class="info-item">
-                                                <div class="info-icon">
-                                                    <i class="fa-solid fa-hands-holding-child text-primary"></i>
-                                                </div>
-                                                <div class="info-content">
-                                                    <div class="info-label">Guardian Name</div>
-                                                    <div class="info-value empty"><?php echo e($opd->patient->guardian_name ?? '--'); ?>
+                                                                                                                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                                                                                                                        <div class="col-sm-7">
 
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="info-item">
-                                                <div class="info-icon">
-                                                    <i class="fa-solid fa-mars-and-venus text-primary"></i>
-                                                </div>
-                                                <div class="info-content">
-                                                    <div class="info-label">Gender</div>
-                                                    <div class="info-value"><?php echo e($opd->patient->gender); ?></div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Insurance & Medical Information -->
-                                        <div class="section-divider">
-                                            <span class="section-title">Insurance & Medical Information</span>
-                                        </div>
-
-                                        <div class="info-grid">
-                                            <div class="info-item">
-                                                <div class="info-icon">
-                                                    <i class="fa-solid fa-users-gear text-primary"></i>
-                                                </div>
-                                                <div class="info-content">
-                                                    <div class="info-label">TPA</div>
-                                                    <div class="info-value empty">
-                                                        <?php echo e($opd->patient->organisation->organisation_name ?? '--'); ?>
-
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="info-item">
-                                                <div class="info-icon">
-                                                    <i class="fa-solid fa-id-badge text-primary"></i>
-                                                </div>
-                                                <div class="info-content">
-                                                    <div class="info-label">TPA ID</div>
-                                                    <div class="info-value empty">
-                                                        <?php echo e($opd->patient->organisation->code ?? '--'); ?>
-
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="info-item">
-                                                <div class="info-icon">
-                                                    <i class="fa-solid fa-user-check text-primary"></i>
-                                                </div>
-                                                <div class="info-content">
-                                                    <div class="info-label">TPA Validity</div>
-                                                    <div class="info-value empty"><?php echo e($opd->patient->tpa_validity ?? '--'); ?>
-
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="info-item">
-                                                <div class="info-icon">
-                                                    <i class="fa-solid fa-barcode text-primary"></i>
-                                                </div>
-                                                <div class="info-content">
-                                                    <div class="info-label">Barcode</div>
-                                                    <div class="info-value empty">--</div>
-                                                </div>
-                                            </div>
-
-                                            <div class="info-item">
-                                                <div class="info-icon">
-                                                    <i class="fa-solid fa-qrcode text-primary"></i>
-                                                </div>
-                                                <div class="info-content">
-                                                    <div class="info-label">QR Code</div>
-                                                    <div class="info-value empty">--</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <hr>
-                                    <div class="d-flex align-items-center mb-3 px-3">
-                                        <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                class="fa-solid fa-tag text-primary"></i></span>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <h6 class="about_patient fs-13 fw-bold mb-1"> Known Allergies :</h6>
-                                            <p class="patient_data mb-0"><?php echo e($opd->allergies ?? '--'); ?></p>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-3 px-3">
-                                        <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                class="fa-solid fa-tag text-primary"></i></span>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <h6 class="about_patient fs-13 fw-bold mb-1"> Findings :</h6>
-                                            <p class="patient_data mb-0">--</p>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-3 px-3">
-                                        <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                class="fa-solid fa-tag text-primary"></i></span>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <h6 class=" fs-13 fw-bold mb-1"> Symptoms :</h6>
-                                            <p class=" mb-0">
-                                            <ul class="m-0">
-                                                <?php $__currentLoopData = $symptoms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $symptom): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                    <li><i class="fa-regular fa-circle-check text-primary"></i>
-                                                        <?php echo e($symptom->symptoms_title); ?></li>
-                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                            </ul>
-                                            </p>
-                                        </div>
-                                    </div>
-
+                                                                                                                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                                                                                                                    </div> -->
                                 </div>
-                                
-
-                                
+                                <hr>
+                                <div class="d-flex align-items-center mb-3">
+                                    <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                            class="fa-solid fa-tag text-primary"></i></span>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <h6 class="about_patient fs-13 fw-bold mb-1"> Known Allergies :</h6>
+                                        <p class="patient_data mb-0">--</p>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center mb-3">
+                                    <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                            class="fa-solid fa-tag text-primary"></i></span>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <h6 class="about_patient fs-13 fw-bold mb-1"> Findings :</h6>
+                                        <p class="patient_data mb-0">--</p>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center mb-3">
+                                    <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                            class="fa-solid fa-tag text-primary"></i></span>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <h6 class=" fs-13 fw-bold mb-1"> Symptoms :</h6>
+                                        <p class=" mb-0">
+                                        <ul>
+                                            <li><i class="fa-regular fa-circle-check text-primary"></i> Fever Chest Pain
+                                            </li>
+                                            <li><i class="fa-regular fa-circle-check text-primary"></i> Fever Fever</li>
+                                        </ul>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="card shadow-sm border-0 mt-2">
@@ -652,20 +318,29 @@
                                     <a href="#">
                                         <div class="d-flex align-items-center mb-3 gap-2">
                                             <div class="patient_img">
-                                                <img src="<?php echo e(asset('assets/img/patient.png')); ?>" alt="product"
-                                                    class="rounded">
+                                                <img src="assets/img/patient.png" alt="product" class="rounded">
                                             </div>
                                             <div class="d-flex align-items-center gap-2">
-                                                <h6 class="fs-13 fw-bold mb-1">
-                                                    <?php echo e($opd->doctor->name . '(' . $opd->doctor->doctor_id . ')' ?? '--'); ?>
-
-                                                </h6>
+                                                <h6 class="fs-13 fw-bold mb-1">Anirban Ghosh (D010)</h6>
                                             </div>
                                         </div>
                                     </a>
 
                                 </div>
+                                <hr>
+                                <div>
+                                    <a href="#">
+                                        <div class="d-flex align-items-center mb-3 gap-2">
+                                            <div class="patient_img">
+                                                <img src="assets/img/patient.png" alt="product" class="rounded">
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="fs-13 fw-bold mb-1">Anjali Rao (D011)</h6>
+                                            </div>
+                                        </div>
+                                    </a>
 
+                                </div>
                             </div>
                         </div>
                         <div class="card shadow-sm border-0 mt-2">
@@ -683,19 +358,18 @@
                         <div class="card shadow-sm border-0 mt-2">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> OPD Payment /
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> IPD Payment /
                                     Billing
                                 </h5>
                             </div>
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <h6 class="text-primary">OPD Payment/Billing</h6>
-                                        <span><?php echo e(round(($opd->paid_amount / $opd->amount) * 100, 2)); ?>%</span>
-                                        <div class="progress mb-3 mt-1" role="progressbar" aria-valuenow="68.18"
+                                        <h6 class="text-primary">IPD Payment/Billing</h6>
+                                        <span>92.31%</span>
+                                        <div class="progress mb-3 mt-1" role="progressbar" aria-valuenow="92.31"
                                             aria-valuemin="0" aria-valuemax="100">
-                                            <div class="progress-bar bg-gradient"
-                                                style="width: <?php echo e(($opd->paid_amount / $opd->amount) * 100); ?>%;"></div>
+                                            <div class="progress-bar bg-gradient" style="width: 90%;"></div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -715,6 +389,14 @@
                                         </div>
                                     </div>
                                     <div class="col-md-6">
+                                        <h6 class="text-primary">Radiology Payment/Billing</h6>
+                                        <span>0%</span>
+                                        <div class="progress mb-3 mt-1" role="progressbar" aria-valuenow="0"
+                                            aria-valuemin="0" aria-valuemax="100">
+                                            <div class="progress-bar" style="width: 0%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
                                         <h6 class="text-primary">Blood Bank Payment/Billing</h6>
                                         <span>0%</span>
                                         <div class="progress mb-3 mt-1" role="progressbar" aria-valuenow="0"
@@ -722,7 +404,14 @@
                                             <div class="progress-bar" style="width: 0%;"></div>
                                         </div>
                                     </div>
-
+                                    <div class="col-md-6">
+                                        <h6 class="text-primary">Ambulance Payment/Billing</h6>
+                                        <span>0%</span>
+                                        <div class="progress mb-0 mt-1" role="progressbar" aria-valuenow="0"
+                                            aria-valuemin="0" aria-valuemax="100">
+                                            <div class="progress-bar" style="width: 0%;"></div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -746,20 +435,9 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php $__currentLoopData = $medicationReport; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $medication): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                <tr>
-                                                    <td><?php echo e($medication->date); ?></td>
-                                                    <td><?php echo e($medication->pharmacy->medicine_name); ?></td>
-                                                    <td><?php echo e($medication->medicineDosage->dosage); ?>
+                                            <tr>
 
-                                                        <?php echo e($medication->medicineDosage->unit->unit_name); ?>
-
-                                                    </td>
-                                                    <td><?php echo e($medication->time); ?></td>
-                                                    <td><?php echo e($medication->remark); ?></td>
-                                                </tr>
-                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -787,24 +465,16 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php $__currentLoopData = $labInvestigations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $lab): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                                                <tr>
-                                                                                    <td>
-                                                                                        <?php echo e($lab->pathology->test_name .
-                                                "
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            (" .
-                                                $lab->pathology->short_name .
-                                                ')'); ?>
-
-                                                                                    </td>
-                                                                                    <td>Pathology</td>
-                                                                                    <td><?php echo e('--'); ?></td>
-                                                                                    <td><?php echo e(\Carbon\Carbon::today()->copy()->addDays(intval($lab->pathology->report_days))->format('d-M-Y')); ?>
-
-                                                                                    </td>
-                                                                                    <td><?php echo e($lab->approved_by ?? '--'); ?></td>
-                                                                                </tr>
-                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                            <tr>
+                                                <td>
+                                                    Lipid Profile
+                                                    (Lipid Profile)
+                                                </td>
+                                                <td>Pathology</td>
+                                                <td></td>
+                                                <td>09/21/2025</td>
+                                                <td></td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -831,15 +501,9 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php $__currentLoopData = $operationDetail; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $operation): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                <tr>
-                                                    <td><?php echo e($operation->reference_no); ?></td>
-                                                    <td><?php echo e($operation->date); ?></td>
-                                                    <td><?php echo e($operation->operation->operation); ?></td>
-                                                    <td><?php echo e($operation->operation->category->category); ?></td>
-                                                    <td><?php echo e($operation->ot_technician); ?></td>
-                                                </tr>
-                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                            <tr>
+
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -867,33 +531,16 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php $__currentLoopData = $opdCharges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $charge): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                <?php
-                                                    $taxAmount =
-                                                        ($charge->charge->standard_charge *
-                                                            $charge->charge->taxCategory->percentage) /
-                                                        100;
-                                                    $amount = $charge->charge->standard_charge + $taxAmount;
-                                                ?>
-                                                <tr>
-                                                    <td>
-                                                        <?php echo e($charge->charge->name); ?>
-
-                                                    </td>
-                                                    <td style="text-transform: capitalize;">
-                                                        <?php echo e($charge->chargeCategory->chargeType->charge_type); ?>
-
-                                                    </td>
-                                                    <td class="text-right"><?php echo e($charge->charge->standard_charge); ?></td>
-                                                    <td class="text-right">
-                                                        (<?php echo e($charge->charge->taxCategory->percentage); ?>%)
-                                                        <?php echo e($taxAmount); ?>
-
-                                                    </td>
-                                                    <td class="text-right"><?php echo e($charge->charge->standard_charge); ?></td>
-                                                    <td class="text-right"><?php echo e($amount); ?></td>
-                                                </tr>
-                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                            <tr>
+                                                <td>
+                                                    Doctor Fees
+                                                </td>
+                                                <td style="text-transform: capitalize;">OPD</td>
+                                                <td class="text-right">50.00</td>
+                                                <td class="text-right">(0.00%) 0.00</td>
+                                                <td class="text-right">400.00</td>
+                                                <td class="text-right">400.00</td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -965,7 +612,7 @@
                 </div>
 
             </div>
-            <div class="tab-pane" id="visits">
+            <div class="tab-pane" id="nurse_notes">
 
 
                 <!-- row start -->
@@ -974,7 +621,8 @@
                         <div class="card shadow-sm flex-fill w-100">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Checkups</h5>
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Nurse Notes
+                                </h5>
                             </div>
                             <div class="card-body">
                                 <div class="row">
@@ -995,17 +643,454 @@
                                                         <div class="text-end d-flex">
                                                             <a href="javascript:void(0);"
                                                                 class="btn btn-primary text-white ms-2 btn-md"
-                                                                data-bs-toggle="modal" data-is-hidden="true"
-                                                                data-bs-target="#createOpdModal"
-                                                                data-patient='<?php echo json_encode($opd->patient, 15, 512) ?>'><i
-                                                                    class="ti ti-plus me-1"></i>New Checkup</a>
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#add_appointment"><i
+                                                                    class="ti ti-plus me-1"></i>Add New Note</a>
                                                         </div>
                                                         <!-- First Modal -->
-                                                        <?php echo $__env->make('components.modals.opd-create-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
-                                                        
+                                                        <div class="modal fade" id="add_appointment" tabindex="-1"
+                                                            aria-hidden="true">
+                                                            <div class="modal-dialog">
+                                                                <div class="modal-content">
+
+                                                                    <div class="modal-header"
+                                                                        style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+
+                                                                        <h5 class="modal-title"
+                                                                            id="addSpecializationLabel">
+                                                                            Add Nurse Note
+                                                                        </h5>
+                                                                        <button type="button" class="btn-close"
+                                                                            data-bs-dismiss="modal"></button>
+
+                                                                    </div>
+
+                                                                    <div class="modal-body">
+
+                                                                        <div class="row gy-3">
+
+                                                                            <div class="col-md-6">
+                                                                                <label for="appointment_date"
+                                                                                    class="form-label">
+                                                                                    Date <span
+                                                                                        class="text-danger">*</span></label>
+                                                                                <input type="date" name="date"
+                                                                                    id="date" class="form-control">
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <label for="nurse"
+                                                                                    class="form-label">Nurse</label>
+                                                                                <select class="form-select"
+                                                                                    id="nurse">
+                                                                                    <option value="">Select
+                                                                                    </option>
+                                                                                    <option value="1">Anjali Sarma
+                                                                                    </option>
+                                                                                    <option value="2">Puja Roy
+                                                                                    </option>
+                                                                                </select>
+                                                                            </div>
+                                                                            <div class="col-md-12">
+                                                                                <label for="casualty"
+                                                                                    class="form-label">Note</label>
+                                                                                <textarea class="form-control" id="note" name='name'>
+                                                                                            
+                                                                                    </textarea>
+                                                                            </div>
+                                                                            <div class="col-md-12">
+                                                                                <label for="comment"
+                                                                                    class="form-label">Comment</label>
+                                                                                <textarea class="form-control" id="comment" name="comment"></textarea>
+                                                                            </div>
+
+
+
+
+
+                                                                        </div>
+
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="submit"
+                                                                            class="btn btn-primary">Save &
+                                                                            Print</button>
+                                                                        <button type="submit"
+                                                                            class="btn btn-primary">Save</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
 
                                                         <!-- Second Modal (nested) -->
-                                                        
+                                                        <div class="modal fade" id="new_patient" tabindex="-1"
+                                                            aria-hidden="true">
+                                                            <div class="modal-dialog modal-dialog-centered modal-xl">
+                                                                <div class="modal-content">
+
+                                                                    <div class="modal-header"
+                                                                        style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                                                        <h5 class="modal-title">Add Patient</h5>
+                                                                        <button type="button" class="btn-close"
+                                                                            data-bs-dismiss="modal"></button>
+                                                                    </div>
+
+                                                                    <div class="modal-body">
+                                                                        <form>
+                                                                            <div class="row align-items-center gy-3">
+                                                                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                                                                    <div class="form-group">
+                                                                                        <label
+                                                                                            class="form-label">Name</label><span
+                                                                                            class="text-danger">
+                                                                                            *</span>
+                                                                                        <input id="name"
+                                                                                            name="name" placeholder=""
+                                                                                            type="text"
+                                                                                            class="form-control"
+                                                                                            value=""
+                                                                                            autocomplete="off">
+                                                                                        <span class="text-danger"></span>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                                                                    <div class="form-group">
+                                                                                        <label class="form-label">Guardian
+                                                                                            Name</label>
+                                                                                        <input type="text"
+                                                                                            name="guardian_name"
+                                                                                            placeholder="" value=""
+                                                                                            class="form-control">
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-md-6 col-sm-12">
+                                                                                    <div class="row">
+                                                                                        <div class="col-sm-3">
+                                                                                            <div class="form-group">
+                                                                                                <label class="form-label">
+                                                                                                    Gender</label>
+                                                                                                <select class="form-select"
+                                                                                                    name="gender"
+                                                                                                    id="addformgender"
+                                                                                                    autocomplete="off">
+                                                                                                    <option value="">
+                                                                                                        Select</option>
+                                                                                                    <option value="Male">
+                                                                                                        Male</option>
+                                                                                                    <option value="Female">
+                                                                                                        Female</option>
+                                                                                                </select>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-sm-4">
+                                                                                            <div class="form-group">
+                                                                                                <label for="dob"
+                                                                                                    class="form-label">Date
+                                                                                                    Of
+                                                                                                    Birth</label>
+                                                                                                <input type="text"
+                                                                                                    name="dob"
+                                                                                                    id="birth_date"
+                                                                                                    placeholder=""
+                                                                                                    class="form-control date patient_dob">
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-sm-5"
+                                                                                            id="calculate">
+                                                                                            <div class="form-group">
+                                                                                                <label
+                                                                                                    class="form-label">Age
+                                                                                                    (yy-mm-dd)
+                                                                                                </label><small
+                                                                                                    class="req">
+                                                                                                    *</small>
+                                                                                                <div
+                                                                                                    style="clear: both;overflow: hidden;">
+                                                                                                    <input type="text"
+                                                                                                        placeholder="Year"
+                                                                                                        name="age[year]"
+                                                                                                        id="age_year"
+                                                                                                        value=""
+                                                                                                        class="form-control patient_age_year"
+                                                                                                        style="width: 30%; float: left;">
+
+                                                                                                    <input type="text"
+                                                                                                        id="age_month"
+                                                                                                        placeholder="Month"
+                                                                                                        name="age[month]"
+                                                                                                        value=""
+                                                                                                        class="form-control patient_age_month"
+                                                                                                        style="width: 36%;float: left; margin-left: 4px;">
+                                                                                                    <input type="text"
+                                                                                                        id="age_day"
+                                                                                                        placeholder="Day"
+                                                                                                        name="age[day]"
+                                                                                                        value=""
+                                                                                                        class="form-control patient_age_day"
+                                                                                                        style="width: 26%;float: left; margin-left: 4px;">
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div><!--./col-md-6-->
+                                                                                <div class="col-md-6 col-sm-12">
+                                                                                    <div class="row">
+                                                                                        <div class="col-sm-3">
+                                                                                            <div class="form-group">
+                                                                                                <label
+                                                                                                    class="form-label">Blood
+                                                                                                    Group</label>
+                                                                                                <select name="blood_group"
+                                                                                                    class="form-select">
+                                                                                                    <option value="">
+                                                                                                        Select</option>
+                                                                                                    <option value="1">
+                                                                                                        O+
+                                                                                                    </option>
+                                                                                                    <option value="2">
+                                                                                                        A+
+                                                                                                    </option>
+                                                                                                    <option value="3">
+                                                                                                        B+
+                                                                                                    </option>
+                                                                                                    <option value="4">
+                                                                                                        AB+</option>
+                                                                                                    <option value="5">
+                                                                                                        O-
+                                                                                                    </option>
+                                                                                                    <option value="6">
+                                                                                                        AB-</option>
+                                                                                                </select>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-sm-3">
+                                                                                            <div class="form-group">
+                                                                                                <label for="pwd"
+                                                                                                    class="form-label">Marital
+                                                                                                    Status</label>
+                                                                                                <select
+                                                                                                    name="marital_status"
+                                                                                                    class="form-select"
+                                                                                                    autocomplete="off">
+                                                                                                    <option value="">
+                                                                                                        Select</option>
+                                                                                                    <option value="Single">
+                                                                                                        Single</option>
+                                                                                                    <option
+                                                                                                        value="Married">
+                                                                                                        Married</option>
+                                                                                                    <option
+                                                                                                        value="Widowed">
+                                                                                                        Widowed</option>
+                                                                                                    <option
+                                                                                                        value="Separated">
+                                                                                                        Separated
+                                                                                                    </option>
+                                                                                                    <option
+                                                                                                        value="Not Specified">
+                                                                                                        Not
+                                                                                                        Specified
+                                                                                                    </option>
+                                                                                                </select>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-sm-6">
+                                                                                            <div class="form-group">
+                                                                                                <label
+                                                                                                    for="exampleInputFile"
+                                                                                                    class="form-label">
+                                                                                                    Patient Photo
+                                                                                                </label>
+                                                                                                <div>
+                                                                                                    <div
+                                                                                                        class="d-flex border rounded position-relative p-1 mb-3 text-center align-items-center">
+                                                                                                        <span
+                                                                                                            class="avatar avatar-sm bg-primary text-white me-2">
+                                                                                                            <i
+                                                                                                                class="ti ti-upload fs-16"></i>
+                                                                                                        </span>
+                                                                                                        <p class="mb-0">
+                                                                                                            Drop files
+                                                                                                            here</p>
+                                                                                                        <input
+                                                                                                            type="file"
+                                                                                                            class="position-absolute top-0 start-0 opacity-0 w-100 h-100">
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <span
+                                                                                                    class="text-danger"></span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div><!--./col-md-6-->
+                                                                                <div class="col-sm-3">
+                                                                                    <div class="form-group">
+                                                                                        <label for="pwd"
+                                                                                            class="form-label">Phone</label>
+                                                                                        <input id="number"
+                                                                                            autocomplete="off"
+                                                                                            name="mobileno" type="text"
+                                                                                            placeholder=""
+                                                                                            class="form-control"
+                                                                                            value="">
+                                                                                        <span class="text-danger"></span>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-sm-3">
+                                                                                    <div class="form-group">
+                                                                                        <label
+                                                                                            class="form-label">Email</label>
+                                                                                        <input type="text"
+                                                                                            placeholder=""
+                                                                                            id="addformemail"
+                                                                                            value="" name="email"
+                                                                                            class="form-control">
+                                                                                        <span class="text-danger"></span>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-sm-6">
+                                                                                    <div class="form-group">
+                                                                                        <label for="address"
+                                                                                            class="form-label">Address</label>
+                                                                                        <input name="address"
+                                                                                            placeholder=""
+                                                                                            class="form-control">
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-sm-6">
+                                                                                    <div class="form-group">
+                                                                                        <label for="pwd"
+                                                                                            class="form-label">Remarks</label>
+                                                                                        <textarea name="note" id="note" class="form-control"></textarea>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-sm-6">
+                                                                                    <div class="form-group">
+                                                                                        <label for="email"
+                                                                                            class="form-label">Any Known
+                                                                                            Allergies</label>
+                                                                                        <textarea name="known_allergies" id="" placeholder="" class="form-control"></textarea>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-sm-4">
+                                                                                    <div class="form-group">
+                                                                                        <label for="tpa"
+                                                                                            class="form-label">TPA</label>
+                                                                                        <select class="form-select"
+                                                                                            name="organisation_id">
+                                                                                            <option value="">Select
+                                                                                            </option>
+                                                                                            <option value="5">MedoLogi
+                                                                                                TPA Pvt. Ltd.
+                                                                                            </option>
+                                                                                            <option value="4">Vidal
+                                                                                                Health TPA </option>
+                                                                                            <option value="3">
+                                                                                                Paramount
+                                                                                                Health Services
+                                                                                            </option>
+                                                                                            <option value="2">Raksha
+                                                                                                TPA
+                                                                                                Pvt. Ltd. </option>
+                                                                                            <option value="1">
+                                                                                                MediAssist
+                                                                                                TPA Pvt. Ltd.
+                                                                                            </option>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-sm-4">
+                                                                                    <div class="form-group">
+                                                                                        <label for="insurance_id"
+                                                                                            class="form-label">TPA
+                                                                                            ID</label>
+                                                                                        <input name="insurance_id"
+                                                                                            placeholder=""
+                                                                                            class="form-control">
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-sm-4">
+                                                                                    <div class="form-group">
+                                                                                        <label for="validity"
+                                                                                            class="form-label">TPA
+                                                                                            Validity</label>
+                                                                                        <input name="validity"
+                                                                                            placeholder=""
+                                                                                            class="form-control date">
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-sm-4">
+                                                                                    <div class="form-group">
+                                                                                        <label class="form-label">National
+                                                                                            Identification
+                                                                                            Number</label>
+                                                                                        <input name="identification_number"
+                                                                                            placeholder=""
+                                                                                            class="form-control">
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-sm-4">
+                                                                                    <div class="form-group">
+                                                                                        <label for="height"
+                                                                                            class="form-label">Height</label>
+                                                                                        <input type="text"
+                                                                                            id="height" name="height"
+                                                                                            class="form-control"
+                                                                                            placeholder="Height (cm)"
+                                                                                            value="">
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-sm-4">
+                                                                                    <div class="form-group">
+                                                                                        <label for="weight"
+                                                                                            class="form-label">Weight</label>
+                                                                                        <input type="text"
+                                                                                            id="weight" name="weight"
+                                                                                            class="form-control"
+                                                                                            placeholder="Weight (kg)"
+                                                                                            value="">
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-sm-4">
+                                                                                    <div class="form-group">
+                                                                                        <label for="temperature"
+                                                                                            class="form-label">Temperature</label>
+                                                                                        <input type="text"
+                                                                                            id="temperature"
+                                                                                            name="temperature"
+                                                                                            class="form-control"
+                                                                                            placeholder="Temperature (°C)"
+                                                                                            value="">
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-sm-4">
+                                                                                    <div class="form-group">
+                                                                                        <label for="screen_tb"
+                                                                                            class="form-label">Screen
+                                                                                            TB</label>
+                                                                                        <select name="screen_tb"
+                                                                                            id="screen_tb"
+                                                                                            class="form-select">
+                                                                                            <option value="">Select
+                                                                                            </option>
+                                                                                            <option value="Yes">Yes
+                                                                                            </option>
+                                                                                            <option value="No">No
+                                                                                            </option>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </form>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="submit"
+                                                                            class="btn btn-primary">Save</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <!-- Table start -->
@@ -1013,70 +1098,38 @@
                                                     <table class="table border">
                                                         <thead class="thead-light">
                                                             <tr>
-                                                                <th>OPD Checkup ID</th>
-                                                                <th>Appointment Date</th>
-                                                                <th>Consultant</th>
-                                                                <th>Reference</th>
-                                                                <th>Symptoms</th>
+                                                                <th>Nurse</th>
+                                                                <th>Date</th>
+                                                                <th>Time</th>
+                                                                <th>Note</th>
+                                                                <th>Comment</th>
                                                                 <th>Action</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <?php $__currentLoopData = $opdVisits; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $visit): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                                <tr>
-                                                                    <td>
-                                                                        <h6 class="fs-14 mb-1"><?php echo e($visit->visit_id); ?>
+                                                            <tr>
+                                                                <td>
+                                                                    <h6 class="fs-14 mb-1">Anjali Sharma ( NUR004 )</h6>
+                                                                </td>
+                                                                <td>09/17/2025</td>
+                                                                <td>12:49 PM </td>
+                                                                <td>Every thing is normal</td>
+                                                                <td>Take rest</td>
+                                                                <td>
+                                                                    <div class="d-flex gap-2">
 
-                                                                        </h6>
-                                                                    </td>
-                                                                    <td><?php echo e($visit->opd->appointment_date); ?></td>
-                                                                    <td><?php echo e($visit->opd->doctor->name); ?>
-
-                                                                        (<?php echo e($visit->opd->doctor->doctor_id); ?>)
-                                                                    </td>
-                                                                    <td><?php echo e($visit->opd->reference); ?></td>
-                                                                    <td>
-                                                                        <?php if(isset($opdSymptoms[$visit->opd->opd_no]) && count($opdSymptoms[$visit->opd->opd_no]) > 0): ?>
-                                                                            <?php $__currentLoopData = $opdSymptoms[$visit->opd->opd_no]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $symptom): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                                                <span
-                                                                                    class="badge bg-primary me-1"><?php echo e($symptom->symptoms_title); ?></span>
-                                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                                                        <?php else: ?>
-                                                                            --
-                                                                        <?php endif; ?>
-                                                                    </td>
-                                                                    <td>
-                                                                        <div class="d-flex gap-2">
-
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                                                <i class="fa-solid fa-prescription" 
-                                                                                    data-bs-toggle="modal"
-                                                                                    data-bs-target="#addPrescriptionModal"
-                                                                                    data-id="<?php echo e($opd->id); ?>"
-                                                                                    title="Add Prescription"></i></a>
-
-
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
-                                                                                <i class="fa-solid fa-print"
-                                                                                    data-bs-toggle="modal"
-                                                                                    data-bs-target="#showPrescriptionModal"
-                                                                                    title="Manual Prescription"></i></a>
-
-
-
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                                <i class="ti ti-menu" data-bs-toggle="tooltip"
-                                                                                    title="Show"></i></a>
-
-
-
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                                        <a href="javascript: void(0);"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+                                                                            <i class="fa-solid fa-pencil"
+                                                                                data-bs-toggle="tooltip"
+                                                                                title="Add Prescription"></i></a>
+                                                                        <a href="javascript: void(0);"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
+                                                                            <i class="ti ti-menu" data-bs-toggle="tooltip"
+                                                                                title="Show"></i></a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1131,7 +1184,8 @@
                                                                     <div class="modal-header"
                                                                         style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
-                                                                        <h5 class="modal-title" id="addSpecializationLabel">
+                                                                        <h5 class="modal-title"
+                                                                            id="addSpecializationLabel">
                                                                             Add Medication Dose
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
@@ -1140,88 +1194,78 @@
                                                                     </div>
 
                                                                     <div class="modal-body">
-                                                                        <form action="<?php echo e(route('opd.createMedication')); ?>"
-                                                                            method="post">
-                                                                            <?php echo csrf_field(); ?>
-                                                                            <div class="row gy-3">
-                                                                                <input type="hidden" name="opd_id"
-                                                                                    value="<?php echo e($opd->id); ?>">
-                                                                                <div class="col-md-6">
-                                                                                    <label for="date"
-                                                                                        class="form-label">Date
-                                                                                        <span class="text-danger">*</span>
-                                                                                    </label>
-                                                                                    <input type="date" name="date"
-                                                                                        id="date"
-                                                                                        class="form-control">
-                                                                                </div>
-                                                                                <div class="col-md-6">
-                                                                                    <label for="time"
-                                                                                        class="form-label">Time
-                                                                                        <span class="text-danger">*</span>
-                                                                                    </label>
-                                                                                    <input type="time" name="time"
-                                                                                        id="time"
-                                                                                        class="form-control">
-                                                                                </div>
-                                                                                <div class="col-md-6">
-                                                                                    <label for="medi_cat"
-                                                                                        class="form-label">Medicine
-                                                                                        Category
-                                                                                        <span class="text-danger">*</span>
-                                                                                    </label>
-                                                                                    <select name="med_cat" id="med_cat"
-                                                                                        class="form-select"
-                                                                                        data-placeholder="Enter Patient Name or Id…">
-                                                                                        <option value="0">Select
-                                                                                        </option>
-                                                                                        <option value="1">Antibiotic
-                                                                                        </option>
-                                                                                    </select>
-                                                                                </div>
-                                                                                <div class="col-md-6">
-                                                                                    <label for="med_name"
-                                                                                        class="form-label">Medicine Name
-                                                                                        <span class="text-danger">*</span>
-                                                                                    </label>
-                                                                                    <select name="med_name" id="med_name"
-                                                                                        class="form-select"
-                                                                                        data-placeholder="Enter Patient Name or Id…">
-                                                                                        <option value="0">Select
-                                                                                        </option>
-                                                                                        <option value="1">Paracetamol
-                                                                                            500mg
-                                                                                        </option>
-                                                                                    </select>
-                                                                                </div>
-                                                                                <div class="col-md-6">
-                                                                                    <label for="dosage"
-                                                                                        class="form-label">Dosage
-                                                                                        <span class="text-danger">*</span>
-                                                                                    </label>
-                                                                                    <select name="dosage" id="dosage"
-                                                                                        class="form-select"
-                                                                                        data-placeholder="Enter Patient Name or Id…">
-                                                                                        <option value="0">Select
-                                                                                        </option>
-                                                                                        <option value="1">1 Tablet
-                                                                                        </option>
-                                                                                    </select>
-                                                                                </div>
-                                                                                <div class="col-md-6">
-                                                                                    <label for="remark"
-                                                                                        class="form-label">Remarks
-                                                                                    </label>
-                                                                                    <textarea name="remark" id="remark" class="form-control"></textarea>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="modal-footer">
-                                                                                <button type="submit"
-                                                                                    class="btn btn-primary">Save</button>
-                                                                            </div>
-                                                                        </form>
-                                                                    </div>
 
+                                                                        <div class="row gy-3">
+
+                                                                            <div class="col-md-6">
+                                                                                <label for="date"
+                                                                                    class="form-label">Date
+                                                                                    <span class="text-danger">*</span>
+                                                                                </label>
+                                                                                <input type="date" name="date"
+                                                                                    id="date" class="form-control">
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <label for="time"
+                                                                                    class="form-label">Time
+                                                                                    <span class="text-danger">*</span>
+                                                                                </label>
+                                                                                <input type="time" name="time"
+                                                                                    id="time" class="form-control">
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <label for="medi_cat"
+                                                                                    class="form-label">Medicine Category
+                                                                                    <span class="text-danger">*</span>
+                                                                                </label>
+                                                                                <select name="medi_cat" id="med_cat"
+                                                                                    class="form-select"
+                                                                                    data-placeholder="Enter Patient Name or Id…">
+                                                                                    <option value="0">Select</option>
+                                                                                    <option value="1">Antibiotic
+                                                                                    </option>
+                                                                                </select>
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <label for="med_name"
+                                                                                    class="form-label">Medicine Name
+                                                                                    <span class="text-danger">*</span>
+                                                                                </label>
+                                                                                <select name="med_name" id="med_name"
+                                                                                    class="form-select"
+                                                                                    data-placeholder="Enter Patient Name or Id…">
+                                                                                    <option value="0">Select</option>
+                                                                                    <option value="1">Paracetamol
+                                                                                        500mg
+                                                                                    </option>
+                                                                                </select>
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <label for="dosage"
+                                                                                    class="form-label">Dosage
+                                                                                    <span class="text-danger">*</span>
+                                                                                </label>
+                                                                                <select name="dosage" id="dosage"
+                                                                                    class="form-select"
+                                                                                    data-placeholder="Enter Patient Name or Id…">
+                                                                                    <option value="0">Select</option>
+                                                                                    <option value="1">1 Tablet
+                                                                                    </option>
+                                                                                </select>
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <label for="remark"
+                                                                                    class="form-label">Remarks
+                                                                                </label>
+                                                                                <textarea name="remark" id="remark" class="form-control"></textarea>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="submit"
+                                                                            class="btn btn-primary">Save</button>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -1239,37 +1283,30 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <?php $__currentLoopData = $medicationReport; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $medication): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                                <tr>
-                                                                    <td>
-                                                                        <h6 class="fs-14 mb-1">
-                                                                            <?php echo e(\Carbon\Carbon::parse($medication->date)->format('d-M-Y')); ?>&nbsp;<?php echo e('(' . \Carbon\Carbon::parse($medication->date)->format('D') . ')'); ?>
-
-                                                                        </h6>
-                                                                    </td>
-                                                                    <td><?php echo e($medication->pharmacy->medicine_name); ?></td>
-                                                                    <td> Time:
-                                                                        <?php echo e(\Carbon\Carbon::parse($medication->time)->format('h:i A')); ?>
-
-                                                                        <?php echo e($medication->medicineDosage->dosage . $medication->medicineDosage->unit->unit_name); ?><br>
-                                                                        Created By:
-                                                                        <?php echo e($medication->generatedBy->userRole->name); ?>
-
-                                                                    </td>
-                                                                    <td>
-                                                                        <div class="d-flex gap-2">
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
-                                                                                <i class="ti ti-pencil" data-bs-toggle="tooltip"
-                                                                                    title="Show"></i></a>
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                                <i class="ti ti-trash" data-bs-toggle="tooltip"
-                                                                                    title="Show"></i></a>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                            <tr>
+                                                                <td>
+                                                                    <h6 class="fs-14 mb-1">10/08/2025
+                                                                        (Wed)</h6>
+                                                                </td>
+                                                                <td>Paracetamol 500mg</td>
+                                                                <td> Time: 03:30 PM
+                                                                    1–2 Tablet Created By: Super Admin (9001)
+                                                                </td>
+                                                                <td>
+                                                                    <div class="d-flex gap-2">
+                                                                        <a href="javascript: void(0);"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
+                                                                            <i class="ti ti-pencil"
+                                                                                data-bs-toggle="tooltip"
+                                                                                title="Show"></i></a>
+                                                                        <a href="javascript: void(0);"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                                            <i class="ti ti-trash"
+                                                                                data-bs-toggle="tooltip"
+                                                                                title="Show"></i></a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1324,30 +1361,24 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <?php $__currentLoopData = $labInvestigations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $lab): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                                <tr>
-                                                                    <td>
-                                                                        <h6 class="fs-14 mb-1">
-                                                                            <?php echo e($lab->pathology->test_name . '(' . $lab->pathology->short_name . ')'); ?>
-
-                                                                        </h6>
-                                                                    </td>
-                                                                    <td>Pathology</td>
-                                                                    <td>Pathology Center :<?php echo e('--'); ?></td>
-                                                                    <td><?php echo e(\Carbon\Carbon::today()->copy()->addDays(intval($lab->pathology->report_days))->format('d-M-Y')); ?>
-
-                                                                    </td>
-                                                                    <td><?php echo e($lab->approved_by ?? '--'); ?></td>
-                                                                    <td>
-                                                                        <div class="d-flex gap-2">
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                                <i class="ti ti-menu" data-bs-toggle="tooltip"
-                                                                                    title="Show"></i></a>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                            <tr>
+                                                                <td>
+                                                                    <h6 class="fs-14 mb-1">Lipid Profile
+                                                                        (Lipid Profile)</h6>
+                                                                </td>
+                                                                <td>Pathology</td>
+                                                                <td>Pathology Center :</td>
+                                                                <td>09/21/2025</td>
+                                                                <td></td>
+                                                                <td>
+                                                                    <div class="d-flex gap-2">
+                                                                        <a href="javascript: void(0);"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
+                                                                            <i class="ti ti-menu" data-bs-toggle="tooltip"
+                                                                                title="Show"></i></a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1401,35 +1432,20 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <h6 class="fs-14 mb-1"></h6>
+                                                                </td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td>
+                                                                    <div class="d-flex gap-2">
 
-                                                            <?php $__currentLoopData = $operationDetail; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $operation): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                                <tr>
-                                                                    <td>
-                                                                        <h6 class="fs-14 mb-1">
-                                                                            <?php echo e($operation->reference_no); ?>
-
-                                                                        </h6>
-                                                                    </td>
-                                                                    <td><?php echo e($operation->date); ?></td>
-                                                                    <td><?php echo e($operation->operation->operation); ?></td>
-                                                                    <td><?php echo e($operation->operation->category->category); ?>
-
-                                                                    </td>
-                                                                    <td><?php echo e($operation->ot_technician); ?></td>
-                                                                    <td>
-                                                                        <div class="d-flex gap-2">
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
-                                                                                <i class="ti ti-pencil" data-bs-toggle="tooltip"
-                                                                                    title="Show"></i></a>
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                                <i class="ti ti-trash" data-bs-toggle="tooltip"
-                                                                                    title="Show"></i></a>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1538,7 +1554,8 @@
                                                                                     </div>
                                                                                     <div class="col-sm-2">
                                                                                         <div class="form-group">
-                                                                                            <label class="form-label">Charge
+                                                                                            <label
+                                                                                                class="form-label">Charge
                                                                                                 Category</label><small
                                                                                                 class="req"> *</small>
                                                                                             <select name="charge_category2"
@@ -1555,7 +1572,8 @@
                                                                                     </div>
                                                                                     <div class="col-sm-2">
                                                                                         <div class="form-group">
-                                                                                            <label class="form-label">Charge
+                                                                                            <label
+                                                                                                class="form-label">Charge
                                                                                                 Name</label><small
                                                                                                 class="req"> *</small>
                                                                                             <select name="charge_id"
@@ -1576,7 +1594,8 @@
                                                                                                 class="form-label">Standard
                                                                                                 Charge
                                                                                                 (INR)</label>
-                                                                                            <input type="text" readonly=""
+                                                                                            <input type="text"
+                                                                                                readonly=""
                                                                                                 name="standard_charge"
                                                                                                 id="addstandard_charge"
                                                                                                 class="form-control reset_value standard_charge"
@@ -1589,7 +1608,8 @@
                                                                                         <div class="form-group">
                                                                                             <label class="form-label">TPA
                                                                                                 Charge (INR)</label>
-                                                                                            <input type="text" readonly=""
+                                                                                            <input type="text"
+                                                                                                readonly=""
                                                                                                 name="schedule_charge"
                                                                                                 id="addscd_charge"
                                                                                                 placeholder=""
@@ -1604,7 +1624,8 @@
                                                                                             <label
                                                                                                 class="form-label">Qty</label><small
                                                                                                 class="req"> *</small>
-                                                                                            <input type="text" name="qty"
+                                                                                            <input type="text"
+                                                                                                name="qty"
                                                                                                 id="qty"
                                                                                                 class="form-control qty"
                                                                                                 value="1">
@@ -1624,7 +1645,8 @@
                                                                                                     <td width="60%"
                                                                                                         colspan="2"
                                                                                                         class="text-right ipdbilltable">
-                                                                                                        <input type="text"
+                                                                                                        <input
+                                                                                                            type="text"
                                                                                                             placeholder="Total"
                                                                                                             value="0"
                                                                                                             name="apply_charge"
@@ -1642,7 +1664,8 @@
                                                                                                         <h4
                                                                                                             style="float: right;font-size: 12px; padding-left: 5px;">
                                                                                                             %</h4>
-                                                                                                        <input type="text"
+                                                                                                        <input
+                                                                                                            type="text"
                                                                                                             value="0"
                                                                                                             placeholder="Discount Percentage"
                                                                                                             name="discount_percentage"
@@ -1652,7 +1675,8 @@
                                                                                                     </td>
                                                                                                     <td
                                                                                                         class="text-right ipdbilltable">
-                                                                                                        <input type="text"
+                                                                                                        <input
+                                                                                                            type="text"
                                                                                                             placeholder="Discount Percentage"
                                                                                                             name="discount_percentage_amount"
                                                                                                             value="0"
@@ -1669,7 +1693,8 @@
                                                                                                         <h4
                                                                                                             style="float: right;font-size: 12px; padding-left: 5px;">
                                                                                                             %</h4>
-                                                                                                        <input type="text"
+                                                                                                        <input
+                                                                                                            type="text"
                                                                                                             placeholder="Tax"
                                                                                                             name="charge_tax"
                                                                                                             id="charge_tax"
@@ -1679,7 +1704,8 @@
                                                                                                     </td>
                                                                                                     <td
                                                                                                         class="text-right ipdbilltable">
-                                                                                                        <input type="text"
+                                                                                                        <input
+                                                                                                            type="text"
                                                                                                             placeholder="Tax"
                                                                                                             name="tax"
                                                                                                             value="0"
@@ -1694,7 +1720,8 @@
                                                                                                     </th>
                                                                                                     <td colspan="2"
                                                                                                         class="text-right ipdbilltable">
-                                                                                                        <input type="text"
+                                                                                                        <input
+                                                                                                            type="text"
                                                                                                             placeholder="Net Amount"
                                                                                                             value="0"
                                                                                                             name="amount"
@@ -1714,10 +1741,7 @@
                                                                                                     <label for=""
                                                                                                         class="form-label">Charge
                                                                                                         Note</label>
-                                                                                                    <textarea name="note"
-                                                                                                        id="edit_note"
-                                                                                                        rows="3"
-                                                                                                        class="form-control edit_charge_note"></textarea>
+                                                                                                    <textarea name="note" id="edit_note" rows="3" class="form-control edit_charge_note"></textarea>
                                                                                                 </div>
                                                                                             </div>
                                                                                         </div>
@@ -1729,13 +1753,15 @@
                                                                                             <small class="req">
                                                                                                 *</small>
                                                                                             <input id="charge_date"
-                                                                                                name="date" placeholder=""
+                                                                                                name="date"
+                                                                                                placeholder=""
                                                                                                 type="text"
                                                                                                 class="form-control datetime">
                                                                                         </div>
                                                                                         <button type="submit"
                                                                                             data-loading-text="Processing..."
-                                                                                            name="charge_data" value="add"
+                                                                                            name="charge_data"
+                                                                                            value="add"
                                                                                             class="btn btn-primary pull-right"><i
                                                                                                 class="fa fa-check-circle"></i>
                                                                                             Add</button>
@@ -1814,62 +1840,41 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            
-                                                            <?php $__currentLoopData = $opdCharges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $charge): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                                <?php
-                                                                    $taxAmount =
-                                                                        ($charge->charge->standard_charge *
-                                                                            $charge->charge->taxCategory->percentage) /
-                                                                        100;
-                                                                    $discountAmount =
-                                                                        ($charge->charge->standard_charge *
-                                                                            $charge->discount) /
-                                                                        100;
-                                                                    $amount =
-                                                                        $charge->charge->standard_charge -
-                                                                        $discountAmount +
-                                                                        $taxAmount;
-                                                                ?>
-                                                                <tr>
-                                                                    <td>
-                                                                        <?php echo e(\Carbon\Carbon::parse($charge->created_at)->format('d-M-Y')); ?>
+                                                            <tr>
+                                                                <td>
+                                                                    09/17/2025 12:49 PM
+                                                                </td>
+                                                                <td>Doctor Fees</td>
+                                                                <td>OPD</td>
+                                                                <td>OPD Doctor Fees </td>
+                                                                <td>1</td>
+                                                                <td>50.00</td>
+                                                                <td>400.00</td>
+                                                                <td>0.00</td>
+                                                                <td>0.00 (0.00%)</td>
+                                                                <td>0.00 (0.00%)</td>
+                                                                <td>400.00</td>
+                                                                <td>
+                                                                    <div class="d-flex gap-2">
+                                                                        <a href="javascript: void(0);"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
+                                                                            <i class="fa-solid fa-print"
+                                                                                data-bs-toggle="tooltip"
+                                                                                title="Print"></i></a>
+                                                                        <a href="javascript: void(0);"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+                                                                            <i class="ti ti-pencil"
+                                                                                data-bs-toggle="tooltip"
+                                                                                title="Edit"></i></a>
 
-                                                                    </td>
-                                                                    <td><?php echo e($charge->charge->name); ?></td>
-                                                                    <td style="text-transform: capitalize;">
-                                                                        <?php echo e($charge->chargeCategory->chargeType->charge_type); ?>
-
-                                                                    </td>
-                                                                    <td><?php echo e($charge->chargeCategory->name); ?> </td>
-                                                                    <td>1</td>
-                                                                    <td><?php echo e($charge->charge->standard_charge); ?></td>
-                                                                    <td><?php echo e($charge->charge->standard_charge); ?></td>
-                                                                    <td>0.00</td>
-                                                                    <td><?php echo e($discountAmount); ?>&nbsp;(<?php echo e($charge->discount); ?>%)
-                                                                    </td>
-                                                                    <td><?php echo e($taxAmount); ?>&nbsp;(<?php echo e($charge->charge->taxCategory->percentage); ?>%)
-                                                                    </td>
-                                                                    <td><?php echo e($amount); ?></td>
-                                                                    <td>
-                                                                        <div class="d-flex gap-2">
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
-                                                                                <i class="fa-solid fa-print"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    title="Print"></i></a>
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                                                <i class="ti ti-pencil" data-bs-toggle="tooltip"
-                                                                                    title="Edit"></i></a>
-
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                                <i class="ti ti-trash" data-bs-toggle="tooltip"
-                                                                                    title="Delete"></i></a>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                                        <a href="javascript: void(0);"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
+                                                                            <i class="ti ti-trash"
+                                                                                data-bs-toggle="tooltip"
+                                                                                title="Delete"></i></a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1924,7 +1929,8 @@
                                                                     <div class="modal-header"
                                                                         style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
-                                                                        <h5 class="modal-title" id="addSpecializationLabel">
+                                                                        <h5 class="modal-title"
+                                                                            id="addSpecializationLabel">
                                                                             Add Payment
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
@@ -1937,19 +1943,22 @@
                                                                         <div class="row gy-3">
 
                                                                             <div class="col-md-6">
-                                                                                <label for="date" class="form-label">Date
+                                                                                <label for="date"
+                                                                                    class="form-label">Date
                                                                                     <span class="text-danger">*</span>
                                                                                 </label>
-                                                                                <input type="date" name="date" id="date"
-                                                                                    class="form-control" required>
+                                                                                <input type="date" name="date"
+                                                                                    id="date" class="form-control"
+                                                                                    required>
                                                                             </div>
                                                                             <div class="col-md-6">
                                                                                 <label for="amount"
                                                                                     class="form-label">Amount (INR)
                                                                                     <span class="text-danger">*</span>
                                                                                 </label>
-                                                                                <input type="text" name="amount" id="amount"
-                                                                                    class="form-control" required>
+                                                                                <input type="text" name="amount"
+                                                                                    id="amount" class="form-control"
+                                                                                    required>
                                                                             </div>
                                                                             <div class="col-md-6">
                                                                                 <label for="payment_mode"
@@ -1957,16 +1966,18 @@
 
                                                                                 </label>
                                                                                 <select name="payment_mode"
-                                                                                    id="payment_mode" class="form-select">
+                                                                                    id="payment_mode"
+                                                                                    class="form-select"
+                                                                                    data-placeholder="Enter Patient Name or Id…">
                                                                                     <option value="0">Select</option>
                                                                                     <option value="1">Cash</option>
                                                                                 </select>
                                                                             </div>
                                                                             <div class="col-md-6">
-                                                                                <label for="note" class="form-label">Note
+                                                                                <label for="note"
+                                                                                    class="form-label">Note
                                                                                 </label>
-                                                                                <textarea name="note" id="note"
-                                                                                    class="form-control"></textarea>
+                                                                                <textarea name="note" id="note" class="form-control"></textarea>
                                                                             </div>
                                                                         </div>
 
@@ -1996,10 +2007,10 @@
                                                         <tbody>
                                                             <tr>
                                                                 <td>
-                                                                    TRID95
+                                                                    TRID83
                                                                 </td>
-                                                                <td>10/14/2025 11:45 AM </td>
-                                                                <td>SmartPay Transaction ID: 528706160448
+                                                                <td>10/13/2025 06:25 PM </td>
+                                                                <td> Time:SmartPay Transaction ID: 528612554379
                                                                 </td>
                                                                 <td></td>
                                                                 <td>20.00</td>
@@ -2012,12 +2023,14 @@
                                                                                 title="Print"></i></a>
                                                                         <a href="javascript: void(0);"
                                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
-                                                                            <i class="ti ti-pencil" data-bs-toggle="tooltip"
+                                                                            <i class="ti ti-pencil"
+                                                                                data-bs-toggle="tooltip"
                                                                                 title="Show"></i></a>
                                                                         <a href="javascript: void(0);"
                                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                            <i class="ti ti-trash" data-bs-toggle="tooltip"
-                                                                                title="Show"></i></a>
+                                                                            <i class="ti ti-trash"
+                                                                                data-bs-toggle="tooltip"
+                                                                                title="Delete"></i></a>
                                                                     </div>
                                                                 </td>
                                                             </tr>
@@ -2145,7 +2158,8 @@
                                                                     <div class="modal-header"
                                                                         style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
-                                                                        <h5 class="modal-title" id="addSpecializationLabel">
+                                                                        <h5 class="modal-title"
+                                                                            id="addSpecializationLabel">
                                                                             Add Timeline
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
@@ -2158,26 +2172,26 @@
                                                                         <div class="row gy-3">
 
                                                                             <div class="col-md-12">
-                                                                                <label for="title" class="form-label">Title
+                                                                                <label for="title"
+                                                                                    class="form-label">Title
                                                                                     <span class="text-danger">*</span>
                                                                                 </label>
-                                                                                <input type="text" name="title" id="title"
-                                                                                    class="form-control">
+                                                                                <input type="text" name="title"
+                                                                                    id="title" class="form-control">
                                                                             </div>
                                                                             <div class="col-md-12">
-                                                                                <label for="date" class="form-label">Date
+                                                                                <label for="date"
+                                                                                    class="form-label">Date
                                                                                     <span class="text-danger">*</span>
                                                                                 </label>
-                                                                                <input type="date" name="date" id="date"
-                                                                                    class="form-control">
+                                                                                <input type="date" name="date"
+                                                                                    id="date" class="form-control">
                                                                             </div>
                                                                             <div class="col-md-12">
                                                                                 <label for="description"
                                                                                     class="form-label">Description
                                                                                 </label>
-                                                                                <textarea name="description"
-                                                                                    id="description"
-                                                                                    class="form-control"></textarea>
+                                                                                <textarea name="description" id="description" class="form-control"></textarea>
                                                                             </div>
                                                                             <div class="col-md-12">
                                                                                 <label for="attch_doc"
@@ -2192,8 +2206,9 @@
                                                                                     this
                                                                                     person
                                                                                 </label>
-                                                                                <input type="checkbox" name="visible_person"
-                                                                                    id="date" class="form-check-input">
+                                                                                <input type="checkbox"
+                                                                                    name="visible_person" id="date"
+                                                                                    class="form-check-input">
                                                                             </div>
                                                                         </div>
 
@@ -2236,7 +2251,8 @@
                                                                     <div class="d-flex gap-2">
                                                                         <a href="javascript: void(0);"
                                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                            <i class="ti ti-menu" data-bs-toggle="tooltip"
+                                                                            <i class="ti ti-menu"
+                                                                                data-bs-toggle="tooltip"
                                                                                 title="Show"></i></a>
                                                                     </div>
                                                                 </td>
@@ -2298,28 +2314,20 @@
                                                             <tr>
                                                                 <td>
                                                                     <h6 class="fs-14 mb-1"><a href="#"
-                                                                            class="fw-semibold"><?php echo e($opd->opd_no); ?></a>
-                                                                    </h6>
+                                                                            class="fw-semibold">OPDN14</a></h6>
                                                                 </td>
-                                                                <td><?php echo e('--'); ?></td>
-                                                                <td> <?php echo e($opd->appointment_date); ?></td>
-                                                                <td>
-                                                                    <ul>
-                                                                        <?php $__currentLoopData = $symptoms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $symptom): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                                            <li><i
-                                                                                    class="fa-regular fa-circle-check text-primary"></i>
-                                                                                <?php echo e($symptom->symptoms_title); ?></li>
-                                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                                                    </ul>
+                                                                <td>18</td>
+                                                                <td> 09/17/2025 12:49 PM</td>
+                                                                <td>Fever
                                                                 </td>
-                                                                <td><?php echo e($opd->doctor->name); ?>
-
+                                                                <td>Anjali Rao (D011)
                                                                 </td>
                                                                 <td>
                                                                     <div class="d-flex gap-2">
                                                                         <a href="javascript: void(0);"
                                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                            <i class="ti ti-menu" data-bs-toggle="tooltip"
+                                                                            <i class="ti ti-menu"
+                                                                                data-bs-toggle="tooltip"
                                                                                 title="Show"></i></a>
                                                                     </div>
                                                                 </td>
@@ -2378,7 +2386,8 @@
                                                                     <div class="modal-header"
                                                                         style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
-                                                                        <h5 class="modal-title" id="addSpecializationLabel">
+                                                                        <h5 class="modal-title"
+                                                                            id="addSpecializationLabel">
                                                                             Add Vitals
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
@@ -2398,7 +2407,8 @@
                                                                                         class="form-label">Vital
                                                                                         Name</label>
                                                                                     <select class="form-select"
-                                                                                        name="vital_name[]" id="vital_name">
+                                                                                        name="vital_name[]"
+                                                                                        id="vital_name">
                                                                                         <option value="">Select
                                                                                         </option>
                                                                                         <option value="1">1</option>
@@ -2409,7 +2419,8 @@
                                                                                     <label for="vital_value"
                                                                                         class="form-label">Vital
                                                                                         Value</label>
-                                                                                    <input type="text" name="vital_value[]"
+                                                                                    <input type="text"
+                                                                                        name="vital_value[]"
                                                                                         id="vital_value"
                                                                                         class="form-control" />
                                                                                 </div>
@@ -2418,7 +2429,8 @@
                                                                                     <label for="date"
                                                                                         class="form-label">Date</label>
                                                                                     <input type="date" name="date[]"
-                                                                                        id="date" class="form-control" />
+                                                                                        id="date"
+                                                                                        class="form-control" />
                                                                                 </div>
                                                                                 <!-- Remove -->
                                                                                 <div
@@ -2432,8 +2444,8 @@
                                                                             </div>
                                                                         </div>
                                                                         <div class="mt-2">
-                                                                            <button type="button" class="btn btn-primary"
-                                                                                id="addBtn">
+                                                                            <button type="button"
+                                                                                class="btn btn-primary" id="addBtn">
                                                                                 <i class="ti ti-plus"></i> Add Operation
                                                                             </button>
                                                                         </div>
@@ -2479,7 +2491,8 @@
                                                                     <div class="d-flex gap-2">
                                                                         <a href="javascript: void(0);"
                                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                            <i class="ti ti-menu" data-bs-toggle="tooltip"
+                                                                            <i class="ti ti-menu"
+                                                                                data-bs-toggle="tooltip"
                                                                                 title="Show"></i></a>
                                                                     </div>
                                                                 </td>
@@ -2503,17 +2516,14 @@
     </div>
     <!-- tab content end -->
     </div>
-    <?php echo $__env->make('components.modals.add-prescription-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
-    <?php echo $__env->make('components.modals.show-prescription-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
-
     <!-- Chart JS -->
     <script src="assets/plugins/chartjs/chart.min.js"></script>
     <script src="assets/plugins/chartjs/chart-data.js"></script>
 
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             // Re-initialize Select2 every time the modal is shown
-            $('#add_medication').on('shown.bs.modal', function () {
+            $('#add_medication').on('shown.bs.modal', function() {
                 $('#med_cat, #med_name, #dosage').select2({
                     width: '100%',
                     placeholder: 'Select',
@@ -2526,7 +2536,7 @@
 
     <!-- Chart.js -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             if (window.Chart) {
                 var ctx = document.getElementById('chartLine1').getContext('2d');
                 var chartLine1 = new Chart(ctx, {
@@ -2564,18 +2574,18 @@
     </script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             const addBtn = document.getElementById("addBtn");
             const vitalFields = document.getElementById("vitalFields");
 
             // Attach remove event to existing remove buttons
-            vitalFields.querySelectorAll(".remove-btn").forEach(function (btn) {
-                btn.addEventListener("click", function () {
+            vitalFields.querySelectorAll(".remove-btn").forEach(function(btn) {
+                btn.addEventListener("click", function() {
                     btn.closest(".vital-row").remove();
                 });
             });
 
-            addBtn.addEventListener("click", function () {
+            addBtn.addEventListener("click", function() {
                 // Clone the first row
                 let firstRow = vitalFields.querySelector(".vital-row");
                 let newRow = firstRow.cloneNode(true);
@@ -2588,7 +2598,7 @@
                 removeBtn.style.display = "inline-block";
 
                 // Attach remove event to the new button
-                removeBtn.addEventListener("click", function () {
+                removeBtn.addEventListener("click", function() {
                     newRow.remove();
                 });
 
@@ -2596,79 +2606,7 @@
                 vitalFields.appendChild(newRow);
             });
         });
-
-        const medCatSelect = document.getElementById('med_cat')
-        const medNameSelect = document.getElementById('med_name')
-        const doseSelect = document.getElementById('dosage')
-        medCatSelect.innerHTML = '<option value="">Loading...</option>';
-        medNameSelect.innerHTML = '<option value="">Loading...</option>';
-        doseSelect.innerHTML = '<option value="">Loading...</option>';
-        fetch("<?php echo e(route('getMedicineCategories')); ?>")
-            .then(response => response.json())
-            .then(data => {
-                window.medicineCategories = data;
-                medCatSelect.innerHTML = '<option value="">Select</option>';
-                data.forEach(category => {
-                    const option = document.createElement('option');
-                    option.value = category.id;
-                    option.textContent = category.medicine_category;
-                    if ("<?php echo e(old('med_cat')); ?>" == category.id) {
-                        option.selected = true;
-                    }
-                    medCatSelect.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching charge categories:', error);
-                medCatSelect.innerHTML = '<option value="">Error loading options</option>';
-            });
-
-        // Listen for Charge Category dropdown change
-        medCatSelect.addEventListener('change', function() {
-            const selectedId = this.value;
-            const baseUrl = "<?php echo e(route('getMedicines', ['categoryId' => 'ID'])); ?>";
-            const finalUrl = baseUrl.replace('ID', selectedId);
-            fetch(finalUrl)
-                .then(response => response.json())
-                .then(data => {
-                    window.chargeData = data;
-                    medNameSelect.innerHTML = '<option value="">Select</option>';
-                    data.forEach(charge => {
-                        const option = document.createElement('option');
-                        option.value = charge.id;
-                        option.textContent = charge.medicine_name;
-                        if ("<?php echo e(old('med_name')); ?>" == charge.id) {
-                            option.selected = true;
-                        }
-                        medNameSelect.appendChild(option);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching Charges:', error);
-                    medNameSelect.innerHTML = '<option value="">Error loading options</option>';
-                });
-            const baseUrlDose = "<?php echo e(route('getDoses', ['categoryId' => 'ID'])); ?>";
-            const finalUrlDose = baseUrlDose.replace('ID', selectedId);
-            fetch(finalUrlDose)
-                .then(response => response.json())
-                .then(data => {
-                    window.chargeData = data;
-                    doseSelect.innerHTML = '<option value="">Select</option>';
-                    data.forEach(charge => {
-                        const option = document.createElement('option');
-                        option.value = charge.id;
-                        option.textContent = charge.dosage + " " + charge.unit.unit_name;
-                        if ("<?php echo e(old('dosage')); ?>" == charge.id) {
-                            option.selected = true;
-                        }
-                        doseSelect.appendChild(option);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching Charges:', error);
-                    doseSelect.innerHTML = '<option value="">Error loading options</option>';
-                });
-        })
     </script>
 <?php $__env->stopSection(); ?>
-<?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\hims\resources\views/admin/opd/opd_view.blade.php ENDPATH**/ ?>
+
+<?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\hims\resources\views/admin/ipd/ipd_view.blade.php ENDPATH**/ ?>
