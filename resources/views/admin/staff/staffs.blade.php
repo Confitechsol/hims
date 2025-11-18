@@ -31,9 +31,9 @@
                                         </div>
                                         <div class="page_btn d-flex">
                                             <div class="text-end d-flex">
-                                                <a href="javascript:void(0);"
+                                                <a href="{{ route('createStaff') }}"
                                                     class="btn btn-primary text-white ms-2 fs-13 btn-md"
-                                                    data-bs-toggle="modal" data-bs-target="#add_Staff"><i
+                                                    ><i
                                                         class="ti ti-plus me-1"></i>Add New
                                                     Staff</a>
                                             </div>

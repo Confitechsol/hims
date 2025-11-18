@@ -593,9 +593,10 @@ Route::prefix('staffs')->group(function () {
     Route::post('/addStaff', [StaffController::class, 'store'])->name('staff.store');
     
     Route::get('/import', [StaffController::class, 'importStaff'])->name('Staff-import');
-    Route::post('/bulkimport', [StaffController::class, 'bulkImport'])->name('Staffs.import');
-    Route::get('/department/{deptId}/specialists', [DepartmentController::class, 'getSpecialists'])
-         ->name('department.specialists');
+    Route::post('/bulkimport', [StaffController::class, 'importStaffExcel'])->name('Staffs.import');
+
+    Route::get('/export-staffs', [StaffController::class, 'exportStaffExcel'])->name('staffs.export');
+
 
     Route::put('/edit/{id}', [BloodDonorController::class, 'editDoner'])->name('bloodBank.editDoner');
     Route::put('/update/{id}', [BloodDonorController::class, 'updateDonor'])->name('bloodBank.updateDoner');

@@ -69,9 +69,9 @@
 
 
                                         <div class="text-end d-flex">
-                                            <button id ="exportBtn"
-                                                class="btn btn-primary text-white ms-2 fs-13 btn-md"><i
-                                                    class="ti ti-download me-1"></i>Download Sample Data</button>
+                                            <a href="<?php echo e(route('staffs.export')); ?>" class="btn btn-primary text-white ms-2 fs-13 btn-md"><i
+                                                    class="ti ti-download me-1"></i>Download Sample Data</a>
+                                            
                                         </div>
                                     </div>
 
@@ -119,6 +119,7 @@
                                     <table class="table table-bordered mb-0" id="table">
                                         <thead>
                                             <tr>
+                                                
                                                 <th>First Name</th>
                                                 <th>Last Name</th>
                                                 <th>Department</th>
@@ -141,11 +142,14 @@
                                                 <th>Blood Group</th>
                                                 <th>Identification Number</th>
                                                 <th>PAN</th>
+                                                <th>Employee Id</th>
                                                 <th>Remarks</th>
+
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr>
+                                                <td>Sample Data</td>
                                                 <td>Sample Data</td>
                                                 <td>Sample Data</td>
                                                 <td>Sample Data</td>
@@ -180,28 +184,20 @@
                                         enctype="multipart/form-data">
                                         <?php echo csrf_field(); ?>
                                         <div class="row">
-                                            <!-- <div class="col-md-6">
-                                                <label for="" class="form-label">
-                                                    Blood Group</label>
-                                                <select name="blood_group" class="form-select">
-                                                    <option value=""> Select</option>
-                                                    <option value="1"> O+</option>
-                                                    <option value="2"> A+</option>
-                                                    <option value="3"> B+</option>
-                                                    <option value="4"> AB+</option>
-                                                    <option value="5"> O-</option>
-                                                    <option value="6"> AB-</option>
-                                                </select>
-                                            </div> -->
+                                           
                                             <div class="col-md-12">
                                                 <label for="" class="form-label">
                                                     Select CSV File <span class="text-danger">*</span></label>
-                                                <input type="file" name="csv_file" id="csv_file" class="form-control"
+                                                <input type="file" name="file" id="csv_file" class="form-control"
                                                     required accept=".csv">
                                             </div>
                                         </div>
                                         <button type="submit" class="btn btn-primary ms-auto d-block mt-3"><i
                                                 class="fa-solid fa-cloud-arrow-up"></i> Import Staffs</button>
+
+                                               
+
+  
                                     </form>
                                 </div>
 
@@ -260,16 +256,58 @@
     }
     
 </script>
+
+
 <script>
-    document.getElementById("exportBtn").addEventListener("click", function() {
-      const table = document.getElementById("table");
-      if (!table) {
+    const departmentList = <?php echo json_encode($departments, 15, 512) ?>;
+
+</script>
+<script>
+document.getElementById("exportBtn").addEventListener("click", function () {
+
+    const table = document.getElementById("table");
+    if (!table) {
         alert("Table not found!");
         return;
-      }
-      const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
-      XLSX.writeFile(wb, "Staffs.xlsx");
-    });
-  </script>
+    }
+
+    const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+    const ws = wb.Sheets["Sheet1"];
+
+    // Freeze header row
+    ws['!freeze'] = { xSplit: 0, ySplit: 1 };
+
+    // Dropdown lists
+    const deptValues = departmentList.join(",");
+    const maritalValues = "Single,Married,Divorced,Widowed";
+    const genderValues = "Male,Female,Other";
+    const bloodValues = "A+,A-,B+,B-,O+,O-,AB+,AB-";
+
+    // Create a validation map
+    const DV = [];
+    function addValidation(range, values) {
+        DV.push({
+            sqref: range,
+            type: "list",
+            allowBlank: true,
+            formula1: `"${values}"`
+        });
+    }
+
+    // Apply dropdowns (Column ranges)
+    addValidation("C2:C500", deptValues);    // Department
+    addValidation("N2:N500", maritalValues); // Marital Status
+    addValidation("S2:S500", genderValues);  // Gender
+    addValidation("T2:T500", bloodValues);   // Blood Group
+
+    // Assign to worksheet
+    ws['!dataValidation'] = DV;
+
+    XLSX.writeFile(wb, "Staffs.xlsx");
+});
+</script>
+
+
+
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\hims\resources\views/admin/staff/importStaff.blade.php ENDPATH**/ ?>
