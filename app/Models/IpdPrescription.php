@@ -4,17 +4,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class OpdPrescription extends Model
+class IpdPrescription extends Model
 {
     use HasFactory;
 
     // Table name (optional if Laravel naming matches)
-    protected $table = 'opd_prescription';
+    protected $table = 'ipd_prescription';
 
     // Mass assignable attributes
     protected $fillable = [
-        'opd_id',
-        'visit_id',
+        'prescription_number',
+        'ipd_id',
         'header_note',
         'footer_note',
         'finding_description',
@@ -25,6 +25,7 @@ class OpdPrescription extends Model
         'radiology_id',
         'date',
         'notification_to',
+        'prescribed_by',
     ];
 
     // Casts for automatic data conversion
@@ -35,9 +36,9 @@ class OpdPrescription extends Model
     /**
      * 🔗 Relation: Each prescription belongs to one OPD.
      */
-    public function opd()
+    public function ipd()
     {
-        return $this->belongsTo(OpdDetail::class, 'opd_id');
+        return $this->belongsTo(IpdDetail::class, 'ipd_id');
     }
 
 }

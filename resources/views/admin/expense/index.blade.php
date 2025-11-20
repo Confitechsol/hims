@@ -87,12 +87,20 @@
                                                             <div class="d-flex">
                                                                 <button
                                                                     class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
-                                                                    data-id="">
+                                                                    data-id="{{ $expense->id }}"
+                                                                    data-name="{{ $expense->name }}"
+                                                                    data-invoice_number="{{ $expense->invoice_no }}"
+                                                                    data-date="{{ optional($expense->date)?->format('Y-m-d') ?? $expense->date }}"
+                                                                    data-description="{{ $expense->note }}"
+                                                                    data-amount="{{ $expense->amount }}"
+                                                                    data-expense_name="{{ $expense->expenseHead->id ?? '' }}"
+                                                                    data-attach_document="{{ $expense->attach_document ?? '' }}">
                                                                     <i class="ti ti-pencil"></i>
                                                                 </button>
-                                                                <form method="POST" action="">
-
-                                                                    <input type="hidden" name="id" value="">
+                                                                <form method="POST" action="" class="ms-2">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <input type="hidden" name="id" value="{{ $expense->id }}">
                                                                     <button type="submit"
                                                                         class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
                                                                         <i class="ti ti-trash"></i>

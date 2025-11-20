@@ -1,6 +1,6 @@
-{{-- resources/views/settings.blade.php --}}
-@extends('layouts.adminLayout')
-@section('content')
+
+
+<?php $__env->startSection('content'); ?>
 
     <style>
         .hidden {
@@ -628,7 +628,8 @@
                                                                                         <img src="assets/img/logo.png" alt="">
                                                                                     </div>
                                                                                     <h1>Birth Certificate</h1>
-                                                                                    
+                                                                                    <p class="sub-title">(ICD-10 Based
+                                                                                        Registration Format)</p>
                                                                                 </div>
 
                                                                                 <!-- Child Information -->
@@ -850,4 +851,5 @@
         });
     </script>
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp82\htdocs\hims\resources\views/admin/certificate/certificate.blade.php ENDPATH**/ ?>

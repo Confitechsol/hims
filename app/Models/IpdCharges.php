@@ -4,14 +4,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class OpdCharges extends Model
+class IpdCharges extends Model
 {
     use HasFactory;
 
-    protected $table = 'opd_charges';
+    protected $table = 'ipd_charges';
 
     protected $fillable = [
-        'opd_id',
+        'ipd_id',
         'charge_type_id',
         'charge_category_id',
         'charge_id',
@@ -31,9 +31,9 @@ class OpdCharges extends Model
         return $this->belongsTo(Charge::class);
     }
 
-    public function opd()
+    public function ipd()
     {
-        return $this->belongsTo(OpdDetail::class);
+        return $this->belongsTo(IpdDetail::class);
     }
     public function chargeCategory()
     {

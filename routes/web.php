@@ -302,13 +302,14 @@ Route::middleware(['admin'])->group(function () {
 
     Route::get('/birth', [BirthController::class, 'index'])->name('birth');
     Route::post('/birth/create', [BirthController::class, 'create'])->name('birth.create');
-    Route::put('/birth/update', [BirthController::class, 'update'])->name('birth.update');
-    Route::delete('/birth/delete', [BirthController::class, 'delete'])->name('birth.delete');
+    Route::put('/birth/update/{id}', [BirthController::class, 'update'])->name('birth.update');
+    Route::delete('/birth/delete/{id}', [BirthController::class, 'delete'])->name('birth.delete');
 
     Route::get('/death', [DeathController::class, 'index'])->name('death');
     Route::post('/death/create', [DeathController::class, 'create'])->name('death.create');
-    Route::put('/death/update', [DeathController::class, 'update'])->name('death.update');
-    Route::delete('/death/delete', [DeathController::class, 'delete'])->name('death.delete');
+    Route::put('/death/update/{id}', [DeathController::class, 'update'])->name('death.update');
+    Route::delete('/death/delete/{id}', [DeathController::class, 'delete'])->name('death.delete');
+    Route::get('/death/patient/{id}', [DeathController::class, 'getPatient'])->name('death.patient');
 
     Route::get('/visitors', [VisitorsController::class, 'index'])->name('visitors');
 
@@ -485,13 +486,18 @@ Route::get('/opd/edit/{id}', [OpdController::class, 'edit'])->name('opd.edit');
 Route::put('/opd/update/{id}', [OpdController::class, 'update'])->name('opd.update');
 Route::get('/getOrganizations', [PatientController::class, 'organizations'])->name('getOrganizations');
 Route::get('/getDoctors', [OpdController::class, 'getDoctors'])->name('getDoctors');
+Route::get('/getChargeTypes', [OpdController::class, 'getChargeTypes'])->name('getChargeTypes');
+Route::get('/getChargeCategoriesByTypeId/{id}', [OpdController::class, 'getChargeCategoriesByTypeId'])->name('getChargeCategoriesByTypeId');
 Route::get('/getChargeCategories', [OpdController::class, 'getChargeCategories'])->name('getChargeCategories');
 Route::get('/getCharges/{id}', [OpdController::class, 'getCharges'])->name('getCharges');
 Route::get('/getSymptomsTypes', [OpdController::class, 'getSymptomsType'])->name('getSymptomsTypes');
 Route::post('/getSymptoms', [OpdController::class, 'getSymptoms'])->name('getSymptoms');
 Route::get('/opd_view/{id}', [OpdController::class, 'showOpd'])->name('opd.show');
+Route::get('/getOpdById/{id}', [OpdController::class, 'getOpdById'])->name('getOpdById');
+Route::get('/getOpdMedicineById/{id}', [OpdController::class, 'getOpdMedicineById'])->name('getOpdMedicineById');
 Route::post('/add_prescription', [OpdController::class, 'storePrescription'])->name('opd.addPrescription');
 Route::post('/opd_medication', [OpdController::class, 'createOpdMedication'])->name('opd.createMedication');
+Route::post('/opd_charge', [OpdController::class, 'addOpdCharge'])->name('opd.addOpdCharge');
 
 Route::get('/ipd', [IpdController::class, 'index'])->name('ipd');
 Route::post('/ipd/store', [IpdController::class, 'store'])->name('ipd.store');
@@ -500,6 +506,13 @@ Route::put('/ipd/update/{id}', [IpdController::class, 'update'])->name('ipd.upda
 Route::get('/getBedGroups', [IpdController::class, 'getBedGroups'])->name('getBedGroups');
 Route::get('/getBedNumbers/{id}', [IpdController::class, 'getBedNumbers'])->name('getBedNumbers');
 Route::get('/ipd_view/{id}', [IpdController::class, 'showIpd'])->name('ipd.show');
+Route::get('/getNurses', [IpdController::class, 'getNurses'])->name('getNurses');
+Route::get('/getIpdById/{id}', [IpdController::class, 'getIpdById'])->name('getIpdById');
+Route::get('/getIpdMedicineById/{id}', [IpdController::class, 'getIpdMedicineById'])->name('getIpdMedicineById');
+Route::post('/add_nurse_note', [IpdController::class, 'addNurseNote'])->name('nurseNote.store');
+Route::post('/ipd/add_prescription', [IpdController::class, 'storePrescription'])->name('ipd.addPrescription');
+Route::post('/ipd_charge', [IpdController::class, 'addIpdCharge'])->name('ipd.addIpdCharge');
+
 Route::get('/billing', function () {
     return view('admin.billing.billing');
 })->name('billing');

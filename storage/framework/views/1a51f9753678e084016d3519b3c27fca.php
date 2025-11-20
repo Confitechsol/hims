@@ -1,4 +1,7 @@
-@props([
+<?php $attributes ??= new \Illuminate\View\ComponentAttributeBag;
+
+$__newAttributes = [];
+$__propNames = \Illuminate\View\ComponentAttributeBag::extractPropNames(([
     'id', // Modal ID
     'title', // Modal title
     'method' => 'POST', // HTTP Method
@@ -8,103 +11,141 @@
     'repeatable_group' => [],
     'type',
     'fileTypes'
-])
+]));
 
-<div class="modal fade" id="{{ $id }}" tabindex="-1" aria-hidden="true">
+foreach ($attributes->all() as $__key => $__value) {
+    if (in_array($__key, $__propNames)) {
+        $$__key = $$__key ?? $__value;
+    } else {
+        $__newAttributes[$__key] = $__value;
+    }
+}
+
+$attributes = new \Illuminate\View\ComponentAttributeBag($__newAttributes);
+
+unset($__propNames);
+unset($__newAttributes);
+
+foreach (array_filter(([
+    'id', // Modal ID
+    'title', // Modal title
+    'method' => 'POST', // HTTP Method
+    'action', // Form action URL
+    'fields' => [], // Array of fields with structure
+    'columns' => 1, // Number of columns (default: 1)
+    'repeatable_group' => [],
+    'type',
+    'fileTypes'
+]), 'is_string', ARRAY_FILTER_USE_KEY) as $__key => $__value) {
+    $$__key = $$__key ?? $__value;
+}
+
+$__defined_vars = get_defined_vars();
+
+foreach ($attributes->all() as $__key => $__value) {
+    if (array_key_exists($__key, $__defined_vars)) unset($$__key);
+}
+
+unset($__defined_vars, $__key, $__value); ?>
+
+<div class="modal fade" id="<?php echo e($id); ?>" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
-            <form action="{{ $action }}" method="POST" id="{{ $id }}-form" enctype="multipart/form-data">
-                @csrf
-                @if (in_array(strtoupper($method), ['PUT', 'PATCH', 'DELETE']))
-                    @method($method)
-                @endif
+            <form action="<?php echo e($action); ?>" method="POST" id="<?php echo e($id); ?>-form" enctype="multipart/form-data">
+                <?php echo csrf_field(); ?>
+                <?php if(in_array(strtoupper($method), ['PUT', 'PATCH', 'DELETE'])): ?>
+                    <?php echo method_field($method); ?>
+                <?php endif; ?>
 
                 <div class="modal-header">
-                    <h5 class="modal-title">{{ $title }}</h5>
+                    <h5 class="modal-title"><?php echo e($title); ?></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
 
                 <div class="modal-body">
-                    @if ($errors->any())
+                    <?php if($errors->any()): ?>
                         <div class="alert alert-danger">
                             <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
+                                <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <li><?php echo e($error); ?></li>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </ul>
                         </div>
-                    @endif
+                    <?php endif; ?>
                     <div class="row">
-                        @foreach ($fields as $field)
-                            @if ($field['type'] == 'hidden')
-                                <input type="hidden" name="id" value="" data-field="{{ $field['name'] }}" />
-                                @php continue; @endphp
-                            @endif
-                            <div class="col-md-{{ isset($field['size']) ? $field['size'] : 12 / $columns }}">
+                        <?php $__currentLoopData = $fields; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $field): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php if($field['type'] == 'hidden'): ?>
+                                <input type="hidden" name="id" value="" data-field="<?php echo e($field['name']); ?>" />
+                                <?php continue; ?>
+                            <?php endif; ?>
+                            <div class="col-md-<?php echo e(isset($field['size']) ? $field['size'] : 12 / $columns); ?>">
                                 <div class="mb-3">
-                                    <label for="{{ $field['name'] }}" class="form-label">
-                                        {{ $field['label'] ?? ucfirst($field['name']) }}
-                                        @if (!empty($field['required']))
+                                    <label for="<?php echo e($field['name']); ?>" class="form-label">
+                                        <?php echo e($field['label'] ?? ucfirst($field['name'])); ?>
+
+                                        <?php if(!empty($field['required'])): ?>
                                             <span class="text-danger">*</span>
-                                        @endif
+                                        <?php endif; ?>
                                     </label>
-                                    @if ($field['type'] === 'select')
-                                        <select name="{{ $field['name'] }}" id="{{ $field['name'] }}" class="form-select" data-field="{{ $field['name'] }}"
-                                        @if (!empty($field['required'])) required @endif
+                                    <?php if($field['type'] === 'select'): ?>
+                                        <select name="<?php echo e($field['name']); ?>" id="<?php echo e($field['name']); ?>" class="form-select" data-field="<?php echo e($field['name']); ?>"
+                                        <?php if(!empty($field['required'])): ?> required <?php endif; ?>
                                         >
-                                            <option value="">Select {{ $field['label'] }}</option>
-                                            @foreach ($field['options'] ?? [] as $key => $val)
-                                                <option value="{{ $key }}">{{ $val }}</option>
-                                            @endforeach
+                                            <option value="">Select <?php echo e($field['label']); ?></option>
+                                            <?php $__currentLoopData = $field['options'] ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $val): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <option value="<?php echo e($key); ?>"><?php echo e($val); ?></option>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </select>
-                                    @elseif($field['type'] === 'textarea')
-                                        <textarea name="{{ $field['name'] }}" id="{{ $field['name'] }}" class="form-control"
-                                            data-field="{{ $field['name'] }}" rows="3">{{ $field['value'] ?? old($field['name']) }}</textarea>
-                                    @elseif($field['type'] === 'img')
-                                    <img src="" data-field="{{ $field['name'] }}" alt="">        
-                                    @else
-                                        <input type="{{ $field['type'] ?? 'text' }}" name="{{ $field['name'] }}"
-                                        @if(isset($field['readonly'])) readonly @endif
-                                            data-field="{{ $field['name'] }}" id="{{ $field['name'] }}"
-                                            value="{{ $field['value'] ?? old($field['name']) }}" class="form-control"
-                                            @if (!empty($field['required'])) required @endif @if(isset($field['fileTypes']))accept="{{$field['fileTypes']}}"@endif>
-                                        {{-- existing-file display removed to avoid showing filenames in modal --}}
-                                    @endif
+                                    <?php elseif($field['type'] === 'textarea'): ?>
+                                        <textarea name="<?php echo e($field['name']); ?>" id="<?php echo e($field['name']); ?>" class="form-control"
+                                            data-field="<?php echo e($field['name']); ?>" rows="3"><?php echo e($field['value'] ?? old($field['name'])); ?></textarea>
+                                    <?php elseif($field['type'] === 'img'): ?>
+                                    <img src="" data-field="<?php echo e($field['name']); ?>" alt="">        
+                                    <?php else: ?>
+                                        <input type="<?php echo e($field['type'] ?? 'text'); ?>" name="<?php echo e($field['name']); ?>"
+                                        <?php if(isset($field['readonly'])): ?> readonly <?php endif; ?>
+                                            data-field="<?php echo e($field['name']); ?>" id="<?php echo e($field['name']); ?>"
+                                            value="<?php echo e($field['value'] ?? old($field['name'])); ?>" class="form-control"
+                                            <?php if(!empty($field['required'])): ?> required <?php endif; ?> <?php if(isset($field['fileTypes'])): ?>accept="<?php echo e($field['fileTypes']); ?>"<?php endif; ?>>
+                                        
+                                    <?php endif; ?>
                                 </div>
                             </div>
-                        @endforeach
-                        {{-- Repeatable Group --}}
-                        @if (!empty($repeatable_group))
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        
+                        <?php if(!empty($repeatable_group)): ?>
                             <div id="repeatable-group-wrapper">
                                 <div class="repeatable-group row mb-3">
-                                    @foreach ($repeatable_group as $subField)
-                                        <div class="col-md-{{ $subField['size'] ?? 6 }}">
+                                    <?php $__currentLoopData = $repeatable_group; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $subField): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <div class="col-md-<?php echo e($subField['size'] ?? 6); ?>">
                                             <label class="form-label">
-                                                {{ $subField['label'] ?? ucfirst($subField['name']) }}
-                                                @if (!empty($subField['required']))
+                                                <?php echo e($subField['label'] ?? ucfirst($subField['name'])); ?>
+
+                                                <?php if(!empty($subField['required'])): ?>
                                                     <span class="text-danger">*</span>
-                                                @endif
+                                                <?php endif; ?>
                                             </label>
-                                            @if ($subField['type'] === 'select')
-                                                <select name="{{ $subField['name'] }}[0]" class="form-select"
-                                                    data-name="{{ $subField['name'] }}"
-                                                    @if (!empty($subField['required'])) required @endif>
-                                                    @foreach ($subField['options'] ?? [] as $key => $value)
-                                                        <option value="{{ $key }}">{{ $value }}
+                                            <?php if($subField['type'] === 'select'): ?>
+                                                <select name="<?php echo e($subField['name']); ?>[0]" class="form-select"
+                                                    data-name="<?php echo e($subField['name']); ?>"
+                                                    <?php if(!empty($subField['required'])): ?> required <?php endif; ?>>
+                                                    <?php $__currentLoopData = $subField['options'] ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                        <option value="<?php echo e($key); ?>"><?php echo e($value); ?>
+
                                                         </option>
-                                                    @endforeach
+                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                 </select>
-                                            @else
-                                                <input type="{{ $subField['type'] ?? 'text' }}"
-                                                    name="{{ $subField['name'] }}[0]" class="form-control"
-                                                    data-name="{{ $subField['name'] }}"
-                                                    @if (!empty($subField['required'])) required @endif>
-                                            @endif
+                                            <?php else: ?>
+                                                <input type="<?php echo e($subField['type'] ?? 'text'); ?>"
+                                                    name="<?php echo e($subField['name']); ?>[0]" class="form-control"
+                                                    data-name="<?php echo e($subField['name']); ?>"
+                                                    <?php if(!empty($subField['required'])): ?> required <?php endif; ?>>
+                                            <?php endif; ?>
                                         </div>
-                                    @endforeach
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     <div class="col-md-1">
                                         <button type="button" class="btn btn-danger btn-sm remove-group">
-                                            <i class="bi bi-x-lg"></i> {{-- Optional icon (Bootstrap Icons) --}}
+                                            <i class="bi bi-x-lg"></i> 
                                         </button>
                                     </div>
                                 </div>
@@ -113,20 +154,20 @@
                                     <button type="button" class="btn btn-success"
                                         id="add-repeatable-group">Add</button>
                                 </div>
-                        @endif
+                        <?php endif; ?>
                     </div>
                 </div>
 
                 <div class="modal-footer">
                     <button type="submit"
-                        class="btn btn-primary">{{ strtoupper($method) === 'PUT' ? 'Update' : 'Save' }}</button>
+                        class="btn btn-primary"><?php echo e(strtoupper($method) === 'PUT' ? 'Update' : 'Save'); ?></button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 </div>
-@if (isset($type) && $type == 'edit')
+<?php if(isset($type) && $type == 'edit'): ?>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const editButtons = document.querySelectorAll('.edit-btn');
@@ -206,7 +247,7 @@
                                     input.value = fieldValue ?? '';
                                 }
                             } else if (input.tagName === 'IMG') {
-                                if (fieldValue) input.src = "{{ url('/') }}" + fieldValue;
+                                if (fieldValue) input.src = "<?php echo e(url('/')); ?>" + fieldValue;
                             } else {
                                 if (fieldValue !== null && typeof fieldValue !== 'undefined') {
                                     input.value = fieldValue;
@@ -227,7 +268,7 @@
             // });
         });
     </script>
-@endif
+<?php endif; ?>
 <script>
     // Listen for when *any* modal is hidden
     document.addEventListener('hidden.bs.modal', function(event) {
@@ -240,7 +281,7 @@
         }
     });
 </script>
-@if (!empty($repeatable_group))
+<?php if(!empty($repeatable_group)): ?>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const addBtn = document.getElementById('add-repeatable-group');
@@ -284,4 +325,5 @@
             }
         });
     </script>
-@endif
+<?php endif; ?>
+<?php /**PATH C:\xampp\htdocs\hims\resources\views/components/modals/form-modal.blade.php ENDPATH**/ ?>

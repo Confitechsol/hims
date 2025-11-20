@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('opd_prescription', function (Blueprint $table) {
+        Schema::create('ipd_prescription', function (Blueprint $table) {
             $table->id();
-            $table->integer('opd_id')->nullable();
-            $table->integer('visit_id')->nullable();
+            $table->string('prescription_number', 8)->nullable();
+            $table->integer('ipd_id')->nullable();
             $table->text('header_note')->nullable();
             $table->text('footer_note')->nullable();
             $table->text('finding_description')->nullable();
@@ -25,15 +25,12 @@ return new class extends Migration
             $table->string('radiology_id')->nullable();
             $table->date('date')->nullable();
             $table->string('notification_to')->nullable();
+            $table->bigInteger('prescribed_by')->unsigned()->nullable();
             $table->timestamps();
 
-            $table->foreign('opd_id')
+            $table->foreign('ipd_id')
                 ->references('id')
-                ->on('opd_details')
-                ->onDelete('cascade');
-            $table->foreign('visit_id')
-                ->references('id')
-                ->on('opd_visits')
+                ->on('ipd_details')
                 ->onDelete('cascade');
         });
     }
@@ -43,6 +40,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('opd_prescription');
+        Schema::dropIfExists('ipd_prescription');
     }
 };
