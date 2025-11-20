@@ -87,7 +87,19 @@
     <div class="d-flex">
         <button
             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
-            data-id="<?php echo e($report->id); ?>">
+            data-id="<?php echo e($report->id); ?>"
+            data-child_name="<?php echo e($report->child_name); ?>"
+            data-gender="<?php echo e($report->gender); ?>"
+            data-weight="<?php echo e($report->weight ?? ''); ?>"
+            data-birth_date="<?php echo e(isset($report->birth_date) ? \Carbon\Carbon::parse($report->birth_date)->format('Y-m-d') : \Carbon\Carbon::parse($report->created_at)->format('Y-m-d')); ?>"
+            data-contact_person_phone="<?php echo e($report->contact ?? ''); ?>"
+            data-address="<?php echo e($report->address ?? ''); ?>"
+            data-caseId="<?php echo e($report->case_reference_id ?? ''); ?>"
+            data-mother_name="<?php echo e($report->mother_name ?? ''); ?>"
+            data-contact_person_name="<?php echo e($report->contact_person_name ?? ''); ?>"
+            data-father_name="<?php echo e($report->father_name ?? ''); ?>"
+            data-report="<?php echo e($report->birth_report); ?>"
+            data-icd_code="<?php echo e($report->icd_code ?? ''); ?>">
             <i class="ti ti-pencil"></i>
         </button>
 
@@ -281,7 +293,7 @@
 <?php endif; ?>
     <?php if (isset($component)) { $__componentOriginal66ca70ec79ff22faa62f501a1b49a88a = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal66ca70ec79ff22faa62f501a1b49a88a = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.modals.form-modal','data' => ['method' => 'put','type' => 'edit','id' => 'edit_modal','title' => 'Edit Birth','action' => ''.e(route('birth.update')).'','fields' => [
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.modals.form-modal','data' => ['method' => 'put','type' => 'edit','id' => 'edit_modal','title' => 'Edit Birth','action' => ''.e(url('/birth/update')).'','fields' => [
             ['name' => 'id', 'type' => 'hidden', 'required' => true],
             [
                 'name' => 'child_name',
@@ -307,13 +319,7 @@
                 'size' => '5',
             ],
             ['name' => 'mother_image', 'label' => 'Mother Photo', 'type' => 'file', 'required' => false, 'size' => '6',],
-            [
-                'name' => 'contact_person_name',
-                'label' => 'Contact Person Name',
-                'type' => 'text',
-                'required' => true,
-                'size' => '6',
-            ],
+            
             [
                 'name' => 'father_name',
                 'label' => 'Father Name ',
@@ -326,6 +332,14 @@
             [
                 'name' => 'report',
                 'label' => 'Report',
+                'type' => 'text',
+                'size' => '5',
+            ],
+
+            [
+                'name' => 'icd_code',
+                'label' => 'ICD Code',
+                'required' => true,
                 'type' => 'text',
                 'size' => '5',
             ],
@@ -337,7 +351,7 @@
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['method' => 'put','type' => 'edit','id' => 'edit_modal','title' => 'Edit Birth','action' => ''.e(route('birth.update')).'','fields' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute([
+<?php $component->withAttributes(['method' => 'put','type' => 'edit','id' => 'edit_modal','title' => 'Edit Birth','action' => ''.e(url('/birth/update')).'','fields' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute([
             ['name' => 'id', 'type' => 'hidden', 'required' => true],
             [
                 'name' => 'child_name',
@@ -363,13 +377,7 @@
                 'size' => '5',
             ],
             ['name' => 'mother_image', 'label' => 'Mother Photo', 'type' => 'file', 'required' => false, 'size' => '6',],
-            [
-                'name' => 'contact_person_name',
-                'label' => 'Contact Person Name',
-                'type' => 'text',
-                'required' => true,
-                'size' => '6',
-            ],
+            
             [
                 'name' => 'father_name',
                 'label' => 'Father Name ',
@@ -382,6 +390,14 @@
             [
                 'name' => 'report',
                 'label' => 'Report',
+                'type' => 'text',
+                'size' => '5',
+            ],
+
+            [
+                'name' => 'icd_code',
+                'label' => 'ICD Code',
+                'required' => true,
                 'type' => 'text',
                 'size' => '5',
             ],

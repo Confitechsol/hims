@@ -124,6 +124,62 @@ public function delete($id)
     return redirect()->back()->with('success', 'Birth record deleted successfully!');
 }
 
+public function update(Request $request, $id)
+{
+    $birth = BirthReport::findOrFail($id);
+
+    $validated = $request->validate([
+        'child_name' => 'required|string|max:255',
+        'gender' => 'required|string|max:10',
+        'weight' => 'required|string|max:20',
+        'birth_date' => 'required|date',
+        'contact_person_phone' => 'required|string|max:15',
+        'address' => 'nullable|string|max:255',
+        'caseId' => 'nullable|string|max:50',
+        'mother_name' => 'required|string|max:255',
+        'father_name' => 'required|string|max:255',
+        'report' => 'required|string|max:255',
+        'baby_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        'mother_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        'father_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        'report_image' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:4096',
+        'icd_code' => 'required|string|max:255',
+    ]);
+
+    // Only process and replace images if new files were uploaded
+    if ($request->hasFile('baby_image')) {
+        $birth->child_pic = $this->processImage($request->file('baby_image'));
+    }
+
+    if ($request->hasFile('mother_image')) {
+        $birth->mother_pic = $this->processImage($request->file('mother_image'));
+    }
+
+    if ($request->hasFile('father_image')) {
+        $birth->father_pic = $this->processImage($request->file('father_image'));
+    }
+
+    if ($request->hasFile('report_image')) {
+        $birth->document = $this->processImage($request->file('report_image'));
+    }
+
+    $birth->child_name = $validated['child_name'];
+    $birth->gender = $validated['gender'];
+    $birth->weight = $validated['weight'];
+    $birth->birth_date = $validated['birth_date'];
+    $birth->contact = $validated['contact_person_phone'] ?? $birth->contact;
+    $birth->address = $validated['address'] ?? $birth->address;
+    $birth->case_reference_id = $validated['caseId'] ?? $birth->case_reference_id;
+    $birth->mother_name = $validated['mother_name'];
+    $birth->father_name = $validated['father_name'];
+    $birth->birth_report = $validated['report'] ?? $birth->birth_report;
+    $birth->icd_code = $validated['icd_code'] ?? $birth->icd_code;
+
+    $birth->save();
+
+    return redirect()->back()->with('success', 'Birth record updated successfully!');
+}
+
 
 
 }

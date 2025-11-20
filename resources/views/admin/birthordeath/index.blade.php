@@ -108,7 +108,19 @@
     <div class="d-flex">
         <button
             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
-            data-id="{{ $report->id }}">
+            data-id="{{ $report->id }}"
+            data-child_name="{{ $report->child_name }}"
+            data-gender="{{ $report->gender }}"
+            data-weight="{{ $report->weight ?? '' }}"
+            data-birth_date="{{ isset($report->birth_date) ? \Carbon\Carbon::parse($report->birth_date)->format('Y-m-d') : \Carbon\Carbon::parse($report->created_at)->format('Y-m-d') }}"
+            data-contact_person_phone="{{ $report->contact ?? '' }}"
+            data-address="{{ $report->address ?? '' }}"
+            data-caseId="{{ $report->case_reference_id ?? '' }}"
+            data-mother_name="{{ $report->mother_name ?? '' }}"
+            data-contact_person_name="{{ $report->contact_person_name ?? '' }}"
+            data-father_name="{{ $report->father_name ?? '' }}"
+            data-report="{{ $report->birth_report }}"
+            data-icd_code="{{ $report->icd_code ?? '' }}">
             <i class="ti ti-pencil"></i>
         </button>
 
@@ -231,7 +243,7 @@
            
         ]" :columns="4" />
     <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Birth"
-        action="{{ route('birth.update') }}" :fields="[
+        action="{{ url('/birth/update') }}" :fields="[
             ['name' => 'id', 'type' => 'hidden', 'required' => true],
             [
                 'name' => 'child_name',
@@ -257,13 +269,7 @@
                 'size' => '5',
             ],
             ['name' => 'mother_image', 'label' => 'Mother Photo', 'type' => 'file', 'required' => false, 'size' => '6',],
-            [
-                'name' => 'contact_person_name',
-                'label' => 'Contact Person Name',
-                'type' => 'text',
-                'required' => true,
-                'size' => '6',
-            ],
+            
             [
                 'name' => 'father_name',
                 'label' => 'Father Name ',
@@ -276,6 +282,14 @@
             [
                 'name' => 'report',
                 'label' => 'Report',
+                'type' => 'text',
+                'size' => '5',
+            ],
+
+            [
+                'name' => 'icd_code',
+                'label' => 'ICD Code',
+                'required' => true,
                 'type' => 'text',
                 'size' => '5',
             ],

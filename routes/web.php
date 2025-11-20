@@ -298,7 +298,7 @@ Route::middleware(['admin'])->group(function () {
 
     Route::get('/birth', [BirthController::class, 'index'])->name('birth');
     Route::post('/birth/create', [BirthController::class, 'create'])->name('birth.create');
-    Route::put('/birth/update', [BirthController::class, 'update'])->name('birth.update');
+    Route::put('/birth/update/{id}', [BirthController::class, 'update'])->name('birth.update');
     Route::delete('/birth/delete/{id}', [BirthController::class, 'delete'])->name('birth.delete');
 
     Route::get('/death', [DeathController::class, 'index'])->name('death');

@@ -185,10 +185,30 @@ unset($__defined_vars, $__key, $__value); ?>
 
                     // If id exists set form action to death update endpoint and fill hidden id input
                     try {
-                        if (id && form) {
-                            form.action = '<?php echo e(url('/death/update')); ?>' + '/' + id;
+                        if (!id) {
+                            console.warn('Edit button clicked but no data-id present on button.');
+                            // avoid opening modal when id missing
+                            return;
+                        }
+                        if (form) {
+                            // Use the form's existing action as the base and append the id.
+                            // This avoids hardcoding resource names and prevents missing-parameter errors.
+                            let base = form.getAttribute('action') || '';
+                            if (base) {
+                                base = base.replace(/\/$/, ''); // remove trailing slash if present
+                                form.action = base + '/' + id;
+                            }
                             const hiddenId = form.querySelector('input[name="id"], input[data-field="id"]');
                             if (hiddenId) hiddenId.value = id;
+
+                            // Logging to assist debugging in browser console
+                            try {
+                                const methodInput = form.querySelector('input[name="_method"]');
+                                const actualMethod = methodInput ? methodInput.value : 'POST';
+                                console.info('Edit form prepared:', { action: form.action, method: actualMethod, id });
+                            } catch (err) {
+                                console.info('Edit form prepared:', { action: form.action, id });
+                            }
                         }
                     } catch (err) {
                         console.warn('Could not set form action dynamically', err);
