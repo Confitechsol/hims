@@ -14,7 +14,7 @@ class Staff extends Model
     // Fillable fields
     protected $fillable = [
         'hospital_id',
-         'branch_id',
+        'branch_id',
         'employee_id',
         'lang_id',
         'department_id',

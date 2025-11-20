@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('hospital_id', 8);
             $table->string('branch_id', 8);
             $table->unsignedBigInteger('case_reference_id')->nullable()->index();
+            $table->integer('ipd_id')->nullable()->index();
             $table->unsignedBigInteger('bed_group_id')->nullable()->index();
             $table->unsignedBigInteger('bed_id')->nullable()->index();
 
@@ -27,6 +28,10 @@ return new class extends Migration
             $table->string('is_active', 20)->nullable();
 
             $table->timestamp('created_at')->useCurrent();
+            $table->foreign('ipd_id')
+                ->references('id')
+                ->on('ipd_details')
+                ->onDelete('cascade');
         });
     }
 

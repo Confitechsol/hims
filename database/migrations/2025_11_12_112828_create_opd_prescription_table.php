@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('opd_prescription', function (Blueprint $table) {
             $table->id();
             $table->integer('opd_id')->nullable();
+            $table->integer('visit_id')->nullable();
             $table->text('header_note')->nullable();
             $table->text('footer_note')->nullable();
             $table->text('finding_description')->nullable();
@@ -29,6 +30,10 @@ return new class extends Migration
             $table->foreign('opd_id')
                 ->references('id')
                 ->on('opd_details')
+                ->onDelete('cascade');
+            $table->foreign('visit_id')
+                ->references('id')
+                ->on('opd_visits')
                 ->onDelete('cascade');
         });
     }

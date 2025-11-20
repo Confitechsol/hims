@@ -109,6 +109,17 @@
         </form>
 
 
+                                                                    data-id="">
+                                                                    <i class="ti ti-pencil"></i>
+                                                                </button>
+                                                                <form method="POST" action="">
+
+                                                                    <input type="hidden" name="id" value="">
+                                                                    <button type="submit"
+                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                                        <i class="ti ti-trash"></i>
+                                                                    </button>
+                                                                </form>
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -192,6 +203,22 @@
                 'label' => 'Report',
                 'type' => 'text',
                 'required' => false,
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.modals.birth-modal','data' => ['type' => 'add','id' => 'createModal','title' => 'Add Death Record','action' => ''.e(route('tpamanagement.store')).'','fields' => [
+            [
+                'name' => 'case_id',
+                'label' => 'Case ID',
+                'type' => 'text',
+                'required' => true,
+                
+            ],
+            ['name' => 'patient_name', 'label' => 'Patient Name', 'type' => 'text', 'required' => true, 'size' => '3'],
+            ['name' => 'death_date', 'label' => 'Death Date', 'type' => 'text', 'required' => true, 'size' => '4'],
+            ['name' => 'guardian_name', 'label' => 'Guardian Name ', 'type' => 'text', 'required' => true, 'size' => '12'],
+            [
+                'name' => 'Report',
+                'label' => 'report',
+                'type' => 'text',
+                'required' => true,
                 'size' => '6',
             ],
          ['name' => 'attachment', 'label' => 'Attachment', 'type' => 'file', 'required' => false, 'size' => '6',],
@@ -233,6 +260,22 @@
                 'label' => 'Report',
                 'type' => 'text',
                 'required' => false,
+<?php $component->withAttributes(['type' => 'add','id' => 'createModal','title' => 'Add Death Record','action' => ''.e(route('tpamanagement.store')).'','fields' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute([
+            [
+                'name' => 'case_id',
+                'label' => 'Case ID',
+                'type' => 'text',
+                'required' => true,
+                
+            ],
+            ['name' => 'patient_name', 'label' => 'Patient Name', 'type' => 'text', 'required' => true, 'size' => '3'],
+            ['name' => 'death_date', 'label' => 'Death Date', 'type' => 'text', 'required' => true, 'size' => '4'],
+            ['name' => 'guardian_name', 'label' => 'Guardian Name ', 'type' => 'text', 'required' => true, 'size' => '12'],
+            [
+                'name' => 'Report',
+                'label' => 'report',
+                'type' => 'text',
+                'required' => true,
                 'size' => '6',
             ],
          ['name' => 'attachment', 'label' => 'Attachment', 'type' => 'file', 'required' => false, 'size' => '6',],
@@ -279,6 +322,12 @@
             [
                 'name' => 'report',
                 'label' => 'Report',
+            ['name' => 'patient_name', 'label' => 'Patient Name', 'type' => 'text', 'required' => true, 'size' => '3'],
+            ['name' => 'death_date', 'label' => 'Death Date', 'type' => 'text', 'required' => true, 'size' => '4'],
+            ['name' => 'guardian_name', 'label' => 'Guardian Name ', 'type' => 'text', 'required' => true, 'size' => '12'],
+            [
+                'name' => 'Report',
+                'label' => 'report',
                 'type' => 'text',
                 'required' => true,
                 'size' => '6',
@@ -321,6 +370,12 @@
             [
                 'name' => 'report',
                 'label' => 'Report',
+            ['name' => 'patient_name', 'label' => 'Patient Name', 'type' => 'text', 'required' => true, 'size' => '3'],
+            ['name' => 'death_date', 'label' => 'Death Date', 'type' => 'text', 'required' => true, 'size' => '4'],
+            ['name' => 'guardian_name', 'label' => 'Guardian Name ', 'type' => 'text', 'required' => true, 'size' => '12'],
+            [
+                'name' => 'Report',
+                'label' => 'report',
                 'type' => 'text',
                 'required' => true,
                 'size' => '6',

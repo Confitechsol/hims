@@ -11,10 +11,19 @@ class OpdCharges extends Model
     protected $table = 'opd_charges';
 
     protected $fillable = [
-        'charge_id',
-        'charge_type_id',
         'opd_id',
-        'discount',
+        'charge_type_id',
+        'charge_category_id',
+        'charge_id',
+        'standard_charge',
+        'tpa_charge',
+        'qty',
+        'total',
+        'discount_percentage',
+        'tax',
+        'net_amount',
+        'charge_note',
+        'date',
     ];
 
     public function charge()
@@ -28,6 +37,10 @@ class OpdCharges extends Model
     }
     public function chargeCategory()
     {
-        return $this->belongsTo(ChargeCategory::class, 'charge_type_id', 'id');
+        return $this->belongsTo(ChargeCategory::class, 'charge_category_id', 'id');
+    }
+    public function chargeType()
+    {
+        return $this->belongsTo(ChargeTypeMaster::class, 'charge_type_master', 'id');
     }
 }

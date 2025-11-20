@@ -14,6 +14,7 @@ class OpdPrescription extends Model
     // Mass assignable attributes
     protected $fillable = [
         'opd_id',
+        'visit_id',
         'header_note',
         'footer_note',
         'finding_description',

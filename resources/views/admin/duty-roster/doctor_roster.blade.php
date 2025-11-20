@@ -102,7 +102,7 @@
                                                                     <option value="">Select</option>
                                                                     @foreach($doctorList as $doctor)
                                                                         <option value="{{ $doctor->id }}">{{ $doctor->name }}
-                                                                            ({{ $doctor->doctor_code ?? '' }})</option>
+                                                                            </option>
                                                                     @endforeach
                                                                 </select>
                                                             </div>

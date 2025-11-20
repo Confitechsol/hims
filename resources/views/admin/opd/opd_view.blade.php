@@ -510,7 +510,8 @@
                                             <div class="info-content">
                                                 <div class="info-label">Age</div>
                                                 <div class="info-value">{{ $opd->patient->age }} Year
-                                                    {{ $opd->patient->month }} Month {{ $opd->patient->day }} Days (As Of
+                                                    {{ $opd->patient->month }} Month {{ $opd->patient->day }} Days (As
+                                                    Of
                                                     {{ \Carbon\Carbon::parse($opd->patient->as_of_date)->format('d/m/Y') }})
                                                 </div>
                                             </div>
@@ -551,7 +552,8 @@
                                             <div class="info-content">
                                                 <div class="info-label">TPA</div>
                                                 <div class="info-value empty">
-                                                    {{ $opd->patient->organisation->organisation_name ?? '--' }}</div>
+                                                    {{ $opd->patient->organisation->organisation_name ?? '--' }}
+                                                </div>
                                             </div>
                                         </div>
 
@@ -562,7 +564,8 @@
                                             <div class="info-content">
                                                 <div class="info-label">TPA ID</div>
                                                 <div class="info-value empty">
-                                                    {{ $opd->patient->organisation->code ?? '--' }}</div>
+                                                    {{ $opd->patient->organisation->code ?? '--' }}
+                                                </div>
                                             </div>
                                         </div>
 
@@ -633,105 +636,106 @@
 
                             </div>
                             {{-- <div class="d-sm-flex position-relative z-0 overflow-hidden p-2">
-                                        <!-- <img src="assets/img/icons/shape-01.svg" alt="img"
-                                                                                                                                                                                                                                                                                                                                                class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
-                                        <a href="javascript:void(0);"
-                                            class="avatar avatar-xxxl patient-avatar me-2 flex-shrink-0">
-                                            <img src="{{ asset('assets/img/patient.png') }}" alt="product" class="rounded">
-                                        </a>
-                                        <div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-phone text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">Phone :</h6>
-                                                    <p class="patient_data mb-0">8910245678</p>
-                                                </div>
-                                            </div>
-
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-calendar-days text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">Age :</h6>
-                                                    <p class="patient_data mb-0">22 Year 9 Month 5 Days (As Of Date 10/06/2025)
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-hands-holding-child text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">Guardian Name :</h6>
-                                                    <p class="patient_data mb-0">--</p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-mars-and-venus text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">Gender :</h6>
-                                                    <p class="patient_data mb-0">Male</p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-users-gear text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">TPA :</h6>
-                                                    <p class="patient_data mb-0">--</p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-id-badge text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">TPA ID :</h6>
-                                                    <p class="patient_data mb-0">--</p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-user-check text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">TPA Validity :</h6>
-                                                    <p class="patient_data mb-0">--</p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-barcode text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">Barcode :</h6>
-                                                    <p class="patient_data mb-0">--</p>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-3">
-                                                <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                        class="fa-solid fa-qrcode text-primary"></i></span>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h6 class="about_patient fs-13 fw-bold mb-1">QR Code :</h6>
-                                                    <p class="patient_data mb-0">--</p>
-                                                </div>
+                                    <!-- <img src="assets/img/icons/shape-01.svg" alt="img"
+                                                                                                                                                                                                                                                                                                                                                                class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
+                                    <a href="javascript:void(0);"
+                                        class="avatar avatar-xxxl patient-avatar me-2 flex-shrink-0">
+                                        <img src="{{ asset('assets/img/patient.png') }}" alt="product" class="rounded">
+                                    </a>
+                                    <div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-phone text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">Phone :</h6>
+                                                <p class="patient_data mb-0">8910245678</p>
                                             </div>
                                         </div>
-                                        <!-- <div class="row">
-                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-5">
 
-                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-7">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-calendar-days text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">Age :</h6>
+                                                <p class="patient_data mb-0">22 Year 9 Month 5 Days (As Of Date 10/06/2025)
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-hands-holding-child text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">Guardian Name :</h6>
+                                                <p class="patient_data mb-0">--</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-mars-and-venus text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">Gender :</h6>
+                                                <p class="patient_data mb-0">Male</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-users-gear text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">TPA :</h6>
+                                                <p class="patient_data mb-0">--</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-id-badge text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">TPA ID :</h6>
+                                                <p class="patient_data mb-0">--</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-user-check text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">TPA Validity :</h6>
+                                                <p class="patient_data mb-0">--</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-barcode text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">Barcode :</h6>
+                                                <p class="patient_data mb-0">--</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
+                                                    class="fa-solid fa-qrcode text-primary"></i></span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="about_patient fs-13 fw-bold mb-1">QR Code :</h6>
+                                                <p class="patient_data mb-0">--</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- <div class="row">
+                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-5">
 
-                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-5">
+                                                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-7">
 
-                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-7">
+                                                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-5">
 
-                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                </div> -->
-                                    </div> --}}
+                                                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-7">
 
-                            {{-- </div> --}}
+                                                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                                                </div> -->
+                                </div> --}}
+
+                            {{--
+                            </div> --}}
                         </div>
 
                         <div class="card shadow-sm border-0 mt-2">
@@ -845,7 +849,8 @@
                                                     <td>{{ $medication->date }}</td>
                                                     <td>{{ $medication->pharmacy->medicine_name }}</td>
                                                     <td>{{ $medication->medicineDosage->dosage }}
-                                                        {{ $medication->medicineDosage->unit->unit_name }}</td>
+                                                        {{ $medication->medicineDosage->unit->unit_name }}
+                                                    </td>
                                                     <td>{{ $medication->time }}</td>
                                                     <td>{{ $medication->remark }}</td>
                                                 </tr>
@@ -883,7 +888,7 @@
                                                     <td>
                                                         {{ $lab->pathology->test_name .
                                                             "
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            (" .
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            (" .
                                                             $lab->pathology->short_name .
                                                             ')' }}
                                                     </td>
@@ -969,7 +974,8 @@
                                                         {{ $charge->charge->name }}
                                                     </td>
                                                     <td style="text-transform: capitalize;">
-                                                        {{ $charge->chargeCategory->chargeType->charge_type }}</td>
+                                                        {{ $charge->chargeCategory->chargeType->charge_type }}
+                                                    </td>
                                                     <td class="text-right">{{ $charge->charge->standard_charge }}</td>
                                                     <td class="text-right">
                                                         ({{ $charge->charge->taxCategory->percentage }}%)
@@ -1080,7 +1086,7 @@
                                                         <div class="text-end d-flex">
                                                             <a href="javascript:void(0);"
                                                                 class="btn btn-primary text-white ms-2 btn-md"
-                                                                data-bs-toggle="modal" data-is-hidden = "true"
+                                                                data-bs-toggle="modal" data-is-hidden="true"
                                                                 data-bs-target="#createOpdModal"
                                                                 data-patient='@json($opd->patient)'><i
                                                                     class="ti ti-plus me-1"></i>New Checkup</a>
@@ -1096,8 +1102,7 @@
                                                                     <div class="modal-header"
                                                                         style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
-                                                                        <h5 class="modal-title"
-                                                                            id="addSpecializationLabel">
+                                                                        <h5 class="modal-title" id="addSpecializationLabel">
                                                                             Patient Details
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
@@ -1165,18 +1170,23 @@
                                                                                         <label for="symptoms_des"
                                                                                             class="form-label">Symptoms
                                                                                         </label>
-                                                                                        <textarea name="symptoms" id="symptoms" class="form-control"></textarea>
+                                                                                        <textarea name="symptoms"
+                                                                                            id="symptoms"
+                                                                                            class="form-control"></textarea>
                                                                                     </div>
                                                                                     <div class="col-md-6">
                                                                                         <label for="note"
                                                                                             class="form-label">Note</label>
-                                                                                        <textarea name="note" id="note" class="form-control"></textarea>
+                                                                                        <textarea name="note" id="note"
+                                                                                            class="form-control"></textarea>
                                                                                     </div>
                                                                                     <div class="col-md-6">
                                                                                         <label for="allergies"
                                                                                             class="form-label">Any Known
                                                                                             Allergies</label>
-                                                                                        <textarea name="allergies" id="allergies" class="form-control"></textarea>
+                                                                                        <textarea name="allergies"
+                                                                                            id="allergies"
+                                                                                            class="form-control"></textarea>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
@@ -1196,9 +1206,8 @@
                                                                                     <div class="col-md-6">
                                                                                         <label for="case"
                                                                                             class="form-label">Case</label>
-                                                                                        <input type="text"
-                                                                                            name="case" id="case"
-                                                                                            class="form-control">
+                                                                                        <input type="text" name="case"
+                                                                                            id="case" class="form-control">
                                                                                     </div>
                                                                                     <div class="col-md-6">
                                                                                         <label for="casualty"
@@ -1226,8 +1235,7 @@
                                                                                     <div class="col-md-6">
                                                                                         <label for="reference"
                                                                                             class="form-label">Reference</label>
-                                                                                        <input type="text"
-                                                                                            name="reference"
+                                                                                        <input type="text" name="reference"
                                                                                             id="reference"
                                                                                             class="form-control">
                                                                                     </div>
@@ -1289,12 +1297,10 @@
                                                                                         <label for="standard_charge"
                                                                                             class="form-label">Standard
                                                                                             Charge (INR)</label>
-                                                                                        <input type="text"
-                                                                                            readonly="true"
+                                                                                        <input type="text" readonly="true"
                                                                                             name="standard_charge"
                                                                                             id="standard_charge"
-                                                                                            class="form-control"
-                                                                                            value=""
+                                                                                            class="form-control" value=""
                                                                                             autocomplete="off" disabled>
                                                                                     </div>
                                                                                     <div class="col-md-6">
@@ -1302,8 +1308,7 @@
                                                                                             class="form-label">Applied
                                                                                             Charge (INR) <span
                                                                                                 class="text-danger">*</span></label>
-                                                                                        <input type="text"
-                                                                                            name="amount"
+                                                                                        <input type="text" name="amount"
                                                                                             id="apply_charge"
                                                                                             class="form-control">
                                                                                     </div>
@@ -1328,10 +1333,8 @@
                                                                                         <div class="input-group">
                                                                                             <input type="text"
                                                                                                 class="form-control discount_percentage"
-                                                                                                name="tax"
-                                                                                                id="tax"
-                                                                                                value="0"
-                                                                                                autocomplete="off"
+                                                                                                name="tax" id="tax"
+                                                                                                value="0" autocomplete="off"
                                                                                                 readonly="true" disabled>
                                                                                             <span
                                                                                                 class="input-group-addon ">
@@ -1343,11 +1346,9 @@
                                                                                             class="form-label">Amount
                                                                                             (INR) <span
                                                                                                 class="text-danger">*</span></label>
-                                                                                        <input type="text"
-                                                                                            readonly="true" name="amount"
-                                                                                            id="amount"
-                                                                                            class="form-control"
-                                                                                            value=""
+                                                                                        <input type="text" readonly="true"
+                                                                                            name="amount" id="amount"
+                                                                                            class="form-control" value=""
                                                                                             autocomplete="off" disabled>
                                                                                     </div>
                                                                                     <div class="col-md-6">
@@ -1371,8 +1372,7 @@
                                                                                         <input type="text"
                                                                                             name="paid_amount"
                                                                                             id="paid_amount"
-                                                                                            class="form-control"
-                                                                                            value=""
+                                                                                            class="form-control" value=""
                                                                                             autocomplete="off">
                                                                                     </div>
                                                                                     <div class="col-md-6">
@@ -1395,8 +1395,7 @@
 
                                                                     </div>
                                                                     <div class="modal-footer">
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary">Save &
+                                                                        <button type="submit" class="btn btn-primary">Save &
                                                                             Print</button>
                                                                         <button type="submit"
                                                                             class="btn btn-primary">Save</button>
@@ -1427,11 +1426,9 @@
                                                                                             class="form-label">Name</label><span
                                                                                             class="text-danger">
                                                                                             *</span>
-                                                                                        <input id="name"
-                                                                                            name="name" placeholder=""
-                                                                                            type="text"
-                                                                                            class="form-control"
-                                                                                            value=""
+                                                                                        <input id="name" name="name"
+                                                                                            placeholder="" type="text"
+                                                                                            class="form-control" value=""
                                                                                             autocomplete="off">
                                                                                         <span class="text-danger"></span>
                                                                                     </div>
@@ -1484,8 +1481,7 @@
                                                                                                 <label
                                                                                                     class="form-label">Age
                                                                                                     (yy-mm-dd)
-                                                                                                </label><small
-                                                                                                    class="req">
+                                                                                                </label><small class="req">
                                                                                                     *</small>
                                                                                                 <div
                                                                                                     style="clear: both;overflow: hidden;">
@@ -1559,11 +1555,9 @@
                                                                                                         Select</option>
                                                                                                     <option value="Single">
                                                                                                         Single</option>
-                                                                                                    <option
-                                                                                                        value="Married">
+                                                                                                    <option value="Married">
                                                                                                         Married</option>
-                                                                                                    <option
-                                                                                                        value="Widowed">
+                                                                                                    <option value="Widowed">
                                                                                                         Widowed</option>
                                                                                                     <option
                                                                                                         value="Separated">
@@ -1595,8 +1589,7 @@
                                                                                                         <p class="mb-0">
                                                                                                             Drop files
                                                                                                             here</p>
-                                                                                                        <input
-                                                                                                            type="file"
+                                                                                                        <input type="file"
                                                                                                             class="position-absolute top-0 start-0 opacity-0 w-100 h-100">
                                                                                                     </div>
                                                                                                 </div>
@@ -1614,8 +1607,7 @@
                                                                                             autocomplete="off"
                                                                                             name="mobileno" type="text"
                                                                                             placeholder=""
-                                                                                            class="form-control"
-                                                                                            value="">
+                                                                                            class="form-control" value="">
                                                                                         <span class="text-danger"></span>
                                                                                     </div>
                                                                                 </div>
@@ -1623,10 +1615,9 @@
                                                                                     <div class="form-group">
                                                                                         <label
                                                                                             class="form-label">Email</label>
-                                                                                        <input type="text"
-                                                                                            placeholder=""
-                                                                                            id="addformemail"
-                                                                                            value="" name="email"
+                                                                                        <input type="text" placeholder=""
+                                                                                            id="addformemail" value=""
+                                                                                            name="email"
                                                                                             class="form-control">
                                                                                         <span class="text-danger"></span>
                                                                                     </div>
@@ -1635,8 +1626,7 @@
                                                                                     <div class="form-group">
                                                                                         <label for="address"
                                                                                             class="form-label">Address</label>
-                                                                                        <input name="address"
-                                                                                            placeholder=""
+                                                                                        <input name="address" placeholder=""
                                                                                             class="form-control">
                                                                                     </div>
                                                                                 </div>
@@ -1644,7 +1634,8 @@
                                                                                     <div class="form-group">
                                                                                         <label for="pwd"
                                                                                             class="form-label">Remarks</label>
-                                                                                        <textarea name="note" id="note" class="form-control"></textarea>
+                                                                                        <textarea name="note" id="note"
+                                                                                            class="form-control"></textarea>
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="col-sm-6">
@@ -1652,7 +1643,9 @@
                                                                                         <label for="email"
                                                                                             class="form-label">Any Known
                                                                                             Allergies</label>
-                                                                                        <textarea name="known_allergies" id="" placeholder="" class="form-control"></textarea>
+                                                                                        <textarea name="known_allergies"
+                                                                                            id="" placeholder=""
+                                                                                            class="form-control"></textarea>
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="col-sm-4">
@@ -1716,8 +1709,8 @@
                                                                                     <div class="form-group">
                                                                                         <label for="height"
                                                                                             class="form-label">Height</label>
-                                                                                        <input type="text"
-                                                                                            id="height" name="height"
+                                                                                        <input type="text" id="height"
+                                                                                            name="height"
                                                                                             class="form-control"
                                                                                             placeholder="Height (cm)"
                                                                                             value="">
@@ -1727,8 +1720,8 @@
                                                                                     <div class="form-group">
                                                                                         <label for="weight"
                                                                                             class="form-label">Weight</label>
-                                                                                        <input type="text"
-                                                                                            id="weight" name="weight"
+                                                                                        <input type="text" id="weight"
+                                                                                            name="weight"
                                                                                             class="form-control"
                                                                                             placeholder="Weight (kg)"
                                                                                             value="">
@@ -1738,8 +1731,7 @@
                                                                                     <div class="form-group">
                                                                                         <label for="temperature"
                                                                                             class="form-label">Temperature</label>
-                                                                                        <input type="text"
-                                                                                            id="temperature"
+                                                                                        <input type="text" id="temperature"
                                                                                             name="temperature"
                                                                                             class="form-control"
                                                                                             placeholder="Temperature (°C)"
@@ -1816,23 +1808,36 @@
                                                                         <div class="d-flex gap-2">
 
                                                                             <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#addPrescriptionModal"
+                                                                                data-id="{{ $opd->id }}">
                                                                                 <i class="fa-solid fa-prescription"
-                                                                                    {{-- data-bs-toggle="tooltip" --}}
-                                                                                    data-bs-toggle="modal"
-                                                                                    data-bs-target="#addPrescriptionModal"
-                                                                                    data-id="{{ $opd->id }}"
+                                                                                    {{--
+                                                                                    data-bs-toggle="tooltip" --}}
                                                                                     title="Add Prescription"></i></a>
+
+
                                                                             <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill"
+                                                                                data-is-ipd="false"
+                                                                                data-id="{{ $visit->opd->id }}"
+                                                                                data-pres-id = "{{ $visit->id }}"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#showPrescriptionModal">
                                                                                 <i class="fa-solid fa-print"
-                                                                                    data-bs-toggle="tooltip"
                                                                                     title="Manual Prescription"></i></a>
+
+
+
                                                                             <a href="javascript: void(0);"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
                                                                                 <i class="ti ti-menu"
                                                                                     data-bs-toggle="tooltip"
                                                                                     title="Show"></i></a>
+
+
+
                                                                         </div>
                                                                     </td>
                                                                 </tr>
@@ -1901,78 +1906,88 @@
                                                                     </div>
 
                                                                     <div class="modal-body">
-
-                                                                        <div class="row gy-3">
-
-                                                                            <div class="col-md-6">
-                                                                                <label for="date"
-                                                                                    class="form-label">Date
-                                                                                    <span class="text-danger">*</span>
-                                                                                </label>
-                                                                                <input type="date" name="date"
-                                                                                    id="date" class="form-control">
+                                                                        <form action="{{ route('opd.createMedication') }}"
+                                                                            method="post">
+                                                                            @csrf
+                                                                            <div class="row gy-3">
+                                                                                <input type="hidden" name="opd_id"
+                                                                                    value="{{ $opd->id }}">
+                                                                                <div class="col-md-6">
+                                                                                    <label for="date"
+                                                                                        class="form-label">Date
+                                                                                        <span class="text-danger">*</span>
+                                                                                    </label>
+                                                                                    <input type="date" name="date"
+                                                                                        id="date"
+                                                                                        class="form-control">
+                                                                                </div>
+                                                                                <div class="col-md-6">
+                                                                                    <label for="time"
+                                                                                        class="form-label">Time
+                                                                                        <span class="text-danger">*</span>
+                                                                                    </label>
+                                                                                    <input type="time" name="time"
+                                                                                        id="time"
+                                                                                        class="form-control">
+                                                                                </div>
+                                                                                <div class="col-md-6">
+                                                                                    <label for="medi_cat"
+                                                                                        class="form-label">Medicine
+                                                                                        Category
+                                                                                        <span class="text-danger">*</span>
+                                                                                    </label>
+                                                                                    <select name="med_cat" id="med_cat"
+                                                                                        class="form-select"
+                                                                                        data-placeholder="Enter Patient Name or Id…">
+                                                                                        <option value="0">Select
+                                                                                        </option>
+                                                                                        <option value="1">Antibiotic
+                                                                                        </option>
+                                                                                    </select>
+                                                                                </div>
+                                                                                <div class="col-md-6">
+                                                                                    <label for="med_name"
+                                                                                        class="form-label">Medicine Name
+                                                                                        <span class="text-danger">*</span>
+                                                                                    </label>
+                                                                                    <select name="med_name" id="med_name"
+                                                                                        class="form-select"
+                                                                                        data-placeholder="Enter Patient Name or Id…">
+                                                                                        <option value="0">Select
+                                                                                        </option>
+                                                                                        <option value="1">Paracetamol
+                                                                                            500mg
+                                                                                        </option>
+                                                                                    </select>
+                                                                                </div>
+                                                                                <div class="col-md-6">
+                                                                                    <label for="dosage"
+                                                                                        class="form-label">Dosage
+                                                                                        <span class="text-danger">*</span>
+                                                                                    </label>
+                                                                                    <select name="dosage" id="dosage"
+                                                                                        class="form-select"
+                                                                                        data-placeholder="Enter Patient Name or Id…">
+                                                                                        <option value="0">Select
+                                                                                        </option>
+                                                                                        <option value="1">1 Tablet
+                                                                                        </option>
+                                                                                    </select>
+                                                                                </div>
+                                                                                <div class="col-md-6">
+                                                                                    <label for="remark"
+                                                                                        class="form-label">Remarks
+                                                                                    </label>
+                                                                                    <textarea name="remark" id="remark" class="form-control"></textarea>
+                                                                                </div>
                                                                             </div>
-                                                                            <div class="col-md-6">
-                                                                                <label for="time"
-                                                                                    class="form-label">Time
-                                                                                    <span class="text-danger">*</span>
-                                                                                </label>
-                                                                                <input type="time" name="time"
-                                                                                    id="time" class="form-control">
+                                                                            <div class="modal-footer">
+                                                                                <button type="submit"
+                                                                                    class="btn btn-primary">Save</button>
                                                                             </div>
-                                                                            <div class="col-md-6">
-                                                                                <label for="medi_cat"
-                                                                                    class="form-label">Medicine Category
-                                                                                    <span class="text-danger">*</span>
-                                                                                </label>
-                                                                                <select name="medi_cat" id="med_cat"
-                                                                                    class="form-select"
-                                                                                    data-placeholder="Enter Patient Name or Id…">
-                                                                                    <option value="0">Select</option>
-                                                                                    <option value="1">Antibiotic
-                                                                                    </option>
-                                                                                </select>
-                                                                            </div>
-                                                                            <div class="col-md-6">
-                                                                                <label for="med_name"
-                                                                                    class="form-label">Medicine Name
-                                                                                    <span class="text-danger">*</span>
-                                                                                </label>
-                                                                                <select name="med_name" id="med_name"
-                                                                                    class="form-select"
-                                                                                    data-placeholder="Enter Patient Name or Id…">
-                                                                                    <option value="0">Select</option>
-                                                                                    <option value="1">Paracetamol
-                                                                                        500mg
-                                                                                    </option>
-                                                                                </select>
-                                                                            </div>
-                                                                            <div class="col-md-6">
-                                                                                <label for="dosage"
-                                                                                    class="form-label">Dosage
-                                                                                    <span class="text-danger">*</span>
-                                                                                </label>
-                                                                                <select name="dosage" id="dosage"
-                                                                                    class="form-select"
-                                                                                    data-placeholder="Enter Patient Name or Id…">
-                                                                                    <option value="0">Select</option>
-                                                                                    <option value="1">1 Tablet
-                                                                                    </option>
-                                                                                </select>
-                                                                            </div>
-                                                                            <div class="col-md-6">
-                                                                                <label for="remark"
-                                                                                    class="form-label">Remarks
-                                                                                </label>
-                                                                                <textarea name="remark" id="remark" class="form-control"></textarea>
-                                                                            </div>
-                                                                        </div>
-
+                                                                        </form>
                                                                     </div>
-                                                                    <div class="modal-footer">
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary">Save</button>
-                                                                    </div>
+
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -2155,7 +2170,8 @@
                                                                 <tr>
                                                                     <td>
                                                                         <h6 class="fs-14 mb-1">
-                                                                            {{ $operation->reference_no }}</h6>
+                                                                            {{ $operation->reference_no }}
+                                                                        </h6>
                                                                     </td>
                                                                     <td>{{ $operation->date }}</td>
                                                                     <td>{{ $operation->operation->operation }}</td>
@@ -2256,295 +2272,309 @@
 
 
                                                                     </div>
+                                                                    <form action="{{ route('opd.addOpdCharge') }}"
+                                                                        method="POST" id="addChargeForm">
+                                                                        @csrf
+                                                                        <div class="modal-body">
+                                                                            <div class="row ">
+                                                                                <div class="col-lg-12 col-md-12 col-sm-12">
 
-                                                                    <div class="modal-body">
-                                                                        <div class="row ">
-                                                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                                    <div class="row ptt10">
+                                                                                        <div class="col-sm-2">
+                                                                                            <div class="form-group">
+                                                                                                <label
+                                                                                                    class="form-label displayblock">Charge
+                                                                                                    Type<small
+                                                                                                        class="req">
+                                                                                                        *</small></label>
+                                                                                                <input type="hidden" name="opd_id" id="opd_id" value="{{ $opd->id }}">
+                                                                                                <select name="charge_type"
+                                                                                                    id="add_charge_type"
+                                                                                                    class="form-control charge_type select2 reset_value select2-hidden-accessible"
+                                                                                                    style="width: 100%"
+                                                                                                    tabindex="-1"
+                                                                                                    aria-hidden="true">
+                                                                                                    <option value="">
+                                                                                                        Select
+                                                                                                    </option>
 
-                                                                                <div class="row ptt10">
-                                                                                    <div class="col-sm-2">
-                                                                                        <div class="form-group">
-                                                                                            <label
-                                                                                                class="form-label displayblock">Charge
-                                                                                                Type<small class="req">
-                                                                                                    *</small></label>
-                                                                                            <select name="charge_type"
-                                                                                                id="add_charge_type"
-                                                                                                class="form-control charge_type select2 reset_value select2-hidden-accessible"
-                                                                                                style="width: 100%"
-                                                                                                tabindex="-1"
-                                                                                                aria-hidden="true">
-                                                                                                <option value="">
-                                                                                                    Select
-                                                                                                </option>
-                                                                                                <option value="1">
-                                                                                                    Appointment </option>
+                                                                                                </select>
 
-                                                                                            </select>
-
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-sm-2">
-                                                                                        <div class="form-group">
-                                                                                            <label
-                                                                                                class="form-label">Charge
-                                                                                                Category</label><small
-                                                                                                class="req"> *</small>
-                                                                                            <select name="charge_category2"
-                                                                                                id="charge_category2"
-                                                                                                style="width: 100%"
-                                                                                                class="form-control select2 charge_category2 reset_value select2-hidden-accessible"
-                                                                                                tabindex="-1"
-                                                                                                aria-hidden="true">
-                                                                                                <option value="">
-                                                                                                    Select
-                                                                                                </option>
-                                                                                            </select>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-sm-2">
-                                                                                        <div class="form-group">
-                                                                                            <label
-                                                                                                class="form-label">Charge
-                                                                                                Name</label><small
-                                                                                                class="req"> *</small>
-                                                                                            <select name="charge_id"
-                                                                                                id="charge_id"
-                                                                                                style="width: 100%"
-                                                                                                class="form-control addcharge  select2 reset_value select2-hidden-accessible"
-                                                                                                tabindex="-1"
-                                                                                                aria-hidden="true">
-                                                                                                <option value="">
-                                                                                                    Select
-                                                                                                </option>
-                                                                                            </select>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-md-2">
-                                                                                        <div class="form-group">
-                                                                                            <label
-                                                                                                class="form-label">Standard
-                                                                                                Charge
-                                                                                                (INR)</label>
-                                                                                            <input type="text"
-                                                                                                readonly=""
-                                                                                                name="standard_charge"
-                                                                                                id="addstandard_charge"
-                                                                                                class="form-control reset_value standard_charge"
-                                                                                                value="">
-                                                                                            <span
-                                                                                                class="text-danger"></span>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-md-2">
-                                                                                        <div class="form-group">
-                                                                                            <label class="form-label">TPA
-                                                                                                Charge (INR)</label>
-                                                                                            <input type="text"
-                                                                                                readonly=""
-                                                                                                name="schedule_charge"
-                                                                                                id="addscd_charge"
-                                                                                                placeholder=""
-                                                                                                class="form-control reset_value schedule_charge"
-                                                                                                value="">
-                                                                                            <span
-                                                                                                class="text-danger"></span>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-sm-2">
-                                                                                        <div class="form-group">
-                                                                                            <label
-                                                                                                class="form-label">Qty</label><small
-                                                                                                class="req"> *</small>
-                                                                                            <input type="text"
-                                                                                                name="qty"
-                                                                                                id="qty"
-                                                                                                class="form-control qty"
-                                                                                                value="1">
-                                                                                            <span
-                                                                                                class="text-danger"></span>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="row pt-3">
-                                                                                    <div class="col-sm-5">
-                                                                                        <table class="printablea4">
-                                                                                            <tbody>
-                                                                                                <tr>
-                                                                                                    <th width="40%">
-                                                                                                        Total
-                                                                                                        (INR)</th>
-                                                                                                    <td width="60%"
-                                                                                                        colspan="2"
-                                                                                                        class="text-right ipdbilltable">
-                                                                                                        <input
-                                                                                                            type="text"
-                                                                                                            placeholder="Total"
-                                                                                                            value="0"
-                                                                                                            name="apply_charge"
-                                                                                                            id="apply_charge"
-                                                                                                            style="width: 30%; float: right"
-                                                                                                            class="form-control total apply_charge_add_charge"
-                                                                                                            readonly="">
-                                                                                                    </td>
-                                                                                                </tr>
-                                                                                                <tr>
-                                                                                                    <th>Discount Percentage
-                                                                                                        (INR)</th>
-                                                                                                    <td
-                                                                                                        class="text-right ipdbilltable">
-                                                                                                        <h4
-                                                                                                            style="float: right;font-size: 12px; padding-left: 5px;">
-                                                                                                            %</h4>
-                                                                                                        <input
-                                                                                                            type="text"
-                                                                                                            value="0"
-                                                                                                            placeholder="Discount Percentage"
-                                                                                                            name="discount_percentage"
-                                                                                                            id="discount_percentage_add_charge"
-                                                                                                            class="form-control discount_percentage_add_charge"
-                                                                                                            style="width: 70%; float: right;font-size: 12px;">
-                                                                                                    </td>
-                                                                                                    <td
-                                                                                                        class="text-right ipdbilltable">
-                                                                                                        <input
-                                                                                                            type="text"
-                                                                                                            placeholder="Discount Percentage"
-                                                                                                            name="discount_percentage_amount"
-                                                                                                            value="0"
-                                                                                                            id="discount_percentage_amount"
-                                                                                                            style="width: 50%; float: right"
-                                                                                                            class="form-control discount_percentage_amount"
-                                                                                                            readonly="">
-                                                                                                    </td>
-                                                                                                </tr>
-                                                                                                <tr>
-                                                                                                    <th>Tax (INR)</th>
-                                                                                                    <td
-                                                                                                        class="text-right ipdbilltable">
-                                                                                                        <h4
-                                                                                                            style="float: right;font-size: 12px; padding-left: 5px;">
-                                                                                                            %</h4>
-                                                                                                        <input
-                                                                                                            type="text"
-                                                                                                            placeholder="Tax"
-                                                                                                            name="charge_tax"
-                                                                                                            id="charge_tax"
-                                                                                                            class="form-control charge_tax"
-                                                                                                            readonly=""
-                                                                                                            style="width: 70%; float: right;font-size: 12px;">
-                                                                                                    </td>
-                                                                                                    <td
-                                                                                                        class="text-right ipdbilltable">
-                                                                                                        <input
-                                                                                                            type="text"
-                                                                                                            placeholder="Tax"
-                                                                                                            name="tax"
-                                                                                                            value="0"
-                                                                                                            id="tax"
-                                                                                                            style="width: 50%; float: right"
-                                                                                                            class="form-control tax"
-                                                                                                            readonly="">
-                                                                                                    </td>
-                                                                                                </tr>
-                                                                                                <tr>
-                                                                                                    <th>Net Amount (INR)
-                                                                                                    </th>
-                                                                                                    <td colspan="2"
-                                                                                                        class="text-right ipdbilltable">
-                                                                                                        <input
-                                                                                                            type="text"
-                                                                                                            placeholder="Net Amount"
-                                                                                                            value="0"
-                                                                                                            name="amount"
-                                                                                                            id="final_amount"
-                                                                                                            style="width: 30%; float: right"
-                                                                                                            class="form-control net_amount"
-                                                                                                            readonly="">
-                                                                                                    </td>
-                                                                                                </tr>
-                                                                                            </tbody>
-                                                                                        </table>
-                                                                                    </div>
-                                                                                    <div class="col-sm-4">
-                                                                                        <div class="row">
-                                                                                            <div class="col-sm-12">
-                                                                                                <div class="form-group">
-                                                                                                    <label for=""
-                                                                                                        class="form-label">Charge
-                                                                                                        Note</label>
-                                                                                                    <textarea name="note" id="edit_note" rows="3" class="form-control edit_charge_note"></textarea>
-                                                                                                </div>
                                                                                             </div>
                                                                                         </div>
-                                                                                    </div><!--./col-sm-6-->
-                                                                                    <div class="col-sm-3">
-                                                                                        <div class="form-group mb-2">
-                                                                                            <label for=""
-                                                                                                class="form-label">Date</label>
-                                                                                            <small class="req">
-                                                                                                *</small>
-                                                                                            <input id="charge_date"
-                                                                                                name="date"
-                                                                                                placeholder=""
-                                                                                                type="text"
-                                                                                                class="form-control datetime">
+                                                                                        <div class="col-sm-2">
+                                                                                            <div class="form-group">
+                                                                                                <label
+                                                                                                    class="form-label">Charge
+                                                                                                    Category</label><small
+                                                                                                    class="req">
+                                                                                                    *</small>
+                                                                                                <select
+                                                                                                    name="charge_category2"
+                                                                                                    id="charge_category2"
+                                                                                                    style="width: 100%"
+                                                                                                    class="form-control select2 charge_category2 reset_value select2-hidden-accessible"
+                                                                                                    tabindex="-1"
+                                                                                                    aria-hidden="true">
+                                                                                                    <option value="">
+                                                                                                        Select
+                                                                                                    </option>
+                                                                                                </select>
+                                                                                            </div>
                                                                                         </div>
-                                                                                        <button type="submit"
-                                                                                            data-loading-text="Processing..."
-                                                                                            name="charge_data"
-                                                                                            value="add"
-                                                                                            class="btn btn-primary pull-right"><i
-                                                                                                class="fa fa-check-circle"></i>
-                                                                                            Add</button>
+                                                                                        <div class="col-sm-2">
+                                                                                            <div class="form-group">
+                                                                                                <label
+                                                                                                    class="form-label">Charge
+                                                                                                    Name</label><small
+                                                                                                    class="req">
+                                                                                                    *</small>
+                                                                                                <select name="charge_id"
+                                                                                                    id="charge_id"
+                                                                                                    style="width: 100%"
+                                                                                                    class="form-control addcharge  select2 reset_value select2-hidden-accessible"
+                                                                                                    tabindex="-1"
+                                                                                                    aria-hidden="true">
+                                                                                                    <option value="">
+                                                                                                        Select
+                                                                                                    </option>
+                                                                                                </select>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-md-2">
+                                                                                            <div class="form-group">
+                                                                                                <label
+                                                                                                    class="form-label">Standard
+                                                                                                    Charge
+                                                                                                    (INR)</label>
+                                                                                                <input type="text"
+                                                                                                    readonly=""
+                                                                                                    name="standard_charge"
+                                                                                                    id="addstandard_charge"
+                                                                                                    class="form-control reset_value standard_charge"
+                                                                                                    value="">
+                                                                                                <span
+                                                                                                    class="text-danger"></span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-md-2">
+                                                                                            <div class="form-group">
+                                                                                                <label
+                                                                                                    class="form-label">TPA
+                                                                                                    Charge (INR)</label>
+                                                                                                <input type="text"
+                                                                                                    readonly=""
+                                                                                                    name="schedule_charge"
+                                                                                                    id="addscd_charge"
+                                                                                                    placeholder=""
+                                                                                                    class="form-control reset_value schedule_charge"
+                                                                                                    value="">
+                                                                                                <span
+                                                                                                    class="text-danger"></span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-sm-2">
+                                                                                            <div class="form-group">
+                                                                                                <label
+                                                                                                    class="form-label">Qty</label><small
+                                                                                                    class="req">
+                                                                                                    *</small>
+                                                                                                <input type="text"
+                                                                                                    name="qty"
+                                                                                                    id="qty"
+                                                                                                    class="form-control qty"
+                                                                                                    value="1">
+                                                                                                <span
+                                                                                                    class="text-danger"></span>
+                                                                                            </div>
+                                                                                        </div>
                                                                                     </div>
-                                                                                </div><!--./row-->
-                                                                                <hr>
-                                                                            </div>
-                                                                            <div class="col-lg-12 col-md-12 col-sm-12">
-                                                                                <table
-                                                                                    class="table table-striped table-bordered table-hover">
-                                                                                    <tbody>
-                                                                                        <tr>
-                                                                                            <th>Date</th>
-                                                                                            <th>Charge Type</th>
-                                                                                            <th>Charge Category</th>
-                                                                                            <th>Charge Name <br> Charge Note
-                                                                                            </th>
-                                                                                            <th class="text-right">
-                                                                                                Standard
-                                                                                                Charge (INR)</th>
-                                                                                            <th class="text-right">TPA
-                                                                                                Charge (INR)</th>
-                                                                                            <th class="text-right">Qty
-                                                                                            </th>
-                                                                                            <th class="text-right">Total
-                                                                                                (INR)</th>
-                                                                                            <th class="text-right">
-                                                                                                Discount
-                                                                                                (INR)</th>
-                                                                                            <th class="text-right">Tax
-                                                                                                (INR)
-                                                                                            </th>
-                                                                                            <th class="text-right">Net
-                                                                                                Amount (INR)</th>
-                                                                                            <th class="text-right">Action
-                                                                                            </th>
-                                                                                        </tr>
-                                                                                    </tbody>
-                                                                                    <tbody id="preview_charges">
+                                                                                    <div class="row pt-3">
+                                                                                        <div class="col-sm-5">
+                                                                                            <table class="printablea4">
+                                                                                                <tbody>
+                                                                                                    <tr>
+                                                                                                        <th width="40%">
+                                                                                                            Total
+                                                                                                            (INR)</th>
+                                                                                                        <td width="60%"
+                                                                                                            colspan="2"
+                                                                                                            class="text-right ipdbilltable">
+                                                                                                            <input
+                                                                                                                type="text"
+                                                                                                                placeholder="Total"
+                                                                                                                value="0"
+                                                                                                                name="apply_charge"
+                                                                                                                id="apply_charge"
+                                                                                                                style="width: 30%; float: right"
+                                                                                                                class="form-control total apply_charge_add_charge"
+                                                                                                                readonly="">
+                                                                                                        </td>
+                                                                                                    </tr>
+                                                                                                    <tr>
+                                                                                                        <th>Discount
+                                                                                                            Percentage
+                                                                                                            (INR)</th>
+                                                                                                        <td
+                                                                                                            class="text-right ipdbilltable">
+                                                                                                            <h4
+                                                                                                                style="float: right;font-size: 12px; padding-left: 5px;">
+                                                                                                                %</h4>
+                                                                                                            <input
+                                                                                                                type="text"
+                                                                                                                value="0"
+                                                                                                                placeholder="Discount Percentage"
+                                                                                                                name="discount_percentage"
+                                                                                                                id="discount_percentage_add_charge"
+                                                                                                                class="form-control discount_percentage_add_charge"
+                                                                                                                style="width: 70%; float: right;font-size: 12px;">
+                                                                                                        </td>
+                                                                                                        <td
+                                                                                                            class="text-right ipdbilltable">
+                                                                                                            <input
+                                                                                                                type="text"
+                                                                                                                placeholder="Discount Percentage"
+                                                                                                                name="discount_percentage_amount"
+                                                                                                                value="0"
+                                                                                                                id="discount_percentage_amount"
+                                                                                                                style="width: 50%; float: right"
+                                                                                                                class="form-control discount_percentage_amount"
+                                                                                                                readonly="">
+                                                                                                        </td>
+                                                                                                    </tr>
+                                                                                                    <tr>
+                                                                                                        <th>Tax (INR)</th>
+                                                                                                        <td
+                                                                                                            class="text-right ipdbilltable">
+                                                                                                            <h4
+                                                                                                                style="float: right;font-size: 12px; padding-left: 5px;">
+                                                                                                                %</h4>
+                                                                                                            <input
+                                                                                                                type="text"
+                                                                                                                placeholder="Tax"
+                                                                                                                name="charge_tax"
+                                                                                                                id="charge_tax"
+                                                                                                                class="form-control charge_tax"
+                                                                                                                style="width: 70%; float: right;font-size: 12px;">
+                                                                                                        </td>
+                                                                                                        <td
+                                                                                                            class="text-right ipdbilltable">
+                                                                                                            <input
+                                                                                                                type="text"
+                                                                                                                placeholder="Tax"
+                                                                                                                name="tax"
+                                                                                                                value="0"
+                                                                                                                id="tax_amt"
+                                                                                                                style="width: 50%; float: right"
+                                                                                                                class="form-control tax"
+                                                                                                                readonly="">
+                                                                                                        </td>
+                                                                                                    </tr>
+                                                                                                    <tr>
+                                                                                                        <th>Net Amount (INR)
+                                                                                                        </th>
+                                                                                                        <td colspan="2"
+                                                                                                            class="text-right ipdbilltable">
+                                                                                                            <input
+                                                                                                                type="text"
+                                                                                                                placeholder="Net Amount"
+                                                                                                                value="0"
+                                                                                                                name="amount"
+                                                                                                                id="final_amount"
+                                                                                                                style="width: 30%; float: right"
+                                                                                                                class="form-control net_amount"
+                                                                                                                readonly="">
+                                                                                                        </td>
+                                                                                                    </tr>
+                                                                                                </tbody>
+                                                                                            </table>
+                                                                                        </div>
+                                                                                        <div class="col-sm-4">
+                                                                                            <div class="row">
+                                                                                                <div class="col-sm-12">
+                                                                                                    <div
+                                                                                                        class="form-group">
+                                                                                                        <label
+                                                                                                            for=""
+                                                                                                            class="form-label">Charge
+                                                                                                            Note</label>
+                                                                                                        <textarea name="note" id="edit_note" rows="3" class="form-control edit_charge_note"></textarea>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div><!--./col-sm-6-->
+                                                                                        <div class="col-sm-3">
+                                                                                            <div class="form-group mb-2">
+                                                                                                <label for=""
+                                                                                                    class="form-label">Date</label>
+                                                                                                <small class="req">
+                                                                                                    *</small>
+                                                                                                <input id="charge_date"
+                                                                                                    name="date"
+                                                                                                    placeholder=""
+                                                                                                    type="date"
+                                                                                                    class="form-control datetime">
+                                                                                            </div>
+                                                                                            <button type="submit"
+                                                                                                data-loading-text="Processing..."
+                                                                                                name="charge_data"
+                                                                                                value="add"
+                                                                                                class="btn btn-primary pull-right"><i
+                                                                                                    class="fa fa-check-circle"></i>
+                                                                                                Add</button>
+                                                                                        </div>
+                                                                                    </div><!--./row-->
+                                                                                    <hr>
+                                                                                </div>
+                                                                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                                    <table
+                                                                                        class="table table-striped table-bordered table-hover">
+                                                                                        <tbody>
+                                                                                            <tr>
+                                                                                                <th>Date</th>
+                                                                                                <th>Charge Type</th>
+                                                                                                <th>Charge Category</th>
+                                                                                                <th>Charge Name <br> Charge
+                                                                                                    Note
+                                                                                                </th>
+                                                                                                <th class="text-right">
+                                                                                                    Standard
+                                                                                                    Charge (INR)</th>
+                                                                                                <th class="text-right">TPA
+                                                                                                    Charge (INR)</th>
+                                                                                                <th class="text-right">Qty
+                                                                                                </th>
+                                                                                                <th class="text-right">
+                                                                                                    Total
+                                                                                                    (INR)</th>
+                                                                                                <th class="text-right">
+                                                                                                    Discount
+                                                                                                    (INR)</th>
+                                                                                                <th class="text-right">Tax
+                                                                                                    (INR)
+                                                                                                </th>
+                                                                                                <th class="text-right">Net
+                                                                                                    Amount (INR)</th>
+                                                                                                <th class="text-right">
+                                                                                                    Action
+                                                                                                </th>
+                                                                                            </tr>
+                                                                                        </tbody>
+                                                                                        <tbody id="preview_charges">
 
-                                                                                    </tbody>
-                                                                                </table>
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </div>
                                                                             </div>
+
                                                                         </div>
+                                                                        <div class="modal-footer">
 
-                                                                    </div>
-                                                                    <div class="modal-footer">
+                                                                            <button type="submit"
+                                                                                class="btn btn-primary">Save</button>
+                                                                        </div>
+                                                                    </form>
 
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary">Save</button>
-                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -2573,26 +2603,29 @@
                                                         </thead>
                                                         <tbody>
                                                             {{-- @php
-                                                    $taxAmount =
-                                                        ($charge->charge->standard_charge *
+                                                            $taxAmount =
+                                                            ($charge->charge->standard_charge *
                                                             $charge->charge->taxCategory->percentage) /
-                                                        100;
-                                                    $amount = $charge->charge->standard_charge + $taxAmount;
-                                                @endphp
-                                                <tr>
-                                                    <td>
-                                                        {{ $charge->charge->name }}
-                                                    </td>
-                                                    <td style="text-transform: capitalize;">
-                                                        {{ $charge->chargeCategory->chargeType->charge_type }}</td>
-                                                    <td class="text-right">{{ $charge->charge->standard_charge }}</td>
-                                                    <td class="text-right">
-                                                        ({{ $charge->charge->taxCategory->percentage }}%)
-                                                        {{ $taxAmount }}
-                                                    </td>
-                                                    <td class="text-right">{{ $charge->charge->standard_charge }}</td>
-                                                    <td class="text-right">{{ $amount }}</td>
-                                                </tr> --}}
+                                                            100;
+                                                            $amount = $charge->charge->standard_charge + $taxAmount;
+                                                            @endphp
+                                                            <tr>
+                                                                <td>
+                                                                    {{ $charge->charge->name }}
+                                                                </td>
+                                                                <td style="text-transform: capitalize;">
+                                                                    {{ $charge->chargeCategory->chargeType->charge_type }}
+                                                                </td>
+                                                                <td class="text-right">{{ $charge->charge->standard_charge
+                                                                    }}</td>
+                                                                <td class="text-right">
+                                                                    ({{ $charge->charge->taxCategory->percentage }}%)
+                                                                    {{ $taxAmount }}
+                                                                </td>
+                                                                <td class="text-right">{{ $charge->charge->standard_charge
+                                                                    }}</td>
+                                                                <td class="text-right">{{ $amount }}</td>
+                                                            </tr> --}}
                                                             @foreach ($opdCharges as $charge)
                                                                 @php
                                                                     $taxAmount =
@@ -2937,57 +2970,70 @@
                                                                             data-bs-dismiss="modal"></button>
 
                                                                     </div>
+                                                                    <form action="{{ route('patient-timeline.store') }}"
+                                                                        method="post">
+                                                                        @csrf
 
-                                                                    <div class="modal-body">
+                                                                        <div class="modal-body">
 
-                                                                        <div class="row gy-3">
+                                                                            <div class="row gy-3">
 
-                                                                            <div class="col-md-12">
-                                                                                <label for="title"
-                                                                                    class="form-label">Title
-                                                                                    <span class="text-danger">*</span>
-                                                                                </label>
-                                                                                <input type="text" name="title"
-                                                                                    id="title" class="form-control">
+                                                                                <div class="col-md-12">
+                                                                                    <label for="title"
+                                                                                        class="form-label">Title
+                                                                                        <span class="text-danger">*</span>
+                                                                                    </label>
+                                                                                    <input type="hidden"
+                                                                                        name="patient_id"
+                                                                                        value="{{ $opd->patient->id }}">
+                                                                                    <input type="text" name="title"
+                                                                                        id="title"
+                                                                                        class="form-control">
+                                                                                </div>
+                                                                                <div class="col-md-12">
+                                                                                    <label for="date"
+                                                                                        class="form-label">Date
+                                                                                        <span class="text-danger">*</span>
+                                                                                    </label>
+                                                                                    <input type="date" name="date"
+                                                                                        id="date"
+                                                                                        class="form-control">
+                                                                                </div>
+                                                                                <div class="col-md-12">
+                                                                                    <label for="description"
+                                                                                        class="form-label">Description
+                                                                                    </label>
+                                                                                    <textarea name="description" id="description" class="form-control"></textarea>
+                                                                                </div>
+                                                                                <div class="col-md-12">
+                                                                                    <label for="attch_doc"
+                                                                                        class="form-label">Attach Document
+                                                                                    </label>
+                                                                                    <input type="file"
+                                                                                        name="attch_doc" id="file"
+                                                                                        class="form-control">
+                                                                                </div>
+                                                                                <div class="col-md-12">
+                                                                                    <label for="visible_person"
+                                                                                        class="form-check-label">Visible
+                                                                                        to
+                                                                                        this
+                                                                                        person
+                                                                                    </label>
+                                                                                    <input type="checkbox"
+                                                                                        name="visible_person"
+                                                                                        id="date"
+                                                                                        class="form-check-input">
+                                                                                </div>
                                                                             </div>
-                                                                            <div class="col-md-12">
-                                                                                <label for="date"
-                                                                                    class="form-label">Date
-                                                                                    <span class="text-danger">*</span>
-                                                                                </label>
-                                                                                <input type="date" name="date"
-                                                                                    id="date" class="form-control">
-                                                                            </div>
-                                                                            <div class="col-md-12">
-                                                                                <label for="description"
-                                                                                    class="form-label">Description
-                                                                                </label>
-                                                                                <textarea name="description" id="description" class="form-control"></textarea>
-                                                                            </div>
-                                                                            <div class="col-md-12">
-                                                                                <label for="attch_doc"
-                                                                                    class="form-label">Attach Document
-                                                                                </label>
-                                                                                <input type="file" name="attch_doc"
-                                                                                    id="date" class="form-control">
-                                                                            </div>
-                                                                            <div class="col-md-12">
-                                                                                <label for="visible_person"
-                                                                                    class="form-check-label">Visible to
-                                                                                    this
-                                                                                    person
-                                                                                </label>
-                                                                                <input type="checkbox"
-                                                                                    name="visible_person" id="date"
-                                                                                    class="form-check-input">
-                                                                            </div>
+
                                                                         </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="submit"
+                                                                                class="btn btn-primary">Save</button>
+                                                                        </div>
+                                                                    </form>
 
-                                                                    </div>
-                                                                    <div class="modal-footer">
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary">Save</button>
-                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -3296,11 +3342,238 @@
     <!-- tab content end -->
     </div>
     @include('components.modals.add-prescription-modal')
+    @include('components.modals.show-prescription-modal')
 
     <!-- Chart JS -->
     <script src="assets/plugins/chartjs/chart.min.js"></script>
     <script src="assets/plugins/chartjs/chart-data.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const chargeTypeSelect = document.getElementById("add_charge_type")
+            const chargeCategorySelect = document.getElementById("charge_category2")
+            const chargeSelect = document.getElementById("charge_id")
 
+
+
+            fetch("{{ route('getChargeTypes') }}").then(response => response.json())
+                .then(data => {
+                    window.chargeTypeData = data;
+                    chargeTypeSelect.innerHTML = '<option value="">Select</option>';
+                    data.forEach(type => {
+                        const option = document.createElement('option');
+                        option.value = type.id;
+                        option.textContent = type.charge_type;
+                        if ("{{ old('charge_type') }}" == type.id) {
+                            option.selected = true;
+                        }
+                        chargeTypeSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching charge types:', error);
+                    chargeTypeSelect.innerHTML = '<option value="">Error loading options</option>';
+                });
+
+            chargeTypeSelect.addEventListener('change', function() {
+                const selectedId = this.value;
+                const baseUrl = "{{ route('getChargeCategoriesByTypeId', ['id' => 'ID']) }}";
+                const finalUrl = baseUrl.replace('ID', selectedId);
+                fetch(finalUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        window.chargeCategoryData = data;
+                        chargeCategorySelect.innerHTML = '<option value="">Select</option>';
+                        data.forEach(category => {
+                            const option = document.createElement('option');
+                            option.value = category.id;
+                            option.textContent = category.name;
+                            if ("{{ old('charge_category') }}" == category.id) {
+                                option.selected = true;
+                            }
+                            chargeCategorySelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching charge categories:', error);
+                        chargeCategorySelect.innerHTML =
+                            '<option value="">Error loading options</option>';
+                    });
+            })
+
+
+            // Listen for Charge Category dropdown change
+            chargeCategorySelect.addEventListener('change', function() {
+                const selectedId = this.value;
+                const baseUrl = "{{ route('getCharges', ['id' => 'ID']) }}";
+                const finalUrl = baseUrl.replace('ID', selectedId);
+                fetch(finalUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        window.chargeData = data;
+                        chargeSelect.innerHTML = '<option value="">Select</option>';
+                        data.forEach(charge => {
+                            const option = document.createElement('option');
+                            option.value = charge.id;
+                            option.textContent = charge.name;
+                            if ("{{ old('charge') }}" == charge.id) {
+                                option.selected = true;
+                            }
+                            chargeSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching Charges:', error);
+                        chargeSelect.innerHTML = '<option value="">Error loading options</option>';
+                    });
+
+                chargeSelect.addEventListener('change', function() {
+                    const selectedCharge = window.chargeData[0];
+
+                    const standardCharge = document.getElementById("addstandard_charge")
+                    const tpaCharge = document.getElementById("addscd_charge")
+                    const total = document.getElementById("apply_charge");
+                    const discount = document.getElementById("discount_percentage_add_charge");
+                    const tax = document.getElementById("charge_tax");
+                    const netAmount = document.getElementById("final_amount");
+                    const discountAmountInp = document.getElementById("discount_percentage_amount");
+                    const taxAmountInp = document.getElementById("tax_amt");
+
+                    standardCharge.value = selectedCharge.standard_charge
+                    tpaCharge.value = 0
+                    total.value = selectedCharge.standard_charge
+                    tax.value = selectedCharge.tax_category.percentage
+                    discount.value = 0
+                    calculateAmount();
+                    if (!total || !tax || !discount) {
+                        console.error(
+                            "❌ One or more required input fields are missing in the DOM.");
+                        return;
+                    }
+                    [total, tax, discount].forEach(field => {
+                        field.addEventListener('input', calculateAmount);
+                    });
+
+                    function calculateAmount() {
+                        const appliedChargeValue = parseFloat(total.value) || 0;
+                        const taxValue = parseFloat(tax.value) || 0;
+                        const discountValue = parseFloat(discount.value) || 0;
+
+                        // Formula: Amount = (AppliedCharge + Tax%) - Discount%
+                        const taxAmount = appliedChargeValue * (taxValue / 100);
+                        const discountAmount = appliedChargeValue * (discountValue / 100);
+                        const totalAmount = appliedChargeValue + taxAmount - discountAmount;
+
+                        discountAmountInp.value = discountAmount;
+                        taxAmountInp.value = taxAmount;
+                        netAmount.value = totalAmount.toFixed(2);
+
+                    }
+                })
+
+
+            })
+
+
+
+            const previewBody = document.getElementById("preview_charges");
+            const addBtn = document.querySelector("button[name='charge_data']");
+
+            addBtn.addEventListener("click", function(e) {
+                e.preventDefault();
+
+                const chargeTypeText = document.getElementById("add_charge_type").selectedOptions[0].text;
+                const chargeTypeVal = document.getElementById("add_charge_type").value;
+
+                const categoryText = document.getElementById("charge_category2").selectedOptions[0].text;
+                const categoryVal = document.getElementById("charge_category2").value;
+
+                const chargeText = document.getElementById("charge_id").selectedOptions[0].text;
+                const chargeVal = document.getElementById("charge_id").value;
+
+                const stdCharge = document.getElementById("addstandard_charge").value;
+                const tpaCharge = document.getElementById("addscd_charge").value;
+                const qty = document.getElementById("qty").value;
+
+                const total = document.getElementById("apply_charge").value;
+                const discount = document.getElementById("discount_percentage_amount").value;
+                const tax = document.getElementById("tax_amt").value;
+                const netAmount = document.getElementById("final_amount").value;
+
+                const note = document.getElementById("edit_note").value;
+                const date = document.getElementById("charge_date").value;
+
+                // VALIDATION
+                if (!chargeTypeVal || !categoryVal || !chargeVal) {
+                    alert("Please fill required fields");
+                    return;
+                }
+
+                // -------------------------------
+                // BUILD ROW HTML
+                // -------------------------------
+                let row = `
+    <tr>
+        <td>${date}</td>
+        <td>${chargeTypeText}</td>
+        <td>${categoryText}</td>
+        <td>${chargeText}<br><small>${note}</small></td>
+
+        <td class="text-right">${stdCharge}</td>
+        <td class="text-right">${tpaCharge}</td>
+        <td class="text-right">${qty}</td>
+        <td class="text-right">${total}</td>
+        <td class="text-right">${discount}</td>
+        <td class="text-right">${tax}</td>
+        <td class="text-right">${netAmount}</td>
+
+        <td class="text-right">
+            <button type="button" class="btn btn-danger btn-sm delete-charge-row">X</button>
+        </td>
+
+        <!-- HIDDEN INPUT FIELDS -->
+        <input type="hidden" name="charge_type[]" value="${chargeTypeVal}">
+        <input type="hidden" name="charge_category[]" value="${categoryVal}">
+        <input type="hidden" name="charge_id[]" value="${chargeVal}">
+        <input type="hidden" name="standard_charge[]" value="${stdCharge}">
+        <input type="hidden" name="tpa_charge[]" value="${tpaCharge}">
+        <input type="hidden" name="qty[]" value="${qty}">
+        <input type="hidden" name="total[]" value="${total}">
+        <input type="hidden" name="discount_percentage[]" value="${discount}">
+        <input type="hidden" name="tax[]" value="${tax}">
+        <input type="hidden" name="net_amount[]" value="${netAmount}">
+        <input type="hidden" name="charge_note[]" value="${note}">
+        <input type="hidden" name="charge_date[]" value="${date}">
+    </tr>
+    `;
+
+                previewBody.insertAdjacentHTML("beforeend", row);
+
+                // RESET FIELDS
+                document.getElementById("add_charge_type").value = "";
+                document.getElementById("charge_category2").value = "";
+                document.getElementById("charge_id").value = "";
+                document.getElementById("addstandard_charge").value = "";
+                document.getElementById("addscd_charge").value = "";
+                document.getElementById("qty").value = "1";
+                document.getElementById("apply_charge").value = "0";
+                document.getElementById("discount_percentage_add_charge").value = "0";
+                document.getElementById("discount_percentage_amount").value = "0";
+                document.getElementById("charge_tax").value = "0";
+                document.getElementById("tax_amt").value = "0";
+                document.getElementById("final_amount").value = "0";
+                document.getElementById("edit_note").value = "";
+                document.getElementById("charge_date").value = "";
+            });
+
+            // DELETE Row
+            document.addEventListener("click", function(e) {
+                if (e.target.classList.contains("delete-charge-row")) {
+                    e.target.closest("tr").remove();
+                }
+            });
+
+        });
+    </script>
     <script>
         $(document).ready(function() {
             // Re-initialize Select2 every time the modal is shown
@@ -3387,5 +3660,78 @@
                 vitalFields.appendChild(newRow);
             });
         });
+
+        const medCatSelect = document.getElementById('med_cat')
+        const medNameSelect = document.getElementById('med_name')
+        const doseSelect = document.getElementById('dosage')
+        medCatSelect.innerHTML = '<option value="">Loading...</option>';
+        medNameSelect.innerHTML = '<option value="">Loading...</option>';
+        doseSelect.innerHTML = '<option value="">Loading...</option>';
+        fetch("{{ route('getMedicineCategories') }}")
+            .then(response => response.json())
+            .then(data => {
+                window.medicineCategories = data;
+                medCatSelect.innerHTML = '<option value="">Select</option>';
+                data.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.id;
+                    option.textContent = category.medicine_category;
+                    if ("{{ old('med_cat') }}" == category.id) {
+                        option.selected = true;
+                    }
+                    medCatSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching charge categories:', error);
+                medCatSelect.innerHTML = '<option value="">Error loading options</option>';
+            });
+
+        // Listen for Charge Category dropdown change
+        medCatSelect.addEventListener('change', function() {
+            const selectedId = this.value;
+            const baseUrl = "{{ route('getMedicines', ['categoryId' => 'ID']) }}";
+            const finalUrl = baseUrl.replace('ID', selectedId);
+            fetch(finalUrl)
+                .then(response => response.json())
+                .then(data => {
+                    window.chargeData = data;
+                    medNameSelect.innerHTML = '<option value="">Select</option>';
+                    data.forEach(charge => {
+                        const option = document.createElement('option');
+                        option.value = charge.id;
+                        option.textContent = charge.medicine_name;
+                        if ("{{ old('med_name') }}" == charge.id) {
+                            option.selected = true;
+                        }
+                        medNameSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching Charges:', error);
+                    medNameSelect.innerHTML = '<option value="">Error loading options</option>';
+                });
+            const baseUrlDose = "{{ route('getDoses', ['categoryId' => 'ID']) }}";
+            const finalUrlDose = baseUrlDose.replace('ID', selectedId);
+            fetch(finalUrlDose)
+                .then(response => response.json())
+                .then(data => {
+                    window.chargeData = data;
+                    doseSelect.innerHTML = '<option value="">Select</option>';
+                    data.forEach(charge => {
+                        const option = document.createElement('option');
+                        option.value = charge.id;
+                        option.textContent = charge.dosage + " " + charge.unit.unit_name;
+                        if ("{{ old('dosage') }}" == charge.id) {
+                            option.selected = true;
+                        }
+                        doseSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching Charges:', error);
+                    doseSelect.innerHTML = '<option value="">Error loading options</option>';
+                });
+        })
     </script>
 @endsection

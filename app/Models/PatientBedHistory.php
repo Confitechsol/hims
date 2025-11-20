@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,6 +15,7 @@ class PatientBedHistory extends Model
     protected $fillable = [
         'hospital_id',
         'branch_id',
+        'ipd_id',
         'case_reference_id',
         'bed_group_id',
         'bed_id',

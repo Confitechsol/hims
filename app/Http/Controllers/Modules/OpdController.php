@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Modules;
 use App\Http\Controllers\Controller;
 use App\Models\Charge;
 use App\Models\ChargeCategory;
+use App\Models\ChargeTypeMaster;
 use App\Models\Doctor;
 use App\Models\MedicationReport;
 use App\Models\OpdCharges;
@@ -431,6 +432,87 @@ class OpdController extends Controller
             // dd($e);
             return back()->with('error', 'Something went wrong: ' . $e->getMessage());
         }
+    }
+
+    public function createOpdMedication(Request $request)
+    {
+        try {
+
+            $request->validate([
+                'date'     => 'required|date',
+                'time'     => 'required|date_format:H:i',
+                'med_cat'  => 'required|exists:medicine_category,id',
+                'med_name' => 'required|exists:pharmacy,id',
+                'dosage'   => 'required|exists:medicine_dosage,id',
+                'remark'   => 'nullable|string',
+                'opd_id'   => 'required|exists:opd_details,id',
+            ]);
+
+            MedicationReport::create([
+                'opd_details_id'     => $request->opd_id,
+                'medicine_dosage_id' => $request->dosage,
+                'pharmacy_id'        => $request->med_name,
+                'date'               => $request->date,
+                'time'               => $request->time,
+                'remark'             => $request->remark,
+                'generated_by'       => 1,
+            ]);
+            return redirect()->back()->with('success', 'Medication created successfully.');
+        } catch (Exception $e) {
+            //throw $th;
+            return back()->with('error', 'Something went wrong: ' . $e->getMessage());
+        }
+    }
+
+    public function getOpdById(Request $request, $id)
+    {
+        $opd = OpdDetail::with('patient.bloodGroup', 'doctor.department')->where('id', $id)->firstOrFail();
+        return response()->json($opd, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
+    }
+    public function getOpdMedicineById(Request $request, $id)
+    {
+        $opdPrescription = OpdPrescription::where('visit_id', $id)->firstOrFail();
+        $opdMedicines    = OpdMedicine::with('pharmacy', 'medicineDosage.unit', 'doseInterval', 'doseDuration')->where('prescription_id', $opdPrescription->id)->get();
+        // dd($opdMedicines);
+        return response()->json($opdMedicines, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
+    }
+
+    public function getChargeTypes(Request $request)
+    {
+        $chargeTypes = ChargeTypeMaster::all();
+        return response()->json($chargeTypes, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
+    }
+    public function getChargeCategoriesByTypeId(Request $request, $id)
+    {
+        $chargeCategories = ChargeCategory::where('charge_type_id', $id)->get();
+        return response()->json($chargeCategories, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
+    }
+
+    public function addOpdCharge(Request $request)
+    {
+                                               // dd($request->charge_category);         // dd($request->all());
+        $count = count($request->charge_type); // Number of rows
+
+        for ($i = 0; $i < $count; $i++) {
+
+            OpdCharges::create([
+                'opd_id'              => $request->opd_id ?? null,
+                'charge_type_id'      => $request->charge_type[$i],
+                'charge_category_id'  => $request->charge_category[$i],
+                'charge_id'           => $request->charge_id[$i],
+                'standard_charge'     => $request->standard_charge[$i],
+                'tpa_charge'          => $request->tpa_charge[$i],
+                'qty'                 => $request->qty[$i],
+                'total'               => $request->total[$i],
+                'discount_percentage' => $request->discount_percentage[$i],
+                'tax'                 => $request->tax[$i],
+                'net_amount'          => $request->net_amount[$i],
+                'charge_note'         => $request->charge_note[$i],
+                'date'                => $request->charge_date[$i],
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Charges saved successfully!');
     }
 
 }
