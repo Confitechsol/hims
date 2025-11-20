@@ -505,7 +505,8 @@
                                             <div class="info-content">
                                                 <div class="info-label">Age</div>
                                                 <div class="info-value"><?php echo e($opd->patient->age); ?> Year
-                                                    <?php echo e($opd->patient->month); ?> Month <?php echo e($opd->patient->day); ?> Days (As Of
+                                                    <?php echo e($opd->patient->month); ?> Month <?php echo e($opd->patient->day); ?> Days (As
+                                                    Of
                                                     <?php echo e(\Carbon\Carbon::parse($opd->patient->as_of_date)->format('d/m/Y')); ?>)
                                                 </div>
                                             </div>
@@ -547,7 +548,9 @@
                                             <div class="info-content">
                                                 <div class="info-label">TPA</div>
                                                 <div class="info-value empty">
-                                                    <?php echo e($opd->patient->organisation->organisation_name ?? '--'); ?></div>
+                                                    <?php echo e($opd->patient->organisation->organisation_name ?? '--'); ?>
+
+                                                </div>
                                             </div>
                                         </div>
 
@@ -558,7 +561,9 @@
                                             <div class="info-content">
                                                 <div class="info-label">TPA ID</div>
                                                 <div class="info-value empty">
-                                                    <?php echo e($opd->patient->organisation->code ?? '--'); ?></div>
+                                                    <?php echo e($opd->patient->organisation->code ?? '--'); ?>
+
+                                                </div>
                                             </div>
                                         </div>
 
@@ -747,7 +752,9 @@
                                                     <td><?php echo e($medication->pharmacy->medicine_name); ?></td>
                                                     <td><?php echo e($medication->medicineDosage->dosage); ?>
 
-                                                        <?php echo e($medication->medicineDosage->unit->unit_name); ?></td>
+                                                        <?php echo e($medication->medicineDosage->unit->unit_name); ?>
+
+                                                    </td>
                                                     <td><?php echo e($medication->time); ?></td>
                                                     <td><?php echo e($medication->remark); ?></td>
                                                 </tr>
@@ -785,7 +792,7 @@
                                                     <td>
                                                         <?php echo e($lab->pathology->test_name .
                                                             "
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    (" .
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            (" .
                                                             $lab->pathology->short_name .
                                                             ')'); ?>
 
@@ -874,7 +881,9 @@
 
                                                     </td>
                                                     <td style="text-transform: capitalize;">
-                                                        <?php echo e($charge->chargeCategory->chargeType->charge_type); ?></td>
+                                                        <?php echo e($charge->chargeCategory->chargeType->charge_type); ?>
+
+                                                    </td>
                                                     <td class="text-right"><?php echo e($charge->charge->standard_charge); ?></td>
                                                     <td class="text-right">
                                                         (<?php echo e($charge->charge->taxCategory->percentage); ?>%)
@@ -986,7 +995,7 @@
                                                         <div class="text-end d-flex">
                                                             <a href="javascript:void(0);"
                                                                 class="btn btn-primary text-white ms-2 btn-md"
-                                                                data-bs-toggle="modal" data-is-hidden = "true"
+                                                                data-bs-toggle="modal" data-is-hidden="true"
                                                                 data-bs-target="#createOpdModal"
                                                                 data-patient='<?php echo json_encode($opd->patient, 15, 512) ?>'><i
                                                                     class="ti ti-plus me-1"></i>New Checkup</a>
@@ -1040,23 +1049,35 @@
                                                                         <div class="d-flex gap-2">
 
                                                                             <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#addPrescriptionModal"
+                                                                                data-id="<?php echo e($opd->id); ?>">
                                                                                 <i class="fa-solid fa-prescription"
                                                                                     
-                                                                                    data-bs-toggle="modal"
-                                                                                    data-bs-target="#addPrescriptionModal"
-                                                                                    data-id="<?php echo e($opd->id); ?>"
                                                                                     title="Add Prescription"></i></a>
+
+
                                                                             <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill"
+                                                                                data-is-ipd="false"
+                                                                                data-id="<?php echo e($visit->opd->id); ?>"
+                                                                                data-pres-id = "<?php echo e($visit->id); ?>"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#showPrescriptionModal">
                                                                                 <i class="fa-solid fa-print"
-                                                                                    data-bs-toggle="tooltip"
                                                                                     title="Manual Prescription"></i></a>
+
+
+
                                                                             <a href="javascript: void(0);"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
                                                                                 <i class="ti ti-menu"
                                                                                     data-bs-toggle="tooltip"
                                                                                     title="Show"></i></a>
+
+
+
                                                                         </div>
                                                                     </td>
                                                                 </tr>
@@ -1394,7 +1415,9 @@
                                                                 <tr>
                                                                     <td>
                                                                         <h6 class="fs-14 mb-1">
-                                                                            <?php echo e($operation->reference_no); ?></h6>
+                                                                            <?php echo e($operation->reference_no); ?>
+
+                                                                        </h6>
                                                                     </td>
                                                                     <td><?php echo e($operation->date); ?></td>
                                                                     <td><?php echo e($operation->operation->operation); ?></td>
@@ -1496,295 +1519,309 @@
 
 
                                                                     </div>
+                                                                    <form action="<?php echo e(route('opd.addOpdCharge')); ?>"
+                                                                        method="POST" id="addChargeForm">
+                                                                        <?php echo csrf_field(); ?>
+                                                                        <div class="modal-body">
+                                                                            <div class="row ">
+                                                                                <div class="col-lg-12 col-md-12 col-sm-12">
 
-                                                                    <div class="modal-body">
-                                                                        <div class="row ">
-                                                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                                    <div class="row ptt10">
+                                                                                        <div class="col-sm-2">
+                                                                                            <div class="form-group">
+                                                                                                <label
+                                                                                                    class="form-label displayblock">Charge
+                                                                                                    Type<small
+                                                                                                        class="req">
+                                                                                                        *</small></label>
+                                                                                                <input type="hidden" name="opd_id" id="opd_id" value="<?php echo e($opd->id); ?>">
+                                                                                                <select name="charge_type"
+                                                                                                    id="add_charge_type"
+                                                                                                    class="form-control charge_type select2 reset_value select2-hidden-accessible"
+                                                                                                    style="width: 100%"
+                                                                                                    tabindex="-1"
+                                                                                                    aria-hidden="true">
+                                                                                                    <option value="">
+                                                                                                        Select
+                                                                                                    </option>
 
-                                                                                <div class="row ptt10">
-                                                                                    <div class="col-sm-2">
-                                                                                        <div class="form-group">
-                                                                                            <label
-                                                                                                class="form-label displayblock">Charge
-                                                                                                Type<small class="req">
-                                                                                                    *</small></label>
-                                                                                            <select name="charge_type"
-                                                                                                id="add_charge_type"
-                                                                                                class="form-control charge_type select2 reset_value select2-hidden-accessible"
-                                                                                                style="width: 100%"
-                                                                                                tabindex="-1"
-                                                                                                aria-hidden="true">
-                                                                                                <option value="">
-                                                                                                    Select
-                                                                                                </option>
-                                                                                                <option value="1">
-                                                                                                    Appointment </option>
+                                                                                                </select>
 
-                                                                                            </select>
-
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-sm-2">
-                                                                                        <div class="form-group">
-                                                                                            <label
-                                                                                                class="form-label">Charge
-                                                                                                Category</label><small
-                                                                                                class="req"> *</small>
-                                                                                            <select name="charge_category2"
-                                                                                                id="charge_category2"
-                                                                                                style="width: 100%"
-                                                                                                class="form-control select2 charge_category2 reset_value select2-hidden-accessible"
-                                                                                                tabindex="-1"
-                                                                                                aria-hidden="true">
-                                                                                                <option value="">
-                                                                                                    Select
-                                                                                                </option>
-                                                                                            </select>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-sm-2">
-                                                                                        <div class="form-group">
-                                                                                            <label
-                                                                                                class="form-label">Charge
-                                                                                                Name</label><small
-                                                                                                class="req"> *</small>
-                                                                                            <select name="charge_id"
-                                                                                                id="charge_id"
-                                                                                                style="width: 100%"
-                                                                                                class="form-control addcharge  select2 reset_value select2-hidden-accessible"
-                                                                                                tabindex="-1"
-                                                                                                aria-hidden="true">
-                                                                                                <option value="">
-                                                                                                    Select
-                                                                                                </option>
-                                                                                            </select>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-md-2">
-                                                                                        <div class="form-group">
-                                                                                            <label
-                                                                                                class="form-label">Standard
-                                                                                                Charge
-                                                                                                (INR)</label>
-                                                                                            <input type="text"
-                                                                                                readonly=""
-                                                                                                name="standard_charge"
-                                                                                                id="addstandard_charge"
-                                                                                                class="form-control reset_value standard_charge"
-                                                                                                value="">
-                                                                                            <span
-                                                                                                class="text-danger"></span>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-md-2">
-                                                                                        <div class="form-group">
-                                                                                            <label class="form-label">TPA
-                                                                                                Charge (INR)</label>
-                                                                                            <input type="text"
-                                                                                                readonly=""
-                                                                                                name="schedule_charge"
-                                                                                                id="addscd_charge"
-                                                                                                placeholder=""
-                                                                                                class="form-control reset_value schedule_charge"
-                                                                                                value="">
-                                                                                            <span
-                                                                                                class="text-danger"></span>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-sm-2">
-                                                                                        <div class="form-group">
-                                                                                            <label
-                                                                                                class="form-label">Qty</label><small
-                                                                                                class="req"> *</small>
-                                                                                            <input type="text"
-                                                                                                name="qty"
-                                                                                                id="qty"
-                                                                                                class="form-control qty"
-                                                                                                value="1">
-                                                                                            <span
-                                                                                                class="text-danger"></span>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="row pt-3">
-                                                                                    <div class="col-sm-5">
-                                                                                        <table class="printablea4">
-                                                                                            <tbody>
-                                                                                                <tr>
-                                                                                                    <th width="40%">
-                                                                                                        Total
-                                                                                                        (INR)</th>
-                                                                                                    <td width="60%"
-                                                                                                        colspan="2"
-                                                                                                        class="text-right ipdbilltable">
-                                                                                                        <input
-                                                                                                            type="text"
-                                                                                                            placeholder="Total"
-                                                                                                            value="0"
-                                                                                                            name="apply_charge"
-                                                                                                            id="apply_charge"
-                                                                                                            style="width: 30%; float: right"
-                                                                                                            class="form-control total apply_charge_add_charge"
-                                                                                                            readonly="">
-                                                                                                    </td>
-                                                                                                </tr>
-                                                                                                <tr>
-                                                                                                    <th>Discount Percentage
-                                                                                                        (INR)</th>
-                                                                                                    <td
-                                                                                                        class="text-right ipdbilltable">
-                                                                                                        <h4
-                                                                                                            style="float: right;font-size: 12px; padding-left: 5px;">
-                                                                                                            %</h4>
-                                                                                                        <input
-                                                                                                            type="text"
-                                                                                                            value="0"
-                                                                                                            placeholder="Discount Percentage"
-                                                                                                            name="discount_percentage"
-                                                                                                            id="discount_percentage_add_charge"
-                                                                                                            class="form-control discount_percentage_add_charge"
-                                                                                                            style="width: 70%; float: right;font-size: 12px;">
-                                                                                                    </td>
-                                                                                                    <td
-                                                                                                        class="text-right ipdbilltable">
-                                                                                                        <input
-                                                                                                            type="text"
-                                                                                                            placeholder="Discount Percentage"
-                                                                                                            name="discount_percentage_amount"
-                                                                                                            value="0"
-                                                                                                            id="discount_percentage_amount"
-                                                                                                            style="width: 50%; float: right"
-                                                                                                            class="form-control discount_percentage_amount"
-                                                                                                            readonly="">
-                                                                                                    </td>
-                                                                                                </tr>
-                                                                                                <tr>
-                                                                                                    <th>Tax (INR)</th>
-                                                                                                    <td
-                                                                                                        class="text-right ipdbilltable">
-                                                                                                        <h4
-                                                                                                            style="float: right;font-size: 12px; padding-left: 5px;">
-                                                                                                            %</h4>
-                                                                                                        <input
-                                                                                                            type="text"
-                                                                                                            placeholder="Tax"
-                                                                                                            name="charge_tax"
-                                                                                                            id="charge_tax"
-                                                                                                            class="form-control charge_tax"
-                                                                                                            readonly=""
-                                                                                                            style="width: 70%; float: right;font-size: 12px;">
-                                                                                                    </td>
-                                                                                                    <td
-                                                                                                        class="text-right ipdbilltable">
-                                                                                                        <input
-                                                                                                            type="text"
-                                                                                                            placeholder="Tax"
-                                                                                                            name="tax"
-                                                                                                            value="0"
-                                                                                                            id="tax"
-                                                                                                            style="width: 50%; float: right"
-                                                                                                            class="form-control tax"
-                                                                                                            readonly="">
-                                                                                                    </td>
-                                                                                                </tr>
-                                                                                                <tr>
-                                                                                                    <th>Net Amount (INR)
-                                                                                                    </th>
-                                                                                                    <td colspan="2"
-                                                                                                        class="text-right ipdbilltable">
-                                                                                                        <input
-                                                                                                            type="text"
-                                                                                                            placeholder="Net Amount"
-                                                                                                            value="0"
-                                                                                                            name="amount"
-                                                                                                            id="final_amount"
-                                                                                                            style="width: 30%; float: right"
-                                                                                                            class="form-control net_amount"
-                                                                                                            readonly="">
-                                                                                                    </td>
-                                                                                                </tr>
-                                                                                            </tbody>
-                                                                                        </table>
-                                                                                    </div>
-                                                                                    <div class="col-sm-4">
-                                                                                        <div class="row">
-                                                                                            <div class="col-sm-12">
-                                                                                                <div class="form-group">
-                                                                                                    <label for=""
-                                                                                                        class="form-label">Charge
-                                                                                                        Note</label>
-                                                                                                    <textarea name="note" id="edit_note" rows="3" class="form-control edit_charge_note"></textarea>
-                                                                                                </div>
                                                                                             </div>
                                                                                         </div>
-                                                                                    </div><!--./col-sm-6-->
-                                                                                    <div class="col-sm-3">
-                                                                                        <div class="form-group mb-2">
-                                                                                            <label for=""
-                                                                                                class="form-label">Date</label>
-                                                                                            <small class="req">
-                                                                                                *</small>
-                                                                                            <input id="charge_date"
-                                                                                                name="date"
-                                                                                                placeholder=""
-                                                                                                type="text"
-                                                                                                class="form-control datetime">
+                                                                                        <div class="col-sm-2">
+                                                                                            <div class="form-group">
+                                                                                                <label
+                                                                                                    class="form-label">Charge
+                                                                                                    Category</label><small
+                                                                                                    class="req">
+                                                                                                    *</small>
+                                                                                                <select
+                                                                                                    name="charge_category2"
+                                                                                                    id="charge_category2"
+                                                                                                    style="width: 100%"
+                                                                                                    class="form-control select2 charge_category2 reset_value select2-hidden-accessible"
+                                                                                                    tabindex="-1"
+                                                                                                    aria-hidden="true">
+                                                                                                    <option value="">
+                                                                                                        Select
+                                                                                                    </option>
+                                                                                                </select>
+                                                                                            </div>
                                                                                         </div>
-                                                                                        <button type="submit"
-                                                                                            data-loading-text="Processing..."
-                                                                                            name="charge_data"
-                                                                                            value="add"
-                                                                                            class="btn btn-primary pull-right"><i
-                                                                                                class="fa fa-check-circle"></i>
-                                                                                            Add</button>
+                                                                                        <div class="col-sm-2">
+                                                                                            <div class="form-group">
+                                                                                                <label
+                                                                                                    class="form-label">Charge
+                                                                                                    Name</label><small
+                                                                                                    class="req">
+                                                                                                    *</small>
+                                                                                                <select name="charge_id"
+                                                                                                    id="charge_id"
+                                                                                                    style="width: 100%"
+                                                                                                    class="form-control addcharge  select2 reset_value select2-hidden-accessible"
+                                                                                                    tabindex="-1"
+                                                                                                    aria-hidden="true">
+                                                                                                    <option value="">
+                                                                                                        Select
+                                                                                                    </option>
+                                                                                                </select>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-md-2">
+                                                                                            <div class="form-group">
+                                                                                                <label
+                                                                                                    class="form-label">Standard
+                                                                                                    Charge
+                                                                                                    (INR)</label>
+                                                                                                <input type="text"
+                                                                                                    readonly=""
+                                                                                                    name="standard_charge"
+                                                                                                    id="addstandard_charge"
+                                                                                                    class="form-control reset_value standard_charge"
+                                                                                                    value="">
+                                                                                                <span
+                                                                                                    class="text-danger"></span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-md-2">
+                                                                                            <div class="form-group">
+                                                                                                <label
+                                                                                                    class="form-label">TPA
+                                                                                                    Charge (INR)</label>
+                                                                                                <input type="text"
+                                                                                                    readonly=""
+                                                                                                    name="schedule_charge"
+                                                                                                    id="addscd_charge"
+                                                                                                    placeholder=""
+                                                                                                    class="form-control reset_value schedule_charge"
+                                                                                                    value="">
+                                                                                                <span
+                                                                                                    class="text-danger"></span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-sm-2">
+                                                                                            <div class="form-group">
+                                                                                                <label
+                                                                                                    class="form-label">Qty</label><small
+                                                                                                    class="req">
+                                                                                                    *</small>
+                                                                                                <input type="text"
+                                                                                                    name="qty"
+                                                                                                    id="qty"
+                                                                                                    class="form-control qty"
+                                                                                                    value="1">
+                                                                                                <span
+                                                                                                    class="text-danger"></span>
+                                                                                            </div>
+                                                                                        </div>
                                                                                     </div>
-                                                                                </div><!--./row-->
-                                                                                <hr>
-                                                                            </div>
-                                                                            <div class="col-lg-12 col-md-12 col-sm-12">
-                                                                                <table
-                                                                                    class="table table-striped table-bordered table-hover">
-                                                                                    <tbody>
-                                                                                        <tr>
-                                                                                            <th>Date</th>
-                                                                                            <th>Charge Type</th>
-                                                                                            <th>Charge Category</th>
-                                                                                            <th>Charge Name <br> Charge Note
-                                                                                            </th>
-                                                                                            <th class="text-right">
-                                                                                                Standard
-                                                                                                Charge (INR)</th>
-                                                                                            <th class="text-right">TPA
-                                                                                                Charge (INR)</th>
-                                                                                            <th class="text-right">Qty
-                                                                                            </th>
-                                                                                            <th class="text-right">Total
-                                                                                                (INR)</th>
-                                                                                            <th class="text-right">
-                                                                                                Discount
-                                                                                                (INR)</th>
-                                                                                            <th class="text-right">Tax
-                                                                                                (INR)
-                                                                                            </th>
-                                                                                            <th class="text-right">Net
-                                                                                                Amount (INR)</th>
-                                                                                            <th class="text-right">Action
-                                                                                            </th>
-                                                                                        </tr>
-                                                                                    </tbody>
-                                                                                    <tbody id="preview_charges">
+                                                                                    <div class="row pt-3">
+                                                                                        <div class="col-sm-5">
+                                                                                            <table class="printablea4">
+                                                                                                <tbody>
+                                                                                                    <tr>
+                                                                                                        <th width="40%">
+                                                                                                            Total
+                                                                                                            (INR)</th>
+                                                                                                        <td width="60%"
+                                                                                                            colspan="2"
+                                                                                                            class="text-right ipdbilltable">
+                                                                                                            <input
+                                                                                                                type="text"
+                                                                                                                placeholder="Total"
+                                                                                                                value="0"
+                                                                                                                name="apply_charge"
+                                                                                                                id="apply_charge"
+                                                                                                                style="width: 30%; float: right"
+                                                                                                                class="form-control total apply_charge_add_charge"
+                                                                                                                readonly="">
+                                                                                                        </td>
+                                                                                                    </tr>
+                                                                                                    <tr>
+                                                                                                        <th>Discount
+                                                                                                            Percentage
+                                                                                                            (INR)</th>
+                                                                                                        <td
+                                                                                                            class="text-right ipdbilltable">
+                                                                                                            <h4
+                                                                                                                style="float: right;font-size: 12px; padding-left: 5px;">
+                                                                                                                %</h4>
+                                                                                                            <input
+                                                                                                                type="text"
+                                                                                                                value="0"
+                                                                                                                placeholder="Discount Percentage"
+                                                                                                                name="discount_percentage"
+                                                                                                                id="discount_percentage_add_charge"
+                                                                                                                class="form-control discount_percentage_add_charge"
+                                                                                                                style="width: 70%; float: right;font-size: 12px;">
+                                                                                                        </td>
+                                                                                                        <td
+                                                                                                            class="text-right ipdbilltable">
+                                                                                                            <input
+                                                                                                                type="text"
+                                                                                                                placeholder="Discount Percentage"
+                                                                                                                name="discount_percentage_amount"
+                                                                                                                value="0"
+                                                                                                                id="discount_percentage_amount"
+                                                                                                                style="width: 50%; float: right"
+                                                                                                                class="form-control discount_percentage_amount"
+                                                                                                                readonly="">
+                                                                                                        </td>
+                                                                                                    </tr>
+                                                                                                    <tr>
+                                                                                                        <th>Tax (INR)</th>
+                                                                                                        <td
+                                                                                                            class="text-right ipdbilltable">
+                                                                                                            <h4
+                                                                                                                style="float: right;font-size: 12px; padding-left: 5px;">
+                                                                                                                %</h4>
+                                                                                                            <input
+                                                                                                                type="text"
+                                                                                                                placeholder="Tax"
+                                                                                                                name="charge_tax"
+                                                                                                                id="charge_tax"
+                                                                                                                class="form-control charge_tax"
+                                                                                                                style="width: 70%; float: right;font-size: 12px;">
+                                                                                                        </td>
+                                                                                                        <td
+                                                                                                            class="text-right ipdbilltable">
+                                                                                                            <input
+                                                                                                                type="text"
+                                                                                                                placeholder="Tax"
+                                                                                                                name="tax"
+                                                                                                                value="0"
+                                                                                                                id="tax_amt"
+                                                                                                                style="width: 50%; float: right"
+                                                                                                                class="form-control tax"
+                                                                                                                readonly="">
+                                                                                                        </td>
+                                                                                                    </tr>
+                                                                                                    <tr>
+                                                                                                        <th>Net Amount (INR)
+                                                                                                        </th>
+                                                                                                        <td colspan="2"
+                                                                                                            class="text-right ipdbilltable">
+                                                                                                            <input
+                                                                                                                type="text"
+                                                                                                                placeholder="Net Amount"
+                                                                                                                value="0"
+                                                                                                                name="amount"
+                                                                                                                id="final_amount"
+                                                                                                                style="width: 30%; float: right"
+                                                                                                                class="form-control net_amount"
+                                                                                                                readonly="">
+                                                                                                        </td>
+                                                                                                    </tr>
+                                                                                                </tbody>
+                                                                                            </table>
+                                                                                        </div>
+                                                                                        <div class="col-sm-4">
+                                                                                            <div class="row">
+                                                                                                <div class="col-sm-12">
+                                                                                                    <div
+                                                                                                        class="form-group">
+                                                                                                        <label
+                                                                                                            for=""
+                                                                                                            class="form-label">Charge
+                                                                                                            Note</label>
+                                                                                                        <textarea name="note" id="edit_note" rows="3" class="form-control edit_charge_note"></textarea>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div><!--./col-sm-6-->
+                                                                                        <div class="col-sm-3">
+                                                                                            <div class="form-group mb-2">
+                                                                                                <label for=""
+                                                                                                    class="form-label">Date</label>
+                                                                                                <small class="req">
+                                                                                                    *</small>
+                                                                                                <input id="charge_date"
+                                                                                                    name="date"
+                                                                                                    placeholder=""
+                                                                                                    type="date"
+                                                                                                    class="form-control datetime">
+                                                                                            </div>
+                                                                                            <button type="submit"
+                                                                                                data-loading-text="Processing..."
+                                                                                                name="charge_data"
+                                                                                                value="add"
+                                                                                                class="btn btn-primary pull-right"><i
+                                                                                                    class="fa fa-check-circle"></i>
+                                                                                                Add</button>
+                                                                                        </div>
+                                                                                    </div><!--./row-->
+                                                                                    <hr>
+                                                                                </div>
+                                                                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                                    <table
+                                                                                        class="table table-striped table-bordered table-hover">
+                                                                                        <tbody>
+                                                                                            <tr>
+                                                                                                <th>Date</th>
+                                                                                                <th>Charge Type</th>
+                                                                                                <th>Charge Category</th>
+                                                                                                <th>Charge Name <br> Charge
+                                                                                                    Note
+                                                                                                </th>
+                                                                                                <th class="text-right">
+                                                                                                    Standard
+                                                                                                    Charge (INR)</th>
+                                                                                                <th class="text-right">TPA
+                                                                                                    Charge (INR)</th>
+                                                                                                <th class="text-right">Qty
+                                                                                                </th>
+                                                                                                <th class="text-right">
+                                                                                                    Total
+                                                                                                    (INR)</th>
+                                                                                                <th class="text-right">
+                                                                                                    Discount
+                                                                                                    (INR)</th>
+                                                                                                <th class="text-right">Tax
+                                                                                                    (INR)
+                                                                                                </th>
+                                                                                                <th class="text-right">Net
+                                                                                                    Amount (INR)</th>
+                                                                                                <th class="text-right">
+                                                                                                    Action
+                                                                                                </th>
+                                                                                            </tr>
+                                                                                        </tbody>
+                                                                                        <tbody id="preview_charges">
 
-                                                                                    </tbody>
-                                                                                </table>
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </div>
                                                                             </div>
+
                                                                         </div>
+                                                                        <div class="modal-footer">
 
-                                                                    </div>
-                                                                    <div class="modal-footer">
+                                                                            <button type="submit"
+                                                                                class="btn btn-primary">Save</button>
+                                                                        </div>
+                                                                    </form>
 
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary">Save</button>
-                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -2159,57 +2196,70 @@
                                                                             data-bs-dismiss="modal"></button>
 
                                                                     </div>
+                                                                    <form action="<?php echo e(route('patient-timeline.store')); ?>"
+                                                                        method="post">
+                                                                        <?php echo csrf_field(); ?>
 
-                                                                    <div class="modal-body">
+                                                                        <div class="modal-body">
 
-                                                                        <div class="row gy-3">
+                                                                            <div class="row gy-3">
 
-                                                                            <div class="col-md-12">
-                                                                                <label for="title"
-                                                                                    class="form-label">Title
-                                                                                    <span class="text-danger">*</span>
-                                                                                </label>
-                                                                                <input type="text" name="title"
-                                                                                    id="title" class="form-control">
+                                                                                <div class="col-md-12">
+                                                                                    <label for="title"
+                                                                                        class="form-label">Title
+                                                                                        <span class="text-danger">*</span>
+                                                                                    </label>
+                                                                                    <input type="hidden"
+                                                                                        name="patient_id"
+                                                                                        value="<?php echo e($opd->patient->id); ?>">
+                                                                                    <input type="text" name="title"
+                                                                                        id="title"
+                                                                                        class="form-control">
+                                                                                </div>
+                                                                                <div class="col-md-12">
+                                                                                    <label for="date"
+                                                                                        class="form-label">Date
+                                                                                        <span class="text-danger">*</span>
+                                                                                    </label>
+                                                                                    <input type="date" name="date"
+                                                                                        id="date"
+                                                                                        class="form-control">
+                                                                                </div>
+                                                                                <div class="col-md-12">
+                                                                                    <label for="description"
+                                                                                        class="form-label">Description
+                                                                                    </label>
+                                                                                    <textarea name="description" id="description" class="form-control"></textarea>
+                                                                                </div>
+                                                                                <div class="col-md-12">
+                                                                                    <label for="attch_doc"
+                                                                                        class="form-label">Attach Document
+                                                                                    </label>
+                                                                                    <input type="file"
+                                                                                        name="attch_doc" id="file"
+                                                                                        class="form-control">
+                                                                                </div>
+                                                                                <div class="col-md-12">
+                                                                                    <label for="visible_person"
+                                                                                        class="form-check-label">Visible
+                                                                                        to
+                                                                                        this
+                                                                                        person
+                                                                                    </label>
+                                                                                    <input type="checkbox"
+                                                                                        name="visible_person"
+                                                                                        id="date"
+                                                                                        class="form-check-input">
+                                                                                </div>
                                                                             </div>
-                                                                            <div class="col-md-12">
-                                                                                <label for="date"
-                                                                                    class="form-label">Date
-                                                                                    <span class="text-danger">*</span>
-                                                                                </label>
-                                                                                <input type="date" name="date"
-                                                                                    id="date" class="form-control">
-                                                                            </div>
-                                                                            <div class="col-md-12">
-                                                                                <label for="description"
-                                                                                    class="form-label">Description
-                                                                                </label>
-                                                                                <textarea name="description" id="description" class="form-control"></textarea>
-                                                                            </div>
-                                                                            <div class="col-md-12">
-                                                                                <label for="attch_doc"
-                                                                                    class="form-label">Attach Document
-                                                                                </label>
-                                                                                <input type="file" name="attch_doc"
-                                                                                    id="date" class="form-control">
-                                                                            </div>
-                                                                            <div class="col-md-12">
-                                                                                <label for="visible_person"
-                                                                                    class="form-check-label">Visible to
-                                                                                    this
-                                                                                    person
-                                                                                </label>
-                                                                                <input type="checkbox"
-                                                                                    name="visible_person" id="date"
-                                                                                    class="form-check-input">
-                                                                            </div>
+
                                                                         </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="submit"
+                                                                                class="btn btn-primary">Save</button>
+                                                                        </div>
+                                                                    </form>
 
-                                                                    </div>
-                                                                    <div class="modal-footer">
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary">Save</button>
-                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -2519,11 +2569,238 @@
     <!-- tab content end -->
     </div>
     <?php echo $__env->make('components.modals.add-prescription-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+    <?php echo $__env->make('components.modals.show-prescription-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
     <!-- Chart JS -->
     <script src="assets/plugins/chartjs/chart.min.js"></script>
     <script src="assets/plugins/chartjs/chart-data.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const chargeTypeSelect = document.getElementById("add_charge_type")
+            const chargeCategorySelect = document.getElementById("charge_category2")
+            const chargeSelect = document.getElementById("charge_id")
 
+
+
+            fetch("<?php echo e(route('getChargeTypes')); ?>").then(response => response.json())
+                .then(data => {
+                    window.chargeTypeData = data;
+                    chargeTypeSelect.innerHTML = '<option value="">Select</option>';
+                    data.forEach(type => {
+                        const option = document.createElement('option');
+                        option.value = type.id;
+                        option.textContent = type.charge_type;
+                        if ("<?php echo e(old('charge_type')); ?>" == type.id) {
+                            option.selected = true;
+                        }
+                        chargeTypeSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching charge types:', error);
+                    chargeTypeSelect.innerHTML = '<option value="">Error loading options</option>';
+                });
+
+            chargeTypeSelect.addEventListener('change', function() {
+                const selectedId = this.value;
+                const baseUrl = "<?php echo e(route('getChargeCategoriesByTypeId', ['id' => 'ID'])); ?>";
+                const finalUrl = baseUrl.replace('ID', selectedId);
+                fetch(finalUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        window.chargeCategoryData = data;
+                        chargeCategorySelect.innerHTML = '<option value="">Select</option>';
+                        data.forEach(category => {
+                            const option = document.createElement('option');
+                            option.value = category.id;
+                            option.textContent = category.name;
+                            if ("<?php echo e(old('charge_category')); ?>" == category.id) {
+                                option.selected = true;
+                            }
+                            chargeCategorySelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching charge categories:', error);
+                        chargeCategorySelect.innerHTML =
+                            '<option value="">Error loading options</option>';
+                    });
+            })
+
+
+            // Listen for Charge Category dropdown change
+            chargeCategorySelect.addEventListener('change', function() {
+                const selectedId = this.value;
+                const baseUrl = "<?php echo e(route('getCharges', ['id' => 'ID'])); ?>";
+                const finalUrl = baseUrl.replace('ID', selectedId);
+                fetch(finalUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        window.chargeData = data;
+                        chargeSelect.innerHTML = '<option value="">Select</option>';
+                        data.forEach(charge => {
+                            const option = document.createElement('option');
+                            option.value = charge.id;
+                            option.textContent = charge.name;
+                            if ("<?php echo e(old('charge')); ?>" == charge.id) {
+                                option.selected = true;
+                            }
+                            chargeSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching Charges:', error);
+                        chargeSelect.innerHTML = '<option value="">Error loading options</option>';
+                    });
+
+                chargeSelect.addEventListener('change', function() {
+                    const selectedCharge = window.chargeData[0];
+
+                    const standardCharge = document.getElementById("addstandard_charge")
+                    const tpaCharge = document.getElementById("addscd_charge")
+                    const total = document.getElementById("apply_charge");
+                    const discount = document.getElementById("discount_percentage_add_charge");
+                    const tax = document.getElementById("charge_tax");
+                    const netAmount = document.getElementById("final_amount");
+                    const discountAmountInp = document.getElementById("discount_percentage_amount");
+                    const taxAmountInp = document.getElementById("tax_amt");
+
+                    standardCharge.value = selectedCharge.standard_charge
+                    tpaCharge.value = 0
+                    total.value = selectedCharge.standard_charge
+                    tax.value = selectedCharge.tax_category.percentage
+                    discount.value = 0
+                    calculateAmount();
+                    if (!total || !tax || !discount) {
+                        console.error(
+                            "❌ One or more required input fields are missing in the DOM.");
+                        return;
+                    }
+                    [total, tax, discount].forEach(field => {
+                        field.addEventListener('input', calculateAmount);
+                    });
+
+                    function calculateAmount() {
+                        const appliedChargeValue = parseFloat(total.value) || 0;
+                        const taxValue = parseFloat(tax.value) || 0;
+                        const discountValue = parseFloat(discount.value) || 0;
+
+                        // Formula: Amount = (AppliedCharge + Tax%) - Discount%
+                        const taxAmount = appliedChargeValue * (taxValue / 100);
+                        const discountAmount = appliedChargeValue * (discountValue / 100);
+                        const totalAmount = appliedChargeValue + taxAmount - discountAmount;
+
+                        discountAmountInp.value = discountAmount;
+                        taxAmountInp.value = taxAmount;
+                        netAmount.value = totalAmount.toFixed(2);
+
+                    }
+                })
+
+
+            })
+
+
+
+            const previewBody = document.getElementById("preview_charges");
+            const addBtn = document.querySelector("button[name='charge_data']");
+
+            addBtn.addEventListener("click", function(e) {
+                e.preventDefault();
+
+                const chargeTypeText = document.getElementById("add_charge_type").selectedOptions[0].text;
+                const chargeTypeVal = document.getElementById("add_charge_type").value;
+
+                const categoryText = document.getElementById("charge_category2").selectedOptions[0].text;
+                const categoryVal = document.getElementById("charge_category2").value;
+
+                const chargeText = document.getElementById("charge_id").selectedOptions[0].text;
+                const chargeVal = document.getElementById("charge_id").value;
+
+                const stdCharge = document.getElementById("addstandard_charge").value;
+                const tpaCharge = document.getElementById("addscd_charge").value;
+                const qty = document.getElementById("qty").value;
+
+                const total = document.getElementById("apply_charge").value;
+                const discount = document.getElementById("discount_percentage_amount").value;
+                const tax = document.getElementById("tax_amt").value;
+                const netAmount = document.getElementById("final_amount").value;
+
+                const note = document.getElementById("edit_note").value;
+                const date = document.getElementById("charge_date").value;
+
+                // VALIDATION
+                if (!chargeTypeVal || !categoryVal || !chargeVal) {
+                    alert("Please fill required fields");
+                    return;
+                }
+
+                // -------------------------------
+                // BUILD ROW HTML
+                // -------------------------------
+                let row = `
+    <tr>
+        <td>${date}</td>
+        <td>${chargeTypeText}</td>
+        <td>${categoryText}</td>
+        <td>${chargeText}<br><small>${note}</small></td>
+
+        <td class="text-right">${stdCharge}</td>
+        <td class="text-right">${tpaCharge}</td>
+        <td class="text-right">${qty}</td>
+        <td class="text-right">${total}</td>
+        <td class="text-right">${discount}</td>
+        <td class="text-right">${tax}</td>
+        <td class="text-right">${netAmount}</td>
+
+        <td class="text-right">
+            <button type="button" class="btn btn-danger btn-sm delete-charge-row">X</button>
+        </td>
+
+        <!-- HIDDEN INPUT FIELDS -->
+        <input type="hidden" name="charge_type[]" value="${chargeTypeVal}">
+        <input type="hidden" name="charge_category[]" value="${categoryVal}">
+        <input type="hidden" name="charge_id[]" value="${chargeVal}">
+        <input type="hidden" name="standard_charge[]" value="${stdCharge}">
+        <input type="hidden" name="tpa_charge[]" value="${tpaCharge}">
+        <input type="hidden" name="qty[]" value="${qty}">
+        <input type="hidden" name="total[]" value="${total}">
+        <input type="hidden" name="discount_percentage[]" value="${discount}">
+        <input type="hidden" name="tax[]" value="${tax}">
+        <input type="hidden" name="net_amount[]" value="${netAmount}">
+        <input type="hidden" name="charge_note[]" value="${note}">
+        <input type="hidden" name="charge_date[]" value="${date}">
+    </tr>
+    `;
+
+                previewBody.insertAdjacentHTML("beforeend", row);
+
+                // RESET FIELDS
+                document.getElementById("add_charge_type").value = "";
+                document.getElementById("charge_category2").value = "";
+                document.getElementById("charge_id").value = "";
+                document.getElementById("addstandard_charge").value = "";
+                document.getElementById("addscd_charge").value = "";
+                document.getElementById("qty").value = "1";
+                document.getElementById("apply_charge").value = "0";
+                document.getElementById("discount_percentage_add_charge").value = "0";
+                document.getElementById("discount_percentage_amount").value = "0";
+                document.getElementById("charge_tax").value = "0";
+                document.getElementById("tax_amt").value = "0";
+                document.getElementById("final_amount").value = "0";
+                document.getElementById("edit_note").value = "";
+                document.getElementById("charge_date").value = "";
+            });
+
+            // DELETE Row
+            document.addEventListener("click", function(e) {
+                if (e.target.classList.contains("delete-charge-row")) {
+                    e.target.closest("tr").remove();
+                }
+            });
+
+        });
+    </script>
     <script>
         $(document).ready(function() {
             // Re-initialize Select2 every time the modal is shown

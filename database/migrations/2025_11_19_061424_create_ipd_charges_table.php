@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('opd_charges', function (Blueprint $table) {
+        Schema::create('ipd_charges', function (Blueprint $table) {
             $table->id();
             $table->integer('charge_id');
             $table->integer('charge_category_id');
             $table->integer('charge_type_id');
-            $table->integer('opd_id');
+            $table->integer('ipd_id');
             $table->integer('qty');
             $table->decimal('standard_charge', 10, 2)->default(0);
             $table->decimal('tpa_charge', 10, 2)->default(0);
@@ -42,9 +42,9 @@ return new class extends Migration
                 ->on('charge_type_master')
                 ->onDelete('cascade');
 
-            $table->foreign('opd_id')
+            $table->foreign('ipd_id')
                 ->references('id')
-                ->on('opd_details')
+                ->on('ipd_details')
                 ->onDelete('cascade');
         });
     }
@@ -54,6 +54,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('opd_charges');
+        Schema::dropIfExists('ipd_charges');
     }
 };

@@ -20,7 +20,7 @@
                         <!-- Items -->
                         <div class="d-flex align-items-center justify-content-between border-1 border-bottom pb-3 mb-3">
                             <div class="hospital_logo">
-                                <img src={{ asset('assets/images/logo.webp') }} class="logo-white" alt="logo">
+                                <img src=<?php echo e(asset('assets/images/logo.webp')); ?> class="logo-white" alt="logo">
                             </div>
                             <div class="hospital_info">
                                 <div class="py-1 px-2 text-end">
@@ -159,7 +159,7 @@
                 const ipd_id = button.getAttribute('data-id');
                 const pres_id = button.getAttribute('data-pres-id');
 
-                const baseUrl = "{{ route('getIpdById', ['id' => 'ID']) }}";
+                const baseUrl = "<?php echo e(route('getIpdById', ['id' => 'ID'])); ?>";
                 const finalUrl = baseUrl.replace('ID', ipd_id);
 
                 fetch(finalUrl)
@@ -177,7 +177,7 @@
                         bGrp.innerHTML = data.patient.blood_group.name
                         pId.innerHTML = '--'
                         presType.innerHTML = 'IPD Prescription'
-                        const baseUrlMed = "{{ route('getIpdMedicineById', ['id' => 'ID']) }}";
+                        const baseUrlMed = "<?php echo e(route('getIpdMedicineById', ['id' => 'ID'])); ?>";
                         const finalUrlMed = baseUrlMed.replace('ID', pres_id);
                         fetch(finalUrlMed).then(response => response.json())
                             .then(data => {
@@ -222,7 +222,7 @@
                 const opd_id = button.getAttribute('data-id');
                 const pres_id = button.getAttribute('data-pres-id');
 
-                const baseUrl = "{{ route('getOpdById', ['id' => 'ID']) }}";
+                const baseUrl = "<?php echo e(route('getOpdById', ['id' => 'ID'])); ?>";
                 const finalUrl = baseUrl.replace('ID', opd_id);
 
                 fetch(finalUrl)
@@ -240,7 +240,7 @@
                         bGrp.innerHTML = data.patient.blood_group.name
                         pId.innerHTML = '--'
                         presType.innerHTML = 'OPD Prescription'
-                        const baseUrlMed = "{{ route('getOpdMedicineById', ['id' => 'ID']) }}";
+                        const baseUrlMed = "<?php echo e(route('getOpdMedicineById', ['id' => 'ID'])); ?>";
                         const finalUrlMed = baseUrlMed.replace('ID', pres_id);
                         fetch(finalUrlMed).then(response => response.json())
                             .then(data => {
@@ -284,3 +284,4 @@
         })
     })
 </script>
+<?php /**PATH C:\xampp\htdocs\hims\resources\views/components/modals/show-prescription-modal.blade.php ENDPATH**/ ?>

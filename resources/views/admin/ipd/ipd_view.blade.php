@@ -215,7 +215,24 @@
     </style>
 
     <div class="p-4">
-
+        @if (session('success'))
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: "{{ session('alertTitle') ?? 'Success' }}",
+                    text: "{{ session('success') }}",
+                });
+            </script>
+        @endif
+        @if (session('error'))
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: "{{ session('alertTitle') ?? 'Error' }}",
+                    text: "{{ session('error') }}",
+                });
+            </script>
+        @endif
         <!-- tab start -->
         <div class="tabs-scroll-wrapper">
             <ul class="nav nav-tabs nav-bordered mb-3 flex-nowrap">
@@ -331,16 +348,17 @@
                         <div class="card shadow-sm border-0 mt-2">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Virat Kohli (13)
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>
+                                    {{ $ipd->patient->patient_name }}
                                 </h5>
                             </div>
                             <div class="card-body">
                                 <div class="d-sm-flex position-relative z-0 overflow-hidden p-2">
                                     <!-- <img src="assets/img/icons/shape-01.svg" alt="img"
-                                                                                                                                                                                                                                                                                                                                                                                        class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
                                     <a href="javascript:void(0);"
                                         class="avatar avatar-xxxl patient-avatar me-2 flex-shrink-0">
-                                        <img src="assets/img/patient.png" alt="product" class="rounded">
+                                        <img src="{{ asset('assets/img/patient.png') }}" alt="product" class="rounded">
                                     </a>
                                     <div>
                                         <div class="d-flex align-items-center mb-3">
@@ -348,7 +366,7 @@
                                                     class="fa-solid fa-phone text-primary"></i></span>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">Phone :</h6>
-                                                <p class="patient_data mb-0">8910245678</p>
+                                                <p class="patient_data mb-0">{{ $ipd->patient->mobileno }}</p>
                                             </div>
                                         </div>
 
@@ -357,7 +375,10 @@
                                                     class="fa-solid fa-calendar-days text-primary"></i></span>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">Age :</h6>
-                                                <p class="patient_data mb-0">22 Year 9 Month 5 Days (As Of Date 10/06/2025)
+                                                <p class="patient_data mb-0">{{ $ipd->patient->age }} Year
+                                                    {{ $ipd->patient->month }} Month {{ $ipd->patient->day }} Days (As
+                                                    Of
+                                                    {{ \Carbon\Carbon::parse($ipd->patient->as_of_date)->format('d/m/Y') }})
                                                 </p>
                                             </div>
                                         </div>
@@ -366,7 +387,8 @@
                                                     class="fa-solid fa-hands-holding-child text-primary"></i></span>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">Guardian Name :</h6>
-                                                <p class="patient_data mb-0">--</p>
+                                                <p class="patient_data mb-0">{{ $ipd->patient->guardian_name ?? '--' }}
+                                                </p>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-3">
@@ -374,7 +396,7 @@
                                                     class="fa-solid fa-mars-and-venus text-primary"></i></span>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">Gender :</h6>
-                                                <p class="patient_data mb-0">Male</p>
+                                                <p class="patient_data mb-0">{{ $ipd->patient->gender }}</p>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-3">
@@ -382,7 +404,8 @@
                                                     class="fa-solid fa-users-gear text-primary"></i></span>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">TPA :</h6>
-                                                <p class="patient_data mb-0">--</p>
+                                                <p class="patient_data mb-0">
+                                                    {{ $ipd->patient->organisation->organisation_name ?? '--' }}</p>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-3">
@@ -390,7 +413,8 @@
                                                     class="fa-solid fa-id-badge text-primary"></i></span>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">TPA ID :</h6>
-                                                <p class="patient_data mb-0">--</p>
+                                                <p class="patient_data mb-0">
+                                                    {{ $ipd->patient->organisation->code ?? '--' }}</p>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-3">
@@ -398,7 +422,7 @@
                                                     class="fa-solid fa-user-check text-primary"></i></span>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">TPA Validity :</h6>
-                                                <p class="patient_data mb-0">--</p>
+                                                <p class="patient_data mb-0">{{ $ipd->patient->tpa_validity ?? '--' }}</p>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-3">
@@ -419,19 +443,19 @@
                                         </div>
                                     </div>
                                     <!-- <div class="row">
-                                                                                                                                                                                                                                                                                                                                                                            <div class="col-sm-5">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="col-sm-5">
 
-                                                                                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                                                                                            <div class="col-sm-7">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="col-sm-7">
 
-                                                                                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                                                                                            <div class="col-sm-5">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="col-sm-5">
 
-                                                                                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                                                                                            <div class="col-sm-7">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="col-sm-7">
 
-                                                                                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                                                                                        </div> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div> -->
                                 </div>
                                 <hr>
                                 <div class="d-flex align-items-center mb-3">
@@ -439,7 +463,7 @@
                                             class="fa-solid fa-tag text-primary"></i></span>
                                     <div class="d-flex align-items-center gap-2">
                                         <h6 class="about_patient fs-13 fw-bold mb-1"> Known Allergies :</h6>
-                                        <p class="patient_data mb-0">--</p>
+                                        <p class="patient_data mb-0">{{ $ipd->known_allergies ?? '--' }}</p>
                                     </div>
                                 </div>
                                 <div class="d-flex align-items-center mb-3">
@@ -457,9 +481,10 @@
                                         <h6 class=" fs-13 fw-bold mb-1"> Symptoms :</h6>
                                         <p class=" mb-0">
                                         <ul>
-                                            <li><i class="fa-regular fa-circle-check text-primary"></i> Fever Chest Pain
-                                            </li>
-                                            <li><i class="fa-regular fa-circle-check text-primary"></i> Fever Fever</li>
+                                            @foreach ($symptoms as $symptom)
+                                                <li><i class="fa-regular fa-circle-check text-primary"></i>
+                                                    {{ $symptom->symptoms_title }}</li>
+                                            @endforeach
                                         </ul>
                                         </p>
                                     </div>
@@ -478,18 +503,21 @@
 
                                 <div>
                                     <a href="#">
-                                        <div class="d-flex align-items-center mb-3 gap-2">
+                                        <div class="d-flex align-items-center gap-2">
                                             <div class="patient_img">
-                                                <img src="assets/img/patient.png" alt="product" class="rounded">
+                                                <img src="{{ asset('assets/img/patient.png') }}" alt="product"
+                                                    class="rounded">
                                             </div>
                                             <div class="d-flex align-items-center gap-2">
-                                                <h6 class="fs-13 fw-bold mb-1">Anirban Ghosh (D010)</h6>
+                                                <h6 class="fs-13 fw-bold mb-1">
+                                                    {{ $ipd->doctor->name . '(' . $ipd->doctor->doctor_id . ')' ?? '--' }}
+                                                </h6>
                                             </div>
                                         </div>
                                     </a>
 
                                 </div>
-                                <hr>
+                                {{-- <hr>
                                 <div>
                                     <a href="#">
                                         <div class="d-flex align-items-center mb-3 gap-2">
@@ -502,17 +530,64 @@
                                         </div>
                                     </a>
 
-                                </div>
+                                </div> --}}
                             </div>
                         </div>
                         <div class="card shadow-sm border-0 mt-2">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> TimeLine
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Nurse Notes
                                 </h5>
                             </div>
                             <div class="card-body">
+                                <div class="timeline-wrapper">
 
+                                    <!-- Step 1 (Completed) -->
+                                    @foreach ($nurseNotes as $note)
+                                        <div class="timeline-item">
+                                            <div class="timeline-date">
+                                                <div class="date-badge">
+                                                    {{ \Carbon\Carbon::parse($note->date)->format('d/m/Y') }}
+
+                                                    <span class="time"></span>
+                                                </div>
+                                            </div>
+
+                                            <div class="timeline-node bg-primary" title="Completed">
+                                                <i class="fa-solid fa-file-lines"></i>
+                                            </div>
+
+                                            <div class="timeline-card">
+                                                <div class="card-header p-0 pb-3">
+                                                    <div>
+                                                        <h5 class="title text-primary">
+                                                            {{ $note->staff->name }}
+                                                        </h5>
+
+                                                    </div>
+
+                                                </div>
+                                                <div class="timeline-body">
+
+                                                    <p class="lh-base"><strong>Note</strong> <br>
+                                                        {{ $note->note }}</p>
+                                                    <p class="lh-base"><strong>Comment</strong> <br>
+                                                        {{ $note->comment }}
+                                                    </p>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+
+                                    <!-- Final clock marker -->
+                                    <div class="timeline-end">
+                                        <div class="node-end" aria-hidden="true">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                    </div>
+
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -597,15 +672,65 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-
-                                            </tr>
+                                            @foreach ($medicationReport as $medication)
+                                                <tr>
+                                                    <td>{{ $medication->date }}</td>
+                                                    <td>{{ $medication->pharmacy->medicine_name }}</td>
+                                                    <td>{{ $medication->medicineDosage->dosage }}
+                                                        {{ $medication->medicineDosage->unit->unit_name }}
+                                                    </td>
+                                                    <td>{{ $medication->time }}</td>
+                                                    <td>{{ $medication->remark }}</td>
+                                                </tr>
+                                            @endforeach
                                         </tbody>
                                     </table>
                                 </div>
                                 <!-- Table end -->
                             </div>
                         </div>
+                        {{-- prescription --}}
+                        <div class="card shadow-sm border-0 mt-2">
+                            <div class="card-header"
+                                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Prescription
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Table start -->
+                                <div class="table-responsive table-nowrap">
+                                    <table class="table border">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>Prescription No.</th>
+                                                <th>Date</th>
+                                                <th>Prescribed By</th>
+                                                <th>Generated By</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($ipdPrescriptions as $prescription)
+                                                <tr>
+                                                    <td>
+                                                        <h6 class="fs-14 mb-1">
+                                                            {{ $prescription->prescription_number }}</h6>
+                                                    </td>
+                                                    <td>{{ \Carbon\Carbon::parse($prescription->date)->format('d/m/Y') }}
+                                                    </td>
+                                                    <td>--</td>
+                                                    <td>--</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- Table end -->
+                            </div>
+                        </div>
+                        {{-- prescription End --}}
+
+
+
                         <div class="card shadow-sm border-0 mt-2">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
@@ -627,16 +752,22 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td>
-                                                    Lipid Profile
-                                                    (Lipid Profile)
-                                                </td>
-                                                <td>Pathology</td>
-                                                <td></td>
-                                                <td>09/21/2025</td>
-                                                <td></td>
-                                            </tr>
+                                            @foreach ($labInvestigations as $lab)
+                                                <tr>
+                                                    <td>
+                                                        {{ $lab->pathology->test_name .
+                                                            "
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            (" .
+                                                            $lab->pathology->short_name .
+                                                            ')' }}
+                                                    </td>
+                                                    <td>Pathology</td>
+                                                    <td>{{ '--' }}</td>
+                                                    <td>{{ \Carbon\Carbon::today()->copy()->addDays(intval($lab->pathology->report_days))->format('d-M-Y') }}
+                                                    </td>
+                                                    <td>{{ $lab->approved_by ?? '--' }}</td>
+                                                </tr>
+                                            @endforeach
                                         </tbody>
                                     </table>
                                 </div>
@@ -663,9 +794,21 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
+                                            @foreach ($operationDetail as $operation)
+                                                <tr>
+                                                    <td>
+                                                        <h6 class="fs-14 mb-1">
+                                                            {{ $operation->reference_no }}
+                                                        </h6>
+                                                    </td>
+                                                    <td>{{ $operation->date }}</td>
+                                                    <td>{{ $operation->operation->operation }}</td>
+                                                    <td>{{ $operation->operation->category->category }}
+                                                    </td>
+                                                    <td>{{ $operation->ot_technician }}</td>
 
-                                            </tr>
+                                                </tr>
+                                            @endforeach
                                         </tbody>
                                     </table>
                                 </div>
@@ -693,16 +836,30 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td>
-                                                    Doctor Fees
-                                                </td>
-                                                <td style="text-transform: capitalize;">OPD</td>
-                                                <td class="text-right">50.00</td>
-                                                <td class="text-right">(0.00%) 0.00</td>
-                                                <td class="text-right">400.00</td>
-                                                <td class="text-right">400.00</td>
-                                            </tr>
+                                            @foreach ($ipdCharges as $charge)
+                                                @php
+                                                    $taxAmount =
+                                                        ($charge->charge->standard_charge *
+                                                            $charge->charge->taxCategory->percentage) /
+                                                        100;
+                                                    $amount = $charge->charge->standard_charge + $taxAmount;
+                                                @endphp
+                                                <tr>
+                                                    <td>
+                                                        {{ $charge->charge->name }}
+                                                    </td>
+                                                    <td style="text-transform: capitalize;">
+                                                        {{ $charge->chargeCategory->chargeType->charge_type }}
+                                                    </td>
+                                                    <td class="text-right">{{ $charge->charge->standard_charge }}</td>
+                                                    <td class="text-right">
+                                                        ({{ $charge->charge->taxCategory->percentage }}%)
+                                                        {{ $taxAmount }}
+                                                    </td>
+                                                    <td class="text-right">{{ $charge->charge->standard_charge }}</td>
+                                                    <td class="text-right">{{ $amount }}</td>
+                                                </tr>
+                                            @endforeach
                                         </tbody>
                                     </table>
                                 </div>
@@ -805,7 +962,8 @@
                                                         <div class="text-end d-flex">
                                                             <a href="javascript:void(0);"
                                                                 class="btn btn-primary text-white ms-2 btn-md"
-                                                                data-bs-toggle="modal" data-bs-target="#add_appointment"><i
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#add_appointment"><i
                                                                     class="ti ti-plus me-1"></i>Add New Note</a>
                                                         </div>
                                                         <!-- First Modal -->
@@ -817,66 +975,66 @@
                                                                     <div class="modal-header"
                                                                         style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
-                                                                        <h5 class="modal-title" id="addSpecializationLabel">
+                                                                        <h5 class="modal-title"
+                                                                            id="addSpecializationLabel">
                                                                             Add Nurse Note
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
                                                                             data-bs-dismiss="modal"></button>
 
                                                                     </div>
+                                                                    <form action="{{ route('nurseNote.store') }}"
+                                                                        method="post">
+                                                                        @csrf
 
-                                                                    <div class="modal-body">
+                                                                        <div class="modal-body">
 
-                                                                        <div class="row gy-3 py-4 mx-1">
+                                                                            <div class="row gy-3 py-4 mx-1">
+                                                                                <input type="hidden" name="ipd_id"
+                                                                                    value="{{ $ipd->id }}">
+                                                                                <div class="col-md-6">
+                                                                                    <label for="appointment_date"
+                                                                                        class="form-label">
+                                                                                        Date <span
+                                                                                            class="text-danger">*</span></label>
+                                                                                    <input type="date" name="date"
+                                                                                        id="date"
+                                                                                        class="form-control">
+                                                                                </div>
+                                                                                <div class="col-md-6">
+                                                                                    <label for="nurse"
+                                                                                        class="form-label">Nurse</label>
+                                                                                    <select class="form-select"
+                                                                                        id="nurse" name="nurse">
+                                                                                        <option value="">Loading...
+                                                                                        </option>
 
-                                                                            <div class="col-md-6">
-                                                                                <label for="appointment_date"
-                                                                                    class="form-label">
-                                                                                    Date <span
-                                                                                        class="text-danger">*</span></label>
-                                                                                <input type="date" name="date" id="date"
-                                                                                    class="form-control">
-                                                                            </div>
-                                                                            <div class="col-md-6">
-                                                                                <label for="nurse"
-                                                                                    class="form-label">Nurse</label>
-                                                                                <select class="form-select" id="nurse">
-                                                                                    <option value="">Select
-                                                                                    </option>
-                                                                                    <option value="1">Anjali Sarma
-                                                                                    </option>
-                                                                                    <option value="2">Puja Roy
-                                                                                    </option>
-                                                                                </select>
-                                                                            </div>
-                                                                            <div class="col-md-12">
-                                                                                <label for="casualty"
-                                                                                    class="form-label">Note</label>
-                                                                                <textarea class="form-control" id="note"
-                                                                                    name='name'>
+                                                                                    </select>
+                                                                                </div>
+                                                                                <div class="col-md-12">
+                                                                                    <label for="casualty"
+                                                                                        class="form-label">Note</label>
+                                                                                    <textarea class="form-control" id="note" name='note'>
 
                                                                                                         </textarea>
+                                                                                </div>
+                                                                                <div class="col-md-12">
+                                                                                    <label for="comment"
+                                                                                        class="form-label">Comment</label>
+                                                                                    <textarea class="form-control" id="comment" name="comment"></textarea>
+                                                                                </div>
                                                                             </div>
-                                                                            <div class="col-md-12">
-                                                                                <label for="comment"
-                                                                                    class="form-label">Comment</label>
-                                                                                <textarea class="form-control" id="comment"
-                                                                                    name="comment"></textarea>
-                                                                            </div>
-
-
-
-
 
                                                                         </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="submit"
+                                                                                class="btn btn-primary">Save &
+                                                                                Print</button>
+                                                                            <button type="submit"
+                                                                                class="btn btn-primary">Save</button>
+                                                                        </div>
+                                                                    </form>
 
-                                                                    </div>
-                                                                    <div class="modal-footer">
-                                                                        <button type="submit" class="btn btn-primary">Save &
-                                                                            Print</button>
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary">Save</button>
-                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -903,9 +1061,11 @@
                                                                                             class="form-label">Name</label><span
                                                                                             class="text-danger">
                                                                                             *</span>
-                                                                                        <input id="name" name="name"
-                                                                                            placeholder="" type="text"
-                                                                                            class="form-control" value=""
+                                                                                        <input id="name"
+                                                                                            name="name" placeholder=""
+                                                                                            type="text"
+                                                                                            class="form-control"
+                                                                                            value=""
                                                                                             autocomplete="off">
                                                                                         <span class="text-danger"></span>
                                                                                     </div>
@@ -958,7 +1118,8 @@
                                                                                                 <label
                                                                                                     class="form-label">Age
                                                                                                     (yy-mm-dd)
-                                                                                                </label><small class="req">
+                                                                                                </label><small
+                                                                                                    class="req">
                                                                                                     *</small>
                                                                                                 <div
                                                                                                     style="clear: both;overflow: hidden;">
@@ -1032,9 +1193,11 @@
                                                                                                         Select</option>
                                                                                                     <option value="Single">
                                                                                                         Single</option>
-                                                                                                    <option value="Married">
+                                                                                                    <option
+                                                                                                        value="Married">
                                                                                                         Married</option>
-                                                                                                    <option value="Widowed">
+                                                                                                    <option
+                                                                                                        value="Widowed">
                                                                                                         Widowed</option>
                                                                                                     <option
                                                                                                         value="Separated">
@@ -1066,7 +1229,8 @@
                                                                                                         <p class="mb-0">
                                                                                                             Drop files
                                                                                                             here</p>
-                                                                                                        <input type="file"
+                                                                                                        <input
+                                                                                                            type="file"
                                                                                                             class="position-absolute top-0 start-0 opacity-0 w-100 h-100">
                                                                                                     </div>
                                                                                                 </div>
@@ -1084,7 +1248,8 @@
                                                                                             autocomplete="off"
                                                                                             name="mobileno" type="text"
                                                                                             placeholder=""
-                                                                                            class="form-control" value="">
+                                                                                            class="form-control"
+                                                                                            value="">
                                                                                         <span class="text-danger"></span>
                                                                                     </div>
                                                                                 </div>
@@ -1092,9 +1257,10 @@
                                                                                     <div class="form-group">
                                                                                         <label
                                                                                             class="form-label">Email</label>
-                                                                                        <input type="text" placeholder=""
-                                                                                            id="addformemail" value=""
-                                                                                            name="email"
+                                                                                        <input type="text"
+                                                                                            placeholder=""
+                                                                                            id="addformemail"
+                                                                                            value="" name="email"
                                                                                             class="form-control">
                                                                                         <span class="text-danger"></span>
                                                                                     </div>
@@ -1103,7 +1269,8 @@
                                                                                     <div class="form-group">
                                                                                         <label for="address"
                                                                                             class="form-label">Address</label>
-                                                                                        <input name="address" placeholder=""
+                                                                                        <input name="address"
+                                                                                            placeholder=""
                                                                                             class="form-control">
                                                                                     </div>
                                                                                 </div>
@@ -1111,8 +1278,7 @@
                                                                                     <div class="form-group">
                                                                                         <label for="pwd"
                                                                                             class="form-label">Remarks</label>
-                                                                                        <textarea name="note" id="note"
-                                                                                            class="form-control"></textarea>
+                                                                                        <textarea name="note" id="note" class="form-control"></textarea>
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="col-sm-6">
@@ -1120,9 +1286,7 @@
                                                                                         <label for="email"
                                                                                             class="form-label">Any Known
                                                                                             Allergies</label>
-                                                                                        <textarea name="known_allergies"
-                                                                                            id="" placeholder=""
-                                                                                            class="form-control"></textarea>
+                                                                                        <textarea name="known_allergies" id="" placeholder="" class="form-control"></textarea>
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="col-sm-4">
@@ -1186,8 +1350,8 @@
                                                                                     <div class="form-group">
                                                                                         <label for="height"
                                                                                             class="form-label">Height</label>
-                                                                                        <input type="text" id="height"
-                                                                                            name="height"
+                                                                                        <input type="text"
+                                                                                            id="height" name="height"
                                                                                             class="form-control"
                                                                                             placeholder="Height (cm)"
                                                                                             value="">
@@ -1197,8 +1361,8 @@
                                                                                     <div class="form-group">
                                                                                         <label for="weight"
                                                                                             class="form-label">Weight</label>
-                                                                                        <input type="text" id="weight"
-                                                                                            name="weight"
+                                                                                        <input type="text"
+                                                                                            id="weight" name="weight"
                                                                                             class="form-control"
                                                                                             placeholder="Weight (kg)"
                                                                                             value="">
@@ -1208,7 +1372,8 @@
                                                                                     <div class="form-group">
                                                                                         <label for="temperature"
                                                                                             class="form-label">Temperature</label>
-                                                                                        <input type="text" id="temperature"
+                                                                                        <input type="text"
+                                                                                            id="temperature"
                                                                                             name="temperature"
                                                                                             class="form-control"
                                                                                             placeholder="Temperature (°C)"
@@ -1249,49 +1414,55 @@
                                                 <div class="timeline-wrapper">
 
                                                     <!-- Step 1 (Completed) -->
-                                                    <div class="timeline-item">
-                                                        <div class="timeline-date">
-                                                            <div class="date-badge">
-                                                                11/11/2025
+                                                    @foreach ($nurseNotes as $note)
+                                                        <div class="timeline-item">
+                                                            <div class="timeline-date">
+                                                                <div class="date-badge">
+                                                                    {{ \Carbon\Carbon::parse($note->date)->format('d/m/Y') }}
 
-                                                                <span class="time">03:20 PM</span>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="timeline-node bg-primary" title="Completed">
-                                                            <i class="fa-solid fa-file-lines"></i>
-                                                        </div>
-
-                                                        <div class="timeline-card">
-                                                            <div class="card-header p-0 pb-3">
-                                                                <div>
-                                                                    <h5 class="title text-primary">Anjali Sharma ( NUR004 )
-                                                                    </h5>
-
-                                                                </div>
-                                                                <div class="timeline-actions"
-                                                                    aria-label="Edit or delete step">
-                                                                    <a href="javascript: void(0);"
-                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-info rounded-pill">
-                                                                        <i class="ti ti-pencil" data-bs-toggle="tooltip"
-                                                                            title="Edit"></i></a>
-                                                                    <a href="javascript: void(0);"
-                                                                        class="fs-18 btn btn-icon btn-sm btn-danger rounded-pill">
-                                                                        <i class="ti ti-trash text" data-bs-toggle="tooltip"
-                                                                            title="Delete"></i></a>
-
+                                                                    <span class="time"></span>
                                                                 </div>
                                                             </div>
-                                                            <div class="timeline-body">
 
-                                                                <p class="lh-base"><strong>Note</strong> <br> Every thing is
-                                                                    normal</p>
-                                                                <p class="lh-base"><strong>Comment</strong> <br> Take rest
-                                                                </p>
+                                                            <div class="timeline-node bg-primary" title="Completed">
+                                                                <i class="fa-solid fa-file-lines"></i>
+                                                            </div>
 
+                                                            <div class="timeline-card">
+                                                                <div class="card-header p-0 pb-3">
+                                                                    <div>
+                                                                        <h5 class="title text-primary">
+                                                                            {{ $note->staff->name }}
+                                                                        </h5>
+
+                                                                    </div>
+                                                                    <div class="timeline-actions"
+                                                                        aria-label="Edit or delete step">
+                                                                        <a href="javascript: void(0);"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-info rounded-pill">
+                                                                            <i class="ti ti-pencil"
+                                                                                data-bs-toggle="tooltip"
+                                                                                title="Edit"></i></a>
+                                                                        <a href="javascript: void(0);"
+                                                                            class="fs-18 btn btn-icon btn-sm btn-danger rounded-pill">
+                                                                            <i class="ti ti-trash text"
+                                                                                data-bs-toggle="tooltip"
+                                                                                title="Delete"></i></a>
+
+                                                                    </div>
+                                                                </div>
+                                                                <div class="timeline-body">
+
+                                                                    <p class="lh-base"><strong>Note</strong> <br>
+                                                                        {{ $note->note }}</p>
+                                                                    <p class="lh-base"><strong>Comment</strong> <br>
+                                                                        {{ $note->comment }}
+                                                                    </p>
+
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    @endforeach
 
                                                     <!-- Final clock marker -->
                                                     <div class="timeline-end">
@@ -1352,7 +1523,8 @@
                                                                     <div class="modal-header"
                                                                         style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
-                                                                        <h5 class="modal-title" id="addSpecializationLabel">
+                                                                        <h5 class="modal-title"
+                                                                            id="addSpecializationLabel">
                                                                             Add Medication Dose
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
@@ -1365,18 +1537,20 @@
                                                                         <div class="row gy-3">
 
                                                                             <div class="col-md-6">
-                                                                                <label for="date" class="form-label">Date
+                                                                                <label for="date"
+                                                                                    class="form-label">Date
                                                                                     <span class="text-danger">*</span>
                                                                                 </label>
-                                                                                <input type="date" name="date" id="date"
-                                                                                    class="form-control">
+                                                                                <input type="date" name="date"
+                                                                                    id="date" class="form-control">
                                                                             </div>
                                                                             <div class="col-md-6">
-                                                                                <label for="time" class="form-label">Time
+                                                                                <label for="time"
+                                                                                    class="form-label">Time
                                                                                     <span class="text-danger">*</span>
                                                                                 </label>
-                                                                                <input type="time" name="time" id="time"
-                                                                                    class="form-control">
+                                                                                <input type="time" name="time"
+                                                                                    id="time" class="form-control">
                                                                             </div>
                                                                             <div class="col-md-6">
                                                                                 <label for="medi_cat"
@@ -1422,8 +1596,7 @@
                                                                                 <label for="remark"
                                                                                     class="form-label">Remarks
                                                                                 </label>
-                                                                                <textarea name="remark" id="remark"
-                                                                                    class="form-control"></textarea>
+                                                                                <textarea name="remark" id="remark" class="form-control"></textarea>
                                                                             </div>
                                                                         </div>
 
@@ -1449,28 +1622,29 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr>
-                                                                <td>
-                                                                    <h6 class="fs-14 mb-1">10/08/2025
-                                                                        (Wed)</h6>
-                                                                </td>
-                                                                <td>Paracetamol 500mg</td>
-                                                                <td> Time: 03:30 PM
-                                                                    1–2 Tablet Created By: Super Admin (9001)
-                                                                </td>
-                                                                <td>
-                                                                    <div class="d-flex gap-2">
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
-                                                                            <i class="ti ti-pencil" data-bs-toggle="tooltip"
-                                                                                title="Show"></i></a>
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                            <i class="ti ti-trash" data-bs-toggle="tooltip"
-                                                                                title="Show"></i></a>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
+                                                            @foreach ($medicationReport as $medication)
+                                                                <tr>
+                                                                    <td>{{ $medication->date }}</td>
+                                                                    <td>{{ $medication->pharmacy->medicine_name }}</td>
+                                                                    <td>{{ $medication->medicineDosage->dosage }}
+                                                                        {{ $medication->medicineDosage->unit->unit_name }}
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="d-flex gap-2">
+                                                                            <a href="javascript: void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
+                                                                                <i class="ti ti-pencil"
+                                                                                    data-bs-toggle="tooltip"
+                                                                                    title="Show"></i></a>
+                                                                            <a href="javascript: void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                                                <i class="ti ti-trash"
+                                                                                    data-bs-toggle="tooltip"
+                                                                                    title="Show"></i></a>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1525,24 +1699,34 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr>
-                                                                <td>
-                                                                    <h6 class="fs-14 mb-1">Lipid Profile
-                                                                        (Lipid Profile)</h6>
-                                                                </td>
-                                                                <td>Pathology</td>
-                                                                <td>Pathology Center :</td>
-                                                                <td>09/21/2025</td>
-                                                                <td></td>
-                                                                <td>
-                                                                    <div class="d-flex gap-2">
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                            <i class="ti ti-menu" data-bs-toggle="tooltip"
-                                                                                title="Show"></i></a>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
+                                                            @foreach ($labInvestigations as $lab)
+                                                                <tr>
+                                                                    <td>
+                                                                        {{ $lab->pathology->test_name .
+                                                                            "
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        (" .
+                                                                            $lab->pathology->short_name .
+                                                                            ')' }}
+                                                                    </td>
+                                                                    <td>Pathology</td>
+                                                                    <td>{{ '--' }}</td>
+                                                                    <td>{{ \Carbon\Carbon::today()->copy()->addDays(intval($lab->pathology->report_days))->format('d-M-Y') }}
+                                                                    </td>
+                                                                    <td>{{ $lab->approved_by ?? '--' }}</td>
+                                                                    <td>
+                                                                        <div class="d-flex gap-2">
+                                                                            <a href="javascript: void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
+                                                                                <i class="ti ti-menu"
+                                                                                    data-bs-toggle="tooltip"
+                                                                                    title="Show"></i></a>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+
+
+
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1596,20 +1780,34 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr>
-                                                                <td>
-                                                                    <h6 class="fs-14 mb-1"></h6>
-                                                                </td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td>
-                                                                    <div class="d-flex gap-2">
-
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
+                                                            @foreach ($operationDetail as $operation)
+                                                                <tr>
+                                                                    <td>
+                                                                        <h6 class="fs-14 mb-1">
+                                                                            {{ $operation->reference_no }}
+                                                                        </h6>
+                                                                    </td>
+                                                                    <td>{{ $operation->date }}</td>
+                                                                    <td>{{ $operation->operation->operation }}</td>
+                                                                    <td>{{ $operation->operation->category->category }}
+                                                                    </td>
+                                                                    <td>{{ $operation->ot_technician }}</td>
+                                                                    <td>
+                                                                        <div class="d-flex gap-2">
+                                                                            <a href="javascript: void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
+                                                                                <i class="ti ti-pencil"
+                                                                                    data-bs-toggle="tooltip"
+                                                                                    title="Show"></i></a>
+                                                                            <a href="javascript: void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                                                <i class="ti ti-trash"
+                                                                                    data-bs-toggle="tooltip"
+                                                                                    title="Show"></i></a>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1689,284 +1887,313 @@
 
                                                                     </div>
 
-                                                                    <div class="modal-body">
-                                                                        <div class="row ">
-                                                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                    <form action="{{ route('ipd.addIpdCharge') }}"
+                                                                        method="POST" id="addChargeForm">
+                                                                        @csrf
+                                                                        <div class="modal-body">
+                                                                            <div class="row ">
+                                                                                <div class="col-lg-12 col-md-12 col-sm-12">
 
-                                                                                <div class="row ptt10">
-                                                                                    <div class="col-sm-2">
-                                                                                        <div class="form-group">
-                                                                                            <label
-                                                                                                class="form-label displayblock">Charge
-                                                                                                Type<small class="req">
-                                                                                                    *</small></label>
-                                                                                            <select name="charge_type"
-                                                                                                id="add_charge_type"
-                                                                                                class="form-control charge_type select2 reset_value select2-hidden-accessible"
-                                                                                                style="width: 100%"
-                                                                                                tabindex="-1"
-                                                                                                aria-hidden="true">
-                                                                                                <option value="">
-                                                                                                    Select
-                                                                                                </option>
-                                                                                                <option value="1">
-                                                                                                    Appointment </option>
+                                                                                    <div class="row ptt10">
+                                                                                        <div class="col-sm-2">
+                                                                                            <div class="form-group">
+                                                                                                <label
+                                                                                                    class="form-label displayblock">Charge
+                                                                                                    Type<small
+                                                                                                        class="req">
+                                                                                                        *</small></label>
+                                                                                                <input type="hidden"
+                                                                                                    name="ipd_id"
+                                                                                                    id="ipd_id"
+                                                                                                    value="{{ $ipd->id }}">
+                                                                                                <select name="charge_type"
+                                                                                                    id="add_charge_type"
+                                                                                                    class="form-control charge_type select2 reset_value select2-hidden-accessible"
+                                                                                                    style="width: 100%"
+                                                                                                    tabindex="-1"
+                                                                                                    aria-hidden="true">
+                                                                                                    <option value="">
+                                                                                                        Select
+                                                                                                    </option>
 
-                                                                                            </select>
+                                                                                                </select>
 
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-sm-2">
-                                                                                        <div class="form-group">
-                                                                                            <label class="form-label">Charge
-                                                                                                Category</label><small
-                                                                                                class="req"> *</small>
-                                                                                            <select name="charge_category2"
-                                                                                                id="charge_category2"
-                                                                                                style="width: 100%"
-                                                                                                class="form-control select2 charge_category2 reset_value select2-hidden-accessible"
-                                                                                                tabindex="-1"
-                                                                                                aria-hidden="true">
-                                                                                                <option value="">
-                                                                                                    Select
-                                                                                                </option>
-                                                                                            </select>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-sm-2">
-                                                                                        <div class="form-group">
-                                                                                            <label class="form-label">Charge
-                                                                                                Name</label><small
-                                                                                                class="req"> *</small>
-                                                                                            <select name="charge_id"
-                                                                                                id="charge_id"
-                                                                                                style="width: 100%"
-                                                                                                class="form-control addcharge  select2 reset_value select2-hidden-accessible"
-                                                                                                tabindex="-1"
-                                                                                                aria-hidden="true">
-                                                                                                <option value="">
-                                                                                                    Select
-                                                                                                </option>
-                                                                                            </select>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-md-2">
-                                                                                        <div class="form-group">
-                                                                                            <label
-                                                                                                class="form-label">Standard
-                                                                                                Charge
-                                                                                                (INR)</label>
-                                                                                            <input type="text" readonly=""
-                                                                                                name="standard_charge"
-                                                                                                id="addstandard_charge"
-                                                                                                class="form-control reset_value standard_charge"
-                                                                                                value="">
-                                                                                            <span
-                                                                                                class="text-danger"></span>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-md-2">
-                                                                                        <div class="form-group">
-                                                                                            <label class="form-label">TPA
-                                                                                                Charge (INR)</label>
-                                                                                            <input type="text" readonly=""
-                                                                                                name="schedule_charge"
-                                                                                                id="addscd_charge"
-                                                                                                placeholder=""
-                                                                                                class="form-control reset_value schedule_charge"
-                                                                                                value="">
-                                                                                            <span
-                                                                                                class="text-danger"></span>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-sm-2">
-                                                                                        <div class="form-group">
-                                                                                            <label
-                                                                                                class="form-label">Qty</label><small
-                                                                                                class="req"> *</small>
-                                                                                            <input type="text" name="qty"
-                                                                                                id="qty"
-                                                                                                class="form-control qty"
-                                                                                                value="1">
-                                                                                            <span
-                                                                                                class="text-danger"></span>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="row pt-3">
-                                                                                    <div class="col-sm-5">
-                                                                                        <table class="printablea4">
-                                                                                            <tbody>
-                                                                                                <tr>
-                                                                                                    <th width="40%">
-                                                                                                        Total
-                                                                                                        (INR)</th>
-                                                                                                    <td width="60%"
-                                                                                                        colspan="2"
-                                                                                                        class="text-right ipdbilltable">
-                                                                                                        <input type="text"
-                                                                                                            placeholder="Total"
-                                                                                                            value="0"
-                                                                                                            name="apply_charge"
-                                                                                                            id="apply_charge"
-                                                                                                            style="width: 30%; float: right"
-                                                                                                            class="form-control total apply_charge_add_charge"
-                                                                                                            readonly="">
-                                                                                                    </td>
-                                                                                                </tr>
-                                                                                                <tr>
-                                                                                                    <th>Discount Percentage
-                                                                                                        (INR)</th>
-                                                                                                    <td
-                                                                                                        class="text-right ipdbilltable">
-                                                                                                        <h4
-                                                                                                            style="float: right;font-size: 12px; padding-left: 5px;">
-                                                                                                            %</h4>
-                                                                                                        <input type="text"
-                                                                                                            value="0"
-                                                                                                            placeholder="Discount Percentage"
-                                                                                                            name="discount_percentage"
-                                                                                                            id="discount_percentage_add_charge"
-                                                                                                            class="form-control discount_percentage_add_charge"
-                                                                                                            style="width: 70%; float: right;font-size: 12px;">
-                                                                                                    </td>
-                                                                                                    <td
-                                                                                                        class="text-right ipdbilltable">
-                                                                                                        <input type="text"
-                                                                                                            placeholder="Discount Percentage"
-                                                                                                            name="discount_percentage_amount"
-                                                                                                            value="0"
-                                                                                                            id="discount_percentage_amount"
-                                                                                                            style="width: 50%; float: right"
-                                                                                                            class="form-control discount_percentage_amount"
-                                                                                                            readonly="">
-                                                                                                    </td>
-                                                                                                </tr>
-                                                                                                <tr>
-                                                                                                    <th>Tax (INR)</th>
-                                                                                                    <td
-                                                                                                        class="text-right ipdbilltable">
-                                                                                                        <h4
-                                                                                                            style="float: right;font-size: 12px; padding-left: 5px;">
-                                                                                                            %</h4>
-                                                                                                        <input type="text"
-                                                                                                            placeholder="Tax"
-                                                                                                            name="charge_tax"
-                                                                                                            id="charge_tax"
-                                                                                                            class="form-control charge_tax"
-                                                                                                            readonly=""
-                                                                                                            style="width: 70%; float: right;font-size: 12px;">
-                                                                                                    </td>
-                                                                                                    <td
-                                                                                                        class="text-right ipdbilltable">
-                                                                                                        <input type="text"
-                                                                                                            placeholder="Tax"
-                                                                                                            name="tax"
-                                                                                                            value="0"
-                                                                                                            id="tax"
-                                                                                                            style="width: 50%; float: right"
-                                                                                                            class="form-control tax"
-                                                                                                            readonly="">
-                                                                                                    </td>
-                                                                                                </tr>
-                                                                                                <tr>
-                                                                                                    <th>Net Amount (INR)
-                                                                                                    </th>
-                                                                                                    <td colspan="2"
-                                                                                                        class="text-right ipdbilltable">
-                                                                                                        <input type="text"
-                                                                                                            placeholder="Net Amount"
-                                                                                                            value="0"
-                                                                                                            name="amount"
-                                                                                                            id="final_amount"
-                                                                                                            style="width: 30%; float: right"
-                                                                                                            class="form-control net_amount"
-                                                                                                            readonly="">
-                                                                                                    </td>
-                                                                                                </tr>
-                                                                                            </tbody>
-                                                                                        </table>
-                                                                                    </div>
-                                                                                    <div class="col-sm-4">
-                                                                                        <div class="row">
-                                                                                            <div class="col-sm-12">
-                                                                                                <div class="form-group">
-                                                                                                    <label for=""
-                                                                                                        class="form-label">Charge
-                                                                                                        Note</label>
-                                                                                                    <textarea name="note"
-                                                                                                        id="edit_note"
-                                                                                                        rows="3"
-                                                                                                        class="form-control edit_charge_note"></textarea>
-                                                                                                </div>
                                                                                             </div>
                                                                                         </div>
-                                                                                    </div><!--./col-sm-6-->
-                                                                                    <div class="col-sm-3">
-                                                                                        <div class="form-group mb-2">
-                                                                                            <label for=""
-                                                                                                class="form-label">Date</label>
-                                                                                            <small class="req">
-                                                                                                *</small>
-                                                                                            <input id="charge_date"
-                                                                                                name="date" placeholder=""
-                                                                                                type="text"
-                                                                                                class="form-control datetime">
+                                                                                        <div class="col-sm-2">
+                                                                                            <div class="form-group">
+                                                                                                <label
+                                                                                                    class="form-label">Charge
+                                                                                                    Category</label><small
+                                                                                                    class="req">
+                                                                                                    *</small>
+                                                                                                <select
+                                                                                                    name="charge_category2"
+                                                                                                    id="charge_category2"
+                                                                                                    style="width: 100%"
+                                                                                                    class="form-control select2 charge_category2 reset_value select2-hidden-accessible"
+                                                                                                    tabindex="-1"
+                                                                                                    aria-hidden="true">
+                                                                                                    <option value="">
+                                                                                                        Select
+                                                                                                    </option>
+                                                                                                </select>
+                                                                                            </div>
                                                                                         </div>
-                                                                                        <button type="submit"
-                                                                                            data-loading-text="Processing..."
-                                                                                            name="charge_data" value="add"
-                                                                                            class="btn btn-primary pull-right"><i
-                                                                                                class="fa fa-check-circle"></i>
-                                                                                            Add</button>
+                                                                                        <div class="col-sm-2">
+                                                                                            <div class="form-group">
+                                                                                                <label
+                                                                                                    class="form-label">Charge
+                                                                                                    Name</label><small
+                                                                                                    class="req">
+                                                                                                    *</small>
+                                                                                                <select name="charge_id"
+                                                                                                    id="charge_id"
+                                                                                                    style="width: 100%"
+                                                                                                    class="form-control addcharge  select2 reset_value select2-hidden-accessible"
+                                                                                                    tabindex="-1"
+                                                                                                    aria-hidden="true">
+                                                                                                    <option value="">
+                                                                                                        Select
+                                                                                                    </option>
+                                                                                                </select>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-md-2">
+                                                                                            <div class="form-group">
+                                                                                                <label
+                                                                                                    class="form-label">Standard
+                                                                                                    Charge
+                                                                                                    (INR)</label>
+                                                                                                <input type="text"
+                                                                                                    readonly=""
+                                                                                                    name="standard_charge"
+                                                                                                    id="addstandard_charge"
+                                                                                                    class="form-control reset_value standard_charge"
+                                                                                                    value="">
+                                                                                                <span
+                                                                                                    class="text-danger"></span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-md-2">
+                                                                                            <div class="form-group">
+                                                                                                <label
+                                                                                                    class="form-label">TPA
+                                                                                                    Charge (INR)</label>
+                                                                                                <input type="text"
+                                                                                                    readonly=""
+                                                                                                    name="schedule_charge"
+                                                                                                    id="addscd_charge"
+                                                                                                    placeholder=""
+                                                                                                    class="form-control reset_value schedule_charge"
+                                                                                                    value="">
+                                                                                                <span
+                                                                                                    class="text-danger"></span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-sm-2">
+                                                                                            <div class="form-group">
+                                                                                                <label
+                                                                                                    class="form-label">Qty</label><small
+                                                                                                    class="req">
+                                                                                                    *</small>
+                                                                                                <input type="text"
+                                                                                                    name="qty"
+                                                                                                    id="qty"
+                                                                                                    class="form-control qty"
+                                                                                                    value="1">
+                                                                                                <span
+                                                                                                    class="text-danger"></span>
+                                                                                            </div>
+                                                                                        </div>
                                                                                     </div>
-                                                                                </div><!--./row-->
-                                                                                <hr>
-                                                                            </div>
-                                                                            <div class="col-lg-12 col-md-12 col-sm-12">
-                                                                                <table
-                                                                                    class="table table-striped table-bordered table-hover">
-                                                                                    <tbody>
-                                                                                        <tr>
-                                                                                            <th>Date</th>
-                                                                                            <th>Charge Type</th>
-                                                                                            <th>Charge Category</th>
-                                                                                            <th>Charge Name <br> Charge Note
-                                                                                            </th>
-                                                                                            <th class="text-right">
-                                                                                                Standard
-                                                                                                Charge (INR)</th>
-                                                                                            <th class="text-right">TPA
-                                                                                                Charge (INR)</th>
-                                                                                            <th class="text-right">Qty
-                                                                                            </th>
-                                                                                            <th class="text-right">Total
-                                                                                                (INR)</th>
-                                                                                            <th class="text-right">
-                                                                                                Discount
-                                                                                                (INR)</th>
-                                                                                            <th class="text-right">Tax
-                                                                                                (INR)
-                                                                                            </th>
-                                                                                            <th class="text-right">Net
-                                                                                                Amount (INR)</th>
-                                                                                            <th class="text-right">Action
-                                                                                            </th>
-                                                                                        </tr>
-                                                                                    </tbody>
-                                                                                    <tbody id="preview_charges">
+                                                                                    <div class="row pt-3">
+                                                                                        <div class="col-sm-5">
+                                                                                            <table class="printablea4">
+                                                                                                <tbody>
+                                                                                                    <tr>
+                                                                                                        <th
+                                                                                                            width="40%">
+                                                                                                            Total
+                                                                                                            (INR)</th>
+                                                                                                        <td width="60%"
+                                                                                                            colspan="2"
+                                                                                                            class="text-right ipdbilltable">
+                                                                                                            <input
+                                                                                                                type="text"
+                                                                                                                placeholder="Total"
+                                                                                                                value="0"
+                                                                                                                name="apply_charge"
+                                                                                                                id="apply_charge"
+                                                                                                                style="width: 30%; float: right"
+                                                                                                                class="form-control total apply_charge_add_charge"
+                                                                                                                readonly="">
+                                                                                                        </td>
+                                                                                                    </tr>
+                                                                                                    <tr>
+                                                                                                        <th>Discount
+                                                                                                            Percentage
+                                                                                                            (INR)</th>
+                                                                                                        <td
+                                                                                                            class="text-right ipdbilltable">
+                                                                                                            <h4
+                                                                                                                style="float: right;font-size: 12px; padding-left: 5px;">
+                                                                                                                %</h4>
+                                                                                                            <input
+                                                                                                                type="text"
+                                                                                                                value="0"
+                                                                                                                placeholder="Discount Percentage"
+                                                                                                                name="discount_percentage"
+                                                                                                                id="discount_percentage_add_charge"
+                                                                                                                class="form-control discount_percentage_add_charge"
+                                                                                                                style="width: 70%; float: right;font-size: 12px;">
+                                                                                                        </td>
+                                                                                                        <td
+                                                                                                            class="text-right ipdbilltable">
+                                                                                                            <input
+                                                                                                                type="text"
+                                                                                                                placeholder="Discount Percentage"
+                                                                                                                name="discount_percentage_amount"
+                                                                                                                value="0"
+                                                                                                                id="discount_percentage_amount"
+                                                                                                                style="width: 50%; float: right"
+                                                                                                                class="form-control discount_percentage_amount"
+                                                                                                                readonly="">
+                                                                                                        </td>
+                                                                                                    </tr>
+                                                                                                    <tr>
+                                                                                                        <th>Tax (INR)</th>
+                                                                                                        <td
+                                                                                                            class="text-right ipdbilltable">
+                                                                                                            <h4
+                                                                                                                style="float: right;font-size: 12px; padding-left: 5px;">
+                                                                                                                %</h4>
+                                                                                                            <input
+                                                                                                                type="text"
+                                                                                                                placeholder="Tax"
+                                                                                                                name="charge_tax"
+                                                                                                                id="charge_tax"
+                                                                                                                class="form-control charge_tax"
+                                                                                                                style="width: 70%; float: right;font-size: 12px;">
+                                                                                                        </td>
+                                                                                                        <td
+                                                                                                            class="text-right ipdbilltable">
+                                                                                                            <input
+                                                                                                                type="text"
+                                                                                                                placeholder="Tax"
+                                                                                                                name="tax"
+                                                                                                                value="0"
+                                                                                                                id="tax_amt"
+                                                                                                                style="width: 50%; float: right"
+                                                                                                                class="form-control tax"
+                                                                                                                readonly="">
+                                                                                                        </td>
+                                                                                                    </tr>
+                                                                                                    <tr>
+                                                                                                        <th>Net Amount (INR)
+                                                                                                        </th>
+                                                                                                        <td colspan="2"
+                                                                                                            class="text-right ipdbilltable">
+                                                                                                            <input
+                                                                                                                type="text"
+                                                                                                                placeholder="Net Amount"
+                                                                                                                value="0"
+                                                                                                                name="amount"
+                                                                                                                id="final_amount"
+                                                                                                                style="width: 30%; float: right"
+                                                                                                                class="form-control net_amount"
+                                                                                                                readonly="">
+                                                                                                        </td>
+                                                                                                    </tr>
+                                                                                                </tbody>
+                                                                                            </table>
+                                                                                        </div>
+                                                                                        <div class="col-sm-4">
+                                                                                            <div class="row">
+                                                                                                <div class="col-sm-12">
+                                                                                                    <div
+                                                                                                        class="form-group">
+                                                                                                        <label
+                                                                                                            for=""
+                                                                                                            class="form-label">Charge
+                                                                                                            Note</label>
+                                                                                                        <textarea name="note" id="edit_note" rows="3" class="form-control edit_charge_note"></textarea>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div><!--./col-sm-6-->
+                                                                                        <div class="col-sm-3">
+                                                                                            <div class="form-group mb-2">
+                                                                                                <label for=""
+                                                                                                    class="form-label">Date</label>
+                                                                                                <small class="req">
+                                                                                                    *</small>
+                                                                                                <input id="charge_date"
+                                                                                                    name="date"
+                                                                                                    placeholder=""
+                                                                                                    type="date"
+                                                                                                    class="form-control datetime">
+                                                                                            </div>
+                                                                                            <button type="submit"
+                                                                                                data-loading-text="Processing..."
+                                                                                                name="charge_data"
+                                                                                                value="add"
+                                                                                                class="btn btn-primary pull-right"><i
+                                                                                                    class="fa fa-check-circle"></i>
+                                                                                                Add</button>
+                                                                                        </div>
+                                                                                    </div><!--./row-->
+                                                                                    <hr>
+                                                                                </div>
+                                                                                <div
+                                                                                    class="col-lg-12 col-md-12 col-sm-12">
+                                                                                    <table
+                                                                                        class="table table-striped table-bordered table-hover">
+                                                                                        <tbody>
+                                                                                            <tr>
+                                                                                                <th>Date</th>
+                                                                                                <th>Charge Type</th>
+                                                                                                <th>Charge Category</th>
+                                                                                                <th>Charge Name <br> Charge
+                                                                                                    Note
+                                                                                                </th>
+                                                                                                <th class="text-right">
+                                                                                                    Standard
+                                                                                                    Charge (INR)</th>
+                                                                                                <th class="text-right">TPA
+                                                                                                    Charge (INR)</th>
+                                                                                                <th class="text-right">Qty
+                                                                                                </th>
+                                                                                                <th class="text-right">
+                                                                                                    Total
+                                                                                                    (INR)</th>
+                                                                                                <th class="text-right">
+                                                                                                    Discount
+                                                                                                    (INR)</th>
+                                                                                                <th class="text-right">Tax
+                                                                                                    (INR)
+                                                                                                </th>
+                                                                                                <th class="text-right">Net
+                                                                                                    Amount (INR)</th>
+                                                                                                <th class="text-right">
+                                                                                                    Action
+                                                                                                </th>
+                                                                                            </tr>
+                                                                                        </tbody>
+                                                                                        <tbody id="preview_charges">
 
-                                                                                    </tbody>
-                                                                                </table>
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </div>
                                                                             </div>
+
                                                                         </div>
+                                                                        <div class="modal-footer">
 
-                                                                    </div>
-                                                                    <div class="modal-footer">
-
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary">Save</button>
-                                                                    </div>
+                                                                            <button type="submit"
+                                                                                class="btn btn-primary">Save</button>
+                                                                        </div>
+                                                                    </form>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -1994,39 +2221,67 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr>
-                                                                <td>
-                                                                    09/17/2025 12:49 PM
-                                                                </td>
-                                                                <td>Doctor Fees</td>
-                                                                <td>OPD</td>
-                                                                <td>OPD Doctor Fees </td>
-                                                                <td>1</td>
-                                                                <td>50.00</td>
-                                                                <td>400.00</td>
-                                                                <td>0.00</td>
-                                                                <td>0.00 (0.00%)</td>
-                                                                <td>0.00 (0.00%)</td>
-                                                                <td>400.00</td>
-                                                                <td>
-                                                                    <div class="d-flex gap-2">
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
-                                                                            <i class="fa-solid fa-print"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Print"></i></a>
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                                            <i class="ti ti-pencil" data-bs-toggle="tooltip"
-                                                                                title="Edit"></i></a>
+                                                            @foreach ($ipdCharges as $charge)
+                                                                @php
+                                                                    $taxAmount =
+                                                                        ($charge->charge->standard_charge *
+                                                                            $charge->charge->taxCategory->percentage) /
+                                                                        100;
+                                                                    $discountAmount =
+                                                                        ($charge->charge->standard_charge *
+                                                                            $charge->discount) /
+                                                                        100;
+                                                                    $amount =
+                                                                        $charge->charge->standard_charge -
+                                                                        $discountAmount +
+                                                                        $taxAmount;
+                                                                @endphp
+                                                                <tr>
+                                                                    <td>
+                                                                        {{ $charge->charge->name }}
+                                                                    </td>
+                                                                    <td style="text-transform: capitalize;">
+                                                                        {{ $charge->chargeCategory->chargeType->charge_type }}
+                                                                    </td>
+                                                                    <td class="text-right">
+                                                                        {{ $charge->chargeCategory->name }}
+                                                                    </td>
+                                                                    <td>
+                                                                        1
+                                                                    </td>
+                                                                    <td class="text-right">
+                                                                        {{ $charge->charge->standard_charge }}</td>
+                                                                    <td class="text-right">
+                                                                        {{ $charge->charge->standard_charge }}</td>
+                                                                    <td class="text-right">0.00</td>
+                                                                    <td>{{ $discountAmount }}&nbsp;({{ $charge->discount }}%)
+                                                                    </td>
+                                                                    <td>{{ $taxAmount }}&nbsp;({{ $charge->charge->taxCategory->percentage }}%)
+                                                                    </td>
+                                                                    <td>{{ $amount }}</td>
+                                                                    <td>
+                                                                        <div class="d-flex gap-2">
+                                                                            <a href="javascript: void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
+                                                                                <i class="fa-solid fa-print"
+                                                                                    data-bs-toggle="tooltip"
+                                                                                    title="Print"></i></a>
+                                                                            <a href="javascript: void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+                                                                                <i class="ti ti-pencil"
+                                                                                    data-bs-toggle="tooltip"
+                                                                                    title="Edit"></i></a>
 
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                            <i class="ti ti-trash" data-bs-toggle="tooltip"
-                                                                                title="Delete"></i></a>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
+                                                                            <a href="javascript: void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
+                                                                                <i class="ti ti-trash"
+                                                                                    data-bs-toggle="tooltip"
+                                                                                    title="Delete"></i></a>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -2081,7 +2336,8 @@
                                                                     <div class="modal-header"
                                                                         style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
-                                                                        <h5 class="modal-title" id="addSpecializationLabel">
+                                                                        <h5 class="modal-title"
+                                                                            id="addSpecializationLabel">
                                                                             Add Payment
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
@@ -2094,19 +2350,22 @@
                                                                         <div class="row gy-3">
 
                                                                             <div class="col-md-6">
-                                                                                <label for="date" class="form-label">Date
+                                                                                <label for="date"
+                                                                                    class="form-label">Date
                                                                                     <span class="text-danger">*</span>
                                                                                 </label>
-                                                                                <input type="date" name="date" id="date"
-                                                                                    class="form-control" required>
+                                                                                <input type="date" name="date"
+                                                                                    id="date" class="form-control"
+                                                                                    required>
                                                                             </div>
                                                                             <div class="col-md-6">
                                                                                 <label for="amount"
                                                                                     class="form-label">Amount (INR)
                                                                                     <span class="text-danger">*</span>
                                                                                 </label>
-                                                                                <input type="text" name="amount" id="amount"
-                                                                                    class="form-control" required>
+                                                                                <input type="text" name="amount"
+                                                                                    id="amount" class="form-control"
+                                                                                    required>
                                                                             </div>
                                                                             <div class="col-md-6">
                                                                                 <label for="payment_mode"
@@ -2114,17 +2373,18 @@
 
                                                                                 </label>
                                                                                 <select name="payment_mode"
-                                                                                    id="payment_mode" class="form-select"
+                                                                                    id="payment_mode"
+                                                                                    class="form-select"
                                                                                     data-placeholder="Enter Patient Name or Id…">
                                                                                     <option value="0">Select</option>
                                                                                     <option value="1">Cash</option>
                                                                                 </select>
                                                                             </div>
                                                                             <div class="col-md-6">
-                                                                                <label for="note" class="form-label">Note
+                                                                                <label for="note"
+                                                                                    class="form-label">Note
                                                                                 </label>
-                                                                                <textarea name="note" id="note"
-                                                                                    class="form-control"></textarea>
+                                                                                <textarea name="note" id="note" class="form-control"></textarea>
                                                                             </div>
                                                                         </div>
 
@@ -2170,11 +2430,13 @@
                                                                                 title="Print"></i></a>
                                                                         <a href="javascript: void(0);"
                                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
-                                                                            <i class="ti ti-pencil" data-bs-toggle="tooltip"
+                                                                            <i class="ti ti-pencil"
+                                                                                data-bs-toggle="tooltip"
                                                                                 title="Show"></i></a>
                                                                         <a href="javascript: void(0);"
                                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                            <i class="ti ti-trash" data-bs-toggle="tooltip"
+                                                                            <i class="ti ti-trash"
+                                                                                data-bs-toggle="tooltip"
                                                                                 title="Delete"></i></a>
                                                                     </div>
                                                                 </td>
@@ -2303,7 +2565,8 @@
                                                                     <div class="modal-header"
                                                                         style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
-                                                                        <h5 class="modal-title" id="addSpecializationLabel">
+                                                                        <h5 class="modal-title"
+                                                                            id="addSpecializationLabel">
                                                                             Add Timeline
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
@@ -2316,26 +2579,26 @@
                                                                         <div class="row gy-3">
 
                                                                             <div class="col-md-12">
-                                                                                <label for="title" class="form-label">Title
+                                                                                <label for="title"
+                                                                                    class="form-label">Title
                                                                                     <span class="text-danger">*</span>
                                                                                 </label>
-                                                                                <input type="text" name="title" id="title"
-                                                                                    class="form-control">
+                                                                                <input type="text" name="title"
+                                                                                    id="title" class="form-control">
                                                                             </div>
                                                                             <div class="col-md-12">
-                                                                                <label for="date" class="form-label">Date
+                                                                                <label for="date"
+                                                                                    class="form-label">Date
                                                                                     <span class="text-danger">*</span>
                                                                                 </label>
-                                                                                <input type="date" name="date" id="date"
-                                                                                    class="form-control">
+                                                                                <input type="date" name="date"
+                                                                                    id="date" class="form-control">
                                                                             </div>
                                                                             <div class="col-md-12">
                                                                                 <label for="description"
                                                                                     class="form-label">Description
                                                                                 </label>
-                                                                                <textarea name="description"
-                                                                                    id="description"
-                                                                                    class="form-control"></textarea>
+                                                                                <textarea name="description" id="description" class="form-control"></textarea>
                                                                             </div>
                                                                             <div class="col-md-12">
                                                                                 <label for="attch_doc"
@@ -2350,8 +2613,9 @@
                                                                                     this
                                                                                     person
                                                                                 </label>
-                                                                                <input type="checkbox" name="visible_person"
-                                                                                    id="date" class="form-check-input">
+                                                                                <input type="checkbox"
+                                                                                    name="visible_person" id="date"
+                                                                                    class="form-check-input">
                                                                             </div>
                                                                         </div>
 
@@ -2394,7 +2658,8 @@
                                                                     <div class="d-flex gap-2">
                                                                         <a href="javascript: void(0);"
                                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                            <i class="ti ti-menu" data-bs-toggle="tooltip"
+                                                                            <i class="ti ti-menu"
+                                                                                data-bs-toggle="tooltip"
                                                                                 title="Show"></i></a>
                                                                     </div>
                                                                 </td>
@@ -2468,7 +2733,8 @@
                                                                     <div class="d-flex gap-2">
                                                                         <a href="javascript: void(0);"
                                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                            <i class="ti ti-menu" data-bs-toggle="tooltip"
+                                                                            <i class="ti ti-menu"
+                                                                                data-bs-toggle="tooltip"
                                                                                 title="Show"></i></a>
                                                                     </div>
                                                                 </td>
@@ -2516,7 +2782,8 @@
                                                             <a href="javascript:void(0);"
                                                                 class="btn btn-primary text-white ms-2 btn-md"
                                                                 data-bs-toggle="modal"
-                                                                data-bs-target="#addPrescriptionModal"><i
+                                                                data-bs-target="#addPrescriptionModal"
+                                                                data-ipd-id="{{ $ipd->id }}"><i
                                                                     class="ti ti-plus me-1"></i>Add Prescription</a>
                                                         </div>
                                                         @include('components.modals.add-prescription-modal')
@@ -2529,7 +2796,8 @@
                                                                     <div class="modal-header"
                                                                         style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
-                                                                        <h5 class="modal-title" id="addSpecializationLabel">
+                                                                        <h5 class="modal-title"
+                                                                            id="addSpecializationLabel">
                                                                             Add Prescription
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
@@ -2542,26 +2810,26 @@
                                                                         <div class="row gy-3">
 
                                                                             <div class="col-md-12">
-                                                                                <label for="title" class="form-label">Title
+                                                                                <label for="title"
+                                                                                    class="form-label">Title
                                                                                     <span class="text-danger">*</span>
                                                                                 </label>
-                                                                                <input type="text" name="title" id="title"
-                                                                                    class="form-control">
+                                                                                <input type="text" name="title"
+                                                                                    id="title" class="form-control">
                                                                             </div>
                                                                             <div class="col-md-12">
-                                                                                <label for="date" class="form-label">Date
+                                                                                <label for="date"
+                                                                                    class="form-label">Date
                                                                                     <span class="text-danger">*</span>
                                                                                 </label>
-                                                                                <input type="date" name="date" id="date"
-                                                                                    class="form-control">
+                                                                                <input type="date" name="date"
+                                                                                    id="date" class="form-control">
                                                                             </div>
                                                                             <div class="col-md-12">
                                                                                 <label for="description"
                                                                                     class="form-label">Description
                                                                                 </label>
-                                                                                <textarea name="description"
-                                                                                    id="description"
-                                                                                    class="form-control"></textarea>
+                                                                                <textarea name="description" id="description" class="form-control"></textarea>
                                                                             </div>
                                                                             <div class="col-md-12">
                                                                                 <label for="attch_doc"
@@ -2576,8 +2844,9 @@
                                                                                     this
                                                                                     person
                                                                                 </label>
-                                                                                <input type="checkbox" name="visible_person"
-                                                                                    id="date" class="form-check-input">
+                                                                                <input type="checkbox"
+                                                                                    name="visible_person" id="date"
+                                                                                    class="form-check-input">
                                                                             </div>
                                                                         </div>
 
@@ -2603,26 +2872,38 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr>
-                                                                <td>
-                                                                    <h6 class="fs-14 mb-1">IPDP8</h6>
-                                                                </td>
-                                                                <td>11/11/2025</td>
-                                                                <td>Pallor present, No icterus, Febrile, BMI normal,
-                                                                    Conscious and oriented</td>
-                                                                <td>
-                                                                    <div class="d-flex gap-2">
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
-                                                                            data-bs-toggle="modal"
-                                                                            data-bs-target="#showPrescriptionModal">
-                                                                            <i class="fa-solid fa-prescription"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Show"></i></a>
-                                                                    </div>
-                                                                    @include('components.modals.show-prescription-modal')
-                                                                </td>
-                                                            </tr>
+                                                            @foreach ($ipdPrescriptions as $prescription)
+                                                                <tr>
+                                                                    <td>
+                                                                        <h6 class="fs-14 mb-1">
+                                                                            {{ $prescription->prescription_number }}</h6>
+                                                                    </td>
+                                                                    <td>{{ \Carbon\Carbon::parse($prescription->date)->format('d/m/Y') }}
+                                                                    </td>
+                                                                    <td>
+                                                                        @foreach ($ipdFindings[$prescription->ipd_id] as $finding)
+                                                                            <span
+                                                                                class="badge bg-primary me-1">{{ $finding->name }}</span><br>
+                                                                        @endforeach
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="d-flex gap-2">
+                                                                            <a href="javascript: void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#showPrescriptionModal"
+                                                                                data-is-ipd="true"
+                                                                                data-id="{{ $ipd->id }}"
+                                                                                data-pres-id = "{{ $prescription->id }}">
+                                                                                <i class="fa-solid fa-prescription"
+                                                                                    data-bs-toggle="tooltip"
+                                                                                    title="Show"></i></a>
+                                                                        </div>
+                                                                        @include('components.modals.show-prescription-modal')
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -2675,16 +2956,22 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr>
-                                                                <td>
-                                                                    <h6 class="fs-14 mb-1">ICU (Intensive Care Unit)</h6>
-                                                                </td>
-                                                                <td>Bed 7</td>
-                                                                <td>10/23/2025 10:08 PM </td>
-                                                                <td>10/27/2025 03:49 PM </td>
-                                                                <td>No</td>
+                                                            @foreach ($bedHistories as $history)
+                                                                <tr>
+                                                                    <td>
+                                                                        <h6 class="fs-14 mb-1">
+                                                                            {{ $history->bedGroup->name }}</h6>
+                                                                    </td>
+                                                                    <td>{{ $history->bed->name }}</td>
+                                                                    <td>{{ \Carbon\Carbon::parse($history->from_date)->format('d/m/Y h:i A') }}
+                                                                    </td>
+                                                                    <td>{{ $history->to_date ? \Carbon\Carbon::parse($history->to_date)->format('d/m/Y h:i A') : '--' }}
+                                                                    </td>
+                                                                    <td>{{ $history->bed->is_active }}</td>
 
-                                                            </tr>
+                                                                </tr>
+                                                            @endforeach
+
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -2792,7 +3079,8 @@
                                                                     <div class="modal-header"
                                                                         style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
-                                                                        <h5 class="modal-title" id="addSpecializationLabel">
+                                                                        <h5 class="modal-title"
+                                                                            id="addSpecializationLabel">
                                                                             Add Vitals
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
@@ -2812,7 +3100,8 @@
                                                                                         class="form-label">Vital
                                                                                         Name</label>
                                                                                     <select class="form-select"
-                                                                                        name="vital_name[]" id="vital_name">
+                                                                                        name="vital_name[]"
+                                                                                        id="vital_name">
                                                                                         <option value="">Select
                                                                                         </option>
                                                                                         <option value="1">1</option>
@@ -2823,7 +3112,8 @@
                                                                                     <label for="vital_value"
                                                                                         class="form-label">Vital
                                                                                         Value</label>
-                                                                                    <input type="text" name="vital_value[]"
+                                                                                    <input type="text"
+                                                                                        name="vital_value[]"
                                                                                         id="vital_value"
                                                                                         class="form-control" />
                                                                                 </div>
@@ -2832,7 +3122,8 @@
                                                                                     <label for="date"
                                                                                         class="form-label">Date</label>
                                                                                     <input type="date" name="date[]"
-                                                                                        id="date" class="form-control" />
+                                                                                        id="date"
+                                                                                        class="form-control" />
                                                                                 </div>
                                                                                 <!-- Remove -->
                                                                                 <div
@@ -2846,8 +3137,8 @@
                                                                             </div>
                                                                         </div>
                                                                         <div class="mt-2">
-                                                                            <button type="button" class="btn btn-primary"
-                                                                                id="addBtn">
+                                                                            <button type="button"
+                                                                                class="btn btn-primary" id="addBtn">
                                                                                 <i class="ti ti-plus"></i> Add Operation
                                                                             </button>
                                                                         </div>
@@ -2893,7 +3184,8 @@
                                                                     <div class="d-flex gap-2">
                                                                         <a href="javascript: void(0);"
                                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                            <i class="ti ti-menu" data-bs-toggle="tooltip"
+                                                                            <i class="ti ti-menu"
+                                                                                data-bs-toggle="tooltip"
                                                                                 title="Show"></i></a>
                                                                     </div>
                                                                 </td>
@@ -2922,9 +3214,237 @@
     <script src="assets/plugins/chartjs/chart-data.js"></script>
 
     <script>
-        $(document).ready(function () {
+        document.addEventListener("DOMContentLoaded", function() {
+            const chargeTypeSelect = document.getElementById("add_charge_type")
+            const chargeCategorySelect = document.getElementById("charge_category2")
+            const chargeSelect = document.getElementById("charge_id")
+
+
+
+            fetch("{{ route('getChargeTypes') }}").then(response => response.json())
+                .then(data => {
+                    window.chargeTypeData = data;
+                    chargeTypeSelect.innerHTML = '<option value="">Select</option>';
+                    data.forEach(type => {
+                        const option = document.createElement('option');
+                        option.value = type.id;
+                        option.textContent = type.charge_type;
+                        if ("{{ old('charge_type') }}" == type.id) {
+                            option.selected = true;
+                        }
+                        chargeTypeSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching charge types:', error);
+                    chargeTypeSelect.innerHTML = '<option value="">Error loading options</option>';
+                });
+
+            chargeTypeSelect.addEventListener('change', function() {
+                const selectedId = this.value;
+                const baseUrl = "{{ route('getChargeCategoriesByTypeId', ['id' => 'ID']) }}";
+                const finalUrl = baseUrl.replace('ID', selectedId);
+                fetch(finalUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        window.chargeCategoryData = data;
+                        chargeCategorySelect.innerHTML = '<option value="">Select</option>';
+                        data.forEach(category => {
+                            const option = document.createElement('option');
+                            option.value = category.id;
+                            option.textContent = category.name;
+                            if ("{{ old('charge_category') }}" == category.id) {
+                                option.selected = true;
+                            }
+                            chargeCategorySelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching charge categories:', error);
+                        chargeCategorySelect.innerHTML =
+                            '<option value="">Error loading options</option>';
+                    });
+            })
+
+
+            // Listen for Charge Category dropdown change
+            chargeCategorySelect.addEventListener('change', function() {
+                const selectedId = this.value;
+                const baseUrl = "{{ route('getCharges', ['id' => 'ID']) }}";
+                const finalUrl = baseUrl.replace('ID', selectedId);
+                fetch(finalUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        window.chargeData = data;
+                        chargeSelect.innerHTML = '<option value="">Select</option>';
+                        data.forEach(charge => {
+                            const option = document.createElement('option');
+                            option.value = charge.id;
+                            option.textContent = charge.name;
+                            if ("{{ old('charge') }}" == charge.id) {
+                                option.selected = true;
+                            }
+                            chargeSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching Charges:', error);
+                        chargeSelect.innerHTML = '<option value="">Error loading options</option>';
+                    });
+
+                chargeSelect.addEventListener('change', function() {
+                    const selectedCharge = window.chargeData[0];
+
+                    const standardCharge = document.getElementById("addstandard_charge")
+                    const tpaCharge = document.getElementById("addscd_charge")
+                    const total = document.getElementById("apply_charge");
+                    const discount = document.getElementById("discount_percentage_add_charge");
+                    const tax = document.getElementById("charge_tax");
+                    const netAmount = document.getElementById("final_amount");
+                    const discountAmountInp = document.getElementById("discount_percentage_amount");
+                    const taxAmountInp = document.getElementById("tax_amt");
+
+                    standardCharge.value = selectedCharge.standard_charge
+                    tpaCharge.value = 0
+                    total.value = selectedCharge.standard_charge
+                    tax.value = selectedCharge.tax_category.percentage
+                    discount.value = 0
+                    calculateAmount();
+                    if (!total || !tax || !discount) {
+                        console.error(
+                            "❌ One or more required input fields are missing in the DOM.");
+                        return;
+                    }
+                    [total, tax, discount].forEach(field => {
+                        field.addEventListener('input', calculateAmount);
+                    });
+
+                    function calculateAmount() {
+                        const appliedChargeValue = parseFloat(total.value) || 0;
+                        const taxValue = parseFloat(tax.value) || 0;
+                        const discountValue = parseFloat(discount.value) || 0;
+
+                        // Formula: Amount = (AppliedCharge + Tax%) - Discount%
+                        const taxAmount = appliedChargeValue * (taxValue / 100);
+                        const discountAmount = appliedChargeValue * (discountValue / 100);
+                        const totalAmount = appliedChargeValue + taxAmount - discountAmount;
+
+                        discountAmountInp.value = discountAmount;
+                        taxAmountInp.value = taxAmount;
+                        netAmount.value = totalAmount.toFixed(2);
+
+                    }
+                })
+
+
+            })
+
+
+
+            const previewBody = document.getElementById("preview_charges");
+            const addBtn = document.querySelector("button[name='charge_data']");
+
+            addBtn.addEventListener("click", function(e) {
+                e.preventDefault();
+
+                const chargeTypeText = document.getElementById("add_charge_type").selectedOptions[0].text;
+                const chargeTypeVal = document.getElementById("add_charge_type").value;
+
+                const categoryText = document.getElementById("charge_category2").selectedOptions[0].text;
+                const categoryVal = document.getElementById("charge_category2").value;
+
+                const chargeText = document.getElementById("charge_id").selectedOptions[0].text;
+                const chargeVal = document.getElementById("charge_id").value;
+
+                const stdCharge = document.getElementById("addstandard_charge").value;
+                const tpaCharge = document.getElementById("addscd_charge").value;
+                const qty = document.getElementById("qty").value;
+
+                const total = document.getElementById("apply_charge").value;
+                const discount = document.getElementById("discount_percentage_amount").value;
+                const tax = document.getElementById("tax_amt").value;
+                const netAmount = document.getElementById("final_amount").value;
+
+                const note = document.getElementById("edit_note").value;
+                const date = document.getElementById("charge_date").value;
+
+                // VALIDATION
+                if (!chargeTypeVal || !categoryVal || !chargeVal) {
+                    alert("Please fill required fields");
+                    return;
+                }
+
+                // -------------------------------
+                // BUILD ROW HTML
+                // -------------------------------
+                let row = `
+    <tr>
+        <td>${date}</td>
+        <td>${chargeTypeText}</td>
+        <td>${categoryText}</td>
+        <td>${chargeText}<br><small>${note}</small></td>
+
+        <td class="text-right">${stdCharge}</td>
+        <td class="text-right">${tpaCharge}</td>
+        <td class="text-right">${qty}</td>
+        <td class="text-right">${total}</td>
+        <td class="text-right">${discount}</td>
+        <td class="text-right">${tax}</td>
+        <td class="text-right">${netAmount}</td>
+
+        <td class="text-right">
+            <button type="button" class="btn btn-danger btn-sm delete-charge-row">X</button>
+        </td>
+
+        <!-- HIDDEN INPUT FIELDS -->
+        <input type="hidden" name="charge_type[]" value="${chargeTypeVal}">
+        <input type="hidden" name="charge_category[]" value="${categoryVal}">
+        <input type="hidden" name="charge_id[]" value="${chargeVal}">
+        <input type="hidden" name="standard_charge[]" value="${stdCharge}">
+        <input type="hidden" name="tpa_charge[]" value="${tpaCharge}">
+        <input type="hidden" name="qty[]" value="${qty}">
+        <input type="hidden" name="total[]" value="${total}">
+        <input type="hidden" name="discount_percentage[]" value="${discount}">
+        <input type="hidden" name="tax[]" value="${tax}">
+        <input type="hidden" name="net_amount[]" value="${netAmount}">
+        <input type="hidden" name="charge_note[]" value="${note}">
+        <input type="hidden" name="charge_date[]" value="${date}">
+    </tr>
+    `;
+
+                previewBody.insertAdjacentHTML("beforeend", row);
+
+                // RESET FIELDS
+                document.getElementById("add_charge_type").value = "";
+                document.getElementById("charge_category2").value = "";
+                document.getElementById("charge_id").value = "";
+                document.getElementById("addstandard_charge").value = "";
+                document.getElementById("addscd_charge").value = "";
+                document.getElementById("qty").value = "1";
+                document.getElementById("apply_charge").value = "0";
+                document.getElementById("discount_percentage_add_charge").value = "0";
+                document.getElementById("discount_percentage_amount").value = "0";
+                document.getElementById("charge_tax").value = "0";
+                document.getElementById("tax_amt").value = "0";
+                document.getElementById("final_amount").value = "0";
+                document.getElementById("edit_note").value = "";
+                document.getElementById("charge_date").value = "";
+            });
+
+            // DELETE Row
+            document.addEventListener("click", function(e) {
+                if (e.target.classList.contains("delete-charge-row")) {
+                    e.target.closest("tr").remove();
+                }
+            });
+
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
             // Re-initialize Select2 every time the modal is shown
-            $('#add_medication').on('shown.bs.modal', function () {
+            $('#add_medication').on('shown.bs.modal', function() {
                 $('#med_cat, #med_name, #dosage').select2({
                     width: '100%',
                     placeholder: 'Select',
@@ -2937,7 +3457,7 @@
 
     <!-- Chart.js -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             if (window.Chart) {
                 var ctx = document.getElementById('chartLine1').getContext('2d');
                 var chartLine1 = new Chart(ctx, {
@@ -2975,18 +3495,39 @@
     </script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             const addBtn = document.getElementById("addBtn");
             const vitalFields = document.getElementById("vitalFields");
+            const nurseSelect = document.getElementById('nurse')
+            nurseSelect.innerHTML = '<option value="">Loading...</option>';
 
+            fetch("{{ route('getNurses') }}")
+                .then(response => response.json())
+                .then(data => {
+                    window.nursesData = data;
+                    nurseSelect.innerHTML = '<option value="">Select</option>';
+                    data.forEach(nurse => {
+                        const option = document.createElement('option');
+                        option.value = nurse.id;
+                        option.textContent = nurse.name;
+                        if ("{{ old('nurse') }}" == nurse.id) {
+                            option.selected = true;
+                        }
+                        nurseSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching Nurses:', error);
+                    nurseSelect.innerHTML = '<option value="">Error loading options</option>';
+                });
             // Attach remove event to existing remove buttons
-            vitalFields.querySelectorAll(".remove-btn").forEach(function (btn) {
-                btn.addEventListener("click", function () {
+            vitalFields.querySelectorAll(".remove-btn").forEach(function(btn) {
+                btn.addEventListener("click", function() {
                     btn.closest(".vital-row").remove();
                 });
             });
 
-            addBtn.addEventListener("click", function () {
+            addBtn.addEventListener("click", function() {
                 // Clone the first row
                 let firstRow = vitalFields.querySelector(".vital-row");
                 let newRow = firstRow.cloneNode(true);
@@ -2999,7 +3540,7 @@
                 removeBtn.style.display = "inline-block";
 
                 // Attach remove event to the new button
-                removeBtn.addEventListener("click", function () {
+                removeBtn.addEventListener("click", function() {
                     newRow.remove();
                 });
 

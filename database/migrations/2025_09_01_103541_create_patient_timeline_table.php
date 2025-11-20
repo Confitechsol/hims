@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('hospital_id', 8);
             $table->string('branch_id', 8);
-             $table->unsignedBigInteger('patient_id')->nullable()->index();
+            $table->unsignedBigInteger('patient_id')->nullable()->index();
             $table->string('title', 200)->index();
             $table->dateTime('timeline_date')->nullable()->index();
             $table->text('description')->nullable();
@@ -24,6 +24,7 @@ return new class extends Migration
             $table->dateTime('date')->nullable()->index();
             $table->string('generated_users_type', 100);
             $table->unsignedBigInteger('generated_users_id')->nullable()->index();
+            $table->integer('visible_person')->nullable();
 
             $table->timestamp('created_at')->useCurrent();
         });

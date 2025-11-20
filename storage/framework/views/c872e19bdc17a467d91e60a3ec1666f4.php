@@ -361,7 +361,7 @@
             </div>
 
             <!-- Modal Body (scrollable area provided by modal-dialog-scrollable) -->
-            <form action="<?php echo e(route('opd.addPrescription')); ?>" method="post" enctype="multipart/form-data"><?php echo csrf_field(); ?>
+            <form action="" id="prescriptionForm" method="post" enctype="multipart/form-data"><?php echo csrf_field(); ?>
                 <div class="modal-body" style="max-height: calc(100vh - 160px); overflow-x:hiden;">
                     <div class="row p-4 mx-1">
                         <div class="col-sm-9">
@@ -369,6 +369,7 @@
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <input type="hidden" id="opd_id" name="opd_id">
+                                        <input type="hidden" id="ipd_id" name="ipd_id">
                                         <div class="form-group">
                                             <label class="form-label">Header Note</label>
                                             <div class="toolbar" id="toolbar">
@@ -395,8 +396,7 @@
                                                 <button data-cmd="removeFormat">↺</button>
                                             </div>
 
-                                            <textarea id="editor" contenteditable="true" class="editor-area w-100"
-                                                name="header_note"></textarea>
+                                            <textarea id="editor" contenteditable="true" class="editor-area w-100" name="header_note"></textarea>
                                             <hr>
                                         </div>
                                         <div class="col-sm-12">
@@ -428,8 +428,7 @@
                                                 <div class="col-md-3">
                                                     <label for="finding_description" class="form-label">Finding
                                                         Description</label>
-                                                    <textarea name="finding_description" id="finding_description"
-                                                        class="form-control" rows="3"></textarea>
+                                                    <textarea name="finding_description" id="finding_description" class="form-control" rows="3"></textarea>
                                                 </div>
                                                 <div class="col-md-3">
                                                     <label for="finding_print" class="form-label">Finding Print
@@ -501,17 +500,16 @@
                                                 <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
                                                     <div>
                                                         <label class="form-label">Instruction</label>
-                                                        <textarea name="instructions[]" style="height:28px;"
-                                                            class="form-control"></textarea>
+                                                        <textarea name="instructions[]" style="height:28px;" class="form-control"></textarea>
                                                     </div>
                                                 </div>
 
                                                 <div
                                                     class="col-lg-1 col-md-1 col-sm-1 col-xs-1 d-flex align-items-center">
                                                     <div>
-                                                        <button type="button" class="btn btn-sm btn-danger delete_row"
-                                                            data-row-id="1" autocomplete="off"><i
-                                                                class="fa fa-remove"></i></button>
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-danger delete_row" data-row-id="1"
+                                                            autocomplete="off"><i class="fa fa-remove"></i></button>
                                                     </div>
                                                 </div>
 
@@ -552,8 +550,7 @@
                                                     <button data-cmd="justifyRight">➡</button>
                                                     <button data-cmd="removeFormat">↺</button>
                                                 </div>
-                                                <textarea id="editor-footer" contenteditable="true"
-                                                    class="editor-area w-100" name="footer_note">
+                                                <textarea id="editor-footer" contenteditable="true" class="editor-area w-100" name="footer_note">
                                                 </textarea>
                                             </div>
                                         </div>
@@ -592,47 +589,55 @@
                                     <div class="ptt10">
                                         <label for="exampleInputEmail1" class="form-label">Notification To</label>
                                         <div class="checkbox">
-                                            <label class="form-label"><input type="checkbox" name="visible[]" value="1">
+                                            <label class="form-label"><input type="checkbox" name="visible[]"
+                                                    value="1">
                                                 <b>Admin</b>
                                             </label>
                                         </div>
                                         <div class="checkbox">
-                                            <label class="form-label"><input type="checkbox" name="visible[]" value="2">
+                                            <label class="form-label"><input type="checkbox" name="visible[]"
+                                                    value="2">
                                                 <b>Accountant</b>
                                             </label>
                                         </div>
                                         <div class="checkbox">
-                                            <label class="form-label"><input type="checkbox" name="visible[]" value="3">
+                                            <label class="form-label"><input type="checkbox" name="visible[]"
+                                                    value="3">
                                                 <b>Doctor</b>
                                             </label>
                                         </div>
                                         <div class="checkbox">
-                                            <label class="form-label"><input type="checkbox" name="visible[]" value="4">
+                                            <label class="form-label"><input type="checkbox" name="visible[]"
+                                                    value="4">
                                                 <b>Pharmacist</b>
                                             </label>
                                         </div>
                                         <div class="checkbox">
-                                            <label class="form-label"><input type="checkbox" name="visible[]" value="5">
+                                            <label class="form-label"><input type="checkbox" name="visible[]"
+                                                    value="5">
                                                 <b>Pathologist</b>
                                             </label>
                                         </div>
                                         <div class="checkbox">
-                                            <label class="form-label"><input type="checkbox" name="visible[]" value="6">
+                                            <label class="form-label"><input type="checkbox" name="visible[]"
+                                                    value="6">
                                                 <b>Radiologist</b>
                                             </label>
                                         </div>
                                         <div class="checkbox">
-                                            <label class="form-label"><input type="checkbox" name="visible[]" value="7"
-                                                    checked="" onclick="return false;"> <b>Super
+                                            <label class="form-label"><input type="checkbox" name="visible[]"
+                                                    value="7" checked="" onclick="return false;"> <b>Super
                                                     Admin</b> </label>
                                         </div>
                                         <div class="checkbox">
-                                            <label class="form-label"><input type="checkbox" name="visible[]" value="8">
+                                            <label class="form-label"><input type="checkbox" name="visible[]"
+                                                    value="8">
                                                 <b>Receptionist</b>
                                             </label>
                                         </div>
                                         <div class="checkbox">
-                                            <label class="form-label"><input type="checkbox" name="visible[]" value="9">
+                                            <label class="form-label"><input type="checkbox" name="visible[]"
+                                                    value="9">
                                                 <b>Nurse</b>
                                             </label>
                                         </div>
@@ -664,24 +669,35 @@
     </div>
 </div>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         const createPrescriptionModal = document.getElementById("addPrescriptionModal");
         const findingCategorySelect = document.getElementById('finding_type');
         const findingsSelect = document.getElementById('finding');
         const pathologySelect = document.getElementById('pathologyOpt');
         const radiologySelect = document.getElementById('radiologyOpt');
+
         findingCategorySelect.innerHTML = '<option value="">Loading...</option>';
         findingsSelect.innerHTML = '<option value="">Loading...</option>';
         pathologySelect.innerHTML = '<option value="">Loading...</option>';
         radiologySelect.innerHTML = '<option value="">Loading...</option>';
-
-        createPrescriptionModal.addEventListener('show.bs.modal', function (event) {
+        const opdRoute = "<?php echo e(route('opd.addPrescription')); ?>";
+        const ipdRoute = "<?php echo e(route('ipd.addPrescription')); ?>";
+        createPrescriptionModal.addEventListener('show.bs.modal', function(event) {
+            let form = document.getElementById("prescriptionForm");
             const opdIdField = document.getElementById('opd_id');
+            const ipdIdField = document.getElementById('ipd_id');
 
             var button = event.relatedTarget; // Button that triggered the modal
 
             var opd_id = button.getAttribute('data-id');
             opdIdField.value = opd_id ?? null;
+            var ipd_id = button.getAttribute('data-ipd-id');
+            ipdIdField.value = ipd_id ?? null;
+            if (opd_id) {
+                form.action = opdRoute; // OPD route
+            } else if (ipd_id) {
+                form.action = ipdRoute; // IPD route
+            }
 
             const container = document.getElementById("medicineContainer");
             const addButton = document.getElementById("addMedicineBtn");
@@ -700,7 +716,7 @@
                 // Initialize first row
                 initRow(container.querySelector(".medicine-row"));
 
-                addButton.addEventListener("click", function (e) {
+                addButton.addEventListener("click", function(e) {
                     e.preventDefault();
                     addNewRow();
                 });
@@ -714,7 +730,7 @@
                 fillSelect(row.querySelector(".duration_dosage"), window.doseDurations, "name");
 
                 // Category change → fetch medicines
-                row.querySelector(".medicine_category").addEventListener("change", function () {
+                row.querySelector(".medicine_category").addEventListener("change", function() {
                     const categoryId = this.value;
                     const medicineSelect = row.querySelector(".medicine_name");
                     const doseSelect = row.querySelector(".medicine_dosage");
@@ -742,7 +758,7 @@
 
                 // Delete button
                 const deleteBtn = row.querySelector(".delete_row");
-                deleteBtn.addEventListener("click", function () {
+                deleteBtn.addEventListener("click", function() {
                     const allRows = container.querySelectorAll(".medicine-row");
                     if (allRows.length > 1) row.remove();
                     else alert("At least one medicine must remain.");
@@ -810,7 +826,7 @@
                 findingCategorySelect.innerHTML = '<option value="">Error loading options</option>';
             });
 
-        findingCategorySelect.addEventListener('change', function () {
+        findingCategorySelect.addEventListener('change', function() {
             // ✅ Collect all selected IDs
             const selectedIds = Array.from(this.selectedOptions).map(opt => opt.value);
 
@@ -824,15 +840,15 @@
 
             // ✅ Fetch findings for all selected categories
             fetch("<?php echo e(route('getFindings')); ?>", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: JSON.stringify({
-                    category_ids: selectedIds
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        category_ids: selectedIds
+                    })
                 })
-            })
                 .then(response => response.json())
                 .then(data => {
                     window.findingData = data;
@@ -895,7 +911,7 @@
 
 <script>
     // Ensure jQuery + select2 are loaded
-    $(function () {
+    $(function() {
         // initialize select2 on multiselect elements
         $('#finding_type, .multiselect2').select2({
             placeholder: 'Select',
@@ -930,16 +946,16 @@
         }
 
         // initial adjust for all existing multiselects
-        $('#finding_type, .multiselect2').each(function () {
+        $('#finding_type, .multiselect2').each(function() {
             adjustSelectSize($(this));
         });
 
         // adjust on change / select2 events
-        $(document).on('change', '#finding_type, .multiselect2', function () {
+        $(document).on('change', '#finding_type, .multiselect2', function() {
             adjustSelectSize($(this));
         });
         // also catch select2 specific events for better responsiveness
-        $(document).on('select2:select select2:unselect', '#finding_type, .multiselect2', function () {
+        $(document).on('select2:select select2:unselect', '#finding_type, .multiselect2', function() {
             adjustSelectSize($(this));
         });
 
@@ -994,7 +1010,7 @@
 
 <script>
     // Shorter JS: single global add button, clone rows multiple times, safe select2 re-init
-    $(function () {
+    $(function() {
         var $modal = $('#addPrescriptionModal');
         var $body = $modal.length ? $modal : $('body');
 
@@ -1006,7 +1022,7 @@
         function initSelect($s) {
             try {
                 if ($s.hasClass('select2-hidden-accessible')) $s.select2('destroy');
-            } catch (e) { }
+            } catch (e) {}
             $s.select2({
                 placeholder: 'Select',
                 width: '100%'
@@ -1016,15 +1032,15 @@
         function populateMedicines(cat, $med, idx) {
             $med.prop('disabled', true).empty().append('<option>Loading...</option>');
             $.get('/api/medicines', {
-                category: cat
-            })
-                .done(function (data) {
+                    category: cat
+                })
+                .done(function(data) {
                     $med.empty().append('<option value="">Select</option>');
-                    (data || []).forEach(function (m) {
+                    (data || []).forEach(function(m) {
                         $med.append($('<option>').val(m.id).text(m.text).data('stock', m.stock));
                     });
                 })
-                .fail(function () {
+                .fail(function() {
                     var samples = [{
                         id: '101',
                         text: 'Amoxicillin',
@@ -1035,13 +1051,13 @@
                         stock: 50
                     }];
                     $med.empty().append('<option value="">Select</option>');
-                    samples.forEach(function (m) {
+                    samples.forEach(function(m) {
                         $med.append($('<option>').val(m.id).text(m.text).data('stock', m.stock));
                     });
                 })
-                .always(function () {
+                .always(function() {
                     $med.prop('disabled', false).trigger('change');
-                    $med.off('change.stock').on('change.stock', function () {
+                    $med.off('change.stock').on('change.stock', function() {
                         var st = $med.find('option:selected').data('stock');
                         $('#stock_info_' + idx).text(st !== undefined ? (st + ' in stock') : '');
                     });
@@ -1050,10 +1066,10 @@
 
         function initRow($row) {
             var idx = $row.data('row') || $('.medicine-row').length;
-            $row.find('select').each(function () {
+            $row.find('select').each(function() {
                 initSelect($(this));
             });
-            $row.off('change.cat').on('change.cat', '.medicine_category', function () {
+            $row.off('change.cat').on('change.cat', '.medicine_category', function() {
                 populateMedicines($(this).val(), $row.find('.medicine_name'), idx);
             });
             $row.find('input[type!="hidden"], textarea').val('');
@@ -1062,11 +1078,11 @@
         }
 
         function reindex() {
-            $('.medicine-row').each(function (i) {
+            $('.medicine-row').each(function(i) {
                 var idx = i + 1,
                     $r = $(this);
                 $r.attr('data-row', idx).attr('id', 'row' + idx);
-                $r.find('[name]').each(function () {
+                $r.find('[name]').each(function() {
                     var $el = $(this),
                         n = $el.attr('name'),
                         id = $el.attr('id');
@@ -1093,23 +1109,23 @@
         }
 
         // initial setup: set data-row and init rows
-        $('.medicine-row').each(function (i) {
+        $('.medicine-row').each(function(i) {
             $(this).attr('data-row', i + 1);
             initRow($(this));
         });
         reindex();
 
         // add new row using the single add button
-        $body.on('click', '.add-record', function (e) {
+        $body.on('click', '.add-record', function(e) {
             e.preventDefault();
             var $last = $('.medicine-row').last();
 
             // destroy select2 on last before cloning to avoid cloning select2 markup
-            $last.find('select').each(function () {
+            $last.find('select').each(function() {
                 try {
                     if ($(this).hasClass('select2-hidden-accessible')) $(this).select2(
                         'destroy');
-                } catch (err) { }
+                } catch (err) {}
             });
 
             var $new = $last.clone(false, false); // shallow clone to avoid copying handlers
@@ -1133,7 +1149,7 @@
         });
 
         // delete row
-        $body.on('click', '.delete_row', function (e) {
+        $body.on('click', '.delete_row', function(e) {
             e.preventDefault();
             var $row = $(this).closest('.medicine-row');
             if ($('.medicine-row').length <= 1) {
@@ -1179,4 +1195,5 @@
     // Initialize both editors
     initEditor('toolbar-header', 'editor-header', 'formatBlock-header');
     initEditor('toolbar-footer', 'editor-footer', 'formatBlock-footer');
-</script><?php /**PATH C:\xampp\htdocs\hims\resources\views/components/modals/add-prescription-modal.blade.php ENDPATH**/ ?>
+</script>
+<?php /**PATH C:\xampp\htdocs\hims\resources\views/components/modals/add-prescription-modal.blade.php ENDPATH**/ ?>
