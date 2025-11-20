@@ -67,9 +67,9 @@
 
 
                                         <div class="text-end d-flex">
-                                            <button id ="exportBtn"
-                                                class="btn btn-primary text-white ms-2 fs-13 btn-md"><i
-                                                    class="ti ti-download me-1"></i>Download Sample Data</button>
+                                            <a href="<?php echo e(route('patients.export')); ?>" class="btn btn-primary text-white ms-2 fs-13 btn-md"><i
+                                                    class="ti ti-download me-1"></i>Download Sample Data</a>
+                                            
                                         </div>
                                     </div>
 

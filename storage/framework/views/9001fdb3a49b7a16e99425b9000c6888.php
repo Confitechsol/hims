@@ -100,15 +100,14 @@
                                                             <td><?php echo e($patient->is_dead == 'yes' ? 'Yes' : 'No'); ?></td>
                                                             <td>
                                                                 <div class="d-flex">
-                                                                    <a href="javascript: void(0);"
-                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                                        <i class="ti ti-menu" data-bs-toggle="tooltip"
-                                                                            title="Assign Permission"></i></a>
-                                                                    <a href="javascript: void(0);"
-                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                        <i class="ti ti-dots-vertical"
-                                                                            data-bs-toggle="tooltip"
-                                                                            title="Assign Permission"></i></a>
+                                                                    <a href="<?php echo e(route('patient.edit', $patient->id)); ?>" 
+                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                                        >
+                                                                        <i class="ti ti-pencil"></i>
+                                                                    </a>
+
+                                                                <!-- <?php echo $__env->make('components.modals.edit-patient-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?> -->
+                                                                    
                                                                 </div>
                                                             </td>
                                                         </tr>

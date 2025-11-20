@@ -577,7 +577,7 @@ unset($__errorArgs, $__bag); ?>
 
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Save Role</button>
+                    <button type="submit" class="btn btn-primary">Save Patient</button>
                 </div>
             </form>
         </div>
