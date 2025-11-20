@@ -88,17 +88,31 @@
                                                             <div class="d-flex">
                                                                 <button
                                                                     class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
+                                                                    data-patient_name="{{ $report->patient->patient_name ?? '' }}"
+                                                                    data-patient_id="{{ $report->patient_id }}"
+                                                                    data-case_id="{{ $report->case_reference_id}}"
+                                                                    data-death_date="{{ \Carbon\Carbon::parse($report->death_date)->format('d/m/Y')}}"
+                                                                    data-guardian_name="{{ $report->guardian_name }}"
+                                                                    data-report="{{ $report->attachment_name }}"
+                                                                    data-attachment="{{ $report->attachment }}"
+                                                                
                                                                     data-id="">
                                                                     <i class="ti ti-pencil"></i>
                                                                 </button>
-                                                                <form method="POST" action="">
+      <form action="{{ route('death.delete', $report->id) }}" 
+              method="POST" 
+              style="display:inline;">
+            @csrf
+            @method('DELETE')
 
-                                                                    <input type="hidden" name="id" value="">
-                                                                    <button type="submit"
-                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                        <i class="ti ti-trash"></i>
-                                                                    </button>
-                                                                </form>
+            <button type="submit" 
+                    onclick="return confirm('Are you sure you want to delete this record?')" 
+                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                <i class="ti ti-trash"></i>
+            </button>
+        </form>
+
+
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -150,23 +164,37 @@
     </div>
     </div>
     </div>
-    <x-modals.birth-modal type="add" id="createModal" title="Add Death Record" action="{{ route('tpamanagement.store') }}"
+    <x-modals.birth-modal type="add" id="createModal" title="Add Death Record" action="{{ route('death.create') }}"
         :fields="[
             [
-                'name' => 'case_id',
+                'name' => 'case_reference_id',
                 'label' => 'Case ID',
                 'type' => 'text',
-                'required' => true,
+                'required' => false,
                 
             ],
-            ['name' => 'patient_name', 'label' => 'Patient Name', 'type' => 'text', 'required' => true, 'size' => '3'],
-            ['name' => 'death_date', 'label' => 'Death Date', 'type' => 'text', 'required' => true, 'size' => '4'],
+            [
+            'name' => 'patient_id',
+            'label' => 'Patient ID',
+            'type' => 'number',  // integer input
+            'required' => true,
+            'size' => '3',
+            
+        ],
+        [
+            'name' => 'patient_name',
+            'label' => 'Patient Name',
+             'type' => 'text' ,
+            'readonly' => true,
+        ],
+            ['name' => 'death_date', 'label' => 'Death Date', 'type' => 'date', 'required' => true, 'size' => '4'],
+           
             ['name' => 'guardian_name', 'label' => 'Guardian Name ', 'type' => 'text', 'required' => true, 'size' => '12'],
             [
-                'name' => 'Report',
-                'label' => 'report',
+                'name' => 'attachment_name',
+                'label' => 'Report',
                 'type' => 'text',
-                'required' => true,
+                'required' => false,
                 'size' => '6',
             ],
          ['name' => 'attachment', 'label' => 'Attachment', 'type' => 'file', 'required' => false, 'size' => '6',],
@@ -183,12 +211,25 @@
                 'required' => true,
                 
             ],
-            ['name' => 'patient_name', 'label' => 'Patient Name', 'type' => 'text', 'required' => true, 'size' => '3'],
-            ['name' => 'death_date', 'label' => 'Death Date', 'type' => 'text', 'required' => true, 'size' => '4'],
+             [
+            'name' => 'patient_id',
+            'label' => 'Patient ID',
+            'type' => 'number',  // integer input
+            'required' => true,
+            'size' => '3',
+            
+        ],
+        [
+            'name' => 'patient_name',
+            'label' => 'Patient Name',
+             'type' => 'text' ,
+            'readonly' => true,
+        ],
+            ['name' => 'death_date', 'label' => 'Death Date', 'type' => 'date', 'required' => true, 'size' => '4'],
             ['name' => 'guardian_name', 'label' => 'Guardian Name ', 'type' => 'text', 'required' => true, 'size' => '12'],
             [
-                'name' => 'Report',
-                'label' => 'report',
+                'name' => 'report',
+                'label' => 'Report',
                 'type' => 'text',
                 'required' => true,
                 'size' => '6',
@@ -196,6 +237,42 @@
          ['name' => 'attachment', 'label' => 'Attachment', 'type' => 'file', 'required' => false, 'size' => '6',],
            
         ]" :columns="3" />
+
+       <script>
+       const patientIdField = document.getElementById("patient_id")
+patientIdField.addEventListener("input", function() {
+    const patientId = this.value.trim();
+    const patientNameField = document.getElementById("patient_name");
+
+    // Clear patient name if input is empty
+    if (!patientId) {
+        patientNameField.value = '';
+        return;
+    }
+
+    // Call API
+    const baseUrl = "{{ route('death.patient', ['id' => 'ID']) }}";
+                const finalUrl = baseUrl.replace('ID', patientId);
+    fetch(finalUrl)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                patientNameField.value = data.patient.patient_name; // Fill patient_name
+            } else {
+                patientNameField.value = ''; // Clear if not found
+                console.log(data.message);
+            }
+        })
+        .catch(err => {
+            patientNameField.value = '';
+            console.error("API Error:", err);
+        });
+});
+
+
+
+</script>
+
 
 
 @endsection()

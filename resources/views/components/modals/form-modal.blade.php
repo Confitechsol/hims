@@ -64,6 +64,7 @@
                                     <img src="" data-field="{{ $field['name'] }}" alt="">        
                                     @else
                                         <input type="{{ $field['type'] ?? 'text' }}" name="{{ $field['name'] }}"
+                                        @if(isset($field['readonly'])) readonly @endif
                                             data-field="{{ $field['name'] }}" id="{{ $field['name'] }}"
                                             value="{{ $field['value'] ?? old($field['name']) }}" class="form-control"
                                             @if (!empty($field['required'])) required @endif @if(isset($field['fileTypes']))accept="{{$field['fileTypes']}}"@endif>
@@ -148,25 +149,40 @@
 
                     // Loop through each input field
                     inputFields.forEach(input => {
-                        const fieldName = input.getAttribute('data-field'); // Get the field name from data-field attribute
-                        // const fieldValue = this.getAttribute(`data-${fieldName}`); // Get corresponding data-* attribute from button
-                        const fieldValue = button.getAttribute(`data-${fieldName}`);
-
-                        // Set the input field's value dynamically
-                        if(input.tagName === 'SELECT') {
-                            $(input).select2(); 
-                            $(input).val(fieldValue).trigger('change.select2');
-                        } else{
-                            const isImage = /\.(png|jpg|jpeg)$/i.test(fieldValue);
-                        if (fieldValue !== null) {
-                        if (isImage) {
-                         // Set image source if input is an <img> element
-                         input.src = "{{url('/')}}"+fieldValue;
-                         } else {
-                        // Otherwise, just set the value
-                        input.value = fieldValue;
-                            }
+                        const fieldName = input.getAttribute('data-field'); // e.g. 'name' or 'invoice_number'
+                        let fieldValue = null;
+                        try {
+                            fieldValue = button.getAttribute(`data-${fieldName}`);
+                        } catch (err) {
+                            fieldValue = null;
                         }
+
+                        // Safely set the input field's value dynamically
+                        try {
+                            if (input.tagName === 'SELECT') {
+                                // If select2 is available use it, otherwise set value directly
+                                if (window.jQuery && typeof $(input).select2 === 'function') {
+                                    try {
+                                        $(input).val(fieldValue).trigger('change.select2');
+                                    } catch (err) {
+                                        input.value = fieldValue ?? '';
+                                    }
+                                } else {
+                                    input.value = fieldValue ?? '';
+                                }
+                            } else if (input.tagName === 'IMG') {
+                                if (fieldValue) input.src = "{{ url('/') }}" + fieldValue;
+                            } else {
+                                if (fieldValue !== null && typeof fieldValue !== 'undefined') {
+                                    input.value = fieldValue;
+                                } else {
+                                    // clear field if no value provided
+                                    input.value = '';
+                                }
+                            }
+                        } catch (err) {
+                            // swallow errors to avoid breaking the handler for other fields
+                            console.error('Error populating edit field', fieldName, err);
                         }
                     });
 

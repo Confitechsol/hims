@@ -298,12 +298,14 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/birth', [BirthController::class, 'index'])->name('birth');
     Route::post('/birth/create', [BirthController::class, 'create'])->name('birth.create');
     Route::put('/birth/update', [BirthController::class, 'update'])->name('birth.update');
-    Route::delete('/birth/delete', [BirthController::class, 'delete'])->name('birth.delete');
+    Route::delete('/birth/delete/{id}', [BirthController::class, 'delete'])->name('birth.delete');
 
     Route::get('/death', [DeathController::class, 'index'])->name('death');
     Route::post('/death/create', [DeathController::class, 'create'])->name('death.create');
-    Route::put('/death/update', [DeathController::class, 'update'])->name('death.update');
-    Route::delete('/death/delete', [DeathController::class, 'delete'])->name('death.delete');
+ //   Route::put('/death/update', [DeathController::class, 'update'])->name('death.update');
+    Route::put('/death/update/{id}', [DeathController::class, 'update'])->name('death.update');
+    Route::delete('/death/delete/{id}', [DeathController::class, 'delete'])->name('death.delete');
+    Route::get('/death/patient/{id}', [DeathController::class, 'getPatient'])->name('death.patient');
 
     Route::get('/visitors', [VisitorsController::class, 'index']);
 

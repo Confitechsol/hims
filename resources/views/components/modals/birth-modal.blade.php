@@ -64,6 +64,7 @@
                                     <img src="" data-field="{{ $field['name'] }}" alt="">        
                                     @else
                                         <input type="{{ $field['type'] ?? 'text' }}" name="{{ $field['name'] }}"
+                                        @if(isset($field['readonly'])) readonly @endif
                                             data-field="{{ $field['name'] }}" id="{{ $field['name'] }}"
                                             value="{{ $field['value'] ?? old($field['name']) }}" class="form-control"
                                             @if (!empty($field['required'])) required @endif @if(isset($field['fileTypes']))accept="{{$field['fileTypes']}}"@endif>
