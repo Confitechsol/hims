@@ -303,7 +303,6 @@ Route::middleware(['admin'])->group(function () {
 
     Route::get('/death', [DeathController::class, 'index'])->name('death');
     Route::post('/death/create', [DeathController::class, 'create'])->name('death.create');
- //   Route::put('/death/update', [DeathController::class, 'update'])->name('death.update');
     Route::put('/death/update/{id}', [DeathController::class, 'update'])->name('death.update');
     Route::delete('/death/delete/{id}', [DeathController::class, 'delete'])->name('death.delete');
     Route::get('/death/patient/{id}', [DeathController::class, 'getPatient'])->name('death.patient');

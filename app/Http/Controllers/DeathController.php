@@ -97,6 +97,53 @@ class DeathController extends Controller
     return redirect()->back()->with('success', 'Death record deleted successfully!');
 }
 
+    /**
+     * Update the specified death report.
+     * Route: PUT /death/update/{id}
+     */
+    public function update(Request $request, $id)
+    {
+        $death = DeathReport::findOrFail($id);
+
+        $validated = $request->validate([
+            'case_id' => 'nullable|string|max:255',
+            'patient_id' => 'required|integer',
+            'patient_name' => 'nullable|string|max:255',
+            'death_date' => 'required|date',
+            'guardian_name' => 'required|string|max:255',
+            'report' => 'nullable|string|max:255', // mapped to attachment_name
+            'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf,docx|max:5120',
+        ]);
+
+        // Update simple fields — note view uses 'case_id' and 'report' names for edit form
+        $death->case_reference_id = $validated['case_id'] ?? $death->case_reference_id;
+        $death->patient_id = $validated['patient_id'] ?? $death->patient_id;
+        if (!empty($validated['patient_name'])) {
+            $death->patient_name = $validated['patient_name'];
+        }
+        $death->death_date = $validated['death_date'];
+        $death->guardian_name = $validated['guardian_name'];
+
+        // attachment name / report
+        if (!empty($validated['report'])) {
+            $death->attachment_name = $validated['report'];
+        }
+
+        // If a new file uploaded, convert to BLOB and store (existing code stores BLOB)
+        if ($request->hasFile('attachment')) {
+            $file = $request->file('attachment');
+            $death->attachment = file_get_contents($file->getRealPath());
+            // If no explicit report name provided, use original filename
+            if (empty($death->attachment_name)) {
+                $death->attachment_name = $file->getClientOriginalName();
+            }
+        }
+
+        $death->save();
+
+        return redirect()->back()->with('success', 'Death record updated successfully!');
+    }
+
 
 
 

@@ -107,26 +107,6 @@
     </div>
 </td>
 
-                                                        <td><?php echo e($report->patient->patient_name ?? '-'); ?></td>
-                                                        <td><?php echo e($report->father_name); ?></td>
-                                                        <td>
-                                                            <div class="d-flex">
-                                                                <button
-                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
-                                                                    data-id="">
-                                                                    <i class="ti ti-pencil"></i>
-                                                                </button>
-                                                                <form method="POST" action="">
-
-                                                                    <input type="hidden" name="id" value="">
-                                                                    <button type="submit"
-                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                        <i class="ti ti-trash"></i>
-                                                                    </button>
-                                                                </form>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
                                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
                                             </tbody>
@@ -178,7 +158,6 @@
     <?php if (isset($component)) { $__componentOriginal5f82aee67f9dd23ba37d94ae9a7bff3d = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal5f82aee67f9dd23ba37d94ae9a7bff3d = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.modals.birth-modal','data' => ['type' => 'add','id' => 'createModal','class' => 'modal-fullscreen','title' => 'Add Birth Record','action' => ''.e(route('birth.create')).'','fields' => [
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.modals.birth-modal','data' => ['type' => 'add','id' => 'createModal','class' => 'modal-fullscreen','title' => 'Add Birth Record111','action' => ''.e(route('tpamanagement.store')).'','fields' => [
             [
                 'name' => 'child_name',
                 'label' => 'Child Name',
@@ -193,7 +172,6 @@
             ['name' => 'baby_image', 'label' => 'Child Photo', 'type' => 'file', 'required' => false, 'size' => '6',],
             ['name' => 'birth_date', 'label' => 'Birth Date', 'type' => 'date', 'required' => true, 'size' => '4'],
             ['name' => 'contact_person_phone', 'label' => 'Phone','required' => true, 'type' => 'text',  'size' => '6'],
-            ['name' => 'contact_person_phone', 'label' => 'Phone', 'type' => 'text',  'size' => '6'],
             ['name' => 'address', 'label' => 'Address', 'type' => 'text',  'size' => '12'],
             ['name' => 'caseId', 'label' => 'Case Id', 'type' => 'text',  'size' => '6'],
            [
@@ -230,10 +208,6 @@
                 'type' => 'text',
                 'size' => '5',
             ],
-                'type' => 'text',
-                'size' => '5',
-            ],
-           ['name' => 'report_image', 'label' => 'Attach Document Photo', 'type' => 'file', 'required' => false, 'size' => '6',],
            
         ],'columns' => 4]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('modals.birth-modal'); ?>
@@ -243,7 +217,6 @@
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['type' => 'add','id' => 'createModal','class' => 'modal-fullscreen','title' => 'Add Birth Record','action' => ''.e(route('birth.create')).'','fields' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute([
-<?php $component->withAttributes(['type' => 'add','id' => 'createModal','class' => 'modal-fullscreen','title' => 'Add Birth Record111','action' => ''.e(route('tpamanagement.store')).'','fields' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute([
             [
                 'name' => 'child_name',
                 'label' => 'Child Name',
@@ -258,7 +231,6 @@
             ['name' => 'baby_image', 'label' => 'Child Photo', 'type' => 'file', 'required' => false, 'size' => '6',],
             ['name' => 'birth_date', 'label' => 'Birth Date', 'type' => 'date', 'required' => true, 'size' => '4'],
             ['name' => 'contact_person_phone', 'label' => 'Phone','required' => true, 'type' => 'text',  'size' => '6'],
-            ['name' => 'contact_person_phone', 'label' => 'Phone', 'type' => 'text',  'size' => '6'],
             ['name' => 'address', 'label' => 'Address', 'type' => 'text',  'size' => '12'],
             ['name' => 'caseId', 'label' => 'Case Id', 'type' => 'text',  'size' => '6'],
            [
@@ -295,10 +267,6 @@
                 'type' => 'text',
                 'size' => '5',
             ],
-                'type' => 'text',
-                'size' => '5',
-            ],
-           ['name' => 'report_image', 'label' => 'Attach Document Photo', 'type' => 'file', 'required' => false, 'size' => '6',],
            
         ]),'columns' => 4]); ?>
 <?php echo $__env->renderComponent(); ?>
@@ -314,7 +282,6 @@
     <?php if (isset($component)) { $__componentOriginal66ca70ec79ff22faa62f501a1b49a88a = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal66ca70ec79ff22faa62f501a1b49a88a = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.modals.form-modal','data' => ['method' => 'put','type' => 'edit','id' => 'edit_modal','title' => 'Edit Birth','action' => ''.e(route('birth.update')).'','fields' => [
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.modals.form-modal','data' => ['method' => 'put','type' => 'edit','id' => 'edit_modal','title' => 'Edit Birth','action' => ''.e(route('tpamanagement.update')).'','fields' => [
             ['name' => 'id', 'type' => 'hidden', 'required' => true],
             [
                 'name' => 'child_name',
@@ -371,7 +338,6 @@
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['method' => 'put','type' => 'edit','id' => 'edit_modal','title' => 'Edit Birth','action' => ''.e(route('birth.update')).'','fields' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute([
-<?php $component->withAttributes(['method' => 'put','type' => 'edit','id' => 'edit_modal','title' => 'Edit Birth','action' => ''.e(route('tpamanagement.update')).'','fields' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute([
             ['name' => 'id', 'type' => 'hidden', 'required' => true],
             [
                 'name' => 'child_name',

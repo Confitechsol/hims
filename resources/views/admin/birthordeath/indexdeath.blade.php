@@ -91,12 +91,11 @@
                                                                     data-patient_name="{{ $report->patient->patient_name ?? '' }}"
                                                                     data-patient_id="{{ $report->patient_id }}"
                                                                     data-case_id="{{ $report->case_reference_id}}"
-                                                                    data-death_date="{{ \Carbon\Carbon::parse($report->death_date)->format('d/m/Y')}}"
+                                                                    data-death_date="{{ \Carbon\Carbon::parse($report->death_date)->format('Y-m-d') }}"
                                                                     data-guardian_name="{{ $report->guardian_name }}"
                                                                     data-report="{{ $report->attachment_name }}"
-                                                                    data-attachment="{{ $report->attachment }}"
                                                                 
-                                                                    data-id="">
+                                                                    data-id="{{ $report->id }}">
                                                                     <i class="ti ti-pencil"></i>
                                                                 </button>
       <form action="{{ route('death.delete', $report->id) }}" 
@@ -201,7 +200,7 @@
 
         ]" :columns="3" />
     <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Death Name"
-        action="{{ route('tpamanagement.update') }}" :fields="[
+        action="{{ url('/death/update') }}" :fields="[
             ['name' => 'id', 'type' => 'hidden', 'required' => true],
 
               [

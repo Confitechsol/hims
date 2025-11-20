@@ -68,6 +68,7 @@
                                             data-field="{{ $field['name'] }}" id="{{ $field['name'] }}"
                                             value="{{ $field['value'] ?? old($field['name']) }}" class="form-control"
                                             @if (!empty($field['required'])) required @endif @if(isset($field['fileTypes']))accept="{{$field['fileTypes']}}"@endif>
+                                        {{-- existing-file display removed to avoid showing filenames in modal --}}
                                     @endif
                                 </div>
                             </div>
@@ -139,10 +140,18 @@
             const button = e.target.closest('.edit-btn');
             if (!button) return;
                     // Get the ID from the button
-                    // const id = this.getAttribute('data-id');
+                    const id = button.getAttribute('data-id');
 
-                    // Dynamically update the form's action URL to match the ID for the update route
-                    // form.action = `{{ url('/') }}/medicine-group/${id}`;
+                    // If id exists set form action to death update endpoint and fill hidden id input
+                    try {
+                        if (id && form) {
+                            form.action = '{{ url('/death/update') }}' + '/' + id;
+                            const hiddenId = form.querySelector('input[name="id"], input[data-field="id"]');
+                            if (hiddenId) hiddenId.value = id;
+                        }
+                    } catch (err) {
+                        console.warn('Could not set form action dynamically', err);
+                    }
 
                     // Find all input fields in the form
                     const inputFields = form.querySelectorAll('[data-field]');
@@ -159,6 +168,12 @@
 
                         // Safely set the input field's value dynamically
                         try {
+                            // File inputs cannot be prefilled and we intentionally do not display filenames here.
+                            if (input.type === 'file') {
+                                // Skip populating file inputs or any filename display.
+                                return;
+                            }
+
                             if (input.tagName === 'SELECT') {
                                 // If select2 is available use it, otherwise set value directly
                                 if (window.jQuery && typeof $(input).select2 === 'function') {
