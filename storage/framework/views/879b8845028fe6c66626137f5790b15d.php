@@ -1,6 +1,6 @@
-@extends('layouts.adminLayout')
 
-@section('content')
+
+<?php $__env->startSection('content'); ?>
 <div class="row px-5 py-4">
     <div class="col-12 d-flex">
 
@@ -21,28 +21,28 @@
                             <div class="modal fade" id="add_roster" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered modal-md">
                                     <div class="modal-content">
-                                        <form method="POST" action="{{ route('dutyroster.addRoster') }}">
-                                            @csrf
+                                        <form method="POST" action="<?php echo e(route('dutyroster.addRoster')); ?>">
+                                            <?php echo csrf_field(); ?>
                                             <div class="modal-header bg-primary text-white">
                                                 <h5 class="modal-title">Add Duty Roster</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
 
                                             <div class="modal-body">
-                                                {{-- SHIFT SELECTION --}}
+                                                
                                                 <div class="mb-3">
                                                     <label for="duty_roster_shift_id" class="form-label">Select Shift <small class="req">*</small></label>
                                                     <select name="duty_roster_shift_id" id="duty_roster_shift_id" class="form-control" required>
                                                         <option value="">Select Shift</option>
-                                                        @foreach($shifts as $shift)
-                                                            <option value="{{ $shift->id }}">
-                                                                {{ $shift->shift_name }} ({{ date('h:i A', strtotime($shift->shift_start)) }} - {{ date('h:i A', strtotime($shift->shift_end)) }})
+                                                        <?php $__currentLoopData = $shifts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $shift): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                            <option value="<?php echo e($shift->id); ?>">
+                                                                <?php echo e($shift->shift_name); ?> (<?php echo e(date('h:i A', strtotime($shift->shift_start))); ?> - <?php echo e(date('h:i A', strtotime($shift->shift_end))); ?>)
                                                             </option>
-                                                        @endforeach
+                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                     </select>
                                                 </div>
 
-                                                {{-- START & END DATE --}}
+                                                
                                                 <div class="row">
                                                     <div class="col-md-6 mb-3">
                                                         <label for="duty_roster_start_date" class="form-label">Start Date <small class="req">*</small></label>
@@ -54,7 +54,7 @@
                                                     </div>
                                                 </div>
 
-                                                {{-- TOTAL DAYS --}}
+                                                
                                                 <div class="mb-3">
                                                     <label for="duty_roster_total_day" class="form-label">Total Days</label>
                                                     <input type="number" name="duty_roster_total_day" id="duty_roster_total_day" class="form-control" readonly>
@@ -77,9 +77,9 @@
             </div>
 
             <div class="card-body">
-                @if($rosters->isEmpty())
+                <?php if($rosters->isEmpty()): ?>
                     <p class="text-center">No roster details found.</p>
-                @else
+                <?php else: ?>
                     <div class="table-responsive table-nowrap">
                         <table class="table border">
                             <thead class="thead-light text-center">
@@ -94,32 +94,32 @@
                                 </tr>
                             </thead>
                             <tbody class="text-center">
-                                @foreach($rosters as $roster)
+                                <?php $__currentLoopData = $rosters; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $roster): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <tr>
-                                        <td>{{ $roster->dutyRosterShift->shift_name }}</td>
-                                        <td>{{ date('h:i A', strtotime($roster->dutyRosterShift->shift_start)) }}</td>
-                                        <td>{{ date('h:i A', strtotime($roster->dutyRosterShift->shift_end)) }}</td>
-                                        <td>{{ $roster->dutyRosterShift->shift_hour }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($roster->duty_roster_start_date)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($roster->duty_roster_end_date)->format('d/m/Y') }}</td>
-                                        <td>{{ $roster->duty_roster_total_day }}</td>
+                                        <td><?php echo e($roster->dutyRosterShift->shift_name); ?></td>
+                                        <td><?php echo e(date('h:i A', strtotime($roster->dutyRosterShift->shift_start))); ?></td>
+                                        <td><?php echo e(date('h:i A', strtotime($roster->dutyRosterShift->shift_end))); ?></td>
+                                        <td><?php echo e($roster->dutyRosterShift->shift_hour); ?></td>
+                                        <td><?php echo e(\Carbon\Carbon::parse($roster->duty_roster_start_date)->format('d/m/Y')); ?> - <?php echo e(\Carbon\Carbon::parse($roster->duty_roster_end_date)->format('d/m/Y')); ?></td>
+                                        <td><?php echo e($roster->duty_roster_total_day); ?></td>
                                         <td>
-                                            <!-- <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#viewShift{{ $roster->id }}">
+                                            <!-- <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#viewShift<?php echo e($roster->id); ?>">
                                                 View Shift
                                             </button> -->
                                             <a href="javascript:void(0);" 
                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
-                                                onclick="openEditModal({{ $roster->id }}, {{ $roster->duty_roster_shift_id }}, '{{ $roster->duty_roster_start_date }}', '{{ $roster->duty_roster_end_date }}', {{ $roster->duty_roster_total_day }})">
+                                                onclick="openEditModal(<?php echo e($roster->id); ?>, <?php echo e($roster->duty_roster_shift_id); ?>, '<?php echo e($roster->duty_roster_start_date); ?>', '<?php echo e($roster->duty_roster_end_date); ?>', <?php echo e($roster->duty_roster_total_day); ?>)">
                                                     <i class="ti ti-pencil"></i>
                                             </a>
 
                                             <a href="javascript:void(0);" 
-                                                onclick="confirmDelete('{{ route('dutyroster.destroy', $roster->id) }}')" 
+                                                onclick="confirmDelete('<?php echo e(route('dutyroster.destroy', $roster->id)); ?>')" 
                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
                                                 <i class="ti ti-trash"></i>
                                             </a>
                                             <form id="deleteForm" method="POST" style="display: none;">
-                                                @csrf
-                                                @method('DELETE')
+                                                <?php echo csrf_field(); ?>
+                                                <?php echo method_field('DELETE'); ?>
                                             </form>
 
                                             <!-- Edit Roster Modal -->
@@ -127,8 +127,8 @@
                                                     <div class="modal-dialog modal-dialog-centered modal-md">
                                                         <div class="modal-content">
                                                             <form id="editRosterForm" method="POST">
-                                                                @csrf
-                                                                @method('PUT')
+                                                                <?php echo csrf_field(); ?>
+                                                                <?php echo method_field('PUT'); ?>
                                                                 <div class="modal-header bg-primary text-white">
                                                                     <h5 class="modal-title">Edit Duty Roster</h5>
                                                                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -140,12 +140,12 @@
                                                                     <div class="mb-3">
                                                                         <label for="edit_duty_roster_shift_id" class="form-label">Select Shift</label>
                                                                         <select id="edit_duty_roster_shift_id" name="duty_roster_shift_id" class="form-control" required>
-                                                                            @foreach($shifts as $shift)
-                                                                                <option value="{{ $shift->id }}">{{ $shift->shift_name }}</option>
-                                                                            @endforeach
+                                                                            <?php $__currentLoopData = $shifts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $shift): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                                <option value="<?php echo e($shift->id); ?>"><?php echo e($shift->shift_name); ?></option>
+                                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                         </select>
                                                                     </div>
-                                                                    {{-- START & END DATE --}}
+                                                                    
                                                                     <div class="row">
 
                                                                         <div class="col-md-6 mb-3">
@@ -176,11 +176,11 @@
 
                                         </td>
                                     </tr>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </tbody>
                         </table>
                     </div>
-                @endif
+                <?php endif; ?>
             </div>
         </div>
 
@@ -217,7 +217,7 @@ function openEditModal(id, shiftId, startDate, endDate, totalDays) {
 
     // Update form action URL dynamically
     let form = document.getElementById('editRosterForm');
-    form.action = "{{ route('dutyroster.update', ':id') }}".replace(':id', id);
+    form.action = "<?php echo e(route('dutyroster.update', ':id')); ?>".replace(':id', id);
 
 
     // Show modal
@@ -247,7 +247,7 @@ function confirmDelete(url) {
             let csrf = document.createElement('input');
             csrf.type = 'hidden';
             csrf.name = '_token';
-            csrf.value = '{{ csrf_token() }}';
+            csrf.value = '<?php echo e(csrf_token()); ?>';
             form.appendChild(csrf);
 
             // Spoof DELETE method
@@ -265,14 +265,16 @@ function confirmDelete(url) {
 
 
 </script>
-@if(session('success'))
+<?php if(session('success')): ?>
 <script>
 Swal.fire({
     icon: 'success',
-    title: '{{ session('success') }}',
+    title: '<?php echo e(session('success')); ?>',
     showConfirmButton: false,
     timer: 1500
 });
 </script>
-@endif
-@endsection
+<?php endif; ?>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\hims\resources\views/admin/duty-roster/roster_list_details.blade.php ENDPATH**/ ?>

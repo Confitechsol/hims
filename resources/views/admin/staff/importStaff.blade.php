@@ -39,7 +39,7 @@
     <div class="col-md-11">
         <div class="card shadow-sm border-0 mt-4">
             <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Import Patient</h5>
+                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Import Staff</h5>
             </div>
 
             <div class="card-body">
@@ -69,9 +69,9 @@
 
 
                                         <div class="text-end d-flex">
-                                            <button id ="exportBtn"
-                                                class="btn btn-primary text-white ms-2 fs-13 btn-md"><i
-                                                    class="ti ti-download me-1"></i>Download Sample Data</button>
+                                            <a href="{{ route('staffs.export') }}" class="btn btn-primary text-white ms-2 fs-13 btn-md"><i
+                                                    class="ti ti-download me-1"></i>Download Sample Data</a>
+                                            
                                         </div>
                                     </div>
 
@@ -88,11 +88,11 @@
                                                 that
                                                 your file is UTF-8 to avoid unnecessary encoding problems.
                                             </li>
-                                            <li class="mb-2">For patient 'Gender' use Male, Female value.</li>
+                                            <li class="mb-2">For Staff 'Gender' use Male, Female value.</li>
                                             <li class="mb-2">For Age column 'Age (year)' and 'Age (month)' and 'Age
                                                 (day)' make sure
                                                 that is numbers only.</li>
-                                            <li>For patient 'Marital Status' use Single, Married, Widowed, Separated,
+                                            <li>For Staff 'Marital Status' use Single, Married, Widowed, Separated,
                                                 Not Specified value.</li>
                                         </ol>
                                     </div>
@@ -119,25 +119,45 @@
                                     <table class="table table-bordered mb-0" id="table">
                                         <thead>
                                             <tr>
-                                                <th>Patient</th>
-                                                <th>Gender</th>
-                                                <th>Blood Group</th>
-                                                <th>Age(Year)</th>
-                                                <th>Age(Month)</th>
-                                                <th>Age(Day)</th>
-                                                <th>Marital Status</th>
-                                                <th>Phone</th>
+                                                
+                                                <th>First Name</th>
+                                                <th>Last Name</th>
+                                                <th>Department</th>
+                                                <th>Designation</th>
+                                                <th>specialization</th>
+                                                <th>Qualification</th>
+                                                <th>Work Experience</th>
+                                                <th>Fathers Name</th>
+                                                <th>Mothers Name</th>
+                                                <th>Contact Number</th>
+                                                <th>Emergency Contact Number</th>
                                                 <th>Email</th>
-                                                <th>Address</th>
-                                                <th>Remarks</th>
-                                                <th>Known Allergies</th>
+                                                <th>DOB</th>
+                                                <th>Marital Status</th>
+                                                <th>Date of Joining</th>
+                                                <th>Date of Leaving</th>
+                                                <th>Local Address</th>
+                                                <th>Permanent Address</th>
+                                                <th>Gender</th>                                              
+                                                <th>Blood Group</th>
                                                 <th>Identification Number</th>
-                                                <th>TPA ID</th>
-                                                <th>TPA Validity</th>
+                                                <th>PAN</th>
+                                                <th>Employee Id</th>
+                                                <th>Remarks</th>
+
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr>
+                                                <td>Sample Data</td>
+                                                <td>Sample Data</td>
+                                                <td>Sample Data</td>
+                                                <td>Sample Data</td>
+                                                <td>Sample Data</td>
+                                                <td>Sample Data</td>
+                                                <td>Sample Data</td>
+                                                <td>Sample Data</td>
+                                                <td>Sample Data</td>
                                                 <td>Sample Data</td>
                                                 <td>Sample Data</td>
                                                 <td>Sample Data</td>
@@ -160,32 +180,24 @@
 
 
                                 <div class="import_form">
-                                    <form action="{{ route('patients.import') }}" method="POST"
+                                    <form action="{{ route('Staffs.import') }}" method="POST"
                                         enctype="multipart/form-data">
                                         @csrf
                                         <div class="row">
-                                            <!-- <div class="col-md-6">
-                                                <label for="" class="form-label">
-                                                    Blood Group</label>
-                                                <select name="blood_group" class="form-select">
-                                                    <option value=""> Select</option>
-                                                    <option value="1"> O+</option>
-                                                    <option value="2"> A+</option>
-                                                    <option value="3"> B+</option>
-                                                    <option value="4"> AB+</option>
-                                                    <option value="5"> O-</option>
-                                                    <option value="6"> AB-</option>
-                                                </select>
-                                            </div> -->
+                                           
                                             <div class="col-md-12">
                                                 <label for="" class="form-label">
                                                     Select CSV File <span class="text-danger">*</span></label>
-                                                <input type="file" name="csv_file" id="csv_file" class="form-control"
+                                                <input type="file" name="file" id="csv_file" class="form-control"
                                                     required accept=".csv">
                                             </div>
                                         </div>
                                         <button type="submit" class="btn btn-primary ms-auto d-block mt-3"><i
-                                                class="fa-solid fa-cloud-arrow-up"></i> Import Patients</button>
+                                                class="fa-solid fa-cloud-arrow-up"></i> Import Staffs</button>
+
+                                               
+
+  
                                     </form>
                                 </div>
 
@@ -239,20 +251,62 @@
         const blob = new Blob([csv], { type: 'text/csv' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = 'patients.csv';
+        link.download = 'Staffs.csv';
         link.click();
     }
     
 </script>
+
+
 <script>
-    document.getElementById("exportBtn").addEventListener("click", function() {
-      const table = document.getElementById("table");
-      if (!table) {
+    const departmentList = @json($departments);
+
+</script>
+<script>
+document.getElementById("exportBtn").addEventListener("click", function () {
+
+    const table = document.getElementById("table");
+    if (!table) {
         alert("Table not found!");
         return;
-      }
-      const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
-      XLSX.writeFile(wb, "patients.xlsx");
-    });
-  </script>
+    }
+
+    const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+    const ws = wb.Sheets["Sheet1"];
+
+    // Freeze header row
+    ws['!freeze'] = { xSplit: 0, ySplit: 1 };
+
+    // Dropdown lists
+    const deptValues = departmentList.join(",");
+    const maritalValues = "Single,Married,Divorced,Widowed";
+    const genderValues = "Male,Female,Other";
+    const bloodValues = "A+,A-,B+,B-,O+,O-,AB+,AB-";
+
+    // Create a validation map
+    const DV = [];
+    function addValidation(range, values) {
+        DV.push({
+            sqref: range,
+            type: "list",
+            allowBlank: true,
+            formula1: `"${values}"`
+        });
+    }
+
+    // Apply dropdowns (Column ranges)
+    addValidation("C2:C500", deptValues);    // Department
+    addValidation("N2:N500", maritalValues); // Marital Status
+    addValidation("S2:S500", genderValues);  // Gender
+    addValidation("T2:T500", bloodValues);   // Blood Group
+
+    // Assign to worksheet
+    ws['!dataValidation'] = DV;
+
+    XLSX.writeFile(wb, "Staffs.xlsx");
+});
+</script>
+
+
+
 @endsection

@@ -63,6 +63,7 @@ use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\TpamanagmentController;
 use App\Http\Controllers\VisitorsController;
 use App\Http\Controllers\VitalController;
+use App\Http\Controllers\StaffController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -305,7 +306,7 @@ Route::middleware(['admin'])->group(function () {
     Route::put('/death/update', [DeathController::class, 'update'])->name('death.update');
     Route::delete('/death/delete', [DeathController::class, 'delete'])->name('death.delete');
 
-    Route::get('/visitors', [VisitorsController::class, 'index']);
+    Route::get('/visitors', [VisitorsController::class, 'index'])->name('visitors');
 
 });
 
@@ -596,6 +597,22 @@ Route::prefix('dutyroster')->group(function () {
     // Route::get('/show/{id}', [DutyRosterController::class, 'show'])->name('dutyroster.show');
 });
 Route::prefix('ambulance')->group(function () {
+});
+Route::prefix('staffs')->group(function () {
+    
+    Route::get('/', [StaffController::class, 'index'])->name('staffs.index');
+    Route::get('/create', [StaffController::class, 'create'])->name('createStaff');
+    Route::post('/addStaff', [StaffController::class, 'store'])->name('staff.store');
+    
+    Route::get('/import', [StaffController::class, 'importStaff'])->name('Staff-import');
+    Route::post('/bulkimport', [StaffController::class, 'importStaffExcel'])->name('Staffs.import');
+
+    Route::get('/export-staffs', [StaffController::class, 'exportStaffExcel'])->name('staffs.export');
+
+
+    Route::put('/edit/{id}', [BloodDonorController::class, 'editDoner'])->name('bloodBank.editDoner');
+    Route::put('/update/{id}', [BloodDonorController::class, 'updateDonor'])->name('bloodBank.updateDoner');
+    Route::delete('/destroy', [BloodDonorController::class, 'destroyDonor'])->name('Staffs.bulkDelete');
 });
 Route::prefix('bloodBank')->group(function () {
 

@@ -91,7 +91,7 @@ class PatientController extends Controller
         if ($request->isMethod('post')) {
             $request->validate([
                 'csv_file'    => 'required|file|mimes:csv,txt',
-                'blood_group' => 'required|in:1,2,3,4,5,6',
+                // 'blood_group' => 'required|in:1,2,3,4,5,6',
             ]);
             $bloodGroups = [
                 '1' => 'O+',
@@ -101,7 +101,7 @@ class PatientController extends Controller
                 '5' => 'O-',
                 '6' => 'AB-',
             ];
-            $bloodGroupText = $bloodGroups[$request->input('blood_group')];
+            // $bloodGroupText = $bloodGroups[$request->input('blood_group')];
             $file           = $request->file('csv_file');
             $path           = $file->getRealPath();
 
@@ -116,6 +116,7 @@ class PatientController extends Controller
             $expected = [
                 'patient',
                 'gender',
+                'blood group',
                 'age(year)',
                 'age(month)',
                 'age(day)',
@@ -129,6 +130,7 @@ class PatientController extends Controller
                 'tpa id',
                 'tpa validity',
             ];
+            //dd($header, $expected);
             if ($header !== $expected) {
                 return back()->with('error', 'CSV header does not match expected format.');
             }
@@ -144,19 +146,20 @@ class PatientController extends Controller
                 Patient::create([
                     'patient_name'          => $row[0],
                     'gender'                => $row[1],
-                    'age'                   => $row[2],
-                    'month'                 => $row[3],
-                    'day'                   => $row[4],
-                    'marital_status'        => $row[5],
-                    'mobileno'              => $row[6],
-                    'email'                 => $row[7],
-                    'address'               => $row[8],
-                    'note'                  => $row[9],
-                    'known_allergies'       => $row[10],
-                    'identification_number' => $row[11],
-                    'insurance_id'          => $row[12],
-                    'insurance_validity'    => \Carbon\Carbon::parse($row[13])->format('Y-m-d'),
-                    'blood_group'           => $bloodGroupText,
+                    'blood_group'           => $row[2],
+                    'age'                   => $row[3],
+                    'month'                 => $row[4],
+                    'day'                   => $row[5],
+                    'marital_status'        => $row[6],
+                    'mobileno'              => $row[7],
+                    'email'                 => $row[8],
+                    'address'               => $row[9],
+                    'note'                  => $row[10],
+                    'known_allergies'       => $row[11],
+                    'identification_number' => $row[12],
+                    'insurance_id'          => $row[13],
+                    'insurance_validity'    => \Carbon\Carbon::parse($row[14])->format('Y-m-d'),
+                    
                 ]);
                 // }
                 return back()->with('success', 'Patients imported successfully.');
