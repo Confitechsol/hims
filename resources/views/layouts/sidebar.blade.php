@@ -501,7 +501,7 @@
                                     <li><a href="{{ route('permissions.modules') }}">Modules</a></li>
                                 </ul>
                             </li>
-                            <li><a href="{{ route('patients') }}">Patient</a></li>
+                            <li><a href="{{ route('patients') }}"><i class="ti ti-user-cog"></i><span> Patient </span></a></li>
                             
                             <li class="submenu">
                                 <a href="javascript:void(0);">
