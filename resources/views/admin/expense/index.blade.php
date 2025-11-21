@@ -97,7 +97,7 @@
                                                                     data-attach_document="{{ $expense->attach_document ?? '' }}">
                                                                     <i class="ti ti-pencil"></i>
                                                                 </button>
-                                                                <form method="POST" action="" class="ms-2">
+                                                                <form method="POST" action="{{ route('expense.delete', $expense->id) }}" class="ms-2">
                                                                     @csrf
                                                                     @method('DELETE')
                                                                     <input type="hidden" name="id" value="{{ $expense->id }}">
@@ -165,12 +165,22 @@
     </div>
     </div>
     </div>
-    <x-modals.form-modal type="add" id="createModal" title="Add Expense" action="{{ route('tpamanagement.store') }}"
+    @php
+        $expenseOptions = [];
+        if (!empty($expenseHeads)) {
+            $expenseOptions = collect($expenseHeads)->mapWithKeys(function ($item) {
+                return [$item->id => $item->exp_category];
+            })->toArray();
+        }
+    @endphp
+
+    <x-modals.form-modal type="add" id="createModal" title="Add Expense" action="{{ route('expense.create') }}"
         :fields="[
             [
                 'name' => 'expense_name',
                 'label' => 'Expense Head',
-                'type' => 'text',
+                'type' => 'select',
+                'options' => $expenseOptions,
                 'required' => true,
                 'size' => '5',
             ],
@@ -204,12 +214,13 @@
             ],
         ]" :columns="3" />
     <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Expense"
-        action="{{ route('tpamanagement.update') }}" :fields="[
+        action="{{ url('/expense/update') }}" :fields="[
             ['name' => 'id', 'type' => 'hidden', 'required' => true],
             [
                 'name' => 'expense_name',
                 'label' => 'Expense Head',
-                'type' => 'text',
+                'type' => 'select',
+                'options' => $expenseOptions,
                 'required' => true,
                 'size' => '5',
             ],
