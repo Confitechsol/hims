@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Floor;
+use Illuminate\Support\Facades\Auth;
 class FloorController extends Controller
 {
     public function index(Request $request)

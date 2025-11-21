@@ -176,26 +176,22 @@
                                     <li><a href="doctor-schedule.html">Doctor
                                             Schedule</a></li>
                                 </ul>
-                            </li>
+                            </li>-->
                             <li class="submenu">
                                 <a href="javascript:void(0);">
-                                    <i class="ti ti-user-heart"></i><span>Patients</span>
+                                    <i class="ti ti-user-heart"></i><span>OPD & IPD </span>
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{route('patients')}}">Patients</a></li>
-                                    <li><a href="patient-details.html">Patient
+                                    
+                                    <li><a href="{{ route('opd') }}">OPD Patient
                                             Details</a></li>
-                                    <li><a href="create-patient.html">Create
-                                            Patient</a></li>
-                                    <li><a href="patient-details.html">OPD Patient
-                                            Details</a></li>
-                                    <li><a href="patient-details.html">IPD Patient
+                                    <li><a href="{{ route('ipd') }}">IPD Patient
                                             Details</a></li>
 
 
                                 </ul>
-                            </li>-->
+                            </li>
                             <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-calendar-check"></i><span>Appointments</span>
@@ -205,9 +201,9 @@
                                     <li><a href="{{ route('appointment-details') }}">Appointment Details</a></li>
                                     <!--<li><a href="new-appointment.html">New
                                             Appointment</a></li>
-                                    <li><a href="appointment-calendar.html">Calendar</a></li>
+                                    <li><a href="appointment-calendar.html">Calendar</a></li> -->
                                 
-                            </li>-->
+                            </li>
                             </ul>
                             <li class="submenu">
                                 <a href="javascript:void(0);">
@@ -386,26 +382,26 @@
                             <li>
                         <ul>
                             <li>
-                                <a href="staffs.html">
+                                <a href="{{ route('staffs.index') }}">
                                     <i class="ti ti-users-group"></i><span>Staffs</span>
                                 </a>
                             </li>
-                            <li>
+                            <!-- <li>
                                 <a href="hrm-departments.html">
                                     <i class="ti ti-building-bank"></i><span>Departments</span>
                                 </a>
-                            </li>
-                            <li>
+                            </li> -->
+                            <!-- <li>
                                 <a href="designation.html">
                                     <i class="ti ti-user-cog"></i><span>Designation</span>
                                 </a>
-                            </li>
-                            <li>
+                            </li> -->
+                            <!-- <li>
                                 <a href="attendance.html">
                                     <i class="ti ti-user-check"></i><span>Attendance</span>
                                 </a>
-                            </li>
-                            <li class="submenu">
+                            </li> -->
+                            <!-- <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-users-minus"></i><span>Leaves</span>
                                     <span class="menu-arrow"></span>
@@ -415,17 +411,17 @@
                                     <li><a href="leave-type.html">Leave
                                             Type</a></li>
                                 </ul>
-                            </li>
-                            <li>
+                            </li> -->
+                            <!-- <li>
                                 <a href="holidays.html">
                                     <i class="ti ti-home-exclamation"></i><span>Holidays</span>
                                 </a>
-                            </li>
-                            <li>
+                            </li> -->
+                            <!-- <li>
                                 <a href="payroll.html">
                                     <i class="ti ti-coin"></i><span>Payroll</span>
                                 </a>
-                            </li>
+                            </li> -->
                         </ul>
                             </li>
                             <li class="submenu">
@@ -727,7 +723,7 @@
                                             Reason</a></li>
                                 </ul>
                             </li>
-                            <li class="submenu">
+                            <!-- <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-device-mobile-cog"></i><span>App
                                         Settings</span>
@@ -742,7 +738,7 @@
                                     <li><a href="custom-fields-settings.html">Custom
                                             Fields</a></li>
                                 </ul>
-                            </li>
+                            </li> -->
                             <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-device-desktop-cog"></i><span>System
