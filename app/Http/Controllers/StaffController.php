@@ -12,6 +12,7 @@ use App\Models\BloodBankProduct;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
+use Illuminate\Support\Facades\Auth;
 
 
 
@@ -59,7 +60,9 @@ class StaffController extends Controller
         //dd($request->all());
 
         $staff = new Staff();
-        $staff->employee_id = $request->employee_id;
+        $staff->hospital_id     = Auth::user()->hospital_id;
+        $staff->branch_id       = Auth::user()->branch_id ?? null;
+        $staff->employee_id     = $request->employee_id;
         $staff->role_id = $request->role;
         $staff->staff_designation_id = $request->designation;
         $staff->department_id = $request->department;
@@ -361,6 +364,7 @@ class StaffController extends Controller
             $bloodGroupId  = BloodBankProduct::where('name', $bloodGroupName)->value('id');
             $specialistId  = Specialist::where('specialist_name', $specialistName)->value('id');
             $rolesId       = Role::where('name', $rolesName)->value('id');
+            
 
 
             // Validate existence
@@ -382,6 +386,8 @@ class StaffController extends Controller
 
             // Insert into staff table
             Staff::create([
+                'hospital_id'               => Auth::user()->hospital_id,
+                'branch_id'                 => Auth::user()->branch_id ?? null,
                 'employee_id'               => $employeeId,
                 'name'                      => $firstName,
                 'surname'                   => $lastName,
@@ -411,6 +417,7 @@ class StaffController extends Controller
                 'password'                  => '123456',
                 'user_id'                   => 0,
                 'is_active'                 => 1,
+                
             ]);
         }
 
