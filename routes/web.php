@@ -68,7 +68,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('home.homeScreen');
-})->name('dashboard');
+})->name('homescreen');
 
 Route::get('/doctors', function () {
     return view('home.doctors');

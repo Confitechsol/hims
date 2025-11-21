@@ -250,11 +250,11 @@
                                     <i class="ti ti-map-pin"></i><span>Ambulance Call</span>
                                 </a>
                             </li>
-                            <li>
+                            <!-- <li>
                                 <a href="#">
                                     <i class="ti ti-map-pin"></i><span>Front Office</span>
                                 </a>
-                            </li>
+                            </li> -->
                             <li class="submenu">
                                 <a href="javascript:void(0);" class="active subdrop">
                                     <i class="ti ti-layout-dashboard"></i><span>Duty Roster</span>
@@ -535,7 +535,11 @@
                                     
                                 </ul>
                             </li>
-                            <li><a href="<?php echo e(route('letterHead')); ?>">Print Header Footer</a></li>
+                            <li><a href="<?php echo e(route('letterHead')); ?>">
+                                    <i class="ti ti-world-cog"></i>
+                                    <span>Print Header Footer</span>
+                                </a>
+                            </li>
                             <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-world-cog"></i><span>Front
