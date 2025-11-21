@@ -292,7 +292,7 @@ Route::middleware(['admin'])->group(function () {
 
     Route::get('/income', [IncomeController::class, 'index'])->name('income');
     Route::post('/income/create', [IncomeController::class, 'create'])->name('income.create');
-    Route::put('/income/update', [IncomeController::class, 'update'])->name('income.update');
+    Route::put('/income/update/{id}', [IncomeController::class, 'update'])->name('income.update');
     Route::delete('/income/destroy', [IncomeController::class, 'destroy'])->name('income.destroy');
 
     Route::get('/expense', [ExpenseController::class, 'index'])->name('expense');

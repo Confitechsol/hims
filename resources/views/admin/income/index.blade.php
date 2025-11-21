@@ -217,7 +217,7 @@
             
         ]" :columns="2" />
     <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Company Name"
-        action="{{ route('income.update') }}" :fields="[
+        action="{{ url('/income/update') }}" :fields="[
             ['name' => 'id', 'type' => 'hidden', 'required' => true],
             [
                 'name' => 'income_head_id',
