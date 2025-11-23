@@ -52,6 +52,25 @@
                         </div>
                     </div>
 
+                    <!-- TPA Section -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="form-check mb-3">
+                                <input type="checkbox" class="form-check-input" id="activate_tpa" name="activate_tpa">
+                                <label class="form-check-label" for="activate_tpa">
+                                    Activate TPA
+                                </label>
+                            </div>
+                            <div id="tpa_dropdown_container" style="display: none;">
+                                <label class="form-label">Select TPA <span class="text-danger">*</span></label>
+                                <select name="organisation_id" id="tpa_dropdown" class="form-select">
+                                    <option value="">Select TPA</option>
+                                </select>
+                                <small class="text-muted" id="tpa_help_text"></small>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Test Selection Table -->
                     <div class="row mb-4">
                         <div class="col-12">
@@ -250,6 +269,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const selectedOption = this.options[this.selectedIndex];
         const row = $(this).closest('tr');
+        const testId = this.value;
         
         console.log('Selected option:', selectedOption.text);
         console.log('Data attributes:', {
@@ -258,16 +278,43 @@ document.addEventListener('DOMContentLoaded', function() {
             amount: selectedOption.getAttribute('data-amount')
         });
         
-        if (this.value) {
+        if (testId) {
             const reportDays = selectedOption.getAttribute('data-report-days') || 0;
             const tax = selectedOption.getAttribute('data-tax') || 0;
-            const amount = selectedOption.getAttribute('data-amount') || 0;
+            const standardAmount = parseFloat(selectedOption.getAttribute('data-amount')) || 0;
             
-            console.log('Setting values - Days:', reportDays, 'Tax:', tax, 'Amount:', amount);
+            // Store original charge
+            originalCharges[testId] = standardAmount;
+            
+            console.log('Setting values - Days:', reportDays, 'Tax:', tax, 'Amount:', standardAmount);
             
             row.find('.report_days').val(reportDays);
             row.find('.tax_percentage').val(tax);
-            row.find('.test_amount').val(amount);
+            
+            // Check if TPA is active and get TPA charge
+            const activateTpa = document.getElementById('activate_tpa').checked;
+            const tpaDropdown = document.getElementById('tpa_dropdown');
+            const organisationId = tpaDropdown ? tpaDropdown.value : null;
+            
+            if (activateTpa && organisationId) {
+                // Fetch TPA charge
+                fetch(`/hims/pathology/billing/api/tpa-charge?test_id=${testId}&organisation_id=${organisationId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const amountToUse = (data.tpa_charge !== null && data.tpa_charge !== undefined) 
+                            ? data.tpa_charge 
+                            : standardAmount;
+                        row.find('.test_amount').val(amountToUse.toFixed(2));
+                        calculateTotals();
+                    })
+                    .catch(error => {
+                        console.error('Error fetching TPA charge:', error);
+                        row.find('.test_amount').val(standardAmount.toFixed(2));
+                        calculateTotals();
+                    });
+            } else {
+                row.find('.test_amount').val(standardAmount.toFixed(2));
+            }
             
             // Calculate report date
             const reportingDate = new Date(document.getElementById('date').value);
@@ -282,7 +329,9 @@ document.addEventListener('DOMContentLoaded', function() {
             row.find('.report_date').val(today);
         }
         
-        calculateTotals();
+        if (!activateTpa || !organisationId) {
+            calculateTotals();
+        }
     });
 
     // Discount handler
@@ -418,6 +467,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         hiddenInput.value = patient.id;
                         suggestionsDiv.style.display = 'none';
                         loadPatientPrescriptions(patient.id);
+                        loadPatientTpas(patient.id);
                     });
                     suggestionsDiv.appendChild(div);
                 });
@@ -501,6 +551,145 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => {
                 console.error('Error loading prescriptions:', error);
             });
+    }
+
+    function loadPatientTpas(patientId) {
+        const helpText = document.getElementById('tpa_help_text');
+        helpText.textContent = 'Loading TPAs...';
+        helpText.className = 'text-muted';
+        
+        fetch(`/hims/pathology/billing/api/patient-tpas/${patientId}`)
+            .then(response => response.json())
+            .then(data => {
+                const tpaDropdown = document.getElementById('tpa_dropdown');
+                tpaDropdown.innerHTML = '<option value="">Select TPA</option>';
+                
+                if (data && data.length > 0) {
+                    data.forEach(tpa => {
+                        const option = document.createElement('option');
+                        option.value = tpa.id;
+                        option.textContent = tpa.name + (tpa.code ? ' (' + tpa.code + ')' : '');
+                        tpaDropdown.appendChild(option);
+                    });
+                    helpText.textContent = `${data.length} TPA(s) found for this patient`;
+                    helpText.className = 'text-success';
+                } else {
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = 'No TPA found for this patient';
+                    option.disabled = true;
+                    tpaDropdown.appendChild(option);
+                    helpText.textContent = 'No TPA found for this patient. TPA charges will not be available.';
+                    helpText.className = 'text-warning';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading TPAs:', error);
+                helpText.textContent = 'Error loading TPAs. Please try again.';
+                helpText.className = 'text-danger';
+            });
+    }
+
+    // Store original charges for each test
+    let originalCharges = {};
+
+    // TPA checkbox handler
+    document.getElementById('activate_tpa').addEventListener('change', function() {
+        const tpaContainer = document.getElementById('tpa_dropdown_container');
+        const tpaDropdown = document.getElementById('tpa_dropdown');
+        const helpText = document.getElementById('tpa_help_text');
+        
+        if (this.checked) {
+            tpaContainer.style.display = 'block';
+            tpaDropdown.required = true;
+            const patientId = document.getElementById('patient_id').value;
+            if (patientId) {
+                loadPatientTpas(patientId);
+            } else {
+                helpText.textContent = 'Please select a patient first';
+                helpText.className = 'text-danger';
+            }
+        } else {
+            tpaContainer.style.display = 'none';
+            tpaDropdown.required = false;
+            tpaDropdown.value = '';
+            helpText.textContent = '';
+            // Revert all test charges to standard charges
+            revertToStandardCharges();
+        }
+    });
+
+    // TPA dropdown change handler
+    document.getElementById('tpa_dropdown').addEventListener('change', function() {
+        const organisationId = this.value;
+        if (organisationId) {
+            applyTpaCharges(organisationId);
+        } else {
+            revertToStandardCharges();
+        }
+    });
+
+    function applyTpaCharges(organisationId) {
+        const testRows = document.querySelectorAll('.test-row');
+        let promises = [];
+
+        testRows.forEach((row, index) => {
+            const testSelect = row.querySelector('.test_name');
+            if (testSelect && testSelect.value) {
+                const testId = testSelect.value;
+                
+                // Store original charge if not already stored
+                if (!originalCharges[testId]) {
+                    const amountInput = row.querySelector('.test_amount');
+                    originalCharges[testId] = parseFloat(amountInput.value) || 0;
+                }
+
+                // Fetch TPA charge for this test
+                const promise = fetch(`/hims/pathology/billing/api/tpa-charge?test_id=${testId}&organisation_id=${organisationId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const amountInput = row.querySelector('.test_amount');
+                        if (data.tpa_charge !== null && data.tpa_charge !== undefined) {
+                            amountInput.value = data.tpa_charge.toFixed(2);
+                        } else {
+                            // If no TPA charge found, use standard charge
+                            amountInput.value = data.standard_charge.toFixed(2);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching TPA charge:', error);
+                    });
+                
+                promises.push(promise);
+            }
+        });
+
+        Promise.all(promises).then(() => {
+            calculateTotals();
+        });
+    }
+
+    function revertToStandardCharges() {
+        const testRows = document.querySelectorAll('.test-row');
+        
+        testRows.forEach((row) => {
+            const testSelect = row.querySelector('.test_name');
+            if (testSelect && testSelect.value) {
+                const testId = testSelect.value;
+                const amountInput = row.querySelector('.test_amount');
+                
+                if (originalCharges[testId] !== undefined) {
+                    amountInput.value = originalCharges[testId].toFixed(2);
+                } else {
+                    // Get standard charge from option data
+                    const selectedOption = testSelect.options[testSelect.selectedIndex];
+                    const standardCharge = parseFloat(selectedOption.getAttribute('data-amount')) || 0;
+                    amountInput.value = standardCharge.toFixed(2);
+                }
+            }
+        });
+        
+        calculateTotals();
     }
 
     function handleKeyNavigation(e, suggestionsDiv) {

@@ -1,4 +1,3 @@
-
 <?php $__env->startSection('content'); ?>
     <div class="row justify-content-center">
         <div class="col-md-11">
@@ -46,6 +45,8 @@
                                                     <th>Short Name</th>
                                                     <th>Test Type</th>
                                                     <th>Category</th>
+                                                    <th>Charge Category</th>
+                                                    <th>Charge Name</th>
                                                     <th>Sub Category</th>
                                                     <th>Method</th>
                                                     <th>Report Days</th>
@@ -63,12 +64,14 @@
                                                         <td><?php echo e($test->short_name); ?></td>
                                                         <td><?php echo e($test->test_type ?? '-'); ?></td>
                                                         <td><?php echo e($test->category->category_name ?? '-'); ?></td>
+                                                        <td><?php echo e($test->chargeCategory->name ?? ($test->charge && $test->charge->category ? $test->charge->category->name : '-')); ?></td>
+                                                        <td><?php echo e($test->charge->name ?? '-'); ?></td>
                                                         <td><?php echo e($test->sub_category ?? '-'); ?></td>
                                                         <td><?php echo e($test->method ?? '-'); ?></td>
                                                         <td><?php echo e($test->report_days ?? '-'); ?></td>
                                                         <td><?php echo e($test->charge && $test->charge->taxCategory ? number_format($test->charge->taxCategory->percentage, 2) : '0.00'); ?>%</td>
-                                                        <td>₹<?php echo e(number_format($test->standard_charge ?? 0, 2)); ?></td>
-                                                        <td class="fw-bold">₹<?php echo e(number_format($test->amount ?? 0, 2)); ?></td>
+                                                        <td>₹<?php echo e(number_format($test->standard_charge ?? ($test->charge ? $test->charge->standard_charge : 0), 2)); ?></td>
+                                                        <td class="fw-bold">₹<?php echo e(number_format($test->amount ?? ($test->charge ? ($test->charge->standard_charge + ($test->charge->standard_charge * ($test->charge->taxCategory ? $test->charge->taxCategory->percentage : 0) / 100)) : 0), 2)); ?></td>
                                                         <td>
                                                             <div class="d-flex gap-2">
                                                                 <a href="<?php echo e(route('pathology.test.show', $test->id)); ?>" class="btn btn-sm btn-info text-white" title="View">

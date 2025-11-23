@@ -28,6 +28,7 @@ use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PharmacyCompanyController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RolesController;
+use App\Http\Controllers\AppSwitchController;
 use App\Http\Controllers\Setup\CompanyListController;
 use App\Http\Controllers\Setup\DosageDurationController;
 use App\Http\Controllers\Setup\DoseIntervalController;
@@ -83,6 +84,8 @@ Route::get('/ufpassword', function () {
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 
 Route::post('/login', [LoginController::class, 'login'])->name('login');
+
+Route::middleware(['auth'])->get('/hr-portal/redirect', [AppSwitchController::class, 'switchToClient'])->name('hrms.switch');
 
 Route::middleware(['admin'])->group(function () {
     Route::get('/dashboard', function () {
@@ -655,6 +658,7 @@ Route::prefix('pathology/test')->group(function () {
     Route::get('/', [PathologyTestController::class, 'index'])->name('pathology.test.index');
     Route::get('/create', [PathologyTestController::class, 'create'])->name('pathology.test.create');
     Route::post('/store', [PathologyTestController::class, 'store'])->name('pathology.test.store');
+    Route::put('/tpa-charge/update', [PathologyTestController::class, 'updateTpaCharge'])->name('pathology.test.update-tpa-charge');
     Route::get('/{id}', [PathologyTestController::class, 'show'])->name('pathology.test.show');
     Route::get('/{id}/edit', [PathologyTestController::class, 'edit'])->name('pathology.test.edit');
     Route::put('/{id}', [PathologyTestController::class, 'update'])->name('pathology.test.update');
@@ -682,6 +686,8 @@ Route::prefix('pathology/billing')->group(function () {
 Route::prefix('pathology/billing/api')->group(function () {
     Route::get('/patient-prescriptions/{patientId}', [PathologyBillingController::class, 'getPatientPrescriptions'])->name('pathology.billing.api.patient-prescriptions');
     Route::get('/test-details', [PathologyBillingController::class, 'getTestDetails'])->name('pathology.billing.api.test-details');
+    Route::get('/patient-tpas/{patientId}', [PathologyBillingController::class, 'getPatientTpas'])->name('pathology.billing.api.patient-tpas');
+    Route::get('/tpa-charge', [PathologyBillingController::class, 'getTpaCharge'])->name('pathology.billing.api.tpa-charge');
 });
 
 // Pharmacy Masters Routes

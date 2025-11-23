@@ -1,5 +1,4 @@
-@extends('layouts.adminLayout')
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="row justify-content-center">
         <div class="col-md-11">
             <div class="card shadow-sm border-0 mt-4">
@@ -12,12 +11,12 @@
                 <div class="card-body">
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <a href="{{ route('pathology.test.index') }}" class="btn btn-secondary">
+                            <a href="<?php echo e(route('pathology.test.index')); ?>" class="btn btn-secondary">
                                 <i class="ti ti-arrow-left me-1"></i>Back to List
                             </a>
                         </div>
                         <div class="col-md-6 text-end">
-                            <a href="{{ route('pathology.test.edit', $test->id) }}" class="btn btn-warning text-white">
+                            <a href="<?php echo e(route('pathology.test.edit', $test->id)); ?>" class="btn btn-warning text-white">
                                 <i class="ti ti-edit me-1"></i>Edit
                             </a>
                         </div>
@@ -28,31 +27,31 @@
                             <table class="table table-bordered">
                                 <tr>
                                     <th width="40%">Test Name:</th>
-                                    <td>{{ $test->test_name }}</td>
+                                    <td><?php echo e($test->test_name); ?></td>
                                 </tr>
                                 <tr>
                                     <th>Short Name:</th>
-                                    <td>{{ $test->short_name }}</td>
+                                    <td><?php echo e($test->short_name); ?></td>
                                 </tr>
                                 <tr>
                                     <th>Test Type:</th>
-                                    <td>{{ $test->test_type ?? '-' }}</td>
+                                    <td><?php echo e($test->test_type ?? '-'); ?></td>
                                 </tr>
                                 <tr>
                                     <th>Category:</th>
-                                    <td>{{ $test->category->category_name ?? '-' }}</td>
+                                    <td><?php echo e($test->category->category_name ?? '-'); ?></td>
                                 </tr>
                                 <tr>
                                     <th>Sub Category:</th>
-                                    <td>{{ $test->sub_category ?? '-' }}</td>
+                                    <td><?php echo e($test->sub_category ?? '-'); ?></td>
                                 </tr>
                                 <tr>
                                     <th>Method:</th>
-                                    <td>{{ $test->method ?? '-' }}</td>
+                                    <td><?php echo e($test->method ?? '-'); ?></td>
                                 </tr>
                                 <tr>
                                     <th>Report Days:</th>
-                                    <td>{{ $test->report_days ?? '-' }}</td>
+                                    <td><?php echo e($test->report_days ?? '-'); ?></td>
                                 </tr>
                             </table>
                         </div>
@@ -61,29 +60,29 @@
                             <table class="table table-bordered">
                                 <tr>
                                     <th width="40%">Charge Category:</th>
-                                    <td>{{ $test->chargeCategory->name ?? ($test->charge && $test->charge->category ? $test->charge->category->name : '-') }}</td>
+                                    <td><?php echo e($test->chargeCategory->name ?? ($test->charge && $test->charge->category ? $test->charge->category->name : '-')); ?></td>
                                 </tr>
                                 <tr>
                                     <th>Charge Name:</th>
-                                    <td>{{ $test->charge->name ?? '-' }}</td>
+                                    <td><?php echo e($test->charge->name ?? '-'); ?></td>
                                 </tr>
                                 <tr>
                                     <th>Standard Charge:</th>
-                                    <td>₹{{ number_format($test->standard_charge ?? ($test->charge ? $test->charge->standard_charge : 0), 2) }}</td>
+                                    <td>₹<?php echo e(number_format($test->standard_charge ?? ($test->charge ? $test->charge->standard_charge : 0), 2)); ?></td>
                                 </tr>
                                 <tr>
                                     <th>Tax (%):</th>
-                                    <td>{{ $test->charge && $test->charge->taxCategory ? number_format($test->charge->taxCategory->percentage, 2) : '0.00' }}%</td>
+                                    <td><?php echo e($test->charge && $test->charge->taxCategory ? number_format($test->charge->taxCategory->percentage, 2) : '0.00'); ?>%</td>
                                 </tr>
                                 <tr>
                                     <th>Amount:</th>
-                                    <td class="fw-bold">₹{{ number_format($test->amount ?? ($test->charge ? ($test->charge->standard_charge + ($test->charge->standard_charge * ($test->charge->taxCategory ? $test->charge->taxCategory->percentage : 0) / 100)) : 0), 2) }}</td>
+                                    <td class="fw-bold">₹<?php echo e(number_format($test->amount ?? ($test->charge ? ($test->charge->standard_charge + ($test->charge->standard_charge * ($test->charge->taxCategory ? $test->charge->taxCategory->percentage : 0) / 100)) : 0), 2)); ?></td>
                                 </tr>
                             </table>
                         </div>
                     </div>
 
-                    @if($test->parameters && $test->parameters->count() > 0)
+                    <?php if($test->parameters && $test->parameters->count() > 0): ?>
                         <div class="row mt-4">
                             <div class="col-12">
                                 <h5 class="mb-3">Test Parameters</h5>
@@ -99,24 +98,24 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach($test->parameters as $index => $paramDetail)
-                                                @php
+                                            <?php $__currentLoopData = $test->parameters; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $paramDetail): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <?php
                                                     $parameter = $paramDetail->parameter;
-                                                @endphp
+                                                ?>
                                                 <tr>
-                                                    <td>{{ $index + 1 }}</td>
-                                                    <td>{{ $parameter->parameter_name ?? '-' }}</td>
-                                                    <td>{{ $parameter->reference_range ?? '-' }}</td>
-                                                    <td>{{ $parameter->unitRelation->unit_name ?? '-' }}</td>
-                                                    <td>{{ $parameter->description ?? '-' }}</td>
+                                                    <td><?php echo e($index + 1); ?></td>
+                                                    <td><?php echo e($parameter->parameter_name ?? '-'); ?></td>
+                                                    <td><?php echo e($parameter->reference_range ?? '-'); ?></td>
+                                                    <td><?php echo e($parameter->unitRelation->unit_name ?? '-'); ?></td>
+                                                    <td><?php echo e($parameter->description ?? '-'); ?></td>
                                                 </tr>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
                         </div>
-                    @endif
+                    <?php endif; ?>
 
                     <!-- TPA Charges Section -->
                     <div class="row mt-4">
@@ -128,20 +127,22 @@
                                     </h5>
                                 </div>
                                 <div class="card-body">
-                                    @if(session('success'))
+                                    <?php if(session('success')): ?>
                                         <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                            {{ session('success') }}
-                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                        </div>
-                                    @endif
-                                    @if(session('error'))
-                                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                            {{ session('error') }}
-                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                        </div>
-                                    @endif
+                                            <?php echo e(session('success')); ?>
 
-                                    @if($tpaCharges && count($tpaCharges) > 0)
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                        </div>
+                                    <?php endif; ?>
+                                    <?php if(session('error')): ?>
+                                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                            <?php echo e(session('error')); ?>
+
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <?php if($tpaCharges && count($tpaCharges) > 0): ?>
                                         <div class="table-responsive">
                                             <table class="table table-bordered">
                                                 <thead class="thead-light">
@@ -153,37 +154,37 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    @foreach($tpaCharges as $tpaCharge)
+                                                    <?php $__currentLoopData = $tpaCharges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tpaCharge): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                         <tr>
                                                             <td>
-                                                                <strong>{{ $tpaCharge->organisation->organisation_name ?? '-' }}</strong>
-                                                                @if($tpaCharge->organisation && $tpaCharge->organisation->code)
-                                                                    <br><small class="text-muted">Code: {{ $tpaCharge->organisation->code }}</small>
-                                                                @endif
+                                                                <strong><?php echo e($tpaCharge->organisation->organisation_name ?? '-'); ?></strong>
+                                                                <?php if($tpaCharge->organisation && $tpaCharge->organisation->code): ?>
+                                                                    <br><small class="text-muted">Code: <?php echo e($tpaCharge->organisation->code); ?></small>
+                                                                <?php endif; ?>
                                                             </td>
-                                                            <td>₹{{ number_format($test->standard_charge ?? 0, 2) }}</td>
-                                                            <td>₹{{ number_format($tpaCharge->org_charge ?? 0, 2) }}</td>
+                                                            <td>₹<?php echo e(number_format($test->standard_charge ?? 0, 2)); ?></td>
+                                                            <td>₹<?php echo e(number_format($tpaCharge->org_charge ?? 0, 2)); ?></td>
                                                             <td>
                                                                 <button
                                                                     class="btn btn-sm btn-soft-success rounded-pill edit-tpa-charge-btn"
-                                                                    data-id="{{ $tpaCharge->id }}"
-                                                                    data-org_charge="{{ $tpaCharge->org_charge }}"
-                                                                    data-org_name="{{ $tpaCharge->organisation->organisation_name ?? 'TPA' }}"
+                                                                    data-id="<?php echo e($tpaCharge->id); ?>"
+                                                                    data-org_charge="<?php echo e($tpaCharge->org_charge); ?>"
+                                                                    data-org_name="<?php echo e($tpaCharge->organisation->organisation_name ?? 'TPA'); ?>"
                                                                     data-bs-toggle="modal"
                                                                     data-bs-target="#editTpaChargeModal">
                                                                     <i class="ti ti-pencil"></i> Edit
                                                                 </button>
                                                             </td>
                                                         </tr>
-                                                    @endforeach
+                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                 </tbody>
                                             </table>
                                         </div>
-                                    @else
+                                    <?php else: ?>
                                         <div class="alert alert-info">
                                             <i class="ti ti-info-circle me-2"></i>No TPA charges found for this pathology test. TPA charges are automatically created when you create a pathology test.
                                         </div>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -201,9 +202,9 @@
                     <h5 class="modal-title" id="editTpaChargeModalLabel">Edit TPA Charge</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ route('pathology.test.update-tpa-charge') }}" method="POST">
-                    @csrf
-                    @method('PUT')
+                <form action="<?php echo e(route('pathology.test.update-tpa-charge')); ?>" method="POST">
+                    <?php echo csrf_field(); ?>
+                    <?php echo method_field('PUT'); ?>
                     <input type="hidden" name="id" id="tpa_charge_id">
                     <div class="modal-body">
                         <div class="mb-3">
@@ -212,7 +213,7 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Standard Charge (INR)</label>
-                            <input type="text" class="form-control" value="₹{{ number_format($test->standard_charge ?? 0, 2) }}" readonly>
+                            <input type="text" class="form-control" value="₹<?php echo e(number_format($test->standard_charge ?? 0, 2)); ?>" readonly>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">TPA Charge (INR) <span class="text-danger">*</span></label>
@@ -244,5 +245,7 @@
             });
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
 
+
+<?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\xampp-8.2\htdocs\hims\resources\views/admin/pathology/test/show.blade.php ENDPATH**/ ?>

@@ -281,6 +281,13 @@
                         Assistance<i class="ti ti-chart-bubble-filled ms-1"></i></a>
                     <!-- AI Assistance -->
 
+                    <?php if(auth()->guard()->check()): ?>
+                        <a href="<?php echo e(route('hrms.switch')); ?>" class="btn btn-primary me-3 d-lg-flex d-none">
+                            Move to HR Portal
+                            <i class="ti ti-external-link ms-1"></i>
+                        </a>
+                    <?php endif; ?>
+
                     <!-- Appointment -->
                     <div class="header-item">
                         <div class="dropdown me-2">
