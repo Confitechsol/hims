@@ -4,13 +4,23 @@ namespace App\Http\Controllers\Modules;
 use App\Http\Controllers\Controller;
 use App\Models\Charge;
 use App\Models\ChargeCategory;
+use App\Models\ChargeTypeMaster;
 use App\Models\Doctor;
+use App\Models\MedicationReport;
+use App\Models\OpdCharges;
 use App\Models\OpdDetail;
+use App\Models\OpdMedicine;
 use App\Models\OpdPatient;
+use App\Models\OpdPrescription;
+use App\Models\OpdVisits;
+use App\Models\OperationTheatre;
+use App\Models\PathologyReport;
 use App\Models\Patient;
 use App\Models\Prefix;
 use App\Models\Symptom;
 use App\Models\SymptomsClassification;
+use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -23,7 +33,7 @@ class OpdController extends Controller
         $doctors     = Doctor::all();
         $opdSymptoms = [];
         if ($isOpdTab) {
-            $opdDetails = OpdDetail::with('patient', 'doctor', 'chargeCategory', 'charge')->get();
+            $opdDetails = OpdDetail::with('patient.bloodGroup', 'doctor', 'chargeCategory', 'charge')->get();
             foreach ($opdDetails as $opdDetail) {
                 // Split comma-separated symptom IDs and clean up
                 $symptomIds = array_filter(
@@ -107,6 +117,8 @@ class OpdController extends Controller
             // 🔹 Create OPD record
             $opd        = new OpdDetail();
             $opdPatient = new OpdPatient();
+            $opdVistis  = new OpdVisits();
+            $opdCharge  = new OpdCharges();
             // dd($opd);
             $opd->hospital_id = $user->hospital_id;
             // Patient Details
@@ -149,8 +161,28 @@ class OpdController extends Controller
             $opdPatient->patient_id = $request->patient_id ?? null;
             $opdPatient->opd_id     = $opd->id ?? null;
             $opdPatient->doctor_id  = $request->doctor_id ?? null;
-
             $opdPatient->save();
+
+            $opdCharge->opd_id         = $opd->id;
+            $opdCharge->charge_id      = $opd->charge_id;
+            $opdCharge->discount       = $opd->discount;
+            $opdCharge->charge_type_id = $opd->charge_category_id;
+            $opdCharge->save();
+
+            $lastVisit = OpdVisits::orderBy('id', 'desc')->first();
+            if ($lastVisit && preg_match('/OCID(\d+)/', $lastVisit->visit_id, $matches)) {
+                $lastNumber = intval($matches[1]);
+            } else {
+                $lastNumber = 0;
+            }
+            $visitPrefix = Prefix::where("type", 'opd_checkup_id')->firstOrFail();
+            $nextNumber  = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+            $visitNo     = $visitPrefix->prefix . $nextNumber;
+
+            $opdVistis->visit_id   = $visitNo ?? null;
+            $opdVistis->patient_id = $request->patient_id ?? null;
+            $opdVistis->opd_id     = $opd->id ?? null;
+            $opdVistis->save();
 
             DB::commit();
 
@@ -291,6 +323,196 @@ class OpdController extends Controller
         // dd($symptoms);
 
         return response()->json($symptoms, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
+    }
+
+    public function showOpd(Request $request, $id)
+    {
+        $opd        = OpdDetail::with('patient.bloodGroup', 'patient.organisation', 'doctor', 'chargeCategory', 'charge')->where('id', $id)->firstOrFail();
+        $symptomIds = array_filter(
+            explode(',', $opd->symptoms_title),
+            fn($id) => $id !== null && trim($id) !== ''
+        );
+
+        // Fetch symptoms related to this OPD
+        $symptoms = ! empty($symptomIds)
+            ? Symptom::whereIn('id', $symptomIds)->get()
+            : collect();
+
+        $medicationReport  = MedicationReport::with('medicineDosage.unit', 'pharmacy', 'generatedBy.userRole')->where('opd_details_id', $id)->get();
+        $operationDetail   = OperationTheatre::with('operation.category')->where('opd_details_id', $id)->get();
+        $opdCharges        = OpdCharges::with('opd', 'charge.taxCategory', 'chargeCategory.chargeType')->where('opd_id', $id)->get();
+        $labInvestigations = PathologyReport::with('pathology')->where('patient_id', $opd->patient->id)->get();
+        $opdVisits         = OpdVisits::with('patient', 'opd.doctor')->where('opd_id', $id)->get();
+        $opdSymptoms       = [];
+        foreach ($opdVisits as $opdDetail) {
+            // Split comma-separated symptom IDs and clean up
+            $symptomIds = array_filter(
+                explode(',', $opdDetail->opd->symptoms_title),
+                fn($id) => $id !== null && trim($id) !== ''
+            );
+
+            // Fetch symptoms related to this OPD
+            $symptoms = ! empty($symptomIds)
+                ? Symptom::whereIn('id', $symptomIds)->get()
+                : collect();
+
+            // Store in array using OPD number as key
+            $opdSymptoms[$opdDetail->opd->opd_no] = $symptoms;
+        }
+        // Store in array using OPD number as key
+        return view('admin.opd.opd_view', compact('opd', 'symptoms', 'medicationReport', 'operationDetail', 'opdCharges', 'labInvestigations', 'opdVisits', 'opdSymptoms'));
+    }
+
+    public function storePrescription(Request $request)
+    {
+        // dd($request->all());
+        try { $request->validate([
+            'opd_id'              => 'nullable|string',
+            'header_note'         => 'nullable|string',
+            'footer_note'         => 'nullable|string',
+            'finding_description' => 'nullable|string',
+            'finding_print'       => 'nullable|string',
+            'finding_type'        => 'nullable|array',
+            'finding_type.*'      => 'string',
+            'findings'            => 'nullable|array',
+            'findings.*'          => 'string',
+            'pathology'           => 'nullable|array',
+            'pathology.*'         => 'string',
+            'radiology'           => 'nullable|array',
+            'radiology.*'         => 'string',
+            'visible'             => 'nullable|array',
+            'visible.*'           => 'string',
+            'medicines'           => 'nullable|array',
+            'medicines.*'         => 'string',
+            'dosages'             => 'nullable|array',
+            'dosages.*'           => 'string',
+            'interval_dosages'    => 'nullable|array',
+            'interval_dosages.*'  => 'string',
+            'duration_dosages'    => 'nullable|array',
+            'duration_dosages.*'  => 'string',
+            'instructions'        => 'nullable|array',
+            'instructions.*'      => 'string',
+        ]);
+            $findingTypes         = array_filter($request->finding_type, fn($type) => $type !== null && $type !== '');
+            $findings             = array_filter($request->findings, fn($title) => $title !== null && $title !== '');
+            $pathology_ids        = array_filter($request->pathology, fn($pathology) => $pathology !== null && $pathology !== '');
+            $radiology_ids        = array_filter($request->radiology, fn($radio) => $radio !== null && $radio !== '');
+            $notification_to      = array_filter($request->visible, fn($notify) => $notify !== null && $notify !== '');
+            $implodedFindingTypes = implode(", ", $findingTypes);
+            $implodedFindings     = implode(", ", $findings);
+            $implodedPathologies  = implode(", ", $pathology_ids);
+            $implodedRadiologies  = implode(", ", $radiology_ids);
+            $implodedVisibles     = implode(", ", $notification_to);
+            $prescription         = OpdPrescription::create([
+                'opd_id'              => $request->opd_id,
+                'header_note'         => $request->header_note ?? null,
+                'footer_note'         => $request->footer_note ?? null,
+                'finding_description' => $request->finding_description ?? null,
+                'is_finding_print'    => $request->finding_print ?? null,
+                'date'                => Carbon::now()->toDateString(),
+                'finding_categories'  => $implodedFindingTypes,
+                'findings'            => $implodedFindings,
+                'pathology_id'        => $implodedPathologies,
+                'radiology_id'        => $implodedRadiologies,
+                'notification_to'     => $implodedVisibles,
+            ]);
+
+            foreach ($request->medicines as $i => $med) {
+
+                OpdMedicine::create([
+                    "prescription_id"    => $prescription->id,
+                    "pharmacy_id"        => intval($med),
+                    "medicine_dosage_id" => intval($request->dosages[$i]), //$input['hsn_code'][$i],
+                    "dose_interval_id"   => intval($request->interval_dosages[$i]),
+                    "dose_duration_id"   => intval($request->duration_dosages[$i]),
+                    "instruction"        => $request->instructions[$i],
+                ]);
+            }
+            return redirect()->back()->with('success', 'Prescription created successfully.');} catch (Exception $e) {
+            // dd($e);
+            return back()->with('error', 'Something went wrong: ' . $e->getMessage());
+        }
+    }
+
+    public function createOpdMedication(Request $request)
+    {
+        try {
+
+            $request->validate([
+                'date'     => 'required|date',
+                'time'     => 'required|date_format:H:i',
+                'med_cat'  => 'required|exists:medicine_category,id',
+                'med_name' => 'required|exists:pharmacy,id',
+                'dosage'   => 'required|exists:medicine_dosage,id',
+                'remark'   => 'nullable|string',
+                'opd_id'   => 'required|exists:opd_details,id',
+            ]);
+
+            MedicationReport::create([
+                'opd_details_id'     => $request->opd_id,
+                'medicine_dosage_id' => $request->dosage,
+                'pharmacy_id'        => $request->med_name,
+                'date'               => $request->date,
+                'time'               => $request->time,
+                'remark'             => $request->remark,
+                'generated_by'       => 1,
+            ]);
+            return redirect()->back()->with('success', 'Medication created successfully.');
+        } catch (Exception $e) {
+            //throw $th;
+            return back()->with('error', 'Something went wrong: ' . $e->getMessage());
+        }
+    }
+
+    public function getOpdById(Request $request, $id)
+    {
+        $opd = OpdDetail::with('patient.bloodGroup', 'doctor.department')->where('id', $id)->firstOrFail();
+        return response()->json($opd, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
+    }
+    public function getOpdMedicineById(Request $request, $id)
+    {
+        $opdPrescription = OpdPrescription::where('visit_id', $id)->firstOrFail();
+        $opdMedicines    = OpdMedicine::with('pharmacy', 'medicineDosage.unit', 'doseInterval', 'doseDuration')->where('prescription_id', $opdPrescription->id)->get();
+        // dd($opdMedicines);
+        return response()->json($opdMedicines, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
+    }
+
+    public function getChargeTypes(Request $request)
+    {
+        $chargeTypes = ChargeTypeMaster::all();
+        return response()->json($chargeTypes, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
+    }
+    public function getChargeCategoriesByTypeId(Request $request, $id)
+    {
+        $chargeCategories = ChargeCategory::where('charge_type_id', $id)->get();
+        return response()->json($chargeCategories, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
+    }
+
+    public function addOpdCharge(Request $request)
+    {
+                                               // dd($request->charge_category);         // dd($request->all());
+        $count = count($request->charge_type); // Number of rows
+
+        for ($i = 0; $i < $count; $i++) {
+
+            OpdCharges::create([
+                'opd_id'              => $request->opd_id ?? null,
+                'charge_type_id'      => $request->charge_type[$i],
+                'charge_category_id'  => $request->charge_category[$i],
+                'charge_id'           => $request->charge_id[$i],
+                'standard_charge'     => $request->standard_charge[$i],
+                'tpa_charge'          => $request->tpa_charge[$i],
+                'qty'                 => $request->qty[$i],
+                'total'               => $request->total[$i],
+                'discount_percentage' => $request->discount_percentage[$i],
+                'tax'                 => $request->tax[$i],
+                'net_amount'          => $request->net_amount[$i],
+                'charge_note'         => $request->charge_note[$i],
+                'date'                => $request->charge_date[$i],
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Charges saved successfully!');
     }
 
 }

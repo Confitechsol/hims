@@ -11601,7 +11601,7 @@ table.dataTable>thead .sorting_desc_disabled:after {
 
 .table.table-dark th {
   color: var(--white) !important;
-  <<<<<<< HEAD background-color: var(--gray-900);
+  background-color: var(--gray-900);
   padding: 12px 16px;
   border-color: var(--gray-800);
 }
@@ -11611,7 +11611,7 @@ table.dataTable>thead .sorting_desc_disabled:after {
   color: var(--white) !important;
   padding: 12px 16px;
   border-color: var(--gray-800);
-  =======
+   
 }
 
 .border-primary thead tr th {
@@ -11620,7 +11620,7 @@ table.dataTable>thead .sorting_desc_disabled:after {
 
 .border-success thead tr th {
   border-color: var(--success) !important;
-  >>>>>>>development
+
 }
 
 .table> :not(caption)>.table-primary>* {

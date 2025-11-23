@@ -3,10 +3,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Staff extends Model
 {
     use HasFactory;
+
+    use SoftDeletes;
 
     // Table name (optional if it matches plural form)
     protected $table = 'staff';
@@ -14,7 +17,7 @@ class Staff extends Model
     // Fillable fields
     protected $fillable = [
         'hospital_id',
-         'branch_id',
+        'branch_id',
         'employee_id',
         'lang_id',
         'department_id',

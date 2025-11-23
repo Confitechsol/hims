@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('hospital_id', 8);
             $table->string('branch_id', 8);
+            $table->string('reference_no', 8);
             $table->unsignedBigInteger('opd_details_id')->nullable()->index();
             $table->unsignedBigInteger('ipd_details_id')->nullable()->index();
             $table->string('customer_type', 50)->nullable();

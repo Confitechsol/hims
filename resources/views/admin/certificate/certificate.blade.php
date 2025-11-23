@@ -52,6 +52,109 @@
             transform: translateX(26px);
         }
     </style>
+
+    <style>
+        .certificate {
+            width: 1000px;
+            margin: 20px auto;
+            background: #ffffff;
+            padding: 40px;
+            /* border: 5px solid #4a6fa5; */
+            border-radius: 12px;
+            box-shadow: 0 0 18px rgba(0, 0, 0, 0.15);
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo-box {
+            width: 200px;
+            margin: 0px auto 50px;
+        }
+
+        h1 {
+            font-size: 36px;
+            margin-bottom: 3px;
+            color: #750096;
+        }
+
+        .sub-title {
+            font-size: 14px;
+            color: #5f6e82;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        h2 {
+            font-size: 22px;
+            margin-top: 30px;
+            color: #750096;
+            border-bottom: 3px solid #750096;
+            padding-bottom: 6px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            gap: 20px;
+        }
+
+        .col {
+            width: 48%;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 15px;
+            color: #2c3e50;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .line-data {
+            font-size: 16px;
+            padding: 8px 10px;
+            border-bottom: 2px solid #750096;
+            background: #e7c1f217;
+            border-radius: 4px;
+            margin-bottom: 12px;
+        }
+
+        .multi-data {
+            font-size: 16px;
+            padding: 8px 10px;
+            border: 2px solid #750096;
+            background: #e7c1f217;
+            border-radius: 4px;
+            height: 70px;
+            margin-bottom: 15px;
+        }
+
+        .seal-section {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .seal-box,
+        .sign-box {
+            width: 45%;
+            height: 130px;
+            border: 2px dashed #750096;
+            border-radius: 6px;
+            text-align: center;
+            padding-top: 50px;
+            font-size: 15px;
+            color: #750096;
+            background: #e7c1f217;
+        }
+
+ 
+    </style>
     <!-- row start -->
 
     <div class="row p-4">
@@ -469,6 +572,237 @@
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                    </td>
+                                                    <td>
+                                                        <img src="" alt="Background Image">
+                                                    </td>
+                                                    <td>
+                                                        <div class="d-flex gap-2">
+                                                            <a href="javascript: void(0);"
+                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
+                                                                <i class="ti ti-menu" data-bs-toggle="tooltip"
+                                                                    title="Show"></i></a>
+                                                            <a href="javascript: void(0);"
+                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
+                                                                <i class="ti ti-pencil" data-bs-toggle="tooltip"
+                                                                    title="edit"></i></a>
+                                                            <a href="javascript: void(0);"
+                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                                <i class="ti ti-trash" data-bs-toggle="tooltip"
+                                                                    title="Delete"></i></a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center flex-wrap gap-2">
+                                                            <div class="text-end d-flex">
+                                                                <a href="" data-bs-toggle="modal"
+                                                                    data-bs-target="#birth_certificate">Sample Birth
+                                                                    Certificate</a>
+                                                            </div>
+                                                            <!-- First Modal -->
+                                                            <div class="modal fade" id="birth_certificate" tabindex="-1"
+                                                                aria-hidden="true">
+                                                                <div class="modal-dialog modal-dialog-centered modal-xl">
+                                                                    <div class="modal-content ">
+
+                                                                        <div class="modal-header"
+                                                                            style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+
+                                                                            <h5 class="modal-title"
+                                                                                id="addSpecializationLabel">
+                                                                                Birth Certificate Template
+                                                                            </h5>
+                                                                            <button type="button" class="btn-close"
+                                                                                data-bs-dismiss="modal"></button>
+
+                                                                        </div>
+
+                                                                        <div class="modal-body">
+
+                                                                            <div class="certificate">
+
+                                                                                <div class="header">
+                                                                                    <div class="logo-box">
+                                                                                        <img src="assets/img/logo.png" alt="">
+                                                                                    </div>
+                                                                                    <h1>Birth Certificate</h1>
+                                                                                    
+                                                                                </div>
+
+                                                                                <!-- Child Information -->
+                                                                                <h2>Child Information</h2>
+
+                                                                                <div class="row">
+                                                                                    <div class="col">
+                                                                                        <label>Full Name</label>
+                                                                                        <div class="line-data">Aarav Sharma
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col">
+                                                                                        <label>Sex</label>
+                                                                                        <div class="line-data">Male</div>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <div class="row">
+                                                                                    <div class="col">
+                                                                                        <label>Date of Birth</label>
+                                                                                        <div class="line-data">14 November
+                                                                                            2025</div>
+                                                                                    </div>
+                                                                                    <div class="col">
+                                                                                        <label>Time of Birth</label>
+                                                                                        <div class="line-data">09:42 AM
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <label>Place of Birth</label>
+                                                                                <div class="line-data">Sunrise
+                                                                                    Multispeciality Hospital, Kolkata</div>
+
+                                                                                <div class="row">
+                                                                                    <div class="col">
+                                                                                        <label>Birth Weight</label>
+                                                                                        <div class="line-data">3.1 kg</div>
+                                                                                    </div>
+                                                                                    <div class="col">
+                                                                                        <label>Birth Length</label>
+                                                                                        <div class="line-data">49 cm</div>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <div class="row">
+                                                                                    <div class="col">
+                                                                                        <label>Apgar Score (1 min / 5
+                                                                                            min)</label>
+                                                                                        <div class="line-data">8 / 9</div>
+                                                                                    </div>
+                                                                                    <div class="col">
+                                                                                        <label>Gestational Age
+                                                                                            (Weeks)</label>
+                                                                                        <div class="line-data">38 weeks
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <!-- ICD-10 -->
+                                                                                <h2>ICD-10 Coding</h2>
+
+                                                                                <label>Live Birth Code (Z38 Series)</label>
+                                                                                <div class="line-data">Z38.0 – Single live
+                                                                                    birth in hospital</div>
+
+                                                                                <label>Maternal Conditions (O00 –
+                                                                                    O99)</label>
+                                                                                <div class="line-data">O80 – Full-term
+                                                                                    uncomplicated delivery</div>
+
+                                                                                <label>Congenital Anomalies (Q00 –
+                                                                                    Q99)</label>
+                                                                                <div class="line-data">None Reported</div>
+
+                                                                                <!-- Mother -->
+                                                                                <h2>Mother's Details</h2>
+                                                                                <div class="row">
+                                                                                    <div class="col">
+                                                                                        <label>Full Name</label>
+                                                                                        <div class="line-data">Priya Sharma
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col">
+                                                                                        <label>Age</label>
+                                                                                        <div class="line-data">29</div>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <label>Address</label>
+                                                                                <div class="multi-data">45/2 Lake Road,
+                                                                                    South Kolkata, West Bengal</div>
+
+                                                                                <div class="row">
+                                                                                    <div class="col">
+                                                                                        <label>Mobile Number</label>
+                                                                                        <div class="line-data">9876543210
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col">
+                                                                                        <label>Blood Group</label>
+                                                                                        <div class="line-data">B+</div>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <!-- Father -->
+                                                                                <h2>Father's Details</h2>
+                                                                                <div class="row">
+                                                                                    <div class="col">
+                                                                                        <label>Full Name</label>
+                                                                                        <div class="line-data">Rohan Sharma
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col">
+                                                                                        <label>Age</label>
+                                                                                        <div class="line-data">32</div>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <label>Address</label>
+                                                                                <div class="multi-data">45/2 Lake Road,
+                                                                                    South Kolkata, West Bengal</div>
+
+                                                                                <div class="row">
+                                                                                    <div class="col">
+                                                                                        <label>Mobile Number</label>
+                                                                                        <div class="line-data">9830023456
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col">
+                                                                                        <label>Blood Group</label>
+                                                                                        <div class="line-data">O+</div>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <!-- Informant -->
+                                                                                <h2>Informant Details</h2>
+                                                                                <div class="row">
+                                                                                    <div class="col">
+                                                                                        <label>Name of Informant</label>
+                                                                                        <div class="line-data">Rohan Sharma
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col">
+                                                                                        <label>Relation to Child</label>
+                                                                                        <div class="line-data">Father</div>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <label>Date of Reporting</label>
+                                                                                <div class="line-data">15 November 2025
+                                                                                </div>
+
+                                                                                <!-- Seal & Signature -->
+                                                                                <h2>Authentication</h2>
+                                                                                <div class="seal-section">
+                                                                                    <div class="sign-box">Dr. Ananya
+                                                                                        Gupta<br><br>MBBS, MD (Pediatrics)
+                                                                                    </div>
+                                                                                    <div class="seal-box">Sunrise
+                                                                                        Multispeciality Hospital Seal</div>
+                                                                                </div>
+
+                                                                            </div>
+
+
+                                                                        </div>
+
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
                                                     </td>
                                                     <td>
                                                         <img src="" alt="Background Image">

@@ -135,24 +135,24 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="index.html" class="active">Birth Record
+                                    <li><a href="{{ route('birth') }}" class="active">Birth Record
                                             </a></li>
-                                    <li><a href="doctor-dashboard.html">Death Record
+                                    <li><a href="{{ route('death') }}">Death Record
                                             </a></li>
                                     
                                 </ul>
                             </li>
                             <li class="submenu">
-                                <a href="javascript:void(0);" class="active subdrop">
+                                <a href="{{route('certificate')}}" class="active subdrop">
                                     <i class="ti ti-layout-dashboard"></i><span>Certificate</span>
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="index.html" class="active">Certificate
+                                    <li><a href="{{route('certificate')}}" class="active">Certificate
                                             </a></li>
-                                    <li><a href="doctor-dashboard.html">Patient ID Card
+                                    <li><a href="{{route('generate_patient_id')}}">Patient ID Card
                                             </a></li>
-                                    <li><a href="patient-dashboard.html">Staff ID Card
+                                    <li><a href="{{route('generate_patient_id')}}">Staff ID Card
                                             </a></li>
                                 </ul>
                             </li>
@@ -176,26 +176,22 @@
                                     <li><a href="doctor-schedule.html">Doctor
                                             Schedule</a></li>
                                 </ul>
-                            </li>
+                            </li>-->
                             <li class="submenu">
                                 <a href="javascript:void(0);">
-                                    <i class="ti ti-user-heart"></i><span>Patients</span>
+                                    <i class="ti ti-user-heart"></i><span>OPD & IPD </span>
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{route('patients')}}">Patients</a></li>
-                                    <li><a href="patient-details.html">Patient
+                                    
+                                    <li><a href="{{ route('opd') }}">OPD Patient
                                             Details</a></li>
-                                    <li><a href="create-patient.html">Create
-                                            Patient</a></li>
-                                    <li><a href="patient-details.html">OPD Patient
-                                            Details</a></li>
-                                    <li><a href="patient-details.html">IPD Patient
+                                    <li><a href="{{ route('ipd') }}">IPD Patient
                                             Details</a></li>
 
 
                                 </ul>
-                            </li>-->
+                            </li>
                             <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-calendar-check"></i><span>Appointments</span>
@@ -205,9 +201,9 @@
                                     <li><a href="{{ route('appointment-details') }}">Appointment Details</a></li>
                                     <!--<li><a href="new-appointment.html">New
                                             Appointment</a></li>
-                                    <li><a href="appointment-calendar.html">Calendar</a></li>
+                                    <li><a href="appointment-calendar.html">Calendar</a></li> -->
                                 
-                            </li>-->
+                            </li>
                             </ul>
                             <li class="submenu">
                                 <a href="javascript:void(0);">
@@ -254,29 +250,33 @@
                                     <i class="ti ti-map-pin"></i><span>Ambulance Call</span>
                                 </a>
                             </li>
-                            <li>
+                            <!-- <li>
                                 <a href="#">
                                     <i class="ti ti-map-pin"></i><span>Front Office</span>
                                 </a>
-                            </li>
+                            </li> -->
                             <li class="submenu">
                                 <a href="javascript:void(0);" class="active subdrop">
                                     <i class="ti ti-layout-dashboard"></i><span>Duty Roster</span>
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="index.html" class="active">Staff
+                                    <li><a href="{{ route('dutyroster') }}" >Duty Roster List
                                             </a></li>
-                                    <li><a href="doctor-dashboard.html">Doctors
+                                    <li><a href="{{ route('dutyroster.Shift') }}" >Duty Shift List
+                                            </a></li>
+                                    <li><a href="{{ route('dutyroster.staff') }}" >Staff Roster Details
+                                            </a></li>
+                                    <li><a href="{{ route('dutyroster.doctor') }}">Doctors Roster Details
                                             </a></li>
                                     
                                 </ul>
                             </li>
-                            <li>
+                            <!-- <li>
                                 <a href="#">
                                     <i class="ti ti-map-pin"></i><span>Annual Calender</span>
                                 </a>
-                            </li>
+                            </li> -->
                             <li>
                                 <a href="{{ route('tpamanagement') }}">
                                     <i class="ti ti-map-pin"></i><span>TPA Management</span>
@@ -382,26 +382,26 @@
                             <li>
                         <ul>
                             <li>
-                                <a href="staffs.html">
+                                <a href="{{ route('staffs.index') }}">
                                     <i class="ti ti-users-group"></i><span>Staffs</span>
                                 </a>
                             </li>
-                            <li>
+                            <!-- <li>
                                 <a href="hrm-departments.html">
                                     <i class="ti ti-building-bank"></i><span>Departments</span>
                                 </a>
-                            </li>
-                            <li>
+                            </li> -->
+                            <!-- <li>
                                 <a href="designation.html">
                                     <i class="ti ti-user-cog"></i><span>Designation</span>
                                 </a>
-                            </li>
-                            <li>
+                            </li> -->
+                            <!-- <li>
                                 <a href="attendance.html">
                                     <i class="ti ti-user-check"></i><span>Attendance</span>
                                 </a>
-                            </li>
-                            <li class="submenu">
+                            </li> -->
+                            <!-- <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-users-minus"></i><span>Leaves</span>
                                     <span class="menu-arrow"></span>
@@ -411,17 +411,17 @@
                                     <li><a href="leave-type.html">Leave
                                             Type</a></li>
                                 </ul>
-                            </li>
-                            <li>
+                            </li> -->
+                            <!-- <li>
                                 <a href="holidays.html">
                                     <i class="ti ti-home-exclamation"></i><span>Holidays</span>
                                 </a>
-                            </li>
-                            <li>
+                            </li> -->
+                            <!-- <li>
                                 <a href="payroll.html">
                                     <i class="ti ti-coin"></i><span>Payroll</span>
                                 </a>
-                            </li>
+                            </li> -->
                         </ul>
                             </li>
                             <li class="submenu">
@@ -501,7 +501,7 @@
                                     <li><a href="{{ route('permissions.modules') }}">Modules</a></li>
                                 </ul>
                             </li>
-                            <li><a href="{{ route('patients') }}">Patient</a></li>
+                            <li><a href="{{ route('patients') }}"><i class="ti ti-user-cog"></i><span> Patient </span></a></li>
                             
                             <li class="submenu">
                                 <a href="javascript:void(0);">
@@ -535,7 +535,11 @@
                                     
                                 </ul>
                             </li>
-                            <li><a href="{{ route('letterHead') }}">Print Header Footer</a></li>
+                            <li><a href="{{ route('letterHead') }}">
+                                    <i class="ti ti-world-cog"></i>
+                                    <span>Print Header Footer</span>
+                                </a>
+                            </li>
                             <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-world-cog"></i><span>Front
@@ -723,7 +727,7 @@
                                             Reason</a></li>
                                 </ul>
                             </li>
-                            <li class="submenu">
+                            <!-- <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-device-mobile-cog"></i><span>App
                                         Settings</span>
@@ -738,7 +742,7 @@
                                     <li><a href="custom-fields-settings.html">Custom
                                             Fields</a></li>
                                 </ul>
-                            </li>
+                            </li> -->
                             <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-device-desktop-cog"></i><span>System

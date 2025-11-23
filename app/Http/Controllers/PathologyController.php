@@ -1,12 +1,11 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Pathology;
-use App\Models\Unit;
 use App\Models\PathologyCategory;
 use App\Models\pathologyParameter;
+use App\Models\Unit;
+use Illuminate\Http\Request;
 
 class PathologyController extends Controller
 {
@@ -22,8 +21,8 @@ class PathologyController extends Controller
         ]);
 
         PathologyCategory::insert([
-            'category_name'       => $request->category_name,
-            'created_at' => now(), // only if your table has created_at
+            'category_name' => $request->category_name,
+            'created_at'    => now(), // only if your table has created_at
         ]);
 
         return redirect()->back()->with('success', 'Pathology Category added successfully!');
@@ -57,7 +56,7 @@ class PathologyController extends Controller
 
     public function storeUnit(Request $request)
     {
-       
+
         $request->validate([
             'unit_name' => 'required|string|max:255',
         ]);
@@ -94,15 +93,15 @@ class PathologyController extends Controller
     }
     public function pathologyParameters()
     {
-        // Fetch only pathology parameters
+                                                                       // Fetch only pathology parameters
         $parameters = PathologyParameter::with('unitRelation')->get(); // or Unit::where('unit_type','PathologyParameter')->get();
-        $units = Unit::where('unit_type', 'Pathology')->get();
-        return view('admin.setup.pathology_parameter', compact('parameters','units'));
+        $units      = Unit::where('unit_type', 'Pathology')->get();
+        return view('admin.setup.pathology_parameter', compact('parameters', 'units'));
     }
 
     public function storeParameter(Request $request)
     {
-            $request->validate([
+        $request->validate([
             'parameter_name' => 'required|string|max:255', // parameter name
             'ref_range_from' => 'required|string|max:255',
             'ref_range_to'   => 'required|string|max:255',
@@ -111,17 +110,16 @@ class PathologyController extends Controller
         ]);
 
         PathologyParameter::create([
-            'parameter_name'   => $request->parameter_name,  // maps form field "unit_name" to parameter_name
-            'range_from'       => $request->ref_range_from,
-            'range_to'         => $request->ref_range_to,
-            'reference_range'  => $request->ref_range_from . ' - ' . $request->ref_range_to,
-            'unit_id'          => $request->unit_id,
-            'description'      => $request->description,
+            'parameter_name'  => $request->parameter_name, // maps form field "unit_name" to parameter_name
+            'range_from'      => $request->ref_range_from,
+            'range_to'        => $request->ref_range_to,
+            'reference_range' => $request->ref_range_from . ' - ' . $request->ref_range_to,
+            'unit_id'         => $request->unit_id,
+            'description'     => $request->description,
         ]);
 
         return redirect()->back()->with('success', 'Pathology Parameter added successfully!');
 
-      
     }
 
     public function updateParameter(Request $request, $id)
@@ -132,12 +130,12 @@ class PathologyController extends Controller
 
         $parameter = PathologyParameter::findOrFail($id);
         $parameter->update([
-            'parameter_name' => $request->parameter_name,
-            'range_from'       => $request->ref_range_from,
-            'range_to'         => $request->ref_range_to,
-            'reference_range'  => $request->ref_range_from . ' - ' . $request->ref_range_to,
-            'unit_id'          => $request->unit_id,
-            'description'      => $request->description,
+            'parameter_name'  => $request->parameter_name,
+            'range_from'      => $request->ref_range_from,
+            'range_to'        => $request->ref_range_to,
+            'reference_range' => $request->ref_range_from . ' - ' . $request->ref_range_to,
+            'unit_id'         => $request->unit_id,
+            'description'     => $request->description,
         ]);
 
         return redirect()->back()->with('success', 'Pathology Parameter updated successfully!');
@@ -151,6 +149,12 @@ class PathologyController extends Controller
         return redirect()->back()->with('success', 'Pathology Parameter deleted successfully.');
     }
 
-
+    public function getPathologies(Request $request)
+    {
+        // dd($id);
+        $categories = Pathology::all();
+        // dd($bedNumbers);
+        return response()->json($categories, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
+    }
 
 }

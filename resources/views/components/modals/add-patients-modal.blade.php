@@ -299,10 +299,10 @@
 
                     </div>
 
-            </div>
-            <div class="modal-footer">
-                <button type="submit" class="btn btn-primary">Save Role</button>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save Patient</button>
+                </div>
             </form>
         </div>
     </div>
@@ -334,17 +334,17 @@
                 tpaSelect.innerHTML = '<option value="">Error loading options</option>';
             });
 
-        // Listen for dropdown change
-        tpaSelect.addEventListener('change', function() {
-            const selectedId = this.value;
-            const selectedOrg = window.organizationsData.find(org => org.id == selectedId);
-            tpaIdInput.value = selectedOrg ? selectedOrg.code : '';
-        });
-    //auto calculate age..............................................................................
-    const birthDateInput = document.getElementById('birth_date');
-    const ageYearInput = document.getElementById('age_year');
-    const ageMonthInput = document.getElementById('age_month');
-    const ageDayInput = document.getElementById('age_day');
+            // Listen for dropdown change
+            tpaSelect.addEventListener('change', function() {
+                const selectedId = this.value;
+                const selectedOrg = window.organizationsData.find(org => org.id == selectedId);
+                tpaIdInput.value = selectedOrg ? selectedOrg.code : '';
+            });
+        //auto calculate age..............................................................................
+        const birthDateInput = document.getElementById('birth_date');
+        const ageYearInput = document.getElementById('age_year');
+        const ageMonthInput = document.getElementById('age_month');
+        const ageDayInput = document.getElementById('age_day');
 
     birthDateInput.addEventListener('change', function() {
         const birthDate = new Date(this.value);

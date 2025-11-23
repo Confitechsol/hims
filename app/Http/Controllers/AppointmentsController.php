@@ -1,17 +1,26 @@
 <?php
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Doctor;
-use App\Models\Patient;
 use App\Models\Appointment;
-use App\Models\Prefix;
-use App\Models\GlobalShift;
-use App\Models\DoctorShiftTime;
+use App\Models\AppointPriority;
+use App\Models\Doctor;
 use App\Models\DoctorGlobalShift;
-use Illuminate\Support\Facades\Http;
+use App\Models\DoctorShiftTime;
+use App\Models\OpdDetail;
+use App\Models\OpdPatient;
+use App\Models\PathologyReport;
+use App\Models\Patient;
+use App\Models\PatientTimeline;
+use App\Models\PatientVital;
+use App\Models\Prefix;
+use App\Models\Symptom;
+use App\Models\VisitDetail;
+use App\Models\Vital;
+use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 
 class AppointmentsController extends Controller
 {
@@ -29,34 +38,36 @@ class AppointmentsController extends Controller
     public function appointmentDetails()
     {
         $appointments = Appointment::with(['patient', 'doctorUser', 'doctorShift'])
-        ->orderBy('date', 'desc')
-        ->get();
+            ->orderBy('date', 'desc')
+            ->get();
         //dd(Doctor::find(1));
         //dd($appointments->first()->doctorUser);
-        $doctors  = Doctor::all();
-        $patients = Patient::all();
-        return view('admin.appointments.appointment_details', compact('appointments','doctors', 'patients'));
+        $doctors    = Doctor::all();
+        $patients   = Patient::all();
+        $priorities = AppointPriority::select('id', 'appoint_priority')->get();
+        return view('admin.appointments.appointment_details', compact('appointments', 'doctors', 'patients', 'priorities'));
     }
-    
+
     public function store(Request $request)
     {
+
         $request->validate([
-            'patient_id' => 'required',
-            'doctor' => 'required',
-            'appointment_date' => 'required|date',
-            'shift' => 'required',
-            'slot' => 'required',
+            'patient_id'           => 'required',
+            'doctor'               => 'required',
+            'appointment_date'     => 'required|date',
+            'shift'                => 'required',
+            'slot'                 => 'required',
             'appointment_priority' => 'nullable',
-            'payment_method' => 'nullable|string',
-            'status' => 'required|string',
-            'discount_percentage' => 'nullable|numeric|min:0|max:100',
-            'message' => 'nullable|string',
-            'live_con' => 'nullable|string',
+            'payment_method'       => 'nullable|string',
+            'status'               => 'required|string',
+            'discount_percentage'  => 'nullable|numeric|min:0|max:100',
+            'message'              => 'nullable|string',
+            'live_con'             => 'nullable|string',
         ]);
 
         $latestAppointment = Appointment::orderBy('id', 'desc')->first();
 
-            // ✅ Fetch dynamic prefix
+        // ✅ Fetch dynamic prefix
         $prefix = Prefix::where('type', 'appointment')->value('prefix') ?? 'APPID';
 
         // ✅ Find last appointment_id with this prefix
@@ -74,26 +85,79 @@ class AppointmentsController extends Controller
         // ✅ Generate new appointment_id
         $appointmentId = $prefix . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
 
-        $appointment = new Appointment();
+        $appointment                 = new Appointment();
         $appointment->appointment_id = $appointmentId;
-        $appointment->patient_id = $request->patient_id;
-        $appointment->doctor = $request->doctor;
-        $appointment->amount = $request->doctor_fees;
+        $appointment->patient_id     = $request->patient_id;
+        $appointment->doctor         = $request->doctor;
+        // $appointment->amount = $request->doctor_fees;
         $appointment->doctor_global_shift_id = $request->shift;
-        $appointment->date = $request->appointment_date;
-        $appointment->doctor_shift_time_id = $request->slot;
-        $appointment->priority = $request->appointment_priority;
-    
+        $appointment->date                   = $request->appointment_date;
+        $appointment->doctor_shift_time_id   = $request->slot;
+        $appointment->priority               = $request->appointment_priority;
+
         $appointment->appointment_status = $request->status;
         // $appointment->discount_percentage = $request->discount_percentage;
-        $appointment->source = 'Offline'; 
-        $appointment->message = $request->message;
+        $appointment->source       = 'Offline';
+        $appointment->message      = $request->message;
         $appointment->live_consult = $request->live_con;
-        $appointment->is_opd = 'Yes';
-        $appointment->is_ipd = 'No'; 
+        $appointment->is_opd       = 'Yes';
+        $appointment->is_ipd       = 'No';
         $appointment->save();
 
-        
+        $opdPrefix = Prefix::where('type', 'opd_no')->value('prefix') ?? 'OPD';
+
+        $lastOpd = OpdDetail::where('opd_no', 'like', $opdPrefix . '%')
+            ->orderBy('id', 'desc')
+            ->first();
+
+        $nextOpdNumber = $lastOpd
+            ? ((int) str_replace($opdPrefix, '', $lastOpd->opd_no) + 1)
+            : 1;
+
+        $opdNo = $opdPrefix . str_pad($nextOpdNumber, 3, '0', STR_PAD_LEFT);
+
+        /**
+         * ======================
+         * ✅ Store OPD Details
+         * ======================
+         */
+        $opd                       = new OpdDetail();
+        $opdPatient                = new OpdPatient();
+        $opd->hospital_id          = auth()->user()->hospital_id ?? null;
+        $opd->branch_id            = auth()->user()->branch_id ?? null;
+        $opd->opd_no               = $opdNo;
+        $opd->patient_id           = $request->patient_id;
+        $opd->appointment_date     = $request->appointment_date;
+        $opd->case_type            = $request->case_type;
+        $opd->apply_tpa            = 'No';
+        $opd->casualty             = 'No';
+        $opd->reference            = null;
+        $opd->doctor_id            = $request->doctor;
+        $opd->charge_category_id   = '1';
+        $opd->charge_id            = '1';
+        $opd->standard_charge      = $request->doctor_fees;
+        $opd->applied_charge       = $request->doctor_fees;
+        $opd->discount             = $request->discount_percentage ?? 0;
+        $opd->tax                  = 0;
+        $opd->amount               = $request->doctor_fees;
+        $opd->payment_mode         = $request->payment_method ?? 'Cash';
+        $opd->paid_amount          = $request->doctor_fees;
+        $opd->payment_date         = now();
+        $opd->live_consultation    = $request->live_con ?? 'No';
+        $opd->symptoms_type        = '';
+        $opd->symptoms_title       = '';
+        $opd->allergies            = '';
+        $opd->symptoms_description = '';
+        $opd->note                 = $request->message ?? null;
+        $opd->status               = $request->status;
+        $opd->created_by           = auth()->id();
+        $opd->save();
+
+        // dd($opd->id);
+        $opdPatient->patient_id = $request->patient_id ?? null;
+        $opdPatient->opd_id     = $opd->id ?? null;
+        $opdPatient->doctor_id  = $request->doctor ?? null;
+        $opdPatient->save();
 
         return redirect()->back()->with('success', 'Appointment created successfully!');
     }
@@ -102,19 +166,19 @@ class AppointmentsController extends Controller
     {
         $appointment = Appointment::with(['patient', 'doctorUser'])->find($id);
 
-        if (!$appointment) {
+        if (! $appointment) {
             return response()->json(['error' => 'Appointment not found'], 404);
         }
 
         $shifts = DoctorGlobalShift::with('globalShift')->where('doctor_id', $appointment->doctor)->get();
-        $slots = DoctorShiftTime::where('doctor_id', $appointment->doctor)
-                    ->where('doctor_global_shift_id', $appointment->doctor_global_shift_id)
-                    ->get();
+        $slots  = DoctorShiftTime::where('doctor_id', $appointment->doctor)
+            ->where('doctor_global_shift_id', $appointment->doctor_global_shift_id)
+            ->get();
 
         return response()->json([
             'appointment' => $appointment,
-            'shifts' => $shifts,
-            'slots' => $slots,
+            'shifts'      => $shifts,
+            'slots'       => $slots,
         ]);
     }
 
@@ -122,24 +186,24 @@ class AppointmentsController extends Controller
     {
         return response()->json([
             'appointment' => $appointment,
-            'shifts' => DoctorGlobalShift::all(),
-            'slots' => DoctorShiftTime::where('doctor_id', $appointment->doctor)->get(),
+            'shifts'      => DoctorGlobalShift::all(),
+            'slots'       => DoctorShiftTime::where('doctor_id', $appointment->doctor)->get(),
         ]);
     }
     public function update(Request $request, $id)
     {
         $request->validate([
             'appointment_date' => 'required|date',
-            'shift' => 'required',
-            'slot' => 'required',
+            'shift'            => 'required',
+            'slot'             => 'required',
         ]);
         //dd($request->all());
 
-        $appointment = Appointment::findOrFail($id);
-        $appointment->date = $request->appointment_date;
+        $appointment                         = Appointment::findOrFail($id);
+        $appointment->date                   = $request->appointment_date;
         $appointment->doctor_global_shift_id = $request->shift;
-        $appointment->doctor_shift_time_id = $request->slot;
-        $appointment->appointment_status = $request->status;
+        $appointment->doctor_shift_time_id   = $request->slot;
+        $appointment->appointment_status     = $request->status;
         $appointment->save();
 
         return redirect()->back()->with('success', 'Appointment rescheduled successfully!');
@@ -147,12 +211,12 @@ class AppointmentsController extends Controller
     public function doctorwise()
     {
         $appointments = Appointment::with(['patient', 'doctorUser', 'doctorShift'])
-        ->orderBy('date', 'desc')
-        ->get();
+            ->orderBy('date', 'desc')
+            ->get();
         $doctors  = Doctor::all();
         $patients = Patient::all();
         $doctors  = Doctor::all();
-        return view('admin.appointments.doctor_wise', compact('appointments','doctors', 'patients'));
+        return view('admin.appointments.doctor_wise', compact('appointments', 'doctors', 'patients'));
     }
 
     public function searchAppointments(Request $request)
@@ -170,7 +234,7 @@ class AppointmentsController extends Controller
         $appointments = $query->orderBy('date', 'desc')->get();
 
         return response()->json([
-            'appointments' => $appointments ?? []
+            'appointments' => $appointments ?? [],
         ]);
     }
 
@@ -179,11 +243,129 @@ class AppointmentsController extends Controller
         // Fetch the patient details
         $appointment = Appointment::with(['patient'])->where('patient_id', $patient_id)->firstOrFail();
 
+        $opdDetails = OpdDetail::with('doctor')->where('patient_id', $patient_id)->get();
+
+        $visitDetails = VisitDetail::with('opdDetail')->where('patient_id', $patient_id)->get();
+
+        $labInvestigations = PathologyReport::with('pathology')->where('patient_id', $patient_id)->get();
+
+        $vitalDetails = PatientVital::with('vital')->where('patient_id', $patient_id)->get();
+
+        $vitals = Vital::all();
+
+        $PatientTimelines = PatientTimeline::with('patient')->where('patient_id', $patient_id)->get();
+
+        $symptomTitles = [];
+        if (! empty($opdDetails->symptoms_title)) {
+            $symptomIds    = explode(',', $opdDetails->symptoms_title);
+            $symptomTitles = Symptom::whereIn('id', $symptomIds)->pluck('symptom_title')->toArray();
+        }
+
+        //dd($visitDetails);
+
         // Return to patient details view
-        return view('admin.appointments.patient_view', compact('appointment'));
+        return view('admin.appointments.patient_view', compact('appointment', 'PatientTimelines', 'opdDetails', 'symptomTitles', 'labInvestigations', 'vitalDetails', 'vitals', 'visitDetails'));
+    }
+    public function storePatientVitals(Request $request)
+    {
+        // Validate input
+        $request->validate([
+            'vital_name.*'  => 'required|exists:vitals,id',
+            'vital_value.*' => 'required|string',
+            'date.*'        => 'required|date',
+        ]);
+
+        // Loop through each row of dynamic form data
+        foreach ($request->vital_name as $index => $vitalId) {
+            if (! empty($vitalId)) {
+                PatientVital::create([
+                    'patient_id'      => $request->patient_id,
+                    'vital_id'        => $vitalId,
+                    'reference_range' => $request->vital_value[$index],
+                    'messure_date'    => $request->date[$index],
+                    'created_by'      => Auth::id(), // optional, if you want to track user
+                ]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Vitals saved successfully!');
     }
 
+    public function storePatientTimeline(Request $request)
+    {
+        //dd($request->all());
+        try {
 
+            $request->validate([
+                'patient_id'  => 'required|exists:patients,id',
+                'title'       => 'required|string|max:255',
+                'date'        => 'required|date',
+                'description' => 'nullable|string',
+                'attch_doc'   => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:2048',
+            ]);
 
-    
+            //$request->all();
+
+            $fileName = null;
+            if ($request->hasFile('attch_doc')) {
+                $fileName = time() . '_' . $request->attch_doc->getClientOriginalName();
+                $request->attch_doc->storeAs('timeline_docs', $fileName, 'public');
+            }
+
+            PatientTimeline::create([
+                'patient_id'           => $request->patient_id,
+                'title'                => $request->title,
+                'timeline_date'        => $request->date,
+                'description'          => $request->description,
+                'document'             => $fileName,
+                'status'               => 'yes',
+                'visible_person'       => $request->has('visible_person') ? 1 : 0,
+                'generated_users_type' => 'patient',
+                'created_by'           => Auth::id(),
+            ]);
+
+            return redirect()->back()->with('success', 'Timeline entry added successfully!');
+        } catch (Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function updatePatientTimeline(Request $request, $id)
+    {
+        $timeline = PatientTimeline::findOrFail($id);
+
+        $request->validate([
+            'title'       => 'required|string|max:255',
+            'date'        => 'required|date',
+            'description' => 'nullable|string',
+            'attch_doc'   => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:2048',
+        ]);
+
+        if ($request->hasFile('attch_doc')) {
+            $fileName = time() . '_' . $request->attch_doc->getClientOriginalName();
+            $request->attch_doc->storeAs('timeline_docs', $fileName, 'public');
+            $timeline->attch_doc = $fileName;
+        }
+
+        $timeline->update([
+            'title'          => $request->title,
+            'date'           => $request->date,
+            'description'    => $request->description,
+            'visible_person' => $request->has('visible_person') ? 1 : 0,
+        ]);
+
+        return redirect()->back()->with('success', 'Timeline updated successfully!');
+    }
+    public function getChartData()
+    {
+        // Example static data (replace with DB query as needed)
+        $data = [
+            'labels' => ['OPD', 'Pharmacy', 'Pathology', 'Blood Bank'],
+            'label'  => 'Patients',
+            'values' => [12, 19, 3, 5],
+        ];
+
+        return response()->json($data);
+    }
+
 }

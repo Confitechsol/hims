@@ -69,9 +69,9 @@
 
 
                                         <div class="text-end d-flex">
-                                            <button onclick="exportToCSV()"
-                                                class="btn btn-primary text-white ms-2 fs-13 btn-md"><i
-                                                    class="ti ti-download me-1"></i>Download Sample Data</button>
+                                            <a href="{{ route('patients.export') }}" class="btn btn-primary text-white ms-2 fs-13 btn-md"><i
+                                                    class="ti ti-download me-1"></i>Download Sample Data</a>
+                                            
                                         </div>
                                     </div>
 
@@ -119,9 +119,9 @@
                                     <table class="table table-bordered mb-0" id="table">
                                         <thead>
                                             <tr>
-
                                                 <th>Patient</th>
                                                 <th>Gender</th>
+                                                <th>Blood Group</th>
                                                 <th>Age(Year)</th>
                                                 <th>Age(Month)</th>
                                                 <th>Age(Day)</th>
@@ -152,17 +152,19 @@
                                                 <td>Sample Data</td>
                                                 <td>Sample Data</td>
                                                 <td>Sample Data</td>
+                                                <td>Sample Data</td>
                                             </tr>
                                         </tbody>
                                     </table>
                                 </div>
+
 
                                 <div class="import_form">
                                     <form action="{{ route('patients.import') }}" method="POST"
                                         enctype="multipart/form-data">
                                         @csrf
                                         <div class="row">
-                                            <div class="col-md-6">
+                                            <!-- <div class="col-md-6">
                                                 <label for="" class="form-label">
                                                     Blood Group</label>
                                                 <select name="blood_group" class="form-select">
@@ -174,8 +176,8 @@
                                                     <option value="5"> O-</option>
                                                     <option value="6"> AB-</option>
                                                 </select>
-                                            </div>
-                                            <div class="col-md-6">
+                                            </div> -->
+                                            <div class="col-md-12">
                                                 <label for="" class="form-label">
                                                     Select CSV File <span class="text-danger">*</span></label>
                                                 <input type="file" name="csv_file" id="csv_file" class="form-control"
@@ -228,6 +230,7 @@
     // Export to CSV
     function exportToCSV() {
         const table = document.getElementById("table");
+        console.log(document.getElementById("table"));
         // const csv = XLSX.utils.table_to_csv(table);
         // Convert table to workbook
         const wb = XLSX.utils.table_to_book(table);
@@ -239,5 +242,17 @@
         link.download = 'patients.csv';
         link.click();
     }
+    
 </script>
+<script>
+    document.getElementById("exportBtn").addEventListener("click", function() {
+      const table = document.getElementById("table");
+      if (!table) {
+        alert("Table not found!");
+        return;
+      }
+      const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+      XLSX.writeFile(wb, "patients.xlsx");
+    });
+  </script>
 @endsection

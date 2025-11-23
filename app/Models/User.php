@@ -19,7 +19,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'hospital_id',
-         'branch_id',
+        'branch_id',
         'user_id',
         'username',
         'password',
@@ -34,6 +34,10 @@ class User extends Authenticatable
     // {
     //     return $this->hasOne(Staff::class, 'user_id', 'user_id');
     // }
+    public function userRole()
+    {
+        return $this->belongsTo(Role::class, 'role');
+    }
 
     /**
      * The attributes that should be hidden for serialization.

@@ -109,7 +109,7 @@
                                                 @foreach ($ipd as $ipdDetails)
                                                     <tr>
                                                         <td>{{ $loop->iteration }}</td>
-                                                        <td><a href="#"
+                                                        <td><a href="{{ route('ipd.show', ['id' => $ipdDetails->id]) }}"
                                                                 class="text-primary">{{ $ipdDetails->ipd_no }}</a>
                                                         </td>
                                                         <td>{{ $ipdDetails->patient->patient_name ?? '-' }}</td>
