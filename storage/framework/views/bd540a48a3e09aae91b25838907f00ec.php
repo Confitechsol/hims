@@ -323,9 +323,9 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="index.html" class="active">Income
+                                    <li><a href="<?php echo e(route('income')); ?>" class="active">Income
                                             </a></li>
-                                    <li><a href="doctor-dashboard.html">Expenses
+                                    <li><a href="<?php echo e(route('expense')); ?>">Expenses
                                             </a></li>
                                     
                                 </ul>
