@@ -487,7 +487,7 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="<?php echo e(route('profile')); ?>">Profile</a></li>
+                                    <!-- <li><a href="<?php echo e(route('profile')); ?>">Profile</a></li> -->
                                     <!--<li><a href="security-settings.html">Security</a></li>
                                     //<li><a href="notifications-settings.html">Notifications</a></li>
                                     <li><a href="integrations-settings.html">Integrations</a></li>-->
