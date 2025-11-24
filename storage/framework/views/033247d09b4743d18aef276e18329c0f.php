@@ -226,7 +226,7 @@ unset($__errorArgs, $__bag); ?>"
                                             <label class="form-label">TPA Code</label>
                                             <input type="text" id="edit_tpa_id_<?php echo e($patient->id); ?>" name="tpa_id"
                                                 class="form-control"
-                                                value="<?php echo e(old('tpa_id', $patient->tpa_id)); ?>" />
+                                                value="<?php echo e(old('tpa_id', $patient->insurance_id)); ?>" />
                                         </div>
 
                                         
@@ -260,73 +260,91 @@ unset($__errorArgs, $__bag); ?>"
         </div>
     </div>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const tpaSelect = document.getElementById('tpa');
-        const tpaIdInput = document.getElementById('tpa_id');
-        tpaSelect.innerHTML = '<option value="">Loading...</option>';
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
 
-        fetch("<?php echo e(route('getOrganizations')); ?>")
-            .then(response => response.json())
-            .then(data => {
-                window.organizationsData = data;
-                tpaSelect.innerHTML = '<option value="">Select</option>';
-                data.forEach(org => {
-                    const option = document.createElement('option');
-                    option.value = org.id;
-                    option.textContent = org.organisation_name;
-                    if ("<?php echo e(old('tpa')); ?>" == org.id) {
-                        option.selected = true;
-                    }
-                    tpaSelect.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching organizations:', error);
-                tpaSelect.innerHTML = '<option value="">Error loading options</option>';
-            });
+    // ------------------- TPA LOAD & AUTO CODE -------------------
+    const tpaSelect = document.getElementById('edit_tpa_<?php echo e($patient->id); ?>');
+    const tpaIdInput = document.getElementById('edit_tpa_id_<?php echo e($patient->id); ?>');
 
-            // Listen for dropdown change
-            tpaSelect.addEventListener('change', function() {
-                const selectedId = this.value;
-                const selectedOrg = window.organizationsData.find(org => org.id == selectedId);
-                tpaIdInput.value = selectedOrg ? selectedOrg.code : '';
-            });
-            //auto calculate age..............................................................................
-            const birthDateInput = document.getElementById('birth_date');
-            const ageYearInput = document.getElementById('age_year');
-            const ageMonthInput = document.getElementById('age_month');
-            const ageDayInput = document.getElementById('age_day');
+    tpaSelect.innerHTML = '<option value="">Loading...</option>';
 
-            birthDateInput.addEventListener('change', function() {
-                const birthDate = new Date(this.value);
-                if (!this.value || isNaN(birthDate)) {
-                    ageYearInput.value = '';
-                    ageMonthInput.value = '';
-                    ageDayInput.value = '';
-                    return;
+    fetch("<?php echo e(route('getOrganizations')); ?>")
+        .then(response => response.json())
+        .then(data => {
+            window.organizationsData = data;
+            tpaSelect.innerHTML = '<option value="">Select</option>';
+
+            data.forEach(org => {
+                const option = document.createElement('option');
+                option.value = org.id;
+                option.textContent = org.organisation_name;
+
+                // Preselect if patient already has TPA
+                if ("<?php echo e(old('tpa', $patient->organisation_id)); ?>" == org.id) {
+                    option.selected = true;
                 }
 
-                const today = new Date();
-                let years = today.getFullYear() - birthDate.getFullYear();
-                let months = today.getMonth() - birthDate.getMonth();
-                let days = today.getDate() - birthDate.getDate();
-
-                if (days < 0) {
-                    months--;
-                    const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-                    days += prevMonth.getDate();
-                }
-
-                if (months < 0) {
-                    years--;
-                    months += 12;
-                }
-                ageYearInput.value = years;
-                ageMonthInput.value = months;
-                ageDayInput.value = days;
+                tpaSelect.appendChild(option);
             });
+
+            // Autofill TPA code when editing existing patient
+            const selectedOrg = data.find(org => org.id == "<?php echo e(old('tpa', $patient->organisation_id)); ?>");
+            if (selectedOrg) {
+                tpaIdInput.value = selectedOrg.code;
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching organizations:', error);
+            tpaSelect.innerHTML = '<option value="">Error loading options</option>';
+        });
+
+    // Change event for dropdown
+    tpaSelect.addEventListener('change', function() {
+        const selectedId = this.value;
+        const selectedOrg = window.organizationsData.find(org => org.id == selectedId);
+        tpaIdInput.value = selectedOrg ? selectedOrg.code : '';
     });
+
+    // ------------------- AUTO CALCULATE AGE -------------------
+    const birthDateInput = document.getElementById('birth_date'); // your ID
+    const ageYearInput = document.getElementById('edit_age_year_<?php echo e($patient->id); ?>');
+    const ageMonthInput = document.getElementById('edit_age_month_<?php echo e($patient->id); ?>');
+    const ageDayInput = document.getElementById('edit_age_day_<?php echo e($patient->id); ?>');
+
+    birthDateInput.addEventListener('change', function() {
+        const birthDate = new Date(this.value);
+
+        if (!this.value || isNaN(birthDate)) {
+            ageYearInput.value = '';
+            ageMonthInput.value = '';
+            ageDayInput.value = '';
+            return;
+        }
+
+        const today = new Date();
+        let years = today.getFullYear() - birthDate.getFullYear();
+        let months = today.getMonth() - birthDate.getMonth();
+        let days = today.getDate() - birthDate.getDate();
+
+        if (days < 0) {
+            months--;
+            const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+            days += prevMonth.getDate();
+        }
+
+        if (months < 0) {
+            years--;
+            months += 12;
+        }
+
+        ageYearInput.value = years;
+        ageMonthInput.value = months;
+        ageDayInput.value = days;
+    });
+
+});
+ 
 </script>
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\hims\resources\views/admin/setup/edit-patient.blade.php ENDPATH**/ ?>
