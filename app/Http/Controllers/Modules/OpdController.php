@@ -24,6 +24,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class OpdController extends Controller
 {
@@ -223,8 +224,25 @@ class OpdController extends Controller
 
     public function update(Request $request, $id)
     {
-        // dd($request->all());
-        $request->validate([
+        //dd($request->all());
+        // $request->validate([
+        //     'appointment_date'     => 'required|date',
+        //     'old_patient'          => 'required|string',
+        //     'casualty'             => 'required|string',
+        //     'reference'            => 'nullable|string',
+        //     'consultant_doctor'    => 'required|exists:doctor,id',
+        //     'payment_date'         => 'nullable|date',
+        //     'paid_amount'          => 'required|numeric|min:0',
+        //     'payment_mode'         => 'nullable|string|max:50',
+        //     'symptoms_type'        => 'required|array',
+        //     'symptoms_type.*'      => 'string',
+        //     'symptoms_title'       => 'required|array',
+        //     'symptoms_title.*'     => 'string',
+        //     'symptoms_description' => 'required|string',
+        //     'known_allergies'      => 'nullable|string',
+        //     'note'                 => 'nullable|string',
+        // ]);
+        $validator = Validator::make($request->all(), [
             'appointment_date'     => 'required|date',
             'old_patient'          => 'required|string',
             'casualty'             => 'required|string',
@@ -241,6 +259,10 @@ class OpdController extends Controller
             'known_allergies'      => 'nullable|string',
             'note'                 => 'nullable|string',
         ]);
+
+        if ($validator->fails()) {
+            dd($validator->errors()->all());  // 👈 will show validation errors
+        }
 
         DB::beginTransaction();
         $user = Auth::user();

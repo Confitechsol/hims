@@ -76,8 +76,9 @@ class PatientController extends Controller
     }
     public function edit($id)
     {
-        $patient = Patient::find($id);
-        return view('admin.setup.edit-patient', compact("patient"));
+        
+        $patient = Patient::with('organisation')->find($id);
+        return view('admin.setup.edit-patient', compact('patient'));
 
     }
     public function update(Request $request, $id)
@@ -236,7 +237,9 @@ class PatientController extends Controller
         $genderList = '"Male,Female,Other"';
         $maritalList = '"Single,Married,Divorced,Widowed"';
         $bloodGroups = BloodBankProduct::where('is_blood_group', 1)->pluck('name')->toArray();
+        $tpas = Organisation::pluck('organisation_name')->toArray();
         $bloodList = '"' . implode(",", $bloodGroups) . '"';
+        $tpaList = '"' . implode(",", $tpas) . '"';
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -245,7 +248,7 @@ class PatientController extends Controller
         $headers = [
             "Patient", "Gender", "Blood Group", "Age(Year)", "Age(Month)", "Age(Day)",
             "Marital Status", "Phone", "Email", "Address", "Remarks",
-            "Known Allergies", "Identification Number", "TPA ID", "TPA Validity"
+            "Known Allergies", "Identification Number", "TPA", "TPA ID", "TPA Validity"
         ];
 
         // Add header row
@@ -268,13 +271,16 @@ class PatientController extends Controller
         // Marital Status → Column G
         $this->addDropdown($sheet, "G2:G500", $maritalList);
 
+        // Marital Status → Column N
+        $this->addDropdown($sheet, "N2:N500", $tpaList);
+
         // Lock header row
-        foreach (range('A', 'O') as $col) {
+        foreach (range('A', 'Q') as $col) {
             $sheet->getStyle($col.'1')->getProtection()->setLocked(true);
         }
 
         // Unlock data rows
-        $sheet->getStyle('A2:O500')->getProtection()->setLocked(false);
+        $sheet->getStyle('A2:Q500')->getProtection()->setLocked(false);
 
         // Protect sheet
         $sheet->getProtection()->setSheet(true);
