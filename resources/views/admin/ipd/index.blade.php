@@ -7,6 +7,8 @@
             color: #f8f9fa !important;
             font-weight: 600 !important;
         }
+
+        
     </style>
     <div class="container">
         <div class="card shadow-sm border-0 mt-4">
@@ -273,6 +275,7 @@
     {{-- filters --}}
 
     <script>
+        
         document.addEventListener("DOMContentLoaded", function() {
             const filterTypeSelect = document.getElementById('filterType');
             const dateRangeFilter = document.getElementById('dateRangeFilter');

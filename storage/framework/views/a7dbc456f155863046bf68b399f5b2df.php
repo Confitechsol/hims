@@ -705,6 +705,8 @@
                     initSelect($(this));
                 });
 
+               
+
                 // Initialize selects that appear inside modals when they open
                 $('.modal').off('shown.bs.modal.select2init').on('shown.bs.modal.select2init', function () {
                     var $modal = $(this);

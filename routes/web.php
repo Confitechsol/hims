@@ -509,6 +509,7 @@ Route::post('/ipd/store', [IpdController::class, 'store'])->name('ipd.store');
 Route::get('/ipd/edit/{id}', [IpdController::class, 'edit'])->name('ipd.edit');
 Route::put('/ipd/update/{id}', [IpdController::class, 'update'])->name('ipd.update');
 Route::get('/getBedGroups', [IpdController::class, 'getBedGroups'])->name('getBedGroups');
+Route::get('/get-available-beds', [IpdController::class, 'getAvailableBeds'])->name('get.available.beds');
 Route::get('/getBedNumbers/{id}', [IpdController::class, 'getBedNumbers'])->name('getBedNumbers');
 Route::get('/ipd_view/{id}', [IpdController::class, 'showIpd'])->name('ipd.show');
 Route::get('/getNurses', [IpdController::class, 'getNurses'])->name('getNurses');
@@ -517,6 +518,7 @@ Route::get('/getIpdMedicineById/{id}', [IpdController::class, 'getIpdMedicineByI
 Route::post('/add_nurse_note', [IpdController::class, 'addNurseNote'])->name('nurseNote.store');
 Route::post('/ipd/add_prescription', [IpdController::class, 'storePrescription'])->name('ipd.addPrescription');
 Route::post('/ipd_charge', [IpdController::class, 'addIpdCharge'])->name('ipd.addIpdCharge');
+Route::post('/assignNewBed', [IpdController::class, 'assignNewBed'])->name('assignNewBed');
 
 Route::get('/billing', function () {
     return view('admin.billing.billing');

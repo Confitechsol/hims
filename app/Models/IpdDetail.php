@@ -71,6 +71,8 @@ class IpdDetail extends Model
         return $this->belongsTo(BedGroup::class, 'bed_group_id');
     }
 
+
+
     public function doctor()
     {
         return $this->belongsTo(Doctor::class, 'cons_doctor');

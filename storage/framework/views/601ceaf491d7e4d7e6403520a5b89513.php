@@ -2649,7 +2649,7 @@
                                                             <tr>
                                                                 <th>OPD No</th>
                                                                 <th>Case ID</th>
-                                                                <th>Appointment Date</th>
+                                                                <th>Admission Date</th>
                                                                 <th>Title</th>
                                                                 <th>Date</th>
                                                                 <th>Action</th>
@@ -2974,7 +2974,7 @@
                                                                 <tr>
                                                                     <td>
                                                                         <h6 class="fs-14 mb-1">
-                                                                            <?php echo e($history->bedGroup->name); ?></h6>
+                                                                            <?php echo e($history->bedGroup->name?? '-'); ?></h6>
                                                                     </td>
                                                                     <td><?php echo e($history->bed->name); ?></td>
                                                                     <td><?php echo e(\Carbon\Carbon::parse($history->from_date)->format('d/m/Y h:i A')); ?>
@@ -3012,43 +3012,63 @@
                                 </h5>
                             </div>
                             <div class="card-body">
-                                <div class="row">
-                                    <div class="col-lg-12">
-                                        <div class="row gy-4">
-                                            <div class="col-md-6">
-                                                <span class="text-primary"> <b>Old Assigned Bed : </b> </span>
-                                                <span> Bed 4 - General Ward - Floor 2</span>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <span class="text-primary"> <b>Assigned Date : </b> </span>
-                                                <span> 12th September 2025 06:08:22 am</span>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label for="released_date" class="form-label">Select Released Date <span
-                                                        class="text-danger">*</span></label>
-                                                <input type="text" name="released_date" id="released_date"
-                                                    class="form-control">
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label for="bed_group" class="form-label">Select Bed Group <span
-                                                        class="text-danger">*</span></label>
-                                                <select name="bed_group" id="bed_group" class="form-select">
-                                                    <option value="">Select Bed Group</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label for="new_bed" class="form-label">Select New Bed <span
-                                                        class="text-danger">*</span></label>
-                                                <select name="new_bed" id="new_bed" class="form-select">
-                                                    <option value="">Select New Bed</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-12 text-end mt-4">
-                                                <button type="submit" class="btn btn-primary">Assign</button>
+                                <form action = "<?php echo e(route('assignNewBed')); ?>" method = "POST">
+                                    <?php echo csrf_field(); ?>
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="row gy-4">
+                                                <div class="col-md-6">
+                                                    <span class="text-primary"> <b>Old Assigned Bed : </b> </span>
+                                                    
+                                                        <span>
+                                                            <?php echo e($bedShiftHistory->bed->name ?? '-'); ?>
+
+                                                            -
+                                                            <?php echo e($bedShiftHistory->bedGroup->name ?? 'No Ward'); ?>
+
+                                                            -
+                                                            <?php echo e($bedShiftHistory->bedGroup->floorDetail->name ?? '-'); ?>
+
+                                                        </span>
+                                                   
+                                                        
+                                                </div>
+                                                <input type="hidden" name="ipd_id" value="<?php echo e($ipd->id); ?>">
+                                                <div class="col-md-6">
+                                                    <span class="text-primary"><b>Assigned Date : </b></span>
+                                                    <span>
+                                                        <?php echo e($bedShiftHistory->from_date ? \Carbon\Carbon::parse($bedShiftHistory->from_date)->format('jS F Y h:i:s a') : '-'); ?>
+
+                                                    </span>
+                                                </div>
+                                                
+                                                <div class="col-md-4">
+                                                    <label for="released_date" class="form-label">Select Released Date <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="datetime-local" name="released_date" id="released_date" class="form-control">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="bed_group" class="form-label">Select Bed Group <span class="text-danger">*</span></label>
+                                                    <select name="bed_group" id="bed_group" class="form-select">
+                                                        <option value="">Select Bed Group</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <label for="new_bed" class="form-label">Select New Bed <span class="text-danger">*</span></label>
+                                                    <select name="new_bed" id="new_bed" class="form-select">
+                                                        <option value="">Select New Bed</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-md-12 text-end mt-4">
+                                                    <button type="submit" class="btn btn-primary">Assign</button>
+                                                </div>
+                                                
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -3565,6 +3585,39 @@
             });
         });
     </script>
+    <script>
+$(document).ready(function() {
+
+    // Load bed groups on page load
+    $.get("<?php echo e(route('getBedGroups')); ?>", function(data){
+        let options = '<option value="">Select Bed Group</option>';
+        data.forEach(function(group){
+            options += `<option value="${group.id}">${group.name} - ${group.floor_detail?.name ?? '-'}</option>`;
+        });
+        $('#bed_group').html(options);
+    });
+
+    // Load available beds when bed group changes
+    $('#bed_group').on('change', function () {
+        let groupId = $(this).val();
+        $('#new_bed').html('<option value="">Loading...</option>');
+
+        if (groupId) {
+            $.get("<?php echo e(route('get.available.beds')); ?>", { bed_group_id: groupId }, function(data){
+                let options = '<option value="">Select New Bed</option>';
+                data.forEach(function(bed){
+                    options += `<option value="${bed.id}"> ${bed.name}</option>`;
+                });
+                $('#new_bed').html(options);
+            });
+        } else {
+            $('#new_bed').html('<option value="">Select New Bed</option>');
+        }
+    });
+
+});
+</script>
+
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\hims\resources\views/admin/ipd/ipd_view.blade.php ENDPATH**/ ?>
