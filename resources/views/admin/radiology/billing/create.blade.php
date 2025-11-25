@@ -5,10 +5,10 @@
     <div class="col-md-11">
         <div class="card shadow-sm border-0 mt-4">
             <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                <h5 class="mb-0" style="color: #750096"><i class="fas fa-plus-circle me-2"></i>Generate Pathology Bill</h5>
+                <h5 class="mb-0" style="color: #750096"><i class="fas fa-plus-circle me-2"></i>Generate Radiology Bill</h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('pathology.billing.store') }}" method="POST" id="pathologyBillForm">
+                <form action="{{ route('radiology.billing.store') }}" method="POST" id="radiologyBillForm">
                     @csrf
                     
                     <!-- Patient and Bill Information -->
@@ -73,7 +73,7 @@
                     <!-- Test Selection Table -->
                     <div class="row mb-4">
                         <div class="col-12">
-                            <h6 class="mb-3">Pathology Test Details</h6>
+                            <h6 class="mb-3">Radiology Test Details</h6>
                             <div class="table-responsive">
                                 <table class="table table-bordered" id="testTable">
                                     <thead class="table-light">
@@ -89,15 +89,15 @@
                                     <tbody id="testTableBody">
                                         <tr class="test-row">
                                             <td>
-                                                <select name="tests[0][pathology_id]" class="form-select test_name" required>
+                                                <select name="tests[0][radiology_id]" class="form-select test_name" required>
                                                     <option value="">Select Test</option>
                                                     @if(isset($tests) && count($tests) > 0)
                                                         @foreach($tests as $test)
                                                             <option value="{{ $test->id }}" 
                                                                 data-report-days="{{ $test->report_days ?? 0 }}" 
                                                                 data-tax="{{ $test->charge && $test->charge->taxCategory ? $test->charge->taxCategory->percentage : 0 }}" 
-                                                                data-amount="{{ $test->amount ?? ($test->charge ? $test->charge->standard_charge : 0) }}">
-                                                                {{ $test->test_name }} - ₹{{ number_format($test->amount ?? ($test->charge ? $test->charge->standard_charge : 0), 2) }}
+                                                                data-amount="{{ $test->charge ? ($test->charge->standard_charge + ($test->charge->standard_charge * ($test->charge->taxCategory ? $test->charge->taxCategory->percentage : 0) / 100)) : 0 }}">
+                                                                {{ $test->test_name }} - ₹{{ number_format($test->charge ? ($test->charge->standard_charge + ($test->charge->standard_charge * ($test->charge->taxCategory ? $test->charge->taxCategory->percentage : 0) / 100)) : 0, 2) }}
                                                             </option>
                                                         @endforeach
                                                     @else
@@ -182,7 +182,7 @@
                     </div>
 
                     <div class="d-flex justify-content-end gap-2 mt-4">
-                        <a href="{{ route('pathology.billing.index') }}" class="btn btn-secondary">Cancel</a>
+                        <a href="{{ route('radiology.billing.index') }}" class="btn btn-secondary">Cancel</a>
                         <button type="submit" class="btn btn-primary">Generate Bill</button>
                     </div>
                 </form>
@@ -256,11 +256,6 @@ document.addEventListener('DOMContentLoaded', function() {
     initPatientAutocomplete();
     initPrescriptionAutocomplete();
     
-    // Check if test select exists
-    const testSelect = document.querySelector('.test_name');
-    console.log('Test select found:', testSelect);
-    console.log('Select2 is applied:', testSelect.classList.contains('select2-hidden-accessible'));
-    
     // Test selection handler - Using jQuery with Select2
     $(document).on('change', '.test_name', function(e) {
         console.log('Test dropdown changed! (Select2 event)');
@@ -269,13 +264,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const row = $(this).closest('tr');
         const testId = this.value;
         
-        console.log('Selected option:', selectedOption.text);
-        console.log('Data attributes:', {
-            days: selectedOption.getAttribute('data-report-days'),
-            tax: selectedOption.getAttribute('data-tax'),
-            amount: selectedOption.getAttribute('data-amount')
-        });
-        
         if (testId) {
             const reportDays = selectedOption.getAttribute('data-report-days') || 0;
             const tax = selectedOption.getAttribute('data-tax') || 0;
@@ -283,8 +271,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Store original charge
             originalCharges[testId] = standardAmount;
-            
-            console.log('Setting values - Days:', reportDays, 'Tax:', tax, 'Amount:', standardAmount);
             
             row.find('.report_days').val(reportDays);
             row.find('.tax_percentage').val(tax);
@@ -296,7 +282,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (activateTpa && organisationId) {
                 // Fetch TPA charge
-                fetch(`/hims/pathology/billing/api/tpa-charge?test_id=${testId}&organisation_id=${organisationId}`)
+                fetch(`/hims/radiology/billing/api/tpa-charge?test_id=${testId}&organisation_id=${organisationId}`)
                     .then(response => response.json())
                     .then(data => {
                         const amountToUse = (data.tpa_charge !== null && data.tpa_charge !== undefined) 
@@ -318,8 +304,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const reportingDate = new Date(document.getElementById('date').value);
             reportingDate.setDate(reportingDate.getDate() + parseInt(reportDays));
             row.find('.report_date').val(reportingDate.toISOString().split('T')[0]);
-            
-            console.log('Values set successfully!');
         } else {
             row.find('.report_days').val(0);
             row.find('.tax_percentage').val(0);
@@ -342,14 +326,14 @@ document.addEventListener('DOMContentLoaded', function() {
         newRow.className = 'test-row';
         newRow.innerHTML = `
             <td>
-                <select name="tests[${testRowCount}][pathology_id]" class="form-select test_name" required>
+                <select name="tests[${testRowCount}][radiology_id]" class="form-select test_name" required>
                     <option value="">Select Test</option>
                     @foreach($tests as $test)
                         <option value="{{ $test->id }}" 
                             data-report-days="{{ $test->report_days ?? 0 }}" 
                             data-tax="{{ $test->charge && $test->charge->taxCategory ? $test->charge->taxCategory->percentage : 0 }}" 
-                            data-amount="{{ $test->amount ?? ($test->charge ? $test->charge->standard_charge : 0) }}">
-                            {{ $test->test_name }} - ₹{{ number_format($test->amount ?? ($test->charge ? $test->charge->standard_charge : 0), 2) }}
+                            data-amount="{{ $test->charge ? ($test->charge->standard_charge + ($test->charge->standard_charge * ($test->charge->taxCategory ? $test->charge->taxCategory->percentage : 0) / 100)) : 0 }}">
+                            {{ $test->test_name }} - ₹{{ number_format($test->charge ? ($test->charge->standard_charge + ($test->charge->standard_charge * ($test->charge->taxCategory ? $test->charge->taxCategory->percentage : 0) / 100)) : 0, 2) }}
                         </option>
                     @endforeach
                 </select>
@@ -428,11 +412,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Patient autocomplete
+    let currentFocus = -1;
     function initPatientAutocomplete() {
         const searchInput = document.getElementById('patient_search');
         const hiddenInput = document.getElementById('patient_id');
         const suggestionsDiv = document.getElementById('patient_suggestions');
-        let currentFocus = -1;
 
         searchInput.addEventListener('input', function() {
             const searchTerm = this.value.toLowerCase();
@@ -535,7 +519,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function loadPatientPrescriptions(patientId) {
-        fetch(`/hims/pathology/billing/api/patient-prescriptions/${patientId}`)
+        fetch(`/hims/radiology/billing/api/patient-prescriptions/${patientId}`)
             .then(response => response.json())
             .then(data => {
                 prescriptionData = data;
@@ -555,7 +539,7 @@ document.addEventListener('DOMContentLoaded', function() {
         helpText.textContent = 'Loading TPAs...';
         helpText.className = 'text-muted';
         
-        fetch(`/hims/pathology/billing/api/patient-tpas/${patientId}`)
+        fetch(`/hims/radiology/billing/api/patient-tpas/${patientId}`)
             .then(response => response.json())
             .then(data => {
                 const tpaDropdown = document.getElementById('tpa_dropdown');
@@ -642,7 +626,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 // Fetch TPA charge for this test
-                const promise = fetch(`/hims/pathology/billing/api/tpa-charge?test_id=${testId}&organisation_id=${organisationId}`)
+                const promise = fetch(`/hims/radiology/billing/api/tpa-charge?test_id=${testId}&organisation_id=${organisationId}`)
                     .then(response => response.json())
                     .then(data => {
                         const amountInput = row.querySelector('.test_amount');
@@ -722,3 +706,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endsection
+

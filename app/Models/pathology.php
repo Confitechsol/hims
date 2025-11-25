@@ -10,6 +10,8 @@ class Pathology extends Model
     use HasFactory;
 
     protected $table = 'pathology';
+    
+    public $timestamps = false; // Disable timestamps since updated_at column doesn't exist
 
     protected $fillable = [
         'hospital_id',
