@@ -1,11 +1,11 @@
-
-<?php $__env->startSection('content'); ?>
+@extends('layouts.adminLayout')
+@section('content')
     <div class="row justify-content-center">
         <div class="col-md-11">
             <div class="card shadow-sm border-0 mt-4">
                 <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                     <h5 class="mb-0" style="color: #750096">
-                        <i class="fas fa-file-invoice me-2"></i>Pathology Bill List
+                        <i class="fas fa-file-invoice me-2"></i>Radiology Bill List
                     </h5>
                 </div>
 
@@ -17,18 +17,18 @@
                             </span>
                             <input type="text" class="form-control shadow-sm" id="searchBill" placeholder="Search Bill">
                         </div>
-                        <a href="<?php echo e(route('pathology.billing.create')); ?>" class="btn btn-primary text-white">
+                        <a href="{{ route('radiology.billing.create') }}" class="btn btn-primary text-white">
                             <i class="ti ti-plus me-1"></i>Generate Bill
                         </a>
                     </div>
 
-                    <?php if(session('success')): ?>
-                        <div class="alert alert-success"><?php echo e(session('success')); ?></div>
-                    <?php endif; ?>
+                    @if (session('success'))
+                        <div class="alert alert-success">{{ session('success') }}</div>
+                    @endif
 
-                    <?php if(session('error')): ?>
-                        <div class="alert alert-danger"><?php echo e(session('error')); ?></div>
-                    <?php endif; ?>
+                    @if (session('error'))
+                        <div class="alert alert-danger">{{ session('error') }}</div>
+                    @endif
 
                     <div class="table-responsive">
                         <table class="table mb-0">
@@ -47,28 +47,28 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php $__empty_1 = true; $__currentLoopData = $bills; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $bill): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                @forelse($bills as $bill)
                                     <tr>
-                                        <td>PATB<?php echo e(str_pad($bill->id, 2, '0', STR_PAD_LEFT)); ?></td>
-                                        <td><?php echo e($bill->case_reference_id ?? '-'); ?></td>
-                                        <td><?php echo e($bill->date ? date('m/d/Y h:i A', strtotime($bill->date)) : '-'); ?></td>
-                                        <td><?php echo e($bill->patient->patient_name ?? '-'); ?> (<?php echo e($bill->patient_id ?? '-'); ?>)</td>
-                                        <td><?php echo e($bill->doctor_name ?? '-'); ?></td>
-                                        <td><?php echo e(number_format($bill->discount ?? 0, 2)); ?> (<?php echo e(number_format($bill->discount_percentage ?? 0, 2)); ?>%)</td>
-                                        <td>₹<?php echo e(number_format($bill->total ?? 0, 2)); ?></td>
+                                        <td>RADB{{ str_pad($bill->id, 2, '0', STR_PAD_LEFT) }}</td>
+                                        <td>{{ $bill->case_reference_id ?? '-' }}</td>
+                                        <td>{{ $bill->date ? date('m/d/Y h:i A', strtotime($bill->date)) : '-' }}</td>
+                                        <td>{{ $bill->patient->patient_name ?? '-' }} ({{ $bill->patient_id ?? '-' }})</td>
+                                        <td>{{ $bill->doctor_name ?? '-' }}</td>
+                                        <td>{{ number_format($bill->discount ?? 0, 2) }} ({{ number_format($bill->discount_percentage ?? 0, 2) }}%)</td>
+                                        <td>₹{{ number_format($bill->total ?? 0, 2) }}</td>
                                         <td>₹0.00</td>
-                                        <td>₹<?php echo e(number_format($bill->net_amount ?? 0, 2)); ?></td>
+                                        <td>₹{{ number_format($bill->net_amount ?? 0, 2) }}</td>
                                         <td>
                                             <div class="d-flex gap-2">
-                                                <a href="<?php echo e(route('pathology.billing.show', $bill->id)); ?>" class="btn btn-sm btn-info text-white" title="View">
+                                                <a href="{{ route('radiology.billing.show', $bill->id) }}" class="btn btn-sm btn-info text-white" title="View">
                                                     <i class="ti ti-eye"></i>
                                                 </a>
-                                                <a href="<?php echo e(route('pathology.billing.edit', $bill->id)); ?>" class="btn btn-sm btn-warning text-white" title="Edit">
+                                                <a href="{{ route('radiology.billing.edit', $bill->id) }}" class="btn btn-sm btn-warning text-white" title="Edit">
                                                     <i class="ti ti-edit"></i>
                                                 </a>
-                                                <form action="<?php echo e(route('pathology.billing.destroy', $bill->id)); ?>" method="POST" class="d-inline" onsubmit="return confirmDeleteForm(event, 'Delete Billing?', 'Are you sure you want to delete this billing record?');">
-                                                    <?php echo csrf_field(); ?>
-                                                    <?php echo method_field('DELETE'); ?>
+                                                <form action="{{ route('radiology.billing.destroy', $bill->id) }}" method="POST" class="d-inline" onsubmit="return confirmDeleteForm(event, 'Delete Billing?', 'Are you sure you want to delete this billing record?');">
+                                                    @csrf
+                                                    @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-danger text-white" title="Delete">
                                                         <i class="ti ti-trash"></i>
                                                     </button>
@@ -76,23 +76,22 @@
                                             </div>
                                         </td>
                                     </tr>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                @empty
                                     <tr>
                                         <td colspan="10" class="text-center py-4">
                                             <div class="text-muted">
                                                 <i class="ti ti-inbox fs-48 mb-2"></i>
-                                                <p>No pathology bills found. Generate your first bill!</p>
+                                                <p>No radiology bills found. Generate your first bill!</p>
                                             </div>
                                         </td>
                                     </tr>
-                                <?php endif; ?>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
 
                     <div class="mt-3">
-                        <?php echo e($bills->links()); ?>
-
+                        {{ $bills->links() }}
                     </div>
                 </div>
             </div>
@@ -114,7 +113,5 @@
             });
         });
     </script>
-<?php $__env->stopSection(); ?>
+@endsection
 
-
-<?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\xampp-8.2\htdocs\hims\resources\views/admin/pathology/billing/index.blade.php ENDPATH**/ ?>

@@ -28,6 +28,8 @@ use App\Http\Controllers\OperationController;
 use App\Http\Controllers\PathologyBillingController;
 use App\Http\Controllers\PathologyController;
 use App\Http\Controllers\PathologyTestController;
+use App\Http\Controllers\RadiologyBillingController;
+use App\Http\Controllers\RadiologyTestController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PharmacyCompanyController;
@@ -770,6 +772,43 @@ Route::prefix('pathology/billing/api')->group(function () {
     Route::get('/test-details', [PathologyBillingController::class, 'getTestDetails'])->name('pathology.billing.api.test-details');
     Route::get('/patient-tpas/{patientId}', [PathologyBillingController::class, 'getPatientTpas'])->name('pathology.billing.api.patient-tpas');
     Route::get('/tpa-charge', [PathologyBillingController::class, 'getTpaCharge'])->name('pathology.billing.api.tpa-charge');
+});
+
+// Radiology Test Routes
+Route::prefix('radiology/test')->group(function () {
+    Route::get('/', [RadiologyTestController::class, 'index'])->name('radiology.test.index');
+    Route::get('/create', [RadiologyTestController::class, 'create'])->name('radiology.test.create');
+    Route::post('/store', [RadiologyTestController::class, 'store'])->name('radiology.test.store');
+    Route::put('/tpa-charge/update', [RadiologyTestController::class, 'updateTpaCharge'])->name('radiology.test.update-tpa-charge');
+    Route::get('/{id}', [RadiologyTestController::class, 'show'])->name('radiology.test.show');
+    Route::get('/{id}/edit', [RadiologyTestController::class, 'edit'])->name('radiology.test.edit');
+    Route::put('/{id}', [RadiologyTestController::class, 'update'])->name('radiology.test.update');
+    Route::delete('/{id}', [RadiologyTestController::class, 'destroy'])->name('radiology.test.destroy');
+});
+
+// Radiology Test API Routes
+Route::prefix('radiology/api')->group(function () {
+    Route::get('/charge-names', [RadiologyTestController::class, 'getChargeNames'])->name('radiology.api.charge-names');
+    Route::get('/charge-details', [RadiologyTestController::class, 'getChargeDetails'])->name('radiology.api.charge-details');
+});
+
+// Radiology Billing Routes
+Route::prefix('radiology/billing')->group(function () {
+    Route::get('/', [RadiologyBillingController::class, 'index'])->name('radiology.billing.index');
+    Route::get('/create', [RadiologyBillingController::class, 'create'])->name('radiology.billing.create');
+    Route::post('/store', [RadiologyBillingController::class, 'store'])->name('radiology.billing.store');
+    Route::get('/{id}', [RadiologyBillingController::class, 'show'])->name('radiology.billing.show');
+    Route::get('/{id}/edit', [RadiologyBillingController::class, 'edit'])->name('radiology.billing.edit');
+    Route::put('/{id}', [RadiologyBillingController::class, 'update'])->name('radiology.billing.update');
+    Route::delete('/{id}', [RadiologyBillingController::class, 'destroy'])->name('radiology.billing.destroy');
+});
+
+// Radiology Billing API Routes
+Route::prefix('radiology/billing/api')->group(function () {
+    Route::get('/patient-prescriptions/{patientId}', [RadiologyBillingController::class, 'getPatientPrescriptions'])->name('radiology.billing.api.patient-prescriptions');
+    Route::get('/test-details', [RadiologyBillingController::class, 'getTestDetails'])->name('radiology.billing.api.test-details');
+    Route::get('/patient-tpas/{patientId}', [RadiologyBillingController::class, 'getPatientTpas'])->name('radiology.billing.api.patient-tpas');
+    Route::get('/tpa-charge', [RadiologyBillingController::class, 'getTpaCharge'])->name('radiology.billing.api.tpa-charge');
 });
 
 // Pharmacy Masters Routes

@@ -235,10 +235,18 @@
                                     <li><a href="{{ route('pathology.billing.index') }}">Pathology Billing</a></li>
                                 </ul>
                             </li>
-                            <li>
-                                <a href="#">
+                            <li class="submenu">
+                                <a href="javascript:void(0);">
                                     <i class="ti ti-map-pin"></i><span>Radiology</span>
+                                    <span class="menu-arrow"></span>
                                 </a>
+                                <ul>
+                                    <li><a href="{{ route('radiology-category') }}">Radiology Category</a></li>
+                                    <li><a href="{{ route('radiology-unit') }}">Radiology Unit</a></li>
+                                    <li><a href="{{ route('radiology-parameter') }}">Radiology Parameter</a></li>
+                                    <li><a href="{{ route('radiology.test.index') }}">Radiology Test</a></li>
+                                    <li><a href="{{ route('radiology.billing.index') }}">Radiology Billing</a></li>
+                                </ul>
                             </li>
                             <li>
                                 <a href="#">
