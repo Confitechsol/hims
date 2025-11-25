@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\PathologyBilling;
-use App\Models\PathologyReport;
-use App\Models\Pathology;
+use App\Models\RadiologyBilling;
+use App\Models\RadiologyReport;
+use App\Models\Radio;
 use App\Models\Patient;
 use App\Models\Doctor;
 use App\Models\CaseReference;
@@ -14,22 +14,22 @@ use App\Models\OrganisationsCharge;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
-class PathologyBillingController extends Controller
+class RadiologyBillingController extends Controller
 {
     /**
-     * Display a listing of pathology bills
+     * Display a listing of radiology bills
      */
     public function index()
     {
-        $bills = PathologyBilling::with(['patient', 'doctor'])
+        $bills = RadiologyBilling::with(['patient', 'doctor'])
             ->orderBy('id', 'desc')
             ->paginate(15);
         
-        return view('admin.pathology.billing.index', compact('bills'));
+        return view('admin.radiology.billing.index', compact('bills'));
     }
 
     /**
-     * Show the form for creating a new pathology bill
+     * Show the form for creating a new radiology bill
      */
     public function create()
     {
@@ -41,13 +41,13 @@ class PathologyBillingController extends Controller
                       ->orWhere('is_active', 'yes');
             })
             ->get();
-        $tests = Pathology::with(['category', 'charge.taxCategory'])->get();
+        $tests = Radio::with(['radiologyCategory', 'charge.taxCategory'])->get();
         
-        return view('admin.pathology.billing.create', compact('patients', 'doctors', 'tests'));
+        return view('admin.radiology.billing.create', compact('patients', 'doctors', 'tests'));
     }
 
     /**
-     * Store a newly created pathology bill
+     * Store a newly created radiology bill
      */
     public function store(Request $request)
     {
@@ -67,7 +67,7 @@ class PathologyBillingController extends Controller
             'organisation_id' => 'nullable|exists:organisation,id',
             'activate_tpa' => 'nullable|boolean',
             'tests' => 'required|array|min:1',
-            'tests.*.pathology_id' => 'required|exists:pathology,id',
+            'tests.*.radiology_id' => 'required|exists:radio,id',
             'tests.*.report_days' => 'required|integer|min:0',
             'tests.*.report_date' => 'required|date',
             'tests.*.tax_percentage' => 'nullable|numeric|min:0',
@@ -77,11 +77,10 @@ class PathologyBillingController extends Controller
         DB::beginTransaction();
         
         try {
-            // Get bill number
-            $billNo = 'PATB' . str_pad(PathologyBilling::max('id') + 1, 2, '0', STR_PAD_LEFT);
+            $user = Auth::user();
             
-            // Create pathology bill
-            $bill = PathologyBilling::create([
+            // Create radiology bill
+            $bill = RadiologyBilling::create([
                 'date' => $validated['date'],
                 'patient_id' => $validated['patient_id'],
                 'case_reference_id' => $validated['case_reference_id'] ?? null,
@@ -96,51 +95,55 @@ class PathologyBillingController extends Controller
                 'note' => $validated['note'] ?? null,
                 'organisation_id' => ($request->has('activate_tpa') && $request->activate_tpa) ? ($validated['organisation_id'] ?? null) : null,
                 'generated_by' => Auth::id(),
+                'hospital_id' => $user->hospital_id ?? '',
+                'branch_id' => $user->branch_id ?? '',
             ]);
 
-            // Create pathology reports
+            // Create radiology reports
             foreach ($validated['tests'] as $test) {
-                PathologyReport::create([
-                    'pathology_bill_id' => $bill->id,
-                    'pathology_id' => $test['pathology_id'],
+                RadiologyReport::create([
+                    'radiology_bill_id' => $bill->id,
+                    'radiology_id' => $test['radiology_id'],
                     'patient_id' => $validated['patient_id'],
                     'reporting_date' => $test['report_date'],
                     'tax_percentage' => $test['tax_percentage'] ?? 0,
                     'apply_charge' => $test['amount'],
                     'customer_type' => 'OPD',
+                    'hospital_id' => $user->hospital_id ?? '',
+                    'branch_id' => $user->branch_id ?? '',
                 ]);
             }
 
             DB::commit();
             
-            return redirect()->route('pathology.billing.index')
-                ->with('success', 'Pathology bill created successfully!');
+            return redirect()->route('radiology.billing.index')
+                ->with('success', 'Radiology bill created successfully!');
                 
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'Error creating pathology bill: ' . $e->getMessage());
+                ->with('error', 'Error creating radiology bill: ' . $e->getMessage());
         }
     }
 
     /**
-     * Display the specified pathology bill
+     * Display the specified radiology bill
      */
     public function show($id)
     {
-        $bill = PathologyBilling::with(['patient', 'doctor', 'reports.pathology'])
+        $bill = RadiologyBilling::with(['patient', 'doctor', 'reports.radiology'])
             ->findOrFail($id);
         
-        return view('admin.pathology.billing.show', compact('bill'));
+        return view('admin.radiology.billing.show', compact('bill'));
     }
 
     /**
-     * Show the form for editing the specified pathology bill
+     * Show the form for editing the specified radiology bill
      */
     public function edit($id)
     {
-        $bill = PathologyBilling::with(['patient', 'doctor', 'reports.pathology'])->findOrFail($id);
+        $bill = RadiologyBilling::with(['patient', 'doctor', 'reports.radiology'])->findOrFail($id);
         $patients = Patient::select('id', 'patient_name', 'mobileno')->get();
         $doctors = Doctor::select('id', 'name', 'surname', 'doctor_id')
             ->where(function($query) {
@@ -149,13 +152,13 @@ class PathologyBillingController extends Controller
                       ->orWhere('is_active', 'yes');
             })
             ->get();
-        $tests = Pathology::with(['category', 'charge.taxCategory'])->get();
+        $tests = Radio::with(['radiologyCategory', 'charge.taxCategory'])->get();
         
-        return view('admin.pathology.billing.edit', compact('bill', 'patients', 'doctors', 'tests'));
+        return view('admin.radiology.billing.edit', compact('bill', 'patients', 'doctors', 'tests'));
     }
 
     /**
-     * Update the specified pathology bill
+     * Update the specified radiology bill
      */
     public function update(Request $request, $id)
     {
@@ -175,7 +178,7 @@ class PathologyBillingController extends Controller
             'organisation_id' => 'nullable|exists:organisation,id',
             'activate_tpa' => 'nullable|boolean',
             'tests' => 'required|array|min:1',
-            'tests.*.pathology_id' => 'required|exists:pathology,id',
+            'tests.*.radiology_id' => 'required|exists:radio,id',
             'tests.*.report_days' => 'required|integer|min:0',
             'tests.*.report_date' => 'required|date',
             'tests.*.tax_percentage' => 'nullable|numeric|min:0',
@@ -185,9 +188,9 @@ class PathologyBillingController extends Controller
         DB::beginTransaction();
         
         try {
-            $bill = PathologyBilling::findOrFail($id);
+            $bill = RadiologyBilling::findOrFail($id);
             
-            // Update pathology bill
+            // Update radiology bill
             $bill->update([
                 'date' => $validated['date'],
                 'patient_id' => $validated['patient_id'],
@@ -205,59 +208,62 @@ class PathologyBillingController extends Controller
             ]);
 
             // Delete existing reports
-            PathologyReport::where('pathology_bill_id', $bill->id)->delete();
+            RadiologyReport::where('radiology_bill_id', $bill->id)->delete();
 
-            // Create new pathology reports
+            // Create new radiology reports
+            $user = Auth::user();
             foreach ($validated['tests'] as $test) {
-                PathologyReport::create([
-                    'pathology_bill_id' => $bill->id,
-                    'pathology_id' => $test['pathology_id'],
+                RadiologyReport::create([
+                    'radiology_bill_id' => $bill->id,
+                    'radiology_id' => $test['radiology_id'],
                     'patient_id' => $validated['patient_id'],
                     'reporting_date' => $test['report_date'],
                     'tax_percentage' => $test['tax_percentage'] ?? 0,
                     'apply_charge' => $test['amount'],
                     'customer_type' => 'OPD',
+                    'hospital_id' => $user->hospital_id ?? '',
+                    'branch_id' => $user->branch_id ?? '',
                 ]);
             }
 
             DB::commit();
             
-            return redirect()->route('pathology.billing.index')
-                ->with('success', 'Pathology bill updated successfully!');
+            return redirect()->route('radiology.billing.index')
+                ->with('success', 'Radiology bill updated successfully!');
                 
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'Error updating pathology bill: ' . $e->getMessage());
+                ->with('error', 'Error updating radiology bill: ' . $e->getMessage());
         }
     }
 
     /**
-     * Remove the specified pathology bill
+     * Remove the specified radiology bill
      */
     public function destroy($id)
     {
         DB::beginTransaction();
         
         try {
-            $bill = PathologyBilling::findOrFail($id);
+            $bill = RadiologyBilling::findOrFail($id);
             
             // Delete related reports
-            PathologyReport::where('pathology_bill_id', $bill->id)->delete();
+            RadiologyReport::where('radiology_bill_id', $bill->id)->delete();
             
             // Delete bill
             $bill->delete();
             
             DB::commit();
             
-            return redirect()->route('pathology.billing.index')
-                ->with('success', 'Pathology bill deleted successfully!');
+            return redirect()->route('radiology.billing.index')
+                ->with('success', 'Radiology bill deleted successfully!');
                 
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()
-                ->with('error', 'Error deleting pathology bill: ' . $e->getMessage());
+                ->with('error', 'Error deleting radiology bill: ' . $e->getMessage());
         }
     }
 
@@ -284,13 +290,13 @@ class PathologyBillingController extends Controller
     }
 
     /**
-     * API: Get pathology test details
+     * API: Get radiology test details
      */
     public function getTestDetails(Request $request)
     {
         $testId = $request->input('test_id');
         
-        $test = Pathology::with(['charge.taxCategory'])->find($testId);
+        $test = Radio::with(['charge.taxCategory'])->find($testId);
         
         if (!$test) {
             return response()->json(['error' => 'Test not found'], 404);
@@ -301,16 +307,16 @@ class PathologyBillingController extends Controller
             'test_name' => $test->test_name,
             'report_days' => $test->report_days,
             'tax_percentage' => $test->charge && $test->charge->taxCategory ? $test->charge->taxCategory->percentage : 0,
-            'amount' => $test->amount ?? 0,
+            'amount' => $test->charge ? $test->charge->standard_charge : 0,
         ]);
     }
 
     /**
-     * API: Get TPA names for a patient from previous pathology bills
+     * API: Get TPA names for a patient from previous radiology bills
      */
     public function getPatientTpas($patientId)
     {
-        $tpas = PathologyBilling::where('patient_id', $patientId)
+        $tpas = RadiologyBilling::where('patient_id', $patientId)
             ->whereNotNull('organisation_id')
             ->with('organisation')
             ->select('organisation_id')
@@ -339,17 +345,17 @@ class PathologyBillingController extends Controller
             return response()->json(['error' => 'Test ID and Organisation ID are required'], 400);
         }
         
-        $test = Pathology::find($testId);
+        $test = Radio::find($testId);
         
         if (!$test || !$test->charge_id) {
-            return response()->json(['tpa_charge' => null, 'standard_charge' => $test->amount ?? 0]);
+            return response()->json(['tpa_charge' => null, 'standard_charge' => $test->charge ? $test->charge->standard_charge : 0]);
         }
         
         $tpaCharge = OrganisationsCharge::where('charge_id', $test->charge_id)
             ->where('org_id', $organisationId)
             ->first();
         
-        $standardCharge = $test->amount ?? ($test->charge ? $test->charge->standard_charge : 0);
+        $standardCharge = $test->charge ? $test->charge->standard_charge : 0;
         
         return response()->json([
             'tpa_charge' => $tpaCharge ? $tpaCharge->org_charge : null,

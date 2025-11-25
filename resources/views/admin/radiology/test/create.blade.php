@@ -5,12 +5,12 @@
             <div class="card shadow-sm border-0 mt-4">
                 <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                     <h5 class="mb-0" style="color: #750096">
-                        <i class="fas fa-plus-circle me-2"></i>Add Test Details
+                        <i class="fas fa-plus-circle me-2"></i>Add Radiology Test Details
                     </h5>
                 </div>
 
                 <div class="card-body">
-                    <form action="{{ route('pathology.test.store') }}" method="POST" id="pathologyTestForm">
+                    <form action="{{ route('radiology.test.store') }}" method="POST" id="radiologyTestForm">
                         @csrf
 
                         <!-- Row 1 -->
@@ -41,15 +41,15 @@
 
                             <div class="col-md-3">
                                 <label class="form-label">Category Name <span class="text-danger">*</span></label>
-                                <select name="pathology_category_id" id="pathology_category_id" class="form-control" required>
+                                <select name="radiology_category_id" id="radiology_category_id" class="form-control" required>
                                     <option value="">Select</option>
                                     @foreach($categories as $category)
-                                        <option value="{{ $category->id }}" {{ old('pathology_category_id') == $category->id ? 'selected' : '' }}>
-                                            {{ $category->category_name }}
+                                        <option value="{{ $category->id }}" {{ old('radiology_category_id') == $category->id ? 'selected' : '' }}>
+                                            {{ $category->name }}
                                         </option>
                                     @endforeach
                                 </select>
-                                @error('pathology_category_id')
+                                @error('radiology_category_id')
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -61,14 +61,6 @@
                                 <label class="form-label">Sub Category</label>
                                 <input type="text" name="sub_category" class="form-control" value="{{ old('sub_category') }}" maxlength="25" placeholder="Sub Category">
                                 @error('sub_category')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="form-label">Method</label>
-                                <input type="text" name="method" class="form-control" value="{{ old('method') }}" maxlength="25" placeholder="Method">
-                                @error('method')
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -95,10 +87,7 @@
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror
                             </div>
-                        </div>
 
-                        <!-- Row 3 -->
-                        <div class="row mb-3">
                             <div class="col-md-3">
                                 <label class="form-label">Charge Name <span class="text-danger">*</span></label>
                                 <select name="charge_id" id="charge_id" class="form-control" required>
@@ -108,7 +97,10 @@
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror
                             </div>
+                        </div>
 
+                        <!-- Row 3 -->
+                        <div class="row mb-3">
                             <div class="col-md-3">
                                 <label class="form-label">Tax (%)</label>
                                 <div class="input-group">
@@ -118,16 +110,16 @@
                             </div>
 
                             <div class="col-md-3">
-                                <label class="form-label">Standard Charge (INR) <span class="text-danger">*</span></label>
-                                <input type="number" name="standard_charge" id="standard_charge" class="form-control" value="{{ old('standard_charge') }}" step="0.01" min="0" required readonly>
+                                <label class="form-label">Standard Charge (INR)</label>
+                                <input type="number" name="standard_charge" id="standard_charge" class="form-control" value="{{ old('standard_charge') }}" step="0.01" min="0" readonly>
                                 @error('standard_charge')
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="col-md-3">
-                                <label class="form-label">Amount (INR) <span class="text-danger">*</span></label>
-                                <input type="number" name="amount" id="amount" class="form-control" value="{{ old('amount') }}" step="0.01" min="0" required readonly>
+                                <label class="form-label">Amount (INR)</label>
+                                <input type="number" name="amount" id="amount" class="form-control" value="{{ old('amount') }}" step="0.01" min="0" readonly>
                                 @error('amount')
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror
@@ -184,48 +176,8 @@
                             </div>
                         </div>
 
-                        <!-- Test Parameters Section -->
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <h6 class="mb-3">Test Parameters</h6>
-                                <div id="parametersContainer">
-                                    <div class="row mb-2 parameter-row">
-                                        <div class="col-md-4">
-                                            <label class="form-label">Test Parameter Name <span class="text-danger">*</span></label>
-                                            <select name="parameters[]" class="form-control parameter-select" required>
-                                                <option value="">Select</option>
-                                                @foreach($parameters as $parameter)
-                                                    <option value="{{ $parameter['id'] }}" 
-                                                            data-reference="{{ $parameter['reference_range'] ?? 'N/A' }}" 
-                                                            data-unit="{{ $parameter['unit_relation']['unit_name'] ?? 'N/A' }}">
-                                                        {{ $parameter['parameter_name'] }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label class="form-label">Reference Range <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control parameter-reference" disabled placeholder="Select parameter first">
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label class="form-label">Unit <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control parameter-unit" disabled placeholder="Select parameter first">
-                                        </div>
-                                        <div class="col-md-2 d-flex align-items-end">
-                                            <button type="button" class="btn btn-danger btn-sm remove-parameter">
-                                                <i class="ti ti-x"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button type="button" class="btn btn-sm" style="background-color: #CB6CE6; color: white;" id="addParameter">
-                                    <i class="ti ti-plus"></i> Add
-                                </button>
-                            </div>
-                        </div>
-
                         <div class="d-flex justify-content-end gap-2 mt-4">
-                            <a href="{{ route('pathology.test.index') }}" class="btn btn-secondary">Cancel</a>
+                            <a href="{{ route('radiology.test.index') }}" class="btn btn-secondary">Cancel</a>
                             <button type="submit" class="btn btn-success">
                                 <i class="ti ti-check"></i> Save
                             </button>
@@ -243,13 +195,12 @@
             const standardChargeInput = document.getElementById('standard_charge');
             const taxPercentageInput = document.getElementById('tax_percentage');
             const amountInput = document.getElementById('amount');
-            const parametersData = @json($parameters);
 
-            // Manually initialize Select2 for specific dropdowns (since they use form-control, not form-select)
+            // Initialize Select2 for dropdowns
             setTimeout(function() {
                 if (typeof jQuery !== 'undefined' && typeof jQuery.fn.select2 !== 'undefined') {
-                    // Initialize pathology category
-                    jQuery('#pathology_category_id').select2({
+                    // Initialize radiology category
+                    jQuery('#radiology_category_id').select2({
                         width: '100%',
                         placeholder: 'Select Category',
                         allowClear: false
@@ -269,15 +220,7 @@
                         allowClear: false
                     });
                     
-                    // Initialize parameter selects
-                    jQuery('.parameter-select').select2({
-                        width: '100%',
-                        dropdownParent: jQuery('body'),
-                        placeholder: 'Select Parameter',
-                        allowClear: false
-                    });
-                    
-                    console.log('Select2 initialized for pathology dropdowns');
+                    console.log('Select2 initialized for radiology dropdowns');
                 }
             }, 500);
 
@@ -292,7 +235,7 @@
                 amountInput.value = '';
 
                 if (chargeCategoryId) {
-                    const url = `{{ route('pathology.api.charge-names') }}?charge_category_id=${chargeCategoryId}`;
+                    const url = `{{ route('radiology.api.charge-names') }}?charge_category_id=${chargeCategoryId}`;
                     
                     fetch(url)
                         .then(response => {
@@ -321,12 +264,12 @@
                 }
             });
 
-            // Load charge details when charge is selected (using jQuery for Select2 compatibility)
+            // Load charge details when charge is selected
             jQuery('#charge_id').on('change', function() {
                 const chargeId = jQuery(this).val();
 
                 if (chargeId) {
-                    fetch(`{{ route('pathology.api.charge-details') }}?charge_id=${chargeId}`)
+                    fetch(`{{ route('radiology.api.charge-details') }}?charge_id=${chargeId}`)
                         .then(response => response.json())
                         .then(data => {
                             standardChargeInput.value = data.standard_charge;
@@ -351,82 +294,7 @@
                     });
                 }
             });
-
-            // Parameter selection handler - using jQuery for Select2 compatibility
-            jQuery(document).on('change', '.parameter-select', function() {
-                const $select = jQuery(this);
-                const selectedOption = $select.find('option:selected');
-                const row = $select.closest('.parameter-row');
-                const referenceInput = row.find('.parameter-reference');
-                const unitInput = row.find('.parameter-unit');
-
-                if ($select.val()) {
-                    const refRange = selectedOption.data('reference') || 'N/A';
-                    const unitName = selectedOption.data('unit') || 'N/A';
-                    
-                    // Set values but keep fields disabled (readonly)
-                    referenceInput.val(refRange).prop('disabled', true);
-                    unitInput.val(unitName).prop('disabled', true);
-                } else {
-                    referenceInput.val('').prop('disabled', true);
-                    unitInput.val('').prop('disabled', true);
-                }
-            });
-
-            // Add parameter row
-            document.getElementById('addParameter').addEventListener('click', function() {
-                const container = document.getElementById('parametersContainer');
-                const newRow = document.createElement('div');
-                newRow.className = 'row mb-2 parameter-row';
-                newRow.innerHTML = `
-                    <div class="col-md-4">
-                        <select name="parameters[]" class="form-control parameter-select" required>
-                            <option value="">Select</option>
-                            @foreach($parameters as $parameter)
-                                <option value="{{ $parameter['id'] }}" 
-                                        data-reference="{{ $parameter['reference_range'] ?? 'N/A' }}" 
-                                        data-unit="{{ $parameter['unit_relation']['unit_name'] ?? 'N/A' }}">
-                                    {{ $parameter['parameter_name'] }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <input type="text" class="form-control parameter-reference" disabled placeholder="Select parameter first">
-                    </div>
-                    <div class="col-md-3">
-                        <input type="text" class="form-control parameter-unit" disabled placeholder="Select parameter first">
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="button" class="btn btn-danger btn-sm remove-parameter">
-                            <i class="ti ti-x"></i>
-                        </button>
-                    </div>
-                `;
-                container.appendChild(newRow);
-                
-                // Initialize Select2 for the new select element
-                if (typeof jQuery !== 'undefined' && typeof jQuery.fn.select2 !== 'undefined') {
-                    jQuery(newRow).find('.parameter-select').select2({
-                        width: '100%',
-                        dropdownParent: jQuery('body'),
-                        placeholder: 'Select Parameter',
-                        allowClear: false
-                    });
-                }
-            });
-
-            // Remove parameter row
-            document.addEventListener('click', function(e) {
-                if (e.target.closest('.remove-parameter')) {
-                    const row = e.target.closest('.parameter-row');
-                    if (document.querySelectorAll('.parameter-row').length > 1) {
-                        row.remove();
-                    } else {
-                        alert('At least one parameter is required!');
-                    }
-                }
-            });
         });
     </script>
 @endsection
+
