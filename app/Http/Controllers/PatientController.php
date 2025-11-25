@@ -15,8 +15,9 @@ class PatientController extends Controller
 {
     public function index()
     {
+        $bloodGroups = BloodBankProduct::where('is_blood_group', 1)->get();
         $patients = Patient::get();
-        return view('admin.setup.patient', compact("patients"));
+        return view('admin.setup.patient', compact('patients','bloodGroups'));
     }
     public function store(Request $request)
     {
@@ -34,6 +35,9 @@ class PatientController extends Controller
             'file'               => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'phone'              => 'nullable|string|max:20',
             'email'              => 'nullable|email|max:255',
+            'height'             => 'nullable|string|max:255',
+            'weight'             => 'nullable|string|max:255',
+            'temperature'        => 'nullable|string|max:255',
             'address'            => 'nullable|string|max:500',
             'remarks'            => 'nullable|string|max:500',
             'allergies'          => 'nullable|string|max:255',
@@ -247,8 +251,8 @@ class PatientController extends Controller
         // Column headings (match your import format)
         $headers = [
             "Patient", "Gender", "Blood Group", "Age(Year)", "Age(Month)", "Age(Day)",
-            "Marital Status", "Phone", "Email", "Address", "Remarks",
-            "Known Allergies", "Identification Number", "TPA", "TPA ID", "TPA Validity"
+            "Marital Status", "Phone", "Email", "Address", "Remarks", "Known Allergies",
+            "Height","Weight","Temperature","Identification Number", "TPA", "TPA ID", "TPA Validity"
         ];
 
         // Add header row
@@ -275,12 +279,12 @@ class PatientController extends Controller
         $this->addDropdown($sheet, "N2:N500", $tpaList);
 
         // Lock header row
-        foreach (range('A', 'Q') as $col) {
+        foreach (range('A', 'Z') as $col) {
             $sheet->getStyle($col.'1')->getProtection()->setLocked(true);
         }
 
         // Unlock data rows
-        $sheet->getStyle('A2:Q500')->getProtection()->setLocked(false);
+        $sheet->getStyle('A2:Z500')->getProtection()->setLocked(false);
 
         // Protect sheet
         $sheet->getProtection()->setSheet(true);

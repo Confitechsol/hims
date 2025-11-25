@@ -1,3 +1,4 @@
+
 <div class="modal fade" id="add_patient" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content modal-xl">
@@ -11,7 +12,7 @@
             <div class="modal-body">
                 <form action="{{ route('patient-store') }}" method="POST">
                     @csrf
-                    @if ($errors->any())
+                    <!-- @if ($errors->any())
                         <div class="alert alert-danger">
                             <strong>There were some problems with your
                                 input:</strong>
@@ -21,7 +22,7 @@
                                 @endforeach
                             </ul>
                         </div>
-                    @endif
+                    @endif -->
 
                     <div class="row p-4 mx-1 gy-3">
 
@@ -126,18 +127,12 @@
                                     <select name="blood_group"
                                         class="form-control @error('blood_group') is-invalid @enderror">
                                         <option value="">Select</option>
-                                        <option value="1" {{ old('blood_group') == '1' ? 'selected' : '' }}>O+
-                                        </option>
-                                        <option value="2" {{ old('blood_group') == '2' ? 'selected' : '' }}>A+
-                                        </option>
-                                        <option value="3" {{ old('blood_group') == '3' ? 'selected' : '' }}>B+
-                                        </option>
-                                        <option value="4" {{ old('blood_group') == '4' ? 'selected' : '' }}>AB+
-                                        </option>
-                                        <option value="5" {{ old('blood_group') == '5' ? 'selected' : '' }}>O-
-                                        </option>
-                                        <option value="6" {{ old('blood_group') == '6' ? 'selected' : '' }}>AB-
-                                        </option>
+                                        @foreach($bloodGroups as $group)
+                                            <option value="{{ $group->id }}"
+                                                {{ old('blood_group') == $group->id ? 'selected' : '' }}>
+                                                {{ $group->name }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                     @error('blood_group')
                                         <div class="invalid-feedback">{{ $message }}
