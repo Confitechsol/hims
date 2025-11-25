@@ -331,9 +331,9 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="index.html" class="active">Income
+                                    <li><a href="{{ route('income') }}" class="active">Income
                                             </a></li>
-                                    <li><a href="doctor-dashboard.html">Expenses
+                                    <li><a href="{{ route('expense') }}">Expenses
                                             </a></li>
                                     
                                 </ul>
@@ -495,7 +495,7 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('profile') }}">Profile</a></li>
+                                    <!-- <li><a href="{{ route('profile') }}">Profile</a></li> -->
                                     <!--<li><a href="security-settings.html">Security</a></li>
                                     //<li><a href="notifications-settings.html">Notifications</a></li>
                                     <li><a href="integrations-settings.html">Integrations</a></li>-->
