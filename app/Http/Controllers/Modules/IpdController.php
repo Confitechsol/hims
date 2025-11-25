@@ -26,11 +26,13 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class IpdController extends Controller
 {
     public function index(Request $request)
     {
+        
         $isIpdTab = $request->get('tab', 'ipd') == 'ipd';
         $doctors  = Doctor::all();
         if ($isIpdTab) {
@@ -175,8 +177,8 @@ class IpdController extends Controller
 
     public function update(Request $request, $id)
     {
-        // dd($request->all());
-        $request->validate([
+         //dd($request->all());
+        $validator = Validator::make($request->all(), [
             'patient_id'           => 'required|exists:patients,id',
             'appointment_date'     => 'required|date',
             'old_patient'          => 'required|string',
@@ -193,6 +195,10 @@ class IpdController extends Controller
             'symptoms_description' => 'required|string',
             'note'                 => 'nullable|string',
         ]);
+
+        if ($validator->fails()) {
+            dd($validator->errors()->all());  // 👈 will show validation errors
+        }
 
         DB::beginTransaction();
         $user = Auth::user();
@@ -285,6 +291,7 @@ class IpdController extends Controller
         $ipdCharges        = IpdCharges::with('ipd', 'charge.taxCategory', 'chargeCategory.chargeType')->where('ipd_id', $id)->get();
         $labInvestigations = PathologyReport::with('pathology')->where('patient_id', $ipd->patient->id)->get();
         $ipdPrescriptions  = IpdPrescription::where('ipd_id', $id)->get();
+        //dd($id);
         $ipdFindings       = [];
         foreach ($ipdPrescriptions as $pres) {
             // Split comma-separated symptom IDs and clean up
@@ -361,7 +368,7 @@ class IpdController extends Controller
 
     public function storePrescription(Request $request)
     {
-        // dd($request->all());
+        dd($request->all());
         try { $request->validate([
             'ipd_id'              => 'nullable|string',
             'header_note'         => 'nullable|string',
@@ -390,10 +397,14 @@ class IpdController extends Controller
             'instructions.*'      => 'string',
         ]);
             $findingTypes         = array_filter($request->finding_type, fn($type) => $type !== null && $type !== '');
-            $findings             = array_filter($request->findings, fn($title) => $title !== null && $title !== '');
-            $pathology_ids        = array_filter($request->pathology, fn($pathology) => $pathology !== null && $pathology !== '');
-            $radiology_ids        = array_filter($request->radiology, fn($radio) => $radio !== null && $radio !== '');
-            $notification_to      = array_filter($request->visible, fn($notify) => $notify !== null && $notify !== '');
+            // $findings             = array_filter($request->findings, fn($title) => $title !== null && $title !== '');
+            $findings             = array_filter($request->input('findings', []), fn($title) => $title !== null && $title !== '');
+            $pathology_ids   = array_filter($request->input('pathology', []), fn($pathology) => $pathology !== null && $pathology !== '');
+            $radiology_ids   = array_filter($request->input('radiology', []), fn($radio) => $radio !== null && $radio !== '');
+            $notification_to = array_filter($request->input('visible', []), fn($notify) => $notify !== null && $notify !== '');
+            // $pathology_ids        = array_filter($request->pathology, fn($pathology) => $pathology !== null && $pathology !== '');
+            // $radiology_ids        = array_filter($request->radiology, fn($radio) => $radio !== null && $radio !== '');
+            // $notification_to      = array_filter($request->visible, fn($notify) => $notify !== null && $notify !== '');
             $implodedFindingTypes = implode(", ", $findingTypes);
             $implodedFindings     = implode(", ", $findings);
             $implodedPathologies  = implode(", ", $pathology_ids);

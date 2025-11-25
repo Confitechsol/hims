@@ -83,7 +83,7 @@
 
                                     <div class="text-end d-flex">
                                         <button class="btn btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#createIpdModal">Appoint Patient</button>
+                                            data-bs-target="#createIpdModal">Admit Patient</button>
                                     </div>
                                 </div>
                                 <?php if($isIpdTab): ?>

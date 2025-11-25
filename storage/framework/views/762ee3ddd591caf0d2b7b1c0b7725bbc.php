@@ -1,3 +1,4 @@
+
 <div class="modal fade" id="add_patient" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content modal-xl">
@@ -11,7 +12,7 @@
             <div class="modal-body">
                 <form action="<?php echo e(route('patient-store')); ?>" method="POST">
                     <?php echo csrf_field(); ?>
-                    <?php if($errors->any()): ?>
+                    <!-- <?php if($errors->any()): ?>
                         <div class="alert alert-danger">
                             <strong>There were some problems with your
                                 input:</strong>
@@ -21,7 +22,7 @@
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </ul>
                         </div>
-                    <?php endif; ?>
+                    <?php endif; ?> -->
 
                     <div class="row gy-3">
 
@@ -236,18 +237,13 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>">
                                         <option value="">Select</option>
-                                        <option value="1" <?php echo e(old('blood_group') == '1' ? 'selected' : ''); ?>>O+
-                                        </option>
-                                        <option value="2" <?php echo e(old('blood_group') == '2' ? 'selected' : ''); ?>>A+
-                                        </option>
-                                        <option value="3" <?php echo e(old('blood_group') == '3' ? 'selected' : ''); ?>>B+
-                                        </option>
-                                        <option value="4" <?php echo e(old('blood_group') == '4' ? 'selected' : ''); ?>>AB+
-                                        </option>
-                                        <option value="5" <?php echo e(old('blood_group') == '5' ? 'selected' : ''); ?>>O-
-                                        </option>
-                                        <option value="6" <?php echo e(old('blood_group') == '6' ? 'selected' : ''); ?>>AB-
-                                        </option>
+                                        <?php $__currentLoopData = $bloodGroups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $group): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <option value="<?php echo e($group->id); ?>"
+                                                <?php echo e(old('blood_group') == $group->id ? 'selected' : ''); ?>>
+                                                <?php echo e($group->name); ?>
+
+                                            </option>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </select>
                                     <?php $__errorArgs = ['blood_group'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');

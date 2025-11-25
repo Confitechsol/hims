@@ -1,6 +1,4 @@
-@extends('layouts.adminLayout')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
     <style>
         .section-body {
             padding: 0.75rem 1.5rem;
@@ -497,20 +495,20 @@
 
             <div class="card-body">
 
-                {{-- Flash Messages --}}
-                @if (session('success'))
-                    <div class="alert alert-success alert-dismissible fade show">{{ session('success') }}</div>
-                @endif
-                @if (session('error'))
-                    <div class="alert alert-danger alert-dismissible fade show">{{ session('error') }}</div>
-                @endif
+                
+                <?php if(session('success')): ?>
+                    <div class="alert alert-success alert-dismissible fade show"><?php echo e(session('success')); ?></div>
+                <?php endif; ?>
+                <?php if(session('error')): ?>
+                    <div class="alert alert-danger alert-dismissible fade show"><?php echo e(session('error')); ?></div>
+                <?php endif; ?>
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card">
                             <div class="card-body">
-                                <form id="editIpdForm" action="{{ route('ipd.update', [$ipd->id]) }}" method="POST">
-                                    @csrf
-                                    @method('PUT')
+                                <form id="editIpdForm" action="<?php echo e(route('ipd.update', [$ipd->id])); ?>" method="POST">
+                                    <?php echo csrf_field(); ?>
+                                    <?php echo method_field('PUT'); ?>
                                     <div class="form-section mb-4">
                                         <div class="section-header">
                                             <div class="section-icon">
@@ -523,8 +521,8 @@
                                                 <div class="field-group col-10">
                                                     <div class="info-value empty" id="marital_value"
                                                         style=" border: 1px solid; padding: 0.5rem; border-radius: 10px; ">
-                                                        {{ $ipd->patient->patient_name }}</div>
-                                                    <input type="hidden" name="patient_id" value="{{ $ipd->patient->id ?? '' }}">
+                                                        <?php echo e($ipd->patient->patient_name); ?></div>
+                                                    <input type="hidden" name="patient_id" value="<?php echo e($ipd->patient->id ?? ''); ?>">
                                                 </div>
                                                 <div class="field-group col-2 text-end">
                                                     <button class="btn btn-primary" type="button" data-bs-toggle="modal"
@@ -585,12 +583,7 @@
 
                                                 <div class="field-group">
                                                     <label for="symptoms" class="form-label">Symptoms</label>
-                                                    {{-- <div class="custom-multiselect-wrapper">
-                                                        <!-- Hidden native select (for form submission) -->
-                                                        <select name="symptoms_title[]" id="symptoms_title"
-                                                            class="form-select" multiple>
-                                                            <option value="">Loading...</option>
-                                                        </select> --}}
+                                                    
 
                                                     <!-- Custom Multi-Select UI -->
                                                     <div class="custom-multiselect-wrapper">
@@ -638,7 +631,7 @@
                                                         Description</label>
                                                     <input type="text" name="symptoms_description"
                                                         id="symptoms_description" class="form-control"
-                                                        value="{{ old('symptoms_description', $ipd->symptoms_description) }}"
+                                                        value="<?php echo e(old('symptoms_description', $ipd->symptoms_description)); ?>"
                                                         placeholder="Enter description">
                                                 </div>
                                             </div>
@@ -661,7 +654,7 @@
                                                     </label>
                                                     <input type="date" name="appointment_date" id="appointment_date"
                                                         class="form-control"
-                                                        value="{{ old('appointment_date', $ipd->date) }}" required readonly>
+                                                        value="<?php echo e(old('appointment_date', $ipd->date)); ?>" required readonly>
                                                 </div>
 
                                                 <div class="field-group">
@@ -669,10 +662,10 @@
                                                     <select name="old_patient" id="old_patient" class="form-select">
                                                         <option value="">Select</option>
                                                         <option value="Old Patient"
-                                                            {{ old('old_patient', $ipd->patient_old ?? '') == 'Old Patient' ? 'selected' : '' }}>
+                                                            <?php echo e(old('old_patient', $ipd->patient_old ?? '') == 'Old Patient' ? 'selected' : ''); ?>>
                                                             Old Patient</option>
                                                         <option value="New Patient"
-                                                            {{ old('old_patient', $ipd->patient_old ?? '') == 'New Patient' ? 'selected' : '' }}>
+                                                            <?php echo e(old('old_patient', $ipd->patient_old ?? '') == 'New Patient' ? 'selected' : ''); ?>>
                                                             New Patient</option>
                                                     </select>
                                                 </div>
@@ -682,10 +675,10 @@
                                                     <select name="casualty" id="casualty" class="form-select">
                                                         <option value="">Select</option>
                                                         <option value="No"
-                                                            {{ old('casualty', $ipd->casualty ?? '') == 'No' ? 'selected' : '' }}>
+                                                            <?php echo e(old('casualty', $ipd->casualty ?? '') == 'No' ? 'selected' : ''); ?>>
                                                             No</option>
                                                         <option value="Yes"
-                                                            {{ old('casualty', $ipd->casualty ?? '') == 'Yes' ? 'selected' : '' }}>
+                                                            <?php echo e(old('casualty', $ipd->casualty ?? '') == 'Yes' ? 'selected' : ''); ?>>
                                                             Yes</option>
                                                     </select>
                                                 </div>
@@ -694,7 +687,7 @@
                                                     <label for="reference" class="form-label">Reference</label>
                                                     <input type="text" name="reference" id="reference"
                                                         class="form-control"
-                                                        value="{{ old('reference', $ipd->refference) }}"
+                                                        value="<?php echo e(old('reference', $ipd->refference)); ?>"
                                                         placeholder="Enter reference">
                                                 </div>
 
@@ -705,12 +698,13 @@
                                                     <select name="consultant_doctor" id="consultant_doctor"
                                                         class="form-select" required>
                                                         <option value="">Select Doctor</option>
-                                                        @foreach ($doctors as $doctor)
-                                                            <option value="{{ $doctor->id }}"
-                                                                {{ old('consultant_doctor', $ipd->cons_doctor ?? '') == $doctor->id ? 'selected' : '' }}>
-                                                                {{ $doctor->name }}
+                                                        <?php $__currentLoopData = $doctors; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $doctor): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                            <option value="<?php echo e($doctor->id); ?>"
+                                                                <?php echo e(old('consultant_doctor', $ipd->cons_doctor ?? '') == $doctor->id ? 'selected' : ''); ?>>
+                                                                <?php echo e($doctor->name); ?>
+
                                                             </option>
-                                                        @endforeach
+                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
                                                     </select>
                                                 </div>
@@ -736,7 +730,7 @@
                                                         <span class="currency-symbol">₹</span>
                                                         <input type="number" name="credit_limit" id="credit_limit"
                                                             class="form-control"
-                                                            value="{{ old('credit_limit', $ipd->credit_limit) }}"
+                                                            value="<?php echo e(old('credit_limit', $ipd->credit_limit)); ?>"
                                                             placeholder="0.00" step="0.01" min="0" required>
                                                     </div>
                                                 </div>
@@ -746,12 +740,13 @@
                                                             class="required">*</span></label>
                                                     <select class="form-select" name="bed_group" id="bed_group_select">
                                                         <option value="">Select</option>
-                                                        @foreach ($bedGroups as $bedGroup)
-                                                            <option value="{{ $bedGroup->id }}"
-                                                                {{ old('bed_group', $ipd->bed_group_id ?? '') == $bedGroup->id ? 'selected' : '' }}>
-                                                                {{ $bedGroup->name }}-{{ $bedGroup->floorDetail->name }}
+                                                        <?php $__currentLoopData = $bedGroups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $bedGroup): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                            <option value="<?php echo e($bedGroup->id); ?>"
+                                                                <?php echo e(old('bed_group', $ipd->bed_group_id ?? '') == $bedGroup->id ? 'selected' : ''); ?>>
+                                                                <?php echo e($bedGroup->name); ?>-<?php echo e($bedGroup->floorDetail->name); ?>
+
                                                             </option>
-                                                        @endforeach
+                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                     </select>
                                                 </div>
 
@@ -760,20 +755,22 @@
                                                             class="required">*</span></label>
                                                     <select class="form-select" name="bed_number" id="bed_number_select">
                                                         <option value="">Select</option>
-                                                        <option value="{{ $ipd->bed }}" selected>
-                                                            {{ $ipd->bedDetail->name }}
+                                                        <option value="<?php echo e($ipd->bed); ?>" selected>
+                                                            <?php echo e($ipd->bedDetail->name); ?>
+
                                                         </option>
-                                                        @foreach ($bedNumbers as $bedNumber)
-                                                            <option value="{{ $bedNumber->id }}"
-                                                                {{ old('bed_number', $ipd->bed ?? '') == $bedNumber->id ? 'selected' : '' }}>
-                                                                {{ $bedNumber->name }}
+                                                        <?php $__currentLoopData = $bedNumbers; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $bedNumber): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                            <option value="<?php echo e($bedNumber->id); ?>"
+                                                                <?php echo e(old('bed_number', $ipd->bed ?? '') == $bedNumber->id ? 'selected' : ''); ?>>
+                                                                <?php echo e($bedNumber->name); ?>
+
                                                             </option>
-                                                        @endforeach
+                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                     </select>
                                                 </div>
                                                 <div class="field-group">
                                                     <label for="note" class="form-label">Note</label>
-                                                    <textarea name="note" id="note" class="form-control" placeholder="Enter notes" rows="1">{{ old('note', $ipd->note) }}</textarea>
+                                                    <textarea name="note" id="note" class="form-control" placeholder="Enter notes" rows="1"><?php echo e(old('note', $ipd->note)); ?></textarea>
                                                 </div>
                                             </div>
                                         </div>
@@ -798,7 +795,7 @@
             </div>
         </div>
     </div>
-    @include('components.modals.patient-details-modal', ['patient' => $ipd->patient])
+    <?php echo $__env->make('components.modals.patient-details-modal', ['patient' => $ipd->patient], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -807,10 +804,10 @@
             const patientSelect = document.getElementById('patient_select');
             bedGroupSelect.addEventListener('change', function() {
                 const selectedId = this.value;
-                const baseUrl = "{{ route('getBedNumbers', ['id' => 'ID']) }}";
+                const baseUrl = "<?php echo e(route('getBedNumbers', ['id' => 'ID'])); ?>";
                 const finalUrl = baseUrl.replace('ID', selectedId);
-                const preSelectedBedGroup = @json($ipd->bed_group_id);
-                const preSelectedBedNumber = @json($ipd->bedDetail);
+                const preSelectedBedGroup = <?php echo json_encode($ipd->bed_group_id, 15, 512) ?>;
+                const preSelectedBedNumber = <?php echo json_encode($ipd->bedDetail, 15, 512) ?>;
 
                 fetch(finalUrl)
                     .then(response => response.json())
@@ -837,7 +834,7 @@
                                 const option = document.createElement('option');
                                 option.value = bedNumber.id;
                                 option.textContent = bedNumber.name;
-                                if ("{{ old('bed_number') }}" == bedNumber.id) {
+                                if ("<?php echo e(old('bed_number')); ?>" == bedNumber.id) {
                                     option.selected = true;
                                 }
                                 bedNumberSelect.appendChild(option);
@@ -1240,8 +1237,8 @@
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
             // Mock data for symptom types
-            const symptomTypes = @json($allSymptomTypes);
-            const selectedSymptomTitles = @json($symptoms);
+            const symptomTypes = <?php echo json_encode($allSymptomTypes, 15, 512) ?>;
+            const selectedSymptomTitles = <?php echo json_encode($symptoms, 15, 512) ?>;
 
 
             // Initialize Symptom Type Select
@@ -1251,7 +1248,7 @@
                     loadSymptomTitles(selectedValues);
                 }
             });
-            const preSelectedVals = @json($symptomTypeIds);
+            const preSelectedVals = <?php echo json_encode($symptomTypeIds, 15, 512) ?>;
             symptomTypeSelect.preselectedValues = preSelectedVals.map(id => Number(id));
 
             // Load initial symptom types
@@ -1281,7 +1278,7 @@
 
                 const symptomSelect = document.getElementById('symptoms_title');
 
-                fetch("{{ route('getSymptoms') }}", {
+                fetch("<?php echo e(route('getSymptoms')); ?>", {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -1298,7 +1295,7 @@
                             const option = document.createElement('option');
                             option.value = title.id;
                             option.textContent = title.symptoms_title;
-                            if ("{{ old('symptoms_title[]') }}" == title.id) {
+                            if ("<?php echo e(old('symptoms_title[]')); ?>" == title.id) {
                                 option.selected = true;
                             }
                             symptomSelect.appendChild(option);
@@ -1349,4 +1346,6 @@
 
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\hims\resources\views/admin/ipd/edit-ipd.blade.php ENDPATH**/ ?>
