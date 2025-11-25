@@ -10,7 +10,7 @@
         <div class="card shadow-sm border-0 mt-4">
             <div class="card-header d-flex justify-content-between align-items-center align-items-sm-center justify-content-between flex-sm-row"
                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> OPD</h5>
+                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> IPD </h5>
                 <div class="text-end d-flex">
                     <ul class="nav nav-tabs">
                         <li class="nav-item" style="border-bottom:0">
@@ -186,7 +186,7 @@
                                 </div>
                                 <div class="offcanvas-body">
                                     <div class="filter-section pb-3 rounded">
-                                        <form action="<?php echo e(request()->routeIs('opd') ? route('opd') : route('opd')); ?>"
+                                        <form action="<?php echo e(request()->routeIs('ipd') ? route('ipd') : route('ipd')); ?>"
                                             method="GET" class="text-center" id="searchForm">
                                             <div
                                                 class="d-flex flex-column flex-md-row gap-2 align-items-center justify-content-center">
@@ -248,7 +248,7 @@
                                                 <button type="submit" class="btn cmn_btn btn-primary w-100">
                                                     <i class="fas fa-filter me-1"></i> Filter
                                                 </button>
-                                                <a href="<?php echo e(request()->routeIs('opd') ? route('opd') : route('opd')); ?>"
+                                                <a href="<?php echo e(request()->routeIs('ipd') ? route('ipd') : route('ipd')); ?>"
                                                     class="btn btn-outline-dark w-100">
                                                     Reset
                                                 </a>
@@ -326,7 +326,7 @@
     </script>
 
 
-    
+    <!--  -->
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\hims\resources\views/admin/ipd/index.blade.php ENDPATH**/ ?>
