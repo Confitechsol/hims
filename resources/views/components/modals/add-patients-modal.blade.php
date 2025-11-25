@@ -23,7 +23,7 @@
                         </div>
                     @endif
 
-                    <div class="row gy-3">
+                    <div class="row p-4 mx-1 gy-3">
 
                         {{-- Name --}}
                         <div class="col-md-6">
