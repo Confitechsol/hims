@@ -194,7 +194,7 @@
                                 <?php endif; ?>
 
                                 
-                                <form action="<?php echo e(route('submit.login')); ?>" method="POST" class="login-form">
+                                <form action="<?php echo e(route('login')); ?>" method="POST" class="login-form">
                                     <?php echo csrf_field(); ?>
                                     <div class="form-group">
                                         <label class="form-label">Username</label>
