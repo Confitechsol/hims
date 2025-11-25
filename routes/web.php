@@ -68,7 +68,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('home.homeScreen');
-})->name('dashboard');
+})->name('homescreen');
 
 Route::get('/doctors', function () {
     return view('home.doctors');
@@ -136,9 +136,13 @@ Route::middleware(['admin'])->group(function () {
 
     Route::get('/patients', [PatientController::class, 'index'])->name('patients');
     Route::post('/patient', [PatientController::class, 'store'])->name('patient-store');
+    Route::get('/patient/edit/{id}', [PatientController::class, 'edit'])->name('patient.edit');
+    Route::put('/patient/update/{id}', [PatientController::class, 'update'])->name('patient-update');
     Route::delete('/patients/bulk-delete', [PatientController::class, 'bulkDelete'])->name('patients.bulkDelete');
     Route::get('/patients/import', [PatientController::class, 'import'])->name('patient-import');
-    Route::post('/patients/import', [PatientController::class, 'import'])->name('patients.import');
+    Route::post('/patients/bulk-import', [PatientController::class, 'bulkImport'])->name('patients.import');
+    Route::get('/patients/export', [PatientController::class, 'exportPatientsExcel'])->name('patients.export');
+    Route::post('/bulkimport', [PatientController::class, 'importStaffExcel'])->name('patients-bulk.import');
 
     Route::get('/languages', [LanguagesController::class, 'index'])->name('languages');
     Route::post('/languages/create', [LanguagesController::class, 'store'])->name('languages.store');
@@ -288,13 +292,13 @@ Route::middleware(['admin'])->group(function () {
 
     Route::get('/income', [IncomeController::class, 'index'])->name('income');
     Route::post('/income/create', [IncomeController::class, 'create'])->name('income.create');
-    Route::put('/income/update', [IncomeController::class, 'update'])->name('income.update');
+    Route::put('/income/update/{id}', [IncomeController::class, 'update'])->name('income.update');
     Route::delete('/income/destroy', [IncomeController::class, 'destroy'])->name('income.destroy');
 
     Route::get('/expense', [ExpenseController::class, 'index'])->name('expense');
     Route::post('/expense/create', [ExpenseController::class, 'create'])->name('expense.create');
-    Route::put('/expense/update', [ExpenseController::class, 'update'])->name('expense.update');
-    Route::delete('/expense/delete', [ExpenseController::class, 'delete'])->name('expense.delete');
+    Route::put('/expense/update/{id}', [ExpenseController::class, 'update'])->name('expense.update');
+    Route::delete('/expense/delete/{id}', [ExpenseController::class, 'delete'])->name('expense.delete');
 
     Route::get('/birth', [BirthController::class, 'index'])->name('birth');
     Route::post('/birth/create', [BirthController::class, 'create'])->name('birth.create');
@@ -611,9 +615,9 @@ Route::prefix('staffs')->group(function () {
     Route::get('/export-staffs', [StaffController::class, 'exportStaffExcel'])->name('staffs.export');
 
 
-    Route::put('/edit/{id}', [BloodDonorController::class, 'editDoner'])->name('bloodBank.editDoner');
-    Route::put('/update/{id}', [BloodDonorController::class, 'updateDonor'])->name('bloodBank.updateDoner');
-    Route::delete('/destroy', [BloodDonorController::class, 'destroyDonor'])->name('Staffs.bulkDelete');
+    Route::get('/edit/{id}', [StaffController::class, 'edit'])->name('staff.edit');
+    Route::put('/update/{id}', [StaffController::class, 'update'])->name('staff.update');
+    Route::delete('/delete', [StaffController::class, 'bulkDelete'])->name('staffs.bulkDelete');
 });
 Route::prefix('bloodBank')->group(function () {
 

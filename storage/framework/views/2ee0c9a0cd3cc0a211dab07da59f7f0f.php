@@ -33,7 +33,11 @@ unset($__defined_vars, $__key, $__value); ?>
         copied: false,
         async copyToClipboard() {
             try {
+<<<<<<< HEAD
+                await window.copyToClipboard('<?php echo e($request->fullUrl()); ?>');
+=======
                 await navigator.clipboard.writeText('<?php echo e($request->fullUrl()); ?>');
+>>>>>>> 57abcc7cf1b1b0bddce47c861740d40fab2a0429
                 this.copied = true;
                 setTimeout(() => { this.copied = false }, 3000);
             } catch (err) {

@@ -628,8 +628,7 @@
                                                                                         <img src="assets/img/logo.png" alt="">
                                                                                     </div>
                                                                                     <h1>Birth Certificate</h1>
-                                                                                    <p class="sub-title">(ICD-10 Based
-                                                                                        Registration Format)</p>
+                                                                                    
                                                                                 </div>
 
                                                                                 <!-- Child Information -->

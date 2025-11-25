@@ -6,4 +6,4 @@
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<?php /**PATH C:\xampp82\htdocs\hims\resources\views/layouts/cdns.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\xampp\htdocs\hims\resources\views/layouts/cdns.blade.php ENDPATH**/ ?>
