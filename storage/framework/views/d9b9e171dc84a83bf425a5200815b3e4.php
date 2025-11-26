@@ -781,8 +781,8 @@
 
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label">Admission Date <span class="required">*</span></label>
-                                <input type="date" class="form-control" name="appointment_date">
+                                <label class="form-label">Admission Date & Time<span class="required">*</span></label>
+                                <input type="datetime-local" class="form-control" name="admission_date">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Case Type</label>
@@ -962,6 +962,7 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
 
                 <!-- Modal Footer -->
