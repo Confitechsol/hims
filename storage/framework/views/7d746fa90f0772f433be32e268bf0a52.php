@@ -39,7 +39,7 @@
     }
 
     .patient-search {
-        background: rgba(255, 255, 255, 0.15);
+        /* background: rgba(255, 255, 255, 0.15); */
         border: 1px solid rgba(255, 255, 255, 0.3);
         /* color: white; */
         border-radius: 8px;
@@ -51,7 +51,7 @@
     }
 
     .patient-search:focus {
-        background: rgba(255, 255, 255, 0.25);
+        /* background: rgba(255, 255, 255, 0.25); */
         border-color: rgba(255, 255, 255, 0.5);
         color: black;
         box-shadow: none;
@@ -632,16 +632,17 @@
 </style>
 
 <!-- Modal -->
-<div class="modal fade" id="createIpdModal" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
+<div class="modal fade" id="createOpdModal" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
-            <form action="<?php echo e(route('ipd.store')); ?>" id="ipdForm" method="POST">
+            <form action="<?php echo e(route('opd.store')); ?>" id="opdForm" method="POST">
                 <?php echo csrf_field(); ?>
                 <!-- Modal Header -->
                 <div class="modal-header align-items-start">
                     <div class="flex-grow-1">
-                        <h5 class="modal-title mb-3">Patient Admission</h5>
-                        <div class="d-flex gap-3 align-items-center">
+                        <h5 class="modal-title mb-3" id="patient-header">Patient Appointment</h5>
+                        
+                        <div class="d-flex gap-3 align-items-center" id="patient-loader">
                             <select type="text" class="form-select patient-search flex-grow-1"
                                 placeholder="Search patient by name or ID..." id="patient_select" name="patient_id">
                                 <option value="">Loading...</option>
@@ -674,7 +675,7 @@
                                         <i class="bi bi-person-circle"></i> Patient Name
                                     </div>
                                     <div class="info-value" id="patient_name_value">-</div>
-                                        
+
                                     <div class="info-label">
                                         <i class="bi bi-gender-ambiguous"></i> Gender
                                     </div>
@@ -704,18 +705,6 @@
                                         <i class="bi bi-geo-alt"></i> Location
                                     </div>
                                     <div class="info-value" id="patient_location_value">-</div>
-                                    <div class="info-label">
-                                        <i class="bi bi-droplet"></i> Height
-                                    </div>
-                                    <div class="info-value" id="patient_height_value">-</div>
-                                    <div class="info-label">
-                                        <i class="bi bi-droplet"></i> Weight
-                                    </div>
-                                    <div class="info-value" id="patient_weight_value">-</div>
-                                    <div class="info-label">Languages</div>
-                                    <div class="info-value" id="patient_languages_value">-</div>
-                                    <div class="info-label">Newspaper Preference</div>
-                                    <div class="info-value" id="patient_newspaper_value">-</div>
                                 </div>
                             </div>
 
@@ -730,10 +719,11 @@
                                         </div>
                                     </div>
                                     <div class="patient-info-grid-tpa">
-                                        
+                                        <div class="info-label">TPA</div>
+                                        <div class="info-value" id="patient_tpa_value">-</div>
 
                                         <div class="info-label">TPA Code</div>
-                                        <div class="info-value" id="patient_tpaCode_value">-</div>
+                                        <div class="info-value" id="patient_tpa_code_value">-</div>
 
                                         <div class="info-label">TPA Validity</div>
                                         <div class="info-value" id="patient_tpa_validity_value">-</div>
@@ -781,28 +771,24 @@
                         </div>
                     </div>
 
-                    <!-- Admission Details Section -->
+                    <!-- Appointment Details Section -->
                     <div class="section-card">
                         <div class="section-header">
                             <div class="section-icon">
                                 <i class="bi bi-calendar-check"></i>
                             </div>
-                            <h6 class="section-title">Admission Details</h6>
+                            <h6 class="section-title">Appointment Details</h6>
                         </div>
 
                         <div class="row g-3">
-                            <div class="col-md-3">
-                                <label class="form-label">Admission Date & Time<span class="required">*</span></label>
-                                <input type="datetime-local" class="form-control" name="admission_date">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Case<span class="required">*</span></label>
-                                <input type="text" class="form-control" name="case">
+                            <div class="col-md-6">
+                                <label class="form-label">Appointment Date <span class="required">*</span></label>
+                                <input type="date" class="form-control" name="appointment_date">
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Patient Type</label>
-                                <select class="form-select" name="patient_type">
-                                    <option value="">Select Patient Type</option>
+                                <label class="form-label">Case Type</label>
+                                <select class="form-select" name="case_type">
+                                    <option value="">Select Case Type</option>
                                     <option value="Old Patient">Old Patient</option>
                                     <option value="New Patient">New Patient</option>
                                 </select>
@@ -815,7 +801,7 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Emergency</label>
+                                <label class="form-label">Casualty</label>
                                 <select class="form-select" name="casualty">
                                     <option value="No">No</option>
                                     <option value="Yes">Yes</option>
@@ -848,9 +834,68 @@
 
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label">Credit Limit (INR) <span class="required">*</span></label>
-                                <input type="number" class="form-control" name="credit_limit" id="credit_limit"
-                                    value="20000" placeholder="0.00">
+                                <label class="form-label">Charge Category</label>
+                                <select class="form-select" name="charge_category" id="charge_category_select">
+                                    <option value="">Loading...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Charge <span class="required">*</span></label>
+                                <select class="form-select" name="charge" id="charge_select">
+                                    <option value="">Loading...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Standard Charge (INR)</label>
+                                <input type="number" class="form-control" name="standard_charge"
+                                    id="standard_charge" placeholder="0.00" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Applied Charge (INR) <span class="required">*</span></label>
+                                <input type="number" class="form-control" name="applied_charge" id="applied_charge"
+                                    placeholder="0.00">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Discount</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" name="discount" id="discount"
+                                        placeholder="0">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Tax</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="tax" name="tax"
+                                        placeholder="0">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Amount (INR) <span class="required">*</span></label>
+                                <input type="number" class="form-control" name="amount" id="amount"
+                                    placeholder="0.00" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Payment Mode</label>
+                                <select class="form-select" name="payment_mode">
+                                    <option value="Cash" selected>Cash</option>
+                                    <option value="Card">Card</option>
+                                    <option value="UPI">UPI</option>
+                                    <option value="Online Transfer">Online Transfer</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Paid Amount (INR) <span class="required">*</span></label>
+                                <input type="number" class="form-control" name="paid_amount" id="paid_amount"
+                                    placeholder="0.00">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="payment_date" class="form-label">
+                                    Payment Date <span class="required">*</span>
+                                </label>
+                                <input type="date" name="payment_date" id="payment_date" class="form-control"
+                                    required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Live Consultation</label>
@@ -859,20 +904,6 @@
                                     <option value="Yes">Yes</option>
                                 </select>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Bed Group <span class="required">*</span></label>
-                                <select class="form-select" name="bed_group" id="bed_group_select">
-                                    <option value="">Loading...</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Bed Number <span class="required">*</span></label>
-                                <select class="form-select" name="bed_number" id="bed_number_select">
-                                    <option value="">Loading...</option>
-                                </select>
-                            </div>
-                            
-
                         </div>
                     </div>
 
@@ -965,10 +996,13 @@
                                 </div>
                             </div>
 
-                            
                             <div class="col-md-4">
+                                <label class="form-label">Any Known Allergies</label>
+                                <textarea class="form-control" name="allergies" rows="1" placeholder="Enter allergies"></textarea>
+                            </div>
+                            <div class="col-md-12">
                                 <label class="form-label">Symptoms Description</label>
-                                <textarea class="form-control" name="symptoms_description" rows="1"
+                                <textarea class="form-control" name="symptoms_description" rows="3"
                                     placeholder="Enter detailed symptoms description"></textarea>
                             </div>
                             <div class="col-md-12">
@@ -977,7 +1011,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
 
                 <!-- Modal Footer -->
@@ -1001,18 +1034,75 @@
 
 <?php echo $__env->make('components.modals.add-patients-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
+    function populatePatientDetails(selected) {
+        
+        document.getElementById('patient_name_value').textContent =
+            `${selected.patient_name} (${selected.id})`;
+        document.getElementById('patient_gender_value').textContent = selected
+            .gender || 'N/A';
+        document.getElementById('patient_age_value').textContent = selected.age +
+            " Year " +
+            selected.month + " Month " + selected.day + " Days " || 'N/A';
+        document.getElementById('patient_marital_status_value').textContent =
+            selected
+            .marital_status || 'N/A';
+        document.getElementById('patient_blood_value').textContent = selected
+            .blood_group.name ||
+            'N/A';
+        document.getElementById('patient_phone_value').textContent = selected
+            .mobileno || 'N/A';
+        document.getElementById('patient_location_value').textContent = selected
+            .address ||
+            'N/A';
+
+        document.getElementById('patient_tpa_value').textContent = selected
+            .organisation
+            .organisation_name || 'N/A';
+        document.getElementById('patient_tpa_code_value').textContent = selected
+            .organisation
+            .code ||
+            'N/A';
+        document.getElementById('patient_tpa_validity_value').textContent = selected
+            .tpa_validity || 'N/A';
+        document.getElementById('patient_identification_value').textContent =
+            selected
+            .identification_number || 'N/A';
+    }
+</script>
+<script>
     document.addEventListener("DOMContentLoaded", function() {
+
         const addPatientBtn = document.getElementById("openAddPatientBtn");
-        const createIpdModal = document.getElementById("createIpdModal");
+        const createOpdModal = document.getElementById("createOpdModal");
         const addPatientModal = document.getElementById("add_patient");
 
+        createOpdModal.addEventListener('show.bs.modal', function(event) {
+            var button = event.relatedTarget; // Button that triggered the modal
+            var isHidden = button.getAttribute('data-is-hidden');
+            const patient = JSON.parse(button.getAttribute('data-patient'));
+
+
+
+
+            var patientLoader = document.getElementById('patient-loader')
+            var patientHeader = document.getElementById('patient-header')
+            // const patientSection = document.querySelector(".patient-card")
+            if (isHidden) {
+                // patientSection.style.setProperty('display', 'block', 'important')
+                patientHeader.classList.remove('mb-3')
+                patientLoader.style.setProperty('display', 'none', 'important')
+                window.selectedPatient = patient
+                populatePatientDetails(patient)
+            }
+
+
+        })
         addPatientBtn.addEventListener("click", function() {
             // Keep the first modal open
-            const ipdModalInstance = bootstrap.Modal.getInstance(createIpdModal);
-            ipdModalInstance._element.classList.add('modal-stacked');
+            const opdModalInstance = bootstrap.Modal.getInstance(createOpdModal);
+            opdModalInstance._element.classList.add('modal-stacked');
 
             // Open the second modal manually (no new backdrop)
             const newModal = new bootstrap.Modal(addPatientModal, {
@@ -1041,144 +1131,97 @@
             document.body.classList.add('modal-open');
 
             // Reset first modal’s stacking class
-            createIpdModal.classList.remove('modal-stacked');
+            createOpdModal.classList.remove('modal-stacked');
         });
     });
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const createOpdModal = document.getElementById("createOpdModal");
+        createOpdModal.addEventListener('show.bs.modal', function(event) {
+            const patientSection = document.querySelector(".patient-card")
+            patientSection.style.display = window.selectedPatient ? "block" : "none"
+            const patientSelect = document.getElementById('patient_select');
+            const photo = document.getElementById('patient_photo');
+            patientSelect.innerHTML = '<option value="">Loading...</option>';
 
-    const patientSection = document.querySelector(".patient-card");
-    patientSection.style.display = "none";
+            fetch("<?php echo e(route('getPatients')); ?>")
+                .then(response => {
+                    return response.json()
+                })
+                .then(data => {
+                    window.patientsData = data;
+                    patientSelect.innerHTML = '<option value="">Select</option>';
+                    data.forEach(patient => {
+                        const option = document.createElement('option');
+                        option.value = patient.id;
+                        option.textContent = patient.patient_name;
+                        if ("<?php echo e(old('patient_select')); ?>" == patient.id) {
+                            option.selected = true;
+                        }
+                        patientSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching patients:', error);
+                    patientSelect.innerHTML = '<option value="">Error loading options</option>';
+                });
+            // When patient is selected
 
-    const patientSelect = document.getElementById('patient_select');
-    const photo = document.getElementById('patient_photo');
-    const noImagePlaceholder = document.getElementById('no_image_placeholder');
 
-    patientSelect.innerHTML = '<option value="">Loading...</option>';
+            patientSelect.addEventListener('change', function() {
+                const selected = window.patientsData.find(p => p.id == this.value);
 
-    fetch("<?php echo e(route('getPatients')); ?>")
-        .then(res => res.json())
-        .then(data => {
-            console.log("Patients Loaded:", data);
-            window.patientsData = data;
+                if (selected) {
+                    patientSection.style.display = 'block'
+                    populatePatientDetails(selected, patientSection)
 
-            patientSelect.innerHTML = '<option value="">Select</option>';
-            data.forEach(patient => {
-                const option = document.createElement('option');
-                option.value = patient.id;
-                option.textContent = patient.patient_name;
-                patientSelect.appendChild(option);
+                    // Handle photo display
+                    if (selected.photo_path) {
+                        photo.src = selected.image;
+                        photo.style.display = 'block';
+                        // noImagePlaceholder.style.display = 'none';
+                    } else {
+                        photo.style.display = 'none';
+                        // noImagePlaceholder.style.display = 'block';
+                    }
+                } else {
+                    // Reset if none selected
+                    [
+                        'patient_name_value', 'patient_gender_value', 'patient_age_value',
+                        'patient_marital_status_value', 'patient_blood_value',
+                        'patient_phone_value', 'patient_location_value',
+                        'patient_tpa_value', 'patient_tpa_code_value',
+                        'patient_tpa_validity_value', 'patient_identification_value'
+                    ].forEach(id => document.getElementById(id).textContent = '—');
+
+                    patientSection.style.display = 'none';
+                    photo.style.display = 'none';
+                    // noImagePlaceholder.style.display = 'block';
+                }
             });
         })
-        .catch(err => {
-            console.error("Error fetching patients:", err);
-            patientSelect.innerHTML = '<option value="">Error loading options</option>';
-        });
-
-    // When a patient is selected
-    patientSelect.addEventListener('change', function() {
-
-        const selected = window.patientsData.find(p => p.id == this.value);
-
-        if (selected) {
-            console.log("Selected patient:", selected);
-
-            patientSection.style.display = 'block';
-
-            document.getElementById('patient_name_value').textContent =
-                `${selected.patient_name} (${selected.id})`;
-
-            document.getElementById('patient_gender_value').textContent = selected.gender ?? 'N/A';
-
-            document.getElementById('patient_age_value').textContent =
-                `${selected.age} Year ${selected.month} Month ${selected.day} Days`;
-
-            document.getElementById('patient_marital_status_value').textContent =
-                selected.marital_status ?? 'N/A';
-
-            document.getElementById('patient_blood_value').textContent =
-                selected.blood_group ?? 'N/A';
-
-            document.getElementById('patient_phone_value').textContent =
-                selected.mobileno ?? 'N/A';
-
-            document.getElementById('patient_location_value').textContent =
-                selected.address ?? 'N/A';
-
-            document.getElementById('patient_height_value').textContent =
-                selected.height ?? 'N/A';
-
-            document.getElementById('patient_weight_value').textContent =
-                selected.weight ?? 'N/A';
-
-            document.getElementById('patient_languages_value').textContent =
-                selected.languages_speak ?? 'N/A';
-
-            document.getElementById('patient_newspaper_value').textContent =
-                selected.newspaper_preference ?? 'N/A';
-
-            // Organisation (use optional chaining)
-            document.getElementById('patient_tpa_value').textContent =
-                selected.organisation?.organisation_name ?? 'N/A';
-
-            document.getElementById('patient_tpaCode_value').textContent =
-                selected.organisation?.code ?? 'N/A';
-
-            document.getElementById('patient_tpa_validity_value').textContent =
-                selected.tpa_validity ?? 'N/A';
-
-            document.getElementById('patient_identification_value').textContent =
-                selected.identification_number ?? 'N/A';
-
-            // ---- PHOTO HANDLING ----
-            if (selected.photo_path) {
-                photo.src = selected.photo_path;
-                photo.style.display = 'block';
-                noImagePlaceholder.style.display = 'none';
-            } else {
-                photo.style.display = 'none';
-                noImagePlaceholder.style.display = 'block';
-            }
-
-        } else {
-            // RESET ALL FIELDS
-            [
-                'patient_name_value','patient_gender_value','patient_age_value',
-                'patient_marital_status_value','patient_blood_value','patient_height_value',
-                'patient_weight_value','patient_languages_value','patient_newspaper_value',
-                'patient_phone_value','patient_location_value','patient_tpa_value',
-                'patient_tpaCode_value','patient_tpa_validity_value','patient_identification_value'
-            ].forEach(id => document.getElementById(id).textContent = '—');
-
-            patientSection.style.display = 'none';
-            photo.style.display = 'none';
-            noImagePlaceholder.style.display = 'block';
-        }
     });
-
-});
-
 </script>
 
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const doctorSelect = document.getElementById('doctor_select');
-        const bedGroupSelect = document.getElementById('bed_group_select');
-        const bedNumberSelect = document.getElementById('bed_number_select');
+        const chargeCategorySelect = document.getElementById('charge_category_select');
+        const chargeSelect = document.getElementById('charge_select');
 
-        // const standardCharge = document.getElementById('standard_charge');
-        // const appliedCharge = document.getElementById('applied_charge');
-        // const discount = document.getElementById('discount');
-        // const tax = document.getElementById('tax');
-        // const amount = document.getElementById('amount');
-        // const paidAmount = document.getElementById('paid_amount');
+        const standardCharge = document.getElementById('standard_charge');
+        const appliedCharge = document.getElementById('applied_charge');
+        const discount = document.getElementById('discount');
+        const tax = document.getElementById('tax');
+        const amount = document.getElementById('amount');
+        const paidAmount = document.getElementById('paid_amount');
         const symptomTypesSelect = document.getElementById('symptoms_type');
 
         doctorSelect.innerHTML = '<option value="">Loading...</option>';
-        bedGroupSelect.innerHTML = '<option value="">Loading...</option>';
-        bedNumberSelect.innerHTML = '<option value="">Loading...</option>';
+        chargeCategorySelect.innerHTML = '<option value="">Loading...</option>';
+        chargeSelect.innerHTML = '<option value="">Loading...</option>';
         symptomTypesSelect.innerHTML = '<option value="">Loading...</option>';
 
         //doctor
@@ -1203,86 +1246,79 @@
             });
 
         //charge category
-        fetch("<?php echo e(route('getBedGroups')); ?>")
+        fetch("<?php echo e(route('getChargeCategories')); ?>")
             .then(response => response.json())
             .then(data => {
-                window.bedGroupData = data;
-                bedGroupSelect.innerHTML = '<option value="">Select</option>';
-                data.forEach(bedGroup => {
+                window.chargeCategoryData = data;
+                chargeCategorySelect.innerHTML = '<option value="">Select</option>';
+                data.forEach(category => {
                     const option = document.createElement('option');
-                    option.value = bedGroup.id;
-                    console.log();
-                    option.textContent = bedGroup.name + ' - ' + bedGroup.floor_detail.name;
-                    if ("<?php echo e(old('bed_group')); ?>" == bedGroup.id) {
+                    option.value = category.id;
+                    option.textContent = category.name;
+                    if ("<?php echo e(old('charge_category')); ?>" == category.id) {
                         option.selected = true;
                     }
-                    bedGroupSelect.appendChild(option);
+                    chargeCategorySelect.appendChild(option);
                 });
             })
             .catch(error => {
-                console.error('Error fetching bed groups:', error);
-                bedGroupSelect.innerHTML = '<option value="">Error loading options</option>';
+                console.error('Error fetching charge categories:', error);
+                chargeCategorySelect.innerHTML = '<option value="">Error loading options</option>';
             });
 
         // Listen for Charge Category dropdown change
-        bedGroupSelect.addEventListener('change', function() {
+        chargeCategorySelect.addEventListener('change', function() {
             const selectedId = this.value;
-            const baseUrl = "<?php echo e(route('getBedNumbers', ['id' => 'ID'])); ?>";
+            const baseUrl = "<?php echo e(route('getCharges', ['id' => 'ID'])); ?>";
             const finalUrl = baseUrl.replace('ID', selectedId);
             fetch(finalUrl)
                 .then(response => response.json())
                 .then(data => {
-                    window.bedNumberData = data;
-                    bedNumberSelect.innerHTML = '<option value="">Select</option>';
-                    bedNumberSelect.disabled = false
-                    if (data.length <= 0) {
-                        bedNumberSelect.innerHTML = '<option value="">No Bed Available</option>';
-                        bedNumberSelect.disabled = true
-                    } else {
-                        data.forEach(bedNumber => {
-                            const option = document.createElement('option');
-                            option.value = bedNumber.id;
-                            option.textContent = bedNumber.name;
-                            if ("<?php echo e(old('bed_number')); ?>" == bedNumber.id) {
-                                option.selected = true;
-                            }
-                            bedNumberSelect.appendChild(option);
-                        });
-                    }
+                    window.chargeData = data;
+                    chargeSelect.innerHTML = '<option value="">Select</option>';
+                    data.forEach(charge => {
+                        const option = document.createElement('option');
+                        option.value = charge.id;
+                        option.textContent = charge.name;
+                        if ("<?php echo e(old('charge')); ?>" == charge.id) {
+                            option.selected = true;
+                        }
+                        chargeSelect.appendChild(option);
+                    });
                 })
                 .catch(error => {
-                    console.error('Error fetching Bed Numbers:', error);
-                    bedNumberSelect.innerHTML = '<option value="">Error loading options</option>';
+                    console.error('Error fetching Charges:', error);
+                    chargeSelect.innerHTML = '<option value="">Error loading options</option>';
                 });
 
-            // bedNumberSelect.addEventListener('change', function() {
-            //     const selectedCharge = window.bedNumberData[0];
-            //     standardCharge.value = selectedCharge.standard_charge
-            //     appliedCharge.value = selectedCharge.standard_charge
-            //     tax.value = selectedCharge.tax_category.percentage
-            //     calculateAmount();
-            // })
-            // if (!appliedCharge || !tax || !discount || !amount) {
-            //     console.error("❌ One or more required input fields are missing in the DOM.");
-            //     return;
-            // }
-            // [appliedCharge, tax, discount].forEach(field => {
-            //     field.addEventListener('input', calculateAmount);
-            // });
+            chargeSelect.addEventListener('change', function() {
+                const selectedCharge = window.chargeData[0];
+                standardCharge.value = selectedCharge.standard_charge
+                appliedCharge.value = selectedCharge.standard_charge
+                tax.value = selectedCharge.tax_category.percentage
+                calculateAmount();
+            })
+            if (!appliedCharge || !tax || !discount || !amount) {
+                console.error("❌ One or more required input fields are missing in the DOM.");
+                return;
+            }
+            [appliedCharge, tax, discount].forEach(field => {
+                field.addEventListener('input', calculateAmount);
+            });
 
-            // function calculateAmount() {
-            //     const appliedChargeValue = parseFloat(appliedCharge.value) || 0;
-            //     const taxValue = parseFloat(tax.value) || 0;
-            //     const discountValue = parseFloat(discount.value) || 0;
+            function calculateAmount() {
+                const appliedChargeValue = parseFloat(appliedCharge.value) || 0;
+                const taxValue = parseFloat(tax.value) || 0;
+                const discountValue = parseFloat(discount.value) || 0;
 
-            //     // Formula: Amount = (AppliedCharge + Tax%) - Discount%
-            //     const taxAmount = appliedChargeValue * (taxValue / 100);
-            //     const discountAmount = appliedChargeValue * (discountValue / 100);
-            //     const totalAmount = appliedChargeValue + taxAmount - discountAmount;
+                // Formula: Amount = (AppliedCharge + Tax%) - Discount%
+                const taxAmount = appliedChargeValue * (taxValue / 100);
+                const discountAmount = appliedChargeValue * (discountValue / 100);
+                const totalAmount = appliedChargeValue + taxAmount - discountAmount;
 
-            //     amount.value = totalAmount.toFixed(2);
-            //     paidAmount.value = totalAmount.toFixed(2);
-            // }
+                amount.value = totalAmount.toFixed(2);
+                paidAmount.value = totalAmount.toFixed(2);
+            }
         });
 
 
@@ -1613,7 +1649,7 @@
 
     // Initialize the application
     document.addEventListener('DOMContentLoaded', function() {
-        const createOpdModal = document.getElementById('createIpdModal');
+        const createOpdModal = document.getElementById('createOpdModal');
         const closeButton = createOpdModal.querySelector('.button-close');
         const cancelButton = document.getElementById('button-close');
 
@@ -1685,6 +1721,37 @@
                     });
             }
 
+            // const form = document.querySelector('#opdForm'); // Replace with your actual form ID
+            // form.addEventListener('submit', function(e) {
+            //     // Before submitting, inject hidden inputs for both multi-select fields
+            //     const existingHiddenInputs = form.querySelectorAll(
+            //         'input[name="symptoms_type[]"], input[name="symptoms_title[]"]');
+            //     existingHiddenInputs.forEach(input => input.remove()); // Clear old ones
+
+            //     const selectedTypes = symptomTypeSelect.getSelectedValues();
+            //     const selectedTitles = symptomTitleSelect.getSelectedValues();
+
+            //     // Add symptom types
+            //     selectedTypes.forEach(value => {
+            //         const hiddenInput = document.createElement('input');
+            //         hiddenInput.type = 'hidden';
+            //         hiddenInput.name = 'symptoms_type[]';
+            //         hiddenInput.value = value;
+            //         form.appendChild(hiddenInput);
+            //     });
+
+            //     // Add symptom titles
+            //     selectedTitles.forEach(value => {
+            //         const hiddenInput = document.createElement('input');
+            //         hiddenInput.type = 'hidden';
+            //         hiddenInput.name = 'symptoms_title[]';
+            //         hiddenInput.value = value;
+            //         form.appendChild(hiddenInput);
+            //     });
+
+            //     // Form continues submitting normally
+            // });
+
         });
 
         closeButton.addEventListener('click', () => {
@@ -1697,4 +1764,4 @@
         })
     })
 </script>
-<?php /**PATH C:\xampp\htdocs\hims\resources\views/components/modals/ipd-create-modal.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\xampp\htdocs\hims\resources\views/components/modals/opd-create-modal.blade.php ENDPATH**/ ?>

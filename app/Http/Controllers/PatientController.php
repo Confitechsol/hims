@@ -10,6 +10,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
+use Illuminate\Support\Facades\Validator;
 
 class PatientController extends Controller
 {
@@ -19,7 +20,7 @@ class PatientController extends Controller
         $patients = Patient::get();
         return view('admin.setup.patient', compact('patients','bloodGroups'));
     }
-    public function store(Request $request)
+    public function storeOld(Request $request)
     {
         //dd($request->all());
         $validated = $request->validate([
@@ -78,10 +79,97 @@ class PatientController extends Controller
 
         return redirect()->back()->with('success', 'Patient saved successfully!');
     }
+    public function store(Request $request)
+{
+    $validated = Validator::make($request->all(), [
+        'name'                  => 'required|string|max:255',
+        'guardian_name'         => 'nullable|string|max:255',
+        'guardian_phone'        => 'nullable|string|max:20',
+        'gender'                => 'required|in:Male,Female',
+        'birth_date'            => 'nullable|date',
+        'age.year'              => 'nullable|integer|min:0',
+        'age.month'             => 'nullable|integer|min:0|max:11',
+        'age.day'               => 'nullable|integer|min:0|max:31',
+        'blood_group'           => 'nullable|in:1,2,3,4,5,6',
+        'marital_status'        => 'nullable|in:Single,Married,Widowed,Separated,Not Specified',
+        'file'                  => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        'phone'                 => 'nullable|string|max:20',
+        'email'                 => 'nullable|email|max:255',
+        'height'                => 'nullable|string|max:255',
+        'weight'                => 'nullable|string|max:255',
+        'temperature'           => 'nullable|string|max:255',
+        'emergency_contact_no'  => 'nullable|string|max:20',
+        'languages_speak'       => 'nullable|string|max:255',
+        'newspaper_preference'  => 'nullable|string|max:255',
+        'address'               => 'nullable|string|max:500',
+        'remarks'               => 'nullable|string|max:500',
+        'allergies'             => 'nullable|string|max:255',
+        'tpa'                   => 'nullable|in:1,2,3,4,5',
+        'tpa_id'                => 'nullable|string|max:100',
+        'tpa_validity'          => 'nullable|string|max:100',
+        'national_id_number'    => 'nullable|string|max:50',
+    ]);
+
+    if ($validated->fails()) {
+        dd($validated->errors()->all());
+        return back()->withErrors($validated)->withInput();
+    }
+
+    // Convert validator result to array
+    $data = $validated->validated();
+
+   
+
+    // Handle file upload
+    $photoPath = null;
+    if ($request->hasFile('file')) {
+        $photoPath = $request->file('file')->store('patient_photos', 'public');
+    }
+
+    // Create patient
+    Patient::create([
+        'patient_name'          => $data['name'],
+        'guardian_name'         => $data['guardian_name'] ?? null,
+        'guardian_phone'        => $data['guardian_phone'] ?? null,
+        'gender'                => $data['gender'],
+        'dob'                   => $data['birth_date'] ?? null,
+
+        'age'                   => $data['age']['year'] ?? null,
+        'month'                 => $data['age']['month'] ?? null,
+        'day'                   => $data['age']['day'] ?? null,
+
+        'blood_group'           => $data['blood_group'] ?? null,
+        'marital_status'        => $data['marital_status'] ?? null,
+        'image'                 => $photoPath,
+
+        'mobileno'              => $data['phone'] ?? null,
+        'email'                 => $data['email'] ?? null,
+        'height'                => $data['height'] ?? null,
+        'weight'                => $data['weight'] ?? null,
+        'temperature'           => $data['temperature'] ?? null,
+        'emergency_contact_no'  => $data['emergency_contact_no'] ?? null,
+        'languages_speak'       => $data['languages_speak'] ?? null,
+        'newspaper_preference'  => $data['newspaper_preference'] ?? null,
+        'address'               => $data['address'] ?? null,
+        'note'                  => $data['remarks'] ?? null,
+        'known_allergies'       => $data['allergies'] ?? null,
+
+        'organisation_id'       => $data['tpa'] ?? null,
+        'insurance_id'          => $data['tpa_id'] ?? null,
+        'insurance_validity'    => $data['tpa_validity'] ?? null,
+        'identification_number' => $data['national_id_number'] ?? null,
+    ]);
+
+    return redirect()->back()->with('success', 'Patient saved successfully!');
+}
+
+
+
     public function edit($id)
     {
         
         $patient = Patient::with('organisation')->find($id);
+        //dd($patient);
         return view('admin.setup.edit-patient', compact('patient'));
 
     }
@@ -89,66 +177,92 @@ class PatientController extends Controller
     {
         $patient = Patient::findOrFail($id);
 
-        $validated = $request->validate([
-            'name'               => 'required|string|max:255',
-            'guardian_name'      => 'nullable|string|max:255',
-            'gender'             => 'required|in:Male,Female',
-            'birth_date'         => 'nullable|date',
-            'age.year'           => 'nullable|integer|min:0',
-            'age.month'          => 'nullable|integer|min:0|max:11',
-            'age.day'            => 'nullable|integer|min:0|max:31',
-            'blood_group'        => 'nullable|in:1,2,3,4,5,6',
-            'marital_status'     => 'nullable|in:Single,Married,Widowed,Separated,Not Specified',
-            'file'               => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'phone'              => 'nullable|string|max:20',
-            'email'              => 'nullable|email|max:255',
-            'address'            => 'nullable|string|max:500',
-            'remarks'            => 'nullable|string|max:500',
-            'allergies'          => 'nullable|string|max:255',
-            'tpa'                => 'nullable|in:1,2,3,4,5',
-            'tpa_id'             => 'nullable|string|max:100',
-            'tpa_validity'       => 'nullable|string|max:100',
-            'national_id_number' => 'nullable|string|max:50',
+        $validated = Validator::make($request->all(), [
+            'name'                  => 'required|string|max:255',
+            'guardian_name'         => 'nullable|string|max:255',
+            'guardian_phone'        => 'nullable|string|max:20',
+            'gender'                => 'required|in:Male,Female',
+            'birth_date'            => 'nullable|date',
+            'age.year'              => 'nullable|integer|min:0',
+            'age.month'             => 'nullable|integer|min:0|max:11',
+            'age.day'               => 'nullable|integer|min:0|max:31',
+            'blood_group'           => 'nullable|in:1,2,3,4,5,6',
+            'marital_status'        => 'nullable|in:Single,Married,Widowed,Separated,Not Specified',
+            'file'                  => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'phone'                 => 'nullable|string|max:20',
+            'email'                 => 'nullable|email|max:255',
+            'height'                => 'nullable|string|max:255',
+            'weight'                => 'nullable|string|max:255',
+            'temperature'           => 'nullable|string|max:255',
+            'emergency_contact_no'  => 'nullable|string|max:20',
+            'languages_speak'       => 'nullable|string|max:255',
+            'newspaper_preference'  => 'nullable|string|max:255',
+            'address'               => 'nullable|string|max:500',
+            'remarks'               => 'nullable|string|max:500',
+            'allergies'             => 'nullable|string|max:255',
+            'tpa'                   => 'nullable|in:1,2,3,4,5',
+            'tpa_id'                => 'nullable|string|max:100',
+            'tpa_validity'          => 'nullable|string|max:100',
+            'national_id_number'    => 'nullable|string|max:50',
         ]);
 
+        if ($validated->fails()) {
+            dd($validated->errors()->all());
+            return back()->withErrors($validated)->withInput();
+        }
+
+        // Convert validated result into an array
+        $data = $validated->validated();
+
+        //dd($data);
+
         // Handle file upload
-        $photoPath = $patient->image; // keep old image
+        $photoPath = $patient->image;
 
         if ($request->hasFile('file')) {
-            // Delete old image if exists
             if ($patient->image && \Storage::disk('public')->exists($patient->image)) {
                 \Storage::disk('public')->delete($patient->image);
             }
 
-            // Upload new image
             $photoPath = $request->file('file')->store('patient_photos', 'public');
         }
 
-        // Update patient
         $patient->update([
-            'patient_name'          => $validated['name'],
-            'guardian_name'         => $validated['guardian_name'] ?? null,
-            'gender'                => $validated['gender'],
-            'dob'                   => $validated['birth_date'] ?? null,
-            'age'                   => $validated['age']['year'] ?? null,
-            'month'                 => $validated['age']['month'] ?? null,
-            'day'                   => $validated['age']['day'] ?? null,
-            'blood_group'           => $validated['blood_group'] ?? null,
-            'marital_status'        => $validated['marital_status'] ?? null,
-            'image'                 => $photoPath,
-            'mobileno'              => $validated['phone'] ?? null,
-            'email'                 => $validated['email'] ?? null,
-            'address'               => $validated['address'] ?? null,
-            'note'                  => $validated['remarks'] ?? null,
-            'known_allergies'       => $validated['allergies'] ?? null,
-            'organisation_id'       => $validated['tpa'] ?? null,
-            'insurance_id'          => $validated['tpa_id'] ?? null,
-            'insurance_validity'    => $validated['tpa_validity'] ?? null,
-            'identification_number' => $validated['national_id_number'] ?? null,
+           'patient_name'          => $data['name'],
+        'guardian_name'         => $data['guardian_name'] ?? null,
+        'guardian_phone'        => $data['guardian_phone'] ?? null,
+        'gender'                => $data['gender'],
+        'dob'                   => $data['birth_date'] ?? null,
+
+        'age'                   => $data['age']['year'] ?? null,
+        'month'                 => $data['age']['month'] ?? null,
+        'day'                   => $data['age']['day'] ?? null,
+
+        'blood_group'           => $data['blood_group'] ?? null,
+        'marital_status'        => $data['marital_status'] ?? null,
+        'image'                 => $photoPath,
+
+        'mobileno'              => $data['phone'] ?? null,
+        'email'                 => $data['email'] ?? null,
+        'height'                => $data['height'] ?? null,
+        'weight'                => $data['weight'] ?? null,
+        'temperature'           => $data['temperature'] ?? null,
+        'emergency_contact_no'  => $data['emergency_contact_no'] ?? null,
+        'languages_speak'       => $data['languages_speak'] ?? null,
+        'newspaper_preference'  => $data['newspaper_preference'] ?? null,
+        'address'               => $data['address'] ?? null,
+        'note'                  => $data['remarks'] ?? null,
+        'known_allergies'       => $data['allergies'] ?? null,
+
+        'organisation_id'       => $data['tpa'] ?? null,
+        'insurance_id'          => $data['tpa_id'] ?? null,
+        'insurance_validity'    => $data['tpa_validity'] ?? null,
+        'identification_number' => $data['national_id_number'] ?? null,
         ]);
 
         return redirect()->back()->with('success', 'Patient updated successfully!');
     }
+
 
     public function bulkDelete(Request $request)
     {
@@ -252,7 +366,8 @@ class PatientController extends Controller
         $headers = [
             "Patient", "Gender", "Blood Group", "Age(Year)", "Age(Month)", "Age(Day)",
             "Marital Status", "Phone", "Email", "Address", "Remarks", "Known Allergies",
-            "Height","Weight","Temperature","Identification Number", "TPA", "TPA ID", "TPA Validity"
+            "Height","Weight","Temperature","Identification Number", "TPA", "TPA ID", "TPA Validity",
+            "Gaurdian Name", "Gaurdian Phone No.", "Emergency Phone No.", "Languages Speak", "Newspaper Preference"
         ];
 
         // Add header row

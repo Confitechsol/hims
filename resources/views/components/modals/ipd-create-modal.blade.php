@@ -674,7 +674,7 @@
                                         <i class="bi bi-person-circle"></i> Patient Name
                                     </div>
                                     <div class="info-value" id="patient_name_value">-</div>
-
+                                        
                                     <div class="info-label">
                                         <i class="bi bi-gender-ambiguous"></i> Gender
                                     </div>
@@ -704,6 +704,18 @@
                                         <i class="bi bi-geo-alt"></i> Location
                                     </div>
                                     <div class="info-value" id="patient_location_value">-</div>
+                                    <div class="info-label">
+                                        <i class="bi bi-droplet"></i> Height
+                                    </div>
+                                    <div class="info-value" id="patient_height_value">-</div>
+                                    <div class="info-label">
+                                        <i class="bi bi-droplet"></i> Weight
+                                    </div>
+                                    <div class="info-value" id="patient_weight_value">-</div>
+                                    <div class="info-label">Languages</div>
+                                    <div class="info-value" id="patient_languages_value">-</div>
+                                    <div class="info-label">Newspaper Preference</div>
+                                    <div class="info-value" id="patient_newspaper_value">-</div>
                                 </div>
                             </div>
 
@@ -718,11 +730,10 @@
                                         </div>
                                     </div>
                                     <div class="patient-info-grid-tpa">
-                                        <div class="info-label">TPA</div>
-                                        <div class="info-value" id="patient_tpa_value">-</div>
+                                        
 
                                         <div class="info-label">TPA Code</div>
-                                        <div class="info-value" id="patient_tpa_code_value">-</div>
+                                        <div class="info-value" id="patient_tpaCode_value">-</div>
 
                                         <div class="info-label">TPA Validity</div>
                                         <div class="info-value" id="patient_tpa_validity_value">-</div>
@@ -780,14 +791,18 @@
                         </div>
 
                         <div class="row g-3">
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <label class="form-label">Admission Date & Time<span class="required">*</span></label>
                                 <input type="datetime-local" class="form-control" name="admission_date">
                             </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Case<span class="required">*</span></label>
+                                <input type="text" class="form-control" name="case">
+                            </div>
                             <div class="col-md-4">
-                                <label class="form-label">Case Type</label>
-                                <select class="form-select" name="case_type">
-                                    <option value="">Select Case Type</option>
+                                <label class="form-label">Patient Type</label>
+                                <select class="form-select" name="patient_type">
+                                    <option value="">Select Patient Type</option>
                                     <option value="Old Patient">Old Patient</option>
                                     <option value="New Patient">New Patient</option>
                                 </select>
@@ -800,7 +815,7 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Casualty</label>
+                                <label class="form-label">Emergency</label>
                                 <select class="form-select" name="casualty">
                                     <option value="No">No</option>
                                     <option value="Yes">Yes</option>
@@ -1098,88 +1113,118 @@
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const patientSection = document.querySelector(".patient-card")
-        patientSection.style.display = "none"
-        const patientSelect = document.getElementById('patient_select');
-        const photo = document.getElementById('patient_photo');
-        patientSelect.innerHTML = '<option value="">Loading...</option>';
 
-        fetch("{{ route('getPatients') }}")
-            .then(response => {
-                return response.json()
-            })
-            .then(data => {
-                window.patientsData = data;
-                patientSelect.innerHTML = '<option value="">Select</option>';
-                data.forEach(patient => {
-                    const option = document.createElement('option');
-                    option.value = patient.id;
-                    option.textContent = patient.patient_name;
-                    if ("{{ old('patient_select') }}" == patient.id) {
-                        option.selected = true;
-                    }
-                    patientSelect.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching patients:', error);
-                patientSelect.innerHTML = '<option value="">Error loading options</option>';
+    const patientSection = document.querySelector(".patient-card");
+    patientSection.style.display = "none";
+
+    const patientSelect = document.getElementById('patient_select');
+    const photo = document.getElementById('patient_photo');
+    const noImagePlaceholder = document.getElementById('no_image_placeholder');
+
+    patientSelect.innerHTML = '<option value="">Loading...</option>';
+
+    fetch("{{ route('getPatients') }}")
+        .then(res => res.json())
+        .then(data => {
+            console.log("Patients Loaded:", data);
+            window.patientsData = data;
+
+            patientSelect.innerHTML = '<option value="">Select</option>';
+            data.forEach(patient => {
+                const option = document.createElement('option');
+                option.value = patient.id;
+                option.textContent = patient.patient_name;
+                patientSelect.appendChild(option);
             });
-        // When patient is selected
-        patientSelect.addEventListener('change', function() {
-            const selected = window.patientsData.find(p => p.id == this.value);
+        })
+        .catch(err => {
+            console.error("Error fetching patients:", err);
+            patientSelect.innerHTML = '<option value="">Error loading options</option>';
+        });
 
-            if (selected) {
-                patientSection.style.display = 'block'
-                document.getElementById('patient_name_value').textContent =
-                    `${selected.patient_name} (${selected.id})`;
-                document.getElementById('patient_gender_value').textContent = selected.gender || 'N/A';
-                document.getElementById('patient_age_value').textContent = selected.age + " Year " +
-                    selected.month + " Month " + selected.day + " Days " || 'N/A';
-                document.getElementById('patient_marital_status_value').textContent = selected
-                    .marital_status || 'N/A';
-                document.getElementById('patient_blood_value').textContent = selected.blood_group ||
-                    'N/A';
-                document.getElementById('patient_phone_value').textContent = selected.mobileno || 'N/A';
-                document.getElementById('patient_location_value').textContent = selected.address ||
-                    'N/A';
+    // When a patient is selected
+    patientSelect.addEventListener('change', function() {
 
-                document.getElementById('patient_tpa_value').textContent = selected.organisation
-                    .organisation_name || 'N/A';
-                document.getElementById('patient_tpa_code_value').textContent = selected.organisation
-                    .code ||
-                    'N/A';
-                document.getElementById('patient_tpa_validity_value').textContent = selected
-                    .tpa_validity || 'N/A';
-                document.getElementById('patient_identification_value').textContent = selected
-                    .identification_number || 'N/A';
+        const selected = window.patientsData.find(p => p.id == this.value);
 
-                // Handle photo display
-                if (selected.photo_path) {
-                    photo.src = selected.image;
-                    photo.style.display = 'block';
-                    noImagePlaceholder.style.display = 'none';
-                } else {
-                    photo.style.display = 'none';
-                    noImagePlaceholder.style.display = 'block';
-                }
+        if (selected) {
+            console.log("Selected patient:", selected);
+
+            patientSection.style.display = 'block';
+
+            document.getElementById('patient_name_value').textContent =
+                `${selected.patient_name} (${selected.id})`;
+
+            document.getElementById('patient_gender_value').textContent = selected.gender ?? 'N/A';
+
+            document.getElementById('patient_age_value').textContent =
+                `${selected.age} Year ${selected.month} Month ${selected.day} Days`;
+
+            document.getElementById('patient_marital_status_value').textContent =
+                selected.marital_status ?? 'N/A';
+
+            document.getElementById('patient_blood_value').textContent =
+                selected.blood_group ?? 'N/A';
+
+            document.getElementById('patient_phone_value').textContent =
+                selected.mobileno ?? 'N/A';
+
+            document.getElementById('patient_location_value').textContent =
+                selected.address ?? 'N/A';
+
+            document.getElementById('patient_height_value').textContent =
+                selected.height ?? 'N/A';
+
+            document.getElementById('patient_weight_value').textContent =
+                selected.weight ?? 'N/A';
+
+            document.getElementById('patient_languages_value').textContent =
+                selected.languages_speak ?? 'N/A';
+
+            document.getElementById('patient_newspaper_value').textContent =
+                selected.newspaper_preference ?? 'N/A';
+
+            // Organisation (use optional chaining)
+            document.getElementById('patient_tpa_value').textContent =
+                selected.organisation?.organisation_name ?? 'N/A';
+
+            document.getElementById('patient_tpaCode_value').textContent =
+                selected.organisation?.code ?? 'N/A';
+
+            document.getElementById('patient_tpa_validity_value').textContent =
+                selected.tpa_validity ?? 'N/A';
+
+            document.getElementById('patient_identification_value').textContent =
+                selected.identification_number ?? 'N/A';
+
+            // ---- PHOTO HANDLING ----
+            if (selected.photo_path) {
+                photo.src = selected.photo_path;
+                photo.style.display = 'block';
+                noImagePlaceholder.style.display = 'none';
             } else {
-                // Reset if none selected
-                [
-                    'patient_name_value', 'patient_gender_value', 'patient_age_value',
-                    'patient_marital_status_value', 'patient_blood_value',
-                    'patient_phone_value', 'patient_location_value',
-                    'patient_tpa_value', 'patient_tpa_code_value',
-                    'patient_tpa_validity_value', 'patient_identification_value'
-                ].forEach(id => document.getElementById(id).textContent = '—');
-
-                patientSection.style.display = 'none';
                 photo.style.display = 'none';
                 noImagePlaceholder.style.display = 'block';
             }
-        });
 
+        } else {
+            // RESET ALL FIELDS
+            [
+                'patient_name_value','patient_gender_value','patient_age_value',
+                'patient_marital_status_value','patient_blood_value','patient_height_value',
+                'patient_weight_value','patient_languages_value','patient_newspaper_value',
+                'patient_phone_value','patient_location_value','patient_tpa_value',
+                'patient_tpaCode_value','patient_tpa_validity_value','patient_identification_value'
+            ].forEach(id => document.getElementById(id).textContent = '—');
+
+            patientSection.style.display = 'none';
+            photo.style.display = 'none';
+            noImagePlaceholder.style.display = 'block';
+        }
     });
+
+});
+
 </script>
 
 {{-- get doctors --}}

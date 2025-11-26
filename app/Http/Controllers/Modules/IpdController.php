@@ -51,11 +51,12 @@ class IpdController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->all());
-        $request->validate([
+        //dd($request->all());
+        $validator = Validator::make($request->all(), [
             'patient_id'           => 'required|exists:patients,id',
-            'admission_date'     => 'required|date',
-            'case_type'            => 'required|string',
+            'admission_date'       => 'required|date',
+            'patient_type'         => 'required|string',
+            'case'                 => 'required|string',
             'casualty'             => 'required|string',
             'reference'            => 'nullable|string',
             'doctor_id'            => 'required|exists:doctor,id',
@@ -67,11 +68,19 @@ class IpdController extends Controller
             'symptoms_type.*'      => 'string',
             'symptoms_title'       => 'required|array',
             'symptoms_title.*'     => 'string',
-            'symptoms_description' => 'required|string',
+            'symptoms_description' => 'nullable|string',
             'note'                 => 'nullable|string',
             'apply_tpa'            => 'nullable|string|max:10',
         ]);
 
+        if ($validator->fails()) {
+             dd($validator->errors()->all());
+            return back()
+                ->withErrors($validator)
+                ->withInput();
+                
+        }
+        
         DB::beginTransaction();
         $user = Auth::user();
         // dd($user);
@@ -108,7 +117,8 @@ class IpdController extends Controller
             $ipd->bed_group_id = $request->bed_group;
             $ipd->bed          = $request->bed_number;
             $ipd->date         = $request->admission_date;
-            $ipd->patient_old  = $request->case_type;
+            $ipd->case_type    = $request->case;
+            $ipd->patient_old  = $request->patient_type;
             $ipd->casualty     = $request->casualty;
             $ipd->refference   = $request->reference;
 
@@ -216,6 +226,7 @@ class IpdController extends Controller
             // 🔹 Update OPD record
             $ipd        = IpdDetail::findOrFail($id);
             $allotedBed = $ipd->bed;
+            //dd($id, IpdPatient::where('ipd_id', $id)->first());
             $ipdPatient = IpdPatient::where('ipd_id', $id)->firstOrFail();
             if ($request->bed_number != $allotedBed) {
                 $newBedDetail            = Bed::where('id', $request->bed_number)->firstOrFail();

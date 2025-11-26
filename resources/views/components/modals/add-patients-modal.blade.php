@@ -47,6 +47,28 @@
                             @enderror
                         </div>
 
+                        {{-- Guardian Phone --}}
+                        <div class="col-md-6">
+                            <label for="guardian_phone" class="form-label">Guardian Phone No.</label>
+                            <input type="text" id="guardian_phone" name="guardian_phone"
+                                class="form-control @error('guardian_phone') is-invalid @enderror"
+                                value="{{ old('guardian_phone') }}" />
+                            @error('guardian_phone')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        {{-- Emergency Contact --}}
+                        <div class="col-md-6">
+                            <label for="emergency_contact_no" class="form-label">Emergency Contact No.</label>
+                            <input type="text" id="emergency_contact_no" name="emergency_contact_no"
+                                class="form-control @error('emergency_contact_no') is-invalid @enderror"
+                                value="{{ old('emergency_contact_no') }}" />
+                            @error('emergency_contact_no')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
                         {{-- Gender + DOB + Age --}}
                         <div class="col-md-6">
                             <div class="row">
@@ -221,25 +243,70 @@
                             @enderror
                         </div>
 
-                        {{-- Remarks --}}
-                        <div class="col-md-6">
-                            <label for="remarks" class="form-label">Remarks</label>
-                            <input type="text" id="remarks" name="remarks"
-                                class="form-control @error('remarks') is-invalid @enderror"
-                                value="{{ old('remarks') }}" />
-                            @error('remarks')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
                         {{-- Allergies --}}
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="allergies" class="form-label">Any Known
                                 Allergies</label>
                             <input type="text" id="allergies" name="allergies"
                                 class="form-control @error('allergies') is-invalid @enderror"
                                 value="{{ old('allergies') }}" />
                             @error('allergies')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        {{-- Languages Speak --}}
+                        <div class="col-md-4">
+                            <label for="languages_speak" class="form-label">Languages Speak</label>
+                            <input type="text" id="languages_speak" name="languages_speak"
+                                class="form-control @error('languages_speak') is-invalid @enderror"
+                                value="{{ old('languages_speak') }}" />
+                            @error('languages_speak')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        {{-- Newspaper Preference --}}
+                        <div class="col-md-4">
+                            <label for="newspaper_preference" class="form-label">Newspaper Preference</label>
+                            <input type="text" id="newspaper_preference" name="newspaper_preference"
+                                class="form-control @error('newspaper_preference') is-invalid @enderror"
+                                value="{{ old('newspaper_preference') }}" />
+                            @error('newspaper_preference')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        {{-- Height --}}
+                        <div class="col-md-4">
+                            <label for="height" class="form-label">Height</label>
+                            <input type="text" id="height" name="height"
+                                class="form-control @error('height') is-invalid @enderror"
+                                value="{{ old('height') }}" />
+                            @error('height')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            
+                        </div>
+
+                        {{-- Weight --}}
+                        <div class="col-md-4">
+                            <label for="weight" class="form-label">Weight</label>
+                            <input type="text" id="weight" name="weight"
+                                class="form-control @error('weight') is-invalid @enderror"
+                                value="{{ old('weight') }}" />
+                            @error('weight')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        {{-- Temperature --}}
+                        <div class="col-md-4">
+                            <label for="temperature" class="form-label"> Temperature </label>
+                            <input type="text" id="temperature" name="temperature"
+                                class="form-control @error('temperature') is-invalid @enderror"
+                                value="{{ old('temperature') }}" />
+                            @error('temperature')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -272,7 +339,7 @@
                         <div class="col-md-4">
                             <label for="tpa_validity" class="form-label">TPA
                                 Validity</label>
-                            <input type="text" id="tpa_validity" name="tpa_validity"
+                            <input type="date" id="tpa_validity" name="tpa_validity"
                                 class="form-control @error('tpa_validity') is-invalid @enderror"
                                 value="{{ old('tpa_validity') }}" />
                             @error('tpa_validity')
@@ -281,9 +348,8 @@
                         </div>
 
                         {{-- National ID --}}
-                        <div class="col-md-4">
-                            <label for="national_id_number" class="form-label">National Identification
-                                Number</label>
+                        <div class="col-md-6">
+                            <label for="national_id_number" class="form-label">Adhaar Card or PAN Card</label>
                             <input type="text" id="national_id_number" name="national_id_number"
                                 class="form-control @error('national_id_number') is-invalid @enderror"
                                 value="{{ old('national_id_number') }}" />
@@ -291,14 +357,24 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+                        {{-- Remarks --}}
+                        <div class="col-md-6">
+                            <label for="remarks" class="form-label">Remarks</label>
+                            <input type="text" id="remarks" name="remarks"
+                                class="form-control @error('remarks') is-invalid @enderror"
+                                value="{{ old('remarks') }}" />
+                            @error('remarks')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
 
                     </div>
 
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Save Patient</button>
-                </div>
-            </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save Patient</button>
+                    </div>
+                </form>
         </div>
     </div>
 </div>
@@ -335,39 +411,78 @@
                 const selectedOrg = window.organizationsData.find(org => org.id == selectedId);
                 tpaIdInput.value = selectedOrg ? selectedOrg.code : '';
             });
-        //auto calculate age..............................................................................
-        const birthDateInput = document.getElementById('birth_date');
-        const ageYearInput = document.getElementById('age_year');
-        const ageMonthInput = document.getElementById('age_month');
-        const ageDayInput = document.getElementById('age_day');
+      // Elements
+const birthDateInput = document.getElementById('birth_date');
+const ageYearInput = document.getElementById('age_year');
+const ageMonthInput = document.getElementById('age_month');
+const ageDayInput = document.getElementById('age_day');
 
-    birthDateInput.addEventListener('change', function() {
-        const birthDate = new Date(this.value);
-        if (!this.value || isNaN(birthDate)) {
-            ageYearInput.value = '';
-            ageMonthInput.value = '';
-            ageDayInput.value = '';
-            return;
-        }
+// ------------------ DOB → AUTO CALCULATE AGE ------------------
+birthDateInput.addEventListener('change', function () {
+    const birthDate = new Date(this.value);
+    if (!this.value || isNaN(birthDate)) {
+        ageYearInput.value = '';
+        ageMonthInput.value = '';
+        ageDayInput.value = '';
+        return;
+    }
 
-        const today = new Date();
-        let years = today.getFullYear() - birthDate.getFullYear();
-        let months = today.getMonth() - birthDate.getMonth();
-        let days = today.getDate() - birthDate.getDate();
+    const today = new Date();
+    let years = today.getFullYear() - birthDate.getFullYear();
+    let months = today.getMonth() - birthDate.getMonth();
+    let days = today.getDate() - birthDate.getDate();
 
-        if (days < 0) {
-            months--;
-            const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-            days += prevMonth.getDate();
-        }
+    if (days < 0) {
+        months--;
+        const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+        days += prevMonth.getDate();
+    }
 
-        if (months < 0) {
-            years--;
-            months += 12;
-        }
-        ageYearInput.value = years;
-        ageMonthInput.value = months;
-        ageDayInput.value = days;
-    });
+    if (months < 0) {
+        years--;
+        months += 12;
+    }
+
+    ageYearInput.value = years;
+    ageMonthInput.value = months;
+    ageDayInput.value = days;
+});
+
+// ------------------ AGE → AUTO CALCULATE DOB ------------------
+function updateDOB() {
+    const years = parseInt(ageYearInput.value) || 0;
+    const months = parseInt(ageMonthInput.value) || 0;
+    const days = parseInt(ageDayInput.value) || 0;
+
+    // If no age entered → do nothing
+    if (!years && !months && !days) return;
+
+    const today = new Date();
+
+    // Subtract entered values
+    let dob = new Date(
+        today.getFullYear() - years,
+        today.getMonth() - months,
+        today.getDate() - days
+    );
+
+    // If month+day not given → approximate DOB = Jan 1st of that year
+    if (!ageMonthInput.value && !ageDayInput.value) {
+        dob = new Date(today.getFullYear() - years, 0, 1); // 1st Jan
+    }
+
+    // Format YYYY-MM-DD
+    const yyyy = dob.getFullYear();
+    const mm = String(dob.getMonth() + 1).padStart(2, '0');
+    const dd = String(dob.getDate()).padStart(2, '0');
+
+    birthDateInput.value = `${yyyy}-${mm}-${dd}`;
+}
+
+// Trigger when age fields are typed/changed
+ageYearInput.addEventListener('input', updateDOB);
+ageMonthInput.addEventListener('input', updateDOB);
+ageDayInput.addEventListener('input', updateDOB);
+
     });
 </script>
