@@ -5,6 +5,8 @@
             color: #f8f9fa !important;
             font-weight: 600 !important;
         }
+
+        
     </style>
     <div class="container">
         <div class="card shadow-sm border-0 mt-4">
@@ -83,7 +85,7 @@
 
                                     <div class="text-end d-flex">
                                         <button class="btn btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#createIpdModal">Appoint Patient</button>
+                                            data-bs-target="#createIpdModal">Admit Patient</button>
                                     </div>
                                 </div>
                                 <?php if($isIpdTab): ?>
@@ -272,6 +274,7 @@
     
 
     <script>
+        
         document.addEventListener("DOMContentLoaded", function() {
             const filterTypeSelect = document.getElementById('filterType');
             const dateRangeFilter = document.getElementById('dateRangeFilter');

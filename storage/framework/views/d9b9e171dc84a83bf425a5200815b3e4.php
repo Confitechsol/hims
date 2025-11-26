@@ -640,7 +640,7 @@
                 <!-- Modal Header -->
                 <div class="modal-header align-items-start">
                     <div class="flex-grow-1">
-                        <h5 class="modal-title mb-3">Patient Appointment</h5>
+                        <h5 class="modal-title mb-3">Patient Admission</h5>
                         <div class="d-flex gap-3 align-items-center">
                             <select type="text" class="form-select patient-search flex-grow-1"
                                 placeholder="Search patient by name or ID..." id="patient_select" name="patient_id">
@@ -770,19 +770,19 @@
                         </div>
                     </div>
 
-                    <!-- Appointment Details Section -->
+                    <!-- Admission Details Section -->
                     <div class="section-card">
                         <div class="section-header">
                             <div class="section-icon">
                                 <i class="bi bi-calendar-check"></i>
                             </div>
-                            <h6 class="section-title">Appointment Details</h6>
+                            <h6 class="section-title">Admission Details</h6>
                         </div>
 
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label">Appointment Date <span class="required">*</span></label>
-                                <input type="date" class="form-control" name="appointment_date">
+                                <label class="form-label">Admission Date & Time<span class="required">*</span></label>
+                                <input type="datetime-local" class="form-control" name="admission_date">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Case Type</label>
@@ -962,6 +962,7 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
 
                 <!-- Modal Footer -->
