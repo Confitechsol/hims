@@ -126,7 +126,7 @@
             height: 60px;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            z-index: 9998;
+            z-index: 2;
             background-image: url("<?php echo e(asset('/assets/images/bot.png')); ?>");
             background-size: 50%;
             background-repeat: no-repeat;

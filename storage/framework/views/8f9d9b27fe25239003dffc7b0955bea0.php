@@ -1,4 +1,4 @@
-<meta name="csrf-token" content="{{ csrf_token() }}">
+<meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
 
 <style>
     body {
@@ -635,8 +635,8 @@
 <div class="modal fade" id="createIpdModal" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
-            <form action="{{ route('ipd.store') }}" id="ipdForm" method="POST">
-                @csrf
+            <form action="<?php echo e(route('ipd.store')); ?>" id="ipdForm" method="POST">
+                <?php echo csrf_field(); ?>
                 <!-- Modal Header -->
                 <div class="modal-header align-items-start">
                     <div class="flex-grow-1">
@@ -782,7 +782,7 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">Admission Date & Time<span class="required">*</span></label>
-                                <input type="datetime-local" class="form-control" name="admission_date">
+                                <input type="datetime-local" class="form-control" name="appointment_date">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Case Type</label>
@@ -856,70 +856,7 @@
                                     <option value="">Loading...</option>
                                 </select>
                             </div>
-                            {{-- <div class="col-md-6">
-                                <label class="form-label">Charge Category</label>
-                                <select class="form-select" name="charge_category" id="charge_category_select">
-                                    <option value="">Loading...</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Charge <span class="required">*</span></label>
-                                <select class="form-select" name="charge" id="charge_select">
-                                    <option value="">Loading...</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Standard Charge (INR)</label>
-                                <input type="number" class="form-control" name="standard_charge"
-                                    id="standard_charge" placeholder="0.00" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Applied Charge (INR) <span class="required">*</span></label>
-                                <input type="number" class="form-control" name="applied_charge" id="applied_charge"
-                                    placeholder="0.00">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Discount</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" name="discount" id="discount"
-                                        placeholder="0">
-                                    <span class="input-group-text">%</span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Tax</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" id="tax" name="tax"
-                                        placeholder="0">
-                                    <span class="input-group-text">%</span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Amount (INR) <span class="required">*</span></label>
-                                <input type="number" class="form-control" name="amount" id="amount"
-                                    placeholder="0.00" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Payment Mode</label>
-                                <select class="form-select" name="payment_mode">
-                                    <option value="Cash" selected>Cash</option>
-                                    <option value="Card">Card</option>
-                                    <option value="UPI">UPI</option>
-                                    <option value="Online Transfer">Online Transfer</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Paid Amount (INR) <span class="required">*</span></label>
-                                <input type="number" class="form-control" name="paid_amount" id="paid_amount"
-                                    placeholder="0.00">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="payment_date" class="form-label">
-                                    Payment Date <span class="required">*</span>
-                                </label>
-                                <input type="date" name="payment_date" id="payment_date" class="form-control"
-                                    required>
-                            </div> --}}
+                            
 
                         </div>
                     </div>
@@ -1013,10 +950,7 @@
                                 </div>
                             </div>
 
-                            {{-- <div class="col-md-4">
-                                <label class="form-label">Any Known Allergies</label>
-                                <textarea class="form-control" name="allergies" rows="1" placeholder="Enter allergies"></textarea>
-                            </div> --}}
+                            
                             <div class="col-md-4">
                                 <label class="form-label">Symptoms Description</label>
                                 <textarea class="form-control" name="symptoms_description" rows="1"
@@ -1050,7 +984,7 @@
 </div>
 
 
-@include('components.modals.add-patients-modal')
+<?php echo $__env->make('components.modals.add-patients-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
@@ -1104,7 +1038,7 @@
         const photo = document.getElementById('patient_photo');
         patientSelect.innerHTML = '<option value="">Loading...</option>';
 
-        fetch("{{ route('getPatients') }}")
+        fetch("<?php echo e(route('getPatients')); ?>")
             .then(response => {
                 return response.json()
             })
@@ -1115,7 +1049,7 @@
                     const option = document.createElement('option');
                     option.value = patient.id;
                     option.textContent = patient.patient_name;
-                    if ("{{ old('patient_select') }}" == patient.id) {
+                    if ("<?php echo e(old('patient_select')); ?>" == patient.id) {
                         option.selected = true;
                     }
                     patientSelect.appendChild(option);
@@ -1182,7 +1116,7 @@
     });
 </script>
 
-{{-- get doctors --}}
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const doctorSelect = document.getElementById('doctor_select');
@@ -1203,7 +1137,7 @@
         symptomTypesSelect.innerHTML = '<option value="">Loading...</option>';
 
         //doctor
-        fetch("{{ route('getDoctors') }}")
+        fetch("<?php echo e(route('getDoctors')); ?>")
             .then(response => response.json())
             .then(data => {
                 window.doctorsData = data;
@@ -1212,7 +1146,7 @@
                     const option = document.createElement('option');
                     option.value = doc.id;
                     option.textContent = doc.name;
-                    if ("{{ old('doctor_id') }}" == doc.id) {
+                    if ("<?php echo e(old('doctor_id')); ?>" == doc.id) {
                         option.selected = true;
                     }
                     doctorSelect.appendChild(option);
@@ -1224,7 +1158,7 @@
             });
 
         //charge category
-        fetch("{{ route('getBedGroups') }}")
+        fetch("<?php echo e(route('getBedGroups')); ?>")
             .then(response => response.json())
             .then(data => {
                 window.bedGroupData = data;
@@ -1234,7 +1168,7 @@
                     option.value = bedGroup.id;
                     console.log();
                     option.textContent = bedGroup.name + ' - ' + bedGroup.floor_detail.name;
-                    if ("{{ old('bed_group') }}" == bedGroup.id) {
+                    if ("<?php echo e(old('bed_group')); ?>" == bedGroup.id) {
                         option.selected = true;
                     }
                     bedGroupSelect.appendChild(option);
@@ -1248,7 +1182,7 @@
         // Listen for Charge Category dropdown change
         bedGroupSelect.addEventListener('change', function() {
             const selectedId = this.value;
-            const baseUrl = "{{ route('getBedNumbers', ['id' => 'ID']) }}";
+            const baseUrl = "<?php echo e(route('getBedNumbers', ['id' => 'ID'])); ?>";
             const finalUrl = baseUrl.replace('ID', selectedId);
             fetch(finalUrl)
                 .then(response => response.json())
@@ -1264,7 +1198,7 @@
                             const option = document.createElement('option');
                             option.value = bedNumber.id;
                             option.textContent = bedNumber.name;
-                            if ("{{ old('bed_number') }}" == bedNumber.id) {
+                            if ("<?php echo e(old('bed_number')); ?>" == bedNumber.id) {
                                 option.selected = true;
                             }
                             bedNumberSelect.appendChild(option);
@@ -1307,7 +1241,7 @@
         });
 
 
-        fetch("{{ route('getSymptomsTypes') }}")
+        fetch("<?php echo e(route('getSymptomsTypes')); ?>")
             .then(response => response.json())
             .then(data => {
                 window.symptomTypesData = data;
@@ -1316,7 +1250,7 @@
                     const option = document.createElement('option');
                     option.value = type.id;
                     option.textContent = type.symptoms_type;
-                    if ("{{ old('symptoms_type[]') }}" == type.id) {
+                    if ("<?php echo e(old('symptoms_type[]')); ?>" == type.id) {
                         option.selected = true;
                     }
                     symptomTypesSelect.appendChild(option);
@@ -1332,7 +1266,7 @@
 
 
 
-{{-- symptoms type multiselect --}}
+
 
 
 <script>
@@ -1674,7 +1608,7 @@
                 symptomTitleSelect.showLoading();
                 symptomTitleSelect.enable();
                 const symptomSelect = document.getElementById('symptoms_title');
-                fetch("{{ route('getSymptoms') }}", {
+                fetch("<?php echo e(route('getSymptoms')); ?>", {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -1692,7 +1626,7 @@
                             const option = document.createElement('option');
                             option.value = title.id;
                             option.textContent = title.symptoms_title;
-                            if ("{{ old('symptoms_title[]') }}" == title.id) {
+                            if ("<?php echo e(old('symptoms_title[]')); ?>" == title.id) {
                                 option.selected = true;
                             }
                             symptomSelect.appendChild(option);
@@ -1718,3 +1652,4 @@
         })
     })
 </script>
+<?php /**PATH C:\xampp\htdocs\hims\resources\views/components/modals/ipd-create-modal.blade.php ENDPATH**/ ?>

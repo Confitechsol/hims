@@ -656,12 +656,12 @@
                                         <div class="section-body">
                                             <div class="form-row cols-2">
                                                 <div class="field-group">
-                                                    <label for="appointment_date" class="form-label">
+                                                    <label for="admission_date" class="form-label">
                                                         Admission Date <span class="required">*</span>
                                                     </label>
-                                                    <input type="date" name="appointment_date" id="appointment_date"
+                                                    <input type="date" name="admission_date" id="admission_date"
                                                         class="form-control"
-                                                        value="{{ old('appointment_date', $ipd->date) }}" required readonly>
+                                                        value="{{ old('admission_date', $ipd->date) }}" required readonly>
                                                 </div>
 
                                                 <div class="field-group">

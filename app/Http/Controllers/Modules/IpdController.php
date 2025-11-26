@@ -54,7 +54,7 @@ class IpdController extends Controller
         // dd($request->all());
         $request->validate([
             'patient_id'           => 'required|exists:patients,id',
-            'appointment_date'     => 'required|date',
+            'admission_date'     => 'required|date',
             'case_type'            => 'required|string',
             'casualty'             => 'required|string',
             'reference'            => 'nullable|string',
@@ -107,7 +107,7 @@ class IpdController extends Controller
             // Visit Details
             $ipd->bed_group_id = $request->bed_group;
             $ipd->bed          = $request->bed_number;
-            $ipd->date         = $request->appointment_date;
+            $ipd->date         = $request->admission_date;
             $ipd->patient_old  = $request->case_type;
             $ipd->casualty     = $request->casualty;
             $ipd->refference   = $request->reference;
@@ -182,7 +182,7 @@ class IpdController extends Controller
          //dd($request->all());
         $validator = Validator::make($request->all(), [
             'patient_id'           => 'required|exists:patients,id',
-            'appointment_date'     => 'required|date',
+            'admission_date'     => 'required|date',
             'old_patient'          => 'required|string',
             'casualty'             => 'required|string',
             'reference'            => 'nullable|string',
@@ -231,7 +231,7 @@ class IpdController extends Controller
             $ipd->cons_doctor = $request->consultant_doctor;
 
             // Visit Details
-            $ipd->date         = $request->appointment_date;
+            $ipd->date         = $request->admission_date;
             $ipd->bed_group_id = $request->bed_group;
             $ipd->bed          = $request->bed_number;
             $ipd->patient_old  = $request->old_patient;
