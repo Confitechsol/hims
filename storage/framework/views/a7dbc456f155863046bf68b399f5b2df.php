@@ -126,7 +126,7 @@
             height: 60px;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            z-index: 9998;
+            z-index: 2;
             background-image: url("<?php echo e(asset('/assets/images/bot.png')); ?>");
             background-size: 50%;
             background-repeat: no-repeat;
@@ -704,6 +704,8 @@
                 $('select.form-select').each(function() {
                     initSelect($(this));
                 });
+
+               
 
                 // Initialize selects that appear inside modals when they open
                 $('.modal').off('shown.bs.modal.select2init').on('shown.bs.modal.select2init', function () {
