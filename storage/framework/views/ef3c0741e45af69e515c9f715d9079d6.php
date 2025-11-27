@@ -77,6 +77,56 @@ unset($__errorArgs, $__bag); ?>
 
                         
                         <div class="col-md-6">
+                            <label for="guardian_phone" class="form-label">Guardian Phone No.</label>
+                            <input type="text" id="guardian_phone" name="guardian_phone"
+                                class="form-control <?php $__errorArgs = ['guardian_phone'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                value="<?php echo e(old('guardian_phone')); ?>" />
+                            <?php $__errorArgs = ['guardian_phone'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <div class="invalid-feedback"><?php echo e($message); ?></div>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                        </div>
+
+                        
+                        <div class="col-md-6">
+                            <label for="emergency_contact_no" class="form-label">Emergency Contact No.</label>
+                            <input type="text" id="emergency_contact_no" name="emergency_contact_no"
+                                class="form-control <?php $__errorArgs = ['emergency_contact_no'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                value="<?php echo e(old('emergency_contact_no')); ?>" />
+                            <?php $__errorArgs = ['emergency_contact_no'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <div class="invalid-feedback"><?php echo e($message); ?></div>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                        </div>
+
+                        
+                        <div class="col-md-6">
                             <div class="row">
 
                                 
@@ -415,32 +465,7 @@ unset($__errorArgs, $__bag); ?>
                         </div>
 
                         
-                        <div class="col-md-6">
-                            <label for="remarks" class="form-label">Remarks</label>
-                            <input type="text" id="remarks" name="remarks"
-                                class="form-control <?php $__errorArgs = ['remarks'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>"
-                                value="<?php echo e(old('remarks')); ?>" />
-                            <?php $__errorArgs = ['remarks'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                                <div class="invalid-feedback"><?php echo e($message); ?></div>
-                            <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
-                        </div>
-
-                        
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="allergies" class="form-label">Any Known
                                 Allergies</label>
                             <input type="text" id="allergies" name="allergies"
@@ -454,6 +479,132 @@ endif;
 unset($__errorArgs, $__bag); ?>"
                                 value="<?php echo e(old('allergies')); ?>" />
                             <?php $__errorArgs = ['allergies'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <div class="invalid-feedback"><?php echo e($message); ?></div>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                        </div>
+
+                        
+                        <div class="col-md-4">
+                            <label for="languages_speak" class="form-label">Languages Speak</label>
+                            <input type="text" id="languages_speak" name="languages_speak"
+                                class="form-control <?php $__errorArgs = ['languages_speak'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                value="<?php echo e(old('languages_speak')); ?>" />
+                            <?php $__errorArgs = ['languages_speak'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <div class="invalid-feedback"><?php echo e($message); ?></div>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                        </div>
+
+                        
+                        <div class="col-md-4">
+                            <label for="newspaper_preference" class="form-label">Newspaper Preference</label>
+                            <input type="text" id="newspaper_preference" name="newspaper_preference"
+                                class="form-control <?php $__errorArgs = ['newspaper_preference'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                value="<?php echo e(old('newspaper_preference')); ?>" />
+                            <?php $__errorArgs = ['newspaper_preference'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <div class="invalid-feedback"><?php echo e($message); ?></div>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                        </div>
+
+                        
+                        <div class="col-md-4">
+                            <label for="height" class="form-label">Height</label>
+                            <input type="text" id="height" name="height"
+                                class="form-control <?php $__errorArgs = ['height'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                value="<?php echo e(old('height')); ?>" />
+                            <?php $__errorArgs = ['height'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <div class="invalid-feedback"><?php echo e($message); ?></div>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                            
+                        </div>
+
+                        
+                        <div class="col-md-4">
+                            <label for="weight" class="form-label">Weight</label>
+                            <input type="text" id="weight" name="weight"
+                                class="form-control <?php $__errorArgs = ['weight'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                value="<?php echo e(old('weight')); ?>" />
+                            <?php $__errorArgs = ['weight'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <div class="invalid-feedback"><?php echo e($message); ?></div>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                        </div>
+
+                        
+                        <div class="col-md-4">
+                            <label for="temperature" class="form-label"> Temperature </label>
+                            <input type="text" id="temperature" name="temperature"
+                                class="form-control <?php $__errorArgs = ['temperature'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                value="<?php echo e(old('temperature')); ?>" />
+                            <?php $__errorArgs = ['temperature'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -521,7 +672,7 @@ unset($__errorArgs, $__bag); ?>
                         <div class="col-md-4">
                             <label for="tpa_validity" class="form-label">TPA
                                 Validity</label>
-                            <input type="text" id="tpa_validity" name="tpa_validity"
+                            <input type="date" id="tpa_validity" name="tpa_validity"
                                 class="form-control <?php $__errorArgs = ['tpa_validity'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
@@ -544,9 +695,8 @@ unset($__errorArgs, $__bag); ?>
                         </div>
 
                         
-                        <div class="col-md-4">
-                            <label for="national_id_number" class="form-label">National Identification
-                                Number</label>
+                        <div class="col-md-6">
+                            <label for="national_id_number" class="form-label">Adhaar Card or PAN Card</label>
                             <input type="text" id="national_id_number" name="national_id_number"
                                 class="form-control <?php $__errorArgs = ['national_id_number'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -568,14 +718,38 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
                         </div>
+                        
+                        <div class="col-md-6">
+                            <label for="remarks" class="form-label">Remarks</label>
+                            <input type="text" id="remarks" name="remarks"
+                                class="form-control <?php $__errorArgs = ['remarks'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                value="<?php echo e(old('remarks')); ?>" />
+                            <?php $__errorArgs = ['remarks'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <div class="invalid-feedback"><?php echo e($message); ?></div>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                        </div>
 
                     </div>
 
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Save Patient</button>
-                </div>
-            </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save Patient</button>
+                    </div>
+                </form>
         </div>
     </div>
 </div>
@@ -612,40 +786,79 @@ unset($__errorArgs, $__bag); ?>
                 const selectedOrg = window.organizationsData.find(org => org.id == selectedId);
                 tpaIdInput.value = selectedOrg ? selectedOrg.code : '';
             });
-        //auto calculate age..............................................................................
-        const birthDateInput = document.getElementById('birth_date');
-        const ageYearInput = document.getElementById('age_year');
-        const ageMonthInput = document.getElementById('age_month');
-        const ageDayInput = document.getElementById('age_day');
+      // Elements
+const birthDateInput = document.getElementById('birth_date');
+const ageYearInput = document.getElementById('age_year');
+const ageMonthInput = document.getElementById('age_month');
+const ageDayInput = document.getElementById('age_day');
 
-    birthDateInput.addEventListener('change', function() {
-        const birthDate = new Date(this.value);
-        if (!this.value || isNaN(birthDate)) {
-            ageYearInput.value = '';
-            ageMonthInput.value = '';
-            ageDayInput.value = '';
-            return;
-        }
+// ------------------ DOB → AUTO CALCULATE AGE ------------------
+birthDateInput.addEventListener('change', function () {
+    const birthDate = new Date(this.value);
+    if (!this.value || isNaN(birthDate)) {
+        ageYearInput.value = '';
+        ageMonthInput.value = '';
+        ageDayInput.value = '';
+        return;
+    }
 
-        const today = new Date();
-        let years = today.getFullYear() - birthDate.getFullYear();
-        let months = today.getMonth() - birthDate.getMonth();
-        let days = today.getDate() - birthDate.getDate();
+    const today = new Date();
+    let years = today.getFullYear() - birthDate.getFullYear();
+    let months = today.getMonth() - birthDate.getMonth();
+    let days = today.getDate() - birthDate.getDate();
 
-        if (days < 0) {
-            months--;
-            const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-            days += prevMonth.getDate();
-        }
+    if (days < 0) {
+        months--;
+        const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+        days += prevMonth.getDate();
+    }
 
-        if (months < 0) {
-            years--;
-            months += 12;
-        }
-        ageYearInput.value = years;
-        ageMonthInput.value = months;
-        ageDayInput.value = days;
-    });
+    if (months < 0) {
+        years--;
+        months += 12;
+    }
+
+    ageYearInput.value = years;
+    ageMonthInput.value = months;
+    ageDayInput.value = days;
+});
+
+// ------------------ AGE → AUTO CALCULATE DOB ------------------
+function updateDOB() {
+    const years = parseInt(ageYearInput.value) || 0;
+    const months = parseInt(ageMonthInput.value) || 0;
+    const days = parseInt(ageDayInput.value) || 0;
+
+    // If no age entered → do nothing
+    if (!years && !months && !days) return;
+
+    const today = new Date();
+
+    // Subtract entered values
+    let dob = new Date(
+        today.getFullYear() - years,
+        today.getMonth() - months,
+        today.getDate() - days
+    );
+
+    // If month+day not given → approximate DOB = Jan 1st of that year
+    if (!ageMonthInput.value && !ageDayInput.value) {
+        dob = new Date(today.getFullYear() - years, 0, 1); // 1st Jan
+    }
+
+    // Format YYYY-MM-DD
+    const yyyy = dob.getFullYear();
+    const mm = String(dob.getMonth() + 1).padStart(2, '0');
+    const dd = String(dob.getDate()).padStart(2, '0');
+
+    birthDateInput.value = `${yyyy}-${mm}-${dd}`;
+}
+
+// Trigger when age fields are typed/changed
+ageYearInput.addEventListener('input', updateDOB);
+ageMonthInput.addEventListener('input', updateDOB);
+ageDayInput.addEventListener('input', updateDOB);
+
     });
 </script>
 <?php /**PATH C:\xampp82\htdocs\hims\resources\views/components/modals/add-patients-modal.blade.php ENDPATH**/ ?>

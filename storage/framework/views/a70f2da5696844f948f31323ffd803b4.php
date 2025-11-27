@@ -1,5 +1,4 @@
-@extends('layouts.adminLayout')
-@section('content')
+<?php $__env->startSection('content'); ?>
 
 <style>
      .section-card {
@@ -41,7 +40,7 @@
         }
 </style>
     <div class="row justify-content-center">
-        {{-- Settings Form --}}
+        
         <div class="col-md-11">
             <div class="card shadow-sm border-0 mt-4">
                 <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
@@ -55,20 +54,20 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="card">
-                                <form action="{{ route('patient-update', $patient->id) }}" method="POST" enctype="multipart/form-data">
-                                    @csrf
-                                    @method('PUT')
+                                <form action="<?php echo e(route('patient-update', $patient->id)); ?>" method="POST" enctype="multipart/form-data">
+                                    <?php echo csrf_field(); ?>
+                                    <?php echo method_field('PUT'); ?>
 
-                                    @if ($errors->any())
+                                    <?php if($errors->any()): ?>
                                         <div class="alert alert-danger">
                                             <strong>There were some problems with your input:</strong>
                                             <ul class="mb-0">
-                                                @foreach ($errors->all() as $error)
-                                                    <li>{{ $error }}</li>
-                                                @endforeach
+                                                <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                    <li><?php echo e($error); ?></li>
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             </ul>
                                         </div>
-                                    @endif
+                                    <?php endif; ?>
 
                                 <div class="main_sec_box p-4">
                                         <div class="form-section mb-4">
@@ -80,201 +79,251 @@
                                             </div>
                                             <div class="section-body px-4">
                                                 <div class="row gy-3">
-                                                     {{-- Name --}}
+                                                     
                                                 <div class="col-md-6">
                                                     <label class="form-label">Name</label>
                                                     <input type="text" name="name"
-                                                        class="form-control @error('name') is-invalid @enderror"
-                                                        value="{{ old('name', $patient->patient_name) }}" />
+                                                        class="form-control <?php $__errorArgs = ['name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                                        value="<?php echo e(old('name', $patient->patient_name)); ?>" />
                                                 </div>
-                                                {{-- Gender + DOB + Age --}}
+                                                
                                                 <div class="col-md-6">
                                                     <div class="row">
         
-                                                        {{-- Gender --}}
+                                                        
                                                         <div class="col-md-3">
                                                             <label class="form-label">Gender</label>
-                                                            <select name="gender" class="form-control @error('gender') is-invalid @enderror">
+                                                            <select name="gender" class="form-control <?php $__errorArgs = ['gender'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>">
                                                                 <option value="">Select</option>
-                                                                <option value="Male" {{ old('gender', $patient->gender) == 'Male' ? 'selected' : '' }}>Male</option>
-                                                                <option value="Female" {{ old('gender', $patient->gender) == 'Female' ? 'selected' : '' }}>Female</option>
+                                                                <option value="Male" <?php echo e(old('gender', $patient->gender) == 'Male' ? 'selected' : ''); ?>>Male</option>
+                                                                <option value="Female" <?php echo e(old('gender', $patient->gender) == 'Female' ? 'selected' : ''); ?>>Female</option>
                                                             </select>
                                                         </div>
         
-                                                        {{-- DOB --}}
+                                                        
                                                         <div class="col-md-4">
                                                             <label class="form-label">Date of Birth</label>
                                                             <input type="date" name="birth_date"
-                                                                class="form-control @error('birth_date') is-invalid @enderror"
-                                                                value="{{ old('birth_date', \Carbon\Carbon::parse($patient->dob)->format('Y-m-d')) }}" />
+                                                                class="form-control <?php $__errorArgs = ['birth_date'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                                                value="<?php echo e(old('birth_date', \Carbon\Carbon::parse($patient->dob)->format('Y-m-d'))); ?>" />
                                                         </div>
         
-                                                        {{-- Age --}}
+                                                        
                                                         <div class="col-md-5">
                                                             <label class="form-label">Age (yy-mm-dd)</label>
         
                                                             <div style="clear: both; overflow: hidden;">
-                                                                <input type="text" name="age[year]" id="edit_age_year_{{ $patient->id }}" placeholder="YY" 
+                                                                <input type="text" name="age[year]" id="edit_age_year_<?php echo e($patient->id); ?>" placeholder="YY" 
                                                                     class="form-control patient_age_year"
                                                                     style="width: 30%; float: left;"
-                                                                    value="{{ old('age.year', $patient->age) }}" />
+                                                                    value="<?php echo e(old('age.year', $patient->age)); ?>" />
         
-                                                                <input type="text" name="age[month]" id="edit_age_month_{{ $patient->id }}" placeholder="MM"
+                                                                <input type="text" name="age[month]" id="edit_age_month_<?php echo e($patient->id); ?>" placeholder="MM"
                                                                     class="form-control patient_age_month"
                                                                     style="width: 36%; float: left; margin-left: 4px;"
-                                                                    value="{{ old('age.month', $patient->month) }}" />
+                                                                    value="<?php echo e(old('age.month', $patient->month)); ?>" />
         
-                                                                <input type="text" name="age[day]" id="edit_age_day_{{ $patient->id }}" placeholder="DD"
+                                                                <input type="text" name="age[day]" id="edit_age_day_<?php echo e($patient->id); ?>" placeholder="DD"
                                                                     class="form-control patient_age_day"
                                                                     style="width: 26%; float: left; margin-left: 4px;"
-                                                                    value="{{ old('age.day', $patient->day) }}" />
+                                                                    value="<?php echo e(old('age.day', $patient->day)); ?>" />
                                                             </div>
                                                         </div>
         
                                                     </div>
                                                 </div>
         
-                                                {{-- Blood Group + Marital Status + Photo --}}
+                                                
                                                 <div class="col-md-6">
                                                     <div class="row">
         
-                                                        {{-- Blood Group --}}
+                                                        
                                                         <div class="col-md-3">
                                                             <label class="form-label">Blood Group</label>
                                                             <select name="blood_group" class="form-control">
                                                                 <option value="">Select</option>
-                                                                <option value="1" {{ old('blood_group', $patient->blood_group) == '1' ? 'selected' : '' }}>O+</option>
-                                                                <option value="2" {{ old('blood_group', $patient->blood_group) == '2' ? 'selected' : '' }}>A+</option>
-                                                                <option value="3" {{ old('blood_group', $patient->blood_group) == '3' ? 'selected' : '' }}>B+</option>
-                                                                <option value="4" {{ old('blood_group', $patient->blood_group) == '4' ? 'selected' : '' }}>AB+</option>
-                                                                <option value="5" {{ old('blood_group', $patient->blood_group) == '5' ? 'selected' : '' }}>O-</option>
-                                                                <option value="6" {{ old('blood_group', $patient->blood_group) == '6' ? 'selected' : '' }}>AB-</option>
+                                                                <option value="1" <?php echo e(old('blood_group', $patient->blood_group) == '1' ? 'selected' : ''); ?>>O+</option>
+                                                                <option value="2" <?php echo e(old('blood_group', $patient->blood_group) == '2' ? 'selected' : ''); ?>>A+</option>
+                                                                <option value="3" <?php echo e(old('blood_group', $patient->blood_group) == '3' ? 'selected' : ''); ?>>B+</option>
+                                                                <option value="4" <?php echo e(old('blood_group', $patient->blood_group) == '4' ? 'selected' : ''); ?>>AB+</option>
+                                                                <option value="5" <?php echo e(old('blood_group', $patient->blood_group) == '5' ? 'selected' : ''); ?>>O-</option>
+                                                                <option value="6" <?php echo e(old('blood_group', $patient->blood_group) == '6' ? 'selected' : ''); ?>>AB-</option>
                                                             </select>
                                                         </div>
         
-                                                        {{-- Marital Status --}}
+                                                        
                                                         <div class="col-md-3">
                                                             <label class="form-label">Marital Status</label>
                                                             <select name="marital_status" class="form-control">
                                                                 <option value="">Select</option>
-                                                                @foreach (['Single','Married','Widowed','Separated','Not Specified'] as $status)
-                                                                    <option value="{{ $status }}"
-                                                                        {{ old('marital_status', $patient->marital_status) == $status ? 'selected' : '' }}>
-                                                                        {{ $status }}
+                                                                <?php $__currentLoopData = ['Single','Married','Widowed','Separated','Not Specified']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $status): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                    <option value="<?php echo e($status); ?>"
+                                                                        <?php echo e(old('marital_status', $patient->marital_status) == $status ? 'selected' : ''); ?>>
+                                                                        <?php echo e($status); ?>
+
                                                                     </option>
-                                                                @endforeach
+                                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                             </select>
                                                         </div>
         
-                                                        {{-- Patient Photo --}}
+                                                        
                                                         <div class="col-md-6">
                                                             <label class="form-label">Patient Photo</label>
                                                             <input type="file" name="file" class="form-control" />
         
-                                                            @if($patient->file)
-                                                                <small class="text-muted">Current: {{ $patient->file }}</small>
-                                                            @endif
+                                                            <?php if($patient->file): ?>
+                                                                <small class="text-muted">Current: <?php echo e($patient->file); ?></small>
+                                                            <?php endif; ?>
                                                         </div>
         
                                                     </div>
                                                 </div>
         
-                                                {{-- Height + Weight + Temperature --}}
+                                                
                                                 <div class="col-md-6">
                                                     <div class="row">
         
-                                                        {{-- Height --}}
+                                                        
                                                         <div class="col-md-3">
                                                             <label class="form-label">Height</label>
-                                                            <input type="text" name="height" class="form-control" value="{{ old('height', $patient->height) }}" />
+                                                            <input type="text" name="height" class="form-control" value="<?php echo e(old('height', $patient->height)); ?>" />
                                                         </div>
         
-                                                        {{-- Weight --}}
+                                                        
                                                         <div class="col-md-3">
                                                             <label class="form-label">Weight</label>
                                                             <input type="text" name="weight" class="form-control"
-                                                                value="{{ old('weight', $patient->weight) }}" />
+                                                                value="<?php echo e(old('weight', $patient->weight)); ?>" />
                                                         </div>
         
-                                                        {{-- Temperature --}}
+                                                        
                                                         <div class="col-md-6">
                                                             <label class="form-label">Temperature</label>
                                                             <input type="text" name="temperature" class="form-control"
-                                                                value="{{ old('temperature', $patient->temperature) }}" />
+                                                                value="<?php echo e(old('temperature', $patient->temperature)); ?>" />
                                                             
                                                         </div>
         
                                                     </div>
                                                 </div>
         
-                                                {{-- Phone + Email --}}
+                                                
                                                 <div class="col-md-6">
                                                     <div class="row">
                                                         <div class="col-md-6">
                                                             <label class="form-label">Phone</label>
                                                             <input type="tel" name="phone"
                                                                 class="form-control"
-                                                                value="{{ old('phone', $patient->mobileno) }}" />
+                                                                value="<?php echo e(old('phone', $patient->mobileno)); ?>" />
                                                         </div>
         
                                                         <div class="col-md-6">
                                                             <label class="form-label">Email</label>
                                                             <input type="email" name="email"
                                                                 class="form-control"
-                                                                value="{{ old('email', $patient->email) }}" />
+                                                                value="<?php echo e(old('email', $patient->email)); ?>" />
                                                         </div>
                                                     </div>
                                                 </div>
         
-                                                {{-- Address --}}
+                                                
                                                 <div class="col-md-6">
                                                     <label class="form-label">Address</label>
                                                     <input type="text" name="address" class="form-control"
-                                                        value="{{ old('address', $patient->address) }}" />
+                                                        value="<?php echo e(old('address', $patient->address)); ?>" />
                                                 </div>
         
-                                                {{-- Remarks --}}
+                                                
                                                 <div class="col-md-6">
                                                     <label class="form-label">Remarks</label>
                                                     <input type="text" name="remarks" class="form-control"
-                                                        value="{{ old('remarks', $patient->remarks) }}" />
+                                                        value="<?php echo e(old('remarks', $patient->remarks)); ?>" />
                                                 </div>
         
-                                                {{-- Allergies --}}
+                                                
                                                 <div class="col-md-4">
                                                     <label class="form-label">Allergies</label>
                                                     <input type="text" name="allergies"
                                                         class="form-control"
-                                                        value="{{ old('allergies', $patient->known_allergies) }}" />
+                                                        value="<?php echo e(old('allergies', $patient->known_allergies)); ?>" />
                                                 </div>
         
-                                                {{-- Languages Speak --}}
+                                                
                                                 <div class="col-md-4">
                                                     <label for="languages_speak" class="form-label">Languages Speak</label>
                                                     <input type="text" id="languages_speak" name="languages_speak"
-                                                        class="form-control @error('languages_speak') is-invalid @enderror"
-                                                        value="{{ old('languages_speak') }}" />
-                                                    @error('languages_speak')
-                                                        <div class="invalid-feedback">{{ $message }}</div>
-                                                    @enderror
+                                                        class="form-control <?php $__errorArgs = ['languages_speak'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                                        value="<?php echo e(old('languages_speak')); ?>" />
+                                                    <?php $__errorArgs = ['languages_speak'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                                        <div class="invalid-feedback"><?php echo e($message); ?></div>
+                                                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                                 </div>
         
-                                                {{-- Newspaper Preference --}}
+                                                
                                                 <div class="col-md-4">
                                                     <label for="newspaper_preference" class="form-label">Newspaper Preference</label>
                                                     <input type="text" id="newspaper_preference" name="newspaper_preference"
-                                                        class="form-control @error('newspaper_preference') is-invalid @enderror"
-                                                        value="{{ old('newspaper_preference') }}" />
-                                                    @error('newspaper_preference')
-                                                        <div class="invalid-feedback">{{ $message }}</div>
-                                                    @enderror
+                                                        class="form-control <?php $__errorArgs = ['newspaper_preference'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                                        value="<?php echo e(old('newspaper_preference')); ?>" />
+                                                    <?php $__errorArgs = ['newspaper_preference'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                                        <div class="invalid-feedback"><?php echo e($message); ?></div>
+                                                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                                 </div>
-                                                 {{-- National ID --}}
+                                                 
                                                 <div class="col-md-4">
                                                     <label class="form-label">Aadhaar No. / PAN No.</label>
                                                     <input type="text" name="national_id_number"
                                                         class="form-control"
-                                                        value="{{ old('national_id_number', $patient->national_id_number) }}" />
+                                                        value="<?php echo e(old('national_id_number', $patient->national_id_number)); ?>" />
                                                 </div>
                                                 </div>
                                             </div>
@@ -289,28 +338,35 @@
                                             </div>
                                             <div class="section-body px-4">
                                                 <div class="row gy-3">
-                                                    {{-- Guardian Name --}}
+                                                    
                                                     <div class="col-md-6">
                                                         <label class="form-label">Guardian Name</label>
                                                         <input type="text" name="guardian_name"
-                                                            class="form-control @error('guardian_name') is-invalid @enderror"
-                                                            value="{{ old('guardian_name', $patient->guardian_name) }}" />
+                                                            class="form-control <?php $__errorArgs = ['guardian_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                                            value="<?php echo e(old('guardian_name', $patient->guardian_name)); ?>" />
                                                     </div>
                                                     
-                                                    {{-- Guardian Phone No. --}}
+                                                    
                                                     <div class="col-md-4">
                                                         <label class="form-label">Guardian Phone No.</label>
                                                         <input type="tel" name="guardian_phone"
                                                             class="form-control"
-                                                            value="{{ old('guardian_phone', $patient->guardian_phone) }}" />
+                                                            value="<?php echo e(old('guardian_phone', $patient->guardian_phone)); ?>" />
                                                     </div>
                                                     
-                                                    {{-- Emergency Contact No. --}}
+                                                    
                                                     <div class="col-md-4">
                                                         <label class="form-label">Emergency Contact No.</label>
                                                         <input type="text" name="emergency_contact_no"
                                                             class="form-control"
-                                                            value="{{ old('emergency_contact_no', $patient->emergency_contact_no) }}" />
+                                                            value="<?php echo e(old('emergency_contact_no', $patient->emergency_contact_no)); ?>" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -328,28 +384,28 @@
                                                     
                                                 
         
-                                                {{-- TPA --}}
+                                                
                                                 <div class="col-md-4">
                                                     <label class="form-label">TPA</label>
-                                                    <select id="edit_tpa_{{ $patient->id }}" name="tpa" class="form-control">
+                                                    <select id="edit_tpa_<?php echo e($patient->id); ?>" name="tpa" class="form-control">
                                                         <option value="">Loading...</option>
                                                     </select>
                                                 </div>
         
-                                                {{-- TPA Code --}}
+                                                
                                                 <div class="col-md-4">
                                                     <label class="form-label">TPA Code</label>
-                                                    <input type="text" id="edit_tpa_id_{{ $patient->id }}" name="tpa_id"
+                                                    <input type="text" id="edit_tpa_id_<?php echo e($patient->id); ?>" name="tpa_id"
                                                         class="form-control"
-                                                        value="{{ old('tpa_id', $patient->insurance_id) }}" />
+                                                        value="<?php echo e(old('tpa_id', $patient->insurance_id)); ?>" />
                                                 </div>
         
-                                                {{-- TPA Validity --}}
+                                                
                                                 <div class="col-md-4">
                                                     <label class="form-label">TPA Validity</label>
                                                     <input type="text" name="tpa_validity"
                                                         class="form-control"
-                                                        value="{{ old('tpa_validity', $patient->tpa_validity) }}" />
+                                                        value="<?php echo e(old('tpa_validity', $patient->tpa_validity)); ?>" />
                                                 </div>
         
                                                
@@ -374,12 +430,12 @@
    document.addEventListener('DOMContentLoaded', function() {
 
     // ------------------- TPA LOAD & AUTO CODE -------------------
-    const tpaSelect = document.getElementById('edit_tpa_{{ $patient->id }}');
-    const tpaIdInput = document.getElementById('edit_tpa_id_{{ $patient->id }}');
+    const tpaSelect = document.getElementById('edit_tpa_<?php echo e($patient->id); ?>');
+    const tpaIdInput = document.getElementById('edit_tpa_id_<?php echo e($patient->id); ?>');
 
     tpaSelect.innerHTML = '<option value="">Loading...</option>';
 
-    fetch("{{ route('getOrganizations') }}")
+    fetch("<?php echo e(route('getOrganizations')); ?>")
         .then(response => response.json())
         .then(data => {
             window.organizationsData = data;
@@ -391,7 +447,7 @@
                 option.textContent = org.organisation_name;
 
                 // Preselect if patient already has TPA
-                if ("{{ old('tpa', $patient->organisation_id) }}" == org.id) {
+                if ("<?php echo e(old('tpa', $patient->organisation_id)); ?>" == org.id) {
                     option.selected = true;
                 }
 
@@ -399,7 +455,7 @@
             });
 
             // Autofill TPA code when editing existing patient
-            const selectedOrg = data.find(org => org.id == "{{ old('tpa', $patient->organisation_id) }}");
+            const selectedOrg = data.find(org => org.id == "<?php echo e(old('tpa', $patient->organisation_id)); ?>");
             if (selectedOrg) {
                 tpaIdInput.value = selectedOrg.code;
             }
@@ -418,9 +474,9 @@
 
     // ------------------- AUTO CALCULATE AGE -------------------
     const birthDateInput = document.getElementById('birth_date'); // your ID
-    const ageYearInput = document.getElementById('edit_age_year_{{ $patient->id }}');
-    const ageMonthInput = document.getElementById('edit_age_month_{{ $patient->id }}');
-    const ageDayInput = document.getElementById('edit_age_day_{{ $patient->id }}');
+    const ageYearInput = document.getElementById('edit_age_year_<?php echo e($patient->id); ?>');
+    const ageMonthInput = document.getElementById('edit_age_month_<?php echo e($patient->id); ?>');
+    const ageDayInput = document.getElementById('edit_age_day_<?php echo e($patient->id); ?>');
 
     birthDateInput.addEventListener('change', function() {
         const birthDate = new Date(this.value);
@@ -456,4 +512,5 @@
 });
  
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp82\htdocs\hims\resources\views/admin/setup/edit-patient.blade.php ENDPATH**/ ?>
