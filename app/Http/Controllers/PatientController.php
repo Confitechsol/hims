@@ -319,9 +319,19 @@ class PatientController extends Controller
             $address            = trim($row['J']);
             $remarks            = trim($row['K']);
             $allergies          = trim($row['L']);
-            $identification     = trim($row['M']);
-            $tpaId              = trim($row['N']);
-            $tpaValidity        = $this->formatExcelDate(trim($row['O']));
+            $height             = trim($row['M']);
+            $weight             = trim($row['N']);
+            $temperature        = trim($row['O']);
+            $identification     = trim($row['P']);
+            $tpa                = trim($row['Q']);
+            $tpaId              = trim($row['R']);
+            $tpaValidity        = $this->formatExcelDate(trim($row['S']));
+            $gaurdianName       = trim($row['T']);
+            $gaurdianPhone      = trim($row['U']);
+            $emergencyPhone     = trim($row['V']);
+            $languages          = trim($row['W']);
+            $newspaper          = trim($row['X']);
+            
 
             // Insert into patient table
             try {
@@ -341,6 +351,15 @@ class PatientController extends Controller
                     'identification_number' => $identification,
                     'insurance_id'          => $tpaId,
                     'insurance_validity'    => $tpaValidity,
+                    'height'                => $height,
+                    'weight'                => $weight,
+                    'temperature'           => $temperature,
+                    'gaurdian_name'         => $gaurdianName,
+                    'gaurdian_phone'        => $gaurdianPhone,
+                    'emergency_contact_no'  => $emergencyPhone,
+                    'languages_speak'  => $languages,
+                    'newspaper_preference'  => $newspaper,
+                    
                 ]);
             } catch (\Exception $e) {
                 return back()->with('error', "Error on Row {$index}: " . $e->getMessage());
@@ -450,116 +469,116 @@ class PatientController extends Controller
             $validation->setFormula1($formulaList);
         }
     }
-    public function importStaffExcel(Request $request)
-    {
+    // public function importStaffExcel(Request $request)
+    // {
         
-        $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv'
-        ]);
+    //     $request->validate([
+    //         'file' => 'required|mimes:xlsx,xls,csv'
+    //     ]);
         
-        $file = $request->file('file');
+    //     $file = $request->file('file');
 
-        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file);
-        $sheet = $spreadsheet->getActiveSheet();
-        $rows = $sheet->toArray(null, true, true, true);
+    //     $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file);
+    //     $sheet = $spreadsheet->getActiveSheet();
+    //     $rows = $sheet->toArray(null, true, true, true);
 
-        // Skip header row (row 1)
-        foreach ($rows as $index => $row) {
-            if ($index == 1) continue;
+    //     // Skip header row (row 1)
+    //     foreach ($rows as $index => $row) {
+    //         if ($index == 1) continue;
 
-            if (empty($row['A']) && empty($row['B'])) {
-                continue; // skip empty rows
-            }
+    //         if (empty($row['A']) && empty($row['B'])) {
+    //             continue; // skip empty rows
+    //         }
 
-            // Mapping Excel columns → Variables
-            $employeeId         = trim($row['A']);
-            $firstName          = trim($row['B']);
-            $lastName           = trim($row['C']);
-            $departmentName     = trim($row['D']);
-            $designationName    = trim($row['E']);
-            $specialistName     = trim($row['F']);
-            $specialization     = trim($row['G']);
-            $qualification      = trim($row['H']);
-            $workExperience     = trim($row['I']);
-            $fatherName         = trim($row['J']);
-            $motherName         = trim($row['K']);
-            $contactNumber      = trim($row['L']);
-            $emergencyContact   = trim($row['M']);
-            $email              = trim($row['N']);
-            $dob                = $this->formatExcelDate(trim($row['O']));
-            $maritalStatus      = trim($row['P']);
-            $dateJoining        = $this->formatExcelDate(trim($row['Q']));
-            $dateLeaving        = $this->formatExcelDate(trim($row['R']));
-            $localAddress       = trim($row['S']);
-            $permanentAddress   = trim($row['T']);
-            $gender             = trim($row['U']);
-            $bloodGroupName     = trim($row['V']);
-            $identification     = trim($row['W']);
-            $pan                = trim($row['X']);
-            $rolesName          = trim($row['Y']);
-            $remarks            = trim($row['Z']);
+    //         // Mapping Excel columns → Variables
+    //         $employeeId         = trim($row['A']);
+    //         $firstName          = trim($row['B']);
+    //         $lastName           = trim($row['C']);
+    //         $departmentName     = trim($row['D']);
+    //         $designationName    = trim($row['E']);
+    //         $specialistName     = trim($row['F']);
+    //         $specialization     = trim($row['G']);
+    //         $qualification      = trim($row['H']);
+    //         $workExperience     = trim($row['I']);
+    //         $fatherName         = trim($row['J']);
+    //         $motherName         = trim($row['K']);
+    //         $contactNumber      = trim($row['L']);
+    //         $emergencyContact   = trim($row['M']);
+    //         $email              = trim($row['N']);
+    //         $dob                = $this->formatExcelDate(trim($row['O']));
+    //         $maritalStatus      = trim($row['P']);
+    //         $dateJoining        = $this->formatExcelDate(trim($row['Q']));
+    //         $dateLeaving        = $this->formatExcelDate(trim($row['R']));
+    //         $localAddress       = trim($row['S']);
+    //         $permanentAddress   = trim($row['T']);
+    //         $gender             = trim($row['U']);
+    //         $bloodGroupName     = trim($row['V']);
+    //         $identification     = trim($row['W']);
+    //         $pan                = trim($row['X']);
+    //         $rolesName          = trim($row['Y']);
+    //         $remarks            = trim($row['Z']);
 
-            // Convert Names → IDs
-            $departmentId  = Department::where('department_name', $departmentName)->value('id');
-            $designationId = StaffDesignation::where('designation', $designationName)->value('id');
-            $bloodGroupId  = BloodBankProduct::where('name', $bloodGroupName)->value('id');
-            $specialistId  = Specialist::where('specialist_name', $specialistName)->value('id');
-            $rolesId       = Role::where('name', $rolesName)->value('id');
+    //         // Convert Names → IDs
+    //         $departmentId  = Department::where('department_name', $departmentName)->value('id');
+    //         $designationId = StaffDesignation::where('designation', $designationName)->value('id');
+    //         $bloodGroupId  = BloodBankProduct::where('name', $bloodGroupName)->value('id');
+    //         $specialistId  = Specialist::where('specialist_name', $specialistName)->value('id');
+    //         $rolesId       = Role::where('name', $rolesName)->value('id');
 
 
-            // Validate existence
-            if (!$departmentId) {
-                return back()->with('error', "Department '{$departmentName}' not found (Row {$index}).");
-            }
+    //         // Validate existence
+    //         if (!$departmentId) {
+    //             return back()->with('error', "Department '{$departmentName}' not found (Row {$index}).");
+    //         }
 
-            if (!$designationId) {
-                return back()->with('error', "Designation '{$designationName}' not found (Row {$index}).");
-            }
+    //         if (!$designationId) {
+    //             return back()->with('error', "Designation '{$designationName}' not found (Row {$index}).");
+    //         }
 
-            if (!$bloodGroupId && $bloodGroupName != "") {
-                return back()->with('error', "Blood Group '{$bloodGroupName}' not found (Row {$index}).");
-            }
+    //         if (!$bloodGroupId && $bloodGroupName != "") {
+    //             return back()->with('error', "Blood Group '{$bloodGroupName}' not found (Row {$index}).");
+    //         }
 
-            if (!$specialistId && $specialistName != "") {
-                return back()->with('error', "specialist '{$specialistName}' not found (Row {$index}).");
-            }
+    //         if (!$specialistId && $specialistName != "") {
+    //             return back()->with('error', "specialist '{$specialistName}' not found (Row {$index}).");
+    //         }
 
-            // Insert into staff table
-            Staff::create([
-                'employee_id'               => $employeeId,
-                'name'                      => $firstName,
-                'surname'                   => $lastName,
-                'department_id'             => $departmentId,
-                'designation_id'            => $designationId,
-                'specialist'                => $specialistId,
-                'specialization'            => $specialization,
-                'qualification'             => $qualification,
-                'work_exp'                  => $workExperience,
-                'father_name'               => $fatherName,
-                'mother_name'               => $motherName,
-                'contact_no'            => $contactNumber,
-                'emergency_contact_no'  => $emergencyContact,
-                'email'                     => $email,
-                'dob'                       => $dob,
-                'marital_status'            => $maritalStatus,
-                'date_of_joining'           => $dateJoining,
-                'date_of_leaving'           => $dateLeaving,
-                'local_address'             => $localAddress,
-                'permanent_address'         => $permanentAddress,
-                'gender'                    => $gender,
-                'blood_group'               => $bloodGroupId,
-                'identification_number'     => $identification,
-                'pan'                       => $pan,
-                'roles'                     => $rolesId,
-                'remarks'                   => $remarks,
-                'password'                  => '123456',
-                'user_id'                   => 0,
-                'is_active'                 => 1,
-            ]);
-        }
+    //         // Insert into staff table
+    //         Staff::create([
+    //             'employee_id'               => $employeeId,
+    //             'name'                      => $firstName,
+    //             'surname'                   => $lastName,
+    //             'department_id'             => $departmentId,
+    //             'designation_id'            => $designationId,
+    //             'specialist'                => $specialistId,
+    //             'specialization'            => $specialization,
+    //             'qualification'             => $qualification,
+    //             'work_exp'                  => $workExperience,
+    //             'father_name'               => $fatherName,
+    //             'mother_name'               => $motherName,
+    //             'contact_no'            => $contactNumber,
+    //             'emergency_contact_no'  => $emergencyContact,
+    //             'email'                     => $email,
+    //             'dob'                       => $dob,
+    //             'marital_status'            => $maritalStatus,
+    //             'date_of_joining'           => $dateJoining,
+    //             'date_of_leaving'           => $dateLeaving,
+    //             'local_address'             => $localAddress,
+    //             'permanent_address'         => $permanentAddress,
+    //             'gender'                    => $gender,
+    //             'blood_group'               => $bloodGroupId,
+    //             'identification_number'     => $identification,
+    //             'pan'                       => $pan,
+    //             'roles'                     => $rolesId,
+    //             'remarks'                   => $remarks,
+    //             'password'                  => '123456',
+    //             'user_id'                   => 0,
+    //             'is_active'                 => 1,
+    //         ]);
+    //     }
 
-        return back()->with('success', 'Staff Excel imported successfully!');
-    }
+    //     return back()->with('success', 'Staff Excel imported successfully!');
+    // }
     private function formatExcelDate($value)
     {
         if (empty($value)) {

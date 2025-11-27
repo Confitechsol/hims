@@ -287,49 +287,7 @@ class IpdController extends Controller
         return response()->json($bedNumbers, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
     }
 
-    public function showIpd(Request $request, $id)
-    {
-        $ipd             = IpdDetail::with('patient.bloodGroup', 'patient.organisation', 'doctor', 'bedDetail', 'bedGroup')->where('id', $id)->firstOrFail();
-        $bedShiftHistory = PatientBedHistory::with('ipd','bedGroup', 'bed')->where('is_active','yes')->where('ipd_id', $id)->firstOrFail();
-        $symptomIds = array_filter(
-            explode(',', $ipd->symptoms_title),
-            fn($id) => $id !== null && trim($id) !== ''
-        );
-
-        // Fetch symptoms related to this OPD
-        $symptoms = ! empty($symptomIds)
-            ? Symptom::whereIn('id', $symptomIds)->get()
-            : collect();
-        $nurseNotes        = NurseNote::with('staff')->where('ipd_id', $id)->get();
-        $medicationReport  = MedicationReport::with('medicineDosage.unit', 'pharmacy', 'generatedBy.userRole')->where('ipd_id', $id)->get();
-        $ipdCharges        = IpdCharges::with('ipd', 'charge.taxCategory', 'chargeCategory.chargeType')->where('ipd_id', $id)->get();
-        $labInvestigations = PathologyReport::with('pathology')->where('patient_id', $ipd->patient->id)->get();
-        $ipdPrescriptions  = IpdPrescription::where('ipd_id', $id)->get();
-        //dd($id);
-        $ipdFindings       = [];
-        foreach ($ipdPrescriptions as $pres) {
-            // Split comma-separated symptom IDs and clean up
-            $findingIds = array_filter(
-                explode(',', $pres->findings),
-                fn($id) => $id !== null && trim($id) !== ''
-            );
-
-            // Fetch symptoms related to this OPD
-            $findings = ! empty($findingIds)
-                ? Finding::whereIn('id', $findingIds)->get()
-                : collect();
-
-            // Store in array using OPD number as key
-            $ipdFindings[$pres->ipd_id] = $findings;
-        }
-        $bedHistories    = PatientBedHistory::with('bedGroup', 'bed')->where('ipd_id', $id)->get();
-        $operationDetail = OperationTheatre::with('operation.category')->where('ipd_details_id', $id)->get();
-        // $opdCharges        = OpdCharges::with('opd', 'charge.taxCategory', 'chargeCategory.chargeType')->where('opd_id', $id)->get();
-        // $opdSymptoms       = [];
-
-        // Store in array using OPD number as key
-        return view('admin.ipd.ipd_view', compact('ipd', 'symptoms', 'nurseNotes', 'medicationReport', 'labInvestigations', 'ipdPrescriptions', 'ipdFindings', 'bedHistories', 'operationDetail', 'ipdCharges','bedShiftHistory'));
-    }
+  
 
     public function getNurses(Request $request)
     {

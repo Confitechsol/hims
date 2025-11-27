@@ -23,6 +23,7 @@ use App\Http\Controllers\MedicineCategoryController;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\MedicineGroupController;
 use App\Http\Controllers\Modules\IpdController;
+use App\Http\Controllers\Modules\IpdViewController;
 use App\Http\Controllers\Modules\OpdController;
 use App\Http\Controllers\OperationController;
 use App\Http\Controllers\PathologyBillingController;
@@ -147,7 +148,7 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/patients/import', [PatientController::class, 'import'])->name('patient-import');
     Route::post('/patients/bulk-import', [PatientController::class, 'bulkImport'])->name('patients.import');
     Route::get('/patients/export', [PatientController::class, 'exportPatientsExcel'])->name('patients.export');
-    Route::post('/bulkimport', [PatientController::class, 'importStaffExcel'])->name('patients-bulk.import');
+  
 
     Route::get('/languages', [LanguagesController::class, 'index'])->name('languages');
     Route::post('/languages/create', [LanguagesController::class, 'store'])->name('languages.store');
@@ -511,7 +512,11 @@ Route::put('/ipd/update/{id}', [IpdController::class, 'update'])->name('ipd.upda
 Route::get('/getBedGroups', [IpdController::class, 'getBedGroups'])->name('getBedGroups');
 Route::get('/get-available-beds', [IpdController::class, 'getAvailableBeds'])->name('get.available.beds');
 Route::get('/getBedNumbers/{id}', [IpdController::class, 'getBedNumbers'])->name('getBedNumbers');
-Route::get('/ipd_view/{id}', [IpdController::class, 'showIpd'])->name('ipd.show');
+Route::get('/ipd_view/{id}', [IpdViewController::class, 'showIpd'])->name('ipd.show');
+Route::post('/ipd_view/medicine/store', [IpdViewController::class, 'store'])->name('medication.store');
+Route::put('/ipd_view/update', [IpdViewController::class, 'update'])->name('medication.update');
+Route::put('/ipd_view/delete/{id}', [IpdViewController::class, 'delete'])->name('medication.delete');
+Route::post('/ipd_view/operation/store', [IpdViewController::class, 'storeOperation'])->name('operation.store');
 Route::get('/getNurses', [IpdController::class, 'getNurses'])->name('getNurses');
 Route::get('/getIpdById/{id}', [IpdController::class, 'getIpdById'])->name('getIpdById');
 Route::get('/getIpdMedicineById/{id}', [IpdController::class, 'getIpdMedicineById'])->name('getIpdMedicineById');
