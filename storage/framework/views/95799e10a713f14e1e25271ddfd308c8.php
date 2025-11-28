@@ -1,6 +1,4 @@
-{{-- resources/views/settings.blade.php --}}
-@extends('layouts.adminLayout')
-@section('content')
+<?php $__env->startSection('content'); ?>
 
     <style>
         .module_billing {
@@ -89,7 +87,8 @@
                         <div class="card shadow-sm border-0 mt-2">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> {{ $appointment->patient->patient_name }}
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> <?php echo e($appointment->patient->patient_name); ?>
+
                                 </h5>
                             </div>
                             <div class="card-body">
@@ -106,7 +105,7 @@
                                                     class="fa-solid fa-phone text-primary"></i></span>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">Phone :</h6>
-                                                <p class="patient_data mb-0">{{ $appointment->patient->mobileno }}</p>
+                                                <p class="patient_data mb-0"><?php echo e($appointment->patient->mobileno); ?></p>
                                             </div>
                                         </div>
 
@@ -115,7 +114,8 @@
                                                     class="fa-solid fa-calendar-days text-primary"></i></span>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">Age :</h6>
-                                                <p class="patient_data mb-0"> {{ $appointment->patient->age }}
+                                                <p class="patient_data mb-0"> <?php echo e($appointment->patient->age); ?>
+
                                                 </p>
                                             </div>
                                         </div>
@@ -124,7 +124,7 @@
                                                     class="fa-solid fa-hands-holding-child text-primary"></i></span>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">Guardian Name :</h6>
-                                                <p class="patient_data mb-0">{{ $appointment->patient->	guardian_name }}</p>
+                                                <p class="patient_data mb-0"><?php echo e($appointment->patient->	guardian_name); ?></p>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-3">
@@ -132,7 +132,7 @@
                                                     class="fa-solid fa-mars-and-venus text-primary"></i></span>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">Gender :</h6>
-                                                <p class="patient_data mb-0">{{ $appointment->patient->gender }}</p>
+                                                <p class="patient_data mb-0"><?php echo e($appointment->patient->gender); ?></p>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-3">
@@ -184,7 +184,7 @@
                                             class="fa-solid fa-tag text-primary"></i></span>
                                     <div class="d-flex align-items-center gap-2">
                                         <h6 class="about_patient fs-13 fw-bold mb-1"> Known Allergies :</h6>
-                                        <p class="patient_data mb-0">{{ $appointment->patient->known_allergies ?? 'N/A'}}</p>
+                                        <p class="patient_data mb-0"><?php echo e($appointment->patient->known_allergies ?? 'N/A'); ?></p>
                                     </div>
                                 </div>
                                 <div class="d-flex align-items-center mb-3">
@@ -202,13 +202,14 @@
                                         <h6 class=" fs-13 fw-bold mb-1"> Symptoms :</h6>
                                         <p class=" mb-0">
                                         <ul>
-                                            @forelse($symptomTitles as $title)
+                                            <?php $__empty_1 = true; $__currentLoopData = $symptomTitles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $title): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                                 <li>
-                                                    <i class="fa-regular fa-circle-check text-primary"></i> {{ $title }}
+                                                    <i class="fa-regular fa-circle-check text-primary"></i> <?php echo e($title); ?>
+
                                                 </li>
-                                            @empty
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                                 <li><i class="fa-regular fa-circle-xmark text-danger"></i> No symptoms recorded</li>
-                                            @endforelse
+                                            <?php endif; ?>
                                         </ul>
                                         </p>
                                     </div>
@@ -233,7 +234,7 @@
                                                 <img src="assets/img/patient.png" alt="product" class="rounded">
                                             </div>
                                             <div class="d-flex align-items-center gap-2">
-                                                <h6 class="fs-13 fw-bold mb-1">{{ $appointment->doctorUser->name ?? 'N/A' }}</h6>
+                                                <h6 class="fs-13 fw-bold mb-1"><?php echo e($appointment->doctorUser->name ?? 'N/A'); ?></h6>
                                             </div>
                                         </div>
                                     </a>
@@ -293,35 +294,37 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                             @forelse($visitDetails as $opd)
+                                             <?php $__empty_1 = true; $__currentLoopData = $visitDetails; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opd): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                                 <tr>
                                                     <td>
                                                         <h6 class="fs-14 mb-1">
-                                                            <a href="#" class="fw-semibold">{{ $opd->opd_details_id ?? '-' }}</a>
+                                                            <a href="#" class="fw-semibold"><?php echo e($opd->opd_details_id ?? '-'); ?></a>
                                                         </h6>
                                                     </td>
-                                                    <td>{{ $opd->opdDetail->patient->patient_name ?? '-' }}</td>
+                                                    <td><?php echo e($opd->opdDetail->patient->patient_name ?? '-'); ?></td>
                                                     <td>
-                                                        @if($opd->appointment_date)
-                                                            {{ \Carbon\Carbon::parse($opd->appointment_date)->format('d/m/Y h:i A') }}
-                                                        @else
+                                                        <?php if($opd->appointment_date): ?>
+                                                            <?php echo e(\Carbon\Carbon::parse($opd->appointment_date)->format('d/m/Y h:i A')); ?>
+
+                                                        <?php else: ?>
                                                             -
-                                                        @endif
+                                                        <?php endif; ?>
                                                     </td>
                                                     <td>
-                                                        {{ $opd->doctor->name ?? $opd->cons_doctor ?? '-' }}
-                                                        <!-- @if(!empty($opd->doctor->employee_id))
-                                                            ({{ $opd->doctor->employee_id }})
-                                                        @endif -->
+                                                        <?php echo e($opd->doctor->name ?? $opd->cons_doctor ?? '-'); ?>
+
+                                                        <!-- <?php if(!empty($opd->doctor->employee_id)): ?>
+                                                            (<?php echo e($opd->doctor->employee_id); ?>)
+                                                        <?php endif; ?> -->
                                                     </td>
-                                                    <td>{{ $opd->reference ?? '-' }}</td>
-                                                    <td>{{ $opd->symptom_titles ?? '-' }}</td>
+                                                    <td><?php echo e($opd->reference ?? '-'); ?></td>
+                                                    <td><?php echo e($opd->symptom_titles ?? '-'); ?></td>
                                                 </tr>
-                                            @empty
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                                 <tr>
                                                     <td colspan="6" class="text-center">No OPD records found</td>
                                                 </tr>
-                                            @endforelse
+                                            <?php endif; ?>
                                         </tbody>
                                     <!-- </table>
                                 </div>
@@ -349,32 +352,34 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse($labInvestigations as $investigation)
+                                            <?php $__empty_1 = true; $__currentLoopData = $labInvestigations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $investigation): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                                 <tr>
-                                                    <td>{{ $investigation->pathology->test_name ?? '-' }}</td>
-                                                    <td>{{ $investigation->case_id ?? '-' }}</td>
-                                                    <td>{{ $investigation->lab_name ?? 'Pathology' }}</td>
+                                                    <td><?php echo e($investigation->pathology->test_name ?? '-'); ?></td>
+                                                    <td><?php echo e($investigation->case_id ?? '-'); ?></td>
+                                                    <td><?php echo e($investigation->lab_name ?? 'Pathology'); ?></td>
                                                     <td>
-                                                        @if(!empty($investigation->collection_date))
-                                                            {{ \Carbon\Carbon::parse($investigation->collection_date)->format('d/m/Y') }}
-                                                        @else
+                                                        <?php if(!empty($investigation->collection_date)): ?>
+                                                            <?php echo e(\Carbon\Carbon::parse($investigation->collection_date)->format('d/m/Y')); ?>
+
+                                                        <?php else: ?>
                                                             -
-                                                        @endif
+                                                        <?php endif; ?>
                                                     </td>
                                                     <td>
-                                                        @if(!empty($investigation->reporting_date))
-                                                            {{ \Carbon\Carbon::parse($investigation->reporting_date)->format('d/m/Y') }}
-                                                        @else
+                                                        <?php if(!empty($investigation->reporting_date)): ?>
+                                                            <?php echo e(\Carbon\Carbon::parse($investigation->reporting_date)->format('d/m/Y')); ?>
+
+                                                        <?php else: ?>
                                                             -
-                                                        @endif
+                                                        <?php endif; ?>
                                                     </td>
-                                                    <td>{{ $investigation->approved_by ?? 'Admin' }}</td>
+                                                    <td><?php echo e($investigation->approved_by ?? 'Admin'); ?></td>
                                                 </tr>
-                                            @empty
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                                 <tr>
                                                     <td colspan="6" class="text-center text-muted">No lab investigations found</td>
                                                 </tr>
-                                            @endforelse
+                                            <?php endif; ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -402,35 +407,37 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse($opdDetails as $opd)
+                                            <?php $__empty_1 = true; $__currentLoopData = $opdDetails; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opd): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                                 <tr>
                                                     <td>
                                                         <h6 class="fs-14 mb-1">
-                                                            <a href="#" class="fw-semibold">{{ $opd->opd_no ?? '-' }}</a>
+                                                            <a href="#" class="fw-semibold"><?php echo e($opd->opd_no ?? '-'); ?></a>
                                                         </h6>
                                                     </td>
-                                                    <td>{{ $opd->case_id ?? '-' }}</td>
+                                                    <td><?php echo e($opd->case_id ?? '-'); ?></td>
                                                     <td>
-                                                        @if($opd->appointment_date)
-                                                            {{ \Carbon\Carbon::parse($opd->appointment_date)->format('d/m/Y h:i A') }}
-                                                        @else
+                                                        <?php if($opd->appointment_date): ?>
+                                                            <?php echo e(\Carbon\Carbon::parse($opd->appointment_date)->format('d/m/Y h:i A')); ?>
+
+                                                        <?php else: ?>
                                                             -
-                                                        @endif
+                                                        <?php endif; ?>
                                                     </td>
                                                     <td>
-                                                        {{ $opd->doctor->name ?? $opd->consultant_name ?? '-' }}
-                                                        @if(!empty($opd->doctor->employee_id))
-                                                            ({{ $opd->doctor->employee_id }})
-                                                        @endif
+                                                        <?php echo e($opd->doctor->name ?? $opd->consultant_name ?? '-'); ?>
+
+                                                        <?php if(!empty($opd->doctor->employee_id)): ?>
+                                                            (<?php echo e($opd->doctor->employee_id); ?>)
+                                                        <?php endif; ?>
                                                     </td>
-                                                    <td>{{ $opd->reference ?? '-' }}</td>
-                                                    <td>{{ $opd->symptom_titles ?? '-' }}</td>
+                                                    <td><?php echo e($opd->reference ?? '-'); ?></td>
+                                                    <td><?php echo e($opd->symptom_titles ?? '-'); ?></td>
                                                 </tr>
-                                            @empty
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                                 <tr>
                                                     <td colspan="6" class="text-center">No OPD records found</td>
                                                 </tr>
-                                            @endforelse
+                                            <?php endif; ?>
                                             
                                         </tbody>
                                     </table>
@@ -500,23 +507,25 @@
                                                                                 <div class="row gy-3">
                                                                                     <div class="col-md-10">
                                                                                         <h3>
-                                                                                            {{ $appointment->patient->patient_name }}
+                                                                                            <?php echo e($appointment->patient->patient_name); ?>
+
                                                                                         </h3>
-                                                                                        <p>Guardian : {{ $appointment->patient->guardian_name }}</p>
-                                                                                        <p>Gender : {{ $appointment->patient->gender }}</p>
-                                                                                        <p>Blood Group : {{ $appointment->patient->blood_group }}</p>
-                                                                                        <p>Marital Status: {{ $appointment->patient->marital_status }}</p>
-                                                                                        <p>Age: {{ $appointment->patient->age }}</p>
-                                                                                        <p>Phone: {{ $appointment->patient->mobileno }}</p>
-                                                                                        <p>Email: {{$appointment->patient->email }}
+                                                                                        <p>Guardian : <?php echo e($appointment->patient->guardian_name); ?></p>
+                                                                                        <p>Gender : <?php echo e($appointment->patient->gender); ?></p>
+                                                                                        <p>Blood Group : <?php echo e($appointment->patient->blood_group); ?></p>
+                                                                                        <p>Marital Status: <?php echo e($appointment->patient->marital_status); ?></p>
+                                                                                        <p>Age: <?php echo e($appointment->patient->age); ?></p>
+                                                                                        <p>Phone: <?php echo e($appointment->patient->mobileno); ?></p>
+                                                                                        <p>Email: <?php echo e($appointment->patient->email); ?>
+
                                                                                         </p>
-                                                                                        <p>Address: {{$appointment->patient->address }}</p>
-                                                                                        <p>Any Known Allergies: {{$appointment->patient->known_allergies}}</p>
-                                                                                        <p>Remarks: {{$appointment->patient->note_remark}}</p>
-                                                                                        <p>TPA : {{$appointment->patient->note_remark}}</p>
-                                                                                        <p>TPA ID : {{$appointment->patient->note_remark}} </p>
-                                                                                        <p>TPA Validity : {{$appointment->patient->note_remark}}</p>
-                                                                                        <p>National Identification Number :  {{$appointment->patient->note_remark}}</p>
+                                                                                        <p>Address: <?php echo e($appointment->patient->address); ?></p>
+                                                                                        <p>Any Known Allergies: <?php echo e($appointment->patient->known_allergies); ?></p>
+                                                                                        <p>Remarks: <?php echo e($appointment->patient->note_remark); ?></p>
+                                                                                        <p>TPA : <?php echo e($appointment->patient->note_remark); ?></p>
+                                                                                        <p>TPA ID : <?php echo e($appointment->patient->note_remark); ?> </p>
+                                                                                        <p>TPA Validity : <?php echo e($appointment->patient->note_remark); ?></p>
+                                                                                        <p>National Identification Number :  <?php echo e($appointment->patient->note_remark); ?></p>
                                                                                     </div>
                                                                                     <div class="col-md-2">
                                                                                         <img src="assets/img/patient.png"
@@ -1160,35 +1169,37 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                             @forelse($visitDetails as $opd)
+                                             <?php $__empty_1 = true; $__currentLoopData = $visitDetails; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opd): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                                 <tr>
                                                     <td>
                                                         <h6 class="fs-14 mb-1">
-                                                            <a href="#" class="fw-semibold">{{ $opd->opd_details_id ?? '-' }}</a>
+                                                            <a href="#" class="fw-semibold"><?php echo e($opd->opd_details_id ?? '-'); ?></a>
                                                         </h6>
                                                     </td>
-                                                    <td>{{ $opd->opdDetail->patient->patient_name ?? '-' }}</td>
+                                                    <td><?php echo e($opd->opdDetail->patient->patient_name ?? '-'); ?></td>
                                                     <td>
-                                                        @if($opd->appointment_date)
-                                                            {{ \Carbon\Carbon::parse($opd->appointment_date)->format('d/m/Y h:i A') }}
-                                                        @else
+                                                        <?php if($opd->appointment_date): ?>
+                                                            <?php echo e(\Carbon\Carbon::parse($opd->appointment_date)->format('d/m/Y h:i A')); ?>
+
+                                                        <?php else: ?>
                                                             -
-                                                        @endif
+                                                        <?php endif; ?>
                                                     </td>
                                                     <td>
-                                                        {{ $opd->doctor->name ?? $opd->cons_doctor ?? '-' }}
-                                                        <!-- @if(!empty($opd->doctor->employee_id))
-                                                            ({{ $opd->doctor->employee_id }})
-                                                        @endif -->
+                                                        <?php echo e($opd->doctor->name ?? $opd->cons_doctor ?? '-'); ?>
+
+                                                        <!-- <?php if(!empty($opd->doctor->employee_id)): ?>
+                                                            (<?php echo e($opd->doctor->employee_id); ?>)
+                                                        <?php endif; ?> -->
                                                     </td>
-                                                    <td>{{ $opd->reference ?? '-' }}</td>
-                                                    <td>{{ $opd->symptom_titles ?? '-' }}</td>
+                                                    <td><?php echo e($opd->reference ?? '-'); ?></td>
+                                                    <td><?php echo e($opd->symptom_titles ?? '-'); ?></td>
                                                 </tr>
-                                            @empty
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                                 <tr>
                                                     <td colspan="6" class="text-center">No OPD records found</td>
                                                 </tr>
-                                            @endforelse
+                                            <?php endif; ?>
                                         </tbody>
                                     </table>
                                                     
@@ -1244,32 +1255,34 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @forelse($labInvestigations as $investigation)
+                                                            <?php $__empty_1 = true; $__currentLoopData = $labInvestigations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $investigation): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                                 <tr>
-                                                    <td>{{ $investigation->pathology->test_name ?? '-' }}</td>
-                                                    <td>{{ $investigation->case_id ?? '-' }}</td>
-                                                    <td>{{ $investigation->lab_name ?? 'Pathology' }}</td>
+                                                    <td><?php echo e($investigation->pathology->test_name ?? '-'); ?></td>
+                                                    <td><?php echo e($investigation->case_id ?? '-'); ?></td>
+                                                    <td><?php echo e($investigation->lab_name ?? 'Pathology'); ?></td>
                                                     <td>
-                                                        @if(!empty($investigation->collection_date))
-                                                            {{ \Carbon\Carbon::parse($investigation->collection_date)->format('d/m/Y') }}
-                                                        @else
+                                                        <?php if(!empty($investigation->collection_date)): ?>
+                                                            <?php echo e(\Carbon\Carbon::parse($investigation->collection_date)->format('d/m/Y')); ?>
+
+                                                        <?php else: ?>
                                                             -
-                                                        @endif
+                                                        <?php endif; ?>
                                                     </td>
                                                     <td>
-                                                        @if(!empty($investigation->reporting_date))
-                                                            {{ \Carbon\Carbon::parse($investigation->reporting_date)->format('d/m/Y') }}
-                                                        @else
+                                                        <?php if(!empty($investigation->reporting_date)): ?>
+                                                            <?php echo e(\Carbon\Carbon::parse($investigation->reporting_date)->format('d/m/Y')); ?>
+
+                                                        <?php else: ?>
                                                             -
-                                                        @endif
+                                                        <?php endif; ?>
                                                     </td>
-                                                    <td>{{ $investigation->approved_by ?? 'Admin' }}</td>
+                                                    <td><?php echo e($investigation->approved_by ?? 'Admin'); ?></td>
                                                 </tr>
-                                            @empty
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                                 <tr>
                                                     <td colspan="6" class="text-center text-muted">No lab investigations found</td>
                                                 </tr>
-                                            @endforelse
+                                            <?php endif; ?>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1324,27 +1337,29 @@
                                                         </thead>
                                                         <tbody>
 
-                                                        @forelse($opdDetails as $opd)
+                                                        <?php $__empty_1 = true; $__currentLoopData = $opdDetails; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opd): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                                 <tr>
                                                     <td>
                                                         <h6 class="fs-14 mb-1">
-                                                            <a href="#" class="fw-semibold">{{ $opd->opd_no ?? '-' }}</a>
+                                                            <a href="#" class="fw-semibold"><?php echo e($opd->opd_no ?? '-'); ?></a>
                                                         </h6>
                                                     </td>
-                                                    <td>{{ $opd->case_id ?? '-' }}</td>
+                                                    <td><?php echo e($opd->case_id ?? '-'); ?></td>
                                                     <td>
-                                                        @if($opd->appointment_date)
-                                                            {{ \Carbon\Carbon::parse($opd->appointment_date)->format('d/m/Y h:i A') }}
-                                                        @else
+                                                        <?php if($opd->appointment_date): ?>
+                                                            <?php echo e(\Carbon\Carbon::parse($opd->appointment_date)->format('d/m/Y h:i A')); ?>
+
+                                                        <?php else: ?>
                                                             -
-                                                        @endif
+                                                        <?php endif; ?>
                                                     </td>
-                                                    <td>{{ $opd->symptom_titles ?? '-' }}</td>
+                                                    <td><?php echo e($opd->symptom_titles ?? '-'); ?></td>
                                                     <td>
-                                                        {{ $opd->doctor->name ?? $opd->consultant_name ?? '-' }}
-                                                        @if(!empty($opd->doctor->employee_id))
-                                                            ({{ $opd->doctor->employee_id }})
-                                                        @endif
+                                                        <?php echo e($opd->doctor->name ?? $opd->consultant_name ?? '-'); ?>
+
+                                                        <?php if(!empty($opd->doctor->employee_id)): ?>
+                                                            (<?php echo e($opd->doctor->employee_id); ?>)
+                                                        <?php endif; ?>
                                                     </td>
                                                     
                                                     
@@ -1357,11 +1372,11 @@
                                                                     </div>
                                                     </td>
                                                 </tr>
-                                            @empty
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                                 <tr>
                                                     <td colspan="6" class="text-center">No OPD records found</td>
                                                 </tr>
-                                            @endforelse
+                                            <?php endif; ?>
                                                             
                                                         </tbody>
                                                     </table>
@@ -1424,13 +1439,13 @@
                                                                             data-bs-dismiss="modal"></button>
 
                                                                     </div>
-                                                                    <form method="POST" action="{{ isset($timeline) ? route('patient-timeline.update', $timeline->id) : route('patient-timeline.store') }}" enctype="multipart/form-data">
-    @csrf
-    @if(isset($timeline))
-        @method('PUT')
-    @endif
+                                                                    <form method="POST" action="<?php echo e(isset($timeline) ? route('patient-timeline.update', $timeline->id) : route('patient-timeline.store')); ?>" enctype="multipart/form-data">
+    <?php echo csrf_field(); ?>
+    <?php if(isset($timeline)): ?>
+        <?php echo method_field('PUT'); ?>
+    <?php endif; ?>
 
-    <input type="hidden" name="patient_id" value="{{ $appointment->patient_id ?? '' }}">
+    <input type="hidden" name="patient_id" value="<?php echo e($appointment->patient_id ?? ''); ?>">
 
     <div class="modal-body">
         <div class="row p-4 mx-1 gy-3">
@@ -1440,7 +1455,7 @@
                     Title <span class="text-danger">*</span>
                 </label>
                 <input type="text" name="title" id="title" class="form-control"
-                    value="{{ old('title', $timeline->title ?? '') }}" required>
+                    value="<?php echo e(old('title', $timeline->title ?? '')); ?>" required>
             </div>
 
             <!-- Date -->
@@ -1449,7 +1464,7 @@
                     Date <span class="text-danger">*</span>
                 </label>
                 <input type="date" name="date" id="date" class="form-control"
-                    value="{{ old('date', isset($timeline->date) ? \Carbon\Carbon::parse($timeline->date)->format('Y-m-d') : '') }}" required>
+                    value="<?php echo e(old('date', isset($timeline->date) ? \Carbon\Carbon::parse($timeline->date)->format('Y-m-d') : '')); ?>" required>
             </div>
 
             <!-- Description -->
@@ -1457,7 +1472,7 @@
                 <label for="description" class="form-label">
                     Description
                 </label>
-                <textarea name="description" id="description" class="form-control" rows="3">{{ old('description', $timeline->description ?? '') }}</textarea>
+                <textarea name="description" id="description" class="form-control" rows="3"><?php echo e(old('description', $timeline->description ?? '')); ?></textarea>
             </div>
 
             <!-- Attach Document -->
@@ -1466,20 +1481,20 @@
                     Attach Document
                 </label>
                 <input type="file" name="attch_doc" id="attch_doc" class="form-control">
-                @if(isset($timeline) && $timeline->attch_doc)
+                <?php if(isset($timeline) && $timeline->attch_doc): ?>
                     <small class="text-muted d-block mt-1">
                         Current File:
-                        <a href="{{ asset('storage/timeline_docs/' . $timeline->attch_doc) }}" target="_blank">
+                        <a href="<?php echo e(asset('storage/timeline_docs/' . $timeline->attch_doc)); ?>" target="_blank">
                             View Document
                         </a>
                     </small>
-                @endif
+                <?php endif; ?>
             </div>
 
             <!-- Visible to Person -->
             <div class="col-md-12 form-check">
                 <input type="checkbox" name="visible_person" id="visible_person" class="form-check-input"
-                    {{ old('visible_person', $timeline->visible_person ?? false) ? 'checked' : '' }}>
+                    <?php echo e(old('visible_person', $timeline->visible_person ?? false) ? 'checked' : ''); ?>>
                 <label for="visible_person" class="form-check-label">Visible to this person</label>
             </div>
         </div>
@@ -1487,7 +1502,8 @@
 
     <div class="modal-footer">
         <button type="submit" class="btn btn-primary">
-            {{ isset($timeline) ? 'Update' : 'Save' }}
+            <?php echo e(isset($timeline) ? 'Update' : 'Save'); ?>
+
         </button>
     </div>
 </form>
@@ -1511,23 +1527,24 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                             @forelse($PatientTimelines as $timeline)
+                                                             <?php $__empty_1 = true; $__currentLoopData = $PatientTimelines; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $timeline): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                 <tr>
                     <td>
                         <h6 class="fs-14 mb-1">
-                            <a href="#" class="fw-semibold">{{ $timeline->patient->patient_name ?? '-' }}</a>
+                            <a href="#" class="fw-semibold"><?php echo e($timeline->patient->patient_name ?? '-'); ?></a>
                         </h6>
                     </td>
                     
                     
-                    <td>{{ $timeline->title ?? '-' }}</td>
-                    <td>{{ $timeline->description ?? '-' }}</td>
+                    <td><?php echo e($timeline->title ?? '-'); ?></td>
+                    <td><?php echo e($timeline->description ?? '-'); ?></td>
                     <td>
-                        @if(!empty($timeline->timeline_date))
-                            {{ \Carbon\Carbon::parse($timeline->timeline_date)->format('d/m/Y h:i A') }}
-                        @else
+                        <?php if(!empty($timeline->timeline_date)): ?>
+                            <?php echo e(\Carbon\Carbon::parse($timeline->timeline_date)->format('d/m/Y h:i A')); ?>
+
+                        <?php else: ?>
                             -
-                        @endif
+                        <?php endif; ?>
                     </td>
                     <td>
                         <div class="d-flex gap-2">
@@ -1539,11 +1556,11 @@
                         </div>
                     </td>
                 </tr>
-            @empty
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <tr>
                     <td colspan="6" class="text-center text-muted">No timeline records found</td>
                 </tr>
-            @endforelse
+            <?php endif; ?>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1605,9 +1622,9 @@
                                                                             data-bs-dismiss="modal"></button>
 
                                                                     </div>
-                                                                    <form method="POST" action="{{ route('patient-vitals.store') }}">
-                                                                        @csrf
-                                                                            <input type="hidden" name="patient_id" value="{{ $appointment->patient_id }}">
+                                                                    <form method="POST" action="<?php echo e(route('patient-vitals.store')); ?>">
+                                                                        <?php echo csrf_field(); ?>
+                                                                            <input type="hidden" name="patient_id" value="<?php echo e($appointment->patient_id); ?>">
                                                                         <div class="modal-body p-4 mx-1">
                                                                             <div id="vitalFields">
                                                                                 <div class="row gy-3 vital-row mb-2">
@@ -1617,9 +1634,9 @@
                                                                                         <label for="vital_name" class="form-label">Vital Name</label>
                                                                                         <select class="form-select" name="vital_name[]" id="vital_name">
                                                                                             <option value="">Select</option>
-                                                                                            @foreach($vitals as $vital)
-                                                                                                <option value="{{ $vital->id }}">{{ $vital->name . ' (' . $vital->reference_range . ')' }} </option>
-                                                                                            @endforeach
+                                                                                            <?php $__currentLoopData = $vitals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $vital): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                                                <option value="<?php echo e($vital->id); ?>"><?php echo e($vital->name . ' (' . $vital->reference_range . ')'); ?> </option>
+                                                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                                         </select>
                                                                                     </div>
 
@@ -1668,37 +1685,39 @@
                                                             <tr>
                                                                 
                                                                 <th>Messure Date</th>
-                                                                 {{-- Dynamically generate vital headers --}}
-                                                                @foreach($vitals as $vital)
-                                                                    <th>{{ $vital->name }}</th>
-                                                                @endforeach
+                                                                 
+                                                                <?php $__currentLoopData = $vitals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $vital): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                    <th><?php echo e($vital->name); ?></th>
+                                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                 <!-- <th>Action</th> -->
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                              @forelse($vitalDetails->groupBy('patient_id') as $caseId => $caseVitals)
-            @php
+                                                              <?php $__empty_1 = true; $__currentLoopData = $vitalDetails->groupBy('patient_id'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $caseId => $caseVitals): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+            <?php
                 $firstRecord = $caseVitals->first();
-            @endphp
+            ?>
             <tr>
 
                 <td>
-                    @if(!empty($firstRecord->messure_date))
-                        {{ \Carbon\Carbon::parse($firstRecord->messure_date)->format('d/m/Y h:i A') }}
-                    @else
+                    <?php if(!empty($firstRecord->messure_date)): ?>
+                        <?php echo e(\Carbon\Carbon::parse($firstRecord->messure_date)->format('d/m/Y h:i A')); ?>
+
+                    <?php else: ?>
                         -
-                    @endif
+                    <?php endif; ?>
                 </td>
 
-                {{-- Loop through all vitals dynamically --}}
-                @foreach($vitals as $vital)
-                    @php
+                
+                <?php $__currentLoopData = $vitals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $vital): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php
                         $record = $caseVitals->where('vital_id', $vital->id)->first();
-                    @endphp
+                    ?>
                     <td>
-                        {{ $record->reference_range ?? '-' }}
+                        <?php echo e($record->reference_range ?? '-'); ?>
+
                     </td>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
                 <!-- <td>
                     <div class="d-flex gap-2">
@@ -1710,13 +1729,13 @@
                     </div>
                 </td> -->
             </tr>
-        @empty
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
             <tr>
-                <td colspan="{{ 4 + $vitals->count() }}" class="text-center text-muted">
+                <td colspan="<?php echo e(4 + $vitals->count()); ?>" class="text-center text-muted">
                     No vital records found
                 </td>
             </tr>
-        @endforelse
+        <?php endif; ?>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1737,17 +1756,17 @@
     <!-- tab content end -->
     </div>
 
-        @include('components.modals.add-prescription-modal')
+        <?php echo $__env->make('components.modals.add-prescription-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
  <!-- Chart.js Scripts -->
-<script src="{{ asset('assets/plugins/chartjs/chart.min.js') }}"></script>
-<script src="{{ asset('assets/plugins/chartjs/chart-data.js') }}"></script>
+<script src="<?php echo e(asset('assets/plugins/chartjs/chart.min.js')); ?>"></script>
+<script src="<?php echo e(asset('assets/plugins/chartjs/chart-data.js')); ?>"></script>
 
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         if (window.Chart) {
             // Fetch data dynamically from Laravel controller
-            fetch("{{ route('chart.data') }}") // Laravel route returning JSON
+            fetch("<?php echo e(route('chart.data')); ?>") // Laravel route returning JSON
                 .then(response => response.json())
                 .then(data => {
                     // Render chart dynamically with fetched data
@@ -1796,9 +1815,9 @@
                     <label class="form-label">Vital Name</label>
                     <select class="form-select" name="vital_name[]">
                         <option value="">Select</option>
-                        @foreach($vitals as $vital)
-                            <option value="{{ $vital->id }}">{{ $vital->name . ' (' . $vital->reference_range . ')' }}</option>
-                        @endforeach
+                        <?php $__currentLoopData = $vitals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $vital): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <option value="<?php echo e($vital->id); ?>"><?php echo e($vital->name . ' (' . $vital->reference_range . ')'); ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                 </div>
                 <div class="col-md-3">
@@ -1871,4 +1890,5 @@
         });
     </script> -->
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp82\htdocs\hims\resources\views/admin/appointments/patient_view.blade.php ENDPATH**/ ?>
