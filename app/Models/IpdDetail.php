@@ -92,4 +92,8 @@ class IpdDetail extends Model
         return $this->belongsToMany(Patient::class, 'ipd_patient', 'ipd_id', 'patient_id')->withPivot('doctor_id')
             ->withTimestamps();
     }
+     public function treatmentHistory()
+    {
+        return $this->hasMany(ConsultantRegister::class, 'ipd_id', 'id');
+    }
 }

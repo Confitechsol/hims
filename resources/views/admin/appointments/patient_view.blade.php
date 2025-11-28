@@ -1425,72 +1425,72 @@
 
                                                                     </div>
                                                                     <form method="POST" action="{{ isset($timeline) ? route('patient-timeline.update', $timeline->id) : route('patient-timeline.store') }}" enctype="multipart/form-data">
-    @csrf
-    @if(isset($timeline))
-        @method('PUT')
-    @endif
+                                                                            @csrf
+                                                                            @if(isset($timeline))
+                                                                                @method('PUT')
+                                                                            @endif
 
-    <input type="hidden" name="patient_id" value="{{ $appointment->patient_id ?? '' }}">
+                                                                            <input type="hidden" name="patient_id" value="{{ $appointment->patient_id ?? '' }}">
 
-    <div class="modal-body">
-        <div class="row gy-3">
-            <!-- Title -->
-            <div class="col-md-12">
-                <label for="title" class="form-label">
-                    Title <span class="text-danger">*</span>
-                </label>
-                <input type="text" name="title" id="title" class="form-control"
-                    value="{{ old('title', $timeline->title ?? '') }}" required>
-            </div>
+                                                                            <div class="modal-body">
+                                                                                <div class="row gy-3">
+                                                                                    <!-- Title -->
+                                                                                    <div class="col-md-12">
+                                                                                        <label for="title" class="form-label">
+                                                                                            Title <span class="text-danger">*</span>
+                                                                                        </label>
+                                                                                        <input type="text" name="title" id="title" class="form-control"
+                                                                                            value="{{ old('title', $timeline->title ?? '') }}" required>
+                                                                                    </div>
 
-            <!-- Date -->
-            <div class="col-md-12">
-                <label for="date" class="form-label">
-                    Date <span class="text-danger">*</span>
-                </label>
-                <input type="date" name="date" id="date" class="form-control"
-                    value="{{ old('date', isset($timeline->date) ? \Carbon\Carbon::parse($timeline->date)->format('Y-m-d') : '') }}" required>
-            </div>
+                                                                                    <!-- Date -->
+                                                                                    <div class="col-md-12">
+                                                                                        <label for="date" class="form-label">
+                                                                                            Date <span class="text-danger">*</span>
+                                                                                        </label>
+                                                                                        <input type="date" name="date" id="date" class="form-control"
+                                                                                            value="{{ old('date', isset($timeline->date) ? \Carbon\Carbon::parse($timeline->date)->format('Y-m-d') : '') }}" required>
+                                                                                    </div>
 
-            <!-- Description -->
-            <div class="col-md-12">
-                <label for="description" class="form-label">
-                    Description
-                </label>
-                <textarea name="description" id="description" class="form-control" rows="3">{{ old('description', $timeline->description ?? '') }}</textarea>
-            </div>
+                                                                                    <!-- Description -->
+                                                                                    <div class="col-md-12">
+                                                                                        <label for="description" class="form-label">
+                                                                                            Description
+                                                                                        </label>
+                                                                                        <textarea name="description" id="description" class="form-control" rows="3">{{ old('description', $timeline->description ?? '') }}</textarea>
+                                                                                    </div>
 
-            <!-- Attach Document -->
-            <div class="col-md-12">
-                <label for="attch_doc" class="form-label">
-                    Attach Document
-                </label>
-                <input type="file" name="attch_doc" id="attch_doc" class="form-control">
-                @if(isset($timeline) && $timeline->attch_doc)
-                    <small class="text-muted d-block mt-1">
-                        Current File:
-                        <a href="{{ asset('storage/timeline_docs/' . $timeline->attch_doc) }}" target="_blank">
-                            View Document
-                        </a>
-                    </small>
-                @endif
-            </div>
+                                                                                    <!-- Attach Document -->
+                                                                                    <div class="col-md-12">
+                                                                                        <label for="attch_doc" class="form-label">
+                                                                                            Attach Document
+                                                                                        </label>
+                                                                                        <input type="file" name="attch_doc" id="attch_doc" class="form-control">
+                                                                                        @if(isset($timeline) && $timeline->attch_doc)
+                                                                                            <small class="text-muted d-block mt-1">
+                                                                                                Current File:
+                                                                                                <a href="{{ asset('storage/timeline_docs/' . $timeline->attch_doc) }}" target="_blank">
+                                                                                                    View Document
+                                                                                                </a>
+                                                                                            </small>
+                                                                                        @endif
+                                                                                    </div>
 
-            <!-- Visible to Person -->
-            <div class="col-md-12 form-check">
-                <input type="checkbox" name="visible_person" id="visible_person" class="form-check-input"
-                    {{ old('visible_person', $timeline->visible_person ?? false) ? 'checked' : '' }}>
-                <label for="visible_person" class="form-check-label">Visible to this person</label>
-            </div>
-        </div>
-    </div>
+                                                                                    <!-- Visible to Person -->
+                                                                                    <div class="col-md-12 form-check">
+                                                                                        <input type="checkbox" name="visible_person" id="visible_person" class="form-check-input"
+                                                                                            {{ old('visible_person', $timeline->visible_person ?? false) ? 'checked' : '' }}>
+                                                                                        <label for="visible_person" class="form-check-label">Visible to this person</label>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
 
-    <div class="modal-footer">
-        <button type="submit" class="btn btn-primary">
-            {{ isset($timeline) ? 'Update' : 'Save' }}
-        </button>
-    </div>
-</form>
+                                                                            <div class="modal-footer">
+                                                                                <button type="submit" class="btn btn-primary">
+                                                                                    {{ isset($timeline) ? 'Update' : 'Save' }}
+                                                                                </button>
+                                                                            </div>
+                                                                        </form>
 
                                                                 </div>
                                                             </div>
@@ -1512,38 +1512,38 @@
                                                         </thead>
                                                         <tbody>
                                                              @forelse($PatientTimelines as $timeline)
-                <tr>
-                    <td>
-                        <h6 class="fs-14 mb-1">
-                            <a href="#" class="fw-semibold">{{ $timeline->patient->patient_name ?? '-' }}</a>
-                        </h6>
-                    </td>
-                    
-                    
-                    <td>{{ $timeline->title ?? '-' }}</td>
-                    <td>{{ $timeline->description ?? '-' }}</td>
-                    <td>
-                        @if(!empty($timeline->timeline_date))
-                            {{ \Carbon\Carbon::parse($timeline->timeline_date)->format('d/m/Y h:i A') }}
-                        @else
-                            -
-                        @endif
-                    </td>
-                    <td>
-                        <div class="d-flex gap-2">
-                            <a href="#"
-                               class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
-                               data-bs-toggle="tooltip" title="Show">
-                                <i class="ti ti-menu"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="6" class="text-center text-muted">No timeline records found</td>
-                </tr>
-            @endforelse
+                                                            <tr>
+                                                                <td>
+                                                                    <h6 class="fs-14 mb-1">
+                                                                        <a href="#" class="fw-semibold">{{ $timeline->patient->patient_name ?? '-' }}</a>
+                                                                    </h6>
+                                                                </td>
+                                                                
+                                                                
+                                                                <td>{{ $timeline->title ?? '-' }}</td>
+                                                                <td>{{ $timeline->description ?? '-' }}</td>
+                                                                <td>
+                                                                    @if(!empty($timeline->timeline_date))
+                                                                        {{ \Carbon\Carbon::parse($timeline->timeline_date)->format('d/m/Y h:i A') }}
+                                                                    @else
+                                                                        -
+                                                                    @endif
+                                                                </td>
+                                                                <td>
+                                                                    <div class="d-flex gap-2">
+                                                                        <a href="#"
+                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
+                                                                        data-bs-toggle="tooltip" title="Show">
+                                                                            <i class="ti ti-menu"></i>
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            @empty
+                                                                <tr>
+                                                                    <td colspan="6" class="text-center text-muted">No timeline records found</td>
+                                                                </tr>
+                                                            @endforelse
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1572,8 +1572,7 @@
                                     <div class="col-lg-12">
                                         <div class="card">
                                             <div class="card-body">
-                                                <div
-                                                    class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
+                                                <div class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
                                                     <div class="input-icon-start position-relative me-2">
                                                         <span class="input-icon-addon">
                                                             <i class="ti ti-search"></i>
@@ -1677,46 +1676,46 @@
                                                         </thead>
                                                         <tbody>
                                                               @forelse($vitalDetails->groupBy('patient_id') as $caseId => $caseVitals)
-            @php
-                $firstRecord = $caseVitals->first();
-            @endphp
-            <tr>
+                                                        @php
+                                                            $firstRecord = $caseVitals->first();
+                                                        @endphp
+                                                        <tr>
 
-                <td>
-                    @if(!empty($firstRecord->messure_date))
-                        {{ \Carbon\Carbon::parse($firstRecord->messure_date)->format('d/m/Y h:i A') }}
-                    @else
-                        -
-                    @endif
-                </td>
+                                                        <td>
+                                                            @if(!empty($firstRecord->messure_date))
+                                                                {{ \Carbon\Carbon::parse($firstRecord->messure_date)->format('d/m/Y h:i A') }}
+                                                            @else
+                                                                -
+                                                            @endif
+                                                        </td>
 
-                {{-- Loop through all vitals dynamically --}}
-                @foreach($vitals as $vital)
-                    @php
-                        $record = $caseVitals->where('vital_id', $vital->id)->first();
-                    @endphp
-                    <td>
-                        {{ $record->reference_range ?? '-' }}
-                    </td>
-                @endforeach
+                                                            {{-- Loop through all vitals dynamically --}}
+                                                            @foreach($vitals as $vital)
+                                                                @php
+                                                                    $record = $caseVitals->where('vital_id', $vital->id)->first();
+                                                                @endphp
+                                                                <td>
+                                                                    {{ $record->reference_range ?? '-' }}
+                                                                </td>
+                                                            @endforeach
 
-                <!-- <td>
-                    <div class="d-flex gap-2">
-                        <a href="#"
-                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
-                            data-bs-toggle="tooltip" title="Show">
-                            <i class="ti ti-menu"></i>
-                        </a>
-                    </div>
-                </td> -->
-            </tr>
-        @empty
-            <tr>
-                <td colspan="{{ 4 + $vitals->count() }}" class="text-center text-muted">
-                    No vital records found
-                </td>
-            </tr>
-        @endforelse
+                                                                    <!-- <td>
+                                                                        <div class="d-flex gap-2">
+                                                                            <a href="#"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
+                                                                                data-bs-toggle="tooltip" title="Show">
+                                                                                <i class="ti ti-menu"></i>
+                                                                            </a>
+                                                                        </div>
+                                                                    </td> -->
+                                                                    </tr>
+                                                            @empty
+                                                                <tr>
+                                                                    <td colspan="{{ 4 + $vitals->count() }}" class="text-center text-muted">
+                                                                        No vital records found
+                                                                    </td>
+                                                                </tr>
+                                                            @endforelse
                                                         </tbody>
                                                     </table>
                                                 </div>

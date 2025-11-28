@@ -2831,6 +2831,7 @@ unset($__errorArgs, $__bag); ?>
                     </div>
                 </div>
             </div>
+            
             <div class="tab-pane" id="timeline">
                 <!-- row start -->
                 <div class="row">
@@ -2872,65 +2873,82 @@ unset($__errorArgs, $__bag); ?>
                                                                     <div class="modal-header"
                                                                         style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
-                                                                        <h5 class="modal-title"
-                                                                            id="addSpecializationLabel">
+                                                                        <h5 class="modal-title" id="addSpecializationLabel">
                                                                             Add Timeline
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
                                                                             data-bs-dismiss="modal"></button>
 
                                                                     </div>
+                                                                    <form method="POST" action="<?php echo e(isset($timeline) ? route('patient-timeline.update', $timeline->id) : route('patient-timeline.store')); ?>" enctype="multipart/form-data">
+                                                                            <?php echo csrf_field(); ?>
+                                                                            <?php if(isset($timeline)): ?>
+                                                                                <?php echo method_field('PUT'); ?>
+                                                                            <?php endif; ?>
 
-                                                                    <div class="modal-body">
+                                                                            <input type="hidden" name="patient_id" value="<?php echo e($ipd->patient_id ?? ''); ?>">
 
-                                                                        <div class="row gy-3">
+                                                                            <div class="modal-body">
+                                                                                <div class="row gy-3">
+                                                                                    <!-- Title -->
+                                                                                    <div class="col-md-12">
+                                                                                        <label for="title" class="form-label">
+                                                                                            Title <span class="text-danger">*</span>
+                                                                                        </label>
+                                                                                        <input type="text" name="title" id="title" class="form-control"
+                                                                                            value="<?php echo e(old('title', $timeline->title ?? '')); ?>" required>
+                                                                                    </div>
 
-                                                                            <div class="col-md-12">
-                                                                                <label for="title"
-                                                                                    class="form-label">Title
-                                                                                    <span class="text-danger">*</span>
-                                                                                </label>
-                                                                                <input type="text" name="title"
-                                                                                    id="title" class="form-control">
-                                                                            </div>
-                                                                            <div class="col-md-12">
-                                                                                <label for="date"
-                                                                                    class="form-label">Date
-                                                                                    <span class="text-danger">*</span>
-                                                                                </label>
-                                                                                <input type="date" name="date"
-                                                                                    id="date" class="form-control">
-                                                                            </div>
-                                                                            <div class="col-md-12">
-                                                                                <label for="description"
-                                                                                    class="form-label">Description
-                                                                                </label>
-                                                                                <textarea name="description" id="description" class="form-control"></textarea>
-                                                                            </div>
-                                                                            <div class="col-md-12">
-                                                                                <label for="attch_doc"
-                                                                                    class="form-label">Attach Document
-                                                                                </label>
-                                                                                <input type="file" name="attch_doc"
-                                                                                    id="date" class="form-control">
-                                                                            </div>
-                                                                            <div class="col-md-12">
-                                                                                <label for="visible_person"
-                                                                                    class="form-check-label">Visible to
-                                                                                    this
-                                                                                    person
-                                                                                </label>
-                                                                                <input type="checkbox"
-                                                                                    name="visible_person" id="date"
-                                                                                    class="form-check-input">
-                                                                            </div>
-                                                                        </div>
+                                                                                    <!-- Date -->
+                                                                                    <div class="col-md-12">
+                                                                                        <label for="date" class="form-label">
+                                                                                            Date <span class="text-danger">*</span>
+                                                                                        </label>
+                                                                                        <input type="date" name="date" id="date" class="form-control"
+                                                                                            value="<?php echo e(old('date', isset($timeline->date) ? \Carbon\Carbon::parse($timeline->date)->format('Y-m-d') : '')); ?>" required>
+                                                                                    </div>
 
-                                                                    </div>
-                                                                    <div class="modal-footer">
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary">Save</button>
-                                                                    </div>
+                                                                                    <!-- Description -->
+                                                                                    <div class="col-md-12">
+                                                                                        <label for="description" class="form-label">
+                                                                                            Description
+                                                                                        </label>
+                                                                                        <textarea name="description" id="description" class="form-control" rows="3"><?php echo e(old('description', $timeline->description ?? '')); ?></textarea>
+                                                                                    </div>
+
+                                                                                    <!-- Attach Document -->
+                                                                                    <div class="col-md-12">
+                                                                                        <label for="attch_doc" class="form-label">
+                                                                                            Attach Document
+                                                                                        </label>
+                                                                                        <input type="file" name="attch_doc" id="attch_doc" class="form-control">
+                                                                                        <?php if(isset($timeline) && $timeline->attch_doc): ?>
+                                                                                            <small class="text-muted d-block mt-1">
+                                                                                                Current File:
+                                                                                                <a href="<?php echo e(asset('storage/timeline_docs/' . $timeline->attch_doc)); ?>" target="_blank">
+                                                                                                    View Document
+                                                                                                </a>
+                                                                                            </small>
+                                                                                        <?php endif; ?>
+                                                                                    </div>
+
+                                                                                    <!-- Visible to Person -->
+                                                                                    <div class="col-md-12 form-check">
+                                                                                        <input type="checkbox" name="visible_person" id="visible_person" class="form-check-input"
+                                                                                            <?php echo e(old('visible_person', $timeline->visible_person ?? false) ? 'checked' : ''); ?>>
+                                                                                        <label for="visible_person" class="form-check-label">Visible to this person</label>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div class="modal-footer">
+                                                                                <button type="submit" class="btn btn-primary">
+                                                                                    <?php echo e(isset($timeline) ? 'Update' : 'Save'); ?>
+
+                                                                                </button>
+                                                                            </div>
+                                                                        </form>
+
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -2941,36 +2959,49 @@ unset($__errorArgs, $__bag); ?>
                                                     <table class="table border">
                                                         <thead class="thead-light">
                                                             <tr>
-                                                                <th>OPD No</th>
-                                                                <th>Case ID</th>
-                                                                <th>Admission Date</th>
+                                                                
+                                                                <th>Patient Name</th>
                                                                 <th>Title</th>
-                                                                <th>Date</th>
+                                                                <th>Description</th>
+                                                                <th>Timeline Date</th>
                                                                 <th>Action</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
+                                                             <?php $__empty_1 = true; $__currentLoopData = $PatientTimelines; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $timeline): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                                             <tr>
                                                                 <td>
-                                                                    <h6 class="fs-14 mb-1"><a href="#"
-                                                                            class="fw-semibold">OPDN14</a></h6>
+                                                                    <h6 class="fs-14 mb-1">
+                                                                        <a href="#" class="fw-semibold"><?php echo e($timeline->patient->patient_name ?? '-'); ?></a>
+                                                                    </h6>
                                                                 </td>
-                                                                <td>18</td>
-                                                                <td> 09/17/2025 12:49 PM</td>
-                                                                <td>xyz
-                                                                </td>
-                                                                <td>09/17/2025 12:49 PM
+                                                                
+                                                                
+                                                                <td><?php echo e($timeline->title ?? '-'); ?></td>
+                                                                <td><?php echo e($timeline->description ?? '-'); ?></td>
+                                                                <td>
+                                                                    <?php if(!empty($timeline->timeline_date)): ?>
+                                                                        <?php echo e(\Carbon\Carbon::parse($timeline->timeline_date)->format('d/m/Y h:i A')); ?>
+
+                                                                    <?php else: ?>
+                                                                        -
+                                                                    <?php endif; ?>
                                                                 </td>
                                                                 <td>
                                                                     <div class="d-flex gap-2">
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                            <i class="ti ti-menu"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Show"></i></a>
+                                                                        <a href="#"
+                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
+                                                                        data-bs-toggle="tooltip" title="Show">
+                                                                            <i class="ti ti-menu"></i>
+                                                                        </a>
                                                                     </div>
                                                                 </td>
                                                             </tr>
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                                                <tr>
+                                                                    <td colspan="6" class="text-center text-muted">No timeline records found</td>
+                                                                </tr>
+                                                            <?php endif; ?>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -2991,8 +3022,7 @@ unset($__errorArgs, $__bag); ?>
                         <div class="card shadow-sm flex-fill w-100">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Treatment
-                                    History
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Treatment History
                                 </h5>
                             </div>
                             <div class="card-body">
@@ -3016,36 +3046,18 @@ unset($__errorArgs, $__bag); ?>
                                                     <table class="table border">
                                                         <thead class="thead-light">
                                                             <tr>
-                                                                <th>OPD No</th>
-                                                                <th>Case ID</th>
-                                                                <th>Appointment Date</th>
-                                                                <th>Symptoms</th>
-                                                                <th>Consultant</th>
+                                                                <th>IPD No</th>
+                                                                <th>Patient ID</th>
+                                                                <th>Consultant Doctor</th>
+                                                                <th>Bed Assigned</th>
                                                                 <th>Action</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr>
-                                                                <td>
-                                                                    <h6 class="fs-14 mb-1"><a href="#"
-                                                                            class="fw-semibold">OPDN14</a></h6>
-                                                                </td>
-                                                                <td>18</td>
-                                                                <td> 09/17/2025 12:49 PM</td>
-                                                                <td>Fever
-                                                                </td>
-                                                                <td>Anjali Rao (D011)
-                                                                </td>
-                                                                <td>
-                                                                    <div class="d-flex gap-2">
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                            <i class="ti ti-menu"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Show"></i></a>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
+                                                        <td><?php echo e($ipd->ipd_no); ?></td>
+                                                        <td><?php echo e($ipd->patient_id); ?></td>
+                                                        <td><?php echo e($ipd->doctor->name); ?> <?php echo e($ipd->doctor->surname); ?></td>
+                                                         <td><?php echo e($ipd->bedGroup->name); ?>-<?php echo e($ipd->bedDetail->name); ?></td>   
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -3383,8 +3395,7 @@ unset($__errorArgs, $__bag); ?>
                                     <div class="col-lg-12">
                                         <div class="card">
                                             <div class="card-body">
-                                                <div
-                                                    class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
+                                                <div class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
                                                     <div class="input-icon-start position-relative me-2">
                                                         <span class="input-icon-addon">
                                                             <i class="ti ti-search"></i>
@@ -3403,81 +3414,70 @@ unset($__errorArgs, $__bag); ?>
                                                         <!-- First Modal -->
                                                         <div class="modal fade" id="add_vital" tabindex="-1"
                                                             aria-hidden="true">
-                                                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                            <div class="modal-dialog modal-dialog-centered">
                                                                 <div class="modal-content">
 
                                                                     <div class="modal-header"
                                                                         style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
-                                                                        <h5 class="modal-title"
-                                                                            id="addSpecializationLabel">
+                                                                        <h5 class="modal-title" id="addSpecializationLabel">
                                                                             Add Vitals
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
                                                                             data-bs-dismiss="modal"></button>
 
                                                                     </div>
+                                                                    <form method="POST" action="<?php echo e(route('patient-vitals.store')); ?>">
+                                                                        <?php echo csrf_field(); ?>
+                                                                            <input type="hidden" name="patient_id" value="<?php echo e($ipd->patient_id); ?>">
+                                                                        <div class="modal-body">
+                                                                            <div id="vitalFields">
+                                                                                <div class="row gy-3 vital-row mb-2">
+                                                                                    <!-- Vital Name -->
+                                                                                      
+                                                                                    <div class="col-md-4">
+                                                                                        <label for="vital_name" class="form-label">Vital Name</label>
+                                                                                        <select class="form-select" name="vital_name[]" id="vital_name">
+                                                                                            <option value="">Select</option>
+                                                                                            <?php $__currentLoopData = $vitals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $vital): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                                                <option value="<?php echo e($vital->id); ?>"><?php echo e($vital->name . ' (' . $vital->reference_range . ')'); ?> </option>
+                                                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                                                        </select>
+                                                                                    </div>
 
-                                                                    <div class="modal-body">
+                                                                                    <!-- Vital Value -->
+                                                                                    <div class="col-md-3">
+                                                                                        <label for="vital_value" class="form-label">Vital Value</label>
+                                                                                        <input type="text" name="vital_value[]" id="vital_value" class="form-control" />
+                                                                                    </div>
 
+                                                                                    <!-- Date -->
+                                                                                    <div class="col-md-4">
+                                                                                        <label for="date" class="form-label">Date</label>
+                                                                                        <input type="date" name="date[]" id="date" class="form-control" />
+                                                                                    </div>
 
-
-                                                                        <div id="vitalFields">
-                                                                            <div class="row gy-3 vital-row mb-2">
-                                                                                <!-- Vital Name -->
-                                                                                <div class="col-md-4">
-                                                                                    <label for="vital_name"
-                                                                                        class="form-label">Vital
-                                                                                        Name</label>
-                                                                                    <select class="form-select"
-                                                                                        name="vital_name[]"
-                                                                                        id="vital_name">
-                                                                                        <option value="">Select
-                                                                                        </option>
-                                                                                        <option value="1">1</option>
-                                                                                    </select>
-                                                                                </div>
-                                                                                <!-- Vital Value -->
-                                                                                <div class="col-md-3">
-                                                                                    <label for="vital_value"
-                                                                                        class="form-label">Vital
-                                                                                        Value</label>
-                                                                                    <input type="text"
-                                                                                        name="vital_value[]"
-                                                                                        id="vital_value"
-                                                                                        class="form-control" />
-                                                                                </div>
-                                                                                <!-- Date -->
-                                                                                <div class="col-md-4">
-                                                                                    <label for="date"
-                                                                                        class="form-label">Date</label>
-                                                                                    <input type="date" name="date[]"
-                                                                                        id="date"
-                                                                                        class="form-control" />
-                                                                                </div>
-                                                                                <!-- Remove -->
-                                                                                <div
-                                                                                    class="col-md-1 d-flex align-items-end">
-                                                                                    <button type="button"
-                                                                                        class="btn btn-danger remove-btn"
-                                                                                        style="display:none;">
-                                                                                        <i class="ti ti-trash"></i>
-                                                                                    </button>
+                                                                                    <!-- Remove -->
+                                                                                    <div class="col-md-1 d-flex align-items-end">
+                                                                                        <button type="button" class="btn btn-danger remove-btn" style="display:none;">
+                                                                                            <i class="ti ti-trash"></i>
+                                                                                        </button>
+                                                                                    </div>
                                                                                 </div>
                                                                             </div>
-                                                                        </div>
-                                                                        <div class="mt-2">
-                                                                            <button type="button"
-                                                                                class="btn btn-primary" id="addBtn">
-                                                                                <i class="ti ti-plus"></i> Add Operation
-                                                                            </button>
-                                                                        </div>
-                                                                    </div>
 
-                                                                    <div class="modal-footer">
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary">Save</button>
-                                                                    </div>
+                                                                            <div class="mt-2">
+                                                                                <button type="button" class="btn btn-primary" id="addBtn">
+                                                                                    <i class="ti ti-plus"></i> Add Vital
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="modal-footer">
+                                                                            <button type="submit" class="btn btn-primary">Save</button>
+                                                                        </div>
+                                                                    </form>
+
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -3488,38 +3488,59 @@ unset($__errorArgs, $__bag); ?>
                                                     <table class="table border">
                                                         <thead class="thead-light">
                                                             <tr>
-                                                                <th>OPD No</th>
-                                                                <th>Case ID</th>
-                                                                <th>Appointment Date</th>
-                                                                <th>Vital Name</th>
-                                                                <th>Vital Value</th>
-                                                                <th>Date</th>
-                                                                <th>Action</th>
+                                                                
+                                                                <th>Messure Date</th>
+                                                                 
+                                                                <?php $__currentLoopData = $vitals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $vital): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                    <th><?php echo e($vital->name); ?></th>
+                                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                                <!-- <th>Action</th> -->
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr>
+                                                              <?php $__empty_1 = true; $__currentLoopData = $vitalDetails->groupBy('patient_id'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $caseId => $caseVitals): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                                        <?php
+                                                            $firstRecord = $caseVitals->first();
+                                                        ?>
+                                                        <tr>
+
+                                                        <td>
+                                                            <?php if(!empty($firstRecord->messure_date)): ?>
+                                                                <?php echo e(\Carbon\Carbon::parse($firstRecord->messure_date)->format('d/m/Y h:i A')); ?>
+
+                                                            <?php else: ?>
+                                                                -
+                                                            <?php endif; ?>
+                                                        </td>
+
+                                                            
+                                                            <?php $__currentLoopData = $vitals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $vital): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                <?php
+                                                                    $record = $caseVitals->where('vital_id', $vital->id)->first();
+                                                                ?>
                                                                 <td>
-                                                                    <h6 class="fs-14 mb-1"><a href="#"
-                                                                            class="fw-semibold">OPDN14</a></h6>
+                                                                    <?php echo e($record->reference_range ?? '-'); ?>
+
                                                                 </td>
-                                                                <td>18</td>
-                                                                <td> 09/17/2025 12:49 PM</td>
-                                                                <td>xyz
-                                                                <td>3
-                                                                </td>
-                                                                <td>09/17/2025 12:49 PM
-                                                                </td>
-                                                                <td>
-                                                                    <div class="d-flex gap-2">
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                            <i class="ti ti-menu"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Show"></i></a>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+                                                                    <!-- <td>
+                                                                        <div class="d-flex gap-2">
+                                                                            <a href="#"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
+                                                                                data-bs-toggle="tooltip" title="Show">
+                                                                                <i class="ti ti-menu"></i>
+                                                                            </a>
+                                                                        </div>
+                                                                    </td> -->
+                                                                    </tr>
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                                                <tr>
+                                                                    <td colspan="<?php echo e(4 + $vitals->count()); ?>" class="text-center text-muted">
+                                                                        No vital records found
+                                                                    </td>
+                                                                </tr>
+                                                            <?php endif; ?>
                                                         </tbody>
                                                     </table>
                                                 </div>

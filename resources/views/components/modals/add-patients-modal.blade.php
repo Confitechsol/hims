@@ -1,3 +1,9 @@
+<style>
+    .unit-select {
+    flex: 0 0 20%; /* fixed 20% width */
+    max-width: 20%;
+}
+</style>
 
 <div class="modal fade" id="add_patient" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
@@ -10,7 +16,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="{{ route('patient-store') }}" method="POST">
+                <form id="ipdForm" action="{{ route('patient-store') }}" method="POST">
                     @csrf
                     <!-- @if ($errors->any())
                         <div class="alert alert-danger">
@@ -81,6 +87,8 @@
                                         <option value="Male" {{ old('gender') == 'Male' ? 'selected' : '' }}>Male
                                         </option>
                                         <option value="Female" {{ old('gender') == 'Female' ? 'selected' : '' }}>Female
+                                        </option>
+                                        <option value="Others" {{ old('gender') == 'Others' ? 'selected' : '' }}>Others
                                         </option>
                                     </select>
                                     @error('gender')
@@ -279,37 +287,71 @@
 
                         {{-- Height --}}
                         <div class="col-md-4">
-                            <label for="height" class="form-label">Height</label>
-                            <input type="text" id="height" name="height"
-                                class="form-control @error('height') is-invalid @enderror"
-                                value="{{ old('height') }}" />
+                            <label for="height_value" class="form-label">Height</label>
+
+                            <div class="input-group d-flex">
+                                <input type="text" id="height_value" class="form-control @error('height') is-invalid @enderror"
+                                    placeholder="Enter height" value="{{ old('height') }}">
+
+                                <select id="height_unit" class="form-select unit-select">
+                                    <option value="ft">ft</option>
+                                    <option value="cm">cm</option>
+                                </select>
+                            </div>
+
+                            <input type="hidden" name="height" id="height">
                             @error('height')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
-                            
                         </div>
+
 
                         {{-- Weight --}}
                         <div class="col-md-4">
-                            <label for="weight" class="form-label">Weight</label>
-                            <input type="text" id="weight" name="weight"
-                                class="form-control @error('weight') is-invalid @enderror"
-                                value="{{ old('weight') }}" />
+                            <label for="weight_value" class="form-label">Weight</label>
+
+                            <div class="input-group d-flex">
+                                <input type="text" id="weight_value" class="form-control @error('weight') is-invalid @enderror"
+                                    placeholder="Enter weight" value="{{ old('weight') }}">
+
+                                <select id="weight_unit" class="form-select unit-select">
+                                    <option value="kg">kg</option>
+                                    <option value="lbs">lbs</option>
+                                </select>
+                            </div>
+
+                            <input type="hidden" name="weight" id="weight">
                             @error('weight')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
 
+
                         {{-- Temperature --}}
                         <div class="col-md-4">
-                            <label for="temperature" class="form-label"> Temperature </label>
-                            <input type="text" id="temperature" name="temperature"
-                                class="form-control @error('temperature') is-invalid @enderror"
-                                value="{{ old('temperature') }}" />
+                            <label for="temperature_value" class="form-label">Temperature</label>
+
+                            <div class="input-group">
+                                <!-- Numeric input -->
+                                <input type="text" id="temperature_value" placeholder="Enter Temperature"
+                                    class="form-control @error('temperature') is-invalid @enderror"
+                                    value="{{ old('temperature') }}" />
+
+                                <!-- Unit dropdown -->
+                                <select id="temperature_unit" class="form-select unit-select">
+                                    <option value="°C">°C</option>
+                                    <option value="°F">°F</option>
+                                </select>
+                            </div>
+
+                            <!-- Hidden field that will store final value (37°C / 98.6°F) -->
+                            <input type="hidden" name="temperature" id="temperature">
+
                             @error('temperature')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
+
 
                         {{-- TPA --}}
                         <div class="col-md-4">
@@ -378,6 +420,34 @@
         </div>
     </div>
 </div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const form = document.getElementById("ipdForm");
+
+    form.addEventListener("submit", function (e) {
+
+        // HEIGHT
+        const hVal = document.getElementById("height_value")?.value ?? "";
+        const hUnit = document.getElementById("height_unit")?.value ?? "";
+        document.getElementById("height").value = (hVal && hUnit) ? (hVal + hUnit) : "";
+
+        // WEIGHT
+        const wVal = document.getElementById("weight_value")?.value ?? "";
+        const wUnit = document.getElementById("weight_unit")?.value ?? "";
+        document.getElementById("weight").value = (wVal && wUnit) ? (wVal + wUnit) : "";
+
+        // TEMPERATURE
+        const tVal = document.getElementById("temperature_value")?.value ?? "";
+        const tUnit = document.getElementById("temperature_unit")?.value ?? "";
+        document.getElementById("temperature").value = (tVal && tUnit) ? (tVal + tUnit) : "";
+
+        console.log("FORM SUBMITTED: height =", document.getElementById("height").value);
+
+    });
+});
+</script>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

@@ -1,3 +1,9 @@
+<style>
+    .unit-select {
+    flex: 0 0 20%; /* fixed 20% width */
+    max-width: 20%;
+}
+</style>
 
 <div class="modal fade" id="add_patient" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
@@ -10,7 +16,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="<?php echo e(route('patient-store')); ?>" method="POST">
+                <form id="ipdForm" action="<?php echo e(route('patient-store')); ?>" method="POST">
                     <?php echo csrf_field(); ?>
                     <!-- <?php if($errors->any()): ?>
                         <div class="alert alert-danger">
@@ -144,6 +150,8 @@ unset($__errorArgs, $__bag); ?>">
                                         <option value="Male" <?php echo e(old('gender') == 'Male' ? 'selected' : ''); ?>>Male
                                         </option>
                                         <option value="Female" <?php echo e(old('gender') == 'Female' ? 'selected' : ''); ?>>Female
+                                        </option>
+                                        <option value="Others" <?php echo e(old('gender') == 'Others' ? 'selected' : ''); ?>>Others
                                         </option>
                                     </select>
                                     <?php $__errorArgs = ['gender'];
@@ -542,9 +550,10 @@ unset($__errorArgs, $__bag); ?>
 
                         
                         <div class="col-md-4">
-                            <label for="height" class="form-label">Height</label>
-                            <input type="text" id="height" name="height"
-                                class="form-control <?php $__errorArgs = ['height'];
+                            <label for="height_value" class="form-label">Height</label>
+
+                            <div class="input-group d-flex">
+                                <input type="text" id="height_value" class="form-control <?php $__errorArgs = ['height'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -552,25 +561,34 @@ $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>"
-                                value="<?php echo e(old('height')); ?>" />
+                                    placeholder="Enter height" value="<?php echo e(old('height')); ?>">
+
+                                <select id="height_unit" class="form-select unit-select">
+                                    <option value="ft">ft</option>
+                                    <option value="cm">cm</option>
+                                </select>
+                            </div>
+
+                            <input type="hidden" name="height" id="height">
                             <?php $__errorArgs = ['height'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?>
-                                <div class="invalid-feedback"><?php echo e($message); ?></div>
+                                <div class="invalid-feedback d-block"><?php echo e($message); ?></div>
                             <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
-                            
                         </div>
+
 
                         
                         <div class="col-md-4">
-                            <label for="weight" class="form-label">Weight</label>
-                            <input type="text" id="weight" name="weight"
-                                class="form-control <?php $__errorArgs = ['weight'];
+                            <label for="weight_value" class="form-label">Weight</label>
+
+                            <div class="input-group d-flex">
+                                <input type="text" id="weight_value" class="form-control <?php $__errorArgs = ['weight'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -578,24 +596,36 @@ $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>"
-                                value="<?php echo e(old('weight')); ?>" />
+                                    placeholder="Enter weight" value="<?php echo e(old('weight')); ?>">
+
+                                <select id="weight_unit" class="form-select unit-select">
+                                    <option value="kg">kg</option>
+                                    <option value="lbs">lbs</option>
+                                </select>
+                            </div>
+
+                            <input type="hidden" name="weight" id="weight">
                             <?php $__errorArgs = ['weight'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?>
-                                <div class="invalid-feedback"><?php echo e($message); ?></div>
+                                <div class="invalid-feedback d-block"><?php echo e($message); ?></div>
                             <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
                         </div>
 
+
                         
                         <div class="col-md-4">
-                            <label for="temperature" class="form-label"> Temperature </label>
-                            <input type="text" id="temperature" name="temperature"
-                                class="form-control <?php $__errorArgs = ['temperature'];
+                            <label for="temperature_value" class="form-label">Temperature</label>
+
+                            <div class="input-group">
+                                <!-- Numeric input -->
+                                <input type="text" id="temperature_value" placeholder="Enter Temperature"
+                                    class="form-control <?php $__errorArgs = ['temperature'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -603,18 +633,30 @@ $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>"
-                                value="<?php echo e(old('temperature')); ?>" />
+                                    value="<?php echo e(old('temperature')); ?>" />
+
+                                <!-- Unit dropdown -->
+                                <select id="temperature_unit" class="form-select unit-select">
+                                    <option value="°C">°C</option>
+                                    <option value="°F">°F</option>
+                                </select>
+                            </div>
+
+                            <!-- Hidden field that will store final value (37°C / 98.6°F) -->
+                            <input type="hidden" name="temperature" id="temperature">
+
                             <?php $__errorArgs = ['temperature'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?>
-                                <div class="invalid-feedback"><?php echo e($message); ?></div>
+                                <div class="invalid-feedback d-block"><?php echo e($message); ?></div>
                             <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
                         </div>
+
 
                         
                         <div class="col-md-4">
@@ -753,6 +795,34 @@ unset($__errorArgs, $__bag); ?>
         </div>
     </div>
 </div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const form = document.getElementById("ipdForm");
+
+    form.addEventListener("submit", function (e) {
+
+        // HEIGHT
+        const hVal = document.getElementById("height_value")?.value ?? "";
+        const hUnit = document.getElementById("height_unit")?.value ?? "";
+        document.getElementById("height").value = (hVal && hUnit) ? (hVal + hUnit) : "";
+
+        // WEIGHT
+        const wVal = document.getElementById("weight_value")?.value ?? "";
+        const wUnit = document.getElementById("weight_unit")?.value ?? "";
+        document.getElementById("weight").value = (wVal && wUnit) ? (wVal + wUnit) : "";
+
+        // TEMPERATURE
+        const tVal = document.getElementById("temperature_value")?.value ?? "";
+        const tUnit = document.getElementById("temperature_unit")?.value ?? "";
+        document.getElementById("temperature").value = (tVal && tUnit) ? (tVal + tUnit) : "";
+
+        console.log("FORM SUBMITTED: height =", document.getElementById("height").value);
+
+    });
+});
+</script>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

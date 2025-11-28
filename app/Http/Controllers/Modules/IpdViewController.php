@@ -30,6 +30,9 @@ use App\Models\Prefix;
 use App\Models\Staff;
 use App\Models\Symptom;
 use App\Models\SymptomsClassification;
+use App\Models\Vital;
+use App\Models\PatientTimeline;
+use App\Models\PatientVital;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -41,7 +44,7 @@ class IpdViewController extends Controller
 {
     public function showIpd(Request $request, $id)
     {
-            $ipd             = IpdDetail::with('patient.bloodGroup', 'patient.organisation', 'doctor', 'bedDetail', 'bedGroup')->where('id', $id)->firstOrFail();
+            $ipd             = IpdDetail::with('patient.bloodGroup', 'patient.organisation', 'doctor', 'bedDetail', 'bedGroup','treatmentHistory')->where('id', $id)->firstOrFail();
             $bedShiftHistory = PatientBedHistory::with('ipd','bedGroup', 'bed')->where('is_active','yes')->where('ipd_id', $id)->firstOrFail();
             $symptomIds = array_filter(
                 explode(',', $ipd->symptoms_title),
@@ -91,8 +94,14 @@ class IpdViewController extends Controller
 
             $medDosages = MedicineDosage::all();
             $operationCategories = OperationCategory::all();
-            $operations = Operation::all(); // Or grouped by category
+            $operations = Operation::all();
+            
 
+            $vitals = Vital::all();
+            $patient_id = $ipd->patient_id;
+
+            $PatientTimelines = PatientTimeline::with('patient')->where('patient_id', $patient_id)->get();
+            $vitalDetails = PatientVital::with('vital')->where('patient_id', $patient_id)->get();
 
         return view('admin.ipd.ipd_view', compact(
             'ipd',
@@ -113,6 +122,9 @@ class IpdViewController extends Controller
             'medicineCategories',
             'operationDetail',
             'medicinesByCategory',
+            'PatientTimelines',
+            'vitalDetails',
+            'vitals',
             'dosages'
         ));
     }

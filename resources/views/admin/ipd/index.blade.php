@@ -43,6 +43,18 @@
                 @if (session('error'))
                     <div class="alert alert-danger alert-dismissible fade show">{{ session('error') }}</div>
                 @endif
+                {{-- Validation Errors --}}
+@if ($errors->any())
+    <div class="alert alert-danger alert-dismissible fade show">
+        <strong>There were some problems with your input:</strong>
+        <ul class="mt-2 mb-0">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card">

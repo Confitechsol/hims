@@ -74,7 +74,7 @@ class IpdController extends Controller
         ]);
 
         if ($validator->fails()) {
-             dd($validator->errors()->all());
+            // dd($validator->errors()->all());
             return back()
                 ->withErrors($validator)
                 ->withInput();

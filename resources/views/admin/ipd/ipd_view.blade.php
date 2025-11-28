@@ -2747,6 +2747,7 @@
                     </div>
                 </div>
             </div>
+            
             <div class="tab-pane" id="timeline">
                 <!-- row start -->
                 <div class="row">
@@ -2788,65 +2789,81 @@
                                                                     <div class="modal-header"
                                                                         style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
-                                                                        <h5 class="modal-title"
-                                                                            id="addSpecializationLabel">
+                                                                        <h5 class="modal-title" id="addSpecializationLabel">
                                                                             Add Timeline
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
                                                                             data-bs-dismiss="modal"></button>
 
                                                                     </div>
+                                                                    <form method="POST" action="{{ isset($timeline) ? route('patient-timeline.update', $timeline->id) : route('patient-timeline.store') }}" enctype="multipart/form-data">
+                                                                            @csrf
+                                                                            @if(isset($timeline))
+                                                                                @method('PUT')
+                                                                            @endif
 
-                                                                    <div class="modal-body">
+                                                                            <input type="hidden" name="patient_id" value="{{ $ipd->patient_id ?? '' }}">
 
-                                                                        <div class="row gy-3">
+                                                                            <div class="modal-body">
+                                                                                <div class="row gy-3">
+                                                                                    <!-- Title -->
+                                                                                    <div class="col-md-12">
+                                                                                        <label for="title" class="form-label">
+                                                                                            Title <span class="text-danger">*</span>
+                                                                                        </label>
+                                                                                        <input type="text" name="title" id="title" class="form-control"
+                                                                                            value="{{ old('title', $timeline->title ?? '') }}" required>
+                                                                                    </div>
 
-                                                                            <div class="col-md-12">
-                                                                                <label for="title"
-                                                                                    class="form-label">Title
-                                                                                    <span class="text-danger">*</span>
-                                                                                </label>
-                                                                                <input type="text" name="title"
-                                                                                    id="title" class="form-control">
-                                                                            </div>
-                                                                            <div class="col-md-12">
-                                                                                <label for="date"
-                                                                                    class="form-label">Date
-                                                                                    <span class="text-danger">*</span>
-                                                                                </label>
-                                                                                <input type="date" name="date"
-                                                                                    id="date" class="form-control">
-                                                                            </div>
-                                                                            <div class="col-md-12">
-                                                                                <label for="description"
-                                                                                    class="form-label">Description
-                                                                                </label>
-                                                                                <textarea name="description" id="description" class="form-control"></textarea>
-                                                                            </div>
-                                                                            <div class="col-md-12">
-                                                                                <label for="attch_doc"
-                                                                                    class="form-label">Attach Document
-                                                                                </label>
-                                                                                <input type="file" name="attch_doc"
-                                                                                    id="date" class="form-control">
-                                                                            </div>
-                                                                            <div class="col-md-12">
-                                                                                <label for="visible_person"
-                                                                                    class="form-check-label">Visible to
-                                                                                    this
-                                                                                    person
-                                                                                </label>
-                                                                                <input type="checkbox"
-                                                                                    name="visible_person" id="date"
-                                                                                    class="form-check-input">
-                                                                            </div>
-                                                                        </div>
+                                                                                    <!-- Date -->
+                                                                                    <div class="col-md-12">
+                                                                                        <label for="date" class="form-label">
+                                                                                            Date <span class="text-danger">*</span>
+                                                                                        </label>
+                                                                                        <input type="date" name="date" id="date" class="form-control"
+                                                                                            value="{{ old('date', isset($timeline->date) ? \Carbon\Carbon::parse($timeline->date)->format('Y-m-d') : '') }}" required>
+                                                                                    </div>
 
-                                                                    </div>
-                                                                    <div class="modal-footer">
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary">Save</button>
-                                                                    </div>
+                                                                                    <!-- Description -->
+                                                                                    <div class="col-md-12">
+                                                                                        <label for="description" class="form-label">
+                                                                                            Description
+                                                                                        </label>
+                                                                                        <textarea name="description" id="description" class="form-control" rows="3">{{ old('description', $timeline->description ?? '') }}</textarea>
+                                                                                    </div>
+
+                                                                                    <!-- Attach Document -->
+                                                                                    <div class="col-md-12">
+                                                                                        <label for="attch_doc" class="form-label">
+                                                                                            Attach Document
+                                                                                        </label>
+                                                                                        <input type="file" name="attch_doc" id="attch_doc" class="form-control">
+                                                                                        @if(isset($timeline) && $timeline->attch_doc)
+                                                                                            <small class="text-muted d-block mt-1">
+                                                                                                Current File:
+                                                                                                <a href="{{ asset('storage/timeline_docs/' . $timeline->attch_doc) }}" target="_blank">
+                                                                                                    View Document
+                                                                                                </a>
+                                                                                            </small>
+                                                                                        @endif
+                                                                                    </div>
+
+                                                                                    <!-- Visible to Person -->
+                                                                                    <div class="col-md-12 form-check">
+                                                                                        <input type="checkbox" name="visible_person" id="visible_person" class="form-check-input"
+                                                                                            {{ old('visible_person', $timeline->visible_person ?? false) ? 'checked' : '' }}>
+                                                                                        <label for="visible_person" class="form-check-label">Visible to this person</label>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div class="modal-footer">
+                                                                                <button type="submit" class="btn btn-primary">
+                                                                                    {{ isset($timeline) ? 'Update' : 'Save' }}
+                                                                                </button>
+                                                                            </div>
+                                                                        </form>
+
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -2857,36 +2874,48 @@
                                                     <table class="table border">
                                                         <thead class="thead-light">
                                                             <tr>
-                                                                <th>OPD No</th>
-                                                                <th>Case ID</th>
-                                                                <th>Admission Date</th>
+                                                                
+                                                                <th>Patient Name</th>
                                                                 <th>Title</th>
-                                                                <th>Date</th>
+                                                                <th>Description</th>
+                                                                <th>Timeline Date</th>
                                                                 <th>Action</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
+                                                             @forelse($PatientTimelines as $timeline)
                                                             <tr>
                                                                 <td>
-                                                                    <h6 class="fs-14 mb-1"><a href="#"
-                                                                            class="fw-semibold">OPDN14</a></h6>
+                                                                    <h6 class="fs-14 mb-1">
+                                                                        <a href="#" class="fw-semibold">{{ $timeline->patient->patient_name ?? '-' }}</a>
+                                                                    </h6>
                                                                 </td>
-                                                                <td>18</td>
-                                                                <td> 09/17/2025 12:49 PM</td>
-                                                                <td>xyz
-                                                                </td>
-                                                                <td>09/17/2025 12:49 PM
+                                                                
+                                                                
+                                                                <td>{{ $timeline->title ?? '-' }}</td>
+                                                                <td>{{ $timeline->description ?? '-' }}</td>
+                                                                <td>
+                                                                    @if(!empty($timeline->timeline_date))
+                                                                        {{ \Carbon\Carbon::parse($timeline->timeline_date)->format('d/m/Y h:i A') }}
+                                                                    @else
+                                                                        -
+                                                                    @endif
                                                                 </td>
                                                                 <td>
                                                                     <div class="d-flex gap-2">
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                            <i class="ti ti-menu"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Show"></i></a>
+                                                                        <a href="#"
+                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
+                                                                        data-bs-toggle="tooltip" title="Show">
+                                                                            <i class="ti ti-menu"></i>
+                                                                        </a>
                                                                     </div>
                                                                 </td>
                                                             </tr>
+                                                            @empty
+                                                                <tr>
+                                                                    <td colspan="6" class="text-center text-muted">No timeline records found</td>
+                                                                </tr>
+                                                            @endforelse
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -2907,8 +2936,7 @@
                         <div class="card shadow-sm flex-fill w-100">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Treatment
-                                    History
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Treatment History
                                 </h5>
                             </div>
                             <div class="card-body">
@@ -2932,36 +2960,18 @@
                                                     <table class="table border">
                                                         <thead class="thead-light">
                                                             <tr>
-                                                                <th>OPD No</th>
-                                                                <th>Case ID</th>
-                                                                <th>Appointment Date</th>
-                                                                <th>Symptoms</th>
-                                                                <th>Consultant</th>
-                                                                <th>Action</th>
+                                                                <th>IPD No</th>
+                                                                <th>Patient ID</th>
+                                                                <th>Consultant Doctor</th>
+                                                                <th>Bed Assigned</th>
+                                                                <!-- <th>Action</th> -->
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr>
-                                                                <td>
-                                                                    <h6 class="fs-14 mb-1"><a href="#"
-                                                                            class="fw-semibold">OPDN14</a></h6>
-                                                                </td>
-                                                                <td>18</td>
-                                                                <td> 09/17/2025 12:49 PM</td>
-                                                                <td>Fever
-                                                                </td>
-                                                                <td>Anjali Rao (D011)
-                                                                </td>
-                                                                <td>
-                                                                    <div class="d-flex gap-2">
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                            <i class="ti ti-menu"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Show"></i></a>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
+                                                        <td>{{$ipd->ipd_no}}</td>
+                                                        <td>{{$ipd->patient_id}}</td>
+                                                        <td>{{$ipd->doctor->name}} {{$ipd->doctor->surname}}</td>
+                                                         <td>{{$ipd->bedGroup->name}}-{{$ipd->bedDetail->name}}</td>   
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -3292,8 +3302,7 @@
                                     <div class="col-lg-12">
                                         <div class="card">
                                             <div class="card-body">
-                                                <div
-                                                    class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
+                                                <div class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
                                                     <div class="input-icon-start position-relative me-2">
                                                         <span class="input-icon-addon">
                                                             <i class="ti ti-search"></i>
@@ -3312,81 +3321,70 @@
                                                         <!-- First Modal -->
                                                         <div class="modal fade" id="add_vital" tabindex="-1"
                                                             aria-hidden="true">
-                                                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                            <div class="modal-dialog modal-dialog-centered">
                                                                 <div class="modal-content">
 
                                                                     <div class="modal-header"
                                                                         style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
-                                                                        <h5 class="modal-title"
-                                                                            id="addSpecializationLabel">
+                                                                        <h5 class="modal-title" id="addSpecializationLabel">
                                                                             Add Vitals
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
                                                                             data-bs-dismiss="modal"></button>
 
                                                                     </div>
+                                                                    <form method="POST" action="{{ route('patient-vitals.store') }}">
+                                                                        @csrf
+                                                                            <input type="hidden" name="patient_id" value="{{ $ipd->patient_id }}">
+                                                                        <div class="modal-body">
+                                                                            <div id="vitalFields">
+                                                                                <div class="row gy-3 vital-row mb-2">
+                                                                                    <!-- Vital Name -->
+                                                                                      
+                                                                                    <div class="col-md-4">
+                                                                                        <label for="vital_name" class="form-label">Vital Name</label>
+                                                                                        <select class="form-select" name="vital_name[]" id="vital_name">
+                                                                                            <option value="">Select</option>
+                                                                                            @foreach($vitals as $vital)
+                                                                                                <option value="{{ $vital->id }}">{{ $vital->name . ' (' . $vital->reference_range . ')' }} </option>
+                                                                                            @endforeach
+                                                                                        </select>
+                                                                                    </div>
 
-                                                                    <div class="modal-body">
+                                                                                    <!-- Vital Value -->
+                                                                                    <div class="col-md-3">
+                                                                                        <label for="vital_value" class="form-label">Vital Value</label>
+                                                                                        <input type="text" name="vital_value[]" id="vital_value" class="form-control" />
+                                                                                    </div>
 
+                                                                                    <!-- Date -->
+                                                                                    <div class="col-md-4">
+                                                                                        <label for="date" class="form-label">Date</label>
+                                                                                        <input type="date" name="date[]" id="date" class="form-control" />
+                                                                                    </div>
 
-
-                                                                        <div id="vitalFields">
-                                                                            <div class="row gy-3 vital-row mb-2">
-                                                                                <!-- Vital Name -->
-                                                                                <div class="col-md-4">
-                                                                                    <label for="vital_name"
-                                                                                        class="form-label">Vital
-                                                                                        Name</label>
-                                                                                    <select class="form-select"
-                                                                                        name="vital_name[]"
-                                                                                        id="vital_name">
-                                                                                        <option value="">Select
-                                                                                        </option>
-                                                                                        <option value="1">1</option>
-                                                                                    </select>
-                                                                                </div>
-                                                                                <!-- Vital Value -->
-                                                                                <div class="col-md-3">
-                                                                                    <label for="vital_value"
-                                                                                        class="form-label">Vital
-                                                                                        Value</label>
-                                                                                    <input type="text"
-                                                                                        name="vital_value[]"
-                                                                                        id="vital_value"
-                                                                                        class="form-control" />
-                                                                                </div>
-                                                                                <!-- Date -->
-                                                                                <div class="col-md-4">
-                                                                                    <label for="date"
-                                                                                        class="form-label">Date</label>
-                                                                                    <input type="date" name="date[]"
-                                                                                        id="date"
-                                                                                        class="form-control" />
-                                                                                </div>
-                                                                                <!-- Remove -->
-                                                                                <div
-                                                                                    class="col-md-1 d-flex align-items-end">
-                                                                                    <button type="button"
-                                                                                        class="btn btn-danger remove-btn"
-                                                                                        style="display:none;">
-                                                                                        <i class="ti ti-trash"></i>
-                                                                                    </button>
+                                                                                    <!-- Remove -->
+                                                                                    <div class="col-md-1 d-flex align-items-end">
+                                                                                        <button type="button" class="btn btn-danger remove-btn" style="display:none;">
+                                                                                            <i class="ti ti-trash"></i>
+                                                                                        </button>
+                                                                                    </div>
                                                                                 </div>
                                                                             </div>
-                                                                        </div>
-                                                                        <div class="mt-2">
-                                                                            <button type="button"
-                                                                                class="btn btn-primary" id="addBtn">
-                                                                                <i class="ti ti-plus"></i> Add Operation
-                                                                            </button>
-                                                                        </div>
-                                                                    </div>
 
-                                                                    <div class="modal-footer">
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary">Save</button>
-                                                                    </div>
+                                                                            <div class="mt-2">
+                                                                                <button type="button" class="btn btn-primary" id="addBtn">
+                                                                                    <i class="ti ti-plus"></i> Add Vital
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="modal-footer">
+                                                                            <button type="submit" class="btn btn-primary">Save</button>
+                                                                        </div>
+                                                                    </form>
+
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -3397,38 +3395,57 @@
                                                     <table class="table border">
                                                         <thead class="thead-light">
                                                             <tr>
-                                                                <th>OPD No</th>
-                                                                <th>Case ID</th>
-                                                                <th>Appointment Date</th>
-                                                                <th>Vital Name</th>
-                                                                <th>Vital Value</th>
-                                                                <th>Date</th>
-                                                                <th>Action</th>
+                                                                
+                                                                <th>Messure Date</th>
+                                                                 {{-- Dynamically generate vital headers --}}
+                                                                @foreach($vitals as $vital)
+                                                                    <th>{{ $vital->name }}</th>
+                                                                @endforeach
+                                                                <!-- <th>Action</th> -->
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr>
+                                                              @forelse($vitalDetails->groupBy('patient_id') as $caseId => $caseVitals)
+                                                        @php
+                                                            $firstRecord = $caseVitals->first();
+                                                        @endphp
+                                                        <tr>
+
+                                                        <td>
+                                                            @if(!empty($firstRecord->messure_date))
+                                                                {{ \Carbon\Carbon::parse($firstRecord->messure_date)->format('d/m/Y h:i A') }}
+                                                            @else
+                                                                -
+                                                            @endif
+                                                        </td>
+
+                                                            {{-- Loop through all vitals dynamically --}}
+                                                            @foreach($vitals as $vital)
+                                                                @php
+                                                                    $record = $caseVitals->where('vital_id', $vital->id)->first();
+                                                                @endphp
                                                                 <td>
-                                                                    <h6 class="fs-14 mb-1"><a href="#"
-                                                                            class="fw-semibold">OPDN14</a></h6>
+                                                                    {{ $record->reference_range ?? '-' }}
                                                                 </td>
-                                                                <td>18</td>
-                                                                <td> 09/17/2025 12:49 PM</td>
-                                                                <td>xyz
-                                                                <td>3
-                                                                </td>
-                                                                <td>09/17/2025 12:49 PM
-                                                                </td>
-                                                                <td>
-                                                                    <div class="d-flex gap-2">
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                            <i class="ti ti-menu"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Show"></i></a>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
+                                                            @endforeach
+
+                                                                    <!-- <td>
+                                                                        <div class="d-flex gap-2">
+                                                                            <a href="#"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
+                                                                                data-bs-toggle="tooltip" title="Show">
+                                                                                <i class="ti ti-menu"></i>
+                                                                            </a>
+                                                                        </div>
+                                                                    </td> -->
+                                                                    </tr>
+                                                            @empty
+                                                                <tr>
+                                                                    <td colspan="{{ 4 + $vitals->count() }}" class="text-center text-muted">
+                                                                        No vital records found
+                                                                    </td>
+                                                                </tr>
+                                                            @endforelse
                                                         </tbody>
                                                     </table>
                                                 </div>
