@@ -3251,8 +3251,12 @@
                                                 <div class="col-md-6">
                                                     <span class="text-primary"><b>Assigned Date : </b></span>
                                                     <span>
-                                                        {{ $bedShiftHistory->from_date ? \Carbon\Carbon::parse($bedShiftHistory->from_date)->format('jS F Y h:i:s a') : '-' }}
-                                                    </span>
+                                                        @if($bedShiftHistory)
+                                                            {{ $bedShiftHistory->from_date ? \Carbon\Carbon::parse($bedShiftHistory->from_date)->format('jS F Y h:i:s a') : '-' }}
+                                                        @else
+                                                            <span class="text-danger">No active bed history</span>
+                                                        @endif
+                                                        </span>
                                                 </div>
                                                 
                                                 <div class="col-md-4">

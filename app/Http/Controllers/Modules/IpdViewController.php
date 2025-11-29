@@ -45,7 +45,7 @@ class IpdViewController extends Controller
     public function showIpd(Request $request, $id)
     {
             $ipd             = IpdDetail::with('patient.bloodGroup', 'patient.organisation', 'doctor', 'bedDetail', 'bedGroup','treatmentHistory')->where('id', $id)->firstOrFail();
-            $bedShiftHistory = PatientBedHistory::with('ipd','bedGroup', 'bed')->where('is_active','yes')->where('ipd_id', $id)->firstOrFail();
+            $bedShiftHistory = PatientBedHistory::with('ipd','bedGroup', 'bed')->where('is_active','yes')->where('ipd_id', $id)->first();
             $symptomIds = array_filter(
                 explode(',', $ipd->symptoms_title),
                 fn($id) => $id !== null && trim($id) !== ''

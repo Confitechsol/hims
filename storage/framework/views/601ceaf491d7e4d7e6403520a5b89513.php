@@ -3050,7 +3050,7 @@ unset($__errorArgs, $__bag); ?>
                                                                 <th>Patient ID</th>
                                                                 <th>Consultant Doctor</th>
                                                                 <th>Bed Assigned</th>
-                                                                <th>Action</th>
+                                                                <!-- <th>Action</th> -->
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -3343,9 +3343,13 @@ unset($__errorArgs, $__bag); ?>
                                                 <div class="col-md-6">
                                                     <span class="text-primary"><b>Assigned Date : </b></span>
                                                     <span>
-                                                        <?php echo e($bedShiftHistory->from_date ? \Carbon\Carbon::parse($bedShiftHistory->from_date)->format('jS F Y h:i:s a') : '-'); ?>
+                                                        <?php if($bedShiftHistory): ?>
+                                                            <?php echo e($bedShiftHistory->from_date ? \Carbon\Carbon::parse($bedShiftHistory->from_date)->format('jS F Y h:i:s a') : '-'); ?>
 
-                                                    </span>
+                                                        <?php else: ?>
+                                                            <span class="text-danger">No active bed history</span>
+                                                        <?php endif; ?>
+                                                        </span>
                                                 </div>
                                                 
                                                 <div class="col-md-4">
