@@ -1447,16 +1447,16 @@
 
                                                                             <input type="hidden" name="patient_id" value="<?php echo e($appointment->patient_id ?? ''); ?>">
 
-                                                                            <div class="modal-body">
-                                                                                <div class="row gy-3">
-                                                                                    <!-- Title -->
-                                                                                    <div class="col-md-12">
-                                                                                        <label for="title" class="form-label">
-                                                                                            Title <span class="text-danger">*</span>
-                                                                                        </label>
-                                                                                        <input type="text" name="title" id="title" class="form-control"
-                                                                                            value="<?php echo e(old('title', $timeline->title ?? '')); ?>" required>
-                                                                                    </div>
+    <div class="modal-body">
+        <div class="row p-4 mx-1 gy-3">
+            <!-- Title -->
+            <div class="col-md-12">
+                <label for="title" class="form-label">
+                    Title <span class="text-danger">*</span>
+                </label>
+                <input type="text" name="title" id="title" class="form-control"
+                    value="<?php echo e(old('title', $timeline->title ?? '')); ?>" required>
+            </div>
 
                                                                                     <!-- Date -->
                                                                                     <div class="col-md-12">
@@ -1624,12 +1624,12 @@
                                                                     <form method="POST" action="<?php echo e(route('patient-vitals.store')); ?>">
                                                                         <?php echo csrf_field(); ?>
                                                                             <input type="hidden" name="patient_id" value="<?php echo e($appointment->patient_id); ?>">
-                                                                        <div class="modal-body">
+                                                                        <div class="modal-body p-4 mx-1">
                                                                             <div id="vitalFields">
                                                                                 <div class="row gy-3 vital-row mb-2">
                                                                                     <!-- Vital Name -->
                                                                                       
-                                                                                    <div class="col-md-4">
+                                                                                    <div class="col-md-3">
                                                                                         <label for="vital_name" class="form-label">Vital Name</label>
                                                                                         <select class="form-select" name="vital_name[]" id="vital_name">
                                                                                             <option value="">Select</option>
@@ -1810,7 +1810,7 @@
             const newRow = document.createElement('div');
             newRow.classList.add('row', 'gy-3', 'vital-row', 'mb-2');
             newRow.innerHTML = `
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label">Vital Name</label>
                     <select class="form-select" name="vital_name[]">
                         <option value="">Select</option>

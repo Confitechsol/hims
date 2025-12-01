@@ -106,6 +106,7 @@ class IpdController extends Controller
             $ipd        = new IpdDetail();
             $ipdPatient = new IpdPatient();
             $bedDetail  = Bed::where('id', $request->bed_number)->firstOrFail();
+            $bedHistory = new PatientBedHistory();
             // dd($opd);
             $ipd->hospital_id = $user->hospital_id;
             // Patient Details
@@ -141,7 +142,18 @@ class IpdController extends Controller
             $ipdPatient->ipd_id     = $ipd->id ?? null;
             $ipdPatient->doctor_id  = $request->doctor_id ?? null;
 
+            
+
             $ipdPatient->save();
+
+            //patienthistory
+            $bedHistory->bed_group_id = $request->bed_group;
+            $bedHistory->ipd_id       = $ipd->id ?? null;
+            $bedHistory->bed_group_id = $request->bed_group;
+            $bedHistory->bed_id = $request->bed_number;
+            $bedHistory->from_date = $request->admission_date;
+            $bedHistory->is_active = 'yes';
+            $bedHistory->save();
 
             $bedDetail->is_active = 'no';
             $bedDetail->save();
@@ -231,6 +243,10 @@ class IpdController extends Controller
             if ($request->bed_number != $allotedBed) {
                 $newBedDetail            = Bed::where('id', $request->bed_number)->firstOrFail();
                 $allotedBedDetail        = Bed::where('id', $allotedBed)->firstOrFail();
+                $bedhistory = PatientBedHistory::where('ipd_id',$id)->firstOrFail();
+                $bedhistory->bed_group = $request->bed_group_id;
+                $bedhistory->bed_id = $request->bed_number;
+                $bedhistory->save();
                 $newBedDetail->is_active = 'no';
                 $newBedDetail->save();
                 $allotedBedDetail->is_active = 'yes';
