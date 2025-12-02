@@ -200,8 +200,13 @@
     </style>
     <style>
         /* Global override: ensure Select2 dropdown search is visible */
-        .select2-container .select2-search--dropdown { display: block !important; }
-        .select2-container .select2-search__field { display: block !important; }
+        .select2-container .select2-search--dropdown {
+            display: block !important;
+        }
+
+        .select2-container .select2-search__field {
+            display: block !important;
+        }
     </style>
 </head>
 
@@ -490,7 +495,8 @@
                     <div class="dropdown profile-dropdown d-flex align-items-center justify-content-center">
                         <a href="javascript:void(0);"
                             class="topbar-link dropdown-toggle drop-arrow-none position-relative"
-                            data-bs-toggle="dropdown" data-bs-offset="0,22" aria-haspopup="false" aria-expanded="false">
+                            data-bs-toggle="dropdown" data-bs-offset="0,22" aria-haspopup="false"
+                            aria-expanded="false">
                             <img src="assets/img/users/user-01.jpg" width="32" class="rounded-circle d-flex"
                                 alt="user-image">
                             <span class="online text-success"><i
@@ -499,8 +505,8 @@
                         <div class="dropdown-menu dropdown-menu-end dropdown-menu-md p-2">
 
                             <div class="d-flex align-items-center bg-light rounded-3 p-2 mb-2">
-                                <img src="assets/img/users/user-01.jpg" class="rounded-circle" width="42" height="42"
-                                    alt>
+                                <img src="assets/img/users/user-01.jpg" class="rounded-circle" width="42"
+                                    height="42" alt>
                                 <div class="ms-2">
                                     <p class="fw-medium text-dark mb-0">Jimmy
                                         Anderson</p>
@@ -584,7 +590,8 @@
             <div class="footer text-center bg-white p-2 border-top">
                 <button id="chatbotButton" class="chatbot-button" onclick="toggleChatbot()"></button>
                 <div id="chatbotWrapper" class="chatbot-iframe-wrapper">
-                    <iframe src="https://hospital-management-chatbot-eta.vercel.app/" allow="clipboard-write"
+                    <iframe src="https://hims-chatbot.vercel.app/" allow="microphone; clipboard-write"
+                        sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups"
                         title="Confitech Chatbot"></iframe>
                 </div>
                 <p class="text-dark mb-0">2025 &copy; <a href="javascript:void(0);"
@@ -602,70 +609,69 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <!-- Print.js for printing functionality -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/print-js/1.6.0/print.min.js"></script>
-    @unless(request()->is('beds','bed-status'))
+    @unless (request()->is('beds', 'bed-status'))
         <script src="{{ asset('assets/js/custom.js') }}"></script>
     @endunless
-   <!-- JavaScript -->
-<script>
-    function toggleChatbot() {
-        var chatbot = document.getElementById('chatbotWrapper');
-        var button = document.getElementById('chatbotButton');
+    <!-- JavaScript -->
+    <script>
+        function toggleChatbot() {
+            var chatbot = document.getElementById('chatbotWrapper');
+            var button = document.getElementById('chatbotButton');
 
-        chatbot.classList.toggle('active');
-        button.classList.toggle('active');
-    }
+            chatbot.classList.toggle('active');
+            button.classList.toggle('active');
+        }
 
-    // Global SweetAlert Delete Confirmation Function
-    function confirmDelete(formId, title = 'Are you sure?', text = 'You won\'t be able to revert this!') {
-        Swal.fire({
-            title: title,
-            text: text,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#750096',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'Cancel',
-            buttonsStyling: true,
-            reverseButtons: true,
-            customClass: {
-                popup: 'swal2-popup-custom'
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Submit the form
-                document.getElementById(formId).submit();
-            }
-        });
-        return false; // Prevent default action
-    }
+        // Global SweetAlert Delete Confirmation Function
+        function confirmDelete(formId, title = 'Are you sure?', text = 'You won\'t be able to revert this!') {
+            Swal.fire({
+                title: title,
+                text: text,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#750096',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel',
+                buttonsStyling: true,
+                reverseButtons: true,
+                customClass: {
+                    popup: 'swal2-popup-custom'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Submit the form
+                    document.getElementById(formId).submit();
+                }
+            });
+            return false; // Prevent default action
+        }
 
-    // SweetAlert for form onsubmit (returns promise-based confirmation)
-    function confirmDeleteForm(event, title = 'Are you sure?', text = 'You won\'t be able to revert this!') {
-        event.preventDefault(); // Stop form submission
-        
-        Swal.fire({
-            title: title,
-            text: text,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#750096',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'Cancel',
-            buttonsStyling: true,
-            reverseButtons: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Submit the form
-                event.target.submit();
-            }
-        });
-        
-        return false;
-    }
+        // SweetAlert for form onsubmit (returns promise-based confirmation)
+        function confirmDeleteForm(event, title = 'Are you sure?', text = 'You won\'t be able to revert this!') {
+            event.preventDefault(); // Stop form submission
 
-</script>
+            Swal.fire({
+                title: title,
+                text: text,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#750096',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel',
+                buttonsStyling: true,
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Submit the form
+                    event.target.submit();
+                }
+            });
+
+            return false;
+        }
+    </script>
     <!-- Resilient global Select2 initializer: waits for Select2 then initializes all selects -->
     <script>
         (function() {
@@ -682,7 +688,7 @@
 
                     //skip which are inside edit modal
                     if ($el.closest('#edit_modal').length > 0) return;
-                
+
                     var dp = $el.closest('.modal').find('.modal-content').first();
                     if (!dp || dp.length === 0) dp = $(document.body);
                     try {
@@ -702,7 +708,7 @@
                 });
 
                 // Initialize selects that appear inside modals when they open
-                $('.modal').off('shown.bs.modal.select2init').on('shown.bs.modal.select2init', function () {
+                $('.modal').off('shown.bs.modal.select2init').on('shown.bs.modal.select2init', function() {
                     var $modal = $(this);
                     if ($modal.attr('id') === 'edit_modal') return;
                     $modal.find('select.form-select').each(function() {
@@ -722,4 +728,5 @@
         })();
     </script>
 </body>
+
 </html>
