@@ -668,7 +668,7 @@ Route::prefix('certificate')->group(function () {
         return view('admin.certificate.staff_id');
     })->name('staff_id');
 });
-Route::prefix('doctors')->group(function () {
+Route::prefix('doctor-details')->group(function () {
     
     Route::get('/', [DoctorController::class, 'index'])->name('doctors.index');
     Route::get('/create', [DoctorController::class, 'create'])->name('createDoctor');

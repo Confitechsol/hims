@@ -394,6 +394,11 @@
                                     <i class="ti ti-users-group"></i><span>Staffs</span>
                                 </a>
                             </li>
+                            <li>
+                                <a href="{{ route('doctors.index') }}">
+                                    <i class="ti ti-users-group"></i><span>Doctors</span>
+                                </a>
+                            </li>
                             <!-- <li>
                                 <a href="hrm-departments.html">
                                     <i class="ti ti-building-bank"></i><span>Departments</span>
