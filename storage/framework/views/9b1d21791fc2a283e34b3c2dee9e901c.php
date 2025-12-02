@@ -39,7 +39,7 @@
                                             </div>
                                             <!-- Modal -->
 
-                                            
+                                           
 
 
                                             <div class="text-end d-flex">
@@ -55,7 +55,7 @@
                                         </div>
 
                                     </div>
-                                    <form action="<?php echo e(route('Staffs.bulkDelete')); ?>" method="POST" id="bulk-delete-form">
+                                    <form action="<?php echo e(route('staffs.bulkDelete')); ?>" method="POST" id="bulk-delete-form">
                                         <?php echo csrf_field(); ?>
                                         <?php echo method_field('DELETE'); ?> <!-- Laravel RESTful delete -->
                                         <div class="text-end mb-2">
@@ -90,7 +90,7 @@
                                                 <tbody>
                                                     <?php $__currentLoopData = $staffs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $staff): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                         <tr>
-                                                            <td><input type="checkbox" name="selected_Staffs[]"
+                                                            <td><input type="checkbox" name="selected_staffs[]"
                                                                     value="<?php echo e($staff->id); ?>" class="select_item"></td>
                                                             <td><?php echo e($staff->name); ?> <?php echo e($staff->surname); ?></td>
                                                             <td><?php echo e($staff->employee_id); ?></td>
@@ -100,15 +100,13 @@
                                                             <td><?php echo e($staff->is_active == '1' ? 'Yes' : 'No'); ?></td>
                                                             <td>
                                                                 <div class="d-flex">
-                                                                    <a href="javascript: void(0);"
-                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                                        <i class="ti ti-menu" data-bs-toggle="tooltip"
-                                                                            title="Assign Permission"></i></a>
-                                                                    <a href="javascript: void(0);"
-                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                        <i class="ti ti-dots-vertical"
-                                                                            data-bs-toggle="tooltip"
-                                                                            title="Assign Permission"></i></a>
+                                                                    <a href="<?php echo e(route('staff.edit', $staff->id)); ?>" 
+                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                                        >
+                                                                        <i class="ti ti-pencil"></i>
+                                                                    </a>
+
+                                                                    
                                                                 </div>
                                                             </td>
                                                         </tr>

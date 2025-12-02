@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Bed;
 use App\Models\BedGroup;
 use App\Models\BedType;
-
+use Illuminate\Support\Facades\Auth;
 
 class BedController extends Controller
 {

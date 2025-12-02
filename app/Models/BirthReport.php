@@ -11,6 +11,7 @@ class BirthReport extends Model
     use HasFactory;
 
     protected $table = 'birth_report';
+    public $timestamps = false; 
 
     protected $fillable = [
         'hospital_id',
@@ -30,6 +31,8 @@ class BirthReport extends Model
         'document',
         'address',
         'is_active',
+        'mother_name',
+        'icd_code',
     ];
 
     protected $casts = [

@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BedGroup;
 use App\Models\Floor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BedGroupController extends Controller
 {

@@ -3,10 +3,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Patient extends Model
 {
     use HasFactory;
+
+    use SoftDeletes;
 
     protected $table = 'patients';
 
@@ -24,6 +27,9 @@ class Patient extends Model
         'as_of_date',
         'image',
         'mobileno',
+        'height',
+        'weight',
+        'temperature',
         'email',
         'gender',
         'marital_status',
@@ -31,6 +37,7 @@ class Patient extends Model
         'blood_bank_product_id',
         'address',
         'guardian_name',
+        'guardian_phone',
         'patient_type',
         'identification_number',
         'known_allergies',
@@ -47,6 +54,8 @@ class Patient extends Model
         'created_at',
         'tpa_code',
         'tpa_validity',
+        'languages_speak',
+        'newspaper_preference',
     ];
 
     protected $casts = [
