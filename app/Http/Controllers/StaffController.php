@@ -185,130 +185,105 @@ class StaffController extends Controller
         $bloodgroups = BloodBankProduct::all(); 
         return view('admin.staff.importStaff', compact('roles', 'designations', 'departments', 'specialists','bloodgroups'));
     }
-    public function exportStaffExcel()
-    {
-        // Fetch departments dynamically
-        $departments = Department::pluck('department_name')->toArray();
-        $designations = StaffDesignation::pluck('designation')->toArray();
-        $specialists = Specialist::pluck('specialist_name')->toArray(); 
-        $bloodgroups = BloodBankProduct::where('is_blood_group', 1)
-                    ->pluck('name')
-                    ->toArray();
-        $roles = Role::pluck('name')->toArray();
+   public function exportStaffExcel()
+{
+    $spreadsheet = new Spreadsheet();
 
+    // =========================
+    // Sheet1: Staffs Template
+    // =========================
+    $sheet = $spreadsheet->getActiveSheet();
+    $sheet->setTitle('Staffs');
 
-        // Dropdown values
-        $departmentList = '"' . implode(",", $departments) . '"';
-        $designationList = '"' . implode(",", $designations) . '"';
-        $specialistsList = '"' . implode(",", $specialists) . '"';
-        $maritalList = '"Single,Married,Divorced,Widowed"';
-        $genderList = '"Male,Female,Other"';
-        $bloodList = '"' . implode(",", $bloodgroups) . '"';
-        $roleList = '"' . implode(",", $roles) . '"';
+    $headers = [
+        "Staff Id", "First Name", "Last Name", "Department", "Designation",
+        "Specialist", "Specialization", "Qualification", "Work Experience",
+        "Fathers Name", "Mothers Name", "Contact Number", "Emergency Contact Number",
+        "Email", "DOB", "Marital Status", "Date of Joining", "Date of Leaving",
+        "Local Address", "Permanent Address", "Gender", "Blood Group",
+        "Aadhar Number", "PAN", "Role", "Remarks", "Staff Registration No.",
+    ];
 
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-
-        // Column headings
-        $headers = [
-            "Employee Id", "First Name", "Last Name", "Department", "Designation", "Specialist","Specialization",
-            "Qualification", "Work Experience", "Fathers Name", "Mothers Name",
-            "Contact Number", "Emergency Contact Number", "Email", "DOB",
-            "Marital Status", "Date of Joining", "Date of Leaving", "Local Address",
-            "Permanent Address", "Gender", "Blood Group", "Identification Number",
-            "PAN", "Role",  "Remarks"
-        ];
-
-        // Add header row
-        $col = "A";
-        foreach ($headers as $header) {
-            $sheet->setCellValue($col.'1', $header);
-            $col++;
-        }
-
-        // Freeze header row
-        $sheet->freezePane('A2');
-
-        // Apply dropdowns
-        // Department → Column D
-        $this->addDropdown($sheet, "D2:D500", $departmentList);
-
-        // Department → Column E
-        $this->addDropdown($sheet, "E2:E500", $designationList);
-
-        // Department → Column F
-        $this->addDropdown($sheet, "F2:F500", $specialistsList);
-
-        // Marital Status → Column P
-        $this->addDropdown($sheet, "P2:P500", $maritalList);
-
-        // Gender → Column U
-        $this->addDropdown($sheet, "U2:U500", $genderList);
-
-        // Blood Group → Column V
-        $this->addDropdown($sheet, "V2:V500", $bloodList);
-
-        // Blood Group → Column Y
-        $this->addDropdown($sheet, "Y2:Y500", $roleList);
-
-        // Auto column width
-        // Lock header row
-        // Lock header row
-        foreach (range('A', 'AA') as $col) {
-            $sheet->getStyle($col.'1')->getProtection()->setLocked(true);
-        }
-
-        // Unlock data rows
-        $sheet->getStyle('A2:AA500')->getProtection()->setLocked(false);
-
-        // Protect the sheet
-        $sheet->getProtection()->setSheet(true);
-        $sheet->getProtection()->setSort(true);
-        $sheet->getProtection()->setInsertRows(true);
-        $sheet->getProtection()->setFormatCells(true);
-
-        // Return file download
-        $writer = new Xlsx($spreadsheet);
-        $fileName = "Staffs.xlsx";
-
-        header('Content-Type: application/vnd.ms-excel');
-        header("Content-Disposition: attachment; filename=\"$fileName\"");
-        header('Cache-Control: max-age=0');
-
-        $writer->save('php://output');
-        exit;
+    $col = 'A';
+    foreach ($headers as $header) {
+        $sheet->setCellValue($col . '1', $header);
+        $col++;
     }
-    private function addDropdown($sheet, $cellRange, $formulaList)
-    {
-        // Apply dropdown to each cell in the range
-        foreach ($sheet->getCellCollection()->getCoordinates() as $coord) {}
 
-        [$start, $end] = explode(":", $cellRange);
+    $sheet->freezePane('A2'); // freeze header
 
-        // Convert start and end rows
-        preg_match('/([A-Z]+)([0-9]+)/', $start, $startMatch);
-        preg_match('/([A-Z]+)([0-9]+)/', $end, $endMatch);
+    // =========================
+    // Sheet2: DropdownData
+    // =========================
+    $dropdownSheet = $spreadsheet->createSheet();
+    $dropdownSheet->setTitle('DropdownData');
 
-        $column = $startMatch[1];
-        $startRow = (int)$startMatch[2];
-        $endRow   = (int)$endMatch[2];
+    $columns = [
+        'A' => Department::pluck('department_name')->filter()->values()->all(),
+        'B' => StaffDesignation::pluck('designation')->filter()->values()->all(),
+        'C' => Specialist::pluck('specialist_name')->filter()->values()->all(),
+        'D' => ["Single", "Married", "Divorced", "Widowed"],
+        'E' => ["Male", "Female", "Other"],
+        'F' => BloodBankProduct::where('is_blood_group', 1)->pluck('name')->filter()->values()->all(),
+        'G' => Role::pluck('name')->filter()->values()->all(),
+    ];
 
-        for ($row = $startRow; $row <= $endRow; $row++) {
-
-            $cell = $sheet->getCell($column . $row);
-            $validation = $cell->getDataValidation();
-
-            $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
-            $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION);
-            $validation->setAllowBlank(true);
-            $validation->setShowInputMessage(true);
-            $validation->setShowErrorMessage(true);
-            $validation->setShowDropDown(true);
-
-            // CORRECT: Formula must be exactly => "item1,item2,item3"
-            $validation->setFormula1($formulaList);
+    foreach ($columns as $col => $values) {
+        $rowIndex = 1;
+        foreach ($values as $val) {
+            $dropdownSheet->setCellValue($col . $rowIndex, $val);
+            $rowIndex++;
         }
     }
+
+    // =========================
+    // Apply dropdowns in Sheet1
+    // =========================
+    $this->setDropdown($sheet, 'D2:D500', 'DropdownData', 'A', count($columns['A'])); // Department
+    $this->setDropdown($sheet, 'E2:E500', 'DropdownData', 'B', count($columns['B'])); // Designation
+    $this->setDropdown($sheet, 'F2:F500', 'DropdownData', 'C', count($columns['C'])); // Specialist
+    $this->setDropdown($sheet, 'P2:P500', 'DropdownData', 'D', count($columns['D'])); // Marital Status
+    $this->setDropdown($sheet, 'U2:U500', 'DropdownData', 'E', count($columns['E'])); // Gender
+    $this->setDropdown($sheet, 'V2:V500', 'DropdownData', 'F', count($columns['F'])); // Blood Group
+    $this->setDropdown($sheet, 'Y2:Y500', 'DropdownData', 'G', count($columns['G'])); // Role
+
+    // =========================
+    // Output Excel file
+    // =========================
+    $writer = new Xlsx($spreadsheet);
+    $fileName = "Staffs.xlsx";
+
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header("Content-Disposition: attachment; filename=\"$fileName\"");
+    header('Cache-Control: max-age=0');
+
+    $writer->save('php://output');
+    exit;
+}
+
+// =========================
+// Helper: Apply dropdown
+// =========================
+private function setDropdown($sheet, $cellRange, $sheetName, $columnLetter, $count)
+{
+    [$start, $end] = explode(':', $cellRange);
+    preg_match('/([A-Z]+)([0-9]+)/', $start, $startMatch);
+    preg_match('/([A-Z]+)([0-9]+)/', $end, $endMatch);
+
+    $startRow = (int)$startMatch[2];
+    $endRow   = (int)$endMatch[2];
+    $column   = $startMatch[1];
+
+    for ($row = $startRow; $row <= $endRow; $row++) {
+        $cell = $sheet->getCell($column . $row);
+        $validation = new DataValidation();
+        $validation->setType(DataValidation::TYPE_LIST);
+        $validation->setAllowBlank(true);
+        $validation->setShowDropDown(true);
+        $validation->setFormula1("='{$sheetName}'!\${$columnLetter}\$1:\${$columnLetter}\${$count}");
+        $cell->setDataValidation($validation);
+    }
+}
     public function importStaffExcel(Request $request)
     {
         
