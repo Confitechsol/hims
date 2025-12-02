@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\BloodBankProduct;
-use Illuminate\Support\Facades\Auth;
 
 class BloodBankController extends Controller
 {

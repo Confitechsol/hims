@@ -38,9 +38,4 @@ class Bed extends Model
     {
         return $this->belongsTo(BedGroup::class, 'bed_group_id');
     }
-
-    public function patientBedHistory()
-    {
-        return $this->hasMany(PatientBedHistory::class, 'bed_id', 'id');
-    }
 }

@@ -494,7 +494,7 @@
                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                 <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Edit IPD Details</h5>
             </div>
-        
+
             <div class="card-body">
 
                 {{-- Flash Messages --}}
@@ -522,9 +522,24 @@
                                             <div class="row  align-items-center">
                                                 <div class="field-group col-10">
                                                     <div class="info-value empty" id="marital_value"
-                                                        style=" border: 1px solid; padding: 0.5rem; border-radius: 10px; ">
+                                                        style="
+                                                    border: 1px solid;
+                                                    padding: 0.5rem;
+                                                    border-radius: 10px;
+                                                ">
                                                         {{ $ipd->patient->patient_name }}</div>
-                                                    <input type="hidden" name="patient_id" value="{{ $ipd->patient->id ?? '' }}">
+                                                    {{-- <select type="text" class="form-select patient-search flex-grow-1"
+                                                        placeholder="Search patient by name or ID..." id="patient_select"
+                                                        name="patient_id">
+                                                        <option value="">Select</option>
+                                                        @foreach ($patients as $patient)
+                                                            <option value="{{ $patient->id }}"
+                                                                data-patient='@json($patient)'
+                                                                {{ old('patient_id', $ipd->patient_id ?? '') == $patient->id ? 'selected' : '' }}>
+                                                                {{ $patient->patient_name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select> --}}
                                                 </div>
                                                 <div class="field-group col-2 text-end">
                                                     <button class="btn btn-primary" type="button" data-bs-toggle="modal"
@@ -645,27 +660,27 @@
                                         </div>
                                     </div>
 
-                                    <!-- Admission Information Section -->
+                                    <!-- Appointment Information Section -->
                                     <div class="form-section mb-4">
                                         <div class="section-header">
                                             <div class="section-icon">
                                                 <i class="bi bi-calendar-check"></i>
                                             </div>
-                                            <h6 class="section-title mb-0 pb-0">Admission Information</h6>
+                                            <h6 class="section-title mb-0 pb-0">Appointment Information</h6>
                                         </div>
                                         <div class="section-body">
                                             <div class="form-row cols-2">
                                                 <div class="field-group">
-                                                    <label for="admission_date" class="form-label">
-                                                        Admission Date <span class="required">*</span>
+                                                    <label for="appointment_date" class="form-label">
+                                                        Appointment Date <span class="required">*</span>
                                                     </label>
-                                                    <input type="datetime-local" name="admission_date" id="admission_date"
+                                                    <input type="date" name="appointment_date" id="appointment_date"
                                                         class="form-control"
-                                                        value="{{ old('admission_date', $ipd->date) }}" required >
+                                                        value="{{ old('appointment_date', $ipd->date) }}" required disabled>
                                                 </div>
 
                                                 <div class="field-group">
-                                                    <label for="old_patient" class="form-label">Patient Type</label>
+                                                    <label for="old_patient" class="form-label">Case Type</label>
                                                     <select name="old_patient" id="old_patient" class="form-select">
                                                         <option value="">Select</option>
                                                         <option value="Old Patient"
@@ -678,7 +693,7 @@
                                                 </div>
 
                                                 <div class="field-group">
-                                                    <label for="casualty" class="form-label">Emergency</label>
+                                                    <label for="casualty" class="form-label">Casualty</label>
                                                     <select name="casualty" id="casualty" class="form-select">
                                                         <option value="">Select</option>
                                                         <option value="No"

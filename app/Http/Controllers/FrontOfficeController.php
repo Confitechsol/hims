@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\VisitorsPurpose;
 use App\Models\ComplaintType;
 use App\Models\Source;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class FrontOfficeController extends Controller

@@ -971,18 +971,18 @@
                                                 @endphp
                                                 <tr>
                                                     <td>
-                                                        {{ $charge->charge->name ?? 'N/A' }}
+                                                        {{ $charge->charge->name }}
                                                     </td>
                                                     <td style="text-transform: capitalize;">
-                                                        {{ $charge->chargeCategory->chargeType->charge_type ?? 'N/A'}}
+                                                        {{ $charge->chargeCategory->chargeType->charge_type }}
                                                     </td>
-                                                    <td class="text-right">{{ $charge->charge->standard_charge ?? 'N/A' }}</td>
+                                                    <td class="text-right">{{ $charge->charge->standard_charge }}</td>
                                                     <td class="text-right">
                                                         ({{ $charge->charge->taxCategory->percentage }}%)
                                                         {{ $taxAmount }}
                                                     </td>
-                                                    <td class="text-right">{{ $charge->charge->standard_charge  ?? 'N/A'}}</td>
-                                                    <td class="text-right">{{ $amount ?? 'N/A' }}</td>
+                                                    <td class="text-right">{{ $charge->charge->standard_charge }}</td>
+                                                    <td class="text-right">{{ $amount }}</td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -2614,15 +2614,15 @@
                                                                     {{ $charge->charge->name }}
                                                                 </td>
                                                                 <td style="text-transform: capitalize;">
-                                                                    {{ $charge->chargeCategory->chargeType->charge_type  ?? 'N/A'}}
+                                                                    {{ $charge->chargeCategory->chargeType->charge_type }}
                                                                 </td>
-                                                                <td class="text-right">{{ $charge->charge->standard_charge ?? 'N/A'
+                                                                <td class="text-right">{{ $charge->charge->standard_charge
                                                                     }}</td>
                                                                 <td class="text-right">
                                                                     ({{ $charge->charge->taxCategory->percentage }}%)
                                                                     {{ $taxAmount }}
                                                                 </td>
-                                                                <td class="text-right">{{ $charge->charge->standard_charge ?? 'N/A'
+                                                                <td class="text-right">{{ $charge->charge->standard_charge
                                                                     }}</td>
                                                                 <td class="text-right">{{ $amount }}</td>
                                                             </tr> --}}
@@ -2647,12 +2647,12 @@
                                                                     </td>
                                                                     <td>{{ $charge->charge->name }}</td>
                                                                     <td style="text-transform: capitalize;">
-                                                                        {{ $charge->chargeCategory->chargeType->charge_type ?? 'N/A' }}
+                                                                        {{ $charge->chargeCategory->chargeType->charge_type }}
                                                                     </td>
-                                                                    <td>{{ $charge->chargeCategory->name ?? 'N/A' }} </td>
+                                                                    <td>{{ $charge->chargeCategory->name }} </td>
                                                                     <td>1</td>
-                                                                    <td>{{ $charge->charge->standard_charge ?? 'N/A' }}</td>
-                                                                    <td>{{ $charge->charge->standard_charge ?? 'N/A' }}</td>
+                                                                    <td>{{ $charge->charge->standard_charge }}</td>
+                                                                    <td>{{ $charge->charge->standard_charge }}</td>
                                                                     <td>0.00</td>
                                                                     <td>{{ $discountAmount }}&nbsp;({{ $charge->discount }}%)
                                                                     </td>

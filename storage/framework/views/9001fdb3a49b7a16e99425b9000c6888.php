@@ -1,35 +1,4 @@
 <?php $__env->startSection('content'); ?>
-
-<?php if(session('success')): ?>
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <?php echo e(session('success')); ?>
-
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-<?php endif; ?>
-
-
-<?php if(session('error')): ?>
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <?php echo e(session('error')); ?>
-
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-<?php endif; ?>
-
-
-<?php if($errors->any()): ?>
-    <div class="alert alert-danger alert-dismissible fade show">
-        <strong>There were some problems with your input:</strong>
-        <ul class="mt-2 mb-0">
-            <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <li><?php echo e($error); ?></li>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-        </ul>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-<?php endif; ?>
-
     <div class="row justify-content-center">
         
         <div class="col-md-11">
@@ -131,14 +100,15 @@
                                                             <td><?php echo e($patient->is_dead == 'yes' ? 'Yes' : 'No'); ?></td>
                                                             <td>
                                                                 <div class="d-flex">
-                                                                    <a href="<?php echo e(route('patient.edit', $patient->id)); ?>" 
-                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
-                                                                        >
-                                                                        <i class="ti ti-pencil"></i>
-                                                                    </a>
-
-                                                                <!-- <?php echo $__env->make('components.modals.edit-patient-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?> -->
-                                                                    
+                                                                    <a href="javascript: void(0);"
+                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+                                                                        <i class="ti ti-menu" data-bs-toggle="tooltip"
+                                                                            title="Assign Permission"></i></a>
+                                                                    <a href="javascript: void(0);"
+                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
+                                                                        <i class="ti ti-dots-vertical"
+                                                                            data-bs-toggle="tooltip"
+                                                                            title="Assign Permission"></i></a>
                                                                 </div>
                                                             </td>
                                                         </tr>

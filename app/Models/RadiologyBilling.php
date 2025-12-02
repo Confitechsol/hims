@@ -51,12 +51,4 @@ class RadiologyBilling extends Model
     {
         return $this->belongsTo(Doctor::class, 'doctor_id');
     }
-
-    /**
-     * Relationship with RadiologyReport
-     */
-    public function reports()
-    {
-        return $this->hasMany(RadiologyReport::class, 'radiology_bill_id');
-    }
 }

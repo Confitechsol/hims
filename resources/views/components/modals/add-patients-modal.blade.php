@@ -1,10 +1,3 @@
-<style>
-    .unit-select {
-    flex: 0 0 20%; /* fixed 20% width */
-    max-width: 20%;
-}
-</style>
-
 <div class="modal fade" id="add_patient" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content modal-xl">
@@ -16,9 +9,9 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="ipdForm" action="{{ route('patient-store') }}" method="POST">
+                <form action="{{ route('patient-store') }}" method="POST">
                     @csrf
-                    <!-- @if ($errors->any())
+                    @if ($errors->any())
                         <div class="alert alert-danger">
                             <strong>There were some problems with your
                                 input:</strong>
@@ -28,9 +21,9 @@
                                 @endforeach
                             </ul>
                         </div>
-                    @endif -->
+                    @endif
 
-                    <div class="row p-4 mx-1 gy-3">
+                    <div class="row gy-3">
 
                         {{-- Name --}}
                         <div class="col-md-6">
@@ -53,28 +46,6 @@
                             @enderror
                         </div>
 
-                        {{-- Guardian Phone --}}
-                        <div class="col-md-6">
-                            <label for="guardian_phone" class="form-label">Guardian Phone No.</label>
-                            <input type="text" id="guardian_phone" name="guardian_phone"
-                                class="form-control @error('guardian_phone') is-invalid @enderror"
-                                value="{{ old('guardian_phone') }}" />
-                            @error('guardian_phone')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        {{-- Emergency Contact --}}
-                        <div class="col-md-6">
-                            <label for="emergency_contact_no" class="form-label">Emergency Contact No.</label>
-                            <input type="text" id="emergency_contact_no" name="emergency_contact_no"
-                                class="form-control @error('emergency_contact_no') is-invalid @enderror"
-                                value="{{ old('emergency_contact_no') }}" />
-                            @error('emergency_contact_no')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
                         {{-- Gender + DOB + Age --}}
                         <div class="col-md-6">
                             <div class="row">
@@ -87,8 +58,6 @@
                                         <option value="Male" {{ old('gender') == 'Male' ? 'selected' : '' }}>Male
                                         </option>
                                         <option value="Female" {{ old('gender') == 'Female' ? 'selected' : '' }}>Female
-                                        </option>
-                                        <option value="Others" {{ old('gender') == 'Others' ? 'selected' : '' }}>Others
                                         </option>
                                     </select>
                                     @error('gender')
@@ -157,12 +126,18 @@
                                     <select name="blood_group"
                                         class="form-control @error('blood_group') is-invalid @enderror">
                                         <option value="">Select</option>
-                                        @foreach($bloodGroups as $group)
-                                            <option value="{{ $group->id }}"
-                                                {{ old('blood_group') == $group->id ? 'selected' : '' }}>
-                                                {{ $group->name }}
-                                            </option>
-                                        @endforeach
+                                        <option value="1" {{ old('blood_group') == '1' ? 'selected' : '' }}>O+
+                                        </option>
+                                        <option value="2" {{ old('blood_group') == '2' ? 'selected' : '' }}>A+
+                                        </option>
+                                        <option value="3" {{ old('blood_group') == '3' ? 'selected' : '' }}>B+
+                                        </option>
+                                        <option value="4" {{ old('blood_group') == '4' ? 'selected' : '' }}>AB+
+                                        </option>
+                                        <option value="5" {{ old('blood_group') == '5' ? 'selected' : '' }}>O-
+                                        </option>
+                                        <option value="6" {{ old('blood_group') == '6' ? 'selected' : '' }}>AB-
+                                        </option>
                                     </select>
                                     @error('blood_group')
                                         <div class="invalid-feedback">{{ $message }}
@@ -251,8 +226,19 @@
                             @enderror
                         </div>
 
+                        {{-- Remarks --}}
+                        <div class="col-md-6">
+                            <label for="remarks" class="form-label">Remarks</label>
+                            <input type="text" id="remarks" name="remarks"
+                                class="form-control @error('remarks') is-invalid @enderror"
+                                value="{{ old('remarks') }}" />
+                            @error('remarks')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
                         {{-- Allergies --}}
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <label for="allergies" class="form-label">Any Known
                                 Allergies</label>
                             <input type="text" id="allergies" name="allergies"
@@ -262,96 +248,6 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-
-                        {{-- Languages Speak --}}
-                        <div class="col-md-4">
-                            <label for="languages_speak" class="form-label">Languages Speak</label>
-                            <input type="text" id="languages_speak" name="languages_speak"
-                                class="form-control @error('languages_speak') is-invalid @enderror"
-                                value="{{ old('languages_speak') }}" />
-                            @error('languages_speak')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        {{-- Newspaper Preference --}}
-                        <div class="col-md-4">
-                            <label for="newspaper_preference" class="form-label">Newspaper Preference</label>
-                            <input type="text" id="newspaper_preference" name="newspaper_preference"
-                                class="form-control @error('newspaper_preference') is-invalid @enderror"
-                                value="{{ old('newspaper_preference') }}" />
-                            @error('newspaper_preference')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        {{-- Height --}}
-                        <div class="col-md-4">
-                            <label for="height_value" class="form-label">Height</label>
-
-                            <div class="input-group d-flex">
-                                <input type="text" id="height_value" class="form-control @error('height') is-invalid @enderror"
-                                    placeholder="Enter height" value="{{ old('height') }}">
-
-                                <select id="height_unit" class="form-select unit-select">
-                                    <option value="ft">ft</option>
-                                    <option value="cm">cm</option>
-                                </select>
-                            </div>
-
-                            <input type="hidden" name="height" id="height">
-                            @error('height')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-
-                        {{-- Weight --}}
-                        <div class="col-md-4">
-                            <label for="weight_value" class="form-label">Weight</label>
-
-                            <div class="input-group d-flex">
-                                <input type="text" id="weight_value" class="form-control @error('weight') is-invalid @enderror"
-                                    placeholder="Enter weight" value="{{ old('weight') }}">
-
-                                <select id="weight_unit" class="form-select unit-select">
-                                    <option value="kg">kg</option>
-                                    <option value="lbs">lbs</option>
-                                </select>
-                            </div>
-
-                            <input type="hidden" name="weight" id="weight">
-                            @error('weight')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-
-                        {{-- Temperature --}}
-                        <div class="col-md-4">
-                            <label for="temperature_value" class="form-label">Temperature</label>
-
-                            <div class="input-group">
-                                <!-- Numeric input -->
-                                <input type="text" id="temperature_value" placeholder="Enter Temperature"
-                                    class="form-control @error('temperature') is-invalid @enderror"
-                                    value="{{ old('temperature') }}" />
-
-                                <!-- Unit dropdown -->
-                                <select id="temperature_unit" class="form-select unit-select">
-                                    <option value="°C">°C</option>
-                                    <option value="°F">°F</option>
-                                </select>
-                            </div>
-
-                            <!-- Hidden field that will store final value (37°C / 98.6°F) -->
-                            <input type="hidden" name="temperature" id="temperature">
-
-                            @error('temperature')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
-                        </div>
-
 
                         {{-- TPA --}}
                         <div class="col-md-4">
@@ -381,7 +277,7 @@
                         <div class="col-md-4">
                             <label for="tpa_validity" class="form-label">TPA
                                 Validity</label>
-                            <input type="date" id="tpa_validity" name="tpa_validity"
+                            <input type="text" id="tpa_validity" name="tpa_validity"
                                 class="form-control @error('tpa_validity') is-invalid @enderror"
                                 value="{{ old('tpa_validity') }}" />
                             @error('tpa_validity')
@@ -390,8 +286,9 @@
                         </div>
 
                         {{-- National ID --}}
-                        <div class="col-md-6">
-                            <label for="national_id_number" class="form-label">Adhaar Card or PAN Card</label>
+                        <div class="col-md-4">
+                            <label for="national_id_number" class="form-label">National Identification
+                                Number</label>
                             <input type="text" id="national_id_number" name="national_id_number"
                                 class="form-control @error('national_id_number') is-invalid @enderror"
                                 value="{{ old('national_id_number') }}" />
@@ -399,55 +296,17 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-                        {{-- Remarks --}}
-                        <div class="col-md-6">
-                            <label for="remarks" class="form-label">Remarks</label>
-                            <input type="text" id="remarks" name="remarks"
-                                class="form-control @error('remarks') is-invalid @enderror"
-                                value="{{ old('remarks') }}" />
-                            @error('remarks')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
 
                     </div>
 
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Save Patient</button>
-                    </div>
-                </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save Role</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    const form = document.getElementById("ipdForm");
-
-    form.addEventListener("submit", function (e) {
-
-        // HEIGHT
-        const hVal = document.getElementById("height_value")?.value ?? "";
-        const hUnit = document.getElementById("height_unit")?.value ?? "";
-        document.getElementById("height").value = (hVal && hUnit) ? (hVal + hUnit) : "";
-
-        // WEIGHT
-        const wVal = document.getElementById("weight_value")?.value ?? "";
-        const wUnit = document.getElementById("weight_unit")?.value ?? "";
-        document.getElementById("weight").value = (wVal && wUnit) ? (wVal + wUnit) : "";
-
-        // TEMPERATURE
-        const tVal = document.getElementById("temperature_value")?.value ?? "";
-        const tUnit = document.getElementById("temperature_unit")?.value ?? "";
-        document.getElementById("temperature").value = (tVal && tUnit) ? (tVal + tUnit) : "";
-
-        console.log("FORM SUBMITTED: height =", document.getElementById("height").value);
-
-    });
-});
-</script>
-
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -475,84 +334,45 @@ document.addEventListener("DOMContentLoaded", function () {
                 tpaSelect.innerHTML = '<option value="">Error loading options</option>';
             });
 
-            // Listen for dropdown change
-            tpaSelect.addEventListener('change', function() {
-                const selectedId = this.value;
-                const selectedOrg = window.organizationsData.find(org => org.id == selectedId);
-                tpaIdInput.value = selectedOrg ? selectedOrg.code : '';
-            });
-      // Elements
-const birthDateInput = document.getElementById('birth_date');
-const ageYearInput = document.getElementById('age_year');
-const ageMonthInput = document.getElementById('age_month');
-const ageDayInput = document.getElementById('age_day');
+        // Listen for dropdown change
+        tpaSelect.addEventListener('change', function() {
+            const selectedId = this.value;
+            const selectedOrg = window.organizationsData.find(org => org.id == selectedId);
+            tpaIdInput.value = selectedOrg ? selectedOrg.code : '';
+        });
+    //auto calculate age..............................................................................
+    const birthDateInput = document.getElementById('birth_date');
+    const ageYearInput = document.getElementById('age_year');
+    const ageMonthInput = document.getElementById('age_month');
+    const ageDayInput = document.getElementById('age_day');
 
-// ------------------ DOB → AUTO CALCULATE AGE ------------------
-birthDateInput.addEventListener('change', function () {
-    const birthDate = new Date(this.value);
-    if (!this.value || isNaN(birthDate)) {
-        ageYearInput.value = '';
-        ageMonthInput.value = '';
-        ageDayInput.value = '';
-        return;
-    }
+    birthDateInput.addEventListener('change', function() {
+        const birthDate = new Date(this.value);
+        if (!this.value || isNaN(birthDate)) {
+            ageYearInput.value = '';
+            ageMonthInput.value = '';
+            ageDayInput.value = '';
+            return;
+        }
 
-    const today = new Date();
-    let years = today.getFullYear() - birthDate.getFullYear();
-    let months = today.getMonth() - birthDate.getMonth();
-    let days = today.getDate() - birthDate.getDate();
+        const today = new Date();
+        let years = today.getFullYear() - birthDate.getFullYear();
+        let months = today.getMonth() - birthDate.getMonth();
+        let days = today.getDate() - birthDate.getDate();
 
-    if (days < 0) {
-        months--;
-        const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-        days += prevMonth.getDate();
-    }
+        if (days < 0) {
+            months--;
+            const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+            days += prevMonth.getDate();
+        }
 
-    if (months < 0) {
-        years--;
-        months += 12;
-    }
-
-    ageYearInput.value = years;
-    ageMonthInput.value = months;
-    ageDayInput.value = days;
-});
-
-// ------------------ AGE → AUTO CALCULATE DOB ------------------
-function updateDOB() {
-    const years = parseInt(ageYearInput.value) || 0;
-    const months = parseInt(ageMonthInput.value) || 0;
-    const days = parseInt(ageDayInput.value) || 0;
-
-    // If no age entered → do nothing
-    if (!years && !months && !days) return;
-
-    const today = new Date();
-
-    // Subtract entered values
-    let dob = new Date(
-        today.getFullYear() - years,
-        today.getMonth() - months,
-        today.getDate() - days
-    );
-
-    // If month+day not given → approximate DOB = Jan 1st of that year
-    if (!ageMonthInput.value && !ageDayInput.value) {
-        dob = new Date(today.getFullYear() - years, 0, 1); // 1st Jan
-    }
-
-    // Format YYYY-MM-DD
-    const yyyy = dob.getFullYear();
-    const mm = String(dob.getMonth() + 1).padStart(2, '0');
-    const dd = String(dob.getDate()).padStart(2, '0');
-
-    birthDateInput.value = `${yyyy}-${mm}-${dd}`;
-}
-
-// Trigger when age fields are typed/changed
-ageYearInput.addEventListener('input', updateDOB);
-ageMonthInput.addEventListener('input', updateDOB);
-ageDayInput.addEventListener('input', updateDOB);
-
+        if (months < 0) {
+            years--;
+            months += 12;
+        }
+        ageYearInput.value = years;
+        ageMonthInput.value = months;
+        ageDayInput.value = days;
+    });
     });
 </script>

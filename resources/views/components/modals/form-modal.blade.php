@@ -64,11 +64,9 @@
                                     <img src="" data-field="{{ $field['name'] }}" alt="">        
                                     @else
                                         <input type="{{ $field['type'] ?? 'text' }}" name="{{ $field['name'] }}"
-                                        @if(isset($field['readonly'])) readonly @endif
                                             data-field="{{ $field['name'] }}" id="{{ $field['name'] }}"
                                             value="{{ $field['value'] ?? old($field['name']) }}" class="form-control"
                                             @if (!empty($field['required'])) required @endif @if(isset($field['fileTypes']))accept="{{$field['fileTypes']}}"@endif>
-                                        {{-- existing-file display removed to avoid showing filenames in modal --}}
                                     @endif
                                 </div>
                             </div>
@@ -140,84 +138,35 @@
             const button = e.target.closest('.edit-btn');
             if (!button) return;
                     // Get the ID from the button
-                    const id = button.getAttribute('data-id');
+                    // const id = this.getAttribute('data-id');
 
-                    // If id exists set form action to death update endpoint and fill hidden id input
-                    try {
-                        if (!id) {
-                            console.warn('Edit button clicked but no data-id present on button.');
-                            // avoid opening modal when id missing
-                            return;
-                        }
-                        if (form) {
-                            // Use the form's existing action as the base and append the id.
-                            // This avoids hardcoding resource names and prevents missing-parameter errors.
-                            let base = form.getAttribute('action') || '';
-                            if (base) {
-                                base = base.replace(/\/$/, ''); // remove trailing slash if present
-                                form.action = base + '/' + id;
-                            }
-                            const hiddenId = form.querySelector('input[name="id"], input[data-field="id"]');
-                            if (hiddenId) hiddenId.value = id;
-
-                            // Logging to assist debugging in browser console
-                            try {
-                                const methodInput = form.querySelector('input[name="_method"]');
-                                const actualMethod = methodInput ? methodInput.value : 'POST';
-                                console.info('Edit form prepared:', { action: form.action, method: actualMethod, id });
-                            } catch (err) {
-                                console.info('Edit form prepared:', { action: form.action, id });
-                            }
-                        }
-                    } catch (err) {
-                        console.warn('Could not set form action dynamically', err);
-                    }
+                    // Dynamically update the form's action URL to match the ID for the update route
+                    // form.action = `{{ url('/') }}/medicine-group/${id}`;
 
                     // Find all input fields in the form
                     const inputFields = form.querySelectorAll('[data-field]');
 
                     // Loop through each input field
                     inputFields.forEach(input => {
-                        const fieldName = input.getAttribute('data-field'); // e.g. 'name' or 'invoice_number'
-                        let fieldValue = null;
-                        try {
-                            fieldValue = button.getAttribute(`data-${fieldName}`);
-                        } catch (err) {
-                            fieldValue = null;
+                        const fieldName = input.getAttribute('data-field'); // Get the field name from data-field attribute
+                        // const fieldValue = this.getAttribute(`data-${fieldName}`); // Get corresponding data-* attribute from button
+                        const fieldValue = button.getAttribute(`data-${fieldName}`);
+
+                        // Set the input field's value dynamically
+                        if(input.tagName === 'SELECT') {
+                            $(input).select2(); 
+                            $(input).val(fieldValue).trigger('change.select2');
+                        } else{
+                            const isImage = /\.(png|jpg|jpeg)$/i.test(fieldValue);
+                        if (fieldValue !== null) {
+                        if (isImage) {
+                         // Set image source if input is an <img> element
+                         input.src = "{{url('/')}}"+fieldValue;
+                         } else {
+                        // Otherwise, just set the value
+                        input.value = fieldValue;
+                            }
                         }
-
-                        // Safely set the input field's value dynamically
-                        try {
-                            // File inputs cannot be prefilled and we intentionally do not display filenames here.
-                            if (input.type === 'file') {
-                                // Skip populating file inputs or any filename display.
-                                return;
-                            }
-
-                            if (input.tagName === 'SELECT') {
-                                // If select2 is available use it, otherwise set value directly
-                                if (window.jQuery && typeof $(input).select2 === 'function') {
-                                    try {
-                                        $(input).val(fieldValue).trigger('change.select2');
-                                    } catch (err) {
-                                        input.value = fieldValue ?? '';
-                                    }
-                                } else {
-                                    input.value = fieldValue ?? '';
-                                }
-                            } else if (input.tagName === 'IMG') {
-                                if (fieldValue) input.src = "{{ url('/') }}" + fieldValue;
-                            } else {
-                                if (fieldValue !== null && typeof fieldValue !== 'undefined') {
-                                    input.value = fieldValue;
-                                } else {
-                                    // clear field if no value provided
-                                    input.value = '';
-                                }
-                            }
-                        } catch (err) {
-                            // swallow errors to avoid breaking the handler for other fields
-                            console.error('Error populating edit field', fieldName, err);
                         }
                     });
 

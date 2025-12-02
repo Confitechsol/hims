@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 57f99a373d9421198712856d25998ba84ef9038c
 <?php $__env->startSection('title', __('Server Error')); ?>
 <?php $__env->startSection('code', '500'); ?>
 <?php $__env->startSection('message', __('Server Error')); ?>

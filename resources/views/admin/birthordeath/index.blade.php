@@ -83,10 +83,9 @@
                                                         <td>{{$report->child_name}}</td>
                                                         <td>{{$report->gender}}</td>
                                                         <td>{{\Carbon\Carbon::parse($report->created_at)->format('d/m/Y h:i A') }}</td>
-                                                        <td>{{$report->mother_name }}</td>
+                                                        <td>{{ $report->patient->patient_name ?? '-' }}</td>
                                                         <td>{{$report->father_name}}</td>
-                                                        
-                                                        {{-- <td>
+                                                        <td>
                                                             <div class="d-flex">
                                                                 <button
                                                                     class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
@@ -103,43 +102,7 @@
                                                                 </form>
                                                             </div>
                                                         </td>
-                                                    </tr> --}}
-                                                    <td>
-    <div class="d-flex">
-        <button
-            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
-            data-id="{{ $report->id }}"
-            data-child_name="{{ $report->child_name }}"
-            data-gender="{{ $report->gender }}"
-            data-weight="{{ $report->weight ?? '' }}"
-            data-birth_date="{{ isset($report->birth_date) ? \Carbon\Carbon::parse($report->birth_date)->format('Y-m-d') : \Carbon\Carbon::parse($report->created_at)->format('Y-m-d') }}"
-            data-contact_person_phone="{{ $report->contact ?? '' }}"
-            data-address="{{ $report->address ?? '' }}"
-            data-caseId="{{ $report->case_reference_id ?? '' }}"
-            data-mother_name="{{ $report->mother_name ?? '' }}"
-            data-contact_person_name="{{ $report->contact_person_name ?? '' }}"
-            data-father_name="{{ $report->father_name ?? '' }}"
-            data-report="{{ $report->birth_report }}"
-            data-icd_code="{{ $report->icd_code ?? '' }}">
-            <i class="ti ti-pencil"></i>
-        </button>
-
-        <form action="{{ route('birth.delete', $report->id) }}" 
-              method="POST" 
-              style="display:inline;">
-            @csrf
-            @method('DELETE')
-
-            <button type="submit" 
-                    onclick="return confirm('Are you sure you want to delete this record?')" 
-                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                <i class="ti ti-trash"></i>
-            </button>
-        </form>
-
-    </div>
-</td>
-
+                                                    </tr>
                                                 @endforeach
 
                                             </tbody>
@@ -188,63 +151,8 @@
     </div>
     </div>
     </div>
-    <x-modals.birth-modal type="add" id="createModal" class="modal-fullscreen" title="Add Birth Record" action="{{ route('birth.create') }}"
+    <x-modals.birth-modal type="add" id="createModal" class="modal-fullscreen" title="Add Birth Record111" action="{{ route('tpamanagement.store') }}"
         :fields="[
-            [
-                'name' => 'child_name',
-                'label' => 'Child Name',
-                'type' => 'text',
-                'required' => true,
-                'size' => '5',
-            ],
-            [ 'name' => 'gender', 'label' => 'Gender', 'type' => 'select', 'required' => true, 'options' => [     'Male' => 'Male',   'Female' => 'Female' ], 'size' => '3'],
-
-            ['name' => 'weight', 'label' => 'Weight', 'type' => 'text', 'required' => true, 'size' => '4'],
-            
-            ['name' => 'baby_image', 'label' => 'Child Photo', 'type' => 'file', 'required' => false, 'size' => '6',],
-            ['name' => 'birth_date', 'label' => 'Birth Date', 'type' => 'date', 'required' => true, 'size' => '4'],
-            ['name' => 'contact_person_phone', 'label' => 'Phone','required' => true, 'type' => 'text',  'size' => '6'],
-            ['name' => 'address', 'label' => 'Address', 'type' => 'text',  'size' => '12'],
-            ['name' => 'caseId', 'label' => 'Case Id', 'type' => 'text',  'size' => '6'],
-           [
-                'name' => 'mother_name',
-                'label' => 'Mother Name ',
-                'type' => 'text',
-                'required' => true,
-                'size' => '5',
-            ],
-            ['name' => 'mother_image', 'label' => 'Mother Photo', 'type' => 'file', 'required' => false, 'size' => '6',],
-            
-            [
-                'name' => 'father_name',
-                'label' => 'Father Name ',
-                'type' => 'text',
-                'required' => true,
-                'size' => '5',
-            ],
-            ['name' => 'father_image', 'label' => 'Father Photo', 'type' => 'file', 'required' => false, 'size' => '6',],
-            
-            [
-                'name' => 'report',
-                'label' => 'Report',
-                'required' => true,
-                'type' => 'text',
-                'size' => '5',
-            ],
-           ['name' => 'report_image', 'label' => 'Attach Document', 'type' => 'file', 'required' => false, 'size' => '6',],
-
-             [
-                'name' => 'icd_code',
-                'label' => 'ICD Code',
-                'required' => true,
-                'type' => 'text',
-                'size' => '5',
-            ],
-           
-        ]" :columns="4" />
-    <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Birth"
-        action="{{ url('/birth/update') }}" :fields="[
-            ['name' => 'id', 'type' => 'hidden', 'required' => true],
             [
                 'name' => 'child_name',
                 'label' => 'Child Name',
@@ -285,17 +193,60 @@
                 'type' => 'text',
                 'size' => '5',
             ],
-
+           ['name' => 'report_image', 'label' => 'Attach Document Photo', 'type' => 'file', 'required' => false, 'size' => '6',],
+           
+        ]" :columns="4" />
+    <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Birth"
+        action="{{ route('tpamanagement.update') }}" :fields="[
+            ['name' => 'id', 'type' => 'hidden', 'required' => true],
             [
-                'name' => 'icd_code',
-                'label' => 'ICD Code',
+                'name' => 'child_name',
+                'label' => 'Child Name',
+                'type' => 'text',
                 'required' => true,
+                'size' => '5',
+            ],
+            [ 'name' => 'gender', 'label' => 'Gender', 'type' => 'select', 'required' => true, 'options' => [     'Male' => 'Male',   'Female' => 'Female' ], 'size' => '3'],
+
+            ['name' => 'weight', 'label' => 'Weight', 'type' => 'text', 'required' => true, 'size' => '4'],
+            
+            ['name' => 'baby_image', 'label' => 'Child Photo', 'type' => 'file', 'required' => false, 'size' => '6',],
+            ['name' => 'birth_date', 'label' => 'Birth Date', 'type' => 'date', 'required' => true, 'size' => '4'],
+            ['name' => 'contact_person_phone', 'label' => 'Phone', 'type' => 'text',  'size' => '6'],
+            ['name' => 'address', 'label' => 'Address', 'type' => 'text',  'size' => '12'],
+            ['name' => 'caseId', 'label' => 'Case Id', 'type' => 'text',  'size' => '6'],
+           [
+                'name' => 'mother_name',
+                'label' => 'Mother Name ',
+                'type' => 'text',
+                'required' => true,
+                'size' => '5',
+            ],
+            ['name' => 'mother_image', 'label' => 'Mother Photo', 'type' => 'file', 'required' => false, 'size' => '6',],
+            [
+                'name' => 'contact_person_name',
+                'label' => 'Contact Person Name',
+                'type' => 'text',
+                'required' => true,
+                'size' => '6',
+            ],
+            [
+                'name' => 'father_name',
+                'label' => 'Father Name ',
+                'type' => 'text',
+                'required' => true,
+                'size' => '5',
+            ],
+            ['name' => 'father_image', 'label' => 'Father Photo', 'type' => 'file', 'required' => false, 'size' => '6',],
+            
+            [
+                'name' => 'report',
+                'label' => 'Report',
                 'type' => 'text',
                 'size' => '5',
             ],
            
         ]" :columns="3" />
 
-   
 
 @endsection()

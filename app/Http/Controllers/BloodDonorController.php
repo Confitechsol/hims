@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\BloodDonor;
 use App\Models\BloodBankProduct;
 use App\Models\BloodIssue;
-use Illuminate\Support\Facades\Auth;
 
 class BloodDonorController extends Controller
 {

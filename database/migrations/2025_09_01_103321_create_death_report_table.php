@@ -21,7 +21,7 @@ return new class extends Migration
             $table->unsignedBigInteger('case_reference_id')->nullable()->index();
             // INT(11), NULL, indexed
 
-           // $table->text('attachment');
+            $table->text('attachment');
             // TEXT, NOT NULL
 
             $table->text('attachment_name')->nullable();
@@ -39,8 +39,6 @@ return new class extends Migration
             $table->string('is_active', 10);
             $table->timestamps();
         });
-
-        DB::statement('ALTER TABLE death_report ADD death_report LONGBLOB NULL AFTER id');
     }
 
     /**

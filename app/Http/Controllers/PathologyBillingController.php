@@ -9,8 +9,6 @@ use App\Models\Pathology;
 use App\Models\Patient;
 use App\Models\Doctor;
 use App\Models\CaseReference;
-use App\Models\Organisation;
-use App\Models\OrganisationsCharge;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
@@ -64,8 +62,6 @@ class PathologyBillingController extends Controller
             'tax' => 'nullable|numeric|min:0',
             'net_amount' => 'required|numeric|min:0',
             'note' => 'nullable|string',
-            'organisation_id' => 'nullable|exists:organisation,id',
-            'activate_tpa' => 'nullable|boolean',
             'tests' => 'required|array|min:1',
             'tests.*.pathology_id' => 'required|exists:pathology,id',
             'tests.*.report_days' => 'required|integer|min:0',
@@ -94,7 +90,6 @@ class PathologyBillingController extends Controller
                 'tax' => $validated['tax'] ?? 0,
                 'net_amount' => $validated['net_amount'],
                 'note' => $validated['note'] ?? null,
-                'organisation_id' => ($request->has('activate_tpa') && $request->activate_tpa) ? ($validated['organisation_id'] ?? null) : null,
                 'generated_by' => Auth::id(),
             ]);
 
@@ -172,8 +167,6 @@ class PathologyBillingController extends Controller
             'tax' => 'nullable|numeric|min:0',
             'net_amount' => 'required|numeric|min:0',
             'note' => 'nullable|string',
-            'organisation_id' => 'nullable|exists:organisation,id',
-            'activate_tpa' => 'nullable|boolean',
             'tests' => 'required|array|min:1',
             'tests.*.pathology_id' => 'required|exists:pathology,id',
             'tests.*.report_days' => 'required|integer|min:0',
@@ -201,7 +194,6 @@ class PathologyBillingController extends Controller
                 'tax' => $validated['tax'] ?? 0,
                 'net_amount' => $validated['net_amount'],
                 'note' => $validated['note'] ?? null,
-                'organisation_id' => ($request->has('activate_tpa') && $request->activate_tpa) ? ($validated['organisation_id'] ?? null) : null,
             ]);
 
             // Delete existing reports
@@ -302,58 +294,6 @@ class PathologyBillingController extends Controller
             'report_days' => $test->report_days,
             'tax_percentage' => $test->charge && $test->charge->taxCategory ? $test->charge->taxCategory->percentage : 0,
             'amount' => $test->amount ?? 0,
-        ]);
-    }
-
-    /**
-     * API: Get TPA names for a patient from previous pathology bills
-     */
-    public function getPatientTpas($patientId)
-    {
-        $tpas = PathologyBilling::where('patient_id', $patientId)
-            ->whereNotNull('organisation_id')
-            ->with('organisation')
-            ->select('organisation_id')
-            ->distinct()
-            ->get()
-            ->map(function($billing) {
-                return [
-                    'id' => $billing->organisation_id,
-                    'name' => $billing->organisation ? $billing->organisation->organisation_name : 'Unknown TPA',
-                    'code' => $billing->organisation ? $billing->organisation->code : null,
-                ];
-            });
-        
-        return response()->json($tpas);
-    }
-
-    /**
-     * API: Get TPA charge for a specific test and TPA
-     */
-    public function getTpaCharge(Request $request)
-    {
-        $testId = $request->input('test_id');
-        $organisationId = $request->input('organisation_id');
-        
-        if (!$testId || !$organisationId) {
-            return response()->json(['error' => 'Test ID and Organisation ID are required'], 400);
-        }
-        
-        $test = Pathology::find($testId);
-        
-        if (!$test || !$test->charge_id) {
-            return response()->json(['tpa_charge' => null, 'standard_charge' => $test->amount ?? 0]);
-        }
-        
-        $tpaCharge = OrganisationsCharge::where('charge_id', $test->charge_id)
-            ->where('org_id', $organisationId)
-            ->first();
-        
-        $standardCharge = $test->amount ?? ($test->charge ? $test->charge->standard_charge : 0);
-        
-        return response()->json([
-            'tpa_charge' => $tpaCharge ? $tpaCharge->org_charge : null,
-            'standard_charge' => $standardCharge,
         ]);
     }
 }

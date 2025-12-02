@@ -22,10 +22,7 @@ class DeathReport extends Model
         'guardian_name',
         'death_report',
         'is_active',
-        'patient_name',
     ];
-
-    public $timestamps = false;   // ✅ VERY IMPORTANT
 
     /**
      * A death report belongs to a patient

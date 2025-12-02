@@ -49,9 +49,4 @@ class PatientBedHistory extends Model
     {
         return $this->belongsTo(Bed::class, 'bed_id');
     }
-
-    public function ipd()
-    {
-        return $this->belongsTo(IpdDetail::class, 'ipd_id');
-    }
 }

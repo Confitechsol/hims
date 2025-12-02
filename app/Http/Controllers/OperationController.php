@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\Operation;
 use App\Models\OperationCategory;
-use Illuminate\Support\Facades\Auth;
+
 use Illuminate\Http\Request;
 
 class OperationController extends Controller

@@ -11,9 +11,6 @@ class Expense extends Model
 
     protected $table = 'expenses';
 
-    // Table does not include Laravel timestamps by default
-    public $timestamps = false;
-
     protected $fillable = [
         'hospital_id',
         'branch_id',

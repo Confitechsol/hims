@@ -126,7 +126,7 @@
             height: 60px;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            z-index: 2;
+            z-index: 9998;
             background-image: url("<?php echo e(asset('/assets/images/bot.png')); ?>");
             background-size: 50%;
             background-repeat: no-repeat;
@@ -285,13 +285,6 @@
                     <a href="javascript:void(0);" class="btn btn-liner-gradient me-3 d-lg-flex d-none">AI
                         Assistance<i class="ti ti-chart-bubble-filled ms-1"></i></a>
                     <!-- AI Assistance -->
-
-                    <?php if(auth()->guard()->check()): ?>
-                        <a href="<?php echo e(route('hrms.switch')); ?>" class="btn btn-primary me-3 d-lg-flex d-none">
-                            Move to HR Portal
-                            <i class="ti ti-external-link ms-1"></i>
-                        </a>
-                    <?php endif; ?>
 
                     <!-- Appointment -->
                     <div class="header-item">
@@ -710,8 +703,6 @@
                 $('select.form-select').each(function() {
                     initSelect($(this));
                 });
-
-               
 
                 // Initialize selects that appear inside modals when they open
                 $('.modal').off('shown.bs.modal.select2init').on('shown.bs.modal.select2init', function() {

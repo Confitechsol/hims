@@ -35,8 +35,4 @@ return [
         ],
     ],
 
-    'hrms' => [
-        'base_url' => env('HRMS_URL', 'http://127.0.0.1/hrms'),
-    ],
-
 ];

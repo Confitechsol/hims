@@ -32,7 +32,6 @@ return new class extends Migration
             $table->foreign('opd_details_id')->references('id')->on('opd_details')->onDelete('set null');
             $table->foreign('ipd_id')->references('id')->on('ipd_details')->onDelete('set null');
             $table->foreign('generated_by')->references('id')->on('users')->onDelete('set null');
-            $table->softDeletes();
         });
     }
 

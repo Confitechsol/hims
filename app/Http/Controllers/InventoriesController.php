@@ -49,7 +49,6 @@ class InventoriesController extends Controller
         // Create main stock record
         $data = [
             'hospital_id'      => auth()->user()->hospital_id,
-            'branch_id'         => auth()->user()->branch_id ?? null,
             'item_category_id' => $request->item_category,
             'item_id'          => $request->item,
             'supplier_id'      => $request->supplier,

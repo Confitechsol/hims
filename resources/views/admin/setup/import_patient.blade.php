@@ -69,9 +69,9 @@
 
 
                                         <div class="text-end d-flex">
-                                            <a href="{{ route('patients.export') }}" class="btn btn-primary text-white ms-2 fs-13 btn-md"><i
-                                                    class="ti ti-download me-1"></i>Download Sample Data</a>
-                                            
+                                            <button id ="exportBtn"
+                                                class="btn btn-primary text-white ms-2 fs-13 btn-md"><i
+                                                    class="ti ti-download me-1"></i>Download Sample Data</button>
                                         </div>
                                     </div>
 

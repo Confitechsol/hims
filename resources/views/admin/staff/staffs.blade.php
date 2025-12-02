@@ -39,7 +39,7 @@
                                             </div>
                                             <!-- Modal -->
 
-                                           
+                                           {{--@include('components.modals.add-Staffs-modal') --}} 
 
 
                                             <div class="text-end d-flex">
@@ -55,7 +55,7 @@
                                         </div>
 
                                     </div>
-                                    <form action="{{ route('staffs.bulkDelete') }}" method="POST" id="bulk-delete-form">
+                                    <form action="{{ route('Staffs.bulkDelete') }}" method="POST" id="bulk-delete-form">
                                         @csrf
                                         @method('DELETE') <!-- Laravel RESTful delete -->
                                         <div class="text-end mb-2">
@@ -90,7 +90,7 @@
                                                 <tbody>
                                                     @foreach ($staffs as $staff)
                                                         <tr>
-                                                            <td><input type="checkbox" name="selected_staffs[]"
+                                                            <td><input type="checkbox" name="selected_Staffs[]"
                                                                     value="{{ $staff->id }}" class="select_item"></td>
                                                             <td>{{ $staff->name }} {{ $staff->surname }}</td>
                                                             <td>{{ $staff->employee_id }}</td>
@@ -100,13 +100,15 @@
                                                             <td>{{ $staff->is_active == '1' ? 'Yes' : 'No' }}</td>
                                                             <td>
                                                                 <div class="d-flex">
-                                                                    <a href="{{ route('staff.edit', $staff->id) }}" 
-                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
-                                                                        >
-                                                                        <i class="ti ti-pencil"></i>
-                                                                    </a>
-
-                                                                    
+                                                                    <a href="javascript: void(0);"
+                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+                                                                        <i class="ti ti-menu" data-bs-toggle="tooltip"
+                                                                            title="Assign Permission"></i></a>
+                                                                    <a href="javascript: void(0);"
+                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
+                                                                        <i class="ti ti-dots-vertical"
+                                                                            data-bs-toggle="tooltip"
+                                                                            title="Assign Permission"></i></a>
                                                                 </div>
                                                             </td>
                                                         </tr>

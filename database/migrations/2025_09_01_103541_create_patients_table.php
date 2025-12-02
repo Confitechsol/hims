@@ -24,9 +24,6 @@ return new class extends Migration
             $table->date('as_of_date')->nullable();
             $table->text('image')->nullable();
             $table->string('mobileno', 100)->nullable()->index();
-            $table->string('height')->nullable();
-            $table->string('weight')->nullable();
-            $table->string('temperature')->nullable();
             $table->string('email', 100)->nullable()->index();
             $table->string('gender', 100)->nullable()->index();
             $table->string('marital_status', 100)->index();
