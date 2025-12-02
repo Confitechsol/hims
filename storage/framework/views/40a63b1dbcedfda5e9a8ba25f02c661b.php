@@ -1,6 +1,4 @@
-@extends('layouts.main')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 
     <body data-spy="scroll" data-target=".navbar" data-offset="90" class="position-relative">
 
@@ -33,14 +31,14 @@
                     <!--Nav Links-->
                     <div class="collapse navbar-collapse">
                         <div class="navbar-nav mx-auto">
-                            <a class="nav-link" href="{{ route('dashboard') }}">Home</a>
+                            <a class="nav-link" href="<?php echo e(route('dashboard')); ?>">Home</a>
                             <a class="nav-link scroll" href="#whymegaone">Why Cognaihealth</a>
-                            <a href="{{ route('doctors') }}" class="nav-link">Doctors</a>
-                            <a href="{{ route('appointments') }}" class="nav-link active">Appointment</a>
+                            <a href="<?php echo e(route('doctors')); ?>" class="nav-link">Doctors</a>
+                            <a href="<?php echo e(route('appointments')); ?>" class="nav-link active">Appointment</a>
                             <a class="nav-link scroll" href="#pateintgallery">Pateint Gallery</a>
                             <a class="nav-link scroll" href="#ourblogs">Our Blogs</a>
                             <a class="nav-link scroll" href="#contactus">Contact us</a>
-                            <a class="nav-link active bg-info text-white" href="{{ route('userLogin') }}">Login</a>
+                            <a class="nav-link active bg-info text-white" href="<?php echo e(route('userLogin')); ?>">Login</a>
                         </div>
                         <div> <span class="open_search"><i class="fas fa-search"></i> </span></div>
 
@@ -84,16 +82,16 @@
                     <nav class="side-nav w-100">
                         <ul class="navbar-nav">
                             <li class="nav-item">
-                                <a class="nav-link  scroll" href="{{ route('dashboard') }}">Home</a>
+                                <a class="nav-link  scroll" href="<?php echo e(route('dashboard')); ?>">Home</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link  scroll" href="#whymegaone">Why MegaOne</a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('doctors') }}" class="nav-link">Doctors</a>
+                                <a href="<?php echo e(route('doctors')); ?>" class="nav-link">Doctors</a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('appointments') }}" class="nav-link active">Appointment</a>
+                                <a href="<?php echo e(route('appointments')); ?>" class="nav-link active">Appointment</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link  scroll" href="#pateintgallery">Pateint Gallery</a>
@@ -146,8 +144,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @if (isset($bookings) && isset($bookings['bookings']))
-                                    @foreach ($bookings['bookings'] as $i => $row)
+                                <?php if(isset($bookings) && isset($bookings['bookings'])): ?>
+                                    <?php $__currentLoopData = $bookings['bookings']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $row): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <tr>
 
                                             <td><?= htmlspecialchars($row['id'] ?? '') ?></td>
@@ -157,12 +155,12 @@
                                             <td class="text-muted"><?= htmlspecialchars($row['slot'] ?? '') ?></td>
                                             <td class="fw-semibold"><?= htmlspecialchars($row['booked_at'] ?? '') ?></td>
                                         </tr>
-                                    @endforeach
-                                @else
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                <?php else: ?>
                                     <tr>
                                         <td colspan="7" class="text-center text-danger">No bookings found</td>
                                     </tr>
-                                @endif
+                                <?php endif; ?>
 
                             </tbody>
                         </table>
@@ -209,4 +207,6 @@
 
 
     </body>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.main', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\hims\resources\views/home/appointments.blade.php ENDPATH**/ ?>

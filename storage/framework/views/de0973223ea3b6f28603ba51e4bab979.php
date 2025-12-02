@@ -1,6 +1,4 @@
-@extends('layouts.main')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 
     <body data-spy="scroll" data-target=".navbar" data-offset="90" class="position-relative">
 
@@ -32,14 +30,14 @@
                     <!--Nav Links-->
                     <div class="collapse navbar-collapse">
                         <div class="navbar-nav mx-auto">
-                            <a class="nav-link scroll" href="{{ route('dashboard') }}">Home</a>
+                            <a class="nav-link scroll" href="<?php echo e(route('dashboard')); ?>">Home</a>
                             <a class="nav-link scroll" href="#whymegaone">Why Cognaihealth</a>
-                            <a href="{{ route('doctors') }}" class="nav-link">Doctors</a>
-                            <a class="nav-link" href="{{ route('appointments') }}">Appointment</a>
+                            <a href="<?php echo e(route('doctors')); ?>" class="nav-link">Doctors</a>
+                            <a class="nav-link" href="<?php echo e(route('appointments')); ?>">Appointment</a>
                             <a class="nav-link scroll" href="#pateintgallery">Pateint Gallery</a>
                             <a class="nav-link scroll" href="#ourblogs">Our Blogs</a>
                             <a class="nav-link scroll" href="#contactus">Contact us</a>
-                            <a class="nav-link active bg-info text-white" href="{{ route('userLogin') }}">Login</a>
+                            <a class="nav-link active bg-info text-white" href="<?php echo e(route('userLogin')); ?>">Login</a>
                         </div>
                         <div> <span class="open_search"><i class="fas fa-search"></i> </span></div>
 
@@ -143,7 +141,7 @@
                             data-param4="" data-param5="" data-param6="" data-param7="" data-param8="" data-param9=""
                             data-param10="" data-description="">
                             <!-- MAIN IMAGE -->
-                            <img src="{{ asset('assets/medical/img/3d469-bg-light-1.jpg') }}" alt=""
+                            <img src="<?php echo e(asset('assets/medical/img/3d469-bg-light-1.jpg')); ?>" alt=""
                                 data-bgposition="center center" data-bgfit="cover" data-bgrepeat="no-repeat"
                                 class="rev-slidebg" data-no-retina>
                             <div class="small-bg-overlay"></div>
@@ -210,7 +208,7 @@
                             data-param4="" data-param5="" data-param6="" data-param7="" data-param8="" data-param9=""
                             data-param10="" data-description="">
                             <!-- MAIN IMAGE -->
-                            <img src="{{ asset('assets/medical/img/3d469-bg-light-2.jpg') }}" alt=""
+                            <img src="<?php echo e(asset('assets/medical/img/3d469-bg-light-2.jpg')); ?>" alt=""
                                 data-bgposition="center center" data-bgfit="cover" data-bgrepeat="no-repeat"
                                 class="rev-slidebg" data-no-retina>
 
@@ -277,7 +275,7 @@
                             data-param4="" data-param5="" data-param6="" data-param7="" data-param8="" data-param9=""
                             data-param10="" data-description="">
                             <!-- MAIN IMAGE -->
-                            <img src="{{ asset('assets/medical/img/3d469-bg-light-3.jpg') }}" alt=""
+                            <img src="<?php echo e(asset('assets/medical/img/3d469-bg-light-3.jpg')); ?>" alt=""
                                 data-bgposition="center center" data-bgfit="cover" data-bgrepeat="no-repeat"
                                 class="rev-slidebg" data-no-retina>
                             <div class="small-bg-overlay"></div>
@@ -817,9 +815,9 @@
 
                         <ul class="da-thumbs gallery">
                             <li class="items surgery operations">
-                                <img src="{{ asset('assets/medical/img/portfolio-1.jpg') }}" alt="img">
+                                <img src="<?php echo e(asset('assets/medical/img/portfolio-1.jpg')); ?>" alt="img">
                                 <div class="overlay">
-                                    <a href="{{ asset('assets/medical/img/portfolio-1.jpg') }}" class="text-center"
+                                    <a href="<?php echo e(asset('assets/medical/img/portfolio-1.jpg')); ?>" class="text-center"
                                         data-fancybox="images">
                                         <div class="search-icon"><i class="fa fa-search"></i> </div>
                                         <h4 class="">Surgery</h4>
@@ -827,9 +825,9 @@
                                 </div>
                             </li>
                             <li class="items clinical patients">
-                                <img src="{{ asset('assets/medical/img/portfolio-2.jpg') }}" alt="img">
+                                <img src="<?php echo e(asset('assets/medical/img/portfolio-2.jpg')); ?>" alt="img">
                                 <div class="overlay">
-                                    <a href="{{ asset('assets/medical/img/portfolio-2.jpg') }}" class="text-center"
+                                    <a href="<?php echo e(asset('assets/medical/img/portfolio-2.jpg')); ?>" class="text-center"
                                         data-fancybox="images">
                                         <div class="search-icon"><i class="fa fa-search"></i> </div>
                                         <h4 class="">Happy patient</h4>
@@ -837,7 +835,7 @@
                                 </div>
                             </li>
                             <li class="items operations clinical">
-                                <img src="{{ asset('assets/medical/img/portfolio-3.jpg') }}" class="text-center"
+                                <img src="<?php echo e(asset('assets/medical/img/portfolio-3.jpg')); ?>" class="text-center"
                                     data-fancybox="images">
                                 <div class="search-icon"><i class="fa fa-search"></i> </div>
                                 <h4 class="">Clinical</h4>
@@ -845,9 +843,9 @@
                     </div>
                     </li>
                     <li class="items patients operations">
-                        <img src="{{ asset('assets/medical/img/portfolio-4.jpg') }}" alt="img">
+                        <img src="<?php echo e(asset('assets/medical/img/portfolio-4.jpg')); ?>" alt="img">
                         <div class="overlay">
-                            <a href="{{ asset('assets/medical/img/portfolio-4.jpg') }}" class="text-center"
+                            <a href="<?php echo e(asset('assets/medical/img/portfolio-4.jpg')); ?>" class="text-center"
                                 data-fancybox="images">
                                 <div class="search-icon"><i class="fa fa-search"></i> </div>
                                 <h4 class="">Clinical</h4>
@@ -856,9 +854,9 @@
                     </li>
 
                     <li class="items surgery patients">
-                        <img src="{{ asset('assets/medical/img/portfolio-5.jpg') }}" alt="img">
+                        <img src="<?php echo e(asset('assets/medical/img/portfolio-5.jpg')); ?>" alt="img">
                         <div class="overlay">
-                            <a href="{{ asset('assets/medical/img/portfolio-5.jpg') }}" class="text-center"
+                            <a href="<?php echo e(asset('assets/medical/img/portfolio-5.jpg')); ?>" class="text-center"
                                 data-fancybox="images">
                                 <div class="search-icon"><i class="fa fa-search"></i> </div>
                                 <h4 class="">Patients</h4>
@@ -867,9 +865,9 @@
                     </li>
                     <li class="items clinical surgery">
 
-                        <img src="{{ asset('assets/medical/img/portfolio-6.jpg') }}" alt="img">
+                        <img src="<?php echo e(asset('assets/medical/img/portfolio-6.jpg')); ?>" alt="img">
                         <div class="overlay">
-                            <a href="{{ asset('assets/medical/img/portfolio-6.jpg') }}" class="text-center"
+                            <a href="<?php echo e(asset('assets/medical/img/portfolio-6.jpg')); ?>" class="text-center"
                                 data-fancybox="images">
                                 <div class="search-icon"><i class="fa fa-search"></i> </div>
                                 <h4 class="">Operation</h4>
@@ -912,7 +910,7 @@
 
                             <!--Image-->
                             <div class="testimonial-image">
-                                <img src="{{ asset('assets/medical/img/testimonial-1.png') }}" alt="image">
+                                <img src="<?php echo e(asset('assets/medical/img/testimonial-1.png')); ?>" alt="image">
                             </div>
                             <h5 class="font-weight-500 main-font drk-blu">David Gover</h5>
                             <span class="destination main-font">Newyork, USA</span>
@@ -927,7 +925,7 @@
 
                             <!--Image-->
                             <div class="testimonial-image">
-                                <img src="{{ asset('assets/medical/img/testimonial-2.png') }}" alt="image">
+                                <img src="<?php echo e(asset('assets/medical/img/testimonial-2.png')); ?>" alt="image">
                             </div>
                             <h5 class="font-weight-500 main-font drk-blu">Jessica Briany</h5>
                             <span class="destination main-font">Florida, USA</span>
@@ -942,7 +940,7 @@
 
                             <!--Image-->
                             <div class="testimonial-image">
-                                <img src="{{ asset('assets/medical/img/testimonial-3.png') }}" alt="image">
+                                <img src="<?php echo e(asset('assets/medical/img/testimonial-3.png')); ?>" alt="image">
                             </div>
                             <h5 class="font-weight-500 main-font drk-blu">Albert Joseph</h5>
                             <span class="destination main-font">London, USA</span>
@@ -957,7 +955,7 @@
 
                             <!--Image-->
                             <div class="testimonial-image">
-                                <img src="{{ asset('assets/medical/img/testimonial-1.png') }}" alt="image">
+                                <img src="<?php echo e(asset('assets/medical/img/testimonial-1.png')); ?>" alt="image">
                             </div>
                             <h5 class="font-weight-500 main-font drk-blu">David Gover</h5>
                             <span class="destination main-font">Newyork, USA</span>
@@ -972,7 +970,7 @@
 
                             <!--Image-->
                             <div class="testimonial-image">
-                                <img src="{{ asset('assets/medical/img/testimonial-1.png') }}" alt="image">
+                                <img src="<?php echo e(asset('assets/medical/img/testimonial-1.png')); ?>" alt="image">
                             </div>
                             <h5 class="font-weight-500 main-font drk-blu">David Gover</h5>
                             <span class="destination main-font">Newyork, USA</span>
@@ -987,7 +985,7 @@
 
                             <!--Image-->
                             <div class="testimonial-image">
-                                <img src="{{ asset('assets/medical/img/testimonial-1.png') }}" alt="image">
+                                <img src="<?php echo e(asset('assets/medical/img/testimonial-1.png')); ?>" alt="image">
                             </div>
                             <h5 class="font-weight-500 main-font drk-blu">David Gover</h5>
                             <span class="destination main-font">Newyork, USA</span>
@@ -1029,13 +1027,13 @@
                         </div>
                         <div id="blog-slider" class=" owl-carousel">
                             <div class="item blog-image wow hover-effect fadeInLeft">
-                                <img src="{{ asset('assets/medical/img/blog-image1.jpg') }}" alt="image">
+                                <img src="<?php echo e(asset('assets/medical/img/blog-image1.jpg')); ?>" alt="image">
                             </div>
                             <div class="item blog-image wow hover-effect fadeInLeft">
-                                <img src="{{ asset('assets/medical/img/blog-image3.jpg') }}" alt="image">
+                                <img src="<?php echo e(asset('assets/medical/img/blog-image3.jpg')); ?>" alt="image">
                             </div>
                             <div class="item blog-image wow hover-effect fadeInLeft">
-                                <img src= "{{ asset('assets/medical/img/blog-image4.jpg') }}" alt="image">
+                                <img src= "<?php echo e(asset('assets/medical/img/blog-image4.jpg')); ?>" alt="image">
                             </div>
 
                         </div>
@@ -1067,13 +1065,13 @@
                         <!--Blog Image-->
                         <div id="blog-slider-1" class="owl-carousel">
                             <div class="item blog-image2 text-right hover-effect wow fadeInRight">
-                                <img src="{{ asset('assets/medical/img/blog-image2.jpg') }}" alt="image">
+                                <img src="<?php echo e(asset('assets/medical/img/blog-image2.jpg')); ?>" alt="image">
                             </div>
                             <div class="item blog-image2 text-right hover-effect wow fadeInRight">
-                                <img src="{{ asset('assets/medical/img/blog-image5.jpg') }}" alt="image">
+                                <img src="<?php echo e(asset('assets/medical/img/blog-image5.jpg')); ?>" alt="image">
                             </div>
                             <div class="item blog-image2 text-right hover-effect wow fadeInRight">
-                                <img src="{{ asset('assets/medical/img/blog-image6.jpg') }}" alt="image">
+                                <img src="<?php echo e(asset('assets/medical/img/blog-image6.jpg')); ?>" alt="image">
                             </div>
                         </div>
                     </div>
@@ -1159,4 +1157,6 @@
     </body>
 
     <!-- Mirrored from megaone.acrothemes.com/index-medical.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 28 Aug 2025 09:28:57 GMT -->
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.main', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\hims\resources\views/home/homeScreen.blade.php ENDPATH**/ ?>
