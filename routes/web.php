@@ -68,6 +68,7 @@ use App\Http\Controllers\TpamanagmentController;
 use App\Http\Controllers\VisitorsController;
 use App\Http\Controllers\VitalController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\DoctorController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -666,6 +667,22 @@ Route::prefix('certificate')->group(function () {
     Route::get('/staff_id', function () {
         return view('admin.certificate.staff_id');
     })->name('staff_id');
+});
+Route::prefix('doctors')->group(function () {
+    
+    Route::get('/', [DoctorController::class, 'index'])->name('doctors.index');
+    Route::get('/create', [DoctorController::class, 'create'])->name('createDoctor');
+    Route::post('/addStaff', [DoctorController::class, 'store'])->name('doctor.store');
+    
+    Route::get('/import', [DoctorController::class, 'importDoctor'])->name('doctor-import');
+    Route::post('/bulkimport', [DoctorController::class, 'importDoctorExcel'])->name('doctors.import');
+
+    Route::get('/export-staffs', [DoctorController::class, 'exportDoctorExcel'])->name('doctors.export');
+
+
+    Route::get('/edit/{id}', [DoctorController::class, 'edit'])->name('doctor.edit');
+    Route::put('/update/{id}', [DoctorController::class, 'update'])->name('doctor.update');
+    Route::delete('/delete', [DoctorController::class, 'bulkDelete'])->name('doctors.bulkDelete');
 });
 // Pharmacy Routes
 Route::prefix('pharmacy')->group(function () {

@@ -298,7 +298,13 @@ class IpdController extends Controller
     public function getBedNumbers(Request $request, $id)
     {
         // dd($id);
-        $bedNumbers = Bed::where('bed_group_id', $id)->where('is_active', 'yes')->get();
+        // $bedNumbers = Bed::where('bed_group_id', $id)->where('is_active', 'yes')->get();
+        $bedNumbers = Bed::where('bed_group_id', $id)
+        ->where('is_active', 'yes')
+        ->whereDoesntHave('patientBedHistory', function ($query) {
+            $query->where('is_active', 'yes'); // means currently occupied
+        })
+        ->get();
         // dd($bedNumbers);
         return response()->json($bedNumbers, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
     }
@@ -483,41 +489,50 @@ class IpdController extends Controller
 
         return response()->json($availableBeds);
     }
-     public function assignNewBed(Request $request)
-    {
-       
-        $request->validate([
-            'released_date' => 'required|date',
-            'bed_group' => 'required',
-            'new_bed' => 'required',
-        ]);
+    public function assignNewBed(Request $request)
+{
+    $request->validate([
+        'released_date' => 'required|date',
+        'bed_group' => 'required',
+        'new_bed' => 'required',
+    ]);
 
-        $ipd = IpdDetail::findOrFail($request->ipd_id);
-        //dd($ipd->id) ;
-        // Mark old bed as released
-        if($ipd->bedDetail){
-            PatientBedHistory::where('ipd_id', $ipd->id)
-                ->where('is_active', 'yes')
-                ->update(['is_active' => 'no', 'to_date' => $request->released_date]);
-             Bed::where('id', $ipd->bedDetail->id)->update(['is_active' => 'no']);
-        }
+    $ipd = IpdDetail::findOrFail($request->ipd_id);
 
-        // Assign new bed
-        PatientBedHistory::create([
-            'ipd_id' => $ipd->id,
-            'bed_id' => $request->new_bed,
-            'bed_group_id' => $request->bed_group,
-            'is_active' => 'yes',
-            'from_date' => now(),
-        ]);
+    // --- Release old bed ---
+    if ($ipd->bed) {
 
-       
-        // Update ipd bed reference
-        // $ipd->bed_id = $request->new_bed;
-        // $ipd->bed_group_id = $request->bed_group;
-        // $ipd->save();
+        // Mark old history inactive
+        PatientBedHistory::where('ipd_id', $ipd->id)
+            ->where('is_active', 'yes')
+            ->update([
+                'is_active' => 'no',
+                'to_date' => $request->released_date
+            ]);
 
-        return redirect()->back()->with('success', 'Bed assigned successfully.');
+        // Make old bed available
+        Bed::where('id', $ipd->bed)->update(['is_active' => 'yes']);
     }
+
+    // --- Assign new bed ---
+    PatientBedHistory::create([
+        'ipd_id' => $ipd->id,
+        'bed_id' => $request->new_bed,
+        'bed_group_id' => $request->bed_group,
+        'from_date' => $request->released_date,
+        'is_active' => 'yes',
+    ]);
+
+    // Make new bed occupied
+    Bed::where('id', $request->new_bed)->update(['is_active' => 'no']);
+
+    // Update IPD record
+    $ipd->bed = $request->new_bed;
+    $ipd->bed_group_id = $request->bed_group;
+    $ipd->save();
+
+    return redirect()->back()->with('success', 'Bed assigned successfully.');
+}
+
 
 }
