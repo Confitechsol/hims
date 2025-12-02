@@ -7,12 +7,14 @@
             color: #f8f9fa !important;
             font-weight: 600 !important;
         }
+
+        
     </style>
     <div class="container">
         <div class="card shadow-sm border-0 mt-4">
             <div class="card-header d-flex justify-content-between align-items-center align-items-sm-center justify-content-between flex-sm-row"
                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> OPD</h5>
+                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> IPD </h5>
                 <div class="text-end d-flex">
                     <ul class="nav nav-tabs">
                         <li class="nav-item" style="border-bottom:0">
@@ -41,6 +43,18 @@
                 @if (session('error'))
                     <div class="alert alert-danger alert-dismissible fade show">{{ session('error') }}</div>
                 @endif
+                {{-- Validation Errors --}}
+@if ($errors->any())
+    <div class="alert alert-danger alert-dismissible fade show">
+        <strong>There were some problems with your input:</strong>
+        <ul class="mt-2 mb-0">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card">
@@ -85,7 +99,7 @@
 
                                     <div class="text-end d-flex">
                                         <button class="btn btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#createIpdModal">Appoint Patient</button>
+                                            data-bs-target="#createIpdModal">Admit Patient</button>
                                     </div>
                                 </div>
                                 @if ($isIpdTab)
@@ -187,7 +201,7 @@
                                 </div>
                                 <div class="offcanvas-body">
                                     <div class="filter-section pb-3 rounded">
-                                        <form action="{{ request()->routeIs('opd') ? route('opd') : route('opd') }}"
+                                        <form action="{{ request()->routeIs('ipd') ? route('ipd') : route('ipd') }}"
                                             method="GET" class="text-center" id="searchForm">
                                             <div
                                                 class="d-flex flex-column flex-md-row gap-2 align-items-center justify-content-center">
@@ -249,7 +263,7 @@
                                                 <button type="submit" class="btn cmn_btn btn-primary w-100">
                                                     <i class="fas fa-filter me-1"></i> Filter
                                                 </button>
-                                                <a href="{{ request()->routeIs('opd') ? route('opd') : route('opd') }}"
+                                                <a href="{{ request()->routeIs('ipd') ? route('ipd') : route('ipd') }}"
                                                     class="btn btn-outline-dark w-100">
                                                     Reset
                                                 </a>
@@ -267,12 +281,13 @@
         </div>
     </div>
 
-    {{-- create OPD modal --}}
+    {{-- create IPD modal --}}
     @include('components.modals.ipd-create-modal')
 
     {{-- filters --}}
 
     <script>
+        
         document.addEventListener("DOMContentLoaded", function() {
             const filterTypeSelect = document.getElementById('filterType');
             const dateRangeFilter = document.getElementById('dateRangeFilter');
@@ -327,7 +342,7 @@
     </script>
 
 
-    {{-- <script>
+    <!-- {{-- <script>
         // const editButton = document.querySelector('.edit-opd')
         // console.log(editButton);
 
@@ -352,7 +367,7 @@
                     '<option value="">Select symptom types first...</option>';
 
                 try {
-                    const baseUrl = "{{ route('opd.edit', ['id' => 'ID']) }}";
+                    const baseUrl = "{{ route('ipd.edit', ['id' => 'ID']) }}";
                     const finalUrl = baseUrl.replace('ID', opdId);
                     const response = await fetch(finalUrl);
                     const data = await response.json();
@@ -445,5 +460,5 @@
                 }
             });
         }
-    </script> --}}
+    </script> --}} -->
 @endsection

@@ -52,6 +52,12 @@ return [
             'lock_path' => storage_path('framework/cache/data'),
         ],
 
+        'shared' => [
+            'driver' => 'file',
+            'path' => env('SHARED_CACHE_PATH', base_path('../shared-cache')),
+            'lock_path' => env('SHARED_CACHE_LOCK_PATH', base_path('../shared-cache')),
+        ],
+
         'memcached' => [
             'driver' => 'memcached',
             'persistent_id' => env('MEMCACHED_PERSISTENT_ID'),
@@ -105,4 +111,5 @@ return [
 
     'prefix' => env('CACHE_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')).'-cache-'),
 
+    'shared_store' => env('SHARED_CACHE_STORE', 'shared'),
 ];

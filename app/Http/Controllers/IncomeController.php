@@ -65,43 +65,42 @@ class IncomeController extends Controller
 
         return redirect()->back()->with('success', 'Income created successfully.');
     }
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
         $request->validate([
-            'id' => 'required|exists:income,id',
             'income_head_id' => 'required|exists:income_head,id',
             'name' => 'required|string|max:255',
-            'invoice_no' => 'required|string|max:255|unique:income,invoice_no,' . $request->id,
+            'invoice_no' => 'required|string|max:255|unique:income,invoice_no,' . $id,
             'amount' => 'required|numeric|min:0',
             'date' => 'required|date',
         ]);
-    
-        $income = Income::findOrFail($request->id);
-    
+
+        $income = Income::findOrFail($id);
+
         // Handle document update (optional)
         if ($request->hasFile('document')) {
             $request->validate([
                 'document' => 'file|mimes:pdf,jpg,jpeg,png|max:2048',
             ]);
-    
+
             // Remove old document if it exists and is local
             if (!empty($income->documents)) {
-                $oldPath = str_replace(url('/'), public_path(), $income->documents);
-                $path = url('/').$oldPath;
-                if (file_exists($path)) {
-                    @unlink($path);
+                $oldRelative = ltrim($income->documents, '/');
+                $oldFullPath = public_path($oldRelative);
+                if (file_exists($oldFullPath)) {
+                    @unlink($oldFullPath);
                 }
             }
-    
+
             // Upload new file
             $file = $request->file('document');
             $fileName = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('uploads'), $fileName);
 
-            // Save full dynamic URL
+            // Save relative path for consistency with create()
             $income->documents = '/uploads/' . $fileName;
         }
-    
+
         // Update other fields
         $income->inc_head_id = $request->income_head_id;
         $income->name = $request->name;
@@ -109,9 +108,9 @@ class IncomeController extends Controller
         $income->amount = $request->amount;
         $income->date = $request->date;
         $income->note = $request->note;
-    
+
         $income->save();
-    
+
         return redirect()->back()->with('success', 'Income updated successfully.');
     }
     

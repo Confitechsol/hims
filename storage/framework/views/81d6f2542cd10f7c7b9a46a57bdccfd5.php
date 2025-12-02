@@ -1440,15 +1440,15 @@
 
                                                                     </div>
                                                                     <form method="POST" action="<?php echo e(isset($timeline) ? route('patient-timeline.update', $timeline->id) : route('patient-timeline.store')); ?>" enctype="multipart/form-data">
-    <?php echo csrf_field(); ?>
-    <?php if(isset($timeline)): ?>
-        <?php echo method_field('PUT'); ?>
-    <?php endif; ?>
+                                                                            <?php echo csrf_field(); ?>
+                                                                            <?php if(isset($timeline)): ?>
+                                                                                <?php echo method_field('PUT'); ?>
+                                                                            <?php endif; ?>
 
-    <input type="hidden" name="patient_id" value="<?php echo e($appointment->patient_id ?? ''); ?>">
+                                                                            <input type="hidden" name="patient_id" value="<?php echo e($appointment->patient_id ?? ''); ?>">
 
     <div class="modal-body">
-        <div class="row gy-3">
+        <div class="row p-4 mx-1 gy-3">
             <!-- Title -->
             <div class="col-md-12">
                 <label for="title" class="form-label">
@@ -1458,55 +1458,55 @@
                     value="<?php echo e(old('title', $timeline->title ?? '')); ?>" required>
             </div>
 
-            <!-- Date -->
-            <div class="col-md-12">
-                <label for="date" class="form-label">
-                    Date <span class="text-danger">*</span>
-                </label>
-                <input type="date" name="date" id="date" class="form-control"
-                    value="<?php echo e(old('date', isset($timeline->date) ? \Carbon\Carbon::parse($timeline->date)->format('Y-m-d') : '')); ?>" required>
-            </div>
+                                                                                    <!-- Date -->
+                                                                                    <div class="col-md-12">
+                                                                                        <label for="date" class="form-label">
+                                                                                            Date <span class="text-danger">*</span>
+                                                                                        </label>
+                                                                                        <input type="date" name="date" id="date" class="form-control"
+                                                                                            value="<?php echo e(old('date', isset($timeline->date) ? \Carbon\Carbon::parse($timeline->date)->format('Y-m-d') : '')); ?>" required>
+                                                                                    </div>
 
-            <!-- Description -->
-            <div class="col-md-12">
-                <label for="description" class="form-label">
-                    Description
-                </label>
-                <textarea name="description" id="description" class="form-control" rows="3"><?php echo e(old('description', $timeline->description ?? '')); ?></textarea>
-            </div>
+                                                                                    <!-- Description -->
+                                                                                    <div class="col-md-12">
+                                                                                        <label for="description" class="form-label">
+                                                                                            Description
+                                                                                        </label>
+                                                                                        <textarea name="description" id="description" class="form-control" rows="3"><?php echo e(old('description', $timeline->description ?? '')); ?></textarea>
+                                                                                    </div>
 
-            <!-- Attach Document -->
-            <div class="col-md-12">
-                <label for="attch_doc" class="form-label">
-                    Attach Document
-                </label>
-                <input type="file" name="attch_doc" id="attch_doc" class="form-control">
-                <?php if(isset($timeline) && $timeline->attch_doc): ?>
-                    <small class="text-muted d-block mt-1">
-                        Current File:
-                        <a href="<?php echo e(asset('storage/timeline_docs/' . $timeline->attch_doc)); ?>" target="_blank">
-                            View Document
-                        </a>
-                    </small>
-                <?php endif; ?>
-            </div>
+                                                                                    <!-- Attach Document -->
+                                                                                    <div class="col-md-12">
+                                                                                        <label for="attch_doc" class="form-label">
+                                                                                            Attach Document
+                                                                                        </label>
+                                                                                        <input type="file" name="attch_doc" id="attch_doc" class="form-control">
+                                                                                        <?php if(isset($timeline) && $timeline->attch_doc): ?>
+                                                                                            <small class="text-muted d-block mt-1">
+                                                                                                Current File:
+                                                                                                <a href="<?php echo e(asset('storage/timeline_docs/' . $timeline->attch_doc)); ?>" target="_blank">
+                                                                                                    View Document
+                                                                                                </a>
+                                                                                            </small>
+                                                                                        <?php endif; ?>
+                                                                                    </div>
 
-            <!-- Visible to Person -->
-            <div class="col-md-12 form-check">
-                <input type="checkbox" name="visible_person" id="visible_person" class="form-check-input"
-                    <?php echo e(old('visible_person', $timeline->visible_person ?? false) ? 'checked' : ''); ?>>
-                <label for="visible_person" class="form-check-label">Visible to this person</label>
-            </div>
-        </div>
-    </div>
+                                                                                    <!-- Visible to Person -->
+                                                                                    <div class="col-md-12 form-check">
+                                                                                        <input type="checkbox" name="visible_person" id="visible_person" class="form-check-input"
+                                                                                            <?php echo e(old('visible_person', $timeline->visible_person ?? false) ? 'checked' : ''); ?>>
+                                                                                        <label for="visible_person" class="form-check-label">Visible to this person</label>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
 
-    <div class="modal-footer">
-        <button type="submit" class="btn btn-primary">
-            <?php echo e(isset($timeline) ? 'Update' : 'Save'); ?>
+                                                                            <div class="modal-footer">
+                                                                                <button type="submit" class="btn btn-primary">
+                                                                                    <?php echo e(isset($timeline) ? 'Update' : 'Save'); ?>
 
-        </button>
-    </div>
-</form>
+                                                                                </button>
+                                                                            </div>
+                                                                        </form>
 
                                                                 </div>
                                                             </div>
@@ -1528,39 +1528,39 @@
                                                         </thead>
                                                         <tbody>
                                                              <?php $__empty_1 = true; $__currentLoopData = $PatientTimelines; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $timeline): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                <tr>
-                    <td>
-                        <h6 class="fs-14 mb-1">
-                            <a href="#" class="fw-semibold"><?php echo e($timeline->patient->patient_name ?? '-'); ?></a>
-                        </h6>
-                    </td>
-                    
-                    
-                    <td><?php echo e($timeline->title ?? '-'); ?></td>
-                    <td><?php echo e($timeline->description ?? '-'); ?></td>
-                    <td>
-                        <?php if(!empty($timeline->timeline_date)): ?>
-                            <?php echo e(\Carbon\Carbon::parse($timeline->timeline_date)->format('d/m/Y h:i A')); ?>
+                                                            <tr>
+                                                                <td>
+                                                                    <h6 class="fs-14 mb-1">
+                                                                        <a href="#" class="fw-semibold"><?php echo e($timeline->patient->patient_name ?? '-'); ?></a>
+                                                                    </h6>
+                                                                </td>
+                                                                
+                                                                
+                                                                <td><?php echo e($timeline->title ?? '-'); ?></td>
+                                                                <td><?php echo e($timeline->description ?? '-'); ?></td>
+                                                                <td>
+                                                                    <?php if(!empty($timeline->timeline_date)): ?>
+                                                                        <?php echo e(\Carbon\Carbon::parse($timeline->timeline_date)->format('d/m/Y h:i A')); ?>
 
-                        <?php else: ?>
-                            -
-                        <?php endif; ?>
-                    </td>
-                    <td>
-                        <div class="d-flex gap-2">
-                            <a href="#"
-                               class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
-                               data-bs-toggle="tooltip" title="Show">
-                                <i class="ti ti-menu"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                <tr>
-                    <td colspan="6" class="text-center text-muted">No timeline records found</td>
-                </tr>
-            <?php endif; ?>
+                                                                    <?php else: ?>
+                                                                        -
+                                                                    <?php endif; ?>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="d-flex gap-2">
+                                                                        <a href="#"
+                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
+                                                                        data-bs-toggle="tooltip" title="Show">
+                                                                            <i class="ti ti-menu"></i>
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                                                <tr>
+                                                                    <td colspan="6" class="text-center text-muted">No timeline records found</td>
+                                                                </tr>
+                                                            <?php endif; ?>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1589,8 +1589,7 @@
                                     <div class="col-lg-12">
                                         <div class="card">
                                             <div class="card-body">
-                                                <div
-                                                    class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
+                                                <div class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
                                                     <div class="input-icon-start position-relative me-2">
                                                         <span class="input-icon-addon">
                                                             <i class="ti ti-search"></i>
@@ -1625,12 +1624,12 @@
                                                                     <form method="POST" action="<?php echo e(route('patient-vitals.store')); ?>">
                                                                         <?php echo csrf_field(); ?>
                                                                             <input type="hidden" name="patient_id" value="<?php echo e($appointment->patient_id); ?>">
-                                                                        <div class="modal-body">
+                                                                        <div class="modal-body p-4 mx-1">
                                                                             <div id="vitalFields">
                                                                                 <div class="row gy-3 vital-row mb-2">
                                                                                     <!-- Vital Name -->
                                                                                       
-                                                                                    <div class="col-md-4">
+                                                                                    <div class="col-md-3">
                                                                                         <label for="vital_name" class="form-label">Vital Name</label>
                                                                                         <select class="form-select" name="vital_name[]" id="vital_name">
                                                                                             <option value="">Select</option>
@@ -1694,48 +1693,48 @@
                                                         </thead>
                                                         <tbody>
                                                               <?php $__empty_1 = true; $__currentLoopData = $vitalDetails->groupBy('patient_id'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $caseId => $caseVitals): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-            <?php
-                $firstRecord = $caseVitals->first();
-            ?>
-            <tr>
+                                                        <?php
+                                                            $firstRecord = $caseVitals->first();
+                                                        ?>
+                                                        <tr>
 
-                <td>
-                    <?php if(!empty($firstRecord->messure_date)): ?>
-                        <?php echo e(\Carbon\Carbon::parse($firstRecord->messure_date)->format('d/m/Y h:i A')); ?>
+                                                        <td>
+                                                            <?php if(!empty($firstRecord->messure_date)): ?>
+                                                                <?php echo e(\Carbon\Carbon::parse($firstRecord->messure_date)->format('d/m/Y h:i A')); ?>
 
-                    <?php else: ?>
-                        -
-                    <?php endif; ?>
-                </td>
+                                                            <?php else: ?>
+                                                                -
+                                                            <?php endif; ?>
+                                                        </td>
 
-                
-                <?php $__currentLoopData = $vitals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $vital): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <?php
-                        $record = $caseVitals->where('vital_id', $vital->id)->first();
-                    ?>
-                    <td>
-                        <?php echo e($record->reference_range ?? '-'); ?>
+                                                            
+                                                            <?php $__currentLoopData = $vitals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $vital): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                <?php
+                                                                    $record = $caseVitals->where('vital_id', $vital->id)->first();
+                                                                ?>
+                                                                <td>
+                                                                    <?php echo e($record->reference_range ?? '-'); ?>
 
-                    </td>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                                </td>
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-                <!-- <td>
-                    <div class="d-flex gap-2">
-                        <a href="#"
-                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
-                            data-bs-toggle="tooltip" title="Show">
-                            <i class="ti ti-menu"></i>
-                        </a>
-                    </div>
-                </td> -->
-            </tr>
-        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-            <tr>
-                <td colspan="<?php echo e(4 + $vitals->count()); ?>" class="text-center text-muted">
-                    No vital records found
-                </td>
-            </tr>
-        <?php endif; ?>
+                                                                    <!-- <td>
+                                                                        <div class="d-flex gap-2">
+                                                                            <a href="#"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
+                                                                                data-bs-toggle="tooltip" title="Show">
+                                                                                <i class="ti ti-menu"></i>
+                                                                            </a>
+                                                                        </div>
+                                                                    </td> -->
+                                                                    </tr>
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                                                <tr>
+                                                                    <td colspan="<?php echo e(4 + $vitals->count()); ?>" class="text-center text-muted">
+                                                                        No vital records found
+                                                                    </td>
+                                                                </tr>
+                                                            <?php endif; ?>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1811,7 +1810,7 @@
             const newRow = document.createElement('div');
             newRow.classList.add('row', 'gy-3', 'vital-row', 'mb-2');
             newRow.innerHTML = `
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label">Vital Name</label>
                     <select class="form-select" name="vital_name[]">
                         <option value="">Select</option>

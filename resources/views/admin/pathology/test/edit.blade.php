@@ -10,6 +10,29 @@
                 </div>
 
                 <div class="card-body">
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <h6>Please fix the following errors:</h6>
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                    
+                    @if(session('error'))
+                        <div class="alert alert-danger">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+                    
+                    @if(session('success'))
+                        <div class="alert alert-success">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+                    
                     <form action="{{ route('pathology.test.update', $test->id) }}" method="POST" id="pathologyTestForm">
                         @csrf
                         @method('PUT')
@@ -87,7 +110,10 @@
                                 <select name="charge_category_id" id="charge_category_id" class="form-control" required>
                                     <option value="">Select</option>
                                     @foreach($chargeCategories as $chargeCategory)
-                                        <option value="{{ $chargeCategory->id }}" {{ old('charge_category_id', $test->charge_category_id) == $chargeCategory->id ? 'selected' : '' }}>
+                                        @php
+                                            $chargeCategoryId = $test->charge_category_id ?? ($test->charge ? $test->charge->charge_category_id : null);
+                                        @endphp
+                                        <option value="{{ $chargeCategory->id }}" {{ old('charge_category_id', $chargeCategoryId) == $chargeCategory->id ? 'selected' : '' }}>
                                             {{ $chargeCategory->name }}
                                         </option>
                                     @endforeach
@@ -132,6 +158,57 @@
                                 @error('amount')
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror
+                            </div>
+                        </div>
+
+                        <!-- TPA Charges Section -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <h6 class="mb-3">
+                                    <i class="fas fa-building me-2"></i>TPA Charges (Optional - Leave blank to use Standard Charge)
+                                </h6>
+                                <div class="card border">
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th width="40%">TPA Organization</th>
+                                                        <th width="40%">TPA Charge (INR)</th>
+                                                        <th width="20%">Code</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($organisations as $organisation)
+                                                        <tr>
+                                                            <td>
+                                                                <strong>{{ $organisation->organisation_name }}</strong>
+                                                            </td>
+                                                            <td>
+                                                                <input type="number" 
+                                                                       name="tpa_charge_{{ $organisation->id }}" 
+                                                                       id="tpa_charge_{{ $organisation->id }}"
+                                                                       class="form-control form-control-sm tpa-charge-input" 
+                                                                       value="{{ old('tpa_charge_' . $organisation->id, $existingTpaCharges[$organisation->id] ?? '') }}"
+                                                                       step="0.01" 
+                                                                       min="0" 
+                                                                       placeholder="Auto: ₹{{ number_format($test->standard_charge ?? 0, 2) }}"
+                                                                       data-org-id="{{ $organisation->id }}">
+                                                            </td>
+                                                            <td>
+                                                                <small class="text-muted">{{ $organisation->code ?? '-' }}</small>
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <small class="text-muted">
+                                            <i class="ti ti-info-circle me-1"></i>
+                                            If TPA charge is not specified, Standard Charge will be used automatically.
+                                        </small>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -201,9 +278,12 @@
             const taxPercentageInput = document.getElementById('tax_percentage');
             const amountInput = document.getElementById('amount');
             const currentChargeId = {{ $test->charge_id ?? 'null' }};
+            const currentChargeCategoryId = {{ $test->charge_category_id ?? ($test->charge ? $test->charge->charge_category_id : 'null') }};
             const parametersData = @json($parameters);
             
             console.log('Parameters Data:', parametersData);
+            console.log('Current Charge ID:', currentChargeId);
+            console.log('Current Charge Category ID:', currentChargeCategoryId);
 
             // Manually initialize Select2 for specific dropdowns (since they use form-control, not form-select)
             setTimeout(function() {
@@ -267,8 +347,15 @@
                 }
             }
 
-            // Load initial charge names
-            loadChargeNames();
+            // Set charge category on page load if it exists
+            if (currentChargeCategoryId) {
+                jQuery('#charge_category_id').val(currentChargeCategoryId).trigger('change.select2');
+            }
+            
+            // Load initial charge names after a short delay to ensure Select2 is initialized
+            setTimeout(function() {
+                loadChargeNames();
+            }, 700);
 
             jQuery('#charge_category_id').on('change', loadChargeNames);
 
@@ -283,6 +370,15 @@
                             standardChargeInput.value = data.standard_charge;
                             taxPercentageInput.value = data.tax_percentage;
                             amountInput.value = data.amount;
+                            
+                            // Update TPA charge placeholder with standard charge
+                            jQuery('.tpa-charge-input').each(function() {
+                                const currentValue = jQuery(this).val();
+                                // Only update placeholder if field is empty
+                                if (!currentValue) {
+                                    jQuery(this).attr('placeholder', 'Auto: ₹' + parseFloat(data.standard_charge).toFixed(2));
+                                }
+                            });
                         })
                         .catch(error => {
                             alert('Error loading charge details. Please try again.');
@@ -291,6 +387,10 @@
                     standardChargeInput.value = '';
                     taxPercentageInput.value = '0';
                     amountInput.value = '';
+                    // Clear TPA charge placeholders
+                    jQuery('.tpa-charge-input').each(function() {
+                        jQuery(this).attr('placeholder', 'Auto: Standard Charge');
+                    });
                 }
             });
 

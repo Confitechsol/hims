@@ -134,6 +134,56 @@
                             </div>
                         </div>
 
+                        <!-- TPA Charges Section -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <h6 class="mb-3">
+                                    <i class="fas fa-building me-2"></i>TPA Charges (Optional - Leave blank to use Standard Charge)
+                                </h6>
+                                <div class="card border">
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th width="40%">TPA Organization</th>
+                                                        <th width="40%">TPA Charge (INR)</th>
+                                                        <th width="20%">Code</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($organisations as $organisation)
+                                                        <tr>
+                                                            <td>
+                                                                <strong>{{ $organisation->organisation_name }}</strong>
+                                                            </td>
+                                                            <td>
+                                                                <input type="number" 
+                                                                       name="tpa_charge_{{ $organisation->id }}" 
+                                                                       id="tpa_charge_{{ $organisation->id }}"
+                                                                       class="form-control form-control-sm tpa-charge-input" 
+                                                                       step="0.01" 
+                                                                       min="0" 
+                                                                       placeholder="Auto: Standard Charge"
+                                                                       data-org-id="{{ $organisation->id }}">
+                                                            </td>
+                                                            <td>
+                                                                <small class="text-muted">{{ $organisation->code ?? '-' }}</small>
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <small class="text-muted">
+                                            <i class="ti ti-info-circle me-1"></i>
+                                            If TPA charge is not specified, Standard Charge will be used automatically.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Test Parameters Section -->
                         <div class="row mb-3">
                             <div class="col-12">
@@ -282,6 +332,11 @@
                             standardChargeInput.value = data.standard_charge;
                             taxPercentageInput.value = data.tax_percentage;
                             amountInput.value = data.amount;
+                            
+                            // Update TPA charge placeholder with standard charge
+                            jQuery('.tpa-charge-input').each(function() {
+                                jQuery(this).attr('placeholder', 'Auto: ₹' + parseFloat(data.standard_charge).toFixed(2));
+                            });
                         })
                         .catch(error => {
                             alert('Error loading charge details. Please try again.');
@@ -290,6 +345,10 @@
                     standardChargeInput.value = '';
                     taxPercentageInput.value = '0';
                     amountInput.value = '';
+                    // Clear TPA charge placeholders
+                    jQuery('.tpa-charge-input').each(function() {
+                        jQuery(this).attr('placeholder', 'Auto: Standard Charge');
+                    });
                 }
             });
 

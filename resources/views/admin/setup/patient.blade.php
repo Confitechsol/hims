@@ -1,6 +1,35 @@
 {{-- resources/views/settings.blade.php --}}
 @extends('layouts.adminLayout')
 @section('content')
+{{-- Success Message --}}
+@if (session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+
+{{-- Error Message (Single Error) --}}
+@if (session('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+
+{{-- Validation Errors --}}
+@if ($errors->any())
+    <div class="alert alert-danger alert-dismissible fade show">
+        <strong>There were some problems with your input:</strong>
+        <ul class="mt-2 mb-0">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+
     <div class="row justify-content-center">
         {{-- Settings Form --}}
         <div class="col-md-11">
@@ -102,15 +131,14 @@
                                                             <td>{{ $patient->is_dead == 'yes' ? 'Yes' : 'No' }}</td>
                                                             <td>
                                                                 <div class="d-flex">
-                                                                    <a href="javascript: void(0);"
-                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                                        <i class="ti ti-menu" data-bs-toggle="tooltip"
-                                                                            title="Assign Permission"></i></a>
-                                                                    <a href="javascript: void(0);"
-                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                        <i class="ti ti-dots-vertical"
-                                                                            data-bs-toggle="tooltip"
-                                                                            title="Assign Permission"></i></a>
+                                                                    <a href="{{ route('patient.edit', $patient->id) }}" 
+                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                                        >
+                                                                        <i class="ti ti-pencil"></i>
+                                                                    </a>
+
+                                                                <!-- @include('components.modals.edit-patient-modal') -->
+                                                                    
                                                                 </div>
                                                             </td>
                                                         </tr>

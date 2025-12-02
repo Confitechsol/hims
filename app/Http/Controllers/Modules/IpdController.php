@@ -26,13 +26,17 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class IpdController extends Controller
 {
     public function index(Request $request)
     {
+        
         $isIpdTab = $request->get('tab', 'ipd') == 'ipd';
         $doctors  = Doctor::all();
+        $bedGroups  = BedGroup::with('floorDetail')->get();
+        
         if ($isIpdTab) {
             $ipd = IpdDetail::with('patient', 'doctor', 'bedDetail', 'bedGroup.floorDetail')->get();
         } else {
@@ -42,16 +46,17 @@ class IpdController extends Controller
             // dd($patients);
             $ipd = $patients;
         }
-        return view("admin.ipd.index", compact("ipd", 'doctors', 'isIpdTab'));
+        return view("admin.ipd.index", compact("ipd", 'doctors', 'isIpdTab','bedGroups'));
     }
 
     public function store(Request $request)
     {
-        // dd($request->all());
-        $request->validate([
+        //dd($request->all());
+        $validator = Validator::make($request->all(), [
             'patient_id'           => 'required|exists:patients,id',
-            'appointment_date'     => 'required|date',
-            'case_type'            => 'required|string',
+            'admission_date'       => 'required|date',
+            'patient_type'         => 'required|string',
+            'case'                 => 'required|string',
             'casualty'             => 'required|string',
             'reference'            => 'nullable|string',
             'doctor_id'            => 'required|exists:doctor,id',
@@ -63,11 +68,19 @@ class IpdController extends Controller
             'symptoms_type.*'      => 'string',
             'symptoms_title'       => 'required|array',
             'symptoms_title.*'     => 'string',
-            'symptoms_description' => 'required|string',
+            'symptoms_description' => 'nullable|string',
             'note'                 => 'nullable|string',
             'apply_tpa'            => 'nullable|string|max:10',
         ]);
 
+        if ($validator->fails()) {
+            // dd($validator->errors()->all());
+            return back()
+                ->withErrors($validator)
+                ->withInput();
+                
+        }
+        
         DB::beginTransaction();
         $user = Auth::user();
         // dd($user);
@@ -93,6 +106,7 @@ class IpdController extends Controller
             $ipd        = new IpdDetail();
             $ipdPatient = new IpdPatient();
             $bedDetail  = Bed::where('id', $request->bed_number)->firstOrFail();
+            $bedHistory = new PatientBedHistory();
             // dd($opd);
             $ipd->hospital_id = $user->hospital_id;
             // Patient Details
@@ -103,8 +117,9 @@ class IpdController extends Controller
             // Visit Details
             $ipd->bed_group_id = $request->bed_group;
             $ipd->bed          = $request->bed_number;
-            $ipd->date         = $request->appointment_date;
-            $ipd->patient_old  = $request->case_type;
+            $ipd->date         = $request->admission_date;
+            $ipd->case_type    = $request->case;
+            $ipd->patient_old  = $request->patient_type;
             $ipd->casualty     = $request->casualty;
             $ipd->refference   = $request->reference;
 
@@ -127,7 +142,18 @@ class IpdController extends Controller
             $ipdPatient->ipd_id     = $ipd->id ?? null;
             $ipdPatient->doctor_id  = $request->doctor_id ?? null;
 
+            
+
             $ipdPatient->save();
+
+            //patienthistory
+            $bedHistory->bed_group_id = $request->bed_group;
+            $bedHistory->ipd_id       = $ipd->id ?? null;
+            $bedHistory->bed_group_id = $request->bed_group;
+            $bedHistory->bed_id = $request->bed_number;
+            $bedHistory->from_date = $request->admission_date;
+            $bedHistory->is_active = 'yes';
+            $bedHistory->save();
 
             $bedDetail->is_active = 'no';
             $bedDetail->save();
@@ -175,10 +201,10 @@ class IpdController extends Controller
 
     public function update(Request $request, $id)
     {
-        // dd($request->all());
-        $request->validate([
+         //dd($request->all());
+        $validator = Validator::make($request->all(), [
             'patient_id'           => 'required|exists:patients,id',
-            'appointment_date'     => 'required|date',
+            'admission_date'     => 'required|date',
             'old_patient'          => 'required|string',
             'casualty'             => 'required|string',
             'reference'            => 'nullable|string',
@@ -194,6 +220,10 @@ class IpdController extends Controller
             'note'                 => 'nullable|string',
         ]);
 
+        if ($validator->fails()) {
+            dd($validator->errors()->all());  // 👈 will show validation errors
+        }
+
         DB::beginTransaction();
         $user = Auth::user();
         // dd($user);
@@ -208,10 +238,15 @@ class IpdController extends Controller
             // 🔹 Update OPD record
             $ipd        = IpdDetail::findOrFail($id);
             $allotedBed = $ipd->bed;
+            //dd($id, IpdPatient::where('ipd_id', $id)->first());
             $ipdPatient = IpdPatient::where('ipd_id', $id)->firstOrFail();
             if ($request->bed_number != $allotedBed) {
                 $newBedDetail            = Bed::where('id', $request->bed_number)->firstOrFail();
                 $allotedBedDetail        = Bed::where('id', $allotedBed)->firstOrFail();
+                $bedhistory = PatientBedHistory::where('ipd_id',$id)->firstOrFail();
+                $bedhistory->bed_group = $request->bed_group_id;
+                $bedhistory->bed_id = $request->bed_number;
+                $bedhistory->save();
                 $newBedDetail->is_active = 'no';
                 $newBedDetail->save();
                 $allotedBedDetail->is_active = 'yes';
@@ -223,7 +258,7 @@ class IpdController extends Controller
             $ipd->cons_doctor = $request->consultant_doctor;
 
             // Visit Details
-            $ipd->date         = $request->appointment_date;
+            $ipd->date         = $request->admission_date;
             $ipd->bed_group_id = $request->bed_group;
             $ipd->bed          = $request->bed_number;
             $ipd->patient_old  = $request->old_patient;
@@ -263,52 +298,18 @@ class IpdController extends Controller
     public function getBedNumbers(Request $request, $id)
     {
         // dd($id);
-        $bedNumbers = Bed::where('bed_group_id', $id)->where('is_active', 'yes')->get();
+        // $bedNumbers = Bed::where('bed_group_id', $id)->where('is_active', 'yes')->get();
+        $bedNumbers = Bed::where('bed_group_id', $id)
+        ->where('is_active', 'yes')
+        ->whereDoesntHave('patientBedHistory', function ($query) {
+            $query->where('is_active', 'yes'); // means currently occupied
+        })
+        ->get();
         // dd($bedNumbers);
         return response()->json($bedNumbers, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
     }
 
-    public function showIpd(Request $request, $id)
-    {
-        $ipd        = IpdDetail::with('patient.bloodGroup', 'patient.organisation', 'doctor', 'bedDetail', 'bedGroup')->where('id', $id)->firstOrFail();
-        $symptomIds = array_filter(
-            explode(',', $ipd->symptoms_title),
-            fn($id) => $id !== null && trim($id) !== ''
-        );
-
-        // Fetch symptoms related to this OPD
-        $symptoms = ! empty($symptomIds)
-            ? Symptom::whereIn('id', $symptomIds)->get()
-            : collect();
-        $nurseNotes        = NurseNote::with('staff')->where('ipd_id', $id)->get();
-        $medicationReport  = MedicationReport::with('medicineDosage.unit', 'pharmacy', 'generatedBy.userRole')->where('ipd_id', $id)->get();
-        $ipdCharges        = IpdCharges::with('ipd', 'charge.taxCategory', 'chargeCategory.chargeType')->where('ipd_id', $id)->get();
-        $labInvestigations = PathologyReport::with('pathology')->where('patient_id', $ipd->patient->id)->get();
-        $ipdPrescriptions  = IpdPrescription::where('ipd_id', $id)->get();
-        $ipdFindings       = [];
-        foreach ($ipdPrescriptions as $pres) {
-            // Split comma-separated symptom IDs and clean up
-            $findingIds = array_filter(
-                explode(',', $pres->findings),
-                fn($id) => $id !== null && trim($id) !== ''
-            );
-
-            // Fetch symptoms related to this OPD
-            $findings = ! empty($findingIds)
-                ? Finding::whereIn('id', $findingIds)->get()
-                : collect();
-
-            // Store in array using OPD number as key
-            $ipdFindings[$pres->ipd_id] = $findings;
-        }
-        $bedHistories    = PatientBedHistory::with('bedGroup', 'bed')->where('ipd_id', $id)->get();
-        $operationDetail = OperationTheatre::with('operation.category')->where('ipd_details_id', $id)->get();
-        // $opdCharges        = OpdCharges::with('opd', 'charge.taxCategory', 'chargeCategory.chargeType')->where('opd_id', $id)->get();
-        // $opdSymptoms       = [];
-
-        // Store in array using OPD number as key
-        return view('admin.ipd.ipd_view', compact('ipd', 'symptoms', 'nurseNotes', 'medicationReport', 'labInvestigations', 'ipdPrescriptions', 'ipdFindings', 'bedHistories', 'operationDetail', 'ipdCharges'));
-    }
+  
 
     public function getNurses(Request $request)
     {
@@ -361,7 +362,7 @@ class IpdController extends Controller
 
     public function storePrescription(Request $request)
     {
-        // dd($request->all());
+       // dd($request->all());
         try { $request->validate([
             'ipd_id'              => 'nullable|string',
             'header_note'         => 'nullable|string',
@@ -390,10 +391,14 @@ class IpdController extends Controller
             'instructions.*'      => 'string',
         ]);
             $findingTypes         = array_filter($request->finding_type, fn($type) => $type !== null && $type !== '');
-            $findings             = array_filter($request->findings, fn($title) => $title !== null && $title !== '');
-            $pathology_ids        = array_filter($request->pathology, fn($pathology) => $pathology !== null && $pathology !== '');
-            $radiology_ids        = array_filter($request->radiology, fn($radio) => $radio !== null && $radio !== '');
-            $notification_to      = array_filter($request->visible, fn($notify) => $notify !== null && $notify !== '');
+            // $findings             = array_filter($request->findings, fn($title) => $title !== null && $title !== '');
+            $findings             = array_filter($request->input('findings', []), fn($title) => $title !== null && $title !== '');
+            $pathology_ids   = array_filter($request->input('pathology', []), fn($pathology) => $pathology !== null && $pathology !== '');
+            $radiology_ids   = array_filter($request->input('radiology', []), fn($radio) => $radio !== null && $radio !== '');
+            $notification_to = array_filter($request->input('visible', []), fn($notify) => $notify !== null && $notify !== '');
+            // $pathology_ids        = array_filter($request->pathology, fn($pathology) => $pathology !== null && $pathology !== '');
+            // $radiology_ids        = array_filter($request->radiology, fn($radio) => $radio !== null && $radio !== '');
+            // $notification_to      = array_filter($request->visible, fn($notify) => $notify !== null && $notify !== '');
             $implodedFindingTypes = implode(", ", $findingTypes);
             $implodedFindings     = implode(", ", $findings);
             $implodedPathologies  = implode(", ", $pathology_ids);
@@ -466,4 +471,68 @@ class IpdController extends Controller
 
         return redirect()->back()->with('success', 'Charges saved successfully!');
     }
+
+    public function getAvailableBeds(Request $request)
+    {
+        $bedGroupId = $request->bed_group_id;
+
+        // Beds currently assigned (is_active = 1)
+        $occupiedBeds = PatientBedHistory::where('is_active', 'yes')
+                            ->pluck('bed_id')
+                            ->toArray();
+
+        // Fetch beds excluding occupied ones
+        $availableBeds = Bed::where('bed_group_id', $bedGroupId)
+                            ->where('is_active', 'yes')
+                            ->whereNotIn('id', $occupiedBeds)
+                            ->get();
+
+        return response()->json($availableBeds);
+    }
+    public function assignNewBed(Request $request)
+{
+    $request->validate([
+        'released_date' => 'required|date',
+        'bed_group' => 'required',
+        'new_bed' => 'required',
+    ]);
+
+    $ipd = IpdDetail::findOrFail($request->ipd_id);
+
+    // --- Release old bed ---
+    if ($ipd->bed) {
+
+        // Mark old history inactive
+        PatientBedHistory::where('ipd_id', $ipd->id)
+            ->where('is_active', 'yes')
+            ->update([
+                'is_active' => 'no',
+                'to_date' => $request->released_date
+            ]);
+
+        // Make old bed available
+        Bed::where('id', $ipd->bed)->update(['is_active' => 'yes']);
+    }
+
+    // --- Assign new bed ---
+    PatientBedHistory::create([
+        'ipd_id' => $ipd->id,
+        'bed_id' => $request->new_bed,
+        'bed_group_id' => $request->bed_group,
+        'from_date' => $request->released_date,
+        'is_active' => 'yes',
+    ]);
+
+    // Make new bed occupied
+    Bed::where('id', $request->new_bed)->update(['is_active' => 'no']);
+
+    // Update IPD record
+    $ipd->bed = $request->new_bed;
+    $ipd->bed_group_id = $request->bed_group;
+    $ipd->save();
+
+    return redirect()->back()->with('success', 'Bed assigned successfully.');
+}
+
+
 }
