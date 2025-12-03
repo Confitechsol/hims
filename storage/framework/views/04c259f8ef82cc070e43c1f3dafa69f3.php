@@ -877,21 +877,21 @@
                                                 ?>
                                                 <tr>
                                                     <td>
-                                                        <?php echo e($charge->charge->name); ?>
+                                                        <?php echo e($charge->charge->name ?? 'N/A'); ?>
 
                                                     </td>
                                                     <td style="text-transform: capitalize;">
-                                                        <?php echo e($charge->chargeCategory->chargeType->charge_type); ?>
+                                                        <?php echo e($charge->chargeCategory->chargeType->charge_type ?? 'N/A'); ?>
 
                                                     </td>
-                                                    <td class="text-right"><?php echo e($charge->charge->standard_charge); ?></td>
+                                                    <td class="text-right"><?php echo e($charge->charge->standard_charge ?? 'N/A'); ?></td>
                                                     <td class="text-right">
                                                         (<?php echo e($charge->charge->taxCategory->percentage); ?>%)
                                                         <?php echo e($taxAmount); ?>
 
                                                     </td>
-                                                    <td class="text-right"><?php echo e($charge->charge->standard_charge); ?></td>
-                                                    <td class="text-right"><?php echo e($amount); ?></td>
+                                                    <td class="text-right"><?php echo e($charge->charge->standard_charge  ?? 'N/A'); ?></td>
+                                                    <td class="text-right"><?php echo e($amount ?? 'N/A'); ?></td>
                                                 </tr>
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </tbody>
@@ -1872,13 +1872,13 @@
                                                                     </td>
                                                                     <td><?php echo e($charge->charge->name); ?></td>
                                                                     <td style="text-transform: capitalize;">
-                                                                        <?php echo e($charge->chargeCategory->chargeType->charge_type); ?>
+                                                                        <?php echo e($charge->chargeCategory->chargeType->charge_type ?? 'N/A'); ?>
 
                                                                     </td>
-                                                                    <td><?php echo e($charge->chargeCategory->name); ?> </td>
+                                                                    <td><?php echo e($charge->chargeCategory->name ?? 'N/A'); ?> </td>
                                                                     <td>1</td>
-                                                                    <td><?php echo e($charge->charge->standard_charge); ?></td>
-                                                                    <td><?php echo e($charge->charge->standard_charge); ?></td>
+                                                                    <td><?php echo e($charge->charge->standard_charge ?? 'N/A'); ?></td>
+                                                                    <td><?php echo e($charge->charge->standard_charge ?? 'N/A'); ?></td>
                                                                     <td>0.00</td>
                                                                     <td><?php echo e($discountAmount); ?>&nbsp;(<?php echo e($charge->discount); ?>%)
                                                                     </td>

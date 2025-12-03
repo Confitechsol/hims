@@ -633,7 +633,7 @@
 
 <!-- Modal -->
 <div class="modal fade" id="createIpdModal" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <form action="<?php echo e(route('ipd.store')); ?>" id="ipdForm" method="POST">
                 <?php echo csrf_field(); ?>
