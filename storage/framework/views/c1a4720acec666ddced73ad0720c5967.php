@@ -662,7 +662,6 @@
                     <?php endif; ?>
 
                     <div class="row">
-                        <h4>Basic Information</h4>
 
                         <div class="around10">
 
