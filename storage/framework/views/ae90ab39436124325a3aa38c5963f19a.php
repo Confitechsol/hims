@@ -1,10 +1,8 @@
-@extends('layouts.adminLayout')
-
-@section('content')
-@php
+<?php $__env->startSection('content'); ?>
+<?php
     // Detect Add or Edit mode
     $isEdit = isset($staff);
-@endphp
+?>
 
 
 <style>
@@ -647,7 +645,8 @@
             <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                 <h5 class="mb-0" style="color: #750096">
                     <i class="fas fa-cogs me-2"></i>
-                    {{ $isEdit ? 'Edit Staff' : 'Add New Staff' }}
+                    <?php echo e($isEdit ? 'Edit Staff' : 'Add New Staff'); ?>
+
                 </h5>
             </div>
 
@@ -655,14 +654,14 @@
 
                 <!-- FORM -->
                 <form id="form1"
-                      action="{{ $isEdit ? route('staff.update', $staff->id) : route('staff.store') }}"
+                      action="<?php echo e($isEdit ? route('staff.update', $staff->id) : route('staff.store')); ?>"
                       method="POST"
                       enctype="multipart/form-data">
 
-                    @csrf
-                    @if($isEdit)
-                        @method('PUT')
-                    @endif
+                    <?php echo csrf_field(); ?>
+                    <?php if($isEdit): ?>
+                        <?php echo method_field('PUT'); ?>
+                    <?php endif; ?>
 
                     <div class="row">
 
@@ -684,7 +683,7 @@
                                             <label class="form-label">Staff ID</label><small class="req"> *</small>
                                             <input id="employee_id" name="employee_id" type="text"
                                                 class="form-control"
-                                                value="{{ old('employee_id', $staff->employee_id ?? '') }}">
+                                                value="<?php echo e(old('employee_id', $staff->employee_id ?? '')); ?>">
                                         </div>
                                     </div>
 
@@ -694,12 +693,13 @@
                                             <label class="form-label">Role</label><small class="req"> *</small>
                                             <select id="role" name="role" class="form-select">
                                                 <option value="">Select</option>
-                                                @foreach ($roles as $role)
-                                                    <option value="{{ $role->id }}"
-                                                        {{ old('role', $staff->role_id ?? '') == $role->id ? 'selected' : '' }}>
-                                                        {{ $role->name }}
+                                                <?php $__currentLoopData = $roles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $role): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                    <option value="<?php echo e($role->id); ?>"
+                                                        <?php echo e(old('role', $staff->role_id ?? '') == $role->id ? 'selected' : ''); ?>>
+                                                        <?php echo e($role->name); ?>
+
                                                     </option>
-                                                @endforeach
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             </select>
                                         </div>
                                     </div>
@@ -709,7 +709,7 @@
                                         <div class="form-group">
                                             <label class="form-label">First Name</label><small class="req"> *</small>
                                             <input id="name" name="name" type="text" class="form-control"
-                                                value="{{ old('name', $staff->name ?? '') }}">
+                                                value="<?php echo e(old('name', $staff->name ?? '')); ?>">
                                         </div>
                                     </div>
 
@@ -718,7 +718,7 @@
                                         <div class="form-group">
                                             <label class="form-label">Last Name</label>
                                             <input id="surname" name="surname" type="text" class="form-control"
-                                                value="{{ old('surname', $staff->surname ?? '') }}">
+                                                value="<?php echo e(old('surname', $staff->surname ?? '')); ?>">
                                         </div>
                                     </div>
 
@@ -728,12 +728,13 @@
                                             <label class="form-label">Gender</label><small class="req"> *</small>
                                             <select class="form-select" name="gender">
                                                 <option value="">Select</option>
-                                                @foreach (['Male','Female','others'] as $g)
-                                                    <option value="{{ $g }}"
-                                                        {{ old('gender', $staff->gender ?? '') == $g ? 'selected' : '' }}>
-                                                        {{ $g }}
+                                                <?php $__currentLoopData = ['Male','Female','others']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $g): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                    <option value="<?php echo e($g); ?>"
+                                                        <?php echo e(old('gender', $staff->gender ?? '') == $g ? 'selected' : ''); ?>>
+                                                        <?php echo e($g); ?>
+
                                                     </option>
-                                                @endforeach
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             </select>
                                         </div>
                                     </div>
@@ -745,12 +746,13 @@
                                             <select id="department" name="department" class="form-select"
                                                     onchange="loadSpecialists(this.value)">
                                                 <option value="">Select</option>
-                                                @foreach ($departments as $dept)
-                                                    <option value="{{ $dept->id }}"
-                                                        {{ old('department', $staff->department_id ?? '') == $dept->id ? 'selected' : '' }}>
-                                                        {{ $dept->department_name }}
+                                                <?php $__currentLoopData = $departments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $dept): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                    <option value="<?php echo e($dept->id); ?>"
+                                                        <?php echo e(old('department', $staff->department_id ?? '') == $dept->id ? 'selected' : ''); ?>>
+                                                        <?php echo e($dept->department_name); ?>
+
                                                     </option>
-                                                @endforeach
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             </select>
                                         </div>
                                     </div>
@@ -761,12 +763,13 @@
                                             <label class="form-label">Designation</label>
                                             <select id="designation" name="designation" class="form-select">
                                                 <option value="">Select</option>
-                                                @foreach ($designations as $des)
-                                                    <option value="{{ $des->id }}"
-                                                        {{ old('designation', $staff->staff_designation_id  ?? '') == $des->id ? 'selected' : '' }}>
-                                                        {{ $des->designation }}
+                                                <?php $__currentLoopData = $designations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $des): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                    <option value="<?php echo e($des->id); ?>"
+                                                        <?php echo e(old('designation', $staff->staff_designation_id  ?? '') == $des->id ? 'selected' : ''); ?>>
+                                                        <?php echo e($des->designation); ?>
+
                                                     </option>
-                                                @endforeach
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             </select>
                                         </div>
                                     </div>
@@ -778,12 +781,13 @@
                                             <select name="specialist" class="form-select" id="specialist">
                                                 <option value="">Select</option>
 
-                                                @foreach ($specialists as $specialist)
-                                                    <option value="{{ $specialist->id }}"
-                                                        {{ old('specialist', $staff->specialist ?? '') == $specialist->id ? 'selected' : '' }}>
-                                                        {{ $specialist->specialist_name }}
+                                                <?php $__currentLoopData = $specialists; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $specialist): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                    <option value="<?php echo e($specialist->id); ?>"
+                                                        <?php echo e(old('specialist', $staff->specialist ?? '') == $specialist->id ? 'selected' : ''); ?>>
+                                                        <?php echo e($specialist->specialist_name); ?>
+
                                                     </option>
-                                                @endforeach
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             </select>
                                         </div>
                                     </div>
@@ -794,12 +798,13 @@
                                             <label class="form-label">Marital Status</label>
                                             <select class="form-select" name="marital_status">
                                                 <option value="">Select</option>
-                                                @foreach (['Single','Married','Widowed','Separated','Not Specified'] as $ms)
-                                                    <option value="{{ $ms }}"
-                                                        {{ old('marital_status', $staff->marital_status ?? '') == $ms ? 'selected' : '' }}>
-                                                        {{ $ms }}
+                                                <?php $__currentLoopData = ['Single','Married','Widowed','Separated','Not Specified']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ms): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                    <option value="<?php echo e($ms); ?>"
+                                                        <?php echo e(old('marital_status', $staff->marital_status ?? '') == $ms ? 'selected' : ''); ?>>
+                                                        <?php echo e($ms); ?>
+
                                                     </option>
-                                                @endforeach
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             </select>
                                         </div>
                                     </div>
@@ -810,12 +815,13 @@
                                             <label class="form-label">Blood Group</label>
                                             <select class="form-select" name="blood_group">
                                                 <option value="">Select</option>
-                                                @foreach ($bloodgroups as $bg)
-                                                    <option value="{{ $bg }}"
-                                                        {{ old('blood_group', $staff->blood_group ?? '') == $bg->id ? 'selected' : '' }}>
-                                                        {{ $bg->name }}
+                                                <?php $__currentLoopData = $bloodgroups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $bg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                    <option value="<?php echo e($bg); ?>"
+                                                        <?php echo e(old('blood_group', $staff->blood_group ?? '') == $bg->id ? 'selected' : ''); ?>>
+                                                        <?php echo e($bg->name); ?>
+
                                                     </option>
-                                                @endforeach
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             </select>
                                         </div>
                                     </div>
@@ -825,7 +831,7 @@
                                         <div class="form-group">
                                             <label class="form-label">Date Of Birth</label><small class="req"> *</small>
                                             <input id="dob" name="dob" type="text" class="form-control date"
-                                                value="{{ old('dob', $staff->dob ?? '') }}">
+                                                value="<?php echo e(old('dob', $staff->dob ?? '')); ?>">
                                         </div>
                                     </div>
 
@@ -834,7 +840,7 @@
                                         <div class="form-group">
                                             <label class="form-label">Date Of Joining</label>
                                             <input id="date_of_joining" name="date_of_joining" type="text" class="form-control date"
-                                                value="{{ old('date_of_joining', $staff->date_of_joining ?? '') }}">
+                                                value="<?php echo e(old('date_of_joining', $staff->date_of_joining ?? '')); ?>">
                                         </div>
                                     </div>
                                     <!-- FATHER NAME -->
@@ -842,7 +848,7 @@
                                         <div class="form-group">
                                             <label class="form-label">Father Name</label>
                                             <input id="father_name" name="father_name" type="text" class="form-control"
-                                                value="{{ old('father_name', $staff->father_name ?? '') }}">
+                                                value="<?php echo e(old('father_name', $staff->father_name ?? '')); ?>">
                                         </div>
                                     </div>
 
@@ -851,7 +857,7 @@
                                         <div class="form-group">
                                             <label class="form-label">Mother Name</label>
                                             <input id="mother_name" name="mother_name" type="text" class="form-control"
-                                                value="{{ old('mother_name', $staff->mother_name ?? '') }}">
+                                                value="<?php echo e(old('mother_name', $staff->mother_name ?? '')); ?>">
                                         </div>
                                     </div>
                                     
@@ -860,7 +866,7 @@
                                         <div class="form-group">
                                             <label class="form-label">PAN Number</label>
                                             <input name="pan_number" type="text" class="form-control"
-                                                value="{{ old('pan_number', $staff->pan_number ?? '') }}">
+                                                value="<?php echo e(old('pan_number', $staff->pan_number ?? '')); ?>">
                                         </div>
                                     </div>
 
@@ -869,7 +875,7 @@
                                         <div class="form-group">
                                             <label class="form-label">National Identification Number</label>
                                             <input name="identification_number" type="text" class="form-control"
-                                                value="{{ old('identification_number', $staff->identification_number ?? '') }}">
+                                                value="<?php echo e(old('identification_number', $staff->identification_number ?? '')); ?>">
                                         </div>
                                     </div>
 
@@ -878,7 +884,7 @@
                                         <div class="form-group">
                                             <label class="form-label">Local Identification Number</label>
                                             <input name="local_identification_number" type="text" class="form-control"
-                                                value="{{ old('local_identification_number', $staff->local_identification_number ?? '') }}">
+                                                value="<?php echo e(old('local_identification_number', $staff->local_identification_number ?? '')); ?>">
                                         </div>
                                     </div>
 
@@ -887,17 +893,17 @@
                                         <div class="form-group">
                                             <label class="form-label">Photo</label>
                                             <input type="file" class="form-control" name="file">
-                                            @if($isEdit && $staff->photo)
-                                                <small>Current: <img src="{{ asset('uploads/staff/'.$staff->photo) }}"
+                                            <?php if($isEdit && $staff->photo): ?>
+                                                <small>Current: <img src="<?php echo e(asset('uploads/staff/'.$staff->photo)); ?>"
                                                                     width="40"></small>
-                                            @endif
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                     <!-- NOTE -->
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label class="form-label">Note</label>
-                                            <textarea name="note" class="form-control">{{ old('note', $staff->note ?? '') }}</textarea>
+                                            <textarea name="note" class="form-control"><?php echo e(old('note', $staff->note ?? '')); ?></textarea>
                                         </div>
                                     </div>
 
@@ -917,7 +923,7 @@
                                         <div class="form-group">
                                             <label class="form-label">Phone</label>
                                             <input id="mobileno" name="contactno" type="text" class="form-control"
-                                                value="{{ old('contactno', $staff->contact_no ?? '') }}">
+                                                value="<?php echo e(old('contactno', $staff->contact_no ?? '')); ?>">
                                         </div>
                                     </div>
 
@@ -926,7 +932,7 @@
                                         <div class="form-group">
                                             <label class="form-label">Emergency Contact</label>
                                             <input id="emgmobileno" name="emgcontactno" type="text" class="form-control"
-                                                value="{{ old('emgcontactno', $staff->emgcontactno ?? '') }}">
+                                                value="<?php echo e(old('emgcontactno', $staff->emgcontactno ?? '')); ?>">
                                         </div>
                                     </div>
 
@@ -935,7 +941,7 @@
                                         <div class="form-group">
                                             <label class="form-label">Email</label><small class="req"> *</small>
                                             <input id="email" name="email" type="email" class="form-control"
-                                                value="{{ old('email', $staff->email ?? '') }}">
+                                                value="<?php echo e(old('email', $staff->email ?? '')); ?>">
                                         </div>
                                     </div>
                                     
@@ -943,7 +949,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label class="form-label">Current Address</label>
-                                            <textarea name="address" class="form-control">{{ old('address', $staff->local_address ?? '') }}</textarea>
+                                            <textarea name="address" class="form-control"><?php echo e(old('address', $staff->local_address ?? '')); ?></textarea>
                                         </div>
                                     </div>
 
@@ -951,7 +957,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label class="form-label">Permanent Address</label>
-                                            <textarea name="permanent_address" class="form-control">{{ old('permanent_address', $staff->permanent_address ?? '') }}</textarea>
+                                            <textarea name="permanent_address" class="form-control"><?php echo e(old('permanent_address', $staff->permanent_address ?? '')); ?></textarea>
                                         </div>
                                     </div>
 
@@ -970,7 +976,7 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label class="form-label">Qualification</label>
-                                            <textarea name="qualification" class="form-control">{{ old('qualification', $staff->qualification ?? '') }}</textarea>
+                                            <textarea name="qualification" class="form-control"><?php echo e(old('qualification', $staff->qualification ?? '')); ?></textarea>
                                         </div>
                                     </div>
 
@@ -978,7 +984,7 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label class="form-label">Work Experience</label>
-                                            <textarea name="work_exp" class="form-control">{{ old('work_exp', $staff->work_exp ?? '') }}</textarea>
+                                            <textarea name="work_exp" class="form-control"><?php echo e(old('work_exp', $staff->work_exp ?? '')); ?></textarea>
                                         </div>
                                     </div>
 
@@ -986,7 +992,7 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label class="form-label">Specialization</label>
-                                            <textarea name="specialization" class="form-control">{{ old('specialization', $staff->specialization ?? '') }}</textarea>
+                                            <textarea name="specialization" class="form-control"><?php echo e(old('specialization', $staff->specialization ?? '')); ?></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -996,7 +1002,8 @@
 
                     <button type="submit" class="btn btn-primary float-end">
                         <i class="fa fa-check-circle pe-1"></i> 
-                        {{ $isEdit ? 'Update' : 'Save' }}
+                        <?php echo e($isEdit ? 'Update' : 'Save'); ?>
+
                     </button>
 
                 </form>
@@ -1006,4 +1013,6 @@
     </div>
 </div>
 
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp82\htdocs\hims\resources\views/admin/staff/addStaff.blade.php ENDPATH**/ ?>

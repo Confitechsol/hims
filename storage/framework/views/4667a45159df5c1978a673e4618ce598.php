@@ -1495,7 +1495,7 @@
                         <div class="card shadow-sm flex-fill w-100">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Timeline
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Medication
                                 </h5>
                             </div>
                             <div class="card-body">
@@ -1542,7 +1542,7 @@
                                                                         <?php echo csrf_field(); ?>
                                                                         <input type="hidden" name="ipd_id" value="<?php echo e($ipd->id); ?>">
                                                                         <div class="modal-body">
-                                                                            <div class="row gy-3">
+                                                                            <div class="row gy-3 py-4 mx-1">
 
                                                                                 
                                                                                 <div class="col-md-6">
@@ -1760,7 +1760,7 @@ unset($__errorArgs, $__bag); ?>
                                                                                 <input type="hidden" name="ipd_id" value="<?php echo e($ipd->id); ?>">
 
                                                                                 <div class="modal-body">
-                                                                                    <div class="row gy-3">
+                                                                                    <div class="row gy-3 py-4 mx-1">
 
                                                                                         
                                                                                         <div class="col-md-6">
@@ -1967,7 +1967,7 @@ unset($__errorArgs, $__bag); ?>
                                                                     <form action="<?php echo e(route('operation.store')); ?>" method="POST">
                                                                         <?php echo csrf_field(); ?>
                                                                         <input type="text" name="ipd_details_id" class="form-control" value="<?php echo e($ipd->id); ?>" hidden>
-                                                                        <div class="row">                                          
+                                                                        <div class="row gy-3 py-4 mx-1">                                          
 
                                                                             <div class="col-md-4 mb-3">
                                                                                 <label class="form-label">Customer Type</label>
@@ -2195,7 +2195,7 @@ unset($__errorArgs, $__bag); ?>
                                                                         method="POST" id="addChargeForm">
                                                                         <?php echo csrf_field(); ?>
                                                                         <div class="modal-body">
-                                                                            <div class="row ">
+                                                                            <div class="row gy-3 py-4 mx-1">
                                                                                 <div class="col-lg-12 col-md-12 col-sm-12">
 
                                                                                     <div class="row ptt10">
@@ -2654,7 +2654,7 @@ unset($__errorArgs, $__bag); ?>
 
                                                                     <div class="modal-body">
 
-                                                                        <div class="row gy-3">
+                                                                        <div class="row gy-3 py-4 mx-1">
 
                                                                             <div class="col-md-6">
                                                                                 <label for="date"
@@ -2889,7 +2889,7 @@ unset($__errorArgs, $__bag); ?>
                                                                             <input type="hidden" name="patient_id" value="<?php echo e($ipd->patient_id ?? ''); ?>">
 
                                                                             <div class="modal-body">
-                                                                                <div class="row gy-3">
+                                                                                <div class="row gy-3 py-4 mx-1">
                                                                                     <!-- Title -->
                                                                                     <div class="col-md-12">
                                                                                         <label for="title" class="form-label">
@@ -3418,7 +3418,7 @@ unset($__errorArgs, $__bag); ?>
                                                         <!-- First Modal -->
                                                         <div class="modal fade" id="add_vital" tabindex="-1"
                                                             aria-hidden="true">
-                                                            <div class="modal-dialog modal-dialog-centered">
+                                                            <div class="modal-dialog modal-dialog-centered modal-lg">
                                                                 <div class="modal-content">
 
                                                                     <div class="modal-header"
@@ -3434,7 +3434,7 @@ unset($__errorArgs, $__bag); ?>
                                                                     <form method="POST" action="<?php echo e(route('patient-vitals.store')); ?>">
                                                                         <?php echo csrf_field(); ?>
                                                                             <input type="hidden" name="patient_id" value="<?php echo e($ipd->patient_id); ?>">
-                                                                        <div class="modal-body">
+                                                                        <div class="modal-body p-4 mx-1">
                                                                             <div id="vitalFields">
                                                                                 <div class="row gy-3 vital-row mb-2">
                                                                                     <!-- Vital Name -->
@@ -3450,13 +3450,13 @@ unset($__errorArgs, $__bag); ?>
                                                                                     </div>
 
                                                                                     <!-- Vital Value -->
-                                                                                    <div class="col-md-3">
+                                                                                    <div class="col-md-4">
                                                                                         <label for="vital_value" class="form-label">Vital Value</label>
                                                                                         <input type="text" name="vital_value[]" id="vital_value" class="form-control" />
                                                                                     </div>
 
                                                                                     <!-- Date -->
-                                                                                    <div class="col-md-4">
+                                                                                    <div class="col-md-3">
                                                                                         <label for="date" class="form-label">Date</label>
                                                                                         <input type="date" name="date[]" id="date" class="form-control" />
                                                                                     </div>
