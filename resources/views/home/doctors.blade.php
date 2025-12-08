@@ -279,8 +279,10 @@
         <section class="text-center footer-sec">
             <button id="chatbotButton" class="chatbot-button" onclick="toggleChatbot()"></button>
             <div id="chatbotWrapper" class="chatbot-iframe-wrapper">
-                <iframe src="https://hospital-management-chatbot-eta.vercel.app/" allow="clipboard-write"
-                    title="Confitech Chatbot"></iframe>
+                <!-- <iframe src="https://hospital-management-chatbot-eta.vercel.app/" allow="clipboard-write" title="Confitech Chatbot"></iframe> -->
+                <iframe src="https://hims-chatbot.vercel.app/" allow="microphone; clipboard-write"
+                        sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups"
+                        title="Confitech Chatbot"></iframe>
             </div>
             <h2 class="d-none">hidden</h2>
             <div class="container">

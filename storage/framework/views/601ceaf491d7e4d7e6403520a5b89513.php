@@ -1495,7 +1495,7 @@
                         <div class="card shadow-sm flex-fill w-100">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Timeline
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Medication
                                 </h5>
                             </div>
                             <div class="card-body">

@@ -505,6 +505,7 @@ Route::get('/getOpdMedicineById/{id}', [OpdController::class, 'getOpdMedicineByI
 Route::post('/add_prescription', [OpdController::class, 'storePrescription'])->name('opd.addPrescription');
 Route::post('/opd_medication', [OpdController::class, 'createOpdMedication'])->name('opd.createMedication');
 Route::post('/opd_charge', [OpdController::class, 'addOpdCharge'])->name('opd.addOpdCharge');
+Route::post('/opd_visit', [OpdController::class, 'storeVisitDetails'])->name('opd.visit.store');
 
 Route::get('/ipd', [IpdController::class, 'index'])->name('ipd');
 Route::post('/ipd/store', [IpdController::class, 'store'])->name('ipd.store');

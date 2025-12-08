@@ -657,7 +657,10 @@
                                                     class="fa-solid fa-calendar-days text-primary"></i></span>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">Age :</h6>
-                                                <p class="patient_data mb-0">22 Year 9 Month 5 Days (As Of Date 10/06/2025)
+                                                <p class="patient_data mb-0">{{ $opd->patient->age }} Year
+                                                    {{ $opd->patient->month }} Month {{ $opd->patient->day }} Days (As
+                                                    Of
+                                                    {{ \Carbon\Carbon::parse($opd->patient->as_of_date)->format('d/m/Y') }})
                                                 </p>
                                             </div>
                                         </div>
@@ -1087,686 +1090,14 @@
                                                             <a href="javascript:void(0);"
                                                                 class="btn btn-primary text-white ms-2 btn-md"
                                                                 data-bs-toggle="modal" data-is-hidden="true"
-                                                                data-bs-target="#createOpdModal"
-                                                                data-patient='@json($opd->patient)'><i
+                                                                data-bs-target="#visitDetailsModal"
+                                                                data-patient='@json($opd->patient)'
+                                                                data-opd-id="{{ $opd->id }}"><i
                                                                     class="ti ti-plus me-1"></i>New Checkup</a>
                                                         </div>
                                                         <!-- First Modal -->
-                                                        @include('components.modals.opd-create-modal')
-                                                        {{-- <div class="modal fade" id="add_appointment" tabindex="-1"
-                                                            aria-hidden="true">
-                                                            <div
-                                                                class="modal-dialog modal-dialog-centered modal-full-width">
-                                                                <div class="modal-content">
-
-                                                                    <div class="modal-header"
-                                                                        style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-
-                                                                        <h5 class="modal-title" id="addSpecializationLabel">
-                                                                            Patient Details
-                                                                        </h5>
-                                                                        <button type="button" class="btn-close"
-                                                                            data-bs-dismiss="modal"></button>
-
-                                                                    </div>
-
-                                                                    <div class="modal-body">
-
-                                                                        <div class="row gy-3">
-
-                                                                            <div class="col-md-8 border-end">
-                                                                                <div class="row gy-3">
-                                                                                    <div class="col-md-10">
-                                                                                        <h3>
-                                                                                            Animesh Das (39)
-                                                                                        </h3>
-                                                                                        <p>Guardian : --</p>
-                                                                                        <p>Gender : Male</p>
-                                                                                        <p>Blood Group : A+</p>
-                                                                                        <p>Marital Status: Single</p>
-                                                                                        <p>Age: 41 Year 2 Month 27 Days (As
-                                                                                            Of Date 10/14/2025)</p>
-                                                                                        <p>Phone: --</p>
-                                                                                        <p>Email:
-                                                                                        </p>
-                                                                                        <p>Address: --</p>
-                                                                                        <p>Any Known Allergies: --</p>
-                                                                                        <p>Remarks: --</p>
-                                                                                        <p>TPA : --
-                                                                                        </p>
-                                                                                        <p>TPA ID : --</p>
-                                                                                        <p>TPA Validity : --</p>
-                                                                                        <p>National Identification
-                                                                                            Number : --</p>
-                                                                                    </div>
-                                                                                    <div class="col-md-2">
-                                                                                        <img src="assets/img/patient.png"
-                                                                                            alt="product"
-                                                                                            class="rounded thumbnail">
-                                                                                    </div>
-                                                                                    <hr>
-                                                                                    <div class="col-md-3">
-                                                                                        <label for="symptoms_type"
-                                                                                            class="form-label">Symptoms
-                                                                                            Type</label>
-                                                                                        <select class="form-select"
-                                                                                            id="symptoms_type">
-                                                                                            <option value="">Select
-                                                                                            </option>
-                                                                                            <option value="">General
-                                                                                            </option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                    <div class="col-md-3">
-                                                                                        <label for="symptoms_title"
-                                                                                            class="form-label">Symptoms
-                                                                                            Title </label>
-                                                                                        <input type="text"
-                                                                                            name="symptoms_title"
-                                                                                            id="symptoms_title"
-                                                                                            class="form-control">
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="symptoms_des"
-                                                                                            class="form-label">Symptoms
-                                                                                        </label>
-                                                                                        <textarea name="symptoms"
-                                                                                            id="symptoms"
-                                                                                            class="form-control"></textarea>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="note"
-                                                                                            class="form-label">Note</label>
-                                                                                        <textarea name="note" id="note"
-                                                                                            class="form-control"></textarea>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="allergies"
-                                                                                            class="form-label">Any Known
-                                                                                            Allergies</label>
-                                                                                        <textarea name="allergies"
-                                                                                            id="allergies"
-                                                                                            class="form-control"></textarea>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="col-md-4">
-                                                                                <div class="row gy-3">
-
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="appointment_date"
-                                                                                            class="form-label">Appointment
-                                                                                            Date <span
-                                                                                                class="text-danger">*</span></label>
-                                                                                        <input type="date"
-                                                                                            name="appointment_date"
-                                                                                            id="appointment_date"
-                                                                                            class="form-control">
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="case"
-                                                                                            class="form-label">Case</label>
-                                                                                        <input type="text" name="case"
-                                                                                            id="case" class="form-control">
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="casualty"
-                                                                                            class="form-label">Casualty</label>
-                                                                                        <select class="form-select"
-                                                                                            id="casualty">
-                                                                                            <option value="">Select
-                                                                                            </option>
-                                                                                            <option value="">No
-                                                                                            </option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="old_patient"
-                                                                                            class="form-label">Old
-                                                                                            Patient</label>
-                                                                                        <select class="form-select"
-                                                                                            id="old_patient">
-                                                                                            <option value="">Select
-                                                                                            </option>
-                                                                                            <option value="">No
-                                                                                            </option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="reference"
-                                                                                            class="form-label">Reference</label>
-                                                                                        <input type="text" name="reference"
-                                                                                            id="reference"
-                                                                                            class="form-control">
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="doctor"
-                                                                                            class="form-label">Consultant
-                                                                                            Doctor
-                                                                                            <span
-                                                                                                class="text-danger">*</span></label>
-                                                                                        <select class="form-select"
-                                                                                            id="doctor"
-                                                                                            data-placeholder="Select">
-                                                                                            <option value="">
-                                                                                            </option>
-                                                                                            <option value="1">Amitabh
-                                                                                                Kulkarni</option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <div
-                                                                                            class="form-check d-flex gap-2 mt-4">
-                                                                                            <input type="checkbox"
-                                                                                                name="tpa_check"
-                                                                                                id="tpa_check"
-                                                                                                class="form-check-input">
-                                                                                            <label for="tpa_check"
-                                                                                                class="form-check-label">Apply
-                                                                                                TPA</label>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="charge_category"
-                                                                                            class="form-label">Charge
-                                                                                            Category
-                                                                                        </label>
-                                                                                        <select class="form-select"
-                                                                                            id="charge_category"
-                                                                                            data-placeholder="Select">
-                                                                                            <option value="0">
-                                                                                            </option>
-                                                                                            <option value="1">OPD
-                                                                                                Doctor
-                                                                                                Fees</option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="charge"
-                                                                                            class="form-label">Charge
-                                                                                            <span
-                                                                                                class="text-danger">*</span></label>
-                                                                                        <select class="form-select"
-                                                                                            id="charge"
-                                                                                            data-placeholder="Select">
-                                                                                            <option value="">
-                                                                                            </option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="standard_charge"
-                                                                                            class="form-label">Standard
-                                                                                            Charge (INR)</label>
-                                                                                        <input type="text" readonly="true"
-                                                                                            name="standard_charge"
-                                                                                            id="standard_charge"
-                                                                                            class="form-control" value=""
-                                                                                            autocomplete="off" disabled>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="apply_charge"
-                                                                                            class="form-label">Applied
-                                                                                            Charge (INR) <span
-                                                                                                class="text-danger">*</span></label>
-                                                                                        <input type="text" name="amount"
-                                                                                            id="apply_charge"
-                                                                                            class="form-control">
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="discount_percentage"
-                                                                                            class="form-label">Discount</label>
-                                                                                        <div class="input-group">
-                                                                                            <input type="text"
-                                                                                                class="form-control discount_percentage"
-                                                                                                name="discount_percentage"
-                                                                                                id="discount_percentage"
-                                                                                                value="0"
-                                                                                                autocomplete="off">
-                                                                                            <span
-                                                                                                class="input-group-addon ">
-                                                                                                %</span>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="tax"
-                                                                                            class="form-label">Tax</label>
-                                                                                        <div class="input-group">
-                                                                                            <input type="text"
-                                                                                                class="form-control discount_percentage"
-                                                                                                name="tax" id="tax"
-                                                                                                value="0" autocomplete="off"
-                                                                                                readonly="true" disabled>
-                                                                                            <span
-                                                                                                class="input-group-addon ">
-                                                                                                %</span>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="amount"
-                                                                                            class="form-label">Amount
-                                                                                            (INR) <span
-                                                                                                class="text-danger">*</span></label>
-                                                                                        <input type="text" readonly="true"
-                                                                                            name="amount" id="amount"
-                                                                                            class="form-control" value=""
-                                                                                            autocomplete="off" disabled>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="payment_mode"
-                                                                                            class="form-label">Payment
-                                                                                            Mode</label>
-                                                                                        <select class="form-select"
-                                                                                            id="payment_mode">
-                                                                                            <option value="">Select
-                                                                                            </option>
-                                                                                            <option value="1">Case
-                                                                                            </option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="paid_amount"
-                                                                                            class="form-label">Paid
-                                                                                            Amount
-                                                                                            (INR) <span
-                                                                                                class="text-danger">*</span></label>
-                                                                                        <input type="text"
-                                                                                            name="paid_amount"
-                                                                                            id="paid_amount"
-                                                                                            class="form-control" value=""
-                                                                                            autocomplete="off">
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="live_con"
-                                                                                            class="form-label">Live
-                                                                                            Consultation</label>
-                                                                                        <select class="form-select"
-                                                                                            id="live_con">
-                                                                                            <option value="">Select
-                                                                                            </option>
-                                                                                            <option value="1">No
-                                                                                            </option>
-                                                                                        </select>
-                                                                                    </div>
-
-                                                                                </div>
-                                                                            </div>
-
-                                                                        </div>
-
-                                                                    </div>
-                                                                    <div class="modal-footer">
-                                                                        <button type="submit" class="btn btn-primary">Save &
-                                                                            Print</button>
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary">Save</button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div> --}}
-
-                                                        <!-- Second Modal (nested) -->
-                                                        {{-- <div class="modal fade" id="new_patient" tabindex="-1"
-                                                            aria-hidden="true">
-                                                            <div class="modal-dialog modal-dialog-centered modal-xl">
-                                                                <div class="modal-content">
-
-                                                                    <div class="modal-header"
-                                                                        style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                                                        <h5 class="modal-title">Add Patient</h5>
-                                                                        <button type="button" class="btn-close"
-                                                                            data-bs-dismiss="modal"></button>
-                                                                    </div>
-
-                                                                    <div class="modal-body">
-                                                                        <form>
-                                                                            <div class="row align-items-center gy-3">
-                                                                                <div class="col-lg-6 col-md-6 col-sm-6">
-                                                                                    <div class="form-group">
-                                                                                        <label
-                                                                                            class="form-label">Name</label><span
-                                                                                            class="text-danger">
-                                                                                            *</span>
-                                                                                        <input id="name" name="name"
-                                                                                            placeholder="" type="text"
-                                                                                            class="form-control" value=""
-                                                                                            autocomplete="off">
-                                                                                        <span class="text-danger"></span>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-lg-6 col-md-6 col-sm-6">
-                                                                                    <div class="form-group">
-                                                                                        <label class="form-label">Guardian
-                                                                                            Name</label>
-                                                                                        <input type="text"
-                                                                                            name="guardian_name"
-                                                                                            placeholder="" value=""
-                                                                                            class="form-control">
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-md-6 col-sm-12">
-                                                                                    <div class="row">
-                                                                                        <div class="col-sm-3">
-                                                                                            <div class="form-group">
-                                                                                                <label class="form-label">
-                                                                                                    Gender</label>
-                                                                                                <select class="form-select"
-                                                                                                    name="gender"
-                                                                                                    id="addformgender"
-                                                                                                    autocomplete="off">
-                                                                                                    <option value="">
-                                                                                                        Select</option>
-                                                                                                    <option value="Male">
-                                                                                                        Male</option>
-                                                                                                    <option value="Female">
-                                                                                                        Female</option>
-                                                                                                </select>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <div class="col-sm-4">
-                                                                                            <div class="form-group">
-                                                                                                <label for="dob"
-                                                                                                    class="form-label">Date
-                                                                                                    Of
-                                                                                                    Birth</label>
-                                                                                                <input type="text"
-                                                                                                    name="dob"
-                                                                                                    id="birth_date"
-                                                                                                    placeholder=""
-                                                                                                    class="form-control date patient_dob">
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <div class="col-sm-5"
-                                                                                            id="calculate">
-                                                                                            <div class="form-group">
-                                                                                                <label
-                                                                                                    class="form-label">Age
-                                                                                                    (yy-mm-dd)
-                                                                                                </label><small class="req">
-                                                                                                    *</small>
-                                                                                                <div
-                                                                                                    style="clear: both;overflow: hidden;">
-                                                                                                    <input type="text"
-                                                                                                        placeholder="Year"
-                                                                                                        name="age[year]"
-                                                                                                        id="age_year"
-                                                                                                        value=""
-                                                                                                        class="form-control patient_age_year"
-                                                                                                        style="width: 30%; float: left;">
-
-                                                                                                    <input type="text"
-                                                                                                        id="age_month"
-                                                                                                        placeholder="Month"
-                                                                                                        name="age[month]"
-                                                                                                        value=""
-                                                                                                        class="form-control patient_age_month"
-                                                                                                        style="width: 36%;float: left; margin-left: 4px;">
-                                                                                                    <input type="text"
-                                                                                                        id="age_day"
-                                                                                                        placeholder="Day"
-                                                                                                        name="age[day]"
-                                                                                                        value=""
-                                                                                                        class="form-control patient_age_day"
-                                                                                                        style="width: 26%;float: left; margin-left: 4px;">
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div><!--./col-md-6-->
-                                                                                <div class="col-md-6 col-sm-12">
-                                                                                    <div class="row">
-                                                                                        <div class="col-sm-3">
-                                                                                            <div class="form-group">
-                                                                                                <label
-                                                                                                    class="form-label">Blood
-                                                                                                    Group</label>
-                                                                                                <select name="blood_group"
-                                                                                                    class="form-select">
-                                                                                                    <option value="">
-                                                                                                        Select</option>
-                                                                                                    <option value="1">
-                                                                                                        O+
-                                                                                                    </option>
-                                                                                                    <option value="2">
-                                                                                                        A+
-                                                                                                    </option>
-                                                                                                    <option value="3">
-                                                                                                        B+
-                                                                                                    </option>
-                                                                                                    <option value="4">
-                                                                                                        AB+</option>
-                                                                                                    <option value="5">
-                                                                                                        O-
-                                                                                                    </option>
-                                                                                                    <option value="6">
-                                                                                                        AB-</option>
-                                                                                                </select>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <div class="col-sm-3">
-                                                                                            <div class="form-group">
-                                                                                                <label for="pwd"
-                                                                                                    class="form-label">Marital
-                                                                                                    Status</label>
-                                                                                                <select
-                                                                                                    name="marital_status"
-                                                                                                    class="form-select"
-                                                                                                    autocomplete="off">
-                                                                                                    <option value="">
-                                                                                                        Select</option>
-                                                                                                    <option value="Single">
-                                                                                                        Single</option>
-                                                                                                    <option value="Married">
-                                                                                                        Married</option>
-                                                                                                    <option value="Widowed">
-                                                                                                        Widowed</option>
-                                                                                                    <option
-                                                                                                        value="Separated">
-                                                                                                        Separated
-                                                                                                    </option>
-                                                                                                    <option
-                                                                                                        value="Not Specified">
-                                                                                                        Not
-                                                                                                        Specified
-                                                                                                    </option>
-                                                                                                </select>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <div class="col-sm-6">
-                                                                                            <div class="form-group">
-                                                                                                <label
-                                                                                                    for="exampleInputFile"
-                                                                                                    class="form-label">
-                                                                                                    Patient Photo
-                                                                                                </label>
-                                                                                                <div>
-                                                                                                    <div
-                                                                                                        class="d-flex border rounded position-relative p-1 mb-3 text-center align-items-center">
-                                                                                                        <span
-                                                                                                            class="avatar avatar-sm bg-primary text-white me-2">
-                                                                                                            <i
-                                                                                                                class="ti ti-upload fs-16"></i>
-                                                                                                        </span>
-                                                                                                        <p class="mb-0">
-                                                                                                            Drop files
-                                                                                                            here</p>
-                                                                                                        <input type="file"
-                                                                                                            class="position-absolute top-0 start-0 opacity-0 w-100 h-100">
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                                <span
-                                                                                                    class="text-danger"></span>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div><!--./col-md-6-->
-                                                                                <div class="col-sm-3">
-                                                                                    <div class="form-group">
-                                                                                        <label for="pwd"
-                                                                                            class="form-label">Phone</label>
-                                                                                        <input id="number"
-                                                                                            autocomplete="off"
-                                                                                            name="mobileno" type="text"
-                                                                                            placeholder=""
-                                                                                            class="form-control" value="">
-                                                                                        <span class="text-danger"></span>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-sm-3">
-                                                                                    <div class="form-group">
-                                                                                        <label
-                                                                                            class="form-label">Email</label>
-                                                                                        <input type="text" placeholder=""
-                                                                                            id="addformemail" value=""
-                                                                                            name="email"
-                                                                                            class="form-control">
-                                                                                        <span class="text-danger"></span>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-sm-6">
-                                                                                    <div class="form-group">
-                                                                                        <label for="address"
-                                                                                            class="form-label">Address</label>
-                                                                                        <input name="address" placeholder=""
-                                                                                            class="form-control">
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-sm-6">
-                                                                                    <div class="form-group">
-                                                                                        <label for="pwd"
-                                                                                            class="form-label">Remarks</label>
-                                                                                        <textarea name="note" id="note"
-                                                                                            class="form-control"></textarea>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-sm-6">
-                                                                                    <div class="form-group">
-                                                                                        <label for="email"
-                                                                                            class="form-label">Any Known
-                                                                                            Allergies</label>
-                                                                                        <textarea name="known_allergies"
-                                                                                            id="" placeholder=""
-                                                                                            class="form-control"></textarea>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-sm-4">
-                                                                                    <div class="form-group">
-                                                                                        <label for="tpa"
-                                                                                            class="form-label">TPA</label>
-                                                                                        <select class="form-select"
-                                                                                            name="organisation_id">
-                                                                                            <option value="">Select
-                                                                                            </option>
-                                                                                            <option value="5">MedoLogi
-                                                                                                TPA Pvt. Ltd.
-                                                                                            </option>
-                                                                                            <option value="4">Vidal
-                                                                                                Health TPA </option>
-                                                                                            <option value="3">
-                                                                                                Paramount
-                                                                                                Health Services
-                                                                                            </option>
-                                                                                            <option value="2">Raksha
-                                                                                                TPA
-                                                                                                Pvt. Ltd. </option>
-                                                                                            <option value="1">
-                                                                                                MediAssist
-                                                                                                TPA Pvt. Ltd.
-                                                                                            </option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-sm-4">
-                                                                                    <div class="form-group">
-                                                                                        <label for="insurance_id"
-                                                                                            class="form-label">TPA
-                                                                                            ID</label>
-                                                                                        <input name="insurance_id"
-                                                                                            placeholder=""
-                                                                                            class="form-control">
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-sm-4">
-                                                                                    <div class="form-group">
-                                                                                        <label for="validity"
-                                                                                            class="form-label">TPA
-                                                                                            Validity</label>
-                                                                                        <input name="validity"
-                                                                                            placeholder=""
-                                                                                            class="form-control date">
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-sm-4">
-                                                                                    <div class="form-group">
-                                                                                        <label class="form-label">National
-                                                                                            Identification
-                                                                                            Number</label>
-                                                                                        <input name="identification_number"
-                                                                                            placeholder=""
-                                                                                            class="form-control">
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-sm-4">
-                                                                                    <div class="form-group">
-                                                                                        <label for="height"
-                                                                                            class="form-label">Height</label>
-                                                                                        <input type="text" id="height"
-                                                                                            name="height"
-                                                                                            class="form-control"
-                                                                                            placeholder="Height (cm)"
-                                                                                            value="">
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-sm-4">
-                                                                                    <div class="form-group">
-                                                                                        <label for="weight"
-                                                                                            class="form-label">Weight</label>
-                                                                                        <input type="text" id="weight"
-                                                                                            name="weight"
-                                                                                            class="form-control"
-                                                                                            placeholder="Weight (kg)"
-                                                                                            value="">
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-sm-4">
-                                                                                    <div class="form-group">
-                                                                                        <label for="temperature"
-                                                                                            class="form-label">Temperature</label>
-                                                                                        <input type="text" id="temperature"
-                                                                                            name="temperature"
-                                                                                            class="form-control"
-                                                                                            placeholder="Temperature (°C)"
-                                                                                            value="">
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-sm-4">
-                                                                                    <div class="form-group">
-                                                                                        <label for="screen_tb"
-                                                                                            class="form-label">Screen
-                                                                                            TB</label>
-                                                                                        <select name="screen_tb"
-                                                                                            id="screen_tb"
-                                                                                            class="form-select">
-                                                                                            <option value="">Select
-                                                                                            </option>
-                                                                                            <option value="Yes">Yes
-                                                                                            </option>
-                                                                                            <option value="No">No
-                                                                                            </option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </form>
-                                                                    </div>
-                                                                    <div class="modal-footer">
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary">Save</button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div> --}}
+                                                        @include('components.modals.opd-visitDetail-modal')
+                                                       
                                                     </div>
                                                 </div>
                                                 <!-- Table start -->
@@ -1786,17 +1117,17 @@
                                                             @foreach ($opdVisits as $visit)
                                                                 <tr>
                                                                     <td>
-                                                                        <h6 class="fs-14 mb-1">{{ $visit->visit_id }}
+                                                                        <h6 class="fs-14 mb-1">{{ $visit->checkup_id ?? '' }}
                                                                         </h6>
                                                                     </td>
-                                                                    <td>{{ $visit->opd->appointment_date }}</td>
-                                                                    <td>{{ $visit->opd->doctor->name }}
-                                                                        ({{ $visit->opd->doctor->doctor_id }})
+                                                                    <td>{{ $visit->appointment_date }}</td>
+                                                                    <td>{{ $visit->doctor->name ?? '' }}
+                                                                        ({{ $visit->doctor->doctor_id ?? ''}})
                                                                     </td>
-                                                                    <td>{{ $visit->opd->reference }}</td>
+                                                                    <td>{{ $visit->opdDetail->reference }}</td>
                                                                     <td>
-                                                                        @if (isset($opdSymptoms[$visit->opd->opd_no]) && count($opdSymptoms[$visit->opd->opd_no]) > 0)
-                                                                            @foreach ($opdSymptoms[$visit->opd->opd_no] as $symptom)
+                                                                        @if (isset($opdSymptoms[$visit->opd_details_id]) && count($opdSymptoms[$visit->opd_details_id]) > 0)
+                                                                            @foreach ($opdSymptoms[$visit->opd_details_id] as $symptom)
                                                                                 <span
                                                                                     class="badge bg-primary me-1">{{ $symptom->symptoms_title }}</span>
                                                                             @endforeach
@@ -1821,7 +1152,7 @@
                                                                             <a href="javascript: void(0);"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill"
                                                                                 data-is-ipd="false"
-                                                                                data-id="{{ $visit->opd->id }}"
+                                                                                data-id="{{ $visit->opdDetail->id }}"
                                                                                 data-pres-id = "{{ $visit->id }}"
                                                                                 data-bs-toggle="modal"
                                                                                 data-bs-target="#showPrescriptionModal">
@@ -1862,7 +1193,7 @@
                         <div class="card shadow-sm flex-fill w-100">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Timeline
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Medication
                                 </h5>
                             </div>
                             <div class="card-body">
@@ -2000,7 +1331,7 @@
                                                             <tr>
                                                                 <th>Date</th>
                                                                 <th>Medication Name</th>
-                                                                <th>Dose1</th>
+                                                                <th>Dose</th>
                                                                 <th>Action</th>
                                                             </tr>
                                                         </thead>
@@ -2021,19 +1352,106 @@
                                                                     </td>
                                                                     <td>
                                                                         <div class="d-flex gap-2">
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
-                                                                                <i class="ti ti-pencil"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    title="Show"></i></a>
-                                                                            <a href="javascript: void(0);"
+                                                                            <a href="javascript:void(0);" 
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill editMedicationBtn"
+                                                                            data-id="{{ $medication->id }}"
+                                                                            data-date="{{ $medication->date }}"
+                                                                            data-time="{{ $medication->time }}"
+                                                                            data-cat="{{ $medication->pharmacy->medicine_category_id }}"  
+                                                                            data-med="{{ $medication->pharmacy_id }}"           
+                                                                            data-dose="{{ $medication->medicine_dosage_id }}" 
+                                                                            data-remark="{{ $medication->remark }}"
+                                                                            data-bs-toggle="modal"
+                                                                            data-bs-target="#edit_medication">
+                                                                                <i class="ti ti-pencil"></i>
+                                                                            </a>
+                                                                            <!-- <a href="javascript: void(0);"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
                                                                                 <i class="ti ti-trash"
                                                                                     data-bs-toggle="tooltip"
-                                                                                    title="Show"></i></a>
+                                                                                    title="Show"></i></a> -->
                                                                         </div>
                                                                     </td>
                                                                 </tr>
+                                                                <div class="modal fade" id="edit_medication" tabindex="-1" aria-hidden="true">
+                                                                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                                        <div class="modal-content">
+
+                                                                            <div class="modal-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                                                                <h5 class="modal-title">Edit Medication Dose</h5>
+                                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                                            </div>
+
+                                                                            <form method="POST" action="{{ route('medication.update') }}">
+                                                                                @csrf
+                                                                                @method('PUT')
+
+                                                                                <input type="hidden" name="id" id="edit_id">
+                                                                                <input type="hidden" name="opd_id" value="{{ $opd->id }}">
+
+                                                                                <div class="modal-body">
+                                                                                    <div class="row gy-3">
+
+                                                                                        {{-- Date --}}
+                                                                                        <div class="col-md-6">
+                                                                                            <label class="form-label">Date</label>
+                                                                                            <input type="date" name="date" id="edit_date" class="form-control">
+                                                                                        </div>
+
+                                                                                        {{-- Time --}}
+                                                                                        <div class="col-md-6">
+                                                                                            <label class="form-label">Time</label>
+                                                                                            <input type="time" name="time" id="edit_time" class="form-control">
+                                                                                        </div>
+
+                                                                                        {{-- Category --}}
+                                                                                        <div class="col-md-6">
+                                                                                            <label class="form-label">Medicine Category</label>
+                                                                                            <select name="medi_cat" id="edit_medi_cat" class="form-select">
+                                                                                                <option value="">Select</option>
+                                                                                                @foreach($medicineCategories as $cat)
+                                                                                                    <option value="{{ $cat->id }}">{{ $cat->medicine_category }}</option>
+                                                                                                @endforeach
+                                                                                            </select>
+                                                                                        </div>
+
+                                                                                        {{-- Medicine --}}
+                                                                                        <div class="col-md-6">
+                                                                                            <label class="form-label">Medicine Name</label>
+                                                                                            <select name="med_name" id="edit_med_name" class="form-select">
+                                                                                                @foreach($pharmacyDetails as $med)
+                                                                                                    <option value="{{ $med->id }}">{{ $med->medicine_name }}</option>
+                                                                                                @endforeach
+                                                                                            </select>
+                                                                                        </div>
+
+                                                                                        {{-- Dosage --}}
+                                                                                        <div class="col-md-6">
+                                                                                            <label class="form-label">Dosage</label>
+                                                                                            <select name="dosage" id="edit_dosage" class="form-select">
+                                                                                                @foreach($medDosages as $dose)
+                                                                                                    <option value="{{ $dose->id }}">{{ $dose->dosage }}</option>
+                                                                                                @endforeach
+                                                                                            </select>
+                                                                                        </div>
+
+                                                                                        {{-- Remarks --}}
+                                                                                        <div class="col-md-6">
+                                                                                            <label class="form-label">Remarks</label>
+                                                                                            <input type="text" name="remark" id="edit_remark" class="form-control">
+                                                                                        </div>
+
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <div class="modal-footer">
+                                                                                    <button class="btn btn-primary">Update</button>
+                                                                                </div>
+                                                                            </form>
+
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
                                                             @endforeach
                                                         </tbody>
                                                     </table>
@@ -2962,77 +2380,80 @@
                                                                     <div class="modal-header"
                                                                         style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
-                                                                        <h5 class="modal-title"
-                                                                            id="addSpecializationLabel">
+                                                                        <h5 class="modal-title" id="addSpecializationLabel">
                                                                             Add Timeline
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
                                                                             data-bs-dismiss="modal"></button>
 
                                                                     </div>
-                                                                    <form action="{{ route('patient-timeline.store') }}"
-                                                                        method="post">
-                                                                        @csrf
+                                                                    <form method="POST" action="{{ isset($timeline) ? route('patient-timeline.update', $timeline->id) : route('patient-timeline.store') }}" enctype="multipart/form-data">
+                                                                            @csrf
+                                                                            @if(isset($timeline))
+                                                                                @method('PUT')
+                                                                            @endif
 
-                                                                        <div class="modal-body">
+                                                                            <input type="hidden" name="patient_id" value="{{ $opd->patient->id ?? '' }}">
 
-                                                                            <div class="row gy-3">
+                                                                            <div class="modal-body">
+                                                                                <div class="row gy-3">
+                                                                                    <!-- Title -->
+                                                                                    <div class="col-md-12">
+                                                                                        <label for="title" class="form-label">
+                                                                                            Title <span class="text-danger">*</span>
+                                                                                        </label>
+                                                                                        <input type="text" name="title" id="title" class="form-control"
+                                                                                            value="{{ old('title', $timeline->title ?? '') }}" required>
+                                                                                    </div>
 
-                                                                                <div class="col-md-12">
-                                                                                    <label for="title"
-                                                                                        class="form-label">Title
-                                                                                        <span class="text-danger">*</span>
-                                                                                    </label>
-                                                                                    <input type="hidden"
-                                                                                        name="patient_id"
-                                                                                        value="{{ $opd->patient->id }}">
-                                                                                    <input type="text" name="title"
-                                                                                        id="title"
-                                                                                        class="form-control">
-                                                                                </div>
-                                                                                <div class="col-md-12">
-                                                                                    <label for="date"
-                                                                                        class="form-label">Date
-                                                                                        <span class="text-danger">*</span>
-                                                                                    </label>
-                                                                                    <input type="date" name="date"
-                                                                                        id="date"
-                                                                                        class="form-control">
-                                                                                </div>
-                                                                                <div class="col-md-12">
-                                                                                    <label for="description"
-                                                                                        class="form-label">Description
-                                                                                    </label>
-                                                                                    <textarea name="description" id="description" class="form-control"></textarea>
-                                                                                </div>
-                                                                                <div class="col-md-12">
-                                                                                    <label for="attch_doc"
-                                                                                        class="form-label">Attach Document
-                                                                                    </label>
-                                                                                    <input type="file"
-                                                                                        name="attch_doc" id="file"
-                                                                                        class="form-control">
-                                                                                </div>
-                                                                                <div class="col-md-12">
-                                                                                    <label for="visible_person"
-                                                                                        class="form-check-label">Visible
-                                                                                        to
-                                                                                        this
-                                                                                        person
-                                                                                    </label>
-                                                                                    <input type="checkbox"
-                                                                                        name="visible_person"
-                                                                                        id="date"
-                                                                                        class="form-check-input">
+                                                                                    <!-- Date -->
+                                                                                    <div class="col-md-12">
+                                                                                        <label for="date" class="form-label">
+                                                                                            Date <span class="text-danger">*</span>
+                                                                                        </label>
+                                                                                        <input type="date" name="date" id="date" class="form-control"
+                                                                                            value="{{ old('date', isset($timeline->date) ? \Carbon\Carbon::parse($timeline->date)->format('Y-m-d') : '') }}" required>
+                                                                                    </div>
+
+                                                                                    <!-- Description -->
+                                                                                    <div class="col-md-12">
+                                                                                        <label for="description" class="form-label">
+                                                                                            Description
+                                                                                        </label>
+                                                                                        <textarea name="description" id="description" class="form-control" rows="3">{{ old('description', $timeline->description ?? '') }}</textarea>
+                                                                                    </div>
+
+                                                                                    <!-- Attach Document -->
+                                                                                    <div class="col-md-12">
+                                                                                        <label for="attch_doc" class="form-label">
+                                                                                            Attach Document
+                                                                                        </label>
+                                                                                        <input type="file" name="attch_doc" id="attch_doc" class="form-control">
+                                                                                        @if(isset($timeline) && $timeline->attch_doc)
+                                                                                            <small class="text-muted d-block mt-1">
+                                                                                                Current File:
+                                                                                                <a href="{{ asset('storage/timeline_docs/' . $timeline->attch_doc) }}" target="_blank">
+                                                                                                    View Document
+                                                                                                </a>
+                                                                                            </small>
+                                                                                        @endif
+                                                                                    </div>
+
+                                                                                    <!-- Visible to Person -->
+                                                                                    <div class="col-md-12 form-check">
+                                                                                        <input type="checkbox" name="visible_person" id="visible_person" class="form-check-input"
+                                                                                            {{ old('visible_person', $timeline->visible_person ?? false) ? 'checked' : '' }}>
+                                                                                        <label for="visible_person" class="form-check-label">Visible to this person</label>
+                                                                                    </div>
                                                                                 </div>
                                                                             </div>
 
-                                                                        </div>
-                                                                        <div class="modal-footer">
-                                                                            <button type="submit"
-                                                                                class="btn btn-primary">Save</button>
-                                                                        </div>
-                                                                    </form>
+                                                                            <div class="modal-footer">
+                                                                                <button type="submit" class="btn btn-primary">
+                                                                                    {{ isset($timeline) ? 'Update' : 'Save' }}
+                                                                                </button>
+                                                                            </div>
+                                                                        </form>
 
                                                                 </div>
                                                             </div>
@@ -3044,36 +2465,48 @@
                                                     <table class="table border">
                                                         <thead class="thead-light">
                                                             <tr>
-                                                                <th>OPD No</th>
-                                                                <th>Case ID</th>
-                                                                <th>Appointment Date</th>
+                                                                
+                                                                <th>Patient Name</th>
                                                                 <th>Title</th>
-                                                                <th>Date</th>
+                                                                <th>Description</th>
+                                                                <th>Timeline Date</th>
                                                                 <th>Action</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
+                                                             @forelse($PatientTimelines as $timeline)
                                                             <tr>
                                                                 <td>
-                                                                    <h6 class="fs-14 mb-1"><a href="#"
-                                                                            class="fw-semibold">OPDN14</a></h6>
+                                                                    <h6 class="fs-14 mb-1">
+                                                                        <a href="#" class="fw-semibold">{{ $timeline->patient->patient_name ?? '-' }}</a>
+                                                                    </h6>
                                                                 </td>
-                                                                <td>18</td>
-                                                                <td> 09/17/2025 12:49 PM</td>
-                                                                <td>xyz
-                                                                </td>
-                                                                <td>09/17/2025 12:49 PM
+                                                                
+                                                                
+                                                                <td>{{ $timeline->title ?? '-' }}</td>
+                                                                <td>{{ $timeline->description ?? '-' }}</td>
+                                                                <td>
+                                                                    @if(!empty($timeline->timeline_date))
+                                                                        {{ \Carbon\Carbon::parse($timeline->timeline_date)->format('d/m/Y h:i A') }}
+                                                                    @else
+                                                                        -
+                                                                    @endif
                                                                 </td>
                                                                 <td>
                                                                     <div class="d-flex gap-2">
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                            <i class="ti ti-menu"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Show"></i></a>
+                                                                        <a href="#"
+                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
+                                                                        data-bs-toggle="tooltip" title="Show">
+                                                                            <i class="ti ti-menu"></i>
+                                                                        </a>
                                                                     </div>
                                                                 </td>
                                                             </tr>
+                                                            @empty
+                                                                <tr>
+                                                                    <td colspan="6" class="text-center text-muted">No timeline records found</td>
+                                                                </tr>
+                                                            @endforelse
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -3205,81 +2638,70 @@
                                                         <!-- First Modal -->
                                                         <div class="modal fade" id="add_vital" tabindex="-1"
                                                             aria-hidden="true">
-                                                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                            <div class="modal-dialog modal-dialog-centered">
                                                                 <div class="modal-content">
 
                                                                     <div class="modal-header"
                                                                         style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
-                                                                        <h5 class="modal-title"
-                                                                            id="addSpecializationLabel">
+                                                                        <h5 class="modal-title" id="addSpecializationLabel">
                                                                             Add Vitals
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
                                                                             data-bs-dismiss="modal"></button>
 
                                                                     </div>
+                                                                    <form method="POST" action="{{ route('patient-vitals.store') }}">
+                                                                        @csrf
+                                                                            <input type="hidden" name="patient_id" value="{{ $opd->patient->id }}">
+                                                                        <div class="modal-body">
+                                                                            <div id="vitalFields">
+                                                                                <div class="row gy-3 vital-row mb-2">
+                                                                                    <!-- Vital Name -->
+                                                                                      
+                                                                                    <div class="col-md-4">
+                                                                                        <label for="vital_name" class="form-label">Vital Name</label>
+                                                                                        <select class="form-select" name="vital_name[]" id="vital_name">
+                                                                                            <option value="">Select</option>
+                                                                                            @foreach($vitals as $vital)
+                                                                                                <option value="{{ $vital->id }}">{{ $vital->name . ' (' . $vital->reference_range . ')' }} </option>
+                                                                                            @endforeach
+                                                                                        </select>
+                                                                                    </div>
 
-                                                                    <div class="modal-body">
+                                                                                    <!-- Vital Value -->
+                                                                                    <div class="col-md-3">
+                                                                                        <label for="vital_value" class="form-label">Vital Value</label>
+                                                                                        <input type="text" name="vital_value[]" id="vital_value" class="form-control" />
+                                                                                    </div>
 
+                                                                                    <!-- Date -->
+                                                                                    <div class="col-md-4">
+                                                                                        <label for="date" class="form-label">Date</label>
+                                                                                        <input type="date" name="date[]" id="date" class="form-control" />
+                                                                                    </div>
 
-
-                                                                        <div id="vitalFields">
-                                                                            <div class="row gy-3 vital-row mb-2">
-                                                                                <!-- Vital Name -->
-                                                                                <div class="col-md-4">
-                                                                                    <label for="vital_name"
-                                                                                        class="form-label">Vital
-                                                                                        Name</label>
-                                                                                    <select class="form-select"
-                                                                                        name="vital_name[]"
-                                                                                        id="vital_name">
-                                                                                        <option value="">Select
-                                                                                        </option>
-                                                                                        <option value="1">1</option>
-                                                                                    </select>
-                                                                                </div>
-                                                                                <!-- Vital Value -->
-                                                                                <div class="col-md-3">
-                                                                                    <label for="vital_value"
-                                                                                        class="form-label">Vital
-                                                                                        Value</label>
-                                                                                    <input type="text"
-                                                                                        name="vital_value[]"
-                                                                                        id="vital_value"
-                                                                                        class="form-control" />
-                                                                                </div>
-                                                                                <!-- Date -->
-                                                                                <div class="col-md-4">
-                                                                                    <label for="date"
-                                                                                        class="form-label">Date</label>
-                                                                                    <input type="date" name="date[]"
-                                                                                        id="date"
-                                                                                        class="form-control" />
-                                                                                </div>
-                                                                                <!-- Remove -->
-                                                                                <div
-                                                                                    class="col-md-1 d-flex align-items-end">
-                                                                                    <button type="button"
-                                                                                        class="btn btn-danger remove-btn"
-                                                                                        style="display:none;">
-                                                                                        <i class="ti ti-trash"></i>
-                                                                                    </button>
+                                                                                    <!-- Remove -->
+                                                                                    <div class="col-md-1 d-flex align-items-end">
+                                                                                        <button type="button" class="btn btn-danger remove-btn" style="display:none;">
+                                                                                            <i class="ti ti-trash"></i>
+                                                                                        </button>
+                                                                                    </div>
                                                                                 </div>
                                                                             </div>
-                                                                        </div>
-                                                                        <div class="mt-2">
-                                                                            <button type="button"
-                                                                                class="btn btn-primary" id="addBtn">
-                                                                                <i class="ti ti-plus"></i> Add Operation
-                                                                            </button>
-                                                                        </div>
-                                                                    </div>
 
-                                                                    <div class="modal-footer">
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary">Save</button>
-                                                                    </div>
+                                                                            <div class="mt-2">
+                                                                                <button type="button" class="btn btn-primary" id="addBtn">
+                                                                                    <i class="ti ti-plus"></i> Add Vital
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="modal-footer">
+                                                                            <button type="submit" class="btn btn-primary">Save</button>
+                                                                        </div>
+                                                                    </form>
+
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -3290,41 +2712,61 @@
                                                     <table class="table border">
                                                         <thead class="thead-light">
                                                             <tr>
-                                                                <th>OPD No</th>
-                                                                <th>Case ID</th>
-                                                                <th>Appointment Date</th>
-                                                                <th>Vital Name</th>
-                                                                <th>Vital Value</th>
-                                                                <th>Date</th>
-                                                                <th>Action</th>
+                                                                
+                                                                <th>Messure Date</th>
+                                                                 {{-- Dynamically generate vital headers --}}
+                                                                @foreach($vitals as $vital)
+                                                                    <th>{{ $vital->name }}</th>
+                                                                @endforeach
+                                                                <!-- <th>Action</th> -->
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr>
+                                                              @forelse($vitalDetails->groupBy('patient_id') as $caseId => $caseVitals)
+                                                        @php
+                                                            $firstRecord = $caseVitals->first();
+                                                        @endphp
+                                                        <tr>
+
+                                                        <td>
+                                                            @if(!empty($firstRecord->messure_date))
+                                                                {{ \Carbon\Carbon::parse($firstRecord->messure_date)->format('d/m/Y h:i A') }}
+                                                            @else
+                                                                -
+                                                            @endif
+                                                        </td>
+
+                                                            {{-- Loop through all vitals dynamically --}}
+                                                            @foreach($vitals as $vital)
+                                                                @php
+                                                                    $record = $caseVitals->where('vital_id', $vital->id)->first();
+                                                                @endphp
                                                                 <td>
-                                                                    <h6 class="fs-14 mb-1"><a href="#"
-                                                                            class="fw-semibold">OPDN14</a></h6>
+                                                                    {{ $record->reference_range ?? '-' }}
                                                                 </td>
-                                                                <td>18</td>
-                                                                <td> 09/17/2025 12:49 PM</td>
-                                                                <td>xyz
-                                                                <td>3
-                                                                </td>
-                                                                <td>09/17/2025 12:49 PM
-                                                                </td>
-                                                                <td>
-                                                                    <div class="d-flex gap-2">
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                            <i class="ti ti-menu"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Show"></i></a>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
+                                                            @endforeach
+
+                                                                    <!-- <td>
+                                                                        <div class="d-flex gap-2">
+                                                                            <a href="#"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
+                                                                                data-bs-toggle="tooltip" title="Show">
+                                                                                <i class="ti ti-menu"></i>
+                                                                            </a>
+                                                                        </div>
+                                                                    </td> -->
+                                                                    </tr>
+                                                            @empty
+                                                                <tr>
+                                                                    <td colspan="{{ 4 + $vitals->count() }}" class="text-center text-muted">
+                                                                        No vital records found
+                                                                    </td>
+                                                                </tr>
+                                                            @endforelse
                                                         </tbody>
                                                     </table>
                                                 </div>
+                                                <!-- Table end -->
                                                 <!-- Table end -->
                                             </div>
                                         </div>
@@ -3734,4 +3176,15 @@
                 });
         })
     </script>
+    <script>
+    $(document).on('click', '.editMedicationBtn', function() {
+    $('#edit_id').val($(this).data('id'));
+    $('#edit_date').val($(this).data('date'));
+    $('#edit_time').val($(this).data('time'));
+    $('#edit_medi_cat').val($(this).data('cat'));
+    $('#edit_med_name').val($(this).data('med'));
+    $('#edit_dosage').val($(this).data('dose'));
+    $('#edit_remark').val($(this).data('remark'));
+});
+</script>
 @endsection
