@@ -899,4 +899,5 @@ Route::get('/blood_bank_status', function () {
     return view('admin.blood-bank-doner.blood_bank_status');
 })->name('blood_bank_status');
 Route::get('/pathology_test', [ExcelImportController::class, 'importPathology'])->name('pathology.test.import');
-Route::get('/pathology_test_import', [ExcelImportController::class, 'importPathology'])->name('pathologyTests.export');
+Route::post('/pathology_import', [ExcelImportController::class, 'importPathologyExcel'])->name('pathology.import');
+Route::get('/pathology_test_import', [ExcelImportController::class, 'exportPathologyTestExcel'])->name('pathologyTests.export');

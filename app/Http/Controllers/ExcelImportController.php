@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Organisation;
 use App\Models\PathologyCategory;
 use App\Models\ChargeCategory;
 use App\Models\ChargeTypeModule;
 use App\Models\ChargeUnit;
 use App\Models\Charge;
 use App\Models\Pathology;
+use App\Models\PathologyParameter;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
@@ -34,195 +36,249 @@ class ExcelImportController extends Controller
 }
 
     public function importPathologyExcel(Request $request)
-    {
-        
-        $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv'
-        ]);
-        
+{
+    $request->validate([
+        'file' => 'required|mimes:xlsx,xls,csv'
+    ]);
+
+    try {
         $file = $request->file('file');
 
         $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file);
-        $sheet = $spreadsheet->getActiveSheet();
-        $rows = $sheet->toArray(null, true, true, true);
+        $sheet       = $spreadsheet->getActiveSheet();
+        $rows        = $sheet->toArray(null, true, true, true);
 
-        // Skip header row (row 1)
         foreach ($rows as $index => $row) {
+
+            // Skip header row
             if ($index == 1) continue;
 
-            if (empty($row['A']) && empty($row['B'])) {
-                continue; // skip empty rows
+            // Row empty? Skip
+            if (empty($row['A']) && empty($row['B'])) continue;
+
+            // Excel → Variables
+            $testName        = trim($row['A']);
+            $categoryName    = trim($row['B']);
+            $chargeName      = trim($row['C']);
+            $amount          = trim($row['D']);
+            $chargeTypeName  = trim($row['E']);
+            $unitName        = trim($row['F']);
+            $description     = trim($row['G']);
+            $reportDays      = trim($row['H']);
+            $reportDate      = $this->formatExcelDate(trim($row['I']));
+
+            // Name → IDs
+            $categoryId   = PathologyCategory::where('category_name', $categoryName)->value('id');
+            $chargeId     = Charge::where('charge_name', $chargeName)->value('id');
+            $chargeTypeId = ChargeTypeModule::where('name', $chargeTypeName)->value('id');
+            $unitId       = ChargeUnit::where('unit_name', $unitName)->value('id');
+
+            // Skip if test name already exists
+            if (Pathology::where('test_name', $testName)->exists()) {
+                continue; // or log duplicates
             }
 
-            // Mapping Excel columns → Variables
-            $doctorId           = trim($row['A']);
-            $firstName          = trim($row['B']);
-            $lastName           = trim($row['C']);
-            $departmentName     = trim($row['D']);
-            $designationName    = trim($row['E']);
-            $specialistName     = trim($row['F']);
-            $specialization     = trim($row['G']);
-            $qualification      = trim($row['H']);
-            $workExperience     = trim($row['I']);
-            $fatherName         = trim($row['J']);
-            $motherName         = trim($row['K']);
-            $contactNumber      = trim($row['L']);
-            $emergencyContact   = trim($row['M']);
-            $email              = trim($row['N']);
-            $dob                = $this->formatExcelDate(trim($row['O']));
-            $maritalStatus      = trim($row['P']);
-            $dateJoining        = $this->formatExcelDate(trim($row['Q']));
-            $dateLeaving        = $this->formatExcelDate(trim($row['R']));
-            $localAddress       = trim($row['S']);
-            $permanentAddress   = trim($row['T']);
-            $gender             = trim($row['U']);
-            $bloodGroupName     = trim($row['V']);
-            $identification     = trim($row['W']);
-            $pan                = trim($row['X']);
-            $rolesName          = trim($row['Y']);
-            $remarks            = trim($row['Z']);
-            $registrationNo     = trim($row['AA']);
-
-            // Convert Names → IDs
-            $departmentId  = Department::where('department_name', $departmentName)->value('id');
-            $designationId = StaffDesignation::where('designation', $designationName)->value('id');
-            $bloodGroupId  = BloodBankProduct::where('name', $bloodGroupName)->value('id');
-            $specialistId  = Specialist::where('specialist_name', $specialistName)->value('id');
-            $rolesId       = Role::where('name', $rolesName)->value('id');
-            
-
-
-
-
-            // Insert into Doctor table
-            Doctor::create([
-                'hospital_id'               => Auth::user()->hospital_id,
-                'branch_id'                 => Auth::user()->branch_id ?? null,
-                'doctor_id'                 => $doctorId,
-                'name'                      => $firstName,
-                'surname'                   => $lastName,
-                'department_id'             => $departmentId,
-                'designation_id'            => $designationId,
-                'specialist'                => $specialistId,
-                'specialization'            => $specialization,
-                'qualification'             => $qualification,
-                'work_exp'                  => $workExperience,
-                'father_name'               => $fatherName,
-                'mother_name'               => $motherName,
-                'contact_no'                => $contactNumber,
-                'emergency_contact_no'      => $emergencyContact,
-                'email'                     => $email,
-                'dob'                       => $dob,
-                'marital_status'            => $maritalStatus,
-                'date_of_joining'           => $dateJoining,
-                'date_of_leaving'           => $dateLeaving,
-                'local_address'             => $localAddress,
-                'permanent_address'         => $permanentAddress,
-                'gender'                    => $gender,
-                'blood_group'               => $bloodGroupId,
-                'identification_number'     => $identification,
-                'pan'                       => $pan,
-                'roles'                     => $rolesId,
-                'remarks'                   => $remarks,
-                'registration_no'           => $registrationNo,
-                'password'                  => '123456',
-                'user_id'                   => 0,
-                'is_active'                 => 1,
-                
+            // Insert Pathology Test
+            Pathology::create([
+                'hospital_id'     => Auth::user()->hospital_id,
+                'branch_id'       => Auth::user()->branch_id ?? null,
+                'test_name'       => $testName,
+                'category_id'     => $categoryId,
+                'charge_id'       => $chargeId,
+                'charge_type_id'  => $chargeTypeId,
+                'charge_unit_id'  => $unitId,
+                'amount'          => $amount,
+                'description'     => $description,
+                'report_days'     => $reportDays,
+                'report_date'     => $reportDate,
+                'is_active'       => 1,
             ]);
         }
 
-        return back()->with('success', 'Doctor Excel imported successfully!');
+        return back()->with('success', 'Pathology Excel imported successfully!');
+
+    } catch (\Exception $e) {
+        return back()->with('error', 'Error importing file: ' . $e->getMessage());
     }
+}
+
 
     public function exportPathologyTestExcel()
-{
-    $spreadsheet = new Spreadsheet();
-    $sheet = $spreadsheet->getActiveSheet();
-    $sheet->setTitle('Tests');
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Pathology Test');
 
-    $headers = [
-        "Test Code", "Test Name", "Category", "Sample Type",
-        "Method", "Normal Range", "Unit", "Rate", "Remarks"
-    ];
+        $organisations = Organisation::all();       // TPA list
+        $categories    = PathologyCategory::all();
+        $chargeCats    = ChargeCategory::all();
+        $charges       = Charge::all();
+        $parameters    = PathologyParameter::with('unitRelation')->get();
 
-    $col = 'A';
-    foreach ($headers as $header) {
-        $sheet->setCellValue("$col"."1", $header);
-        $col++;
-    }
+        // ===============================
+        // 1. Define Header Columns
+        // ===============================
 
-    $sheet->freezePane('A2');
+        $headers = [
+            'Test Name', 'Short Name', 'Test Type', 'Category Name',
+            'Sub Category', 'Method', 'Report Days',
+            'Charge Category', 'Charge Name', 'Tax (%)',
+            'Standard Charge', 'Amount'
+        ];
 
-    // Dropdown Sheet
-    $dropdownSheet = $spreadsheet->createSheet();
-    $dropdownSheet->setTitle('DropdownData');
+        // Add TPA Columns
+        foreach ($organisations as $org) {
+            $headers[] = "TPA {$org->organisation_name} Charge";
+            $headers[] = "TPA {$org->organisation_name} Code";
+        }
 
-    $columns = [
-        'A' => TestCategory::pluck('category_name')->filter()->values()->all(),
-        'B' => SampleType::pluck('sample_name')->filter()->values()->all(),
-        'C' => Unit::pluck('unit_name')->filter()->values()->all(),
-    ];
+        // Add Parameter Columns (supports multi-rows on import)
+        $headers[] = "Parameter ID (comma separated)";
+        $headers[] = "Reference Range (optional)";
+        $headers[] = "Unit (optional)";
 
-    foreach ($columns as $col => $values) {
+        // Write headers to Excel
+        $col = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($col . '1', $header);
+            $col++;
+        }
+
+        $sheet->freezePane('A2');
+
+        // ===============================
+        // 2. Dropdown Sheet
+        // ===============================
+
+        $dropdown = $spreadsheet->createSheet();
+        $dropdown->setTitle('DropdownData');
+
+        // Category List
         $row = 1;
-        foreach ($values as $val) {
-            $dropdownSheet->setCellValue($col . $row, $val);
+        foreach ($categories as $cat) {
+            $dropdown->setCellValue("A$row", $cat->category_name);
             $row++;
         }
+
+        // Charge Category List
+        $row = 1;
+        foreach ($chargeCats as $cc) {
+            $dropdown->setCellValue("B$row", $cc->name);
+            $row++;
+        }
+
+        // Charge Names
+        $row = 1;
+        foreach ($charges as $charge) {
+            $dropdown->setCellValue("C$row", $charge->charge_name);
+            $row++;
+        }
+
+        // Parameters
+        $row = 1;
+        foreach ($parameters as $param) {
+            $dropdown->setCellValue("D$row", "{$param->id} - {$param->parameter_name}");
+            $row++;
+        }
+
+        // ===============================
+        // 3. Apply Dropdowns in main sheet
+        // ===============================
+
+        // Category Name dropdown
+        $this->setDropdown($sheet, 'D2:D500', 'DropdownData', 'A', count($categories));
+
+        // Charge Category dropdown
+        $this->setDropdown($sheet, 'H2:H500', 'DropdownData', 'B', count($chargeCats));
+
+        // Charge Name dropdown
+        $this->setDropdown($sheet, 'I2:I500', 'DropdownData', 'C', count($charges));
+
+        // Parameter dropdown
+        $this->setDropdown($sheet, 'A2:A500', 'DropdownData', 'D', count($parameters));
+
+        // ===============================
+        // 4. Final Excel Output
+        // ===============================
+
+        $writer = new Xlsx($spreadsheet);
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="PathologyTestTemplate.xlsx"');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        exit;
     }
 
-    $this->setDropdown($sheet, 'C2:C500', 'DropdownData', 'A', count($columns['A']));
-    $this->setDropdown($sheet, 'D2:D500', 'DropdownData', 'B', count($columns['B']));
-    $this->setDropdown($sheet, 'G2:G500', 'DropdownData', 'C', count($columns['C']));
-
-    $writer = new Xlsx($spreadsheet);
-
-    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    header('Content-Disposition: attachment; filename="PathologyTest.xlsx"');
-    header('Cache-Control: max-age=0');
-
-    $writer->save('php://output');
-    exit;
-}
 
 
     // =========================
     // Helper: Apply dropdown
     // =========================
     private function setDropdown($sheet, $cellRange, $sheetName, $columnLetter, $count)
-    {
-        [$start, $end] = explode(':', $cellRange);
-        preg_match('/([A-Z]+)([0-9]+)/', $start, $startMatch);
-        preg_match('/([A-Z]+)([0-9]+)/', $end, $endMatch);
+{
+    [$start, $end] = explode(':', $cellRange);
+    preg_match('/([A-Z]+)([0-9]+)/', $start, $m);
 
-        $startRow = (int)$startMatch[2];
-        $endRow   = (int)$endMatch[2];
-        $column   = $startMatch[1];
+    $startRow = (int)$m[2];
+    $column   = $m[1];
+    $endRow   = explode($column, $end)[1];
 
-        for ($row = $startRow; $row <= $endRow; $row++) {
-            $cell = $sheet->getCell($column . $row);
-            $validation = new DataValidation();
-            $validation->setType(DataValidation::TYPE_LIST);
-            $validation->setAllowBlank(true);
-            $validation->setShowDropDown(true);
-            $validation->setFormula1("='{$sheetName}'!\${$columnLetter}\$1:\${$columnLetter}\${$count}");
-            $cell->setDataValidation($validation);
-        }
+    for ($row = $startRow; $row <= $endRow; $row++) {
+        $validation = new DataValidation();
+        $validation->setType(DataValidation::TYPE_LIST);
+        $validation->setAllowBlank(true);
+        $validation->setFormula1("='{$sheetName}'!\${$columnLetter}\$1:\${$columnLetter}\${$count}");
+
+        $sheet->getCell($column . $row)->setDataValidation($validation);
     }
-    private function formatExcelDate($value)
-    {
-        if (empty($value)) {
+}
+
+   private function formatExcelDate($value)
+{
+    // 1. Handle empty values
+    if ($value === null || $value === '' || trim($value) == '') {
+        return null;
+    }
+
+    // 2. If value is a DateTime object (PhpSpreadsheet sometimes gives this)
+    if ($value instanceof \DateTimeInterface) {
+        return $value->format('Y-m-d');
+    }
+
+    // 3. Excel serial date (numeric)
+    if (is_numeric($value)) {
+        try {
+            return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value)
+                   ->format('Y-m-d');
+        } catch (\Exception $e) {
             return null;
         }
+    }
 
-        // If Excel date is numeric (serial number)
-        if (is_numeric($value)) {
-            return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value)->format('Y-m-d');
+    // 4. Try to parse manually if it's a string date
+    try {
+        // Replace "/" with "-" for consistent parsing
+        $value = str_replace('/', '-', trim($value));
+
+        // Some people write DD-MM-YYYY → strtotime may confuse it on some systems
+        $parts = explode('-', $value);
+
+        if (count($parts) === 3 && strlen($parts[2]) === 4) {
+            // Detect if DD-MM-YYYY (Indian format)
+            if (strlen($parts[0]) <= 2 && strlen($parts[1]) <= 2) {
+                // Convert DD-MM-YYYY → YYYY-MM-DD
+                return date('Y-m-d', strtotime("$parts[2]-$parts[1]-$parts[0]"));
+            }
         }
 
-        // If date is already a string like 9/21/2008 or 21-09-2008
+        // Fallback for any normal date string
         return date('Y-m-d', strtotime($value));
+    } catch (\Throwable $e) {
+        return null;
     }
+}
+
     
 }

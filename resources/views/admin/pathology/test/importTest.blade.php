@@ -217,10 +217,7 @@
 </script>
 
 
-<script>
-    const departmentList = @json($departments);
-
-</script>
+<!-- 
 <script>
 document.getElementById("exportBtn").addEventListener("click", function () {
 
@@ -264,7 +261,7 @@ document.getElementById("exportBtn").addEventListener("click", function () {
 
     XLSX.writeFile(wb, "pathology.xlsx");
 });
-</script>
+</script> -->
 
 
 
