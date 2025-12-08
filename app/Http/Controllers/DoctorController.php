@@ -244,20 +244,24 @@ class DoctorController extends Controller
 
 
             // Validate existence
-            if (!$departmentId) {
-                return back()->with('error', "Department '{$departmentName}' not found (Row {$index}).");
-            }
+            // if (!$departmentId) {
+            //     return back()->with('error', "Department '{$departmentName}' not found (Row {$index}).");
+            // }
 
-            if (!$designationId) {
-                return back()->with('error', "Designation '{$designationName}' not found (Row {$index}).");
-            }
+            // if (!$designationId) {
+            //     return back()->with('error', "Designation '{$designationName}' not found (Row {$index}).");
+            // }
 
-            if (!$bloodGroupId && $bloodGroupName != "") {
-                return back()->with('error', "Blood Group '{$bloodGroupName}' not found (Row {$index}).");
-            }
+            // if (!$bloodGroupId && $bloodGroupName != "") {
+            //     return back()->with('error', "Blood Group '{$bloodGroupName}' not found (Row {$index}).");
+            // }
 
-            if (!$specialistId && $specialistName != "") {
-                return back()->with('error', "specialist '{$specialistName}' not found (Row {$index}).");
+            // if (!$specialistId && $specialistName != "") {
+            //     return back()->with('error', "specialist '{$specialistName}' not found (Row {$index}).");
+            // }
+
+            if (!$email) {
+                 $email = 'doctor_' . $doctorId . '@noemail.com';
             }
 
             // Insert into Doctor table
@@ -275,8 +279,8 @@ class DoctorController extends Controller
                 'work_exp'                  => $workExperience,
                 'father_name'               => $fatherName,
                 'mother_name'               => $motherName,
-                'contact_no'            => $contactNumber,
-                'emergency_contact_no'  => $emergencyContact,
+                'contact_no'                => $contactNumber,
+                'emergency_contact_no'      => $emergencyContact,
                 'email'                     => $email,
                 'dob'                       => $dob,
                 'marital_status'            => $maritalStatus,
@@ -301,105 +305,105 @@ class DoctorController extends Controller
         return back()->with('success', 'Doctor Excel imported successfully!');
     }
 
-   public function exportDoctorExcel()
-{
-    $spreadsheet = new Spreadsheet();
+    public function exportDoctorExcel()
+    {
+        $spreadsheet = new Spreadsheet();
 
-    // =========================
-    // Sheet1: Doctors Template
-    // =========================
-    $sheet = $spreadsheet->getActiveSheet();
-    $sheet->setTitle('Doctors');
+        // =========================
+        // Sheet1: Doctors Template
+        // =========================
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Doctors');
 
-    $headers = [
-        "Doctor Id", "First Name", "Last Name", "Department", "Designation",
-        "Specialist", "Specialization", "Qualification", "Work Experience",
-        "Fathers Name", "Mothers Name", "Contact Number", "Emergency Contact Number",
-        "Email", "DOB", "Marital Status", "Date of Joining", "Date of Leaving",
-        "Local Address", "Permanent Address", "Gender", "Blood Group",
-        "Aadhar Number", "PAN", "Role", "Remarks", "Doctor Registration No.",
-    ];
+        $headers = [
+            "Doctor Id", "First Name", "Last Name", "Department", "Designation",
+            "Specialist", "Specialization", "Qualification", "Work Experience",
+            "Fathers Name", "Mothers Name", "Contact Number", "Emergency Contact Number",
+            "Email", "DOB", "Marital Status", "Date of Joining", "Date of Leaving",
+            "Local Address", "Permanent Address", "Gender", "Blood Group",
+            "Aadhar Number", "PAN", "Role", "Remarks", "Doctor Registration No.",
+        ];
 
-    $col = 'A';
-    foreach ($headers as $header) {
-        $sheet->setCellValue($col . '1', $header);
-        $col++;
+        $col = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($col . '1', $header);
+            $col++;
+        }
+
+        $sheet->freezePane('A2'); // freeze header
+
+        // =========================
+        // Sheet2: DropdownData
+        // =========================
+        $dropdownSheet = $spreadsheet->createSheet();
+        $dropdownSheet->setTitle('DropdownData');
+
+        $columns = [
+            'A' => Department::pluck('department_name')->filter()->values()->all(),
+            'B' => StaffDesignation::pluck('designation')->filter()->values()->all(),
+            'C' => Specialist::pluck('specialist_name')->filter()->values()->all(),
+            'D' => ["Single", "Married", "Divorced", "Widowed"],
+            'E' => ["Male", "Female", "Other"],
+            'F' => BloodBankProduct::where('is_blood_group', 1)->pluck('name')->filter()->values()->all(),
+            'G' => Role::pluck('name')->filter()->values()->all(),
+        ];
+
+        foreach ($columns as $col => $values) {
+            $rowIndex = 1;
+            foreach ($values as $val) {
+                $dropdownSheet->setCellValue($col . $rowIndex, $val);
+                $rowIndex++;
+            }
+        }
+
+        // =========================
+        // Apply dropdowns in Sheet1
+        // =========================
+        $this->setDropdown($sheet, 'D2:D500', 'DropdownData', 'A', count($columns['A'])); // Department
+        $this->setDropdown($sheet, 'E2:E500', 'DropdownData', 'B', count($columns['B'])); // Designation
+        $this->setDropdown($sheet, 'F2:F500', 'DropdownData', 'C', count($columns['C'])); // Specialist
+        $this->setDropdown($sheet, 'P2:P500', 'DropdownData', 'D', count($columns['D'])); // Marital Status
+        $this->setDropdown($sheet, 'U2:U500', 'DropdownData', 'E', count($columns['E'])); // Gender
+        $this->setDropdown($sheet, 'V2:V500', 'DropdownData', 'F', count($columns['F'])); // Blood Group
+        $this->setDropdown($sheet, 'Y2:Y500', 'DropdownData', 'G', count($columns['G'])); // Role
+
+        // =========================
+        // Output Excel file
+        // =========================
+        $writer = new Xlsx($spreadsheet);
+        $fileName = "Doctors.xlsx";
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$fileName\"");
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        exit;
     }
 
-    $sheet->freezePane('A2'); // freeze header
-
     // =========================
-    // Sheet2: DropdownData
+    // Helper: Apply dropdown
     // =========================
-    $dropdownSheet = $spreadsheet->createSheet();
-    $dropdownSheet->setTitle('DropdownData');
+    private function setDropdown($sheet, $cellRange, $sheetName, $columnLetter, $count)
+    {
+        [$start, $end] = explode(':', $cellRange);
+        preg_match('/([A-Z]+)([0-9]+)/', $start, $startMatch);
+        preg_match('/([A-Z]+)([0-9]+)/', $end, $endMatch);
 
-    $columns = [
-        'A' => Department::pluck('department_name')->filter()->values()->all(),
-        'B' => StaffDesignation::pluck('designation')->filter()->values()->all(),
-        'C' => Specialist::pluck('specialist_name')->filter()->values()->all(),
-        'D' => ["Single", "Married", "Divorced", "Widowed"],
-        'E' => ["Male", "Female", "Other"],
-        'F' => BloodBankProduct::where('is_blood_group', 1)->pluck('name')->filter()->values()->all(),
-        'G' => Role::pluck('name')->filter()->values()->all(),
-    ];
+        $startRow = (int)$startMatch[2];
+        $endRow   = (int)$endMatch[2];
+        $column   = $startMatch[1];
 
-    foreach ($columns as $col => $values) {
-        $rowIndex = 1;
-        foreach ($values as $val) {
-            $dropdownSheet->setCellValue($col . $rowIndex, $val);
-            $rowIndex++;
+        for ($row = $startRow; $row <= $endRow; $row++) {
+            $cell = $sheet->getCell($column . $row);
+            $validation = new DataValidation();
+            $validation->setType(DataValidation::TYPE_LIST);
+            $validation->setAllowBlank(true);
+            $validation->setShowDropDown(true);
+            $validation->setFormula1("='{$sheetName}'!\${$columnLetter}\$1:\${$columnLetter}\${$count}");
+            $cell->setDataValidation($validation);
         }
     }
-
-    // =========================
-    // Apply dropdowns in Sheet1
-    // =========================
-    $this->setDropdown($sheet, 'D2:D500', 'DropdownData', 'A', count($columns['A'])); // Department
-    $this->setDropdown($sheet, 'E2:E500', 'DropdownData', 'B', count($columns['B'])); // Designation
-    $this->setDropdown($sheet, 'F2:F500', 'DropdownData', 'C', count($columns['C'])); // Specialist
-    $this->setDropdown($sheet, 'P2:P500', 'DropdownData', 'D', count($columns['D'])); // Marital Status
-    $this->setDropdown($sheet, 'U2:U500', 'DropdownData', 'E', count($columns['E'])); // Gender
-    $this->setDropdown($sheet, 'V2:V500', 'DropdownData', 'F', count($columns['F'])); // Blood Group
-    $this->setDropdown($sheet, 'Y2:Y500', 'DropdownData', 'G', count($columns['G'])); // Role
-
-    // =========================
-    // Output Excel file
-    // =========================
-    $writer = new Xlsx($spreadsheet);
-    $fileName = "Doctors.xlsx";
-
-    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    header("Content-Disposition: attachment; filename=\"$fileName\"");
-    header('Cache-Control: max-age=0');
-
-    $writer->save('php://output');
-    exit;
-}
-
-// =========================
-// Helper: Apply dropdown
-// =========================
-private function setDropdown($sheet, $cellRange, $sheetName, $columnLetter, $count)
-{
-    [$start, $end] = explode(':', $cellRange);
-    preg_match('/([A-Z]+)([0-9]+)/', $start, $startMatch);
-    preg_match('/([A-Z]+)([0-9]+)/', $end, $endMatch);
-
-    $startRow = (int)$startMatch[2];
-    $endRow   = (int)$endMatch[2];
-    $column   = $startMatch[1];
-
-    for ($row = $startRow; $row <= $endRow; $row++) {
-        $cell = $sheet->getCell($column . $row);
-        $validation = new DataValidation();
-        $validation->setType(DataValidation::TYPE_LIST);
-        $validation->setAllowBlank(true);
-        $validation->setShowDropDown(true);
-        $validation->setFormula1("='{$sheetName}'!\${$columnLetter}\$1:\${$columnLetter}\${$count}");
-        $cell->setDataValidation($validation);
-    }
-}
     private function formatExcelDate($value)
     {
         if (empty($value)) {

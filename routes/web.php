@@ -69,6 +69,7 @@ use App\Http\Controllers\VisitorsController;
 use App\Http\Controllers\VitalController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\DoctorController;
+use App\Http\Controllers\ExcelImportController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -772,6 +773,7 @@ Route::prefix('pathology/test')->group(function () {
     Route::get('/{id}/edit', [PathologyTestController::class, 'edit'])->name('pathology.test.edit');
     Route::put('/{id}', [PathologyTestController::class, 'update'])->name('pathology.test.update');
     Route::delete('/{id}', [PathologyTestController::class, 'destroy'])->name('pathology.test.destroy');
+   
 });
 
 // Pathology Test API Routes
@@ -896,3 +898,5 @@ Route::get('/getDoseDurations', [MedicineController::class, 'getDurations'])->na
 Route::get('/blood_bank_status', function () {
     return view('admin.blood-bank-doner.blood_bank_status');
 })->name('blood_bank_status');
+Route::get('/pathology_test', [ExcelImportController::class, 'importPathology'])->name('pathology.test.import');
+Route::get('/pathology_test_import', [ExcelImportController::class, 'importPathology'])->name('pathologyTests.export');
