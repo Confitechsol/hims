@@ -900,4 +900,8 @@ Route::get('/blood_bank_status', function () {
 })->name('blood_bank_status');
 Route::get('/pathology_test', [ExcelImportController::class, 'importPathology'])->name('pathology.test.import');
 Route::post('/pathology_import', [ExcelImportController::class, 'importPathologyExcel'])->name('pathology.import');
-Route::get('/pathology_test_import', [ExcelImportController::class, 'exportPathologyTestExcel'])->name('pathologyTests.export');
+Route::get('/pathology_test_export', [ExcelImportController::class, 'exportPathologyTestExcel'])->name('pathologyTests.export');
+
+Route::get('/radiology_test', [ExcelImportController::class, 'importRadiology'])->name('radiology.test.import');
+Route::post('/radiology_import', [ExcelImportController::class, 'importRadiologyExcel'])->name('radiology.import');
+Route::get('/radiology_test_export', [ExcelImportController::class, 'exportRadiologyTestExcel'])->name('radiologyTests.export');

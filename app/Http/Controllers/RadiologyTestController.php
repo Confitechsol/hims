@@ -76,8 +76,8 @@ class RadiologyTestController extends Controller
                 'sub_category' => $validated['sub_category'] ?? '',
                 'report_days' => $validated['report_days'],
                 'charge_id' => $validated['charge_id'],
-                'hospital_id' => $user->hospital_id ?? '',
-                'branch_id' => $user->branch_id ?? '',
+                // 'hospital_id' => $user->hospital_id ?? '',
+                // 'branch_id' => $user->branch_id ?? '',
             ];
             
             $radiology = Radio::create($createData);

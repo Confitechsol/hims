@@ -25,6 +25,9 @@
                                             <a href="<?php echo e(route('pathology.test.create')); ?>" class="btn btn-primary text-white ms-2 fs-13 btn-md">
                                                 <i class="ti ti-plus me-1"></i>Add Pathology Test
                                             </a>
+                                            <a href="<?php echo e(route('pathology.test.import')); ?>" class="btn btn-primary text-white ms-2 fs-13 btn-md">
+                                                <i class="ti ti-plus me-1"></i>Import Pathology Test
+                                            </a>
                                         </div>
                                     </div>
 
