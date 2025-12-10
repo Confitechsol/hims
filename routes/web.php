@@ -320,6 +320,9 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/death/patient/{id}', [DeathController::class, 'getPatient'])->name('death.patient');
 
     Route::get('/visitors', [VisitorsController::class, 'index'])->name('visitors');
+    Route::post('/visitors/create', [VisitorsController::class, 'create'])->name('visitors.create');
+    Route::put('/visitors/update/{id}', [VisitorsController::class, 'update'])->name('visitors.update');
+    Route::delete('/visitors/delete/{id}', [VisitorsController::class, 'delete'])->name('visitors.delete');
 
 });
 
