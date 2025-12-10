@@ -25,6 +25,9 @@
                                             <a href="<?php echo e(route('radiology.test.create')); ?>" class="btn btn-primary text-white ms-2 fs-13 btn-md">
                                                 <i class="ti ti-plus me-1"></i>Add Radiology Test
                                             </a>
+                                            <a href="<?php echo e(route('radiology.test.import')); ?>" class="btn btn-primary text-white ms-2 fs-13 btn-md">
+                                                <i class="ti ti-plus me-1"></i>Import Radiology Test
+                                            </a>
                                         </div>
                                     </div>
 
