@@ -1,4 +1,4 @@
-<meta name="csrf-token" content="{{ csrf_token() }}">
+<meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
 
 <style>
     body {
@@ -630,18 +630,16 @@
         color: #1f2937;
     }
 </style>
-
-<!-- Modal -->
-<div class="modal fade" id="createOpdModal" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
+<div class="modal fade" id="visitDetailsModal" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
-            <form action="{{ route('opd.store') }}" id="opdForm" method="POST">
-                @csrf
+            <form action="<?php echo e(route('opd.visit.store')); ?>" id="opdForm" method="POST">
+                <?php echo csrf_field(); ?>
                 <!-- Modal Header -->
                 <div class="modal-header align-items-start">
                     <div class="flex-grow-1">
-                        <h5 class="modal-title mb-3" id="patient-header">Patient Appointment</h5>
-                        
+                        <h5 class="modal-title mb-3" id="patient-header">Add New Check Up</h5>
+                        <input type="hidden" name="opd_id" value="<?php echo e($opd->id); ?>">
                         <div class="d-flex gap-3 align-items-center" id="patient-loader">
                             <select type="text" class="form-select patient-search flex-grow-1"
                                 placeholder="Search patient by name or ID..." id="patient_select" name="patient_id">
@@ -671,6 +669,7 @@
                         <div class="row">
                             <div class="col-md-9">
                                 <div class="patient-info-grid">
+                                    <input type="hidden" name="patient_id" id="patient_id_input">
                                     <div class="info-label">
                                         <i class="bi bi-person-circle"></i> Patient Name
                                     </div>
@@ -1031,15 +1030,14 @@
     </div>
 </div>
 
-
-@include('components.modals.add-patients-modal')
-
-{{-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> --}}
 <script>
     function populatePatientDetails(selected) {
         
+       
+         document.getElementById('patient_id_input').value = selected.id;
         document.getElementById('patient_name_value').textContent =
             `${selected.patient_name} (${selected.id})`;
+            
         document.getElementById('patient_gender_value').textContent = selected
             .gender || 'N/A';
         document.getElementById('patient_age_value').textContent = selected.age +
@@ -1075,10 +1073,10 @@
     document.addEventListener("DOMContentLoaded", function() {
 
         const addPatientBtn = document.getElementById("openAddPatientBtn");
-        const createOpdModal = document.getElementById("createOpdModal");
+        const visitDetailsModal = document.getElementById("visitDetailsModal");
         const addPatientModal = document.getElementById("add_patient");
 
-        createOpdModal.addEventListener('show.bs.modal', function(event) {
+        visitDetailsModal.addEventListener('show.bs.modal', function(event) {
             var button = event.relatedTarget; // Button that triggered the modal
             var isHidden = button.getAttribute('data-is-hidden');
             const patient = JSON.parse(button.getAttribute('data-patient'));
@@ -1101,7 +1099,7 @@
         })
         addPatientBtn.addEventListener("click", function() {
             // Keep the first modal open
-            const opdModalInstance = bootstrap.Modal.getInstance(createOpdModal);
+            const opdModalInstance = bootstrap.Modal.getInstance(visitDetailsModal);
             opdModalInstance._element.classList.add('modal-stacked');
 
             // Open the second modal manually (no new backdrop)
@@ -1131,21 +1129,21 @@
             document.body.classList.add('modal-open');
 
             // Reset first modal’s stacking class
-            createOpdModal.classList.remove('modal-stacked');
+            visitDetailsModal.classList.remove('modal-stacked');
         });
     });
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const createOpdModal = document.getElementById("createOpdModal");
-        createOpdModal.addEventListener('show.bs.modal', function(event) {
+        const visitDetailsModal = document.getElementById("visitDetailsModal");
+        visitDetailsModal.addEventListener('show.bs.modal', function(event) {
             const patientSection = document.querySelector(".patient-card")
             patientSection.style.display = window.selectedPatient ? "block" : "none"
             const patientSelect = document.getElementById('patient_select');
             const photo = document.getElementById('patient_photo');
             patientSelect.innerHTML = '<option value="">Loading...</option>';
 
-            fetch("{{ route('getPatients') }}")
+            fetch("<?php echo e(route('getPatients')); ?>")
                 .then(response => {
                     return response.json()
                 })
@@ -1156,7 +1154,7 @@
                         const option = document.createElement('option');
                         option.value = patient.id;
                         option.textContent = patient.patient_name;
-                        if ("{{ old('patient_select') }}" == patient.id) {
+                        if ("<?php echo e(old('patient_select')); ?>" == patient.id) {
                             option.selected = true;
                         }
                         patientSelect.appendChild(option);
@@ -1204,7 +1202,7 @@
     });
 </script>
 
-{{-- get doctors --}}
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const doctorSelect = document.getElementById('doctor_select');
@@ -1225,7 +1223,7 @@
         symptomTypesSelect.innerHTML = '<option value="">Loading...</option>';
 
         //doctor
-        fetch("{{ route('getDoctors') }}")
+        fetch("<?php echo e(route('getDoctors')); ?>")
             .then(response => response.json())
             .then(data => {
                 window.doctorsData = data;
@@ -1234,7 +1232,7 @@
                     const option = document.createElement('option');
                     option.value = doc.id;
                     option.textContent = doc.name;
-                    if ("{{ old('doctor_id') }}" == doc.id) {
+                    if ("<?php echo e(old('doctor_id')); ?>" == doc.id) {
                         option.selected = true;
                     }
                     doctorSelect.appendChild(option);
@@ -1246,7 +1244,7 @@
             });
 
         //charge category
-        fetch("{{ route('getChargeCategories') }}")
+        fetch("<?php echo e(route('getChargeCategories')); ?>")
             .then(response => response.json())
             .then(data => {
                 window.chargeCategoryData = data;
@@ -1255,7 +1253,7 @@
                     const option = document.createElement('option');
                     option.value = category.id;
                     option.textContent = category.name;
-                    if ("{{ old('charge_category') }}" == category.id) {
+                    if ("<?php echo e(old('charge_category')); ?>" == category.id) {
                         option.selected = true;
                     }
                     chargeCategorySelect.appendChild(option);
@@ -1269,7 +1267,7 @@
         // Listen for Charge Category dropdown change
         chargeCategorySelect.addEventListener('change', function() {
             const selectedId = this.value;
-            const baseUrl = "{{ route('getCharges', ['id' => 'ID']) }}";
+            const baseUrl = "<?php echo e(route('getCharges', ['id' => 'ID'])); ?>";
             const finalUrl = baseUrl.replace('ID', selectedId);
             fetch(finalUrl)
                 .then(response => response.json())
@@ -1280,7 +1278,7 @@
                         const option = document.createElement('option');
                         option.value = charge.id;
                         option.textContent = charge.name;
-                        if ("{{ old('charge') }}" == charge.id) {
+                        if ("<?php echo e(old('charge')); ?>" == charge.id) {
                             option.selected = true;
                         }
                         chargeSelect.appendChild(option);
@@ -1322,7 +1320,7 @@
         });
 
 
-        fetch("{{ route('getSymptomsTypes') }}")
+        fetch("<?php echo e(route('getSymptomsTypes')); ?>")
             .then(response => response.json())
             .then(data => {
                 window.symptomTypesData = data;
@@ -1331,7 +1329,7 @@
                     const option = document.createElement('option');
                     option.value = type.id;
                     option.textContent = type.symptoms_type;
-                    if ("{{ old('symptoms_type[]') }}" == type.id) {
+                    if ("<?php echo e(old('symptoms_type[]')); ?>" == type.id) {
                         option.selected = true;
                     }
                     symptomTypesSelect.appendChild(option);
@@ -1346,224 +1344,6 @@
 </script>
 
 
-
-{{-- symptoms type multiselect --}}
-{{-- <script>
-    document.addEventListener('shown.bs.modal', function() {
-        const selectElement = document.getElementById('symptoms_type');
-        const wrapper = selectElement.closest('.custom-multiselect-wrapper');
-        const customSelect = wrapper.querySelector('.custom-multiselect');
-        const selectedBox = customSelect.querySelector('.multiselect-selected');
-        const dropdown = customSelect.querySelector('.multiselect-dropdown');
-        const optionsContainer = customSelect.querySelector('.multiselect-options');
-        const searchInput = customSelect.querySelector('.multiselect-search input');
-        const selectAllBtn = customSelect.querySelector('.select-all');
-        const clearAllBtn = customSelect.querySelector('.clear-all');
-
-        let selectedValues = [];
-
-        // Initialize options
-        function initializeOptions() {
-            optionsContainer.innerHTML = '';
-            const options = Array.prototype.slice.call(selectElement?.options || []);
-            console.log(window.symptomTypesData);
-
-            options.forEach(option => {
-                if (!option.value) return; // Skip empty options
-
-                const optionElement = document.createElement('div');
-                optionElement.className = 'multiselect-option';
-                optionElement.dataset.value = option.value;
-                optionElement.innerHTML = `
-                    <div class="multiselect-checkbox">
-                        <i class="bi bi-check"></i>
-                    </div>
-                    <span>${option.text}</span>
-                `;
-
-                optionElement.addEventListener('click', () => toggleOption(option.value));
-                optionsContainer.appendChild(optionElement);
-            });
-        }
-
-        // Toggle option selection
-        function toggleOption(value) {
-            const index = selectedValues.indexOf(value);
-
-            if (index > -1) {
-                selectedValues.splice(index, 1);
-            } else {
-                selectedValues.push(value);
-            }
-
-            updateUI();
-            updateNativeSelect();
-            updateSelectedDisplay();
-        }
-
-        // Update UI to reflect selected values
-        function updateUI() {
-            const placeholder = selectedBox.querySelector('.multiselect-placeholder');
-            const existingChips = selectedBox.querySelectorAll('.multiselect-chip');
-            existingChips.forEach(chip => chip.remove());
-
-            if (selectedValues.length === 0) {
-                placeholder.style.display = 'block';
-            } else {
-                placeholder.style.display = 'none';
-
-                selectedValues.forEach(value => {
-                    const option = selectElement.querySelector(`option[value="${value}"]`);
-                    if (option) {
-                        const chip = document.createElement('div');
-                        chip.className = 'multiselect-chip';
-                        chip.innerHTML = `
-                            <span>${option.text}</span>
-                            <div class="multiselect-chip-remove" data-value="${value}">
-                                <i class="bi bi-x"></i>
-                            </div>
-                        `;
-
-                        chip.querySelector('.multiselect-chip-remove').addEventListener('click', (
-                            e) => {
-                            e.stopPropagation();
-                            toggleOption(value);
-                        });
-
-                        selectedBox.insertBefore(chip, selectedBox.querySelector('.multiselect-arrow'));
-                    }
-                });
-            }
-
-            // Update option checkboxes
-            const allOptions = optionsContainer.querySelectorAll('.multiselect-option');
-            allOptions.forEach(opt => {
-                if (selectedValues.includes(opt.dataset.value)) {
-                    opt.classList.add('selected');
-                } else {
-                    opt.classList.remove('selected');
-                }
-            });
-        }
-
-        // Update native select element
-        function updateNativeSelect() {
-            Array.from(selectElement.options).forEach(option => {
-                option.selected = selectedValues.includes(option.value);
-            });
-        }
-
-        // Toggle dropdown
-        function toggleDropdown(show) {
-            if (show) {
-                dropdown.classList.add('show');
-                selectedBox.classList.add('active');
-                searchInput.focus();
-            } else {
-                dropdown.classList.remove('show');
-                selectedBox.classList.remove('active');
-                searchInput.value = '';
-                filterOptions('');
-            }
-        }
-
-        // Filter options based on search
-        function filterOptions(searchTerm) {
-            const options = optionsContainer.querySelectorAll('.multiselect-option');
-            const term = searchTerm.toLowerCase();
-            let hasResults = false;
-
-            options.forEach(option => {
-                const text = option.textContent.toLowerCase();
-                if (text.includes(term)) {
-                    option.style.display = 'flex';
-                    hasResults = true;
-                } else {
-                    option.style.display = 'none';
-                }
-            });
-
-            // Show no results message
-            let noResultsMsg = optionsContainer.querySelector('.multiselect-no-results');
-            if (!hasResults) {
-                if (!noResultsMsg) {
-                    noResultsMsg = document.createElement('div');
-                    noResultsMsg.className = 'multiselect-no-results';
-                    noResultsMsg.textContent = 'No results found';
-                    optionsContainer.appendChild(noResultsMsg);
-                }
-            } else if (noResultsMsg) {
-                noResultsMsg.remove();
-            }
-        }
-
-        // Select all options
-        function selectAll() {
-            const visibleOptions = Array.from(optionsContainer.querySelectorAll('.multiselect-option'))
-                .filter(opt => opt.style.display !== 'none');
-
-            visibleOptions.forEach(opt => {
-                if (!selectedValues.includes(opt.dataset.value)) {
-                    selectedValues.push(opt.dataset.value);
-                }
-            });
-
-            updateUI();
-            updateNativeSelect();
-            updateSelectedDisplay();
-        }
-
-        // Clear all options
-        function clearAll() {
-            selectedValues = [];
-            updateUI();
-            updateNativeSelect();
-            updateSelectedDisplay();
-        }
-
-        // Event listeners
-        selectedBox.addEventListener('click', () => {
-            toggleDropdown(!dropdown.classList.contains('show'));
-        });
-
-        searchInput.addEventListener('input', (e) => {
-            filterOptions(e.target.value);
-        });
-
-        searchInput.addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
-
-        selectAllBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            selectAll();
-        });
-
-        clearAllBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            clearAll();
-        });
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!customSelect.contains(e.target)) {
-                toggleDropdown(false);
-            }
-        });
-
-        // Keyboard support
-        selectedBox.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                toggleDropdown(!dropdown.classList.contains('show'));
-            }
-        });
-
-        // Initialize
-        initializeOptions();
-
-    });
-</script> --}}
 
 <script>
     class CustomMultiSelect {
@@ -1864,11 +1644,11 @@
 
     // Initialize the application
     document.addEventListener('DOMContentLoaded', function() {
-        const createOpdModal = document.getElementById('createOpdModal');
-        const closeButton = createOpdModal.querySelector('.button-close');
+        const visitDetailsModal = document.getElementById('visitDetailsModal');
+        const closeButton = visitDetailsModal.querySelector('.button-close');
         const cancelButton = document.getElementById('button-close');
 
-        createOpdModal.addEventListener('shown.bs.modal', function() {
+        visitDetailsModal.addEventListener('shown.bs.modal', function() {
             if (window.symptomTypeSelect) window.symptomTypeSelect = null;
             if (window.symptomTitleSelect) window.symptomTitleSelect = null;
 
@@ -1904,7 +1684,7 @@
                 symptomTitleSelect.showLoading();
                 symptomTitleSelect.enable();
                 const symptomSelect = document.getElementById('symptoms_title');
-                fetch("{{ route('getSymptoms') }}", {
+                fetch("<?php echo e(route('getSymptoms')); ?>", {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -1922,7 +1702,7 @@
                             const option = document.createElement('option');
                             option.value = title.id;
                             option.textContent = title.symptoms_title;
-                            if ("{{ old('symptoms_title[]') }}" == title.id) {
+                            if ("<?php echo e(old('symptoms_title[]')); ?>" == title.id) {
                                 option.selected = true;
                             }
                             symptomSelect.appendChild(option);
@@ -1978,4 +1758,4 @@
             window.location.reload();
         })
     })
-</script>
+</script><?php /**PATH C:\xampp82\htdocs\hims\resources\views/components/modals/opd-visitDetail-modal.blade.php ENDPATH**/ ?>

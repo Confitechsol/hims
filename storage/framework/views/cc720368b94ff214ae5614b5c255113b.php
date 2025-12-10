@@ -633,7 +633,7 @@
 
 <!-- Modal -->
 <div class="modal fade" id="createOpdModal" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
             <form action="<?php echo e(route('opd.store')); ?>" id="opdForm" method="POST">
                 <?php echo csrf_field(); ?>
