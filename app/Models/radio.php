@@ -31,6 +31,11 @@ class Radio extends Model
         return $this->belongsTo(RadiologyCategory::class, 'radiology_category_id');
     }
 
+        public function chargeCategory()
+    {
+        return $this->belongsTo(ChargeCategory::class, 'charge_category_id');
+    }
+
     public function charge()
     {
         return $this->belongsTo(Charge::class, 'charge_id');

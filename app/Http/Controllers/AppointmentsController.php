@@ -159,6 +159,51 @@ class AppointmentsController extends Controller
         $opdPatient->doctor_id  = $request->doctor ?? null;
         $opdPatient->save();
 
+        // ===============================
+            // 🔹 Save Visit Detail (checkup)
+            // ===============================
+            $visitDetail = new VisitDetail();
+
+            $visitDetail->hospital_id       = auth()->user()->hospital_id ?? null;
+            $visitDetail->branch_id         = auth()->user()->branch_id ?? null;
+            $visitDetail->checkup_id        = $visitNo ?? null;
+            $visitDetail->opd_details_id    = $opd->id;           // link to opd_details
+            $visitDetail->patient_id        = $request->patient_id;
+            $visitDetail->organisation_id   = $request->organisation_id ?? null;
+            $visitDetail->patient_charge_id = $opdCharge->id ?? null;
+            $visitDetail->transaction_id    = null;               // add later when payment comes
+            $visitDetail->cons_doctor       = $request->doctor_id;
+            $visitDetail->case_type         = $request->case_type;
+            $visitDetail->appointment_date  = $request->appointment_date;
+
+            $visitDetail->symptoms_type     = $implodedSymptomType ?? null;
+            $visitDetail->symptoms          = $implodedSymptomTitle ?? null;
+
+            $visitDetail->bp                = $request->bp;
+            $visitDetail->height            = $request->height;
+            $visitDetail->weight            = $request->weight;
+            $visitDetail->pulse             = $request->pulse;
+            $visitDetail->temperature       = $request->temperature;
+            $visitDetail->respiration       = $request->respiration;
+
+            $visitDetail->known_allergies   = $request->allergies;
+            $visitDetail->note              = $request->note;
+            $visitDetail->note_remark       = $request->symptoms_description;
+
+            $visitDetail->payment_mode      = $request->payment_mode;
+            $visitDetail->generated_by      = auth()->user()->branch_id ?? null;
+            $visitDetail->live_consult      = $request->live_consultation;
+
+            $visitDetail->patient_old       = $request->case_type == "Old Patient" ? 1 : 0;
+            $visitDetail->casualty          = $request->casualty;
+            $visitDetail->refference        = $request->reference;
+            $visitDetail->date              = date('Y-m-d');
+
+            $visitDetail->is_antenatal      = 0;
+            $visitDetail->can_delete        = 1;
+
+            $visitDetail->save();
+
         return redirect()->back()->with('success', 'Appointment created successfully!');
     }
 
@@ -268,13 +313,14 @@ class AppointmentsController extends Controller
     }
     public function storePatientVitals(Request $request)
     {
+        //dd($request->all());
         // Validate input
         $request->validate([
             'vital_name.*'  => 'required|exists:vitals,id',
             'vital_value.*' => 'required|string',
             'date.*'        => 'required|date',
         ]);
-
+       // dd($request->all());
         // Loop through each row of dynamic form data
         foreach ($request->vital_name as $index => $vitalId) {
             if (! empty($vitalId)) {

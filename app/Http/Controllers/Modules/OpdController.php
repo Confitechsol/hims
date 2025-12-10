@@ -7,12 +7,17 @@ use App\Models\ChargeCategory;
 use App\Models\ChargeTypeMaster;
 use App\Models\Doctor;
 use App\Models\MedicationReport;
+use App\Models\MedicineCategory;
+use App\Models\MedicineDosage;
+use App\Models\MedicineGroup;
+use App\Models\Pharmacy;
 use App\Models\OpdCharges;
 use App\Models\OpdDetail;
 use App\Models\OpdMedicine;
 use App\Models\OpdPatient;
 use App\Models\OpdPrescription;
 use App\Models\OpdVisits;
+use App\Models\VisitDetail;
 use App\Models\OperationTheatre;
 use App\Models\PathologyReport;
 use App\Models\Patient;
@@ -25,6 +30,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Vital;
+use App\Models\PatientTimeline;
+use App\Models\PatientVital;
 
 class OpdController extends Controller
 {
@@ -170,8 +178,8 @@ class OpdController extends Controller
             $opdCharge->charge_type_id = $opd->charge_category_id;
             $opdCharge->save();
 
-            $lastVisit = OpdVisits::orderBy('id', 'desc')->first();
-            if ($lastVisit && preg_match('/OCID(\d+)/', $lastVisit->visit_id, $matches)) {
+            $lastVisit = VisitDetail::orderBy('id', 'desc')->first();
+            if ($lastVisit && preg_match('/OCID(\d+)/', $lastVisit->checkup_id, $matches)) {
                 $lastNumber = intval($matches[1]);
             } else {
                 $lastNumber = 0;
@@ -184,6 +192,52 @@ class OpdController extends Controller
             $opdVistis->patient_id = $request->patient_id ?? null;
             $opdVistis->opd_id     = $opd->id ?? null;
             $opdVistis->save();
+
+            // ===============================
+            // 🔹 Save Visit Detail (checkup)
+            // ===============================
+            $visitDetail = new VisitDetail();
+
+            $visitDetail->hospital_id       = $user->hospital_id;
+            $visitDetail->branch_id         = $user->branch_id;
+            $visitDetail->checkup_id        = $visitNo ?? null;
+            $visitDetail->opd_details_id    = $opd->id;           // link to opd_details
+            $visitDetail->patient_id        = $request->patient_id;
+            $visitDetail->organisation_id   = $request->organisation_id ?? null;
+            $visitDetail->patient_charge_id = $opdCharge->id ?? null;
+            $visitDetail->transaction_id    = null;               // add later when payment comes
+            $visitDetail->cons_doctor       = $request->doctor_id;
+            $visitDetail->case_type         = $request->case_type;
+            $visitDetail->appointment_date  = $request->appointment_date;
+
+            $visitDetail->symptoms_type     = $implodedSymptomType;
+            $visitDetail->symptoms          = $implodedSymptomTitle ?? "";
+
+            $visitDetail->bp                = $request->bp;
+            $visitDetail->height            = $request->height;
+            $visitDetail->weight            = $request->weight;
+            $visitDetail->pulse             = $request->pulse;
+            $visitDetail->temperature       = $request->temperature;
+            $visitDetail->respiration       = $request->respiration;
+
+            $visitDetail->known_allergies   = $request->allergies;
+            $visitDetail->note              = $request->note;
+            $visitDetail->note_remark       = $request->symptoms_description;
+
+            $visitDetail->payment_mode      = $request->payment_mode;
+            $visitDetail->generated_by      = $user->id;
+            $visitDetail->live_consult      = $request->live_consultation;
+
+            $visitDetail->patient_old       = $request->case_type == "Old Patient" ? 1 : 0;
+            $visitDetail->casualty          = $request->casualty;
+            $visitDetail->refference        = $request->reference;
+            $visitDetail->date              = date('Y-m-d');
+
+            $visitDetail->is_antenatal      = 0;
+            $visitDetail->can_delete        = 1;
+
+            $visitDetail->save();
+
 
             DB::commit();
 
@@ -359,17 +413,30 @@ class OpdController extends Controller
         $symptoms = ! empty($symptomIds)
             ? Symptom::whereIn('id', $symptomIds)->get()
             : collect();
-
+        $vitals = Vital::all();
+        
+        $vitalDetails = PatientVital::with('vital')->where('patient_id', $opd->patient->id)->get();
+        $PatientTimelines = PatientTimeline::with('patient')->where('patient_id', $opd->patient->id)->get();
+        $medicineCategories = MedicineCategory::all();
+        $pharmacyDetails = Pharmacy::all();
+        $medicinesByCategory = Pharmacy::select('id', 'medicine_name', 'medicine_category_id')
+                                    ->get()
+                                    ->groupBy('medicine_category_id');
+        $dosages = MedicineDosage::select('id', 'medicine_category_id', 'dosage')
+                        ->get()
+                        ->groupBy('medicine_category_id');
         $medicationReport  = MedicationReport::with('medicineDosage.unit', 'pharmacy', 'generatedBy.userRole')->where('opd_details_id', $id)->get();
+        $medDosages = MedicineDosage::all();
         $operationDetail   = OperationTheatre::with('operation.category')->where('opd_details_id', $id)->get();
         $opdCharges        = OpdCharges::with('opd', 'charge.taxCategory', 'chargeCategory.chargeType')->where('opd_id', $id)->get();
         $labInvestigations = PathologyReport::with('pathology')->where('patient_id', $opd->patient->id)->get();
-        $opdVisits         = OpdVisits::with('patient', 'opd.doctor')->where('opd_id', $id)->get();
+        // $opdVisits         = OpdVisits::with('patient', 'opd.doctor')->where('opd_id', $id)->get();
+        $opdVisits         = VisitDetail::with('opdDetail', 'doctor')->where('opd_details_id', $id)->get();
         $opdSymptoms       = [];
         foreach ($opdVisits as $opdDetail) {
             // Split comma-separated symptom IDs and clean up
             $symptomIds = array_filter(
-                explode(',', $opdDetail->opd->symptoms_title),
+                explode(',', $opdDetail->symptoms_title ?? ''),
                 fn($id) => $id !== null && trim($id) !== ''
             );
 
@@ -379,10 +446,10 @@ class OpdController extends Controller
                 : collect();
 
             // Store in array using OPD number as key
-            $opdSymptoms[$opdDetail->opd->opd_no] = $symptoms;
+            $opdSymptoms[$opdDetail->opd_no] = $symptoms;
         }
         // Store in array using OPD number as key
-        return view('admin.opd.opd_view', compact('opd', 'symptoms', 'medicationReport', 'operationDetail', 'opdCharges', 'labInvestigations', 'opdVisits', 'opdSymptoms'));
+        return view('admin.opd.opd_view', compact('opd', 'symptoms','vitals','vitalDetails','pharmacyDetails','medDosages','dosages','PatientTimelines','medicineCategories', 'medicationReport', 'operationDetail', 'opdCharges', 'labInvestigations', 'opdVisits', 'opdSymptoms'));
     }
 
     public function storePrescription(Request $request)
@@ -536,5 +603,118 @@ class OpdController extends Controller
 
         return redirect()->back()->with('success', 'Charges saved successfully!');
     }
+    public function storeVisitDetails(Request $request)
+    {
+        // ----------------------------------------
+        // ✅ VALIDATOR (No ValidationException)
+        // ----------------------------------------
+        $validator = Validator::make($request->all(), [
+            'opd_id' => 'required|exists:opd_details,id',
+            'patient_id'     => 'required|exists:patients,id',
+            'appointment_date' => 'required|date',
+            'doctor_id'    => 'required|exists:doctor,id',
+
+            'symptoms_type'  => 'nullable|array',
+            'symptoms_title' => 'nullable|array',
+
+            'bp'           => 'nullable|string',
+            'height'       => 'nullable|string',
+            'weight'       => 'nullable|string',
+            'pulse'        => 'nullable|string',
+            'temperature'  => 'nullable|string',
+            'respiration'  => 'nullable|string',
+
+            'payment_mode' => 'nullable|string',
+        ]);
+
+        // ----------------------------------------
+        // 🔥 If validation fails → Dump all errors
+        // ----------------------------------------
+        if ($validator->fails()) {
+            dd($validator->errors()->toArray());
+        }
+
+        try {
+
+            $symptomType          = array_filter($request->symptoms_type, fn($type) => $type !== null && $type !== '');
+            $symptomTitle         = array_filter($request->symptoms_title, fn($title) => $title !== null && $title !== '');
+            $implodedSymptomType  = implode(", ", $symptomType);
+            $implodedSymptomTitle = implode(", ", $symptomTitle);
+
+            DB::beginTransaction();
+
+            $user = Auth::user();
+
+            // ----------------------------------------
+            // 🔥 GENERATE VISIT NUMBER
+            // ----------------------------------------
+            $lastVisit = VisitDetail::orderBy('id', 'desc')->first();
+            if ($lastVisit && preg_match('/OCID(\d+)/', $lastVisit->checkup_id, $matches)) {
+                $lastNumber = intval($matches[1]);
+            } else {
+                $lastNumber = 0;
+            }
+
+            $visitPrefix = Prefix::where("type", 'opd_checkup_id')->firstOrFail();
+            $nextNumber  = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+            $visitNo     = $visitPrefix->prefix . $nextNumber;
+
+            // ----------------------------------------
+            // 🔥 SAVE VISIT DETAILS
+            // ----------------------------------------
+            $visit = new VisitDetail();
+
+            $visit->hospital_id       = $user->hospital_id;
+            $visit->branch_id         = $user->branch_id;
+            $visit->checkup_id        = $visitNo;
+            $visit->opd_details_id    = $request->opd_id;
+            $visit->patient_id        = $request->patient_id;
+            $visit->organisation_id   = $request->organisation_id ?? null;
+            $visit->patient_charge_id = $request->patient_charge_id ?? null;
+            $visit->transaction_id    = null;
+
+            $visit->cons_doctor       = $request->doctor_id;
+            $visit->case_type         = $request->case_type;
+            $visit->appointment_date  = $request->appointment_date;
+
+            $visit->symptoms_type     = $implodedSymptomType ?? "";
+            $visit->symptoms          = $implodedSymptomTitle ?? "";
+            $visit->bp                = $request->bp;
+            $visit->height            = $request->height;
+            $visit->weight            = $request->weight;
+            $visit->pulse             = $request->pulse;
+            $visit->temperature       = $request->temperature;
+            $visit->respiration       = $request->respiration;
+
+            $visit->known_allergies   = $request->known_allergies;
+            $visit->note              = $request->note;
+            $visit->note_remark       = $request->note_remark;
+
+            $visit->payment_mode      = $request->payment_mode;
+            $visit->generated_by      = $user->id;
+            $visit->live_consult      = $request->live_consultation;
+
+            $visit->patient_old       = $request->case_type == "Old Patient" ? 1 : 0;
+            $visit->casualty          = $request->casualty;
+            $visit->refference        = $request->reference;
+            $visit->date              = now()->format('Y-m-d');
+
+            $visit->is_antenatal      = 0;
+            $visit->can_delete        = 1;
+
+            $visit->save();
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Visit details saved successfully!');
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+            return redirect()->back()->with('error', "Something went wrong: " . $e->getMessage());
+        }
+    }
+
+
 
 }

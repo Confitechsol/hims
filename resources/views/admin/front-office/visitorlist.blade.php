@@ -5,7 +5,7 @@
         <div class="col-12 d-flex">
             <div class="card shadow-sm flex-fill w-100">
                 <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                    <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Birth List</h5>
+                    <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Visitor List</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -33,42 +33,16 @@
                                             {{ session('success') }}
                                         </div>
                                     @endif
-                                    {{-- <div
-                                    class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
-                                            <div class="d-flex align-items-center">
-                                                <div class="input-icon-start position-relative me-2">
-                                                    <span class="input-icon-addon">
-                                                        <i class="ti ti-search"></i>
-                                                    </span>
-                                                    <input onkeyup="dataSearch()" type="text" id="language-search" name="search"
-                                                         class="form-control shadow-sm"
-                                                        placeholder="Search">
-                                                </div>
-                                               
-                                            </div>
-                
-                                    <div class="d-flex align-items-center flex-wrap gap-2">
-                                        <div class="text-end d-flex">
-                                            <a href="javascript:void(0);"
-                                                class="btn btn-primary text-white ms-2 btn-md"
-                                                data-bs-toggle="modal" data-bs-target="#add_tpa"><i
-                                                    class="ti ti-plus me-1"></i>Add Expense</a>
-                                        </div>
-                                        <!-- First Modal -->
-                                        
-                                    </div>
-
-                                </div> --}}
-                                    <x-table-actions.actions id="birth" name="Birth Record" />
+                                    <x-table-actions.actions id="visitors" name="Visitor" />
                                     <!-- Table start -->
                                     <div class="table-responsive table-nowrap">
-                                        <table class="table" id="birth">
+                                        <table class="table" id="visitors">
                                             <thead class="thead-light">
                                                 <tr>			 	
                                                     <th>Purpose</th>												
                                                     <th>Name</th>
                                                     <th>Visit To</th>
-                                                    <th>IPD/OPD/Staff</th>
+                                                    <th>Related To</th>
                                                     <th>Phone</th>
                                                     <th>Date</th>
                                                     <th>In Time</th>
@@ -80,42 +54,44 @@
                                             
                                              @foreach($visitorsReports as $report)
                                                     <tr>
-                                                        <td>{{$report->visitors_purpose}}</td>
-                                                        <td>{{$report->visitorBooks[0]->name ?? '-' }}</td>
-                                                        <td>{{$report->visitorBooks[0]->visit_to ?? '-'}}</td>
-                                                        <td>{{$report->visitorBooks[0]->related_to ?? '-'}}</td>
-                                                        <td>{{$report->visitorBooks[0]->contact ?? '-' }}</td>
+                                                        <td>{{ $report->purpose }}</td>
+                                                        <td>{{ $report->name }}</td>
+                                                        <td>{{ $report->visit_to ?? '-' }}</td>
+                                                        <td>{{ $report->related_to ?? '-' }}</td>
+                                                        <td>{{ $report->contact ?? '-' }}</td>
+                                                        <td>{{ \Carbon\Carbon::parse($report->date)->format('d-m-Y') }}</td>
                                                         <td>
-                                                          {{ isset($report->visitorBooks[0]->date)
-                                                         ? \Carbon\Carbon::parse($report->visitorBooks[0]->date)->format('Y-m-d')
-                                                         : '-' }}
-                                                        </td>
-                                                        <td>
-                                                          {{ isset($report->visitorBooks[0]->in_time)
-                                                          ? \Carbon\Carbon::parse($report->visitorBooks[0]->in_time)->format('h:i A')
+                                                          {{ isset($report->in_time)
+                                                          ? \Carbon\Carbon::parse($report->in_time)->format('h:i A')
                                                            : '-' }}
                                                          </td>
-
                                                           <td>
-                                                          {{ isset($report->visitorBooks[0]->out_time)
-                                                          ? \Carbon\Carbon::parse($report->visitorBooks[0]->out_time)->format('h:i A')
+                                                          {{ isset($report->out_time)
+                                                          ? \Carbon\Carbon::parse($report->out_time)->format('h:i A')
                                                            : '-' }}
                                                          </td>
-
-
-                                                  
-
-    
                                                         <td>
                                                             <div class="d-flex">
                                                                 <button
                                                                     class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
-                                                                    data-id="">
+                                                                    data-id="{{ $report->id }}"
+                                                                    data-name="{{ $report->name }}"
+                                                                    data-purpose="{{ $report->purpose }}"
+                                                                    data-contact="{{ $report->contact }}"
+                                                                    data-id_proof="{{ $report->id_proof }}"
+                                                                    data-visit_to="{{ $report->visit_to }}"
+                                                                    data-related_to="{{ $report->related_to }}"
+                                                                    data-no_of_pepple="{{ $report->no_of_pepple }}"
+                                                                    data-date="{{ optional($report->date)->format('Y-m-d') ?? $report->date }}"
+                                                                    data-in_time="{{ optional($report->in_time)?->format('H:i') ?? '' }}"
+                                                                    data-out_time="{{ optional($report->out_time)?->format('H:i') ?? '' }}"
+                                                                    data-note="{{ $report->note }}">
                                                                     <i class="ti ti-pencil"></i>
                                                                 </button>
-                                                                <form method="POST" action="">
-
-                                                                    <input type="hidden" name="id" value="">
+                                                                <form method="POST" action="{{ route('visitors.delete', $report->id) }}" class="ms-2">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <input type="hidden" name="id" value="{{ $report->id }}">
                                                                     <button type="submit"
                                                                         class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
                                                                         <i class="ti ti-trash"></i>
@@ -172,63 +148,99 @@
     </div>
     </div>
     </div>
-    <x-modals.birth-modal type="add" id="createModal" title="Add Birth Record" action="{{ route('tpamanagement.store') }}"
+
+    @php
+        $purposeOptions = [];
+        if (!empty($purposes)) {
+            $purposeOptions = collect($purposes)->mapWithKeys(function ($item) {
+                return [$item->visitors_purpose => $item->visitors_purpose];
+            })->toArray();
+        }
+        
+        $visitToDropdown = [];
+        if (!empty($visitToOptions)) {
+            $visitToDropdown = array_combine($visitToOptions, $visitToOptions);
+        }
+        
+        $relatedToDropdown = [];
+        if (!empty($relatedToOptions)) {
+            $relatedToDropdown = array_combine($relatedToOptions, $relatedToOptions);
+        }
+    @endphp
+
+    <x-modals.form-modal type="add" id="createModal" title="Add Visitor" action="{{ route('visitors.create') }}"
         :fields="[
             [
-                'name' => 'organisation_name',
-                'label' => 'organisation Name',
-                'type' => 'text',
+                'name' => 'purpose',
+                'label' => 'Purpose',
+                'type' => 'select',
+                'options' => $purposeOptions,
                 'required' => true,
                 'size' => '5',
             ],
-            ['name' => 'code', 'label' => 'Code', 'type' => 'text', 'required' => true, 'size' => '3'],
-            ['name' => 'contact_no', 'label' => 'Phone', 'type' => 'text', 'required' => true, 'size' => '4'],
-            ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => true, 'size' => '12'],
+            ['name' => 'name', 'label' => 'Name', 'type' => 'text', 'required' => true, 'size' => '3'],
+            ['name' => 'contact', 'label' => 'Phone', 'type' => 'text', 'required' => false, 'size' => '4'],
+            ['name' => 'id_proof', 'label' => 'ID Card', 'type' => 'text', 'required' => false, 'size' => '12'],
             [
-                'name' => 'contact_person_name',
-                'label' => 'Contact Person Name',
-                'type' => 'text',
-                'required' => true,
-                'size' => '6',
+                'name' => 'visit_to',
+                'label' => 'Visit To',
+                'type' => 'select',
+                'options' => $visitToDropdown,
+                'required' => false,
+                'size' => '4',
             ],
             [
-                'name' => 'contact_person_phone',
-                'label' => 'Contact Person Phone',
-                'type' => 'text',
-                'required' => true,
-                'size' => '6',
+                'name' => 'related_to',
+                'label' => 'Related To',
+                'type' => 'select',
+                'options' => $relatedToDropdown,
+                'required' => false,
+                'size' => '4',
             ],
+            ['name' => 'no_of_pepple', 'label' => 'Number Of Person', 'type' => 'text', 'required' => false, 'size' => '4'],
+            ['name' => 'date', 'label' => 'Date', 'type' => 'date', 'required' => true, 'size' => '4'],
+            ['name' => 'in_time', 'label' => 'In Time', 'type' => 'time', 'required' => false, 'size' => '4'],
+            ['name' => 'out_time', 'label' => 'Out Time', 'type' => 'time', 'required' => false, 'size' => '4'],
+            ['name' => 'note', 'label' => 'Note', 'type' => 'textarea', 'required' => false, 'size' => '12'],
+            ['name' => 'image', 'label' => 'Attach Document', 'type' => 'file', 'required' => false, 'size' => '12'],
         ]" :columns="3" />
-    <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Company Name"
-        action="{{ route('tpamanagement.update') }}" :fields="[
+
+    <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Visitor"
+        action="{{ url('/visitors/update') }}" :fields="[
             ['name' => 'id', 'type' => 'hidden', 'required' => true],
             [
-                'name' => 'organisation_name',
-                'label' => 'organisation Name',
-                'type' => 'text',
+                'name' => 'purpose',
+                'label' => 'Purpose',
+                'type' => 'select',
+                'options' => $purposeOptions,
                 'required' => true,
                 'size' => '5',
             ],
-            ['name' => 'code', 'label' => 'Code', 'type' => 'text', 'required' => true, 'size' => '3'],
-            ['name' => 'contact_no', 'label' => 'Phone', 'type' => 'text', 'required' => true, 'size' => '4'],
-            ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => true, 'size' => '12'],
+            ['name' => 'name', 'label' => 'Name', 'type' => 'text', 'required' => true, 'size' => '3'],
+            ['name' => 'contact', 'label' => 'Phone', 'type' => 'text', 'required' => false, 'size' => '4'],
+            ['name' => 'id_proof', 'label' => 'ID Card', 'type' => 'text', 'required' => false, 'size' => '12'],
             [
-                'name' => 'contact_person_name',
-                'label' => 'Contact Person Name',
-                'type' => 'text',
-                'required' => true,
-                'size' => '6',
+                'name' => 'visit_to',
+                'label' => 'Visit To',
+                'type' => 'select',
+                'options' => $visitToDropdown,
+                'required' => false,
+                'size' => '4',
             ],
             [
-                'name' => 'contact_person_phone',
-                'label' => 'Contact Person Phone',
-                'type' => 'text',
-                'required' => true,
-                'size' => '6',
+                'name' => 'related_to',
+                'label' => 'Related To',
+                'type' => 'select',
+                'options' => $relatedToDropdown,
+                'required' => false,
+                'size' => '4',
             ],
+            ['name' => 'no_of_pepple', 'label' => 'Number Of Person', 'type' => 'text', 'required' => false, 'size' => '4'],
+            ['name' => 'date', 'label' => 'Date', 'type' => 'date', 'required' => true, 'size' => '4'],
+            ['name' => 'in_time', 'label' => 'In Time', 'type' => 'time', 'required' => false, 'size' => '4'],
+            ['name' => 'out_time', 'label' => 'Out Time', 'type' => 'time', 'required' => false, 'size' => '4'],
+            ['name' => 'note', 'label' => 'Note', 'type' => 'textarea', 'required' => false, 'size' => '12'],
+            ['name' => 'image', 'label' => 'Attach Document', 'type' => 'file', 'required' => false, 'size' => '12'],
         ]" :columns="3" />
-
-
-
 
 @endsection()

@@ -101,8 +101,8 @@
                                                                 <label for="datetimepicker" class="form-label">Appointment Date</label>
                                                                 <input type="date" id="datetimepicker" name="appointment_date" class="form-control" required>
                                                             </div>
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Case Type</label>
+                                                            <div class="col-md-3">
+                                                                <label class="form-label">Patient Type</label>
                                                                 <select class="form-select" name="case_type">
                                                                     <option value="">Select Case Type</option>
                                                                     <option value="Old Patient">Old Patient</option>
@@ -110,7 +110,7 @@
                                                                 </select>
                                                             </div>
 
-                                                            <div class="col-md-4">
+                                                            <div class="col-md-3">
                                                                 <label for="slot" class="form-label fw-bold">Slot</label>
                                                                 <select id="slot" name="slot" class="form-select">
                                                                     <option value="">Select</option>
@@ -153,7 +153,7 @@
                                                                 <input type="text" id="discount_percentage" name="discount_percentage" class="form-control">
                                                             </div>
 
-                                                            <div class="col-md-9">
+                                                            <div class="col-md-6">
                                                                 <label for="message" class="form-label">Message</label>
                                                                 <textarea name="message" id="message" class="form-control"></textarea>
                                                             </div>

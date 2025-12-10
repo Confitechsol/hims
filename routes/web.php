@@ -69,6 +69,7 @@ use App\Http\Controllers\VisitorsController;
 use App\Http\Controllers\VitalController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\DoctorController;
+use App\Http\Controllers\ExcelImportController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -319,6 +320,9 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/death/patient/{id}', [DeathController::class, 'getPatient'])->name('death.patient');
 
     Route::get('/visitors', [VisitorsController::class, 'index'])->name('visitors');
+    Route::post('/visitors/create', [VisitorsController::class, 'create'])->name('visitors.create');
+    Route::put('/visitors/update/{id}', [VisitorsController::class, 'update'])->name('visitors.update');
+    Route::delete('/visitors/delete/{id}', [VisitorsController::class, 'delete'])->name('visitors.delete');
 
 });
 
@@ -505,6 +509,7 @@ Route::get('/getOpdMedicineById/{id}', [OpdController::class, 'getOpdMedicineByI
 Route::post('/add_prescription', [OpdController::class, 'storePrescription'])->name('opd.addPrescription');
 Route::post('/opd_medication', [OpdController::class, 'createOpdMedication'])->name('opd.createMedication');
 Route::post('/opd_charge', [OpdController::class, 'addOpdCharge'])->name('opd.addOpdCharge');
+Route::post('/opd_visit', [OpdController::class, 'storeVisitDetails'])->name('opd.visit.store');
 
 Route::get('/ipd', [IpdController::class, 'index'])->name('ipd');
 Route::post('/ipd/store', [IpdController::class, 'store'])->name('ipd.store');
@@ -771,6 +776,7 @@ Route::prefix('pathology/test')->group(function () {
     Route::get('/{id}/edit', [PathologyTestController::class, 'edit'])->name('pathology.test.edit');
     Route::put('/{id}', [PathologyTestController::class, 'update'])->name('pathology.test.update');
     Route::delete('/{id}', [PathologyTestController::class, 'destroy'])->name('pathology.test.destroy');
+   
 });
 
 // Pathology Test API Routes
@@ -895,3 +901,10 @@ Route::get('/getDoseDurations', [MedicineController::class, 'getDurations'])->na
 Route::get('/blood_bank_status', function () {
     return view('admin.blood-bank-doner.blood_bank_status');
 })->name('blood_bank_status');
+Route::get('/pathology_test', [ExcelImportController::class, 'importPathology'])->name('pathology.test.import');
+Route::post('/pathology_import', [ExcelImportController::class, 'importPathologyExcel'])->name('pathology.import');
+Route::get('/pathology_test_export', [ExcelImportController::class, 'exportPathologyTestExcel'])->name('pathologyTests.export');
+
+Route::get('/radiology_test', [ExcelImportController::class, 'importRadiology'])->name('radiology.test.import');
+Route::post('/radiology_import', [ExcelImportController::class, 'importRadiologyExcel'])->name('radiology.import');
+Route::get('/radiology_test_export', [ExcelImportController::class, 'exportRadiologyTestExcel'])->name('radiologyTests.export');

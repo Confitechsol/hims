@@ -136,7 +136,7 @@ class AppointmentController extends Controller
                 DoctorGlobalShift::firstOrCreate([
                     'doctor_id'       => $doctorId,
                     'global_shift_id' => $shiftId,
-                    'hospital_id'     => Auth::user()->hospital_id,
+                    'hospital_id'     => Auth::user()->hospital_id ?? null,
                     'branch_id'       => Auth::user()->branch_id ?? null,
                 ]);
 
@@ -258,14 +258,14 @@ class AppointmentController extends Controller
     }
     public function slotsStore(Request $request)
     {
-        // dd($request->all());
-        // $request->validate([
-        //     'doctor' => 'required|exists:doctor,id',
-        //     'shift' => 'required|exists:global_shift,id',
-        //     'consult_time' => 'required|numeric',
+        //dd($request->all());
+        $request->validate([
+            'doctor' => 'required|exists:doctor,id',
+            'shift' => 'required|exists:doctor_global_shift,id',
+            'consult_time' => 'required|numeric',
 
-        //     'slots' => 'required|array',
-        // ]);
+            'slots' => 'required|array',
+        ]);
 
         $doctorId = $request->doctor;
         $shiftId = $request->shift;
@@ -353,8 +353,10 @@ class AppointmentController extends Controller
     }
     public function getDoctorSlots($doctorId, $shiftId)
     {
+        $doctorGlobalShiftid = DoctorGlobalShift::where('doctor_id', $doctorId)
+                    ->where('global_shift_id', $shiftId)->value('id');
         $slots = DoctorShiftTime::where('doctor_id', $doctorId)
-                    ->where('doctor_global_shift_id', $shiftId)
+                    ->where('doctor_global_shift_id', $doctorGlobalShiftid)
                     ->get(['id', 'day', 'start_time', 'end_time']);
         //dd($slots);
 
