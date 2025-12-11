@@ -240,4 +240,36 @@ public function delete($id)
     return redirect()->back()->with('success', 'Operation added successfully. Reference No: ' . $referenceNo);
 }
 
+public function updateOperation(Request $request, $id)
+{
+    // Validate input
+    $validated = $request->validate([
+        'ipd_details_id'     => 'required|integer',
+        'customer_type'      => 'nullable|string',
+        'operation_id'       => 'nullable|integer',
+        'date'               => 'required|date',
+        'operation_type'     => 'nullable|string|max:255',
+        'consultant_doctor'  => 'nullable|string|max:255',
+        'ass_consultant_1'   => 'nullable|string|max:255',
+        'ass_consultant_2'   => 'nullable|string|max:255',
+        'anesthetist'        => 'nullable|string|max:255',
+        'anaethesia_type'    => 'nullable|string|max:255',
+        'ot_technician'      => 'nullable|string|max:255',
+        'ot_assistant'       => 'nullable|string|max:255',
+        'result'             => 'nullable|string|max:255',
+        'remark'             => 'nullable|string|max:1000',
+        'generated_by'       => 'nullable|string|max:255',
+        // DO NOT validate reference_no → we keep existing one
+    ]);
+
+    // Find the record
+    $operation = OperationTheatre::findOrFail($id);
+
+    // Update record
+    $operation->update($validated);
+
+    return redirect()->back()->with('success', 'Operation updated successfully.');
+}
+
+
 }

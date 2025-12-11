@@ -523,6 +523,7 @@ Route::post('/ipd_view/medicine/store', [IpdViewController::class, 'store'])->na
 Route::put('/ipd_view/update', [IpdViewController::class, 'update'])->name('medication.update');
 Route::put('/ipd_view/delete/{id}', [IpdViewController::class, 'delete'])->name('medication.delete');
 Route::post('/ipd_view/operation/store', [IpdViewController::class, 'storeOperation'])->name('operation.store');
+Route::put('/ipd_view/operation/update/{id}', [IpdViewController::class, 'updateOperation'])->name('operation.update');
 Route::get('/getNurses', [IpdController::class, 'getNurses'])->name('getNurses');
 Route::get('/getIpdById/{id}', [IpdController::class, 'getIpdById'])->name('getIpdById');
 Route::get('/getIpdMedicineById/{id}', [IpdController::class, 'getIpdMedicineById'])->name('getIpdMedicineById');
