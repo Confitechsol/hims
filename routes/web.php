@@ -150,7 +150,7 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/patients/import', [PatientController::class, 'import'])->name('patient-import');
     Route::post('/patients/bulk-import', [PatientController::class, 'bulkImport'])->name('patients.import');
     Route::get('/patients/export', [PatientController::class, 'exportPatientsExcel'])->name('patients.export');
-  
+
 
     Route::get('/languages', [LanguagesController::class, 'index'])->name('languages');
     Route::post('/languages/create', [LanguagesController::class, 'store'])->name('languages.store');
@@ -554,8 +554,10 @@ Route::prefix('/appointment-details')->group(function () {
     Route::put('/appointments/{id}', [AppointmentsController::class, 'update'])->name('appointments.update');
     Route::get('/doctor-wise', [AppointmentsController::class, 'doctorwise'])->name('appointments.doctor-wise');
     Route::post('/doctor-wise/search', [AppointmentsController::class, 'searchAppointments'])->name('appointments.search');
-    Route::get('/queue', function () {return view('admin.appointments.queue');})->name('appointments.queue');
-    Route::get('/queue', function () {return view('admin.appointments.queue');})->name('appointments.queue');
+    Route::get('/queue', function () {
+        return view('admin.appointments.queue'); })->name('appointments.queue');
+    Route::get('/queue', function () {
+        return view('admin.appointments.queue'); })->name('appointments.queue');
     Route::get('patient-view/{patient_id}', [AppointmentsController::class, 'show'])->name('patient.view');
     Route::post('/store-patient-vitals', [AppointmentsController::class, 'storePatientVitals'])->name('patient-vitals.store');
     Route::post('/store-patient-timeline', [AppointmentsController::class, 'storePatientTimeline'])->name('patient-timeline.store');
@@ -623,11 +625,11 @@ Route::prefix('dutyroster')->group(function () {
 Route::prefix('ambulance')->group(function () {
 });
 Route::prefix('staffs')->group(function () {
-    
+
     Route::get('/', [StaffController::class, 'index'])->name('staffs.index');
     Route::get('/create', [StaffController::class, 'create'])->name('createStaff');
     Route::post('/addStaff', [StaffController::class, 'store'])->name('staff.store');
-    
+
     Route::get('/import', [StaffController::class, 'importStaff'])->name('Staff-import');
     Route::post('/bulkimport', [StaffController::class, 'importStaffExcel'])->name('Staffs.import');
 
@@ -675,11 +677,11 @@ Route::prefix('certificate')->group(function () {
     })->name('staff_id');
 });
 Route::prefix('doctor-details')->group(function () {
-    
+
     Route::get('/', [DoctorController::class, 'index'])->name('doctors.index');
     Route::get('/create', [DoctorController::class, 'create'])->name('createDoctor');
     Route::post('/addStaff', [DoctorController::class, 'store'])->name('doctor.store');
-    
+
     Route::get('/import', [DoctorController::class, 'importDoctor'])->name('doctor-import');
     Route::post('/bulkimport', [DoctorController::class, 'importDoctorExcel'])->name('doctors.import');
 
@@ -701,8 +703,8 @@ Route::prefix('pharmacy')->group(function () {
             return 'Purchase route is working! Route order fixed.';
         });
         Route::get('/test-create', function () {
-            $suppliers  = \App\Models\MedicineSupplier::all();
-            $medicines  = \App\Models\Pharmacy::where('is_active', 'yes')->get();
+            $suppliers = \App\Models\MedicineSupplier::all();
+            $medicines = \App\Models\Pharmacy::where('is_active', 'yes')->get();
             $categories = \App\Models\MedicineCategory::all();
             return view('admin.pharmacy.purchase.test', compact('suppliers', 'medicines', 'categories'));
         });
@@ -777,7 +779,7 @@ Route::prefix('pathology/test')->group(function () {
     Route::get('/{id}/edit', [PathologyTestController::class, 'edit'])->name('pathology.test.edit');
     Route::put('/{id}', [PathologyTestController::class, 'update'])->name('pathology.test.update');
     Route::delete('/{id}', [PathologyTestController::class, 'destroy'])->name('pathology.test.destroy');
-   
+
 });
 
 // Pathology Test API Routes
@@ -909,3 +911,32 @@ Route::get('/pathology_test_export', [ExcelImportController::class, 'exportPatho
 Route::get('/radiology_test', [ExcelImportController::class, 'importRadiology'])->name('radiology.test.import');
 Route::post('/radiology_import', [ExcelImportController::class, 'importRadiologyExcel'])->name('radiology.import');
 Route::get('/radiology_test_export', [ExcelImportController::class, 'exportRadiologyTestExcel'])->name('radiologyTests.export');
+
+
+Route::get('/finance', function () {
+    return view('admin.finance.index');
+})->name('finance');
+Route::get('/dailyTransactionReport', function () {
+    return view('admin.finance.daily-transaction-report');
+})->name('dailyTransactionReport');
+Route::get('/allTransactionReport', function () {
+    return view('admin.finance.all-transaction-report');
+})->name('allTransactionReport');
+Route::get('/incomeReport', function () {
+    return view('admin.finance.income-report');
+})->name('incomeReport');
+Route::get('/incomeGroupReport', function () {
+    return view('admin.finance.income-group-report');
+})->name('incomeGroupReport');
+Route::get('/expenseReport', function () {
+    return view('admin.finance.expense-report');
+})->name('expenseReport');
+Route::get('/expenseGroupReport', function () {
+    return view('admin.finance.expense-group-report');
+})->name('expenseGroupReport');
+Route::get('/patientBillReport', function () {
+    return view('admin.finance.patient-bill-report');
+})->name('patientBillReport');
+Route::get('/processingTransactionReport', function () {
+    return view('admin.finance.processing-transaction-report');
+})->name('processingTransactionReport');
