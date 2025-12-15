@@ -179,16 +179,6 @@
                 return [$item->visitors_purpose => $item->visitors_purpose];
             })->toArray();
         }
-        
-        $visitToDropdown = [];
-        if (!empty($visitToOptions)) {
-            $visitToDropdown = array_combine($visitToOptions, $visitToOptions);
-        }
-        
-        $relatedToDropdown = [];
-        if (!empty($relatedToOptions)) {
-            $relatedToDropdown = array_combine($relatedToOptions, $relatedToOptions);
-        }
     ?>
 
     <?php if (isset($component)) { $__componentOriginal66ca70ec79ff22faa62f501a1b49a88a = $component; } ?>
@@ -205,22 +195,8 @@
             ['name' => 'name', 'label' => 'Name', 'type' => 'text', 'required' => true, 'size' => '3'],
             ['name' => 'contact', 'label' => 'Phone', 'type' => 'text', 'required' => false, 'size' => '4'],
             ['name' => 'id_proof', 'label' => 'ID Card', 'type' => 'text', 'required' => false, 'size' => '12'],
-            [
-                'name' => 'visit_to',
-                'label' => 'Visit To',
-                'type' => 'select',
-                'options' => $visitToDropdown,
-                'required' => false,
-                'size' => '4',
-            ],
-            [
-                'name' => 'related_to',
-                'label' => 'Related To',
-                'type' => 'select',
-                'options' => $relatedToDropdown,
-                'required' => false,
-                'size' => '4',
-            ],
+            ['name' => 'visit_to', 'label' => 'Visit To', 'type' => 'text', 'required' => false, 'size' => '4'],
+            ['name' => 'related_to', 'label' => 'Related To', 'type' => 'text', 'required' => false, 'size' => '4'],
             ['name' => 'no_of_pepple', 'label' => 'Number Of Person', 'type' => 'text', 'required' => false, 'size' => '4'],
             ['name' => 'date', 'label' => 'Date', 'type' => 'date', 'required' => true, 'size' => '4'],
             ['name' => 'in_time', 'label' => 'In Time', 'type' => 'time', 'required' => false, 'size' => '4'],
@@ -246,22 +222,8 @@
             ['name' => 'name', 'label' => 'Name', 'type' => 'text', 'required' => true, 'size' => '3'],
             ['name' => 'contact', 'label' => 'Phone', 'type' => 'text', 'required' => false, 'size' => '4'],
             ['name' => 'id_proof', 'label' => 'ID Card', 'type' => 'text', 'required' => false, 'size' => '12'],
-            [
-                'name' => 'visit_to',
-                'label' => 'Visit To',
-                'type' => 'select',
-                'options' => $visitToDropdown,
-                'required' => false,
-                'size' => '4',
-            ],
-            [
-                'name' => 'related_to',
-                'label' => 'Related To',
-                'type' => 'select',
-                'options' => $relatedToDropdown,
-                'required' => false,
-                'size' => '4',
-            ],
+            ['name' => 'visit_to', 'label' => 'Visit To', 'type' => 'text', 'required' => false, 'size' => '4'],
+            ['name' => 'related_to', 'label' => 'Related To', 'type' => 'text', 'required' => false, 'size' => '4'],
             ['name' => 'no_of_pepple', 'label' => 'Number Of Person', 'type' => 'text', 'required' => false, 'size' => '4'],
             ['name' => 'date', 'label' => 'Date', 'type' => 'date', 'required' => true, 'size' => '4'],
             ['name' => 'in_time', 'label' => 'In Time', 'type' => 'time', 'required' => false, 'size' => '4'],
@@ -295,22 +257,8 @@
             ['name' => 'name', 'label' => 'Name', 'type' => 'text', 'required' => true, 'size' => '3'],
             ['name' => 'contact', 'label' => 'Phone', 'type' => 'text', 'required' => false, 'size' => '4'],
             ['name' => 'id_proof', 'label' => 'ID Card', 'type' => 'text', 'required' => false, 'size' => '12'],
-            [
-                'name' => 'visit_to',
-                'label' => 'Visit To',
-                'type' => 'select',
-                'options' => $visitToDropdown,
-                'required' => false,
-                'size' => '4',
-            ],
-            [
-                'name' => 'related_to',
-                'label' => 'Related To',
-                'type' => 'select',
-                'options' => $relatedToDropdown,
-                'required' => false,
-                'size' => '4',
-            ],
+            ['name' => 'visit_to', 'label' => 'Visit To', 'type' => 'text', 'required' => false, 'size' => '4'],
+            ['name' => 'related_to', 'label' => 'Related To', 'type' => 'text', 'required' => false, 'size' => '4'],
             ['name' => 'no_of_pepple', 'label' => 'Number Of Person', 'type' => 'text', 'required' => false, 'size' => '4'],
             ['name' => 'date', 'label' => 'Date', 'type' => 'date', 'required' => true, 'size' => '4'],
             ['name' => 'in_time', 'label' => 'In Time', 'type' => 'time', 'required' => false, 'size' => '4'],
@@ -337,22 +285,8 @@
             ['name' => 'name', 'label' => 'Name', 'type' => 'text', 'required' => true, 'size' => '3'],
             ['name' => 'contact', 'label' => 'Phone', 'type' => 'text', 'required' => false, 'size' => '4'],
             ['name' => 'id_proof', 'label' => 'ID Card', 'type' => 'text', 'required' => false, 'size' => '12'],
-            [
-                'name' => 'visit_to',
-                'label' => 'Visit To',
-                'type' => 'select',
-                'options' => $visitToDropdown,
-                'required' => false,
-                'size' => '4',
-            ],
-            [
-                'name' => 'related_to',
-                'label' => 'Related To',
-                'type' => 'select',
-                'options' => $relatedToDropdown,
-                'required' => false,
-                'size' => '4',
-            ],
+            ['name' => 'visit_to', 'label' => 'Visit To', 'type' => 'text', 'required' => false, 'size' => '4'],
+            ['name' => 'related_to', 'label' => 'Related To', 'type' => 'text', 'required' => false, 'size' => '4'],
             ['name' => 'no_of_pepple', 'label' => 'Number Of Person', 'type' => 'text', 'required' => false, 'size' => '4'],
             ['name' => 'date', 'label' => 'Date', 'type' => 'date', 'required' => true, 'size' => '4'],
             ['name' => 'in_time', 'label' => 'In Time', 'type' => 'time', 'required' => false, 'size' => '4'],

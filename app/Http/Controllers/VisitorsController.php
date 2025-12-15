@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 use App\Models\VisitorsPurpose;
 use App\Models\VisitorBook;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use App\Models\GeneralCall;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class VisitorsController extends Controller
 {
@@ -26,10 +29,9 @@ class VisitorsController extends Controller
     }
     $visitorsReports = $query->paginate($perPage);
     
-    // Get purposes for dropdown
+   
     $purposes = VisitorsPurpose::all();
     
-    // Get distinct visit_to and related_to from visitor_book table
     $visitToOptions = VisitorBook::distinct()->whereNotNull('visit_to')->pluck('visit_to')->toArray();
     $relatedToOptions = VisitorBook::distinct()->whereNotNull('related_to')->pluck('related_to')->toArray();
 
@@ -146,5 +148,116 @@ class VisitorsController extends Controller
         $visitor->delete();
 
         return redirect()->back()->with('success', 'Visitor deleted successfully!');
+    }
+
+    public function phoneCallLog(Request $request)
+    {
+        $perPage = intval($request->input('perPage', 10));
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
+
+        // Prefer the `general_call` table if present (singular), otherwise check model table, then fallback to VisitorBook.
+        if (DB::getSchemaBuilder()->hasTable('general_call')) {
+            $query = DB::table('general_call')->select('*');
+            if ($request->has('search')) {
+                $search_term = $request->search;
+                $query->where(function ($q) use ($search_term) {
+                    $q->where('name', 'like', "%{$search_term}%")
+                      ->orWhere('contact', 'like', "%{$search_term}%")
+                      ->orWhere('purpose', 'like', "%{$search_term}%")
+                      ->orWhere('call_type', 'like', "%{$search_term}%");
+                });
+            }
+            $callLogs = $query->orderBy('date', 'desc')->paginate($perPage);
+        } elseif (class_exists(GeneralCall::class) && DB::getSchemaBuilder()->hasTable((new GeneralCall())->getTable())) {
+            $modelTable = (new GeneralCall())->getTable();
+            $query = GeneralCall::query();
+            if ($request->has('search')) {
+                $search_term = $request->search;
+                $query->where(function ($q) use ($search_term) {
+                    $q->where('name', 'like', "%{$search_term}%")
+                      ->orWhere('contact', 'like', "%{$search_term}%")
+                      ->orWhere('description', 'like', "%{$search_term}%")
+                      ->orWhere('call_type', 'like', "%{$search_term}%");
+                });
+            }
+            $callLogs = $query->orderBy('date', 'desc')->paginate($perPage);
+        } else {
+            // Fallback to VisitorBook if `general_call` doesn't exist
+            $query = VisitorBook::query();
+            if ($request->has('search')) {
+                $search_term = $request->search;
+                $query->where(function ($q) use ($search_term) {
+                    $q->where('name', 'like', "%{$search_term}%")
+                      ->orWhere('contact', 'like', "%{$search_term}%")
+                      ->orWhere('purpose', 'like', "%{$search_term}%");
+                });
+            }
+            $callLogs = $query->paginate($perPage);
+        }
+
+        // Provide purposes to the view so the edit modal's Purpose select can be populated
+        $purposes = VisitorsPurpose::all();
+
+        return view('admin.front-office.phone-call-log', compact('callLogs', 'purposes'));
+    }
+
+    public function createCallLog(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'contact' => 'required|string|max:50',
+            'date' => 'required|date',
+            'next_follow_up_date' => 'nullable|date',
+            'call_type' => 'nullable|string|max:100',
+            'note' => 'nullable|string|max:2000',
+            'call_duration' => 'nullable|integer|min:0',
+        ]);
+
+        $table = DB::getSchemaBuilder()->hasTable('general_call') ? 'general_call' : (class_exists(GeneralCall::class) ? (new GeneralCall())->getTable() : null);
+
+        if ($table) {
+            // Build insert data and include optional columns if they exist in the table
+            $insertData = [
+                'name' => $validated['name'],
+                'contact' => $validated['contact'],
+                'date' => $validated['date'],
+                'follow_up_date' => $validated['next_follow_up_date'] ?? null,
+                'call_type' => $validated['call_type'] ?? null,
+                'description' => $validated['note'] ?? null,
+            ];
+
+            // hospital/branch context if applicable
+            $hospitalId = auth()->user()->hospital_id ?? session('hospital_id', '1');
+            $branchId = auth()->user()->branch_id ?? session('branch_id', '1');
+            if (Schema::hasColumn($table, 'hospital_id')) {
+                $insertData['hospital_id'] = $hospitalId;
+            }
+            if (Schema::hasColumn($table, 'branch_id')) {
+                $insertData['branch_id'] = $branchId;
+            }
+
+            // Ensure call_type isn't null if the DB requires it
+            if (empty($insertData['call_type']) && Schema::hasColumn($table, 'call_type')) {
+                $insertData['call_type'] = $validated['call_type'] ?? 'Unknown';
+            }
+
+            // If the table has a call_duration column, provide a safe default ('0') when not supplied
+            if (Schema::hasColumn($table, 'call_duration')) {
+                $insertData['call_duration'] = (string)($validated['call_duration'] ?? $request->input('call_duration') ?? '0');
+            }
+
+            // If created_at column is present and the DB doesn't default it, set it to now()
+            if (Schema::hasColumn($table, 'created_at') && !array_key_exists('created_at', $insertData)) {
+                $insertData['created_at'] = now();
+            }
+
+            DB::table($table)->insert($insertData);
+
+            return redirect()->back()->with('success', 'Call log added successfully!');
+        }
+
+        return redirect()->back()->with('error', 'Unable to add call log (table missing)');
     }
 }

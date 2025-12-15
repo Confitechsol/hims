@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AppointmentsController;
+use App\Http\Controllers\AppSwitchController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BedController;
 use App\Http\Controllers\BedGroupController;
@@ -11,8 +12,10 @@ use App\Http\Controllers\BloodBankController;
 use App\Http\Controllers\BloodDonorController;
 use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\DeathController;
+use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\DutyRosterController;
 use App\Http\Controllers\EmailController;
+use App\Http\Controllers\ExcelImportController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\FloorController;
@@ -29,13 +32,12 @@ use App\Http\Controllers\OperationController;
 use App\Http\Controllers\PathologyBillingController;
 use App\Http\Controllers\PathologyController;
 use App\Http\Controllers\PathologyTestController;
-use App\Http\Controllers\RadiologyBillingController;
-use App\Http\Controllers\RadiologyTestController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PharmacyCompanyController;
+use App\Http\Controllers\RadiologyBillingController;
+use App\Http\Controllers\RadiologyTestController;
 use App\Http\Controllers\RolesController;
-use App\Http\Controllers\AppSwitchController;
 use App\Http\Controllers\Setup\CompanyListController;
 use App\Http\Controllers\Setup\DosageDurationController;
 use App\Http\Controllers\Setup\DoseDurationController;
@@ -63,13 +65,11 @@ use App\Http\Controllers\Setup\ProfileController;
 use App\Http\Controllers\Setup\RadiologyController;
 use App\Http\Controllers\Setup\UnitController;
 use App\Http\Controllers\Setup\UsersController;
+use App\Http\Controllers\StaffController;
 use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\TpamanagmentController;
 use App\Http\Controllers\VisitorsController;
 use App\Http\Controllers\VitalController;
-use App\Http\Controllers\StaffController;
-use App\Http\Controllers\DoctorController;
-use App\Http\Controllers\ExcelImportController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -150,7 +150,6 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/patients/import', [PatientController::class, 'import'])->name('patient-import');
     Route::post('/patients/bulk-import', [PatientController::class, 'bulkImport'])->name('patients.import');
     Route::get('/patients/export', [PatientController::class, 'exportPatientsExcel'])->name('patients.export');
-  
 
     Route::get('/languages', [LanguagesController::class, 'index'])->name('languages');
     Route::post('/languages/create', [LanguagesController::class, 'store'])->name('languages.store');
@@ -174,6 +173,8 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/letterhead', [LetterHeadController::class, 'index'])->name('letterHead');
     Route::post('/letterhead/store/{categoryId}', [LetterHeadController::class, 'store'])
         ->name('letterhead.store');
+    Route::post('/letterhead/category/store', [LetterHeadController::class, 'storeLetterheadCategory'])
+        ->name('letterheadCategory.store');
 
     Route::prefix('operations')->group(function () {
         Route::get('/', [OperationController::class, 'Operations'])->name('operations');
@@ -323,6 +324,8 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/visitors/create', [VisitorsController::class, 'create'])->name('visitors.create');
     Route::put('/visitors/update/{id}', [VisitorsController::class, 'update'])->name('visitors.update');
     Route::delete('/visitors/delete/{id}', [VisitorsController::class, 'delete'])->name('visitors.delete');
+    Route::get('/phone-call-log', [VisitorsController::class, 'phoneCallLog'])->name('phone-call-log');
+    Route::post('/phone-call-log/create', [VisitorsController::class, 'createCallLog'])->name('phone-call-log.create');
 
 });
 
@@ -554,8 +557,12 @@ Route::prefix('/appointment-details')->group(function () {
     Route::put('/appointments/{id}', [AppointmentsController::class, 'update'])->name('appointments.update');
     Route::get('/doctor-wise', [AppointmentsController::class, 'doctorwise'])->name('appointments.doctor-wise');
     Route::post('/doctor-wise/search', [AppointmentsController::class, 'searchAppointments'])->name('appointments.search');
-    Route::get('/queue', function () {return view('admin.appointments.queue');})->name('appointments.queue');
-    Route::get('/queue', function () {return view('admin.appointments.queue');})->name('appointments.queue');
+    Route::get('/queue', function () {
+        return view('admin.appointments.queue');
+    })->name('appointments.queue');
+    Route::get('/queue', function () {
+        return view('admin.appointments.queue');
+    })->name('appointments.queue');
     Route::get('patient-view/{patient_id}', [AppointmentsController::class, 'show'])->name('patient.view');
     Route::post('/store-patient-vitals', [AppointmentsController::class, 'storePatientVitals'])->name('patient-vitals.store');
     Route::post('/store-patient-timeline', [AppointmentsController::class, 'storePatientTimeline'])->name('patient-timeline.store');
@@ -623,16 +630,15 @@ Route::prefix('dutyroster')->group(function () {
 Route::prefix('ambulance')->group(function () {
 });
 Route::prefix('staffs')->group(function () {
-    
+
     Route::get('/', [StaffController::class, 'index'])->name('staffs.index');
     Route::get('/create', [StaffController::class, 'create'])->name('createStaff');
     Route::post('/addStaff', [StaffController::class, 'store'])->name('staff.store');
-    
+
     Route::get('/import', [StaffController::class, 'importStaff'])->name('Staff-import');
     Route::post('/bulkimport', [StaffController::class, 'importStaffExcel'])->name('Staffs.import');
 
     Route::get('/export-staffs', [StaffController::class, 'exportStaffExcel'])->name('staffs.export');
-
 
     Route::get('/edit/{id}', [StaffController::class, 'edit'])->name('staff.edit');
     Route::put('/update/{id}', [StaffController::class, 'update'])->name('staff.update');
@@ -675,16 +681,15 @@ Route::prefix('certificate')->group(function () {
     })->name('staff_id');
 });
 Route::prefix('doctor-details')->group(function () {
-    
+
     Route::get('/', [DoctorController::class, 'index'])->name('doctors.index');
     Route::get('/create', [DoctorController::class, 'create'])->name('createDoctor');
     Route::post('/addStaff', [DoctorController::class, 'store'])->name('doctor.store');
-    
+
     Route::get('/import', [DoctorController::class, 'importDoctor'])->name('doctor-import');
     Route::post('/bulkimport', [DoctorController::class, 'importDoctorExcel'])->name('doctors.import');
 
     Route::get('/export-staffs', [DoctorController::class, 'exportDoctorExcel'])->name('doctors.export');
-
 
     Route::get('/edit/{id}', [DoctorController::class, 'edit'])->name('doctor.edit');
     Route::put('/update/{id}', [DoctorController::class, 'update'])->name('doctor.update');
@@ -777,7 +782,7 @@ Route::prefix('pathology/test')->group(function () {
     Route::get('/{id}/edit', [PathologyTestController::class, 'edit'])->name('pathology.test.edit');
     Route::put('/{id}', [PathologyTestController::class, 'update'])->name('pathology.test.update');
     Route::delete('/{id}', [PathologyTestController::class, 'destroy'])->name('pathology.test.destroy');
-   
+
 });
 
 // Pathology Test API Routes
@@ -909,3 +914,31 @@ Route::get('/pathology_test_export', [ExcelImportController::class, 'exportPatho
 Route::get('/radiology_test', [ExcelImportController::class, 'importRadiology'])->name('radiology.test.import');
 Route::post('/radiology_import', [ExcelImportController::class, 'importRadiologyExcel'])->name('radiology.import');
 Route::get('/radiology_test_export', [ExcelImportController::class, 'exportRadiologyTestExcel'])->name('radiologyTests.export');
+
+Route::get('/finance', function () {
+    return view('admin.finance.index');
+})->name('finance');
+Route::get('/dailyTransactionReport', function () {
+    return view('admin.finance.daily-transaction-report');
+})->name('dailyTransactionReport');
+Route::get('/allTransactionReport', function () {
+    return view('admin.finance.all-transaction-report');
+})->name('allTransactionReport');
+Route::get('/incomeReport', function () {
+    return view('admin.finance.income-report');
+})->name('incomeReport');
+Route::get('/incomeGroupReport', function () {
+    return view('admin.finance.income-group-report');
+})->name('incomeGroupReport');
+Route::get('/expenseReport', function () {
+    return view('admin.finance.expense-report');
+})->name('expenseReport');
+Route::get('/expenseGroupReport', function () {
+    return view('admin.finance.expense-group-report');
+})->name('expenseGroupReport');
+Route::get('/patientBillReport', function () {
+    return view('admin.finance.patient-bill-report');
+})->name('patientBillReport');
+Route::get('/processingTransactionReport', function () {
+    return view('admin.finance.processing-transaction-report');
+})->name('processingTransactionReport');
