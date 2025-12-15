@@ -2,6 +2,9 @@
     <div class="text-end d-flex mb-3">
         <a href="javascript:void(0);" class="btn btn-primary text-white fs-13 btn-md" data-bs-toggle="modal"
             data-bs-target="#createModal"><i class="ti ti-plus me-1"></i>Add <?php echo e($name); ?></a>
+        <?php if($name === 'Visitor'): ?>
+        <a href="<?php echo e(route('phone-call-log')); ?>" class="btn btn-secondary text-white fs-13 btn-md ms-2"><i class="ti ti-phone me-1"></i>Phone Call Log</a>
+        <?php endif; ?>
     </div>
     <div class="mb-3">
         <button class="btn btn-primary copy-btn" data-clipboard-target="#<?php echo e($id); ?>">Copy</button>

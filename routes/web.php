@@ -323,6 +323,8 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/visitors/create', [VisitorsController::class, 'create'])->name('visitors.create');
     Route::put('/visitors/update/{id}', [VisitorsController::class, 'update'])->name('visitors.update');
     Route::delete('/visitors/delete/{id}', [VisitorsController::class, 'delete'])->name('visitors.delete');
+    Route::get('/phone-call-log', [VisitorsController::class, 'phoneCallLog'])->name('phone-call-log');
+    Route::post('/phone-call-log/create', [VisitorsController::class, 'createCallLog'])->name('phone-call-log.create');
 
 });
 
