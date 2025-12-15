@@ -1,6 +1,4 @@
-{{-- resources/views/settings.blade.php --}}
-@extends('layouts.adminLayout')
-@section('content')
+<?php $__env->startSection('content'); ?>
     <style>
         .module_billing {
             border-radius: 8px;
@@ -338,24 +336,24 @@
     </style>
 
     <div class="p-4">
-        @if (session('success'))
+        <?php if(session('success')): ?>
             <script>
                 Swal.fire({
                     icon: 'success',
-                    title: "{{ session('alertTitle') ?? 'Success' }}",
-                    text: "{{ session('success') }}",
+                    title: "<?php echo e(session('alertTitle') ?? 'Success'); ?>",
+                    text: "<?php echo e(session('success')); ?>",
                 });
             </script>
-        @endif
-        @if (session('error'))
+        <?php endif; ?>
+        <?php if(session('error')): ?>
             <script>
                 Swal.fire({
                     icon: 'error',
-                    title: "{{ session('alertTitle') ?? 'Error' }}",
-                    text: "{{ session('error') }}",
+                    title: "<?php echo e(session('alertTitle') ?? 'Error'); ?>",
+                    text: "<?php echo e(session('error')); ?>",
                 });
             </script>
-        @endif
+        <?php endif; ?>
 
         <!-- tab start -->
         <ul class="nav nav-tabs nav-bordered mb-3 flex-nowrap">
@@ -447,19 +445,15 @@
                     <div class="col-md-6">
 
                         <div class="card shadow-sm border-0 mt-2" style="border-radius: 16px;">
-                            {{-- <div class="card-header"
-                                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Virat Kohli (13)
-                                </h5>
-                            </div> --}}
-                            {{-- <div class="card-body"> --}}
+                            
+                            
                             <div class="patient-info-card">
                                 <!-- Header Section -->
                                 <div class="patient-header">
                                     <div class="header-content">
                                         <div class="patient-avatar-wrapper">
                                             <div class="patient-avatar">
-                                                <img src="{{ asset('assets/img/patient.png') }}" alt="Patient Photo">
+                                                <img src="<?php echo e(asset('assets/img/patient.png')); ?>" alt="Patient Photo">
                                             </div>
                                             <div class="avatar-badge">
                                                 <i class="fas fa-user-check"></i>
@@ -468,21 +462,22 @@
 
                                         <div class="patient-name-section">
                                             <div class="patient-id">
-                                                <i class="fas fa-id-card me-1"></i> OPD ID: {{ $opd->opd_no }}
+                                                <i class="fas fa-id-card me-1"></i> OPD ID: <?php echo e($opd->opd_no); ?>
+
                                             </div>
-                                            <h2 class="patient-name">{{ $opd->patient->patient_name ?? '' }}</h2>
+                                            <h2 class="patient-name"><?php echo e($opd->patient->patient_name); ?></h2>
                                             <div class="patient-quick-info">
                                                 <div class="quick-info-item">
                                                     <i class="fas fa-mars"></i>
-                                                    <span>{{ $opd->patient->gender ?? '' }}</span>
+                                                    <span><?php echo e($opd->patient->gender); ?></span>
                                                 </div>
                                                 <div class="quick-info-item">
                                                     <i class="fas fa-birthday-cake"></i>
-                                                    <span>{{ \Carbon\Carbon::parse($opd->patient->dob)->format('d-M-Y') }}</span>
+                                                    <span><?php echo e(\Carbon\Carbon::parse($opd->patient->dob)->format('d-M-Y')); ?></span>
                                                 </div>
                                                 <div class="quick-info-item">
                                                     <i class="fas fa-droplet"></i>
-                                                    <span>{{ $opd->patient->bloodGroup->name ?? '' }}</span>
+                                                    <span><?php echo e($opd->patient->bloodGroup->name); ?></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -499,7 +494,7 @@
                                             </div>
                                             <div class="info-content">
                                                 <div class="info-label">Phone</div>
-                                                <div class="info-value">{{ $opd->patient->mobileno ?? '--' }}</div>
+                                                <div class="info-value"><?php echo e($opd->patient->mobileno ?? '--'); ?></div>
                                             </div>
                                         </div>
 
@@ -509,10 +504,10 @@
                                             </div>
                                             <div class="info-content">
                                                 <div class="info-label">Age</div>
-                                                <div class="info-value">{{ $opd->patient->age }} Year
-                                                    {{ $opd->patient->month }} Month {{ $opd->patient->day }} Days (As
+                                                <div class="info-value"><?php echo e($opd->patient->age); ?> Year
+                                                    <?php echo e($opd->patient->month); ?> Month <?php echo e($opd->patient->day); ?> Days (As
                                                     Of
-                                                    {{ \Carbon\Carbon::parse($opd->patient->as_of_date)->format('d/m/Y') }})
+                                                    <?php echo e(\Carbon\Carbon::parse($opd->patient->as_of_date)->format('d/m/Y')); ?>)
                                                 </div>
                                             </div>
                                         </div>
@@ -523,7 +518,8 @@
                                             </div>
                                             <div class="info-content">
                                                 <div class="info-label">Guardian Name</div>
-                                                <div class="info-value empty">{{ $opd->patient->guardian_name ?? '--' }}
+                                                <div class="info-value empty"><?php echo e($opd->patient->guardian_name ?? '--'); ?>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -534,7 +530,7 @@
                                             </div>
                                             <div class="info-content">
                                                 <div class="info-label">Gender</div>
-                                                <div class="info-value">{{ $opd->patient->gender ?? '' }}</div>
+                                                <div class="info-value"><?php echo e($opd->patient->gender); ?></div>
                                             </div>
                                         </div>
                                     </div>
@@ -552,7 +548,8 @@
                                             <div class="info-content">
                                                 <div class="info-label">TPA</div>
                                                 <div class="info-value empty">
-                                                    {{ $opd->patient->organisation->organisation_name ?? '--' }}
+                                                    <?php echo e($opd->patient->organisation->organisation_name ?? '--'); ?>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -564,7 +561,8 @@
                                             <div class="info-content">
                                                 <div class="info-label">TPA ID</div>
                                                 <div class="info-value empty">
-                                                    {{ $opd->patient->organisation->code ?? '--' }}
+                                                    <?php echo e($opd->patient->organisation->code ?? '--'); ?>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -575,7 +573,8 @@
                                             </div>
                                             <div class="info-content">
                                                 <div class="info-label">TPA Validity</div>
-                                                <div class="info-value empty">{{ $opd->patient->tpa_validity ?? '--' }}
+                                                <div class="info-value empty"><?php echo e($opd->patient->tpa_validity ?? '--'); ?>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -607,7 +606,7 @@
                                             class="fa-solid fa-tag text-primary"></i></span>
                                     <div class="d-flex align-items-center gap-2">
                                         <h6 class="about_patient fs-13 fw-bold mb-1"> Known Allergies :</h6>
-                                        <p class="patient_data mb-0">{{ $opd->allergies ?? '--' }}</p>
+                                        <p class="patient_data mb-0"><?php echo e($opd->allergies ?? '--'); ?></p>
                                     </div>
                                 </div>
                                 <div class="d-flex align-items-center mb-3 px-3">
@@ -625,120 +624,19 @@
                                         <h6 class=" fs-13 fw-bold mb-1"> Symptoms :</h6>
                                         <p class=" mb-0">
                                         <ul class="m-0">
-                                            @foreach ($symptoms as $symptom)
+                                            <?php $__currentLoopData = $symptoms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $symptom): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <li><i class="fa-regular fa-circle-check text-primary"></i>
-                                                    {{ $symptom->symptoms_title }}</li>
-                                            @endforeach
+                                                    <?php echo e($symptom->symptoms_title); ?></li>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </ul>
                                         </p>
                                     </div>
                                 </div>
 
                             </div>
-                            {{-- <div class="d-sm-flex position-relative z-0 overflow-hidden p-2">
-                                    <!-- <img src="assets/img/icons/shape-01.svg" alt="img"
-                                                                                                                                                                                                                                                                                                                                                                class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
-                                    <a href="javascript:void(0);"
-                                        class="avatar avatar-xxxl patient-avatar me-2 flex-shrink-0">
-                                        <img src="{{ asset('assets/img/patient.png') }}" alt="product" class="rounded">
-                                    </a>
-                                    <div>
-                                        <div class="d-flex align-items-center mb-3">
-                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                    class="fa-solid fa-phone text-primary"></i></span>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <h6 class="about_patient fs-13 fw-bold mb-1">Phone :</h6>
-                                                <p class="patient_data mb-0">8910245678</p>
-                                            </div>
-                                        </div>
+                            
 
-                                        <div class="d-flex align-items-center mb-3">
-                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                    class="fa-solid fa-calendar-days text-primary"></i></span>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <h6 class="about_patient fs-13 fw-bold mb-1">Age :</h6>
-                                                <p class="patient_data mb-0">{{ $opd->patient->age }} Year
-                                                    {{ $opd->patient->month }} Month {{ $opd->patient->day }} Days (As
-                                                    Of
-                                                    {{ \Carbon\Carbon::parse($opd->patient->as_of_date)->format('d/m/Y') }})
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-3">
-                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                    class="fa-solid fa-hands-holding-child text-primary"></i></span>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <h6 class="about_patient fs-13 fw-bold mb-1">Guardian Name :</h6>
-                                                <p class="patient_data mb-0">--</p>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-3">
-                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                    class="fa-solid fa-mars-and-venus text-primary"></i></span>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <h6 class="about_patient fs-13 fw-bold mb-1">Gender :</h6>
-                                                <p class="patient_data mb-0">Male</p>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-3">
-                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                    class="fa-solid fa-users-gear text-primary"></i></span>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <h6 class="about_patient fs-13 fw-bold mb-1">TPA :</h6>
-                                                <p class="patient_data mb-0">--</p>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-3">
-                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                    class="fa-solid fa-id-badge text-primary"></i></span>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <h6 class="about_patient fs-13 fw-bold mb-1">TPA ID :</h6>
-                                                <p class="patient_data mb-0">--</p>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-3">
-                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                    class="fa-solid fa-user-check text-primary"></i></span>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <h6 class="about_patient fs-13 fw-bold mb-1">TPA Validity :</h6>
-                                                <p class="patient_data mb-0">--</p>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-3">
-                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                    class="fa-solid fa-barcode text-primary"></i></span>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <h6 class="about_patient fs-13 fw-bold mb-1">Barcode :</h6>
-                                                <p class="patient_data mb-0">--</p>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-3">
-                                            <span class="avatar rounded-circle bg-light text-dark flex-shrink-0 me-2"><i
-                                                    class="fa-solid fa-qrcode text-primary"></i></span>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <h6 class="about_patient fs-13 fw-bold mb-1">QR Code :</h6>
-                                                <p class="patient_data mb-0">--</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- <div class="row">
-                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-5">
-
-                                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-7">
-
-                                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-5">
-
-                                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-7">
-
-                                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                                </div> -->
-                                </div> --}}
-
-                            {{--
-                            </div> --}}
+                            
                         </div>
 
                         <div class="card shadow-sm border-0 mt-2">
@@ -754,12 +652,13 @@
                                     <a href="#">
                                         <div class="d-flex align-items-center mb-3 gap-2">
                                             <div class="patient_img">
-                                                <img src="{{ asset('assets/img/patient.png') }}" alt="product"
+                                                <img src="<?php echo e(asset('assets/img/patient.png')); ?>" alt="product"
                                                     class="rounded">
                                             </div>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="fs-13 fw-bold mb-1">
-                                                    {{ $opd->doctor->name . '(' . $opd->doctor->doctor_id . ')' ?? '--' }}
+                                                    <?php echo e($opd->doctor->name . '(' . $opd->doctor->doctor_id . ')' ?? '--'); ?>
+
                                                 </h6>
                                             </div>
                                         </div>
@@ -792,11 +691,11 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <h6 class="text-primary">OPD Payment/Billing</h6>
-                                        <span>{{ round(($opd->paid_amount / $opd->amount) * 100, 2) }}%</span>
+                                        <span><?php echo e(round(($opd->paid_amount / $opd->amount) * 100, 2)); ?>%</span>
                                         <div class="progress mb-3 mt-1" role="progressbar" aria-valuenow="68.18"
                                             aria-valuemin="0" aria-valuemax="100">
                                             <div class="progress-bar bg-gradient"
-                                                style="width: {{ ($opd->paid_amount / $opd->amount) * 100 }}%;"></div>
+                                                style="width: <?php echo e(($opd->paid_amount / $opd->amount) * 100); ?>%;"></div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -847,17 +746,19 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($medicationReport as $medication)
+                                            <?php $__currentLoopData = $medicationReport; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $medication): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <tr>
-                                                    <td>{{ $medication->date }}</td>
-                                                    <td>{{ $medication->pharmacy->medicine_name }}</td>
-                                                    <td>{{ $medication->medicineDosage->dosage }}
-                                                        {{ $medication->medicineDosage->unit->unit_name }}
+                                                    <td><?php echo e($medication->date); ?></td>
+                                                    <td><?php echo e($medication->pharmacy->medicine_name); ?></td>
+                                                    <td><?php echo e($medication->medicineDosage->dosage); ?>
+
+                                                        <?php echo e($medication->medicineDosage->unit->unit_name); ?>
+
                                                     </td>
-                                                    <td>{{ $medication->time }}</td>
-                                                    <td>{{ $medication->remark }}</td>
+                                                    <td><?php echo e($medication->time); ?></td>
+                                                    <td><?php echo e($medication->remark); ?></td>
                                                 </tr>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
                                         </tbody>
                                     </table>
@@ -886,22 +787,24 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($labInvestigations as $lab)
+                                            <?php $__currentLoopData = $labInvestigations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $lab): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <tr>
                                                     <td>
-                                                        {{ $lab->pathology->test_name .
+                                                        <?php echo e($lab->pathology->test_name .
                                                             "
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             (" .
                                                             $lab->pathology->short_name .
-                                                            ')' }}
+                                                            ')'); ?>
+
                                                     </td>
                                                     <td>Pathology</td>
-                                                    <td>{{ '--' }}</td>
-                                                    <td>{{ \Carbon\Carbon::today()->copy()->addDays(intval($lab->pathology->report_days))->format('d-M-Y') }}
+                                                    <td><?php echo e('--'); ?></td>
+                                                    <td><?php echo e(\Carbon\Carbon::today()->copy()->addDays(intval($lab->pathology->report_days))->format('d-M-Y')); ?>
+
                                                     </td>
-                                                    <td>{{ $lab->approved_by ?? '--' }}</td>
+                                                    <td><?php echo e($lab->approved_by ?? '--'); ?></td>
                                                 </tr>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -928,15 +831,15 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($operationDetail as $operation)
+                                            <?php $__currentLoopData = $operationDetail; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $operation): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <tr>
-                                                    <td>{{ $operation->reference_no }}</td>
-                                                    <td>{{ $operation->date }}</td>
-                                                    <td>{{ $operation->operation->operation }}</td>
-                                                    <td>{{ $operation->operation->category->category }}</td>
-                                                    <td>{{ $operation->ot_technician }}</td>
+                                                    <td><?php echo e($operation->reference_no); ?></td>
+                                                    <td><?php echo e($operation->date); ?></td>
+                                                    <td><?php echo e($operation->operation->operation); ?></td>
+                                                    <td><?php echo e($operation->operation->category->category); ?></td>
+                                                    <td><?php echo e($operation->ot_technician); ?></td>
                                                 </tr>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -964,30 +867,33 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($opdCharges as $charge)
-                                                @php
+                                            <?php $__currentLoopData = $opdCharges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $charge): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <?php
                                                     $taxAmount =
                                                         ($charge->charge->standard_charge *
                                                             $charge->charge->taxCategory->percentage) /
                                                         100;
                                                     $amount = $charge->charge->standard_charge + $taxAmount;
-                                                @endphp
+                                                ?>
                                                 <tr>
                                                     <td>
-                                                        {{ $charge->charge->name ?? 'N/A' }}
+                                                        <?php echo e($charge->charge->name ?? 'N/A'); ?>
+
                                                     </td>
                                                     <td style="text-transform: capitalize;">
-                                                        {{ $charge->chargeCategory->chargeType->charge_type ?? 'N/A'}}
+                                                        <?php echo e($charge->chargeCategory->chargeType->charge_type ?? 'N/A'); ?>
+
                                                     </td>
-                                                    <td class="text-right">{{ $charge->charge->standard_charge ?? 'N/A' }}</td>
+                                                    <td class="text-right"><?php echo e($charge->charge->standard_charge ?? 'N/A'); ?></td>
                                                     <td class="text-right">
-                                                        ({{ $charge->charge->taxCategory->percentage }}%)
-                                                        {{ $taxAmount }}
+                                                        (<?php echo e($charge->charge->taxCategory->percentage); ?>%)
+                                                        <?php echo e($taxAmount); ?>
+
                                                     </td>
-                                                    <td class="text-right">{{ $charge->charge->standard_charge  ?? 'N/A'}}</td>
-                                                    <td class="text-right">{{ $amount ?? 'N/A' }}</td>
+                                                    <td class="text-right"><?php echo e($charge->charge->standard_charge  ?? 'N/A'); ?></td>
+                                                    <td class="text-right"><?php echo e($amount ?? 'N/A'); ?></td>
                                                 </tr>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -1091,12 +997,12 @@
                                                                 class="btn btn-primary text-white ms-2 btn-md"
                                                                 data-bs-toggle="modal" data-is-hidden="true"
                                                                 data-bs-target="#visitDetailsModal"
-                                                                data-patient='@json($opd->patient)'
-                                                                data-opd-id="{{ $opd->id }}"><i
+                                                                data-patient='<?php echo json_encode($opd->patient, 15, 512) ?>'
+                                                                data-opd-id="<?php echo e($opd->id); ?>"><i
                                                                     class="ti ti-plus me-1"></i>New Checkup</a>
                                                         </div>
                                                         <!-- First Modal -->
-                                                        @include('components.modals.opd-visitDetail-modal')
+                                                        <?php echo $__env->make('components.modals.opd-visitDetail-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
                                                        
                                                     </div>
                                                 </div>
@@ -1114,26 +1020,28 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @foreach ($opdVisits as $visit)
+                                                            <?php $__currentLoopData = $opdVisits; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $visit): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                 <tr>
                                                                     <td>
-                                                                        <h6 class="fs-14 mb-1">{{ $visit->checkup_id ?? '' }}
+                                                                        <h6 class="fs-14 mb-1"><?php echo e($visit->checkup_id ?? ''); ?>
+
                                                                         </h6>
                                                                     </td>
-                                                                    <td>{{ $visit->appointment_date }}</td>
-                                                                    <td>{{ $visit->doctor->name ?? '' }}
-                                                                        ({{ $visit->doctor->doctor_id ?? ''}})
+                                                                    <td><?php echo e($visit->appointment_date); ?></td>
+                                                                    <td><?php echo e($visit->doctor->name ?? ''); ?>
+
+                                                                        (<?php echo e($visit->doctor->doctor_id ?? ''); ?>)
                                                                     </td>
-                                                                    <td>{{ $visit->opdDetail->reference }}</td>
+                                                                    <td><?php echo e($visit->opdDetail->reference); ?></td>
                                                                     <td>
-                                                                        @if (isset($opdSymptoms[$visit->opd_details_id]) && count($opdSymptoms[$visit->opd_details_id]) > 0)
-                                                                            @foreach ($opdSymptoms[$visit->opd_details_id] as $symptom)
+                                                                        <?php if(isset($opdSymptoms[$visit->opd_details_id]) && count($opdSymptoms[$visit->opd_details_id]) > 0): ?>
+                                                                            <?php $__currentLoopData = $opdSymptoms[$visit->opd_details_id]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $symptom): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                                 <span
-                                                                                    class="badge bg-primary me-1">{{ $symptom->symptoms_title }}</span>
-                                                                            @endforeach
-                                                                        @else
+                                                                                    class="badge bg-primary me-1"><?php echo e($symptom->symptoms_title); ?></span>
+                                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                                        <?php else: ?>
                                                                             --
-                                                                        @endif
+                                                                        <?php endif; ?>
                                                                     </td>
                                                                     <td>
                                                                         <div class="d-flex gap-2">
@@ -1142,18 +1050,17 @@
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
                                                                                 data-bs-toggle="modal"
                                                                                 data-bs-target="#addPrescriptionModal"
-                                                                                data-id="{{ $opd->id }}">
+                                                                                data-id="<?php echo e($opd->id); ?>">
                                                                                 <i class="fa-solid fa-prescription"
-                                                                                    {{--
-                                                                                    data-bs-toggle="tooltip" --}}
+                                                                                    
                                                                                     title="Add Prescription"></i></a>
 
 
                                                                             <a href="javascript: void(0);"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill"
                                                                                 data-is-ipd="false"
-                                                                                data-id="{{ $visit->opdDetail->id }}"
-                                                                                data-pres-id = "{{ $visit->id }}"
+                                                                                data-id="<?php echo e($visit->opdDetail->id); ?>"
+                                                                                data-pres-id = "<?php echo e($visit->id); ?>"
                                                                                 data-bs-toggle="modal"
                                                                                 data-bs-target="#showPrescriptionModal">
                                                                                 <i class="fa-solid fa-print"
@@ -1172,7 +1079,7 @@
                                                                         </div>
                                                                     </td>
                                                                 </tr>
-                                                            @endforeach
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1237,12 +1144,12 @@
                                                                     </div>
 
                                                                     <div class="modal-body">
-                                                                        <form action="{{ route('opd.createMedication') }}"
+                                                                        <form action="<?php echo e(route('opd.createMedication')); ?>"
                                                                             method="post">
-                                                                            @csrf
+                                                                            <?php echo csrf_field(); ?>
                                                                             <div class="row py-4 mx-1 gy-3">
                                                                                 <input type="hidden" name="opd_id"
-                                                                                    value="{{ $opd->id }}">
+                                                                                    value="<?php echo e($opd->id); ?>">
                                                                                 <div class="col-md-6">
                                                                                     <label for="date"
                                                                                         class="form-label">Date
@@ -1336,31 +1243,34 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @foreach ($medicationReport as $medication)
+                                                            <?php $__currentLoopData = $medicationReport; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $medication): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                 <tr>
                                                                     <td>
                                                                         <h6 class="fs-14 mb-1">
-                                                                            {{ \Carbon\Carbon::parse($medication->date)->format('d-M-Y') }}&nbsp;{{ '(' . \Carbon\Carbon::parse($medication->date)->format('D') . ')' }}
+                                                                            <?php echo e(\Carbon\Carbon::parse($medication->date)->format('d-M-Y')); ?>&nbsp;<?php echo e('(' . \Carbon\Carbon::parse($medication->date)->format('D') . ')'); ?>
+
                                                                         </h6>
                                                                     </td>
-                                                                    <td>{{ $medication->pharmacy->medicine_name }}</td>
+                                                                    <td><?php echo e($medication->pharmacy->medicine_name); ?></td>
                                                                     <td> Time:
-                                                                        {{ \Carbon\Carbon::parse($medication->time)->format('h:i A') }}
-                                                                        {{ $medication->medicineDosage->dosage . $medication->medicineDosage->unit->unit_name }}<br>
+                                                                        <?php echo e(\Carbon\Carbon::parse($medication->time)->format('h:i A')); ?>
+
+                                                                        <?php echo e($medication->medicineDosage->dosage . $medication->medicineDosage->unit->unit_name); ?><br>
                                                                         Created By:
-                                                                        {{ $medication->generatedBy->userRole->name }}
+                                                                        <?php echo e($medication->generatedBy->userRole->name); ?>
+
                                                                     </td>
                                                                     <td>
                                                                         <div class="d-flex gap-2">
                                                                             <a href="javascript:void(0);" 
                                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill editMedicationBtn"
-                                                                            data-id="{{ $medication->id }}"
-                                                                            data-date="{{ $medication->date }}"
-                                                                            data-time="{{ $medication->time }}"
-                                                                            data-cat="{{ $medication->pharmacy->medicine_category_id }}"  
-                                                                            data-med="{{ $medication->pharmacy_id }}"           
-                                                                            data-dose="{{ $medication->medicine_dosage_id }}" 
-                                                                            data-remark="{{ $medication->remark }}"
+                                                                            data-id="<?php echo e($medication->id); ?>"
+                                                                            data-date="<?php echo e($medication->date); ?>"
+                                                                            data-time="<?php echo e($medication->time); ?>"
+                                                                            data-cat="<?php echo e($medication->pharmacy->medicine_category_id); ?>"  
+                                                                            data-med="<?php echo e($medication->pharmacy_id); ?>"           
+                                                                            data-dose="<?php echo e($medication->medicine_dosage_id); ?>" 
+                                                                            data-remark="<?php echo e($medication->remark); ?>"
                                                                             data-bs-toggle="modal"
                                                                             data-bs-target="#edit_medication">
                                                                                 <i class="ti ti-pencil"></i>
@@ -1382,60 +1292,60 @@
                                                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                                             </div>
 
-                                                                            <form method="POST" action="{{ route('medication.update') }}">
-                                                                                @csrf
-                                                                                @method('PUT')
+                                                                            <form method="POST" action="<?php echo e(route('medication.update')); ?>">
+                                                                                <?php echo csrf_field(); ?>
+                                                                                <?php echo method_field('PUT'); ?>
 
                                                                                 <input type="hidden" name="id" id="edit_id">
-                                                                                <input type="hidden" name="opd_id" value="{{ $opd->id }}">
+                                                                                <input type="hidden" name="opd_id" value="<?php echo e($opd->id); ?>">
 
                                                                                 <div class="modal-body">
                                                                                     <div class="row gy-3">
 
-                                                                                        {{-- Date --}}
+                                                                                        
                                                                                         <div class="col-md-6">
                                                                                             <label class="form-label">Date</label>
                                                                                             <input type="date" name="date" id="edit_date" class="form-control">
                                                                                         </div>
 
-                                                                                        {{-- Time --}}
+                                                                                        
                                                                                         <div class="col-md-6">
                                                                                             <label class="form-label">Time</label>
                                                                                             <input type="time" name="time" id="edit_time" class="form-control">
                                                                                         </div>
 
-                                                                                        {{-- Category --}}
+                                                                                        
                                                                                         <div class="col-md-6">
                                                                                             <label class="form-label">Medicine Category</label>
                                                                                             <select name="medi_cat" id="edit_medi_cat" class="form-select">
                                                                                                 <option value="">Select</option>
-                                                                                                @foreach($medicineCategories as $cat)
-                                                                                                    <option value="{{ $cat->id }}">{{ $cat->medicine_category }}</option>
-                                                                                                @endforeach
+                                                                                                <?php $__currentLoopData = $medicineCategories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                                                    <option value="<?php echo e($cat->id); ?>"><?php echo e($cat->medicine_category); ?></option>
+                                                                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                                             </select>
                                                                                         </div>
 
-                                                                                        {{-- Medicine --}}
+                                                                                        
                                                                                         <div class="col-md-6">
                                                                                             <label class="form-label">Medicine Name</label>
                                                                                             <select name="med_name" id="edit_med_name" class="form-select">
-                                                                                                @foreach($pharmacyDetails as $med)
-                                                                                                    <option value="{{ $med->id }}">{{ $med->medicine_name }}</option>
-                                                                                                @endforeach
+                                                                                                <?php $__currentLoopData = $pharmacyDetails; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $med): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                                                    <option value="<?php echo e($med->id); ?>"><?php echo e($med->medicine_name); ?></option>
+                                                                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                                             </select>
                                                                                         </div>
 
-                                                                                        {{-- Dosage --}}
+                                                                                        
                                                                                         <div class="col-md-6">
                                                                                             <label class="form-label">Dosage</label>
                                                                                             <select name="dosage" id="edit_dosage" class="form-select">
-                                                                                                @foreach($medDosages as $dose)
-                                                                                                    <option value="{{ $dose->id }}">{{ $dose->dosage }}</option>
-                                                                                                @endforeach
+                                                                                                <?php $__currentLoopData = $medDosages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $dose): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                                                    <option value="<?php echo e($dose->id); ?>"><?php echo e($dose->dosage); ?></option>
+                                                                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                                             </select>
                                                                                         </div>
 
-                                                                                        {{-- Remarks --}}
+                                                                                        
                                                                                         <div class="col-md-6">
                                                                                             <label class="form-label">Remarks</label>
                                                                                             <input type="text" name="remark" id="edit_remark" class="form-control">
@@ -1452,7 +1362,7 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            @endforeach
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1507,18 +1417,20 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @foreach ($labInvestigations as $lab)
+                                                            <?php $__currentLoopData = $labInvestigations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $lab): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                 <tr>
                                                                     <td>
                                                                         <h6 class="fs-14 mb-1">
-                                                                            {{ $lab->pathology->test_name . '(' . $lab->pathology->short_name . ')' }}
+                                                                            <?php echo e($lab->pathology->test_name . '(' . $lab->pathology->short_name . ')'); ?>
+
                                                                         </h6>
                                                                     </td>
                                                                     <td>Pathology</td>
-                                                                    <td>Pathology Center :{{ '--' }}</td>
-                                                                    <td>{{ \Carbon\Carbon::today()->copy()->addDays(intval($lab->pathology->report_days))->format('d-M-Y') }}
+                                                                    <td>Pathology Center :<?php echo e('--'); ?></td>
+                                                                    <td><?php echo e(\Carbon\Carbon::today()->copy()->addDays(intval($lab->pathology->report_days))->format('d-M-Y')); ?>
+
                                                                     </td>
-                                                                    <td>{{ $lab->approved_by ?? '--' }}</td>
+                                                                    <td><?php echo e($lab->approved_by ?? '--'); ?></td>
                                                                     <td>
                                                                         <div class="d-flex gap-2">
                                                                             <a href="javascript: void(0);"
@@ -1529,7 +1441,7 @@
                                                                         </div>
                                                                     </td>
                                                                 </tr>
-                                                            @endforeach
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1584,18 +1496,20 @@
                                                         </thead>
                                                         <tbody>
 
-                                                            @foreach ($operationDetail as $operation)
+                                                            <?php $__currentLoopData = $operationDetail; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $operation): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                 <tr>
                                                                     <td>
                                                                         <h6 class="fs-14 mb-1">
-                                                                            {{ $operation->reference_no }}
+                                                                            <?php echo e($operation->reference_no); ?>
+
                                                                         </h6>
                                                                     </td>
-                                                                    <td>{{ $operation->date }}</td>
-                                                                    <td>{{ $operation->operation->operation }}</td>
-                                                                    <td>{{ $operation->operation->category->category }}
+                                                                    <td><?php echo e($operation->date); ?></td>
+                                                                    <td><?php echo e($operation->operation->operation); ?></td>
+                                                                    <td><?php echo e($operation->operation->category->category); ?>
+
                                                                     </td>
-                                                                    <td>{{ $operation->ot_technician }}</td>
+                                                                    <td><?php echo e($operation->ot_technician); ?></td>
                                                                     <td>
                                                                         <div class="d-flex gap-2">
                                                                             <a href="javascript: void(0);"
@@ -1611,7 +1525,7 @@
                                                                         </div>
                                                                     </td>
                                                                 </tr>
-                                                            @endforeach
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1690,9 +1604,9 @@
 
 
                                                                     </div>
-                                                                    <form action="{{ route('opd.addOpdCharge') }}"
+                                                                    <form action="<?php echo e(route('opd.addOpdCharge')); ?>"
                                                                         method="POST" id="addChargeForm">
-                                                                        @csrf
+                                                                        <?php echo csrf_field(); ?>
                                                                         <div class="modal-body">
                                                                             <div class="row py-4 mx-1">
                                                                                 <div class="col-lg-12 col-md-12 col-sm-12">
@@ -1705,7 +1619,7 @@
                                                                                                     Type<small
                                                                                                         class="req">
                                                                                                         *</small></label>
-                                                                                                <input type="hidden" name="opd_id" id="opd_id" value="{{ $opd->id }}">
+                                                                                                <input type="hidden" name="opd_id" id="opd_id" value="<?php echo e($opd->id); ?>">
                                                                                                 <select name="charge_type"
                                                                                                     id="add_charge_type"
                                                                                                     class="form-control charge_type select2 reset_value select2-hidden-accessible"
@@ -2020,32 +1934,9 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            {{-- @php
-                                                            $taxAmount =
-                                                            ($charge->charge->standard_charge *
-                                                            $charge->charge->taxCategory->percentage) /
-                                                            100;
-                                                            $amount = $charge->charge->standard_charge + $taxAmount;
-                                                            @endphp
-                                                            <tr>
-                                                                <td>
-                                                                    {{ $charge->charge->name }}
-                                                                </td>
-                                                                <td style="text-transform: capitalize;">
-                                                                    {{ $charge->chargeCategory->chargeType->charge_type  ?? 'N/A'}}
-                                                                </td>
-                                                                <td class="text-right">{{ $charge->charge->standard_charge ?? 'N/A'
-                                                                    }}</td>
-                                                                <td class="text-right">
-                                                                    ({{ $charge->charge->taxCategory->percentage }}%)
-                                                                    {{ $taxAmount }}
-                                                                </td>
-                                                                <td class="text-right">{{ $charge->charge->standard_charge ?? 'N/A'
-                                                                    }}</td>
-                                                                <td class="text-right">{{ $amount }}</td>
-                                                            </tr> --}}
-                                                            @foreach ($opdCharges as $charge)
-                                                                @php
+                                                            
+                                                            <?php $__currentLoopData = $opdCharges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $charge): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                <?php
                                                                     $taxAmount =
                                                                         ($charge->charge->standard_charge *
                                                                             $charge->charge->taxCategory->percentage) /
@@ -2058,25 +1949,27 @@
                                                                         $charge->charge->standard_charge -
                                                                         $discountAmount +
                                                                         $taxAmount;
-                                                                @endphp
+                                                                ?>
                                                                 <tr>
                                                                     <td>
-                                                                        {{ \Carbon\Carbon::parse($charge->created_at)->format('d-M-Y') }}
+                                                                        <?php echo e(\Carbon\Carbon::parse($charge->created_at)->format('d-M-Y')); ?>
+
                                                                     </td>
-                                                                    <td>{{ $charge->charge->name }}</td>
+                                                                    <td><?php echo e($charge->charge->name); ?></td>
                                                                     <td style="text-transform: capitalize;">
-                                                                        {{ $charge->chargeCategory->chargeType->charge_type ?? 'N/A' }}
+                                                                        <?php echo e($charge->chargeCategory->chargeType->charge_type ?? 'N/A'); ?>
+
                                                                     </td>
-                                                                    <td>{{ $charge->chargeCategory->name ?? 'N/A' }} </td>
+                                                                    <td><?php echo e($charge->chargeCategory->name ?? 'N/A'); ?> </td>
                                                                     <td>1</td>
-                                                                    <td>{{ $charge->charge->standard_charge ?? 'N/A' }}</td>
-                                                                    <td>{{ $charge->charge->standard_charge ?? 'N/A' }}</td>
+                                                                    <td><?php echo e($charge->charge->standard_charge ?? 'N/A'); ?></td>
+                                                                    <td><?php echo e($charge->charge->standard_charge ?? 'N/A'); ?></td>
                                                                     <td>0.00</td>
-                                                                    <td>{{ $discountAmount }}&nbsp;({{ $charge->discount }}%)
+                                                                    <td><?php echo e($discountAmount); ?>&nbsp;(<?php echo e($charge->discount); ?>%)
                                                                     </td>
-                                                                    <td>{{ $taxAmount }}&nbsp;({{ $charge->charge->taxCategory->percentage }}%)
+                                                                    <td><?php echo e($taxAmount); ?>&nbsp;(<?php echo e($charge->charge->taxCategory->percentage); ?>%)
                                                                     </td>
-                                                                    <td>{{ $amount }}</td>
+                                                                    <td><?php echo e($amount); ?></td>
                                                                     <td>
                                                                         <div class="d-flex gap-2">
                                                                             <a href="javascript: void(0);"
@@ -2098,7 +1991,7 @@
                                                                         </div>
                                                                     </td>
                                                                 </tr>
-                                                            @endforeach
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -2387,13 +2280,13 @@
                                                                             data-bs-dismiss="modal"></button>
 
                                                                     </div>
-                                                                    <form method="POST" action="{{ isset($timeline) ? route('patient-timeline.update', $timeline->id) : route('patient-timeline.store') }}" enctype="multipart/form-data">
-                                                                            @csrf
-                                                                            @if(isset($timeline))
-                                                                                @method('PUT')
-                                                                            @endif
+                                                                    <form method="POST" action="<?php echo e(isset($timeline) ? route('patient-timeline.update', $timeline->id) : route('patient-timeline.store')); ?>" enctype="multipart/form-data">
+                                                                            <?php echo csrf_field(); ?>
+                                                                            <?php if(isset($timeline)): ?>
+                                                                                <?php echo method_field('PUT'); ?>
+                                                                            <?php endif; ?>
 
-                                                                            <input type="hidden" name="patient_id" value="{{ $opd->patient->id ?? '' }}">
+                                                                            <input type="hidden" name="patient_id" value="<?php echo e($opd->patient->id ?? ''); ?>">
 
                                                                             <div class="modal-body">
                                                                                 <div class="row gy-3 py-4 mx-1">
@@ -2403,7 +2296,7 @@
                                                                                             Title <span class="text-danger">*</span>
                                                                                         </label>
                                                                                         <input type="text" name="title" id="title" class="form-control"
-                                                                                            value="{{ old('title', $timeline->title ?? '') }}" required>
+                                                                                            value="<?php echo e(old('title', $timeline->title ?? '')); ?>" required>
                                                                                     </div>
 
                                                                                     <!-- Date -->
@@ -2412,7 +2305,7 @@
                                                                                             Date <span class="text-danger">*</span>
                                                                                         </label>
                                                                                         <input type="date" name="date" id="date" class="form-control"
-                                                                                            value="{{ old('date', isset($timeline->date) ? \Carbon\Carbon::parse($timeline->date)->format('Y-m-d') : '') }}" required>
+                                                                                            value="<?php echo e(old('date', isset($timeline->date) ? \Carbon\Carbon::parse($timeline->date)->format('Y-m-d') : '')); ?>" required>
                                                                                     </div>
 
                                                                                     <!-- Description -->
@@ -2420,7 +2313,7 @@
                                                                                         <label for="description" class="form-label">
                                                                                             Description
                                                                                         </label>
-                                                                                        <textarea name="description" id="description" class="form-control" rows="3">{{ old('description', $timeline->description ?? '') }}</textarea>
+                                                                                        <textarea name="description" id="description" class="form-control" rows="3"><?php echo e(old('description', $timeline->description ?? '')); ?></textarea>
                                                                                     </div>
 
                                                                                     <!-- Attach Document -->
@@ -2429,20 +2322,20 @@
                                                                                             Attach Document
                                                                                         </label>
                                                                                         <input type="file" name="attch_doc" id="attch_doc" class="form-control">
-                                                                                        @if(isset($timeline) && $timeline->attch_doc)
+                                                                                        <?php if(isset($timeline) && $timeline->attch_doc): ?>
                                                                                             <small class="text-muted d-block mt-1">
                                                                                                 Current File:
-                                                                                                <a href="{{ asset('storage/timeline_docs/' . $timeline->attch_doc) }}" target="_blank">
+                                                                                                <a href="<?php echo e(asset('storage/timeline_docs/' . $timeline->attch_doc)); ?>" target="_blank">
                                                                                                     View Document
                                                                                                 </a>
                                                                                             </small>
-                                                                                        @endif
+                                                                                        <?php endif; ?>
                                                                                     </div>
 
                                                                                     <!-- Visible to Person -->
                                                                                     <div class="col-md-12 form-check">
                                                                                         <input type="checkbox" name="visible_person" id="visible_person" class="form-check-input"
-                                                                                            {{ old('visible_person', $timeline->visible_person ?? false) ? 'checked' : '' }}>
+                                                                                            <?php echo e(old('visible_person', $timeline->visible_person ?? false) ? 'checked' : ''); ?>>
                                                                                         <label for="visible_person" class="form-check-label">Visible to this person</label>
                                                                                     </div>
                                                                                 </div>
@@ -2450,7 +2343,8 @@
 
                                                                             <div class="modal-footer">
                                                                                 <button type="submit" class="btn btn-primary">
-                                                                                    {{ isset($timeline) ? 'Update' : 'Save' }}
+                                                                                    <?php echo e(isset($timeline) ? 'Update' : 'Save'); ?>
+
                                                                                 </button>
                                                                             </div>
                                                                         </form>
@@ -2474,23 +2368,24 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                             @forelse($PatientTimelines as $timeline)
+                                                             <?php $__empty_1 = true; $__currentLoopData = $PatientTimelines; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $timeline): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                                             <tr>
                                                                 <td>
                                                                     <h6 class="fs-14 mb-1">
-                                                                        <a href="#" class="fw-semibold">{{ $timeline->patient->patient_name ?? '-' }}</a>
+                                                                        <a href="#" class="fw-semibold"><?php echo e($timeline->patient->patient_name ?? '-'); ?></a>
                                                                     </h6>
                                                                 </td>
                                                                 
                                                                 
-                                                                <td>{{ $timeline->title ?? '-' }}</td>
-                                                                <td>{{ $timeline->description ?? '-' }}</td>
+                                                                <td><?php echo e($timeline->title ?? '-'); ?></td>
+                                                                <td><?php echo e($timeline->description ?? '-'); ?></td>
                                                                 <td>
-                                                                    @if(!empty($timeline->timeline_date))
-                                                                        {{ \Carbon\Carbon::parse($timeline->timeline_date)->format('d/m/Y h:i A') }}
-                                                                    @else
+                                                                    <?php if(!empty($timeline->timeline_date)): ?>
+                                                                        <?php echo e(\Carbon\Carbon::parse($timeline->timeline_date)->format('d/m/Y h:i A')); ?>
+
+                                                                    <?php else: ?>
                                                                         -
-                                                                    @endif
+                                                                    <?php endif; ?>
                                                                 </td>
                                                                 <td>
                                                                     <div class="d-flex gap-2">
@@ -2502,11 +2397,11 @@
                                                                     </div>
                                                                 </td>
                                                             </tr>
-                                                            @empty
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                                                 <tr>
                                                                     <td colspan="6" class="text-center text-muted">No timeline records found</td>
                                                                 </tr>
-                                                            @endforelse
+                                                            <?php endif; ?>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -2564,21 +2459,22 @@
                                                             <tr>
                                                                 <td>
                                                                     <h6 class="fs-14 mb-1"><a href="#"
-                                                                            class="fw-semibold">{{ $opd->opd_no }}</a>
+                                                                            class="fw-semibold"><?php echo e($opd->opd_no); ?></a>
                                                                     </h6>
                                                                 </td>
-                                                                <td>{{ '--' }}</td>
-                                                                <td> {{ $opd->appointment_date }}</td>
+                                                                <td><?php echo e('--'); ?></td>
+                                                                <td> <?php echo e($opd->appointment_date); ?></td>
                                                                 <td>
                                                                     <ul>
-                                                                        @foreach ($symptoms as $symptom)
+                                                                        <?php $__currentLoopData = $symptoms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $symptom): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                             <li><i
                                                                                     class="fa-regular fa-circle-check text-primary"></i>
-                                                                                {{ $symptom->symptoms_title }}</li>
-                                                                        @endforeach
+                                                                                <?php echo e($symptom->symptoms_title); ?></li>
+                                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                     </ul>
                                                                 </td>
-                                                                <td>{{ $opd->doctor->name }}
+                                                                <td><?php echo e($opd->doctor->name); ?>
+
                                                                 </td>
                                                                 <td>
                                                                     <div class="d-flex gap-2">
@@ -2651,9 +2547,9 @@
                                                                             data-bs-dismiss="modal"></button>
 
                                                                     </div>
-                                                                    <form method="POST" action="{{ route('patient-vitals.store') }}">
-                                                                        @csrf
-                                                                            <input type="hidden" name="patient_id" value="{{ $opd->patient->id }}">
+                                                                    <form method="POST" action="<?php echo e(route('patient-vitals.store')); ?>">
+                                                                        <?php echo csrf_field(); ?>
+                                                                            <input type="hidden" name="patient_id" value="<?php echo e($opd->patient->id); ?>">
                                                                         <div class="modal-body p-4 mx-1">
                                                                             <div id="vitalFields">
                                                                                 <div class="row gy-3 vital-row mb-2">
@@ -2663,9 +2559,9 @@
                                                                                         <label for="vital_name" class="form-label">Vital Name</label>
                                                                                         <select class="form-select" name="vital_name[]" id="vital_name">
                                                                                             <option value="">Select</option>
-                                                                                            @foreach($vitals as $vital)
-                                                                                                <option value="{{ $vital->id }}">{{ $vital->name . ' (' . $vital->reference_range . ')' }} </option>
-                                                                                            @endforeach
+                                                                                            <?php $__currentLoopData = $vitals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $vital): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                                                <option value="<?php echo e($vital->id); ?>"><?php echo e($vital->name . ' (' . $vital->reference_range . ')'); ?> </option>
+                                                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                                         </select>
                                                                                     </div>
 
@@ -2714,37 +2610,39 @@
                                                             <tr>
                                                                 
                                                                 <th>Messure Date</th>
-                                                                 {{-- Dynamically generate vital headers --}}
-                                                                @foreach($vitals as $vital)
-                                                                    <th>{{ $vital->name }}</th>
-                                                                @endforeach
+                                                                 
+                                                                <?php $__currentLoopData = $vitals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $vital): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                    <th><?php echo e($vital->name); ?></th>
+                                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                 <!-- <th>Action</th> -->
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                              @forelse($vitalDetails->groupBy('patient_id') as $caseId => $caseVitals)
-                                                        @php
+                                                              <?php $__empty_1 = true; $__currentLoopData = $vitalDetails->groupBy('patient_id'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $caseId => $caseVitals): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                                        <?php
                                                             $firstRecord = $caseVitals->first();
-                                                        @endphp
+                                                        ?>
                                                         <tr>
 
                                                         <td>
-                                                            @if(!empty($firstRecord->messure_date))
-                                                                {{ \Carbon\Carbon::parse($firstRecord->messure_date)->format('d/m/Y h:i A') }}
-                                                            @else
+                                                            <?php if(!empty($firstRecord->messure_date)): ?>
+                                                                <?php echo e(\Carbon\Carbon::parse($firstRecord->messure_date)->format('d/m/Y h:i A')); ?>
+
+                                                            <?php else: ?>
                                                                 -
-                                                            @endif
+                                                            <?php endif; ?>
                                                         </td>
 
-                                                            {{-- Loop through all vitals dynamically --}}
-                                                            @foreach($vitals as $vital)
-                                                                @php
+                                                            
+                                                            <?php $__currentLoopData = $vitals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $vital): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                <?php
                                                                     $record = $caseVitals->where('vital_id', $vital->id)->first();
-                                                                @endphp
+                                                                ?>
                                                                 <td>
-                                                                    {{ $record->reference_range ?? '-' }}
+                                                                    <?php echo e($record->reference_range ?? '-'); ?>
+
                                                                 </td>
-                                                            @endforeach
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
                                                                     <!-- <td>
                                                                         <div class="d-flex gap-2">
@@ -2756,13 +2654,13 @@
                                                                         </div>
                                                                     </td> -->
                                                                     </tr>
-                                                            @empty
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                                                 <tr>
-                                                                    <td colspan="{{ 4 + $vitals->count() }}" class="text-center text-muted">
+                                                                    <td colspan="<?php echo e(4 + $vitals->count()); ?>" class="text-center text-muted">
                                                                         No vital records found
                                                                     </td>
                                                                 </tr>
-                                                            @endforelse
+                                                            <?php endif; ?>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -2783,8 +2681,8 @@
     </div>
     <!-- tab content end -->
     </div>
-    @include('components.modals.add-prescription-modal')
-    @include('components.modals.show-prescription-modal')
+    <?php echo $__env->make('components.modals.add-prescription-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+    <?php echo $__env->make('components.modals.show-prescription-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
     <!-- Chart JS -->
     <script src="assets/plugins/chartjs/chart.min.js"></script>
@@ -2797,7 +2695,7 @@
 
 
 
-            fetch("{{ route('getChargeTypes') }}").then(response => response.json())
+            fetch("<?php echo e(route('getChargeTypes')); ?>").then(response => response.json())
                 .then(data => {
                     window.chargeTypeData = data;
                     chargeTypeSelect.innerHTML = '<option value="">Select</option>';
@@ -2805,7 +2703,7 @@
                         const option = document.createElement('option');
                         option.value = type.id;
                         option.textContent = type.charge_type;
-                        if ("{{ old('charge_type') }}" == type.id) {
+                        if ("<?php echo e(old('charge_type')); ?>" == type.id) {
                             option.selected = true;
                         }
                         chargeTypeSelect.appendChild(option);
@@ -2818,7 +2716,7 @@
 
             chargeTypeSelect.addEventListener('change', function() {
                 const selectedId = this.value;
-                const baseUrl = "{{ route('getChargeCategoriesByTypeId', ['id' => 'ID']) }}";
+                const baseUrl = "<?php echo e(route('getChargeCategoriesByTypeId', ['id' => 'ID'])); ?>";
                 const finalUrl = baseUrl.replace('ID', selectedId);
                 fetch(finalUrl)
                     .then(response => response.json())
@@ -2829,7 +2727,7 @@
                             const option = document.createElement('option');
                             option.value = category.id;
                             option.textContent = category.name;
-                            if ("{{ old('charge_category') }}" == category.id) {
+                            if ("<?php echo e(old('charge_category')); ?>" == category.id) {
                                 option.selected = true;
                             }
                             chargeCategorySelect.appendChild(option);
@@ -2846,7 +2744,7 @@
             // Listen for Charge Category dropdown change
             chargeCategorySelect.addEventListener('change', function() {
                 const selectedId = this.value;
-                const baseUrl = "{{ route('getCharges', ['id' => 'ID']) }}";
+                const baseUrl = "<?php echo e(route('getCharges', ['id' => 'ID'])); ?>";
                 const finalUrl = baseUrl.replace('ID', selectedId);
                 fetch(finalUrl)
                     .then(response => response.json())
@@ -2857,7 +2755,7 @@
                             const option = document.createElement('option');
                             option.value = charge.id;
                             option.textContent = charge.name;
-                            if ("{{ old('charge') }}" == charge.id) {
+                            if ("<?php echo e(old('charge')); ?>" == charge.id) {
                                 option.selected = true;
                             }
                             chargeSelect.appendChild(option);
@@ -3109,7 +3007,7 @@
         medCatSelect.innerHTML = '<option value="">Loading...</option>';
         medNameSelect.innerHTML = '<option value="">Loading...</option>';
         doseSelect.innerHTML = '<option value="">Loading...</option>';
-        fetch("{{ route('getMedicineCategories') }}")
+        fetch("<?php echo e(route('getMedicineCategories')); ?>")
             .then(response => response.json())
             .then(data => {
                 window.medicineCategories = data;
@@ -3118,7 +3016,7 @@
                     const option = document.createElement('option');
                     option.value = category.id;
                     option.textContent = category.medicine_category;
-                    if ("{{ old('med_cat') }}" == category.id) {
+                    if ("<?php echo e(old('med_cat')); ?>" == category.id) {
                         option.selected = true;
                     }
                     medCatSelect.appendChild(option);
@@ -3132,7 +3030,7 @@
         // Listen for Charge Category dropdown change
         medCatSelect.addEventListener('change', function() {
             const selectedId = this.value;
-            const baseUrl = "{{ route('getMedicines', ['categoryId' => 'ID']) }}";
+            const baseUrl = "<?php echo e(route('getMedicines', ['categoryId' => 'ID'])); ?>";
             const finalUrl = baseUrl.replace('ID', selectedId);
             fetch(finalUrl)
                 .then(response => response.json())
@@ -3143,7 +3041,7 @@
                         const option = document.createElement('option');
                         option.value = charge.id;
                         option.textContent = charge.medicine_name;
-                        if ("{{ old('med_name') }}" == charge.id) {
+                        if ("<?php echo e(old('med_name')); ?>" == charge.id) {
                             option.selected = true;
                         }
                         medNameSelect.appendChild(option);
@@ -3153,7 +3051,7 @@
                     console.error('Error fetching Charges:', error);
                     medNameSelect.innerHTML = '<option value="">Error loading options</option>';
                 });
-            const baseUrlDose = "{{ route('getDoses', ['categoryId' => 'ID']) }}";
+            const baseUrlDose = "<?php echo e(route('getDoses', ['categoryId' => 'ID'])); ?>";
             const finalUrlDose = baseUrlDose.replace('ID', selectedId);
             fetch(finalUrlDose)
                 .then(response => response.json())
@@ -3164,7 +3062,7 @@
                         const option = document.createElement('option');
                         option.value = charge.id;
                         option.textContent = charge.dosage + " " + charge.unit.unit_name;
-                        if ("{{ old('dosage') }}" == charge.id) {
+                        if ("<?php echo e(old('dosage')); ?>" == charge.id) {
                             option.selected = true;
                         }
                         doseSelect.appendChild(option);
@@ -3187,4 +3085,6 @@
     $('#edit_remark').val($(this).data('remark'));
 });
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\hims\resources\views/admin/opd/opd_view.blade.php ENDPATH**/ ?>

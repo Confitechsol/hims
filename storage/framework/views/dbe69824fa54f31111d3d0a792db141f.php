@@ -630,18 +630,16 @@
         color: #1f2937;
     }
 </style>
-
-<!-- Modal -->
-<div class="modal fade" id="createOpdModal" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
+<div class="modal fade" id="visitDetailsModal" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
-            <form action="<?php echo e(route('opd.store')); ?>" id="opdForm" method="POST">
+            <form action="<?php echo e(route('opd.visit.store')); ?>" id="opdForm" method="POST">
                 <?php echo csrf_field(); ?>
                 <!-- Modal Header -->
                 <div class="modal-header align-items-start">
                     <div class="flex-grow-1">
-                        <h5 class="modal-title mb-3" id="patient-header">Patient Appointment</h5>
-                        
+                        <h5 class="modal-title mb-3" id="patient-header">Add New Check Up</h5>
+                        <input type="hidden" name="opd_id" value="<?php echo e($opd->id); ?>">
                         <div class="d-flex gap-3 align-items-center" id="patient-loader">
                             <select type="text" class="form-select patient-search flex-grow-1"
                                 placeholder="Search patient by name or ID..." id="patient_select" name="patient_id">
@@ -671,6 +669,7 @@
                         <div class="row">
                             <div class="col-md-9">
                                 <div class="patient-info-grid">
+                                    <input type="hidden" name="patient_id" id="patient_id_input">
                                     <div class="info-label">
                                         <i class="bi bi-person-circle"></i> Patient Name
                                     </div>
@@ -1031,15 +1030,14 @@
     </div>
 </div>
 
-
-<?php echo $__env->make('components.modals.add-patients-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
-
-
 <script>
     function populatePatientDetails(selected) {
         
+       
+         document.getElementById('patient_id_input').value = selected.id;
         document.getElementById('patient_name_value').textContent =
             `${selected.patient_name} (${selected.id})`;
+            
         document.getElementById('patient_gender_value').textContent = selected
             .gender || 'N/A';
         document.getElementById('patient_age_value').textContent = selected.age +
@@ -1075,10 +1073,10 @@
     document.addEventListener("DOMContentLoaded", function() {
 
         const addPatientBtn = document.getElementById("openAddPatientBtn");
-        const createOpdModal = document.getElementById("createOpdModal");
+        const visitDetailsModal = document.getElementById("visitDetailsModal");
         const addPatientModal = document.getElementById("add_patient");
 
-        createOpdModal.addEventListener('show.bs.modal', function(event) {
+        visitDetailsModal.addEventListener('show.bs.modal', function(event) {
             var button = event.relatedTarget; // Button that triggered the modal
             var isHidden = button.getAttribute('data-is-hidden');
             const patient = JSON.parse(button.getAttribute('data-patient'));
@@ -1101,7 +1099,7 @@
         })
         addPatientBtn.addEventListener("click", function() {
             // Keep the first modal open
-            const opdModalInstance = bootstrap.Modal.getInstance(createOpdModal);
+            const opdModalInstance = bootstrap.Modal.getInstance(visitDetailsModal);
             opdModalInstance._element.classList.add('modal-stacked');
 
             // Open the second modal manually (no new backdrop)
@@ -1131,14 +1129,14 @@
             document.body.classList.add('modal-open');
 
             // Reset first modal’s stacking class
-            createOpdModal.classList.remove('modal-stacked');
+            visitDetailsModal.classList.remove('modal-stacked');
         });
     });
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const createOpdModal = document.getElementById("createOpdModal");
-        createOpdModal.addEventListener('show.bs.modal', function(event) {
+        const visitDetailsModal = document.getElementById("visitDetailsModal");
+        visitDetailsModal.addEventListener('show.bs.modal', function(event) {
             const patientSection = document.querySelector(".patient-card")
             patientSection.style.display = window.selectedPatient ? "block" : "none"
             const patientSelect = document.getElementById('patient_select');
@@ -1344,9 +1342,6 @@
 
     });
 </script>
-
-
-
 
 
 
@@ -1649,11 +1644,11 @@
 
     // Initialize the application
     document.addEventListener('DOMContentLoaded', function() {
-        const createOpdModal = document.getElementById('createOpdModal');
-        const closeButton = createOpdModal.querySelector('.button-close');
+        const visitDetailsModal = document.getElementById('visitDetailsModal');
+        const closeButton = visitDetailsModal.querySelector('.button-close');
         const cancelButton = document.getElementById('button-close');
 
-        createOpdModal.addEventListener('shown.bs.modal', function() {
+        visitDetailsModal.addEventListener('shown.bs.modal', function() {
             if (window.symptomTypeSelect) window.symptomTypeSelect = null;
             if (window.symptomTitleSelect) window.symptomTitleSelect = null;
 
@@ -1763,5 +1758,4 @@
             window.location.reload();
         })
     })
-</script>
-<?php /**PATH C:\xampp\htdocs\hims\resources\views/components/modals/opd-create-modal.blade.php ENDPATH**/ ?>
+</script><?php /**PATH C:\xampp\htdocs\hims\resources\views/components/modals/opd-visitDetail-modal.blade.php ENDPATH**/ ?>
