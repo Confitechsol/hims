@@ -1979,7 +1979,7 @@
 
                                                                         </div>
 
-                                                                        <div class="mt-3 text-end">
+                                                                        <div class="mt-3 text-end modal-footer">
                                                                             <button type="submit" class="btn btn-primary">Save Operation</button>
                                                                         </div>
                                                                     </form>
@@ -2148,7 +2148,7 @@
                         </div>
 
                     </div>
-                    <div class="mt-3 text-end">
+                    <div class="mt-3 text-end modal-footer">
                         <button type="submit" class="btn btn-primary">Update Operation</button>
                     </div>
                 </form>

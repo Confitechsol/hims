@@ -1,5 +1,4 @@
-@extends('layouts.adminLayout')
-@section('content')
+<?php $__env->startSection('content'); ?>
     <style>
         .editor-wrap {
             width: 900px;
@@ -240,24 +239,24 @@
 
     <!-- Start Content -->
     <div class="content" id="profilePage">
-        {{-- Flash Messages --}}
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show">{{ session('success') }}</div>
-        @endif
-        @if (session('error'))
-            <div class="alert alert-danger alert-dismissible fade show">{{ session('error') }}</div>
-        @endif
+        
+        <?php if(session('success')): ?>
+            <div class="alert alert-success alert-dismissible fade show"><?php echo e(session('success')); ?></div>
+        <?php endif; ?>
+        <?php if(session('error')): ?>
+            <div class="alert alert-danger alert-dismissible fade show"><?php echo e(session('error')); ?></div>
+        <?php endif; ?>
 
         <!-- Page Header -->
         <div class="mb-3 border-bottom pb-3">
             <div class="d-flex justify-content-between align-items-center">
                 <h4 class="fw-bold mb-0">Settings</h4>
-                @if ($letterheadCategory && $letterheadCategory->count() > 0)
+                <?php if($letterheadCategory && $letterheadCategory->count() > 0): ?>
                     <button type="button" class="btn-add-category" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
                         <i class="bi bi-plus-circle"></i>
                         Add Letterhead Category
                     </button>
-                @endif
+                <?php endif; ?>
             </div>
         </div>
         <!-- End Page Header -->
@@ -266,33 +265,26 @@
         <div class="card">
             <div class="card-body p-0">
                 <div class="settings-wrapper d-flex">
-                    @if ($letterheadCategory && $letterheadCategory->count() > 0)
+                    <?php if($letterheadCategory && $letterheadCategory->count() > 0): ?>
                         <!-- Sidebar -->
                         <div class="sidebars settings-sidebar" id="sidebar2" style="max-height: 70vh; overflow: auto;">
                             <div class="sidebar-inner" data-simplebar>
                                 <div id="sidebar-menu5" class="sidebar-menu mt-0 p-0">
                                     <ul class="nav flex-column" id="permissionTabs" role="tablist">
-                                        @foreach ($letterheadCategory as $index => $category)
+                                        <?php $__currentLoopData = $letterheadCategory; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <li class="nav-item">
-                                                <a class="nav-link {{ $index == 0 ? 'active' : '' }}"
-                                                    id="tab-{{ $category->id }}" data-bs-toggle="tab"
-                                                    href="#content-{{ $category->id }}" role="tab"
-                                                    aria-controls="content-{{ $category->id }}"
-                                                    aria-selected="{{ $index == 0 ? 'true' : 'false' }}">
+                                                <a class="nav-link <?php echo e($index == 0 ? 'active' : ''); ?>"
+                                                    id="tab-<?php echo e($category->id); ?>" data-bs-toggle="tab"
+                                                    href="#content-<?php echo e($category->id); ?>" role="tab"
+                                                    aria-controls="content-<?php echo e($category->id); ?>"
+                                                    aria-selected="<?php echo e($index == 0 ? 'true' : 'false'); ?>">
                                                     <i class="ti ti-device-desktop-cog me-2"></i>
-                                                    {{ $category->name }}
+                                                    <?php echo e($category->name); ?>
+
                                                 </a>
                                             </li>
-                                        @endforeach
-                                        {{-- @foreach ($letterheadCategory as $category)
-                                        <li class="nav-item">
-                                            <a class="nav-link active" id="dashboard-tab" data-bs-toggle="tab"
-                                                href="#dashboard" role="tab" aria-controls="dashboard"
-                                                aria-selected="true">
-                                                <i class="ti ti-device-desktop-cog me-2"></i> {{ $category->name }}
-                                            </a>
-                                        </li>
-                                    @endforeach --}}
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        
                                     </ul>
                                 </div>
                             </div>
@@ -306,7 +298,7 @@
                                 <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
                                     <div class="flex-grow-1">
                                         <h4 class="fw-bold mb-0" id="dynamic-title">
-                                            {{ $letterheadCategory->first()->name ?? '' }} Header Footer
+                                            <?php echo e($letterheadCategory->first()->name ?? ''); ?> Header Footer
                                         </h4>
                                     </div>
                                 </div>
@@ -315,20 +307,20 @@
                             <!-- Tab Content -->
                             <div class="card-body px-0 mx-3">
                                 <div class="tab-content" id="permissionTabsContent">
-                                    @foreach ($letterheadCategory as $index => $category)
-                                        @php
+                                    <?php $__currentLoopData = $letterheadCategory; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <?php
                                             $setting = $letterheadSettings[$category->id] ?? null;
-                                        @endphp
+                                        ?>
 
-                                        <div class="tab-pane fade {{ $index == 0 ? 'show active' : '' }}"
-                                            id="content-{{ $category->id }}" role="tabpanel"
-                                            aria-labelledby="tab-{{ $category->id }}">
+                                        <div class="tab-pane fade <?php echo e($index == 0 ? 'show active' : ''); ?>"
+                                            id="content-<?php echo e($category->id); ?>" role="tabpanel"
+                                            aria-labelledby="tab-<?php echo e($category->id); ?>">
 
-                                            <form id="form-{{ $category->id }}"
-                                                action="{{ route('letterhead.store', $category->id) }}" method="POST"
+                                            <form id="form-<?php echo e($category->id); ?>"
+                                                action="<?php echo e(route('letterhead.store', $category->id)); ?>" method="POST"
                                                 enctype="multipart/form-data">
-                                                @csrf
-                                                <input type="hidden" name="letterhead_cat_id" value="{{ $category->id }}">
+                                                <?php echo csrf_field(); ?>
+                                                <input type="hidden" name="letterhead_cat_id" value="<?php echo e($category->id); ?>">
 
                                                 <div class="row g-4">
                                                     <!-- Header Image Section -->
@@ -337,17 +329,17 @@
                                                             <div class="section-header mb-3">
                                                                 <h5 class="section-title mb-1">Header Image</h5>
                                                                 <p class="section-subtitle text-muted mb-0">
-                                                                    {{ $category->name }} • Recommended: 2230×300px
+                                                                    <?php echo e($category->name); ?> • Recommended: 2230×300px
                                                                 </p>
                                                             </div>
 
                                                             <div class="upload-area">
                                                                 <div
                                                                     class="upload-container border border-2 border-dashed rounded-3 p-4 text-center position-relative bg-light hover-bg-primary-subtle transition-all">
-                                                                    @if ($setting && $setting->print_header)
+                                                                    <?php if($setting && $setting->print_header): ?>
                                                                         <div class="current-image mb-3"
-                                                                            id="preview-{{ $category->id }}">
-                                                                            <img src="{{ $setting->print_header }}"
+                                                                            id="preview-<?php echo e($category->id); ?>">
+                                                                            <img src="<?php echo e($setting->print_header); ?>"
                                                                                 class="img-fluid rounded shadow-sm"
                                                                                 style="max-height: 120px; object-fit: cover;">
                                                                         </div>
@@ -359,10 +351,10 @@
                                                                             <small class="text-muted">or drag and
                                                                                 drop</small>
                                                                         </div>
-                                                                    @else
+                                                                    <?php else: ?>
                                                                         <div class="upload-placeholder">
                                                                             <div class="current-image mb-3"
-                                                                                id="preview-{{ $category->id }}">
+                                                                                id="preview-<?php echo e($category->id); ?>">
 
                                                                             </div>
                                                                             <i class="bi bi-image fs-1 text-muted mb-3"
@@ -375,10 +367,10 @@
                                                                             <small class="text-muted">PNG, JPG, SVG up to
                                                                                 5MB</small>
                                                                         </div>
-                                                                    @endif
+                                                                    <?php endif; ?>
 
                                                                     <input type="file"
-                                                                        id="print_header_{{ $category->id }}"
+                                                                        id="print_header_<?php echo e($category->id); ?>"
                                                                         name="print_header" accept="image/*"
                                                                         class="position-absolute top-0 start-0 opacity-0 w-100 h-100 cursor-pointer"
                                                                         accept="image/*">
@@ -401,7 +393,7 @@
                                                             <div class="section-header mb-3">
                                                                 <h5 class="section-title mb-1">Footer Content</h5>
                                                                 <p class="section-subtitle text-muted mb-0">
-                                                                    {{ $category->name }} • Rich text editor
+                                                                    <?php echo e($category->name); ?> • Rich text editor
                                                                 </p>
                                                             </div>
 
@@ -444,16 +436,18 @@
                                                                 </div>
 
                                                                 <div class="editor-container">
-                                                                    <div id="editor-{{ $category->id }}"
+                                                                    <div id="editor-<?php echo e($category->id); ?>"
                                                                         class="form-control editor-content border-top-0 rounded-0 rounded-bottom"
                                                                         contenteditable="true" spellcheck="true"
                                                                         aria-label="Footer content editor"
                                                                         style="min-height: 150px; max-height: 300px; overflow-y: auto;">
-                                                                        {!! $setting->print_footer ?? '<p class="text-muted">Start typing your footer content here...</p>' !!}
+                                                                        <?php echo $setting->print_footer ?? '<p class="text-muted">Start typing your footer content here...</p>'; ?>
+
                                                                     </div>
 
-                                                                    <textarea name="print_footer" class="d-none" id="footer-input-{{ $category->id }}">
-                                                                    {!! $setting->print_footer ?? '' !!}
+                                                                    <textarea name="print_footer" class="d-none" id="footer-input-<?php echo e($category->id); ?>">
+                                                                    <?php echo $setting->print_footer ?? ''; ?>
+
                                                                 </textarea>
                                                                 </div>
 
@@ -477,7 +471,7 @@
                                             </form>
 
                                         </div>
-                                    @endforeach
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </div>
 
 
@@ -485,9 +479,9 @@
                             <!-- End Tab Content -->
 
                         </div>
-                    @else
-                        @include('admin.setup.letterhead_fallback')
-                    @endif
+                    <?php else: ?>
+                        <?php echo $__env->make('admin.setup.letterhead_fallback', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+                    <?php endif; ?>
 
                 </div>
             </div>
@@ -499,9 +493,9 @@
 
     </div>
     <!-- End Content -->
-    @include('components.modals.letterhead-category-modal')
+    <?php echo $__env->make('components.modals.letterhead-category-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-    {{-- Optional JS for "Select All" functionality --}}
+    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
@@ -702,4 +696,6 @@
         });
     </script>
 
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\hims\resources\views/admin/setup/letter_head_foot.blade.php ENDPATH**/ ?>

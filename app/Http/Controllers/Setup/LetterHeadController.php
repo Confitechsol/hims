@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Setup;
 use App\Http\Controllers\Controller;
 use App\Models\LetterheadCategory;
 use App\Models\LetterheadSettings;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class LetterHeadController extends Controller
 {
@@ -64,5 +66,22 @@ class LetterHeadController extends Controller
         );
 
         return redirect()->back()->with('success', 'Letterhead settings saved successfully!');
+    }
+
+    public function storeLetterheadCategory(Request $request)
+    {
+        try {
+            $request->validate([
+                'category_name' => 'required|string',
+            ]);
+            LetterheadCategory::create([
+                'hospital_id' => Auth::user()->hospital_id ?? null,
+                'name'        => $request->category_name,
+            ]);
+            return redirect()->back()->with('success', 'Letterhead Category saved successfully!');
+        } catch (Exception $e) {
+            return redirect()->back()->withInput()->with('error', 'Failed to save Letterhead Category: ' . $e->getMessage());
+        }
+
     }
 }
