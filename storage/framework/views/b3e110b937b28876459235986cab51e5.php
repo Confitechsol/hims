@@ -1,0 +1,276 @@
+<?php $__env->startSection('content'); ?>
+    <div class="row justify-content-center">
+        
+        <div class="col-md-11">
+            <div class="card shadow-sm border-0 mt-4">
+                <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                    <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Item Store List</h5>
+                </div>
+
+                <div class="card-body">
+
+
+                    
+                    <div class="row">
+
+                        <div class="col-lg-12">
+                            <div class="card">
+
+                                <div class="card-body">
+                                    <div
+                                        class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
+
+                                        <div class="input-icon-start position-relative me-2">
+                                            <span class="input-icon-addon">
+                                                <i class="ti ti-search"></i>
+                                            </span>
+                                            <input type="text" class="form-control shadow-sm" placeholder="Search">
+
+                                        </div>
+                                        <div class="page_btn d-flex">
+                                            <div class="text-end d-flex">
+                                                <a href="javascript:void(0);"
+                                                    class="btn btn-primary text-white ms-2 fs-13 btn-md"
+                                                    data-bs-toggle="modal" data-bs-target="#add_item_store"><i
+                                                        class="ti ti-plus me-1"></i>Add Item Store</a>
+                                            </div>
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="add_item_store" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header rounded-0"
+                                                            style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                                            <h5 class="modal-title" id="addSpecializationLabel">Add Item
+                                                                Store
+
+                                                            </h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <form action="<?php echo e(route('item-store.store')); ?>" method="POST">
+                                                                <?php echo csrf_field(); ?>
+                                                                <div class="row gy-3 mb-2">
+
+                                                                    <!-- Operation Name -->
+                                                                    <div class="col-md-12">
+                                                                        <label for="item_store_name" class="form-label">Item
+                                                                            Store Name
+                                                                            <span class="text-danger">*</span></label>
+                                                                        <input type="text" name="item_store_name"
+                                                                            id="item_store_name" class="form-control"
+                                                                            required />
+                                                                    </div>
+                                                                    <div class="col-md-12">
+                                                                        <label for="item_stock_code" class="form-label">Item
+                                                                            Stock Code
+                                                                        </label>
+                                                                        <input type="text" name="item_stock_code"
+                                                                            id="item_stock_code" class="form-control" />
+                                                                    </div>
+
+
+                                                                    <div class="col-md-12">
+                                                                        <label for="description"
+                                                                            class="form-label">Description</label>
+                                                                        <textarea name="description" id="description" class="form-control"></textarea>
+                                                                    </div>
+
+                                                                </div>
+
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="submit" class="btn btn-primary">Save</button>
+                                                        </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="table-responsive">
+                                        <table class="table mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Item Store Name</th>
+                                                    <th>Item Stock Code</th>
+                                                    <th>Description</th>
+                                                    <th>Status</th>
+                                                    <th style="width: 200px;">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php $__currentLoopData = $itemStores; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $itemStore): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                    <tr>
+                                                        <td>
+                                                            <h6 class="mb-0 fs-14 fw-semibold"><?php echo e($itemStore->item_store); ?>
+
+                                                            </h6>
+                                                        </td>
+                                                        <td><?php echo e($itemStore->code); ?></td>
+                                                        <td class="text-wrap"><?php echo e($itemStore->description); ?></td>
+                                                        <td>
+                                                            <form
+                                                                action="<?php echo e(route('item-store.updateStatus', [$itemStore->id])); ?>"
+                                                                method="post">
+                                                                <?php echo csrf_field(); ?>
+                                                                <div class="form-check form-switch mb-0">
+                                                                    <input class="form-check-input status-toggle"
+                                                                        type="checkbox" role="switch"
+                                                                        id="switchCheckDefault" name="is_active"
+                                                                        data-id="<?php echo e($itemStore->id); ?>"
+                                                                        <?php echo e($itemStore->is_active == 'yes' ? 'checked' : ''); ?>>
+                                                                </div>
+                                                            </form>
+                                                        </td>
+                                                        <td>
+                                                            <a href="javascript: void(0);"
+                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                                data-bs-toggle="modal" data-bs-target="#edit_itemStore"
+                                                                data-id="<?php echo e($itemStore->id); ?>"
+                                                                data-name="<?php echo e($itemStore->item_store); ?>"
+                                                                data-code="<?php echo e($itemStore->code); ?>"
+                                                                data-description="<?php echo e($itemStore->description); ?>">
+                                                                <i class="ti ti-pencil"></i></a>
+                                                            <form
+                                                                action="<?php echo e(route('item-store.delete', [$itemStore->id])); ?>"
+                                                                class="d-inline" id="delete-form-<?php echo e($itemStore->id); ?>"
+                                                                method="POST">
+                                                                <?php echo csrf_field(); ?>
+                                                                <?php echo method_field('DELETE'); ?>
+                                                                <a href="javascript: void(0);"
+                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill delete-button"
+                                                                    data-item-store-id="<?php echo e($itemStore->id); ?>"
+                                                                    data-item-store-name="<?php echo e($itemStore->item_store); ?>"
+                                                                    data-form-id="delete-form-<?php echo e($itemStore->id); ?>">
+                                                                    <i class="ti ti-trash"></i></a>
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div class="modal fade" id="edit_itemStore" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header rounded-0"
+                                                    style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                                    <h5 class="modal-title" id="addSpecializationLabel">Update Item
+                                                        Store
+
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form action="<?php echo e(route('item-store.update')); ?>" method="POST">
+                                                        <?php echo csrf_field(); ?>
+                                                        <?php echo method_field('PUT'); ?>
+                                                        <div class="row gy-3 mb-2">
+
+                                                            <!-- Operation Name -->
+                                                            <input type="hidden" name="item_store_id"
+                                                                id="update_item_store_id">
+                                                            <div class="col-md-12">
+                                                                <label for="item_store_name" class="form-label">Item
+                                                                    Store Name
+                                                                    <span class="text-danger">*</span></label>
+                                                                <input type="text" name="item_store_name"
+                                                                    id="update_item_store_name" class="form-control"
+                                                                    required />
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <label for="item_stock_code" class="form-label">Item
+                                                                    Stock Code
+                                                                </label>
+                                                                <input type="text" name="item_stock_code"
+                                                                    id="update_item_stock_code" class="form-control" />
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <label for="description"
+                                                                    class="form-label">Description</label>
+                                                                <textarea name="description" id="update_description" class="form-control"></textarea>
+                                                            </div>
+
+                                                        </div>
+
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="submit" class="btn btn-primary">Update</button>
+                                                </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div> <!-- end card-body -->
+                            </div> <!-- end card -->
+                        </div> <!-- end col -->
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var editModal = document.getElementById('edit_itemStore');
+
+            editModal.addEventListener('show.bs.modal', function(event) {
+                var button = event.relatedTarget; // Button that triggered the modal
+                var id = button.getAttribute('data-id');
+                var name = button.getAttribute('data-name');
+                var code = button.getAttribute('data-code');
+                var description = button.getAttribute('data-description');
+                console.log(name);
+
+                // Populate modal inputs
+                document.getElementById('update_item_store_id').value = id;
+                document.getElementById('update_item_store_name').value = name;
+                document.getElementById('update_item_stock_code').value = code;
+                document.getElementById('update_description').value = description;
+
+            });
+        });
+    </script>
+    <script>
+        document.querySelectorAll('.status-toggle').forEach(input => {
+            input.addEventListener('change', function() {
+                this.closest('form').submit();
+            });
+        });
+    </script>
+    <script>
+        document.querySelectorAll('.delete-button').forEach(input => {
+            input.addEventListener('click', function() {
+                const itemStoreId = this.dataset.itemStoreId;
+                const itemStoreName = this.dataset.itemStoreName;
+                const formId = this.dataset.formId;
+
+                Swal.fire({
+                    title: `Please Confirm`,
+                    text: `Delete Item Store ${itemStoreName}(${itemStoreId})`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Delete!',
+                    cancelButtonText: 'Cancel',
+                }).then(result => {
+                    console.log(result);
+
+                    if (result.isConfirmed) {
+                        document.getElementById(formId).submit(); // Submit your form
+                    }
+                });
+            });
+        });
+    </script>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\hims\resources\views\admin\setup\item_store.blade.php ENDPATH**/ ?>
