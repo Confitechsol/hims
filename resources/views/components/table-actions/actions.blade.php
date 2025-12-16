@@ -3,6 +3,15 @@
         <a href="javascript:void(0);" class="btn btn-primary text-white fs-13 btn-md" data-bs-toggle="modal"
             data-bs-target="#createModal"><i class="ti ti-plus me-1"></i>Add {{$name}}</a>
         @if($name === 'Visitor')
+        <div class="btn-group ms-2">
+            <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="ti ti-mail me-1"></i>Postal
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{{ route('dispatch.receive') }}">Receive</a></li>
+                <li><a class="dropdown-item" href="{{ route('dispatch.dispatch') }}">Dispatch</a></li>
+            </ul>
+        </div>
         <a href="{{ route('phone-call-log') }}" class="btn btn-secondary text-white fs-13 btn-md ms-2"><i class="ti ti-phone me-1"></i>Phone Call Log</a>
         @endif
     </div>
@@ -13,6 +22,7 @@
         <button class="btn btn-danger" onclick="exportToPDF('{{$id}}')">Export to PDF</button>
         <button class="btn btn-warning" onclick="printTable('{{$id}}')">Print</button>
     </div>
+</div>
 </div>
 <div class="input-icon-start position-relative mb-3">
     <span class="input-icon-addon">

@@ -33,7 +33,10 @@
                                             {{ session('success') }}
                                         </div>
                                     @endif
-                                    <x-table-actions.actions id="visitors" name="Visitor" />
+                                    <div class="mb-3 d-flex align-items-center gap-2">
+                                        <x-table-actions.actions id="visitors" name="Visitor" />
+                                        <!-- Phone Call Log and Complain buttons removed as requested -->
+                                    </div>
                                     <!-- Table start -->
                                     <div class="table-responsive table-nowrap">
                                         <table class="table" id="visitors">
