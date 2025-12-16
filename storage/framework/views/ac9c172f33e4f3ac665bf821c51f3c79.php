@@ -47,38 +47,28 @@
                                     class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
                                     <div class="d-flex align-items-center gap-2">
                                         <form action="<?php echo e(route('opd')); ?>" method="GET">
+                                            <input type="hidden" name="tab" value="<?php echo e(request('tab', 'opd')); ?>">
                                             <div class="d-flex align-items-center">
                                                 <div class="input-icon-start position-relative me-2">
-                                                    <span class="input-icon-addon">
-                                                        <i class="ti ti-search"></i>
-                                                    </span>
-                                                    <input type="text" id="language-search" name="search"
-                                                        value="<?php echo e(request('search')); ?>" class="form-control shadow-sm"
-                                                        placeholder="Search">
+                                                    <div class="input-group">
+                                                        <span class="input-group-text" id="addon-wrapping">⌕</span>
+                                                        <input type="text" id="language-search" name="search"
+                                                            value="<?php echo e(request('search')); ?>" class="form-control shadow-sm"
+                                                            placeholder="Search">
+                                                        <a href="<?php echo e(route('opd', ['tab' => request('tab')])); ?>"
+                                                            class="btn btn-outline-cgray">
+                                                            <i class="bi bi-x-circle"></i>
+                                                        </a>
+                                                    </div>
                                                 </div>
                                                 <div>
                                                     <button class="btn btn-primary" type="submit">Search</button>
                                                 </div>
                                             </div>
                                         </form>
-                                        <form action="" style="width: 300px;">
-                                            <div class="input-group shadow-sm">
-                                                <label class="input-group-text" for="inputGroupSelect01">Consultant</label>
-                                                <select class="form-select" id="inputGroupSelect01">
-                                                    <option selected>Select</option>
-                                                    <?php $__currentLoopData = $doctors; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $doctor): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                        <option value="<?php echo e($doctor->id); ?>"><?php echo e($doctor->name); ?></option>
-                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-                                                </select>
-                                            </div>
-                                        </form>
-                                        <div>
-                                            <button class="btn btn-outline-primary" type="button"
-                                                data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop"
-                                                aria-controls="offcanvasTop">Apply
-                                                Filter</button>
-                                        </div>
+                                        
+                                        
                                     </div>
 
                                     <div class="text-end d-flex">
@@ -198,84 +188,8 @@
                                 <?php endif; ?>
                             </div>
 
-                            <div class="offcanvas offcanvas-top" style="height: fit-content;" tabindex="-1"
-                                id="offcanvasTop" aria-labelledby="offcanvasTopLabel">
-                                <div class="offcanvas-header justify-content-center">
-                                    <h4 class="offcanvas-title m-auto font-weight-bold" id="offcanvasTopLabel">FILTERS</h4>
-                                </div>
-                                <div class="offcanvas-body">
-                                    <div class="filter-section pb-3 rounded">
-                                        <form action="<?php echo e(request()->routeIs('opd') ? route('opd') : route('opd')); ?>"
-                                            method="GET" class="text-center" id="searchForm">
-                                            <div
-                                                class="d-flex flex-column flex-md-row gap-2 align-items-center justify-content-center">
-                                                <!-- Filter Type Selector -->
-                                                <div class="align-items-center">
-                                                    <label for="filterType" class="form-label font-weight-bold">Select
-                                                        Filter
-                                                        Type</label>
-                                                    <select id="filterType" class="form-select" name="filter_type"
-                                                        style="width: 250px;">
-                                                        <option value="dateRange"
-                                                            <?php echo e(request('filter_type') == 'dateRange' ? 'selected' : ''); ?>>
-                                                            Date
-                                                            Range
-                                                        </option>
-                                                        <option value="monthly"
-                                                            <?php echo e(request('filter_type') == 'monthly' ? 'selected' : ''); ?>>
-                                                            Monthly</option>
-                                                        <option value="weekly"
-                                                            <?php echo e(request('filter_type') == 'weekly' ? 'selected' : ''); ?>>
-                                                            Weekly</option>
-                                                    </select>
-                                                </div>
-
-                                                <!-- Date Range Filter -->
-                                                <div id="dateRangeFilter">
-                                                    <div
-                                                        class="d-flex flex-column flex-md-row gap-2 align-items-center filter-group">
-                                                        <div>
-                                                            <label class="form-label">From</label>
-                                                            <input type="date" class="form-control" name="fromDate"
-                                                                value="<?php echo e(request('fromDate')); ?>" />
-                                                        </div>
-                                                        <div>
-                                                            <label class="form-label">To</label>
-                                                            <input type="date" class="form-control" name="toDate"
-                                                                value="<?php echo e(request('toDate')); ?>" />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <!-- Monthly Filter -->
-                                                <div id="monthlyFilter" class="d-none">
-                                                    <div class="filter-group">
-                                                        <label class="form-label text-nowrap">Select Month</label>
-                                                        <input type="month" class="form-control" name="monthFilter"
-                                                            value="<?php echo e(request('monthFilter')); ?>" />
-                                                    </div>
-                                                </div>
-                                                <!-- Weekly Filter -->
-                                                <div id="weeklyFilter" class="d-none">
-                                                    <div class="filter-group">
-                                                        <label class="form-label text-nowrap">Select Week</label>
-                                                        <input type="week" class="form-control" name="weekFilter"
-                                                            value="<?php echo e(request('weekFilter')); ?>" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3 d-flex gap-2 mx-auto mt-3">
-                                                <button type="submit" class="btn cmn_btn btn-primary w-100">
-                                                    <i class="fas fa-filter me-1"></i> Filter
-                                                </button>
-                                                <a href="<?php echo e(request()->routeIs('opd') ? route('opd') : route('opd')); ?>"
-                                                    class="btn btn-outline-dark w-100">
-                                                    Reset
-                                                </a>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
+                            
+                            
                         </div>
                     </div>
 
