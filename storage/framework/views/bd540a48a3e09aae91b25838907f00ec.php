@@ -156,6 +156,7 @@
                                             </a></li>
                                 </ul>
                             </li>
+                            
                         </ul>
                     </li>
                     
@@ -325,7 +326,7 @@
                     </li> 
                     <li>
                         <ul>
-                    <li class="submenu">
+                            <li class="submenu">
                                 <a href="javascript:void(0);" class="active subdrop">
                                     <i class="ti ti-layout-dashboard"></i><span>Finance</span>
                                     <span class="menu-arrow"></span>
@@ -338,7 +339,7 @@
                                     
                                 </ul>
                             </li>
-                            </ul>
+                        </ul>
                     </li>
                     <!--<li class="menu-title"><span>Finance &
                             Accounts</span></li>
@@ -443,13 +444,14 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="income-report.html">Income
+                                    <li><a href="<?php echo e(route('finance')); ?>" class="active">Finance Report
+                                            </a></li>
+                                    
+                                    <li><a href="<?php echo e(route('finance')); ?>">OPD
                                             Report</a></li>
-                                    <li><a href="expense-report.html">Expense
+                                    <li><a href="<?php echo e(route('finance')); ?>">IPD
                                             Report</a></li>
-                                    <li><a href="profit-and-loss.html">Profit
-                                            & Loss</a></li>
-                                    <li><a href="appointment-report.html">Appointment
+                                    <li><a href="<?php echo e(route('finance')); ?>">Appointment
                                             Report</a></li>
                                     <li><a href="patient-report.html">Patient
                                             Report</a></li>
