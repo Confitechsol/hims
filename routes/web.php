@@ -718,8 +718,8 @@ Route::prefix('pharmacy')->group(function () {
             return 'Purchase route is working! Route order fixed.';
         });
         Route::get('/test-create', function () {
-            $suppliers  = \App\Models\MedicineSupplier::all();
-            $medicines  = \App\Models\Pharmacy::where('is_active', 'yes')->get();
+            $suppliers = \App\Models\MedicineSupplier::all();
+            $medicines = \App\Models\Pharmacy::where('is_active', 'yes')->get();
             $categories = \App\Models\MedicineCategory::all();
             return view('admin.pharmacy.purchase.test', compact('suppliers', 'medicines', 'categories'));
         });
@@ -953,3 +953,18 @@ Route::get('/patientBillReport', function () {
 Route::get('/processingTransactionReport', function () {
     return view('admin.reports.finance.processing-transaction-report');
 })->name('processingTransactionReport');
+
+
+// OPD
+Route::get('/opdReportsIndex', function () {
+    return view('admin.reports.opd.index');
+})->name('opdReportsIndex');
+Route::get('/opdReports', function () {
+    return view('admin.reports.opd.opd_reports');
+})->name('opdReports');
+Route::get('/opdBalanceReports', function () {
+    return view('admin.reports.opd.opd_balance_reports');
+})->name('opdBalanceReports');
+Route::get('/opdDischargePatient', function () {
+    return view('admin.reports.opd.opd_discharge_patient');
+})->name('opdDischargePatient');
