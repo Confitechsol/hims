@@ -968,3 +968,17 @@ Route::get('/opdBalanceReports', function () {
 Route::get('/opdDischargePatient', function () {
     return view('admin.reports.opd.opd_discharge_patient');
 })->name('opdDischargePatient');
+
+// ipd
+Route::get('/ipdReportsIndex', function () {
+    return view('admin.reports.ipd.index');
+})->name('ipdReportsIndex');
+Route::get('/ipdReports', function () {
+    return view('admin.reports.ipd.ipd_reports');
+})->name('ipdReports');
+Route::get('/ipdBalanceReports', function () {
+    return view('admin.reports.ipd.ipd_balance_reports');
+})->name('ipdBalanceReports');
+Route::get('/ipdDischargePatient', function () {
+    return view('admin.reports.ipd.ipd_discharge_patient');
+})->name('ipdDischargePatient');
