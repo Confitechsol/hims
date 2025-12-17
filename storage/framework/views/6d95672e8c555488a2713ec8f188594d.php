@@ -1,6 +1,4 @@
-{{-- resources/views/settings.blade.php --}}
-@extends('layouts.adminLayout')
-@section('content')
+<?php $__env->startSection('content'); ?>
 
     <style>
         .module_billing {
@@ -18,12 +16,12 @@
 
     <div class="row justify-content-center">
 
-        {{-- Settings Form --}}
+        
         <div class="col-md-11">
             <div class="card shadow-sm border-0 mt-4">
                 <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Daily Transaction Report </h5>
+                   <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> All Transaction Report </h5>
                         <a href="finance" class="text-white fw-bold"><i class="fa-solid fa-angles-left text-white"></i>
                             Finance</a>
                     </div>
@@ -33,18 +31,36 @@
                     <form action="">
                         <div class="row align-items-center gy-4">
 
-                            <div class="col-md-4">
-                                <label for="date_from" class="form-label">Date From <span
+                            <div class="col-md-3">
+                                <label for="time_duration" class="form-label">Time Duration <span
                                         class="text-danger">*</span></label>
-                                <input type="date" name="date_from" id="date_from" class="form-control">
+                                <select name="time_duration" id="time_duration" class="form-select">
+                                    <option value="" selected disabled>Select</option>
+                                    <option value="today">Today</option>
+                                    <option value="this_week">This Week</option>
+                                </select>
                             </div>
-                            <div class="col-md-4">
-                                <label for="date_to" class="form-label">Date To <span class="text-danger">*</span></label>
-                                <input type="date" name="date_to" id="date_to" class="form-control">
+                            <div class="col-md-3">
+                                <label for="collected_by" class="form-label">Collected By <span
+                                        class="text-danger">*</span></label>
+                                <select name="collected_by" id="collected_by" class="form-select">
+                                    <option value="" selected disabled>Select</option>
+                                    <option value="user1">User 1</option>
+                                </select>
                             </div>
-                            <div class="col-md-4">
+
+                            <div class="col-md-3">
+                                <label for="select_head"> Select Head <span class="text-danger">*</span></label>
+                                <select name="select_head" id="select_head" class="form-select">
+                                    <option value="" selected disabled>All</option>
+                                    <option value="head1">OPD</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-3">
                                 <button type="button" class="btn btn-primary btn-sm mt-4">Search</button>
                             </div>
+
                         </div>
                     </form>
 
@@ -79,30 +95,28 @@
                                                     <thead class="thead-light">
                                                         <tr>
 
+                                                            <th>Transaction ID </th>
                                                             <th>Date</th>
-                                                            <th>Total Transaction</th>
-                                                            <th>Online(SAR)</th>
-                                                            <th>Offline(SAR)</th>
-                                                            <th>Amount(SAR)</th>
-                                                            <th>Action</th>
+                                                            <th>Patient Name</th>
+                                                            <th>Reference</th>
+                                                            <th>Category</th>
+                                                            <th>Collected By</th>
+                                                            <th>Payment Type</th>
+                                                            <th>Payment Mode</th>
+                                                            <th>Amount (SAR)</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr>
-                                                            <td>12/12/2025</td>
-                                                            <td>0</td>
-                                                            <td>0.00</td>
-                                                            <td>0.00</td>
-                                                            <td>0.00</td>
-                                                            <td>
-                                                                <div class="d-flex gap-2">
-                                                                    <a href="#"
-                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
-                                                                        data-bs-toggle="tooltip" title="Show">
-                                                                        <i class="ti ti-menu"></i>
-                                                                    </a>
-                                                                </div>
-                                                            </td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -140,4 +154,5 @@
         });
     </script>
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\hims\resources\views/admin/finance/all-transaction-report.blade.php ENDPATH**/ ?>

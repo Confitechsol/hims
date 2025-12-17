@@ -59,7 +59,7 @@
                                                                 <label for="department_id" class="form-label fw-bold">User Department <span class="text-danger">*</span></label>
                                                                 <select name="department_id" id="department_id" class="form-select" required>
                                                                     <option value="">Select Department</option>
-                                                                @foreach ($departments as $department)
+                                                                    @foreach ($departments as $department)
                                                                         <option value="{{ $department->id }}">{{ $department->department_name }}</option>
                                                                     @endforeach
                                                                 </select>

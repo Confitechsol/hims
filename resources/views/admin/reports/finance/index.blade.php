@@ -28,7 +28,7 @@
                 <div class="card-body">
                     <div class="row align-items-center gy-4">
                         <div class="col-md-3">
-                            <a href="dailyTransactionReport">
+                            <a href="{{ route('reports.daily.transaction') }}">
                                 <div class="module_billing">
                                     <i class="fa-solid fa-calendar-check"></i>
                                     <p>Daily Transaction Report</p>
