@@ -470,11 +470,11 @@
                                             <div class="patient-id">
                                                 <i class="fas fa-id-card me-1"></i> OPD ID: {{ $opd->opd_no }}
                                             </div>
-                                            <h2 class="patient-name">{{ $opd->patient->patient_name }}</h2>
+                                            <h2 class="patient-name">{{ $opd->patient->patient_name ?? '' }}</h2>
                                             <div class="patient-quick-info">
                                                 <div class="quick-info-item">
                                                     <i class="fas fa-mars"></i>
-                                                    <span>{{ $opd->patient->gender }}</span>
+                                                    <span>{{ $opd->patient->gender ?? '' }}</span>
                                                 </div>
                                                 <div class="quick-info-item">
                                                     <i class="fas fa-birthday-cake"></i>
@@ -482,7 +482,7 @@
                                                 </div>
                                                 <div class="quick-info-item">
                                                     <i class="fas fa-droplet"></i>
-                                                    <span>{{ $opd->patient->bloodGroup->name }}</span>
+                                                    <span>{{ $opd->patient->bloodGroup->name ?? '' }}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -534,7 +534,7 @@
                                             </div>
                                             <div class="info-content">
                                                 <div class="info-label">Gender</div>
-                                                <div class="info-value">{{ $opd->patient->gender }}</div>
+                                                <div class="info-value">{{ $opd->patient->gender ?? '' }}</div>
                                             </div>
                                         </div>
                                     </div>

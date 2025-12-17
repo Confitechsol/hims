@@ -1,0 +1,1 @@
+<?php /**PATH C:\xampp\htdocs\hims\resources\views\admin\billing\pathology.blade.php ENDPATH**/ ?>

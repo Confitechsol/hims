@@ -35,7 +35,8 @@
 
                                         </div>
                                     <?php endif; ?>
-                                    <?php if (isset($component)) { $__componentOriginal7c6bc96f59264604a162cf868fce49e9 = $component; } ?>
+                                    <div class="mb-3 d-flex align-items-center gap-2">
+                                        <?php if (isset($component)) { $__componentOriginal7c6bc96f59264604a162cf868fce49e9 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal7c6bc96f59264604a162cf868fce49e9 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.table-actions.actions','data' => ['id' => 'visitors','name' => 'Visitor']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('table-actions.actions'); ?>
@@ -55,6 +56,8 @@
 <?php $component = $__componentOriginal7c6bc96f59264604a162cf868fce49e9; ?>
 <?php unset($__componentOriginal7c6bc96f59264604a162cf868fce49e9); ?>
 <?php endif; ?>
+                                        <!-- Phone Call Log and Complain buttons removed as requested -->
+                                    </div>
                                     <!-- Table start -->
                                     <div class="table-responsive table-nowrap">
                                         <table class="table" id="visitors">

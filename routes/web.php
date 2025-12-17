@@ -70,6 +70,7 @@ use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\TpamanagmentController;
 use App\Http\Controllers\VisitorsController;
 use App\Http\Controllers\VitalController;
+use App\Http\Controllers\TransactionReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -326,6 +327,17 @@ Route::middleware(['admin'])->group(function () {
     Route::delete('/visitors/delete/{id}', [VisitorsController::class, 'delete'])->name('visitors.delete');
     Route::get('/phone-call-log', [VisitorsController::class, 'phoneCallLog'])->name('phone-call-log');
     Route::post('/phone-call-log/create', [VisitorsController::class, 'createCallLog'])->name('phone-call-log.create');
+
+    // Dispatch / Receive (Postal) pages
+    Route::get('/dispatch-receive/receive', [\App\Http\Controllers\DispatchReceiveController::class, 'receive'])->name('dispatch.receive');
+    Route::get('/dispatch-receive/dispatch', [\App\Http\Controllers\DispatchReceiveController::class, 'dispatch'])->name('dispatch.dispatch');
+    Route::get('/dispatch-receive/list-json', [\App\Http\Controllers\DispatchReceiveController::class, 'listJson'])->name('dispatch.list_json');
+    Route::get('/dispatch-receive/create', [\App\Http\Controllers\DispatchReceiveController::class, 'create'])->name('dispatch.create');
+    Route::post('/dispatch-receive/store', [\App\Http\Controllers\DispatchReceiveController::class, 'store'])->name('dispatch.store');
+    Route::put('/dispatch-receive/update/{id}', [\App\Http\Controllers\DispatchReceiveController::class, 'update'])->name('dispatch.update');
+    Route::get('/dispatch-receive/{id}', [\App\Http\Controllers\DispatchReceiveController::class, 'show'])->name('dispatch.show');
+    Route::delete('/dispatch-receive/delete/{id}', [\App\Http\Controllers\DispatchReceiveController::class, 'destroy'])->name('dispatch.destroy');
+
 
 });
 
@@ -916,29 +928,28 @@ Route::post('/radiology_import', [ExcelImportController::class, 'importRadiology
 Route::get('/radiology_test_export', [ExcelImportController::class, 'exportRadiologyTestExcel'])->name('radiologyTests.export');
 
 Route::get('/finance', function () {
-    return view('admin.finance.index');
+    return view('admin.reports.finance.index');
 })->name('finance');
-Route::get('/dailyTransactionReport', function () {
-    return view('admin.finance.daily-transaction-report');
-})->name('dailyTransactionReport');
+Route::get('/reports/dailyTransactionReport', [TransactionReportController::class, 'dailyTransactionReport'])->name('reports.daily.transaction');
+
 Route::get('/allTransactionReport', function () {
-    return view('admin.finance.all-transaction-report');
+    return view('admin.reports.finance.all-transaction-report');
 })->name('allTransactionReport');
 Route::get('/incomeReport', function () {
-    return view('admin.finance.income-report');
+    return view('admin.reports.finance.income-report');
 })->name('incomeReport');
 Route::get('/incomeGroupReport', function () {
-    return view('admin.finance.income-group-report');
+    return view('admin.reports.finance.income-group-report');
 })->name('incomeGroupReport');
 Route::get('/expenseReport', function () {
-    return view('admin.finance.expense-report');
+    return view('admin.reports.finance.expense-report');
 })->name('expenseReport');
 Route::get('/expenseGroupReport', function () {
-    return view('admin.finance.expense-group-report');
+    return view('admin.reports.finance.expense-group-report');
 })->name('expenseGroupReport');
 Route::get('/patientBillReport', function () {
-    return view('admin.finance.patient-bill-report');
+    return view('admin.reports.finance.patient-bill-report');
 })->name('patientBillReport');
 Route::get('/processingTransactionReport', function () {
-    return view('admin.finance.processing-transaction-report');
+    return view('admin.reports.finance.processing-transaction-report');
 })->name('processingTransactionReport');

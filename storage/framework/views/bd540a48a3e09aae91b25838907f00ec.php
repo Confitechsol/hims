@@ -706,7 +706,7 @@
                                     
                                 </ul>
                             </li>
-                            <li class="submenu">
+                            <!-- <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-world-cog"></i><span>Website
                                         Settings</span>
@@ -725,8 +725,8 @@
                                             & Register</a></li>
                                     <li><a href="preferences-settings.html">Preferences</a></li>
                                 </ul>
-                            </li>
-                            <li class="submenu">
+                            </li> -->
+                            <!-- <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-building-hospital"></i><span>Clinic
                                         Settings</span>
@@ -739,7 +739,7 @@
                                     <li><a href="cancellation-reason-settings.html">Cancellation
                                             Reason</a></li>
                                 </ul>
-                            </li>
+                            </li> -->
                             <!-- <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-device-mobile-cog"></i><span>App
@@ -756,7 +756,7 @@
                                             Fields</a></li>
                                 </ul>
                             </li> -->
-                            <li class="submenu">
+                            <!-- <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-device-desktop-cog"></i><span>System
                                         Settings</span>
@@ -812,7 +812,7 @@
                                     <li><a href="system-update.html">System
                                             Update</a></li>
                                 </ul>
-                            </li>
+                            </li> -->
                         </ul>
                     </li>
                 </ul>

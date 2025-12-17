@@ -1,17 +1,25 @@
 @extends('layouts.adminLayout')
 @section('content')
 
-<div class="row px-5 py-4">
-    <div class="col-12 d-flex">
-        <div class="card shadow-sm flex-fill w-100">
-            <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                <h5 class="mb-0" style="color: #750096"><i class="fas fa-phone me-2"></i>Phone Call Log</h5>
+<div class="row justify-content-center py-4">
+    <div class="col-12 col-lg-10">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(-90deg, #b266ff 0%, #CB6CE6 100%); border-radius: 0.5rem 0.5rem 0 0;">
+                <div>
+                    <h5 class="mb-0 text-white"><i class="fas fa-phone me-2"></i>Phone Call Log</h5>
+                </div>
+                <div>
+                    <button class="btn btn-primary" style="background:#b266ff;border:none;" data-bs-toggle="modal" data-bs-target="#createCallModal">
+                        <i class="ti ti-plus me-1"></i>Add Call
+                    </button>
+                    <button class="btn btn-secondary copy-btn ms-2" data-clipboard-target="#callLogsTable">Copy</button>
+                    <button class="btn btn-success ms-1" onclick="exportToExcel('callLogsTable')">Export to Excel</button>
+                    <button class="btn btn-info ms-1" onclick="exportToCSV('callLogsTable')">Export to CSV</button>
+                    <button class="btn btn-danger ms-1" onclick="exportToPDF('callLogsTable')">Export to PDF</button>
+                    <button class="btn btn-warning ms-1" onclick="printTable('callLogsTable')">Print</button>
+                </div>
             </div>
             <div class="card-body">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card">
-                            <div class="card-body">
                                 @if (session('success'))
                                     <div class="alert alert-success">
                                         {{ session('success') }}
@@ -23,19 +31,15 @@
                                     </div>
                                 @endif
 
-                                <div class="d-flex justify-content-between mb-3">
-                                    <div>
-                                        <a href="{{ route('visitors') }}" class="btn btn-secondary text-white fs-13 btn-md"><i class="ti ti-arrow-left me-1"></i>Back to Visitors</a>
-                                        <button class="btn btn-success text-white fs-13 btn-md ms-2" data-bs-toggle="modal" data-bs-target="#createCallModal"><i class="ti ti-plus me-1"></i>Add Call</button>
-                                    </div>
-                                    <div>
-                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCallModal"><i class="ti ti-plus me-1"></i>Add Call</button>
-                                        <button class="btn btn-primary copy-btn" data-clipboard-target="#callLogsTable">Copy</button>
-                                        <button class="btn btn-success" onclick="exportToExcel('callLogsTable')">Export to Excel</button>
-                                        <button class="btn btn-info" onclick="exportToCSV('callLogsTable')">Export to CSV</button>
-                                        <button class="btn btn-danger" onclick="exportToPDF('callLogsTable')">Export to PDF</button>
-                                        <button class="btn btn-warning" onclick="printTable('callLogsTable')">Print</button>
-                                    </div>
+                                <!-- Action buttons moved to header -->
+
+                                <div class="mb-3">
+                                    <form method="GET" class="d-flex gap-2">
+                                        <input type="text" name="search" class="form-control shadow-sm" 
+                                               placeholder="Search by Name, Phone, or Purpose" 
+                                               value="{{ request('search') }}">
+                                        <button type="submit" class="btn btn-outline-primary">Search</button>
+                                    </form>
                                 </div>
 
                                 <div class="input-icon-start position-relative mb-3">
