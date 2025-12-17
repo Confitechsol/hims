@@ -782,11 +782,11 @@
 
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label">Appointment Date <span class="required">*</span></label>
-                                <input type="date" class="form-control" name="appointment_date">
+                                <label class="form-label">Appointment Date & Time <span class="required">*</span></label>
+                                <input type="datetime-local" class="form-control" name="appointment_date">
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Case Type</label>
+                                <label class="form-label">Patient Type</label>
                                 <select class="form-select" name="case_type">
                                     <option value="">Select Case Type</option>
                                     <option value="Old Patient">Old Patient</option>
@@ -801,7 +801,7 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Casualty</label>
+                                <label class="form-label">Emergency</label>
                                 <select class="form-select" name="casualty">
                                     <option value="No">No</option>
                                     <option value="Yes">Yes</option>
