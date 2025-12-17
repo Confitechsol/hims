@@ -243,10 +243,10 @@
         cursor: pointer;
     }
 
-    .form-check-input:checked {
+    /* .form-check-input:checked {
         background-color: var(--primary-color);
         border-color: var(--primary-color);
-    }
+    } */
 
     .form-check-label {
         margin-left: 0.5rem;
