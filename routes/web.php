@@ -328,6 +328,17 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/phone-call-log', [VisitorsController::class, 'phoneCallLog'])->name('phone-call-log');
     Route::post('/phone-call-log/create', [VisitorsController::class, 'createCallLog'])->name('phone-call-log.create');
 
+    // Dispatch / Receive (Postal) pages
+    Route::get('/dispatch-receive/receive', [\App\Http\Controllers\DispatchReceiveController::class, 'receive'])->name('dispatch.receive');
+    Route::get('/dispatch-receive/dispatch', [\App\Http\Controllers\DispatchReceiveController::class, 'dispatch'])->name('dispatch.dispatch');
+    Route::get('/dispatch-receive/list-json', [\App\Http\Controllers\DispatchReceiveController::class, 'listJson'])->name('dispatch.list_json');
+    Route::get('/dispatch-receive/create', [\App\Http\Controllers\DispatchReceiveController::class, 'create'])->name('dispatch.create');
+    Route::post('/dispatch-receive/store', [\App\Http\Controllers\DispatchReceiveController::class, 'store'])->name('dispatch.store');
+    Route::put('/dispatch-receive/update/{id}', [\App\Http\Controllers\DispatchReceiveController::class, 'update'])->name('dispatch.update');
+    Route::get('/dispatch-receive/{id}', [\App\Http\Controllers\DispatchReceiveController::class, 'show'])->name('dispatch.show');
+    Route::delete('/dispatch-receive/delete/{id}', [\App\Http\Controllers\DispatchReceiveController::class, 'destroy'])->name('dispatch.destroy');
+
+
 });
 
 // Route::get('/medicine-group', function () {
