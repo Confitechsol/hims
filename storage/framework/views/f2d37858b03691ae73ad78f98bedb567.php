@@ -4,17 +4,17 @@
         <div class="sidebar-logo">
             <div>
                 <!-- Logo Normal -->
-                <a href="{{ route('dashboard') }}" class="logo logo-normal">
+                <a href="<?php echo e(route('dashboard')); ?>" class="logo logo-normal">
                     <img src="assets/img/logo.png" alt="Logo">
                 </a>
 
                 <!-- Logo Small -->
-                <a href="{{ route('dashboard') }}" class="logo-small">
+                <a href="<?php echo e(route('dashboard')); ?>" class="logo-small">
                     <img src="assets/img/logo-small.svg" alt="Logo">
                 </a>
 
                 <!-- Logo Dark -->
-                <a href="{{ route('dashboard') }}" class="dark-logo">
+                <a href="<?php echo e(route('dashboard')); ?>" class="dark-logo">
                     <!-- <img src="assets/img/logo-white.svg" alt="Logo"> -->
                     <h2>LOGO</h2>
                 </a>
@@ -98,7 +98,7 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('dashboard') }}" class="active">Admin
+                                    <li><a href="<?php echo e(route('dashboard')); ?>" class="active">Admin
                                             Dashboard</a></li>
                                     <!--<li><a href="doctor-dashboard.html">Doctor
                                             Dashboard</a></li>
@@ -107,17 +107,17 @@
                                 </ul>
                             </li>
                             <li>
-                                   <a href="{{ route('billing') }}">
+                                   <a href="<?php echo e(route('billing')); ?>">
                                       <!--<i class="fa fa-file-invoice"></i>  optional icon -->
                                           <span>Billing Section</span>
                                               <!--<span class="menu-arrow"></span>-->
                                 </a>
                                 <!--<ul>
-                                    <li><a href="{{ route('billing') }}">Billing
+                                    <li><a href="<?php echo e(route('billing')); ?>">Billing
                                             </a></li>
                                     <li><a href="doctor-dashboard.html">Appointment
                                             </a></li>
-                                    <li><a href="{{ route('opd.billing') }}">OPD
+                                    <li><a href="<?php echo e(route('opd.billing')); ?>">OPD
                                             </a></li>
                                             <li><a href="patient-dashboard.html">Pathology
                                             </a></li>
@@ -135,24 +135,24 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('birth') }}" class="active">Birth Record
+                                    <li><a href="<?php echo e(route('birth')); ?>" class="active">Birth Record
                                             </a></li>
-                                    <li><a href="{{ route('death') }}">Death Record
+                                    <li><a href="<?php echo e(route('death')); ?>">Death Record
                                             </a></li>
                                     
                                 </ul>
                             </li>
                             <li class="submenu">
-                                <a href="{{route('certificate')}}" class="active subdrop">
+                                <a href="<?php echo e(route('certificate')); ?>" class="active subdrop">
                                     <i class="ti ti-layout-dashboard"></i><span>Certificate</span>
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{route('certificate')}}" class="active">Certificate
+                                    <li><a href="<?php echo e(route('certificate')); ?>" class="active">Certificate
                                             </a></li>
-                                    <li><a href="{{route('generate_patient_id')}}">Patient ID Card
+                                    <li><a href="<?php echo e(route('generate_patient_id')); ?>">Patient ID Card
                                             </a></li>
-                                    <li><a href="{{route('generate_patient_id')}}">Staff ID Card
+                                    <li><a href="<?php echo e(route('generate_patient_id')); ?>">Staff ID Card
                                             </a></li>
                                 </ul>
                             </li>
@@ -185,9 +185,9 @@
                                 </a>
                                 <ul>
                                     
-                                    <li><a href="{{ route('opd') }}">OPD Patient
+                                    <li><a href="<?php echo e(route('opd')); ?>">OPD Patient
                                             Details</a></li>
-                                    <li><a href="{{ route('ipd') }}">IPD Patient
+                                    <li><a href="<?php echo e(route('ipd')); ?>">IPD Patient
                                             Details</a></li>
 
 
@@ -199,7 +199,7 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('appointment-details') }}">Appointment Details</a></li>
+                                    <li><a href="<?php echo e(route('appointment-details')); ?>">Appointment Details</a></li>
                                     <!--<li><a href="new-appointment.html">New
                                             Appointment</a></li>
                                     <li><a href="appointment-calendar.html">Calendar</a></li> -->
@@ -212,15 +212,15 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul style="display: none;">
-                                    <li><a href="{{ route('setup.medicine-category') }}">Medicine Category</a></li>
-                                    <li><a href="{{ route('setup.medicine-supplier') }}">Medicine Supplier</a></li>
-                                    <li><a href="{{ route('setup.medicine-dosage') }}">Medicine Dosage</a></li>
-                                    <li><a href="{{ route('setup.medicine-group') }}">Medicine Group</a></li>
-                                    <li><a href="{{ route('setup.medicine-unit') }}">Medicine Unit</a></li>
-                                    <li><a href="{{ route('setup.dose-duration') }}">Dose Duration</a></li>
-                                    <li><a href="{{ route('setup.dose-interval') }}">Dose Interval</a></li>
-                                    <li><a href="{{ route('setup.medicine-company') }}">Medicine Company</a></li>
-                                    <li><a href="{{ route('pharmacy.billing.index') }}">Pharmacy Billing</a></li>                                    
+                                    <li><a href="<?php echo e(route('setup.medicine-category')); ?>">Medicine Category</a></li>
+                                    <li><a href="<?php echo e(route('setup.medicine-supplier')); ?>">Medicine Supplier</a></li>
+                                    <li><a href="<?php echo e(route('setup.medicine-dosage')); ?>">Medicine Dosage</a></li>
+                                    <li><a href="<?php echo e(route('setup.medicine-group')); ?>">Medicine Group</a></li>
+                                    <li><a href="<?php echo e(route('setup.medicine-unit')); ?>">Medicine Unit</a></li>
+                                    <li><a href="<?php echo e(route('setup.dose-duration')); ?>">Dose Duration</a></li>
+                                    <li><a href="<?php echo e(route('setup.dose-interval')); ?>">Dose Interval</a></li>
+                                    <li><a href="<?php echo e(route('setup.medicine-company')); ?>">Medicine Company</a></li>
+                                    <li><a href="<?php echo e(route('pharmacy.billing.index')); ?>">Pharmacy Billing</a></li>                                    
                                 </ul>
                             </li>
                             <li class="submenu">
@@ -229,11 +229,11 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('pathology-category') }}">Pathology Category</a></li>
-                                    <li><a href="{{ route('pathology-unit') }}">Pathology Unit</a></li>
-                                    <li><a href="{{ route('pathology-parameter') }}">Pathology Parameter</a></li>
-                                    <li><a href="{{ route('pathology.test.index') }}">Pathology Test</a></li>
-                                    <li><a href="{{ route('pathology.billing.index') }}">Pathology Billing</a></li>
+                                    <li><a href="<?php echo e(route('pathology-category')); ?>">Pathology Category</a></li>
+                                    <li><a href="<?php echo e(route('pathology-unit')); ?>">Pathology Unit</a></li>
+                                    <li><a href="<?php echo e(route('pathology-parameter')); ?>">Pathology Parameter</a></li>
+                                    <li><a href="<?php echo e(route('pathology.test.index')); ?>">Pathology Test</a></li>
+                                    <li><a href="<?php echo e(route('pathology.billing.index')); ?>">Pathology Billing</a></li>
                                 </ul>
                             </li>
                             <li class="submenu">
@@ -242,11 +242,11 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('radiology-category') }}">Radiology Category</a></li>
-                                    <li><a href="{{ route('radiology-unit') }}">Radiology Unit</a></li>
-                                    <li><a href="{{ route('radiology-parameter') }}">Radiology Parameter</a></li>
-                                    <li><a href="{{ route('radiology.test.index') }}">Radiology Test</a></li>
-                                    <li><a href="{{ route('radiology.billing.index') }}">Radiology Billing</a></li>
+                                    <li><a href="<?php echo e(route('radiology-category')); ?>">Radiology Category</a></li>
+                                    <li><a href="<?php echo e(route('radiology-unit')); ?>">Radiology Unit</a></li>
+                                    <li><a href="<?php echo e(route('radiology-parameter')); ?>">Radiology Parameter</a></li>
+                                    <li><a href="<?php echo e(route('radiology.test.index')); ?>">Radiology Test</a></li>
+                                    <li><a href="<?php echo e(route('radiology.billing.index')); ?>">Radiology Billing</a></li>
                                 </ul>
                             </li>
                             <li>
@@ -270,13 +270,13 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('dutyroster') }}" >Duty Roster List
+                                    <li><a href="<?php echo e(route('dutyroster')); ?>" >Duty Roster List
                                             </a></li>
-                                    <li><a href="{{ route('dutyroster.Shift') }}" >Duty Shift List
+                                    <li><a href="<?php echo e(route('dutyroster.Shift')); ?>" >Duty Shift List
                                             </a></li>
-                                    <li><a href="{{ route('dutyroster.staff') }}" >Staff Roster Details
+                                    <li><a href="<?php echo e(route('dutyroster.staff')); ?>" >Staff Roster Details
                                             </a></li>
-                                    <li><a href="{{ route('dutyroster.doctor') }}">Doctors Roster Details
+                                    <li><a href="<?php echo e(route('dutyroster.doctor')); ?>">Doctors Roster Details
                                             </a></li>
                                     
                                 </ul>
@@ -287,12 +287,12 @@
                                 </a>
                             </li> -->
                             <li>
-                                <a href="{{ route('tpamanagement') }}">
+                                <a href="<?php echo e(route('tpamanagement')); ?>">
                                     <i class="ti ti-map-pin"></i><span>TPA Management</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ route('inventory-details') }}">
+                                <a href="<?php echo e(route('inventory-details')); ?>">
                                     <i class="ti ti-map-pin"></i><span>Inventory</span>
                                 </a>
                             </li>
@@ -332,9 +332,9 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('income') }}" class="active">Income
+                                    <li><a href="<?php echo e(route('income')); ?>" class="active">Income
                                             </a></li>
-                                    <li><a href="{{ route('expense') }}">Expenses
+                                    <li><a href="<?php echo e(route('expense')); ?>">Expenses
                                             </a></li>
                                     
                                 </ul>
@@ -391,12 +391,12 @@
                             <li>
                         <ul>
                             <li>
-                                <a href="{{ route('staffs.index') }}">
+                                <a href="<?php echo e(route('staffs.index')); ?>">
                                     <i class="ti ti-users-group"></i><span>Staffs</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ route('doctors.index') }}">
+                                <a href="<?php echo e(route('doctors.index')); ?>">
                                     <i class="ti ti-users-group"></i><span>Doctors</span>
                                 </a>
                             </li>
@@ -444,14 +444,14 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('finance') }}" class="active">Finance Report
+                                    <li><a href="<?php echo e(route('finance')); ?>" class="active">Finance Report
                                             </a></li>
                                     
-                                    <li><a href="{{ route('finance') }}">OPD
+                                    <li><a href="<?php echo e(route('finance')); ?>">OPD
                                             Report</a></li>
-                                    <li><a href="{{ route('finance') }}">IPD
+                                    <li><a href="<?php echo e(route('finance')); ?>">IPD
                                             Report</a></li>
-                                    <li><a href="{{ route('finance') }}">Appointment
+                                    <li><a href="<?php echo e(route('finance')); ?>">Appointment
                                             Report</a></li>
                                     <li><a href="patient-report.html">Patient
                                             Report</a></li>
@@ -502,21 +502,21 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <!-- <li><a href="{{ route('profile') }}">Profile</a></li> -->
+                                    <!-- <li><a href="<?php echo e(route('profile')); ?>">Profile</a></li> -->
                                     <!--<li><a href="security-settings.html">Security</a></li>
                                     //<li><a href="notifications-settings.html">Notifications</a></li>
                                     <li><a href="integrations-settings.html">Integrations</a></li>-->
-                                    <li><a href="{{ route('profile') }}">General Settings</a></li>
-                                    <li><a href="{{ route('email-setting') }}">Email Settings</a></li>
-                                    <li><a href="{{ route('prefix') }}">Prefix Settings</a></li>
-                                    <li><a href="{{ route('roles') }}">Roles Permissions</a></li>
-                                    <li><a href="{{ route('database.backups') }}">Backup/Restore</a></li>
-                                    <li><a href="{{ route('languages') }}">Languages</a></li>
-                                    <li><a href="{{ route('users') }}">Users</a></li>
-                                    <li><a href="{{ route('permissions.modules') }}">Modules</a></li>
+                                    <li><a href="<?php echo e(route('profile')); ?>">General Settings</a></li>
+                                    <li><a href="<?php echo e(route('email-setting')); ?>">Email Settings</a></li>
+                                    <li><a href="<?php echo e(route('prefix')); ?>">Prefix Settings</a></li>
+                                    <li><a href="<?php echo e(route('roles')); ?>">Roles Permissions</a></li>
+                                    <li><a href="<?php echo e(route('database.backups')); ?>">Backup/Restore</a></li>
+                                    <li><a href="<?php echo e(route('languages')); ?>">Languages</a></li>
+                                    <li><a href="<?php echo e(route('users')); ?>">Users</a></li>
+                                    <li><a href="<?php echo e(route('permissions.modules')); ?>">Modules</a></li>
                                 </ul>
                             </li>
-                            <li><a href="{{ route('patients') }}"><i class="ti ti-user-cog"></i><span> Patient </span></a></li>
+                            <li><a href="<?php echo e(route('patients')); ?>"><i class="ti ti-user-cog"></i><span> Patient </span></a></li>
                             
                             <li class="submenu">
                                 <a href="javascript:void(0);">
@@ -524,12 +524,12 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('charges') }}">Charges</a></li>
-                                    <li><a href="{{ route('charge_categories') }}">Charge Category</a></li>
-                                    <li><a href="{{ route('charge_type_module') }}">Charge Type</a></li>
-                                    <li><a href="{{ route('tax_category') }}">Tax
+                                    <li><a href="<?php echo e(route('charges')); ?>">Charges</a></li>
+                                    <li><a href="<?php echo e(route('charge_categories')); ?>">Charge Category</a></li>
+                                    <li><a href="<?php echo e(route('charge_type_module')); ?>">Charge Type</a></li>
+                                    <li><a href="<?php echo e(route('tax_category')); ?>">Tax
                                             Category</a></li>
-                                    <li><a href="{{ route('charge_units') }}">Unit Type</a></li>
+                                    <li><a href="<?php echo e(route('charge_units')); ?>">Unit Type</a></li>
                                     
                                 </ul>
                             </li>
@@ -541,16 +541,16 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('bed-status') }}">Bed Status</a></li>
-                                    <li><a href="{{ route('bed') }}">Bed</a></li>
-                                    <li><a href="{{ route('bed-types.index') }}">Bed Type</a></li>
-                                    <li><a href="{{ route('bed-groups.index') }}">Bed
+                                    <li><a href="<?php echo e(route('bed-status')); ?>">Bed Status</a></li>
+                                    <li><a href="<?php echo e(route('bed')); ?>">Bed</a></li>
+                                    <li><a href="<?php echo e(route('bed-types.index')); ?>">Bed Type</a></li>
+                                    <li><a href="<?php echo e(route('bed-groups.index')); ?>">Bed
                                             Group</a></li>
-                                    <li><a href="{{ route('floors.index') }}">Floor</a></li>
+                                    <li><a href="<?php echo e(route('floors.index')); ?>">Floor</a></li>
                                     
                                 </ul>
                             </li>
-                            <li><a href="{{ route('letterHead') }}">
+                            <li><a href="<?php echo e(route('letterHead')); ?>">
                                     <i class="ti ti-world-cog"></i>
                                     <span>Print Header Footer</span>
                                 </a>
@@ -562,9 +562,9 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('purpose') }}">Purpose</a></li>
-                                    <li><a href="{{ route('complaint') }}">Complain Type</a></li>
-                                    <li><a href="{{ route('sources') }}">Source</a></li>
+                                    <li><a href="<?php echo e(route('purpose')); ?>">Purpose</a></li>
+                                    <li><a href="<?php echo e(route('complaint')); ?>">Complain Type</a></li>
+                                    <li><a href="<?php echo e(route('sources')); ?>">Source</a></li>
                                     
                                 </ul>
                             </li>
@@ -576,8 +576,8 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('operations') }}">Operation</a></li>
-                                    <li><a href="{{ route('operation-category') }}">Operation Category</a></li>
+                                    <li><a href="<?php echo e(route('operations')); ?>">Operation</a></li>
+                                    <li><a href="<?php echo e(route('operation-category')); ?>">Operation Category</a></li>
                                     
                                 </ul>
                             </li>
@@ -590,9 +590,9 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('pathology-category') }}">Pathology Category</a></li>
-                                    <li><a href="{{ route('pathology-unit') }}">Unit</a></li>
-                                    <li><a href="{{ route('pathology-parameter') }}">Pathology Parameter</a></li>
+                                    <li><a href="<?php echo e(route('pathology-category')); ?>">Pathology Category</a></li>
+                                    <li><a href="<?php echo e(route('pathology-unit')); ?>">Unit</a></li>
+                                    <li><a href="<?php echo e(route('pathology-parameter')); ?>">Pathology Parameter</a></li>
                                     
                                 </ul>
                             </li>
@@ -604,9 +604,9 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('radiology-category') }}">Radiology Category</a></li>
-                                    <li><a href="{{ route('radiology-unit') }}">Unit</a></li>
-                                    <li><a href="{{ route('radiology-parameter') }}">Radiology Parameter</a></li>
+                                    <li><a href="<?php echo e(route('radiology-category')); ?>">Radiology Category</a></li>
+                                    <li><a href="<?php echo e(route('radiology-unit')); ?>">Unit</a></li>
+                                    <li><a href="<?php echo e(route('radiology-parameter')); ?>">Radiology Parameter</a></li>
                                     
                                 </ul>
                             </li>
@@ -618,7 +618,7 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('blood-bank-products') }}">Products</a></li>
+                                    <li><a href="<?php echo e(route('blood-bank-products')); ?>">Products</a></li>
                                     
                                 </ul>
                             </li>
@@ -630,8 +630,8 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('symptoms-head') }}">Symptoms Head</a></li>
-                                    <li><a href="{{ route('symptoms-type') }}">Symptoms Type</a></li>
+                                    <li><a href="<?php echo e(route('symptoms-head')); ?>">Symptoms Head</a></li>
+                                    <li><a href="<?php echo e(route('symptoms-type')); ?>">Symptoms Type</a></li>
                                     
                                 </ul>
                             </li>
@@ -643,12 +643,12 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('finding') }}">Finding</a></li>
-                                    <li><a href="{{ route('finding-category') }}">Category</a></li>
+                                    <li><a href="<?php echo e(route('finding')); ?>">Finding</a></li>
+                                    <li><a href="<?php echo e(route('finding-category')); ?>">Category</a></li>
                                     
                                 </ul>
                             </li>
-                            <li><a href="{{ route('vitals') }}">Vitals</a></li>
+                            <li><a href="<?php echo e(route('vitals')); ?>">Vitals</a></li>
                             <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-world-cog"></i><span>Finance
@@ -656,8 +656,8 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('income-head') }}">Income </a></li>
-                                    <li><a href="{{ route('expense-head') }}">Expenses </a></li>
+                                    <li><a href="<?php echo e(route('income-head')); ?>">Income </a></li>
+                                    <li><a href="<?php echo e(route('expense-head')); ?>">Expenses </a></li>
                                     
                                 </ul>
                             </li>
@@ -669,10 +669,10 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('leave-type') }}">Leave Type</a></li>
-                                    <li><a href="{{ route('department') }}">Department</a></li>
-                                    <li><a href="{{ route('designation') }}">Designation</a></li>
-                                    <li><a href="{{ route('specialist') }}">Specialist
+                                    <li><a href="<?php echo e(route('leave-type')); ?>">Leave Type</a></li>
+                                    <li><a href="<?php echo e(route('department')); ?>">Department</a></li>
+                                    <li><a href="<?php echo e(route('designation')); ?>">Designation</a></li>
+                                    <li><a href="<?php echo e(route('specialist')); ?>">Specialist
                                             </a></li>
                                     
                                 </ul>
@@ -685,10 +685,10 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('slots') }}">Slots</a></li>
-                                    <li><a href="{{ route('doctor-shift') }}">Doctor Shift</a></li>
-                                    <li><a href="{{ route('shift') }}">Shift</a></li>
-                                    <li><a href="{{ route('appointment-priority') }}">Appointment
+                                    <li><a href="<?php echo e(route('slots')); ?>">Slots</a></li>
+                                    <li><a href="<?php echo e(route('doctor-shift')); ?>">Doctor Shift</a></li>
+                                    <li><a href="<?php echo e(route('shift')); ?>">Shift</a></li>
+                                    <li><a href="<?php echo e(route('appointment-priority')); ?>">Appointment
                                             Priority</a></li>
                                     
                                 </ul>
@@ -701,10 +701,10 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('item-category') }}">Item
+                                    <li><a href="<?php echo e(route('item-category')); ?>">Item
                                             Category</a></li>
-                                    <li><a href="{{ route('item-store') }}">Item Store</a></li>
-                                    <li><a href="{{ route('item-supplier') }}">Item Supplier</a></li>
+                                    <li><a href="<?php echo e(route('item-store')); ?>">Item Store</a></li>
+                                    <li><a href="<?php echo e(route('item-supplier')); ?>">Item Supplier</a></li>
                                     
                                 </ul>
                             </li>
@@ -717,10 +717,10 @@
                                 <ul>
                                     <li><a href="organization-settings.html">Organization</a></li>
                                     <li><a href="localization-settings.html">Localization</a></li>
-                                    <li><a href="{{ route('prefix') }}">Prefixes</a></li>
+                                    <li><a href="<?php echo e(route('prefix')); ?>">Prefixes</a></li>
                                     <li><a href="seo-setup-settings.html">SEO
                                             Setup</a></li>
-                                    <li><a href="{{ route('languages') }}">Language</a></li>
+                                    <li><a href="<?php echo e(route('languages')); ?>">Language</a></li>
                                     <li><a href="maintenance-mode-settings.html">Maintenance
                                             Mode</a></li>
                                     <li><a href="login-and-register-settings.html">Login
@@ -869,3 +869,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
     </div>
+<?php /**PATH C:\xampp82\htdocs\hims\resources\views/layouts/sidebar.blade.php ENDPATH**/ ?>
