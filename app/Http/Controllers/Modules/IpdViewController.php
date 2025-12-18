@@ -22,6 +22,7 @@ use App\Models\PatientVital;
 use App\Models\Pharmacy;
 use App\Models\Symptom;
 use App\Models\Vital;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -47,6 +48,10 @@ class IpdViewController extends Controller
         $ipdCharges        = IpdCharges::with('ipd', 'charge.taxCategory', 'chargeCategory.chargeType')->where('ipd_id', $id)->get();
         $labInvestigations = PathologyReport::with('pathology')->where('patient_id', $ipd->patient->id)->get();
         $ipdPrescriptions  = IpdPrescription::where('ipd_id', $id)->get();
+        $transactions      = Transaction::with('ipd')->where('ipd_id', $ipd->id)->where('patient_id', $ipd->patient->id)->get();
+        // $transactions = Transaction::where('ipd_id', $ipd->id)->where('section', 'ipd')->where('type', 'payment')
+        // ->orderBy('transaction_date', 'desc')
+        // ->get();
         $doctors           = Doctor::all();
         //dd($id);
         $ipdFindings = [];
@@ -93,6 +98,7 @@ class IpdViewController extends Controller
             'doctors',
             'medDosages',
             'operationCategories',
+            'transactions',
             'operations',
             'symptoms',
             'nurseNotes',

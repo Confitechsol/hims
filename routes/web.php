@@ -71,6 +71,7 @@ use App\Http\Controllers\TpamanagmentController;
 use App\Http\Controllers\VisitorsController;
 use App\Http\Controllers\VitalController;
 use App\Http\Controllers\TransactionReportController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -311,6 +312,7 @@ Route::middleware(['admin'])->group(function () {
     Route::delete('/expense/delete/{id}', [ExpenseController::class, 'delete'])->name('expense.delete');
 
     Route::get('/birth', [BirthController::class, 'index'])->name('birth');
+    Route::get('/importbirth', [BirthController::class, 'importbirth'])->name('importbirth');
     Route::post('/birth/create', [BirthController::class, 'create'])->name('birth.create');
     Route::put('/birth/update/{id}', [BirthController::class, 'update'])->name('birth.update');
     Route::delete('/birth/delete/{id}', [BirthController::class, 'delete'])->name('birth.delete');
@@ -539,6 +541,10 @@ Route::put('/ipd_view/update', [IpdViewController::class, 'update'])->name('medi
 Route::put('/ipd_view/delete/{id}', [IpdViewController::class, 'delete'])->name('medication.delete');
 Route::post('/ipd_view/operation/store', [IpdViewController::class, 'storeOperation'])->name('operation.store');
 Route::put('/ipd_view/operation/update/{id}', [IpdViewController::class, 'updateOperation'])->name('operation.update');
+Route::post('/transaction/store', [TransactionController::class, 'store'])->name('transactions.store');
+Route::post('/transaction/print', [TransactionController::class, 'store'])->name('transactions.print');
+Route::post('/transaction/show', [TransactionController::class, 'store'])->name('transactions.show');
+Route::post('/transaction/destroy', [TransactionController::class, 'store'])->name('transactions.destroy');
 Route::get('/getNurses', [IpdController::class, 'getNurses'])->name('getNurses');
 Route::get('/getIpdById/{id}', [IpdController::class, 'getIpdById'])->name('getIpdById');
 Route::get('/getIpdMedicineById/{id}', [IpdController::class, 'getIpdMedicineById'])->name('getIpdMedicineById');

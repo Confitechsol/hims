@@ -888,13 +888,37 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td class="text-right">TRID83</td>
-                                                <td class="text-right">10/13/2025 06:25 PM</td>
-                                                <td class="text-right">SmartPay Transaction ID: 528612554379</td>
-                                                <td class="text-right"><br> </td>
-                                                <td class="text-right">20.00</td>
-                                            </tr>
+                                            @forelse($transactions as $transaction)
+                                                                <tr>
+                                                                    <td>
+                                                                        {{ $transaction->transaction_no ?? 'TRID'.$transaction->id }}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {{ \Carbon\Carbon::parse($transaction->transaction_date)->format('d/m/Y h:i A') }}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {{ $transaction->note ?? '-' }}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {{ $transaction->payment_mode == 1 ? 'Cash' : '-' }}
+                                                                    </td>
+
+                                                                    <td class="text-end">
+                                                                        {{ number_format($transaction->amount, 2) }}
+                                                                    </td>
+
+                                                                   
+                                                                </tr>
+                                                            @empty
+                                                                <tr>
+                                                                    <td colspan="6" class="text-center text-muted">
+                                                                        No payments found
+                                                                    </td>
+                                                                </tr>
+                                                            @endforelse
                                         </tbody>
                                     </table>
                                 </div>
@@ -2030,133 +2054,133 @@
                                                                     </td>
                                                                 </tr>
                                                                 <!-- EDIT OPERATION MODAL -->
-<div class="modal fade" id="editOperationModal{{ $operation->id }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
+                                                                <div class="modal fade" id="editOperationModal{{ $operation->id }}" tabindex="-1" aria-hidden="true">
+                                                                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                                                                        <div class="modal-content">
 
-            <div class="modal-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                <h5 class="modal-title" style="color:#750096"><i class="fas fa-cogs me-2"></i>Edit Operation</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
+                                                                            <div class="modal-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                                                                <h5 class="modal-title" style="color:#750096"><i class="fas fa-cogs me-2"></i>Edit Operation</h5>
+                                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                                            </div>
 
-            <div class="modal-body">
-                <form action="{{ route('operation.update', $operation->id) }}" method="POST">
-                    @csrf
-                    @method('PUT')
-                    <input type="text" name="ipd_details_id" class="form-control" value="{{ $ipd->id }}" hidden>
-                    <div class="row gy-3 py-4 mx-1">
-                                                <div class="col-md-4 mb-3">
-                            <label class="form-label">Customer Type</label>
-                            <select name="customer_type" class="form-control" required>
-                                <option value="">Select</option>
-                                <option value="General" {{ $operation->customer_type == 'General' ? 'selected' : '' }}>General</option>
-                                <option value="VIP" {{ $operation->customer_type == 'VIP' ? 'selected' : '' }}>VIP</option>
-                                <option value="Corporate" {{ $operation->customer_type == 'Corporate' ? 'selected' : '' }}>Corporate</option>
-                            </select>
-                        </div>
+                                                                            <div class="modal-body">
+                                                                                <form action="{{ route('operation.update', $operation->id) }}" method="POST">
+                                                                                    @csrf
+                                                                                    @method('PUT')
+                                                                                    <input type="text" name="ipd_details_id" class="form-control" value="{{ $ipd->id }}" hidden>
+                                                                                    <div class="row gy-3 py-4 mx-1">
+                                                                                                                <div class="col-md-4 mb-3">
+                                                                                            <label class="form-label">Customer Type</label>
+                                                                                            <select name="customer_type" class="form-control" required>
+                                                                                                <option value="">Select</option>
+                                                                                                <option value="General" {{ $operation->customer_type == 'General' ? 'selected' : '' }}>General</option>
+                                                                                                <option value="VIP" {{ $operation->customer_type == 'VIP' ? 'selected' : '' }}>VIP</option>
+                                                                                                <option value="Corporate" {{ $operation->customer_type == 'Corporate' ? 'selected' : '' }}>Corporate</option>
+                                                                                            </select>
+                                                                                        </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label">Operation Category</label>
-                            <select name="operation_category_id" class="form-select">
-                                <option value="">Select Category</option>
-                                @foreach($operationCategories as $cat)
-                                    <option value="{{ $cat->id }}" 
-                                        {{ $operation->operation->category_id == $cat->id ? 'selected' : '' }}>
-                                        {{ $cat->category }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                                                                                        <div class="col-md-6">
+                                                                                            <label class="form-label">Operation Category</label>
+                                                                                            <select name="operation_category_id" class="form-select">
+                                                                                                <option value="">Select Category</option>
+                                                                                                @foreach($operationCategories as $cat)
+                                                                                                    <option value="{{ $cat->id }}" 
+                                                                                                        {{ $operation->operation->category_id == $cat->id ? 'selected' : '' }}>
+                                                                                                        {{ $cat->category }}
+                                                                                                    </option>
+                                                                                                @endforeach
+                                                                                            </select>
+                                                                                        </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label">Operations</label>
-                            <select name="operation_id" class="form-select">
-                                <option value="">Select Operation</option>
-                                @foreach($operations as $op)
-                                    <option value="{{ $op->id }}" 
-                                        {{ $operation->operation_id == $op->id ? 'selected' : '' }}>
-                                        {{ $op->operation }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                                                                                        <div class="col-md-6">
+                                                                                            <label class="form-label">Operations</label>
+                                                                                            <select name="operation_id" class="form-select">
+                                                                                                <option value="">Select Operation</option>
+                                                                                                @foreach($operations as $op)
+                                                                                                    <option value="{{ $op->id }}" 
+                                                                                                        {{ $operation->operation_id == $op->id ? 'selected' : '' }}>
+                                                                                                        {{ $op->operation }}
+                                                                                                    </option>
+                                                                                                @endforeach
+                                                                                            </select>
+                                                                                        </div>
 
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Operation Date & Time</label>
-                            <input type="datetime-local" name="date" class="form-control"
-                                   value="{{ \Carbon\Carbon::parse($operation->date)->format('Y-m-d\TH:i') }}" required>
-                        </div>
+                                                                                        <div class="col-md-4 mb-3">
+                                                                                            <label class="form-label">Operation Date & Time</label>
+                                                                                            <input type="datetime-local" name="date" class="form-control"
+                                                                                                value="{{ \Carbon\Carbon::parse($operation->date)->format('Y-m-d\TH:i') }}" required>
+                                                                                        </div>
 
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Consultant Doctor</label>
-                            <select name="consultant_doctor" class="form-select">
-                                <option value="">Select Doctor</option>
-                                @foreach($doctors as $doctor)
-                                    <option value="{{ $doctor->id }}" 
-                                        {{ $operation->consultant_doctor == $doctor->id ? 'selected' : '' }}>
-                                        {{ $doctor->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                                                                                        <div class="col-md-4 mb-3">
+                                                                                            <label class="form-label">Consultant Doctor</label>
+                                                                                            <select name="consultant_doctor" class="form-select">
+                                                                                                <option value="">Select Doctor</option>
+                                                                                                @foreach($doctors as $doctor)
+                                                                                                    <option value="{{ $doctor->id }}" 
+                                                                                                        {{ $operation->consultant_doctor == $doctor->id ? 'selected' : '' }}>
+                                                                                                        {{ $doctor->name }}
+                                                                                                    </option>
+                                                                                                @endforeach
+                                                                                            </select>
+                                                                                        </div>
 
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Assistant Consultant 1</label>
-                            <input type="text" name="ass_consultant_1" class="form-control"
-                                   value="{{ $operation->ass_consultant_1 }}">
-                        </div>
+                                                                                        <div class="col-md-4 mb-3">
+                                                                                            <label class="form-label">Assistant Consultant 1</label>
+                                                                                            <input type="text" name="ass_consultant_1" class="form-control"
+                                                                                                value="{{ $operation->ass_consultant_1 }}">
+                                                                                        </div>
 
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Assistant Consultant 2</label>
-                            <input type="text" name="ass_consultant_2" class="form-control"
-                                   value="{{ $operation->ass_consultant_2 }}">
-                        </div>
+                                                                                        <div class="col-md-4 mb-3">
+                                                                                            <label class="form-label">Assistant Consultant 2</label>
+                                                                                            <input type="text" name="ass_consultant_2" class="form-control"
+                                                                                                value="{{ $operation->ass_consultant_2 }}">
+                                                                                        </div>
 
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Anesthetist</label>
-                            <input type="text" name="anesthetist" class="form-control"
-                                   value="{{ $operation->anesthetist }}">
-                        </div>
+                                                                                        <div class="col-md-4 mb-3">
+                                                                                            <label class="form-label">Anesthetist</label>
+                                                                                            <input type="text" name="anesthetist" class="form-control"
+                                                                                                value="{{ $operation->anesthetist }}">
+                                                                                        </div>
 
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Anaesthesia Type</label>
-                            <input type="text" name="anaethesia_type" class="form-control"
-                                   value="{{ $operation->anaethesia_type }}">
-                        </div>
+                                                                                        <div class="col-md-4 mb-3">
+                                                                                            <label class="form-label">Anaesthesia Type</label>
+                                                                                            <input type="text" name="anaethesia_type" class="form-control"
+                                                                                                value="{{ $operation->anaethesia_type }}">
+                                                                                        </div>
 
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">OT Technician</label>
-                            <input type="text" name="ot_technician" class="form-control"
-                                   value="{{ $operation->ot_technician }}">
-                        </div>
+                                                                                        <div class="col-md-4 mb-3">
+                                                                                            <label class="form-label">OT Technician</label>
+                                                                                            <input type="text" name="ot_technician" class="form-control"
+                                                                                                value="{{ $operation->ot_technician }}">
+                                                                                        </div>
 
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">OT Assistant</label>
-                            <input type="text" name="ot_assistant" class="form-control"
-                                   value="{{ $operation->ot_assistant }}">
-                        </div>
+                                                                                        <div class="col-md-4 mb-3">
+                                                                                            <label class="form-label">OT Assistant</label>
+                                                                                            <input type="text" name="ot_assistant" class="form-control"
+                                                                                                value="{{ $operation->ot_assistant }}">
+                                                                                        </div>
 
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Result</label>
-                            <input type="text" name="result" class="form-control"
-                                   value="{{ $operation->result }}">
-                        </div>
+                                                                                        <div class="col-md-4 mb-3">
+                                                                                            <label class="form-label">Result</label>
+                                                                                            <input type="text" name="result" class="form-control"
+                                                                                                value="{{ $operation->result }}">
+                                                                                        </div>
 
-                        <div class="col-md-12 mb-3">
-                            <label class="form-label">Remark</label>
-                            <textarea name="remark" rows="3" class="form-control">{{ $operation->remark }}</textarea>
-                        </div>
+                                                                                        <div class="col-md-12 mb-3">
+                                                                                            <label class="form-label">Remark</label>
+                                                                                            <textarea name="remark" rows="3" class="form-control">{{ $operation->remark }}</textarea>
+                                                                                        </div>
 
-                    </div>
-                    <div class="mt-3 text-end modal-footer">
-                        <button type="submit" class="btn btn-primary">Update Operation</button>
-                    </div>
-                </form>
-            </div>
+                                                                                    </div>
+                                                                                    <div class="mt-3 text-end modal-footer">
+                                                                                        <button type="submit" class="btn btn-primary">Update Operation</button>
+                                                                                    </div>
+                                                                                </form>
+                                                                            </div>
 
-        </div>
-    </div>
-</div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
 
                                                             @endforeach
                                                         </tbody>
@@ -2697,53 +2721,59 @@
                                                                     </div>
 
                                                                     <div class="modal-body">
+                                                                        <form action="{{ route('transactions.store') }}" method="POST">
+                                                                            @csrf
+                                                                            <input type="hidden" name="ipd_id" value="{{ $ipd->id }}">
+                                                                            <input type="hidden" name="patient_id" value="{{ $ipd->patient_id }}">
+                                                                            <input type="hidden" name="type" value="payment">
+                                                                            <input type="hidden" name="section" value="ipd">
+                                                                                <div class="row gy-3 py-4 mx-1">
 
-                                                                        <div class="row gy-3 py-4 mx-1">
+                                                                                    <div class="col-md-6">
+                                                                                        <label for="date"
+                                                                                            class="form-label">Date
+                                                                                            <span class="text-danger">*</span>
+                                                                                        </label>
+                                                                                        <input type="date" name="date"
+                                                                                            id="date" class="form-control"
+                                                                                            required>
+                                                                                    </div>
+                                                                                    <div class="col-md-6">
+                                                                                        <label for="amount"
+                                                                                            class="form-label">Amount (INR)
+                                                                                            <span class="text-danger">*</span>
+                                                                                        </label>
+                                                                                        <input type="text" name="amount"
+                                                                                            id="amount" class="form-control"
+                                                                                            required>
+                                                                                    </div>
+                                                                                    <div class="col-md-6">
+                                                                                        <label for="payment_mode"
+                                                                                            class="form-label">Payment Mode
 
-                                                                            <div class="col-md-6">
-                                                                                <label for="date"
-                                                                                    class="form-label">Date
-                                                                                    <span class="text-danger">*</span>
-                                                                                </label>
-                                                                                <input type="date" name="date"
-                                                                                    id="date" class="form-control"
-                                                                                    required>
-                                                                            </div>
-                                                                            <div class="col-md-6">
-                                                                                <label for="amount"
-                                                                                    class="form-label">Amount (INR)
-                                                                                    <span class="text-danger">*</span>
-                                                                                </label>
-                                                                                <input type="text" name="amount"
-                                                                                    id="amount" class="form-control"
-                                                                                    required>
-                                                                            </div>
-                                                                            <div class="col-md-6">
-                                                                                <label for="payment_mode"
-                                                                                    class="form-label">Payment Mode
+                                                                                        </label>
+                                                                                        <select name="payment_mode"
+                                                                                            id="payment_mode"
+                                                                                            class="form-select"
+                                                                                            data-placeholder="Enter Patient Name or Id…">
+                                                                                            <option value="0">Select</option>
+                                                                                            <option value="1">Cash</option>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                    <div class="col-md-6">
+                                                                                        <label for="note"
+                                                                                            class="form-label">Note
+                                                                                        </label>
+                                                                                        <textarea name="note" id="note" class="form-control"></textarea>
+                                                                                    </div>
+                                                                                </div>
 
-                                                                                </label>
-                                                                                <select name="payment_mode"
-                                                                                    id="payment_mode"
-                                                                                    class="form-select"
-                                                                                    data-placeholder="Enter Patient Name or Id…">
-                                                                                    <option value="0">Select</option>
-                                                                                    <option value="1">Cash</option>
-                                                                                </select>
                                                                             </div>
-                                                                            <div class="col-md-6">
-                                                                                <label for="note"
-                                                                                    class="form-label">Note
-                                                                                </label>
-                                                                                <textarea name="note" id="note" class="form-control"></textarea>
+                                                                            <div class="modal-footer">
+                                                                                <button type="submit"
+                                                                                    class="btn btn-primary">Save</button>
                                                                             </div>
-                                                                        </div>
-
-                                                                    </div>
-                                                                    <div class="modal-footer">
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary">Save</button>
-                                                                    </div>
+                                                                        </form>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -2759,39 +2789,70 @@
                                                                 <th>Note</th>
                                                                 <th>Payment Mode</th>
                                                                 <th>Paid Amount (INR)</th>
-                                                                <th>Action</th>
+                                                                <!-- <th>Action</th> -->
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr>
-                                                                <td>
-                                                                    TRID83
-                                                                </td>
-                                                                <td>10/13/2025 06:25 PM </td>
-                                                                <td> Time:SmartPay Transaction ID: 528612554379
-                                                                </td>
-                                                                <td></td>
-                                                                <td>20.00</td>
-                                                                <td>
-                                                                    <div class="d-flex gap-2">
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
-                                                                            <i class="fa-solid fa-print"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Print"></i></a>
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
-                                                                            <i class="ti ti-pencil"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Show"></i></a>
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                            <i class="ti ti-trash"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Delete"></i></a>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
+                                                            @forelse($transactions as $transaction)
+                                                                <tr>
+                                                                    <td>
+                                                                        {{ $transaction->transaction_no ?? 'TRID'.$transaction->id }}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {{ \Carbon\Carbon::parse($transaction->transaction_date)->format('d/m/Y h:i A') }}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {{ $transaction->note ?? '-' }}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {{ $transaction->payment_mode == 1 ? 'Cash' : '-' }}
+                                                                    </td>
+
+                                                                    <td class="text-end">
+                                                                        {{ number_format($transaction->amount, 2) }}
+                                                                    </td>
+
+                                                                    <!-- <td>
+                                                                        <div class="d-flex gap-2">
+                                                                            {{-- Print --}}
+                                                                            <a href="{{ route('transactions.print', $transaction->id) }}"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill"
+                                                                            data-bs-toggle="tooltip" title="Print">
+                                                                                <i class="fa-solid fa-print"></i>
+                                                                            </a>
+
+                                                                            {{-- View --}}
+                                                                            <a href="{{ route('transactions.show', $transaction->id) }}"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill"
+                                                                            data-bs-toggle="tooltip" title="Show">
+                                                                                <i class="ti ti-pencil"></i>
+                                                                            </a>
+
+                                                                            {{-- Delete --}}
+                                                                            <form action="{{ route('transactions.destroy', $transaction->id) }}"
+                                                                                method="POST"
+                                                                                onsubmit="return confirm('Delete this payment?')">
+                                                                                @csrf
+                                                                                @method('DELETE')
+                                                                                <button type="submit"
+                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
+                                                                                    data-bs-toggle="tooltip" title="Delete">
+                                                                                    <i class="ti ti-trash"></i>
+                                                                                </button>
+                                                                            </form>
+                                                                        </div>
+                                                                    </td> -->
+                                                                </tr>
+                                                            @empty
+                                                                <tr>
+                                                                    <td colspan="6" class="text-center text-muted">
+                                                                        No payments found
+                                                                    </td>
+                                                                </tr>
+                                                            @endforelse
                                                         </tbody>
                                                     </table>
                                                 </div>
