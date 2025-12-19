@@ -74,7 +74,7 @@ class IpdController extends Controller
             'patient_id'           => 'nullable|exists:patients,id',
             'admission_date'       => 'date',
             'patient_type'         => 'string',
-            'case'                 => 'string',
+            'case'                 => 'nullable|numeric',
             'casualty'             => 'string',
             'reference'            => 'nullable|string',
             'doctor_id'            => 'nullable|exists:doctor,id',
