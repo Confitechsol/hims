@@ -69,7 +69,7 @@
 
 
                                         <div class="text-end d-flex">
-                                            <a href="<?php echo e(route('doctors.export')); ?>" class="btn btn-primary text-white ms-2 fs-13 btn-md"><i
+                                            <a href="<?php echo e(route('birth.export')); ?>" class="btn btn-primary text-white ms-2 fs-13 btn-md"><i
                                                     class="ti ti-download me-1"></i>Download Sample Data</a>
                                             
                                         </div>

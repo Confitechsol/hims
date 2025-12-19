@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 use App\Models\BirthReport;
+use App\Models\Patient;
 use Illuminate\Http\Request;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 
 class BirthController extends Controller
 {
@@ -45,7 +49,7 @@ class BirthController extends Controller
         return view('admin.birthordeath.index', compact('birthReports'));
     }
 
-   public function create(Request $request)
+    public function create(Request $request)
     {
         $validated = $request->validate([
             'child_name' => 'required|string|max:255',
@@ -186,40 +190,29 @@ class BirthController extends Controller
 
         return view('admin.birthordeath.importbirth');
     }
-    public function exportPathologyTestExcel()
+    public function exportBirthExcel()
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle('Pathology Test');
+        $sheet->setTitle('Birth Record');
 
-        $organisations = Organisation::all();       // TPA list
-        $categories    = PathologyCategory::all();
-        $chargeCats    = ChargeCategory::all();
-        $charges       = Charge::all();
-        
-        $parameters    = PathologyParameter::with('unitRelation')->get();
+        $patients = Patient::all();       // TPA list
+      
 
         // ===============================
         // 1. Define Header Columns
         // ===============================
 
         $headers = [
-            'Test Name', 'Short Name', 'Test Type', 'Category Name',
-            'Sub Category', 'Method', 'Report Days',
-            'Charge Category', 'Charge Name', 'Tax (%)',
-            'Standard Charge', 'Amount'
+            'Child Name', 'Gender', 'Weight', 'Birth Date',
+            'Phone No.', 'Address', 'Case Id',
+            'Mother Name', 'Father Name', 'Report',
+            'ICD Code'
         ];
 
-        // Add TPA Columns
-        foreach ($organisations as $org) {
-            $headers[] = "TPA {$org->organisation_name} Charge";
-            $headers[] = "TPA {$org->organisation_name} Code";
-        }
 
-        // Add Parameter Columns (supports multi-rows on import)
-        $headers[] = "Parameter ID (comma separated)";
-        $headers[] = "Reference Range (optional)";
-        $headers[] = "Unit (optional)";
+
+
 
         // Write headers to Excel
         $col = 'A';
@@ -230,56 +223,9 @@ class BirthController extends Controller
 
         $sheet->freezePane('A2');
 
-        // ===============================
-        // 2. Dropdown Sheet
-        // ===============================
+      
 
-        $dropdown = $spreadsheet->createSheet();
-        $dropdown->setTitle('DropdownData');
-
-        // Category List
-        $row = 1;
-        foreach ($categories as $cat) {
-            $dropdown->setCellValue("A$row", $cat->category_name);
-            $row++;
-        }
-
-        // Charge Category List
-        $row = 1;
-        foreach ($chargeCats as $cc) {
-            $dropdown->setCellValue("B$row", $cc->name);
-            $row++;
-        }
-
-        // Charge Names
-        $row = 1;
-        foreach ($charges as $charge) {
-            $dropdown->setCellValue("C$row", $charge->name);
-            $row++;
-        }
-
-        // Parameters
-        $row = 1;
-        foreach ($parameters as $param) {
-            $dropdown->setCellValue("D$row", "{$param->id} - {$param->parameter_name}");
-            $row++;
-        }
-
-        // ===============================
-        // 3. Apply Dropdowns in main sheet
-        // ===============================
-
-        // Category Name dropdown
-        $this->setDropdown($sheet, 'D2:D500', 'DropdownData', 'A', count($categories));
-
-        // Charge Category dropdown
-        $this->setDropdown($sheet, 'H2:H500', 'DropdownData', 'B', count($chargeCats));
-
-        // Charge Name dropdown
-        $this->setDropdown($sheet, 'I2:I500', 'DropdownData', 'C', count($charges));
-
-        // Parameter dropdown
-        $this->setDropdown($sheet, 'A2:A500', 'DropdownData', 'D', count($parameters));
+        
 
         // ===============================
         // 4. Final Excel Output
@@ -288,7 +234,7 @@ class BirthController extends Controller
         $writer = new Xlsx($spreadsheet);
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename="PathologyTestTemplate.xlsx"');
+        header('Content-Disposition: attachment; filename="BirthRecordTemplate.xlsx"');
         header('Cache-Control: max-age=0');
 
         $writer->save('php://output');
