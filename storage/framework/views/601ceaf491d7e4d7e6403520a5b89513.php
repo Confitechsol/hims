@@ -2681,7 +2681,7 @@ unset($__errorArgs, $__bag); ?>
                                                                 <th>Discount</th>
                                                                 <th>Tax</th>
                                                                 <th>Amount (INR)</th>
-                                                                <th>Action</th>
+                                                                <!-- <th>Action</th> -->
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -2702,7 +2702,7 @@ unset($__errorArgs, $__bag); ?>
                                                                 ?>
                                                                 <tr>
                                                                     <td>
-                                                                        <?php echo e($charge->date); ?>
+                                                                         <?php echo e(\Carbon\Carbon::parse($charge->date)->format('d-m-Y')); ?>
 
                                                                     </td>
                                                                     <td>
@@ -2728,7 +2728,7 @@ unset($__errorArgs, $__bag); ?>
                                                                     <td><?php echo e($taxAmount); ?>&nbsp;(<?php echo e($charge->charge->taxCategory->percentage); ?>%)
                                                                     </td>
                                                                     <td><?php echo e($amount); ?></td>
-                                                                    <td>
+                                                                    <!-- <td>
                                                                         <div class="d-flex gap-2">
                                                                             <a href="javascript: void(0);"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
@@ -2747,7 +2747,7 @@ unset($__errorArgs, $__bag); ?>
                                                                                     data-bs-toggle="tooltip"
                                                                                     title="Delete"></i></a>
                                                                         </div>
-                                                                    </td>
+                                                                    </td> -->
                                                                 </tr>
                                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 

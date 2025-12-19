@@ -2613,7 +2613,7 @@
                                                                 @endphp
                                                                 <tr>
                                                                     <td>
-                                                                        {{ $charge->date }}
+                                                                         {{ \Carbon\Carbon::parse($charge->date)->format('d-m-Y') }}
                                                                     </td>
                                                                     <td>
                                                                         {{ $charge->charge->name }}
