@@ -106,8 +106,8 @@ class IpdController extends Controller
             return redirect()->back()->with('error', 'User not authenticated or hospital ID missing.');
         }
         try {
-            $symptomType          = array_filter($request->symptoms_type, fn($type) => $type !== null && $type !== '');
-            $symptomTitle         = array_filter($request->symptoms_title, fn($title) => $title !== null && $title !== '');
+           $symptomType  = array_filter($request->input('symptoms_type', []));
+$symptomTitle = array_filter($request->input('symptoms_title', []));
             $implodedSymptomType  = implode(", ", $symptomType);
             $implodedSymptomTitle = implode(", ", $symptomTitle);
 
