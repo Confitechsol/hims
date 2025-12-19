@@ -2592,7 +2592,7 @@
                                                                 <th>Discount</th>
                                                                 <th>Tax</th>
                                                                 <th>Amount (INR)</th>
-                                                                <th>Action</th>
+                                                                <!-- <th>Action</th> -->
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -2635,7 +2635,7 @@
                                                                     <td>{{ $taxAmount }}&nbsp;({{ $charge->charge->taxCategory->percentage }}%)
                                                                     </td>
                                                                     <td>{{ $amount }}</td>
-                                                                    <td>
+                                                                    <!-- <td>
                                                                         <div class="d-flex gap-2">
                                                                             <a href="javascript: void(0);"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
@@ -2654,7 +2654,7 @@
                                                                                     data-bs-toggle="tooltip"
                                                                                     title="Delete"></i></a>
                                                                         </div>
-                                                                    </td>
+                                                                    </td> -->
                                                                 </tr>
                                                             @endforeach
 
