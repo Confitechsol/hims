@@ -1,6 +1,6 @@
-{{-- resources/views/settings.blade.php --}}
-@extends('layouts.adminLayout')
-@section('content')
+
+
+<?php $__env->startSection('content'); ?>
 <style>
     .guidelines-box {
         max-height: 0;
@@ -35,17 +35,17 @@
 </style>
 
 <div class="row justify-content-center">
-    {{-- Settings Form --}}
+    
     <div class="col-md-11">
         <div class="card shadow-sm border-0 mt-4">
             <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Import Doctor</h5>
+                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Import Pathology Test</h5>
             </div>
 
             <div class="card-body">
 
 
-                {{-- Hospital Name & Code --}}
+                
                 <div class="row">
 
                     <div class="col-lg-12">
@@ -69,7 +69,7 @@
 
 
                                         <div class="text-end d-flex">
-                                            <a href="{{ route('birth.export') }}" class="btn btn-primary text-white ms-2 fs-13 btn-md"><i
+                                            <a href="<?php echo e(route('pathologyTests.export')); ?>" class="btn btn-primary text-white ms-2 fs-13 btn-md"><i
                                                     class="ti ti-download me-1"></i>Download Sample Data</a>
                                             
                                         </div>
@@ -97,53 +97,42 @@
                                         </ol>
                                     </div>
                                 </div>
-                                @if (session('success'))
-                                    <div class="alert alert-success">{{ session('success') }}</div>
-                                @endif
+                                <?php if(session('success')): ?>
+                                    <div class="alert alert-success"><?php echo e(session('success')); ?></div>
+                                <?php endif; ?>
 
-                                @if (session('error'))
-                                    <div class="alert alert-danger">{{ session('error') }}</div>
-                                @endif
-                                @if ($errors->any())
+                                <?php if(session('error')): ?>
+                                    <div class="alert alert-danger"><?php echo e(session('error')); ?></div>
+                                <?php endif; ?>
+                                <?php if($errors->any()): ?>
                                     <div class="alert alert-danger">
                                         <strong>There were some problems with your
                                             input:</strong>
                                         <ul class="mb-0">
-                                            @foreach ($errors->all() as $error)
-                                                <li>{{ $error }}</li>
-                                            @endforeach
+                                            <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <li><?php echo e($error); ?></li>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </ul>
                                     </div>
-                                @endif
+                                <?php endif; ?>
                                 <div class="table-responsive">
                                     <table class="table table-bordered mb-0" id="table">
                                         <thead>
                                             <tr>
                                                 
-                                                <th>First Name</th>
-                                                <th>Last Name</th>
-                                                <th>Department</th>
-                                                <th>Designation</th>
-                                                <th>specialization</th>
-                                                <th>Qualification</th>
-                                                <th>Work Experience</th>
-                                                <th>Fathers Name</th>
-                                                <th>Mothers Name</th>
-                                                <th>Contact Number</th>
-                                                <th>Emergency Contact Number</th>
-                                                <th>Email</th>
-                                                <th>DOB</th>
-                                                <th>Marital Status</th>
-                                                <th>Date of Joining</th>
-                                                <th>Date of Leaving</th>
-                                                <th>Local Address</th>
-                                                <th>Permanent Address</th>
-                                                <th>Gender</th>                                              
-                                                <th>Blood Group</th>
-                                                <th>Identification Number</th>
-                                                <th>PAN</th>
-                                                <th>Employee Id</th>
-                                                <th>Remarks</th>
+                                                <th>Test Name</th>
+                                                <th>Short Name</th>
+                                                <th>Test Type</th>
+                                                <th>Category</th>
+                                                <th>Charge Category</th>
+                                                <th>Charge Name</th>
+                                                <th>Sub Category</th>
+                                                <th>Method</th>
+                                                <th>Report Days</th>
+                                                <th>Tax (%)</th>
+                                                <th>Charge (INR)</th>
+                                                <th>Amount (INR)</th>
+                                                
 
                                             </tr>
                                         </thead>
@@ -161,18 +150,7 @@
                                                 <td>Sample Data</td>
                                                 <td>Sample Data</td>
                                                 <td>Sample Data</td>
-                                                <td>Sample Data</td>
-                                                <td>Sample Data</td>
-                                                <td>Sample Data</td>
-                                                <td>Sample Data</td>
-                                                <td>Sample Data</td>
-                                                <td>Sample Data</td>
-                                                <td>Sample Data</td>
-                                                <td>Sample Data</td>
-                                                <td>Sample Data</td>
-                                                <td>Sample Data</td>
-                                                <td>Sample Data</td>
-                                                <td>Sample Data</td>
+                                                
                                             </tr>
                                         </tbody>
                                     </table>
@@ -180,9 +158,9 @@
 
 
                                 <div class="import_form">
-                                    <form action="{{ route('doctors.import') }}" method="POST"
+                                    <form action="<?php echo e(route('pathology.import')); ?>" method="POST"
                                         enctype="multipart/form-data">
-                                        @csrf
+                                        <?php echo csrf_field(); ?>
                                         <div class="row">
                                            
                                             <div class="col-md-12">
@@ -193,7 +171,7 @@
                                             </div>
                                         </div>
                                         <button type="submit" class="btn btn-primary ms-auto d-block mt-3"><i
-                                                class="fa-solid fa-cloud-arrow-up"></i> Import Doctors</button>
+                                                class="fa-solid fa-cloud-arrow-up"></i> Import Pathology</button>
 
                                                
 
@@ -213,25 +191,6 @@
     </div>
 </div>
 
-
-<!-- <script>
-                            function toggleGuidelines() {
-                                var box = document.getElementById("guidelinesBox");
-
-                                if (box.classList.contains("show")) {
-                                    box.classList.remove("show");
-                                    box.classList.add("hide");
-
-                                    setTimeout(() => {
-                                        box.classList.remove("hide");
-                                        box.style.display = "none";
-                                    }, 350); // match fadeOut duration
-                                } else {
-                                    box.style.display = "block";
-                                    box.classList.add("show");
-                                }
-                            }
-                        </script> -->
 <!-- SheetJS for Excel/CSV export -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
 <script>
@@ -240,11 +199,71 @@
         box.classList.toggle("show");
     }
     // Export to CSV
+    function exportToCSV() {
+        const table = document.getElementById("table");
+        console.log(document.getElementById("table"));
+        // const csv = XLSX.utils.table_to_csv(table);
+        // Convert table to workbook
+        const wb = XLSX.utils.table_to_book(table);
+        // Convert workbook to CSV (first sheet)
+        const csv = XLSX.utils.sheet_to_csv(wb.Sheets[wb.SheetNames[0]]);
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'pathologyTests.csv';
+        link.click();
+    }
     
 </script>
 
 
+<!-- 
+<script>
+document.getElementById("exportBtn").addEventListener("click", function () {
+
+    const table = document.getElementById("table");
+    if (!table) {
+        alert("Table not found!");
+        return;
+    }
+
+    const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+    const ws = wb.Sheets["Sheet1"];
+
+    // Freeze header row
+    ws['!freeze'] = { xSplit: 0, ySplit: 1 };
+
+    // Dropdown lists
+    const deptValues = departmentList.join(",");
+    const maritalValues = "Single,Married,Divorced,Widowed";
+    const genderValues = "Male,Female,Other";
+    const bloodValues = "A+,A-,B+,B-,O+,O-,AB+,AB-";
+
+    // Create a validation map
+    const DV = [];
+    function addValidation(range, values) {
+        DV.push({
+            sqref: range,
+            type: "list",
+            allowBlank: true,
+            formula1: `"${values}"`
+        });
+    }
+
+    // Apply dropdowns (Column ranges)
+    addValidation("C2:C500", deptValues);    // Department
+    addValidation("N2:N500", maritalValues); // Marital Status
+    addValidation("S2:S500", genderValues);  // Gender
+    addValidation("T2:T500", bloodValues);   // Blood Group
+
+    // Assign to worksheet
+    ws['!dataValidation'] = DV;
+
+    XLSX.writeFile(wb, "pathology.xlsx");
+});
+</script> -->
 
 
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\hims\resources\views/admin/pathology/test/importTest.blade.php ENDPATH**/ ?>

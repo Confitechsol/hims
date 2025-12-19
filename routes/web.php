@@ -313,6 +313,7 @@ Route::middleware(['admin'])->group(function () {
 
     Route::get('/birth', [BirthController::class, 'index'])->name('birth');
     Route::get('/importbirth', [BirthController::class, 'importbirth'])->name('importbirth');
+    Route::get('/exportbirth', [BirthController::class, 'exportBirthExcel'])->name('birth.export');
     Route::post('/birth/create', [BirthController::class, 'create'])->name('birth.create');
     Route::put('/birth/update/{id}', [BirthController::class, 'update'])->name('birth.update');
     Route::delete('/birth/delete/{id}', [BirthController::class, 'delete'])->name('birth.delete');
