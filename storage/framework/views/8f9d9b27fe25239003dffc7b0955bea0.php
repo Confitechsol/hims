@@ -795,10 +795,10 @@
                                 <label class="form-label">Admission Date & Time<span class="required">*</span></label>
                                 <input type="datetime-local" class="form-control" name="admission_date">
                             </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Case<span class="required">*</span></label>
+                            <!-- <div class="col-md-3">
+                                <label class="form-label">Case</label>
                                 <input type="text" class="form-control" name="case">
-                            </div>
+                            </div> -->
                             <div class="col-md-4">
                                 <label class="form-label">Patient Type</label>
                                 <select class="form-select" name="patient_type">

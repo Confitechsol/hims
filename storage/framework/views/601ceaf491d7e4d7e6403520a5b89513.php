@@ -2430,7 +2430,7 @@ unset($__errorArgs, $__bag); ?>
                                                                                                     Charge
                                                                                                     (INR)</label>
                                                                                                 <input type="text"
-                                                                                                    readonly=""
+                                                                                                    
                                                                                                     name="standard_charge"
                                                                                                     id="addstandard_charge"
                                                                                                     class="form-control reset_value standard_charge"
@@ -2445,7 +2445,7 @@ unset($__errorArgs, $__bag); ?>
                                                                                                     class="form-label">TPA
                                                                                                     Charge (INR)</label>
                                                                                                 <input type="text"
-                                                                                                    readonly=""
+                                                                                                    
                                                                                                     name="schedule_charge"
                                                                                                     id="addscd_charge"
                                                                                                     placeholder=""
@@ -2491,7 +2491,7 @@ unset($__errorArgs, $__bag); ?>
                                                                                                                 id="apply_charge"
                                                                                                                 style="width: 30%; float: right"
                                                                                                                 class="form-control total apply_charge_add_charge"
-                                                                                                                readonly="">
+                                                                                                                >
                                                                                                         </td>
                                                                                                     </tr>
                                                                                                     <tr>
@@ -2522,7 +2522,7 @@ unset($__errorArgs, $__bag); ?>
                                                                                                                 id="discount_percentage_amount"
                                                                                                                 style="width: 50%; float: right"
                                                                                                                 class="form-control discount_percentage_amount"
-                                                                                                                readonly="">
+                                                                                                                >
                                                                                                         </td>
                                                                                                     </tr>
                                                                                                     <tr>
@@ -2550,7 +2550,7 @@ unset($__errorArgs, $__bag); ?>
                                                                                                                 id="tax_amt"
                                                                                                                 style="width: 50%; float: right"
                                                                                                                 class="form-control tax"
-                                                                                                                readonly="">
+                                                                                                                >
                                                                                                         </td>
                                                                                                     </tr>
                                                                                                     <tr>
@@ -2566,7 +2566,7 @@ unset($__errorArgs, $__bag); ?>
                                                                                                                 id="final_amount"
                                                                                                                 style="width: 30%; float: right"
                                                                                                                 class="form-control net_amount"
-                                                                                                                readonly="">
+                                                                                                                >
                                                                                                         </td>
                                                                                                     </tr>
                                                                                                 </tbody>
