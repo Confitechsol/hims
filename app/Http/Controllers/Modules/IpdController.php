@@ -71,7 +71,7 @@ class IpdController extends Controller
     {
         //dd($request->all());
         $validator = Validator::make($request->all(), [
-            'patient_id'           => 'exists:patients,id',
+            'patient_id'           => 'nullable|exists:patients,id',
             'admission_date'       => 'date',
             'patient_type'         => 'string',
             'case'                 => 'string',
