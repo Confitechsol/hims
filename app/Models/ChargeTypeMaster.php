@@ -27,8 +27,8 @@ class ChargeTypeMaster extends Model
     ];
 
     public function chargeCategories()
-{
-    return $this->hasMany(ChargeCategory::class, 'charge_type_id');
-}
+    {
+        return $this->hasMany(ChargeCategory::class, 'charge_type_id');
+    }
     
 }

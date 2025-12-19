@@ -5,6 +5,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Bed;
 use App\Models\BedGroup;
 use App\Models\Doctor;
+use App\Models\ChargeCategory;
+use App\Models\Charge;
+use App\Models\ChargeTypeMaster;
 use App\Models\IpdCharges;
 use App\Models\IpdDetail;
 use App\Models\IpdMedicine;
@@ -32,7 +35,8 @@ class IpdController extends Controller
         $isIpdTab  = $request->get('tab', 'ipd') == 'ipd';
         $doctors   = Doctor::all();
         $bedGroups = BedGroup::with('floorDetail')->get();
-
+        $chargeType = ChargeTypeMaster::all();
+        $charges = Charge::all();
         if ($isIpdTab) {
             $ipd = IpdDetail::with('patient', 'doctor', 'bedDetail', 'bedGroup.floorDetail')
                 ->when($search, function ($query) use ($search) {
