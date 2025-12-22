@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Modules;
 
 use App\Http\Controllers\Controller;
+use App\Models\DischargeCard;
 use App\Models\Doctor;
 use App\Models\Finding;
 use App\Models\IpdCharges;
@@ -87,7 +88,9 @@ class IpdViewController extends Controller
 
         $PatientTimelines = PatientTimeline::with('patient')->where('patient_id', $patient_id)->get();
         $vitalDetails     = PatientVital::with('vital')->where('patient_id', $patient_id)->get();
-
+        if ($ipd->discharged == 'yes') {
+            $ipd->dischargeCard = DischargeCard::where('ipd_details_id', $id)->firstOrFail();
+        }
         return view('admin.ipd.ipd_view', compact(
             'ipd',
             'doctors',
