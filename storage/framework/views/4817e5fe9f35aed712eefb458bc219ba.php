@@ -1,7 +1,12 @@
-<div class="d-flex justify-content-between">
-    <div class="text-end d-flex mb-3 w-100">
+<div class="d-flex justify-content-between w-100">
+    <div class="text-end d-flex mb-3sta">
         <a href="javascript:void(0);" class="btn btn-primary text-white fs-13 btn-md" data-bs-toggle="modal"
             data-bs-target="#createModal"><i class="ti ti-plus me-1"></i>Add <?php echo e($name); ?></a>
+            <?php if($name === 'Birth Record' || $name === 'Death Record'): ?>
+        <a href="<?php echo e(route('importbirth')); ?>" class="btn btn-primary text-white fs-13 btn-md ms-2" data-bs-toggle="modal"
+            data-bs-target="">Import <?php echo e($name); ?></a>
+        <?php endif; ?>
+          
         <?php if($name === 'Visitor'): ?>
         <div class="btn-group ms-2">
             <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">

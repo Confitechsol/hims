@@ -1187,13 +1187,37 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td class="text-right">TRID83</td>
-                                                <td class="text-right">10/13/2025 06:25 PM</td>
-                                                <td class="text-right">SmartPay Transaction ID: 528612554379</td>
-                                                <td class="text-right"><br> </td>
-                                                <td class="text-right">20.00</td>
-                                            </tr>
+                                            @forelse($transactions as $transaction)
+                                                                <tr>
+                                                                    <td>
+                                                                        {{ $transaction->transaction_no ?? 'TRID'.$transaction->id }}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {{ \Carbon\Carbon::parse($transaction->transaction_date)->format('d/m/Y h:i A') }}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {{ $transaction->note ?? '-' }}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {{ $transaction->payment_mode == 1 ? 'Cash' : '-' }}
+                                                                    </td>
+
+                                                                    <td class="text-end">
+                                                                        {{ number_format($transaction->amount, 2) }}
+                                                                    </td>
+
+
+                                                                </tr>
+                                                            @empty
+                                                                <tr>
+                                                                    <td colspan="6" class="text-center text-muted">
+                                                                        No payments found
+                                                                    </td>
+                                                                </tr>
+                                                            @endforelse
                                         </tbody>
                                     </table>
                                 </div>
@@ -2804,7 +2828,7 @@
                                                                                                     Charge
                                                                                                     (INR)</label>
                                                                                                 <input type="text"
-                                                                                                    readonly=""
+
                                                                                                     name="standard_charge"
                                                                                                     id="addstandard_charge"
                                                                                                     class="form-control reset_value standard_charge"
@@ -2819,7 +2843,7 @@
                                                                                                     class="form-label">TPA
                                                                                                     Charge (INR)</label>
                                                                                                 <input type="text"
-                                                                                                    readonly=""
+
                                                                                                     name="schedule_charge"
                                                                                                     id="addscd_charge"
                                                                                                     placeholder=""
@@ -2865,7 +2889,7 @@
                                                                                                                 id="apply_charge"
                                                                                                                 style="width: 30%; float: right"
                                                                                                                 class="form-control total apply_charge_add_charge"
-                                                                                                                readonly="">
+                                                                                                                >
                                                                                                         </td>
                                                                                                     </tr>
                                                                                                     <tr>
@@ -2896,7 +2920,7 @@
                                                                                                                 id="discount_percentage_amount"
                                                                                                                 style="width: 50%; float: right"
                                                                                                                 class="form-control discount_percentage_amount"
-                                                                                                                readonly="">
+                                                                                                                >
                                                                                                         </td>
                                                                                                     </tr>
                                                                                                     <tr>
@@ -2924,7 +2948,7 @@
                                                                                                                 id="tax_amt"
                                                                                                                 style="width: 50%; float: right"
                                                                                                                 class="form-control tax"
-                                                                                                                readonly="">
+                                                                                                                >
                                                                                                         </td>
                                                                                                     </tr>
                                                                                                     <tr>
@@ -2940,7 +2964,7 @@
                                                                                                                 id="final_amount"
                                                                                                                 style="width: 30%; float: right"
                                                                                                                 class="form-control net_amount"
-                                                                                                                readonly="">
+                                                                                                                >
                                                                                                         </td>
                                                                                                     </tr>
                                                                                                 </tbody>
@@ -3055,7 +3079,7 @@
                                                                 <th>Discount</th>
                                                                 <th>Tax</th>
                                                                 <th>Amount (INR)</th>
-                                                                <th>Action</th>
+                                                                <!-- <th>Action</th> -->
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -3076,6 +3100,9 @@
                                                                 @endphp
                                                                 <tr>
                                                                     <td>
+                                                                         {{ \Carbon\Carbon::parse($charge->date)->format('d-m-Y') }}
+                                                                    </td>
+                                                                    <td>
                                                                         {{ $charge->charge->name }}
                                                                     </td>
                                                                     <td style="text-transform: capitalize;">
@@ -3084,20 +3111,18 @@
                                                                     <td class="text-right">
                                                                         {{ $charge->chargeCategory->name }}
                                                                     </td>
-                                                                    <td>
-                                                                        1
-                                                                    </td>
+
                                                                     <td class="text-right">
-                                                                        {{ $charge->charge->standard_charge }}</td>
+                                                                        {{ $charge->qty }}</td>
                                                                     <td class="text-right">
-                                                                        {{ $charge->charge->standard_charge }}</td>
+                                                                        {{ $charge->standard_charge }}</td>
                                                                     <td class="text-right">0.00</td>
                                                                     <td>{{ $discountAmount }}&nbsp;({{ $charge->discount }}%)
                                                                     </td>
                                                                     <td>{{ $taxAmount }}&nbsp;({{ $charge->charge->taxCategory->percentage }}%)
                                                                     </td>
                                                                     <td>{{ $amount }}</td>
-                                                                    <td>
+                                                                    <!-- <td>
                                                                         <div class="d-flex gap-2">
                                                                             <a href="javascript: void(0);"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
@@ -3116,7 +3141,7 @@
                                                                                     data-bs-toggle="tooltip"
                                                                                     title="Delete"></i></a>
                                                                         </div>
-                                                                    </td>
+                                                                    </td> -->
                                                                 </tr>
                                                             @endforeach
 
@@ -3184,53 +3209,59 @@
                                                                     </div>
 
                                                                     <div class="modal-body">
+                                                                        <form action="{{ route('transactions.store') }}" method="POST">
+                                                                            @csrf
+                                                                            <input type="hidden" name="ipd_id" value="{{ $ipd->id }}">
+                                                                            <input type="hidden" name="patient_id" value="{{ $ipd->patient_id }}">
+                                                                            <input type="hidden" name="type" value="payment">
+                                                                            <input type="hidden" name="section" value="ipd">
+                                                                                <div class="row gy-3 py-4 mx-1">
 
-                                                                        <div class="row gy-3 py-4 mx-1">
+                                                                                    <div class="col-md-6">
+                                                                                        <label for="date"
+                                                                                            class="form-label">Date
+                                                                                            <span class="text-danger">*</span>
+                                                                                        </label>
+                                                                                        <input type="date" name="date"
+                                                                                            id="date" class="form-control"
+                                                                                            required>
+                                                                                    </div>
+                                                                                    <div class="col-md-6">
+                                                                                        <label for="amount"
+                                                                                            class="form-label">Amount (INR)
+                                                                                            <span class="text-danger">*</span>
+                                                                                        </label>
+                                                                                        <input type="text" name="amount"
+                                                                                            id="amount" class="form-control"
+                                                                                            required>
+                                                                                    </div>
+                                                                                    <div class="col-md-6">
+                                                                                        <label for="payment_mode"
+                                                                                            class="form-label">Payment Mode
 
-                                                                            <div class="col-md-6">
-                                                                                <label for="date"
-                                                                                    class="form-label">Date
-                                                                                    <span class="text-danger">*</span>
-                                                                                </label>
-                                                                                <input type="date" name="date"
-                                                                                    id="date" class="form-control"
-                                                                                    required>
-                                                                            </div>
-                                                                            <div class="col-md-6">
-                                                                                <label for="amount"
-                                                                                    class="form-label">Amount (INR)
-                                                                                    <span class="text-danger">*</span>
-                                                                                </label>
-                                                                                <input type="text" name="amount"
-                                                                                    id="amount" class="form-control"
-                                                                                    required>
-                                                                            </div>
-                                                                            <div class="col-md-6">
-                                                                                <label for="payment_mode"
-                                                                                    class="form-label">Payment Mode
+                                                                                        </label>
+                                                                                        <select name="payment_mode"
+                                                                                            id="payment_mode"
+                                                                                            class="form-select"
+                                                                                            data-placeholder="Enter Patient Name or Id…">
+                                                                                            <option value="0">Select</option>
+                                                                                            <option value="1">Cash</option>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                    <div class="col-md-6">
+                                                                                        <label for="note"
+                                                                                            class="form-label">Note
+                                                                                        </label>
+                                                                                        <textarea name="note" id="note" class="form-control"></textarea>
+                                                                                    </div>
+                                                                                </div>
 
-                                                                                </label>
-                                                                                <select name="payment_mode"
-                                                                                    id="payment_mode"
-                                                                                    class="form-select"
-                                                                                    data-placeholder="Enter Patient Name or Id…">
-                                                                                    <option value="0">Select</option>
-                                                                                    <option value="1">Cash</option>
-                                                                                </select>
                                                                             </div>
-                                                                            <div class="col-md-6">
-                                                                                <label for="note"
-                                                                                    class="form-label">Note
-                                                                                </label>
-                                                                                <textarea name="note" id="note" class="form-control"></textarea>
+                                                                            <div class="modal-footer">
+                                                                                <button type="submit"
+                                                                                    class="btn btn-primary">Save</button>
                                                                             </div>
-                                                                        </div>
-
-                                                                    </div>
-                                                                    <div class="modal-footer">
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary">Save</button>
-                                                                    </div>
+                                                                        </form>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -3246,39 +3277,70 @@
                                                                 <th>Note</th>
                                                                 <th>Payment Mode</th>
                                                                 <th>Paid Amount (INR)</th>
-                                                                <th>Action</th>
+                                                                <!-- <th>Action</th> -->
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr>
-                                                                <td>
-                                                                    TRID83
-                                                                </td>
-                                                                <td>10/13/2025 06:25 PM </td>
-                                                                <td> Time:SmartPay Transaction ID: 528612554379
-                                                                </td>
-                                                                <td></td>
-                                                                <td>20.00</td>
-                                                                <td>
-                                                                    <div class="d-flex gap-2">
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
-                                                                            <i class="fa-solid fa-print"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Print"></i></a>
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
-                                                                            <i class="ti ti-pencil"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Show"></i></a>
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                            <i class="ti ti-trash"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Delete"></i></a>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
+                                                            @forelse($transactions as $transaction)
+                                                                <tr>
+                                                                    <td>
+                                                                        {{ $transaction->transaction_no ?? 'TRID'.$transaction->id }}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {{ \Carbon\Carbon::parse($transaction->transaction_date)->format('d/m/Y h:i A') }}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {{ $transaction->note ?? '-' }}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {{ $transaction->payment_mode == 1 ? 'Cash' : '-' }}
+                                                                    </td>
+
+                                                                    <td class="text-end">
+                                                                        {{ number_format($transaction->amount, 2) }}
+                                                                    </td>
+
+                                                                    <!-- <td>
+                                                                        <div class="d-flex gap-2">
+                                                                            {{-- Print --}}
+                                                                            <a href="{{ route('transactions.print', $transaction->id) }}"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill"
+                                                                            data-bs-toggle="tooltip" title="Print">
+                                                                                <i class="fa-solid fa-print"></i>
+                                                                            </a>
+
+                                                                            {{-- View --}}
+                                                                            <a href="{{ route('transactions.show', $transaction->id) }}"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill"
+                                                                            data-bs-toggle="tooltip" title="Show">
+                                                                                <i class="ti ti-pencil"></i>
+                                                                            </a>
+
+                                                                            {{-- Delete --}}
+                                                                            <form action="{{ route('transactions.destroy', $transaction->id) }}"
+                                                                                method="POST"
+                                                                                onsubmit="return confirm('Delete this payment?')">
+                                                                                @csrf
+                                                                                @method('DELETE')
+                                                                                <button type="submit"
+                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
+                                                                                    data-bs-toggle="tooltip" title="Delete">
+                                                                                    <i class="ti ti-trash"></i>
+                                                                                </button>
+                                                                            </form>
+                                                                        </div>
+                                                                    </td> -->
+                                                                </tr>
+                                                            @empty
+                                                                <tr>
+                                                                    <td colspan="6" class="text-center text-muted">
+                                                                        No payments found
+                                                                    </td>
+                                                                </tr>
+                                                            @endforelse
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -4419,233 +4481,193 @@
 
 
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const chargeTypeSelect = document.getElementById("add_charge_type")
-            const chargeCategorySelect = document.getElementById("charge_category2")
-            const chargeSelect = document.getElementById("charge_id")
+<script>
+document.addEventListener("DOMContentLoaded", function () {
 
+    const chargeTypeSelect     = document.getElementById("add_charge_type");
+    const chargeCategorySelect = document.getElementById("charge_category2");
+    const chargeSelect         = document.getElementById("charge_id");
 
+    const standardChargeInp = document.getElementById("addstandard_charge");
+    const tpaChargeInp      = document.getElementById("addscd_charge");
+    const qtyInp            = document.getElementById("qty");
+    const totalInp          = document.getElementById("apply_charge");
+    const discountPercInp   = document.getElementById("discount_percentage_add_charge");
+    const discountAmtInp    = document.getElementById("discount_percentage_amount");
+    const taxPercInp        = document.getElementById("charge_tax");
+    const taxAmtInp         = document.getElementById("tax_amt");
+    const netAmountInp      = document.getElementById("final_amount");
 
-            fetch("{{ route('getChargeTypes') }}").then(response => response.json())
-                .then(data => {
-                    window.chargeTypeData = data;
-                    chargeTypeSelect.innerHTML = '<option value="">Select</option>';
-                    data.forEach(type => {
-                        const option = document.createElement('option');
-                        option.value = type.id;
-                        option.textContent = type.charge_type;
-                        if ("{{ old('charge_type') }}" == type.id) {
-                            option.selected = true;
-                        }
-                        chargeTypeSelect.appendChild(option);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching charge types:', error);
-                    chargeTypeSelect.innerHTML = '<option value="">Error loading options</option>';
-                });
+    const previewBody = document.getElementById("preview_charges");
+    const addBtn = document.querySelector("button[name='charge_data']");
 
-            chargeTypeSelect.addEventListener('change', function() {
-                const selectedId = this.value;
-                const baseUrl = "{{ route('getChargeCategoriesByTypeId', ['id' => 'ID']) }}";
-                const finalUrl = baseUrl.replace('ID', selectedId);
-                fetch(finalUrl)
-                    .then(response => response.json())
-                    .then(data => {
-                        window.chargeCategoryData = data;
-                        chargeCategorySelect.innerHTML = '<option value="">Select</option>';
-                        data.forEach(category => {
-                            const option = document.createElement('option');
-                            option.value = category.id;
-                            option.textContent = category.name;
-                            if ("{{ old('charge_category') }}" == category.id) {
-                                option.selected = true;
-                            }
-                            chargeCategorySelect.appendChild(option);
-                        });
-                    })
-                    .catch(error => {
-                        console.error('Error fetching charge categories:', error);
-                        chargeCategorySelect.innerHTML =
-                            '<option value="">Error loading options</option>';
-                    });
-            })
-
-
-            // Listen for Charge Category dropdown change
-            chargeCategorySelect.addEventListener('change', function() {
-                const selectedId = this.value;
-                const baseUrl = "{{ route('getCharges', ['id' => 'ID']) }}";
-                const finalUrl = baseUrl.replace('ID', selectedId);
-                fetch(finalUrl)
-                    .then(response => response.json())
-                    .then(data => {
-                        window.chargeData = data;
-                        chargeSelect.innerHTML = '<option value="">Select</option>';
-                        data.forEach(charge => {
-                            const option = document.createElement('option');
-                            option.value = charge.id;
-                            option.textContent = charge.name;
-                            if ("{{ old('charge') }}" == charge.id) {
-                                option.selected = true;
-                            }
-                            chargeSelect.appendChild(option);
-                        });
-                    })
-                    .catch(error => {
-                        console.error('Error fetching Charges:', error);
-                        chargeSelect.innerHTML = '<option value="">Error loading options</option>';
-                    });
-
-                chargeSelect.addEventListener('change', function() {
-                    const selectedCharge = window.chargeData[0];
-
-                    const standardCharge = document.getElementById("addstandard_charge")
-                    const tpaCharge = document.getElementById("addscd_charge")
-                    const total = document.getElementById("apply_charge");
-                    const discount = document.getElementById("discount_percentage_add_charge");
-                    const tax = document.getElementById("charge_tax");
-                    const netAmount = document.getElementById("final_amount");
-                    const discountAmountInp = document.getElementById("discount_percentage_amount");
-                    const taxAmountInp = document.getElementById("tax_amt");
-
-                    standardCharge.value = selectedCharge.standard_charge
-                    tpaCharge.value = 0
-                    total.value = selectedCharge.standard_charge
-                    tax.value = selectedCharge.tax_category.percentage
-                    discount.value = 0
-                    calculateAmount();
-                    if (!total || !tax || !discount) {
-                        console.error(
-                            "❌ One or more required input fields are missing in the DOM.");
-                        return;
-                    }
-                    [total, tax, discount].forEach(field => {
-                        field.addEventListener('input', calculateAmount);
-                    });
-
-                    function calculateAmount() {
-                        const appliedChargeValue = parseFloat(total.value) || 0;
-                        const taxValue = parseFloat(tax.value) || 0;
-                        const discountValue = parseFloat(discount.value) || 0;
-
-                        // Formula: Amount = (AppliedCharge + Tax%) - Discount%
-                        const taxAmount = appliedChargeValue * (taxValue / 100);
-                        const discountAmount = appliedChargeValue * (discountValue / 100);
-                        const totalAmount = appliedChargeValue + taxAmount - discountAmount;
-
-                        discountAmountInp.value = discountAmount;
-                        taxAmountInp.value = taxAmount;
-                        netAmount.value = totalAmount.toFixed(2);
-
-                    }
-                })
-
-
-            })
-
-
-
-            const previewBody = document.getElementById("preview_charges");
-            const addBtn = document.querySelector("button[name='charge_data']");
-
-            addBtn.addEventListener("click", function(e) {
-                e.preventDefault();
-
-                const chargeTypeText = document.getElementById("add_charge_type").selectedOptions[0].text;
-                const chargeTypeVal = document.getElementById("add_charge_type").value;
-
-                const categoryText = document.getElementById("charge_category2").selectedOptions[0].text;
-                const categoryVal = document.getElementById("charge_category2").value;
-
-                const chargeText = document.getElementById("charge_id").selectedOptions[0].text;
-                const chargeVal = document.getElementById("charge_id").value;
-
-                const stdCharge = document.getElementById("addstandard_charge").value;
-                const tpaCharge = document.getElementById("addscd_charge").value;
-                const qty = document.getElementById("qty").value;
-
-                const total = document.getElementById("apply_charge").value;
-                const discount = document.getElementById("discount_percentage_amount").value;
-                const tax = document.getElementById("tax_amt").value;
-                const netAmount = document.getElementById("final_amount").value;
-
-                const note = document.getElementById("edit_note").value;
-                const date = document.getElementById("charge_date").value;
-
-                // VALIDATION
-                if (!chargeTypeVal || !categoryVal || !chargeVal) {
-                    alert("Please fill required fields");
-                    return;
-                }
-
-                // -------------------------------
-                // BUILD ROW HTML
-                // -------------------------------
-                let row = `
-    <tr>
-        <td>${date}</td>
-        <td>${chargeTypeText}</td>
-        <td>${categoryText}</td>
-        <td>${chargeText}<br><small>${note}</small></td>
-
-        <td class="text-right">${stdCharge}</td>
-        <td class="text-right">${tpaCharge}</td>
-        <td class="text-right">${qty}</td>
-        <td class="text-right">${total}</td>
-        <td class="text-right">${discount}</td>
-        <td class="text-right">${tax}</td>
-        <td class="text-right">${netAmount}</td>
-
-        <td class="text-right">
-            <button type="button" class="btn btn-danger btn-sm delete-charge-row">X</button>
-        </td>
-
-        <!-- HIDDEN INPUT FIELDS -->
-        <input type="hidden" name="charge_type[]" value="${chargeTypeVal}">
-        <input type="hidden" name="charge_category[]" value="${categoryVal}">
-        <input type="hidden" name="charge_id[]" value="${chargeVal}">
-        <input type="hidden" name="standard_charge[]" value="${stdCharge}">
-        <input type="hidden" name="tpa_charge[]" value="${tpaCharge}">
-        <input type="hidden" name="qty[]" value="${qty}">
-        <input type="hidden" name="total[]" value="${total}">
-        <input type="hidden" name="discount_percentage[]" value="${discount}">
-        <input type="hidden" name="tax[]" value="${tax}">
-        <input type="hidden" name="net_amount[]" value="${netAmount}">
-        <input type="hidden" name="charge_note[]" value="${note}">
-        <input type="hidden" name="charge_date[]" value="${date}">
-    </tr>
-    `;
-
-                previewBody.insertAdjacentHTML("beforeend", row);
-
-                // RESET FIELDS
-                document.getElementById("add_charge_type").value = "";
-                document.getElementById("charge_category2").value = "";
-                document.getElementById("charge_id").value = "";
-                document.getElementById("addstandard_charge").value = "";
-                document.getElementById("addscd_charge").value = "";
-                document.getElementById("qty").value = "1";
-                document.getElementById("apply_charge").value = "0";
-                document.getElementById("discount_percentage_add_charge").value = "0";
-                document.getElementById("discount_percentage_amount").value = "0";
-                document.getElementById("charge_tax").value = "0";
-                document.getElementById("tax_amt").value = "0";
-                document.getElementById("final_amount").value = "0";
-                document.getElementById("edit_note").value = "";
-                document.getElementById("charge_date").value = "";
+    /*--------------------------------------------------
+     | FETCH CHARGE TYPES
+     --------------------------------------------------*/
+    fetch("{{ route('getChargeTypes') }}")
+        .then(res => res.json())
+        .then(data => {
+            window.chargeTypeData = data;
+            chargeTypeSelect.innerHTML = `<option value="">Select</option>`;
+            data.forEach(type => {
+                chargeTypeSelect.innerHTML += `
+                    <option value="${type.id}">${type.charge_type}</option>
+                `;
             });
-
-            // DELETE Row
-            document.addEventListener("click", function(e) {
-                if (e.target.classList.contains("delete-charge-row")) {
-                    e.target.closest("tr").remove();
-                }
-            });
-
         });
-    </script>
+
+    /*--------------------------------------------------
+     | FETCH CATEGORIES BY TYPE
+     --------------------------------------------------*/
+    chargeTypeSelect.addEventListener("change", function () {
+
+        chargeCategorySelect.innerHTML = `<option value="">Select</option>`;
+        chargeSelect.innerHTML = `<option value="">Select</option>`;
+
+        if (!this.value) return;
+
+        fetch("{{ route('getChargeCategoriesByTypeId', ['id' => 'ID']) }}".replace('ID', this.value))
+            .then(res => res.json())
+            .then(data => {
+                window.chargeCategoryData = data;
+                data.forEach(cat => {
+                    chargeCategorySelect.innerHTML += `
+                        <option value="${cat.id}">${cat.name}</option>
+                    `;
+                });
+            });
+    });
+
+    /*--------------------------------------------------
+     | FETCH CHARGES BY CATEGORY
+     --------------------------------------------------*/
+    chargeCategorySelect.addEventListener("change", function () {
+
+        chargeSelect.innerHTML = `<option value="">Select</option>`;
+
+        if (!this.value) return;
+
+        fetch("{{ route('getCharges', ['id' => 'ID']) }}".replace('ID', this.value))
+            .then(res => res.json())
+            .then(data => {
+                window.chargeData = data;
+                data.forEach(charge => {
+                    chargeSelect.innerHTML += `
+                        <option value="${charge.id}">${charge.name}</option>
+                    `;
+                });
+            });
+    });
+
+    /*--------------------------------------------------
+     | AUTO-FILL ON CHARGE SELECT (ONCE)
+     --------------------------------------------------*/
+    chargeSelect.addEventListener("change", function () {
+
+        const chargeId = this.value;
+        const selectedCharge = window.chargeData.find(c => c.id == chargeId);
+        if (!selectedCharge) return;
+
+        standardChargeInp.value = selectedCharge.standard_charge ?? 0;
+        tpaChargeInp.value      = 0;
+        qtyInp.value            = 1;
+        discountPercInp.value   = 0;
+        taxPercInp.value        = selectedCharge.tax_category?.percentage ?? 0;
+
+        calculateAmount();
+    });
+
+    /*--------------------------------------------------
+     | REAL-TIME CALCULATION (EDITABLE SAFE)
+     --------------------------------------------------*/
+    [
+        standardChargeInp,
+        qtyInp,
+        discountPercInp,
+        taxPercInp
+    ].forEach(el => el.addEventListener("input", calculateAmount));
+
+    function calculateAmount() {
+
+        const standard = parseFloat(standardChargeInp.value) || 0;
+        const qty      = parseFloat(qtyInp.value) || 1;
+
+        const discountPerc = parseFloat(discountPercInp.value) || 0;
+        const taxPerc      = parseFloat(taxPercInp.value) || 0;
+
+        const appliedCharge = standard * qty;
+        const discountAmt   = appliedCharge * (discountPerc / 100);
+        const taxAmt        = appliedCharge * (taxPerc / 100);
+        const netAmount     = appliedCharge + taxAmt - discountAmt;
+
+        totalInp.value       = appliedCharge.toFixed(2);
+        discountAmtInp.value = discountAmt.toFixed(2);
+        taxAmtInp.value      = taxAmt.toFixed(2);
+        netAmountInp.value   = netAmount.toFixed(2);
+    }
+
+    /*--------------------------------------------------
+     | ADD ROW TO PREVIEW TABLE
+     --------------------------------------------------*/
+    addBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        if (!chargeTypeSelect.value || !chargeCategorySelect.value || !chargeSelect.value) {
+            alert("Please fill required fields");
+            return;
+        }
+
+        const row = `
+        <tr>
+            <td>${document.getElementById("charge_date").value}</td>
+            <td>${chargeTypeSelect.selectedOptions[0].text}</td>
+            <td>${chargeCategorySelect.selectedOptions[0].text}</td>
+            <td>${chargeSelect.selectedOptions[0].text}<br>
+                <small>${document.getElementById("edit_note").value}</small>
+            </td>
+            <td class="text-right">${standardChargeInp.value}</td>
+            <td class="text-right">${tpaChargeInp.value}</td>
+            <td class="text-right">${qtyInp.value}</td>
+            <td class="text-right">${totalInp.value}</td>
+            <td class="text-right">${discountAmtInp.value}</td>
+            <td class="text-right">${taxAmtInp.value}</td>
+            <td class="text-right">${netAmountInp.value}</td>
+            <td class="text-right">
+                <button type="button" class="btn btn-danger btn-sm delete-charge-row">X</button>
+            </td>
+
+            <input type="hidden" name="charge_type[]" value="${chargeTypeSelect.value}">
+            <input type="hidden" name="charge_category[]" value="${chargeCategorySelect.value}">
+            <input type="hidden" name="charge_id[]" value="${chargeSelect.value}">
+            <input type="hidden" name="standard_charge[]" value="${standardChargeInp.value}">
+            <input type="hidden" name="tpa_charge[]" value="${tpaChargeInp.value}">
+            <input type="hidden" name="qty[]" value="${qtyInp.value}">
+            <input type="hidden" name="total[]" value="${totalInp.value}">
+            <input type="hidden" name="discount_percentage[]" value="${discountAmtInp.value}">
+            <input type="hidden" name="tax[]" value="${taxAmtInp.value}">
+            <input type="hidden" name="net_amount[]" value="${netAmountInp.value}">
+            <input type="hidden" name="charge_note[]" value="${document.getElementById("edit_note").value}">
+            <input type="hidden" name="charge_date[]" value="${document.getElementById("charge_date").value}">
+        </tr>
+        `;
+
+        previewBody.insertAdjacentHTML("beforeend", row);
+
+        document.getElementById("addChargeForm").reset();
+        totalInp.value = discountAmtInp.value = taxAmtInp.value = netAmountInp.value = 0;
+    });
+
+    /*--------------------------------------------------
+     | DELETE ROW
+     --------------------------------------------------*/
+    document.addEventListener("click", function (e) {
+        if (e.target.classList.contains("delete-charge-row")) {
+            e.target.closest("tr").remove();
+        }
+    });
+
+});
+</script>
 
     <script>
         $(document).ready(function() {

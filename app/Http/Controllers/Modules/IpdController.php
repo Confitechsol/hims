@@ -6,6 +6,9 @@ use App\Models\Bed;
 use App\Models\BedGroup;
 use App\Models\DischargeCard;
 use App\Models\Doctor;
+use App\Models\ChargeCategory;
+use App\Models\Charge;
+use App\Models\ChargeTypeMaster;
 use App\Models\IpdCharges;
 use App\Models\IpdDetail;
 use App\Models\IpdMedicine;
@@ -34,7 +37,8 @@ class IpdController extends Controller
         $isIpdTab  = $request->get('tab', 'ipd') == 'ipd';
         $doctors   = Doctor::all();
         $bedGroups = BedGroup::with('floorDetail')->get();
-
+        $chargeType = ChargeTypeMaster::all();
+        $charges = Charge::all();
         if ($isIpdTab) {
             $ipd = IpdDetail::with('patient', 'doctor', 'bedDetail', 'bedGroup.floorDetail')
                 ->when($search, function ($query) use ($search) {
@@ -73,20 +77,20 @@ class IpdController extends Controller
     {
         //dd($request->all());
         $validator = Validator::make($request->all(), [
-            'patient_id'           => 'required|exists:patients,id',
-            'admission_date'       => 'required|date',
-            'patient_type'         => 'required|string',
-            'case'                 => 'required|string',
-            'casualty'             => 'required|string',
+            'patient_id'           => 'nullable|exists:patients,id',
+            'admission_date'       => 'date',
+            'patient_type'         => 'string',
+            'case'                 => 'nullable|numeric',
+            'casualty'             => 'string',
             'reference'            => 'nullable|string',
-            'doctor_id'            => 'required|exists:doctor,id',
-            'credit_limit'         => 'required|numeric|min:0',
+            'doctor_id'            => 'nullable|exists:doctor,id',
+            'credit_limit'         => 'nullable|numeric|min:0',
             'live_consultation'    => 'nullable|string|max:100',
-            'bed_group'            => 'required|exists:bed_group,id',
-            'bed_number'           => 'required|exists:bed,id',
-            'symptoms_type'        => 'required|array',
+            'bed_group'            => 'nullable|exists:bed_group,id',
+            'bed_number'           => 'nullable|exists:bed,id',
+            'symptoms_type'        => 'nullable|array',
             'symptoms_type.*'      => 'string',
-            'symptoms_title'       => 'required|array',
+            'symptoms_title'       => 'array',
             'symptoms_title.*'     => 'string',
             'symptoms_description' => 'nullable|string',
             'note'                 => 'nullable|string',
@@ -108,8 +112,8 @@ class IpdController extends Controller
             return redirect()->back()->with('error', 'User not authenticated or hospital ID missing.');
         }
         try {
-            $symptomType          = array_filter($request->symptoms_type, fn($type) => $type !== null && $type !== '');
-            $symptomTitle         = array_filter($request->symptoms_title, fn($title) => $title !== null && $title !== '');
+           $symptomType  = array_filter($request->input('symptoms_type', []));
+$symptomTitle = array_filter($request->input('symptoms_title', []));
             $implodedSymptomType  = implode(", ", $symptomType);
             $implodedSymptomTitle = implode(", ", $symptomTitle);
 
