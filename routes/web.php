@@ -341,7 +341,6 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/dispatch-receive/{id}', [\App\Http\Controllers\DispatchReceiveController::class, 'show'])->name('dispatch.show');
     Route::delete('/dispatch-receive/delete/{id}', [\App\Http\Controllers\DispatchReceiveController::class, 'destroy'])->name('dispatch.destroy');
 
-
 });
 
 // Route::get('/medicine-group', function () {
@@ -553,6 +552,8 @@ Route::post('/add_nurse_note', [IpdController::class, 'addNurseNote'])->name('nu
 Route::post('/ipd/add_prescription', [IpdController::class, 'storePrescription'])->name('ipd.addPrescription');
 Route::post('/ipd_charge', [IpdController::class, 'addIpdCharge'])->name('ipd.addIpdCharge');
 Route::post('/assignNewBed', [IpdController::class, 'assignNewBed'])->name('assignNewBed');
+Route::post('/discharge-card/store', [IpdController::class, 'storeDischarge'])
+    ->name('discharge.store');
 
 Route::get('/billing', function () {
     return view('admin.billing.billing');

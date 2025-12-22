@@ -53,9 +53,7 @@
             border-radius: 3px;
             /* optional */
         }
-    </style>
 
-    <style>
         .timeline-wrapper {
             position: relative;
             padding-left: 110px;
@@ -213,6 +211,295 @@
                 left: 72px;
             }
         }
+
+
+         /* Modal Styling */
+        .modal-content {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+            padding: 1.5rem;
+            border: none;
+        }
+
+        .modal-title {
+            font-weight: 600;
+            font-size: 1.35rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .modal-title i {
+            font-size: 1.5rem;
+        }
+
+        .btn-close {
+            filter: brightness(0) invert(1);
+            opacity: 0.9;
+        }
+
+        .btn-close:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .modal-body {
+            padding: 0;
+            background: var(--bg-light);
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+
+        /* Section Cards */
+        .section-card {
+            background: white;
+            margin: 1rem;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .section-header {
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .section-header.primary {
+            background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(33, 150, 243, 0.05) 100%);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .section-header.danger {
+            background: linear-gradient(135deg, rgba(244, 67, 54, 0.1) 0%, rgba(244, 67, 54, 0.05) 100%);
+            border-bottom-color: var(--danger-color);
+        }
+
+        .section-header.warning {
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.1) 0%, rgba(255, 152, 0, 0.05) 100%);
+            border-bottom-color: var(--warning-color);
+        }
+
+        .section-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .section-icon.primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        }
+
+        .section-icon.danger {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            color: white;
+        }
+
+        .section-icon.warning {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+            color: white;
+        }
+
+        .section-title {
+            font-weight: 600;
+            font-size: 1.05rem;
+            color: var(--text-dark);
+            margin: 0;
+        }
+
+        .section-body {
+            padding: 1.5rem;
+        }
+
+        /* Info Grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.25rem;
+        }
+
+        .info-grid.full {
+            grid-template-columns: 1fr;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .info-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-label i {
+            color: var(--primary-color);
+            font-size: 0.9rem;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            color: var(--text-dark);
+            font-weight: 500;
+            padding: 0.75rem;
+            background: var(--bg-light);
+            border-radius: 6px;
+            border-left: 3px solid var(--primary-color);
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-value.empty {
+            color: var(--text-muted);
+            font-style: italic;
+            opacity: 0.7;
+            border-left-color: var(--border-color);
+        }
+
+        .info-value.long-text {
+            white-space: pre-wrap;
+            word-break: break-word;
+            align-items: flex-start;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            width: fit-content;
+        }
+
+        .status-badge.active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.discharged {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-badge.death {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-badge.referral {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-badge i {
+            font-size: 1rem;
+        }
+
+        /* Modal Footer */
+        .modal-footer {
+            background: white;
+            border-top: 1px solid var(--border-color);
+            padding: 1.25rem 1.5rem;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            border-radius: 8px;
+            padding: 0.625rem 1.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-print {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+        }
+
+        .btn-print:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+        }
+
+        .btn-close-modal {
+            background: white;
+            color: #6c757d;
+            border: 1px solid #6c757d !important;
+        }
+
+        .btn-close-modal:hover {
+            background: #f8f9fa;
+            color: #212529;
+            border-color: #6c757d;
+        }
+
+        /* Scrollbar */
+        .modal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-body::-webkit-scrollbar-track {
+            background: var(--bg-light);
+        }
+
+        .modal-body::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 4px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-card {
+                margin: 0.5rem;
+            }
+
+            .section-body {
+                padding: 1rem;
+            }
+        }
+
+        /* Hidden sections */
+        .d-none {
+            display: none !important;
+        }
     </style>
 
     <div class="p-4">
@@ -349,14 +636,26 @@
                         <div class="card shadow-sm border-0 mt-2">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>
-                                    {{ $ipd->patient->patient_name }}
-                                </h5>
+                                <div class= "d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>
+                                        {{ $ipd->patient->patient_name }}
+                                    </h5>
+                                    @if ($ipd->discharged == 'yes')
+                                        <button class="bg-transparent border-0" data-bs-toggle="modal"
+                                            data-bs-target="#dischargeDetailsModal"
+                                            data-discharge='@json($ipd->dischargeCard)'><i
+                                                class="bi bi-clipboard-pulse text-white"></i></button>
+                                    @else
+                                        <button class="bg-transparent border-0" data-bs-toggle="modal"
+                                            data-bs-target="#patientDischargeModal" data-id="{{ $ipd->id }}"><i
+                                                class="bi bi-clipboard-pulse text-white"></i></button>
+                                    @endif
+                                </div>
                             </div>
                             <div class="card-body">
                                 <div class="d-sm-flex position-relative z-0 overflow-hidden p-2">
                                     <!-- <img src="assets/img/icons/shape-01.svg" alt="img"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
                                     <a href="javascript:void(0);"
                                         class="avatar avatar-xxxl patient-avatar me-2 flex-shrink-0">
                                         <img src="{{ asset('assets/img/patient.png') }}" alt="product" class="rounded">
@@ -444,19 +743,19 @@
                                         </div>
                                     </div>
                                     <!-- <div class="row">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="col-sm-5">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-5">
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="col-sm-7">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-7">
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="col-sm-5">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-5">
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="col-sm-7">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-7">
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div> -->
                                 </div>
                                 <hr>
                                 <div class="d-flex align-items-center mb-3">
@@ -758,7 +1057,7 @@
                                                     <td>
                                                         {{ $lab->pathology->test_name .
                                                             "
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            (" .
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    (" .
                                                             $lab->pathology->short_name .
                                                             ')' }}
                                                     </td>
@@ -781,7 +1080,7 @@
                                 <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Operation
                                 </h5>
                             </div>
-                            
+
                             <div class="card-body">
                                 <!-- Table start -->
                                 <div class="table-responsive table-nowrap">
@@ -910,7 +1209,7 @@
                                                                         {{ number_format($transaction->amount, 2) }}
                                                                     </td>
 
-                                                                   
+
                                                                 </tr>
                                                             @empty
                                                                 <tr>
@@ -1558,87 +1857,114 @@
 
                                                                     </div>
 
-                                                                    <form method="POST" action="{{ route('medication.store') }}">
+                                                                    <form method="POST"
+                                                                        action="{{ route('medication.store') }}">
                                                                         @csrf
-                                                                        <input type="hidden" name="ipd_id" value="{{ $ipd->id }}">
+                                                                        <input type="hidden" name="ipd_id"
+                                                                            value="{{ $ipd->id }}">
                                                                         <div class="modal-body">
                                                                             <div class="row gy-3 py-4 mx-1">
 
                                                                                 {{-- Date --}}
                                                                                 <div class="col-md-6">
-                                                                                    <label for="date" class="form-label">Date <span class="text-danger">*</span></label>
-                                                                                    <input type="date" name="date" id="date"
+                                                                                    <label for="date"
+                                                                                        class="form-label">Date <span
+                                                                                            class="text-danger">*</span></label>
+                                                                                    <input type="date" name="date"
+                                                                                        id="date"
                                                                                         value="{{ old('date') }}"
                                                                                         class="form-control @error('date') is-invalid @enderror">
                                                                                     @error('date')
-                                                                                        <div class="text-danger small">{{ $message }}</div>
+                                                                                        <div class="text-danger small">
+                                                                                            {{ $message }}</div>
                                                                                     @enderror
                                                                                 </div>
 
                                                                                 {{-- Time --}}
                                                                                 <div class="col-md-6">
-                                                                                    <label for="time" class="form-label">Time <span class="text-danger">*</span></label>
-                                                                                    <input type="time" name="time" id="time"
+                                                                                    <label for="time"
+                                                                                        class="form-label">Time <span
+                                                                                            class="text-danger">*</span></label>
+                                                                                    <input type="time" name="time"
+                                                                                        id="time"
                                                                                         value="{{ old('time') }}"
                                                                                         class="form-control @error('time') is-invalid @enderror">
                                                                                     @error('time')
-                                                                                        <div class="text-danger small">{{ $message }}</div>
+                                                                                        <div class="text-danger small">
+                                                                                            {{ $message }}</div>
                                                                                     @enderror
                                                                                 </div>
 
                                                                                 {{-- Medicine Category --}}
                                                                                 <div class="col-md-6">
-                                                                                    <label for="medi_cat" class="form-label">Medicine Category <span class="text-danger">*</span></label>
+                                                                                    <label for="medi_cat"
+                                                                                        class="form-label">Medicine
+                                                                                        Category <span
+                                                                                            class="text-danger">*</span></label>
                                                                                     <select name="medi_cat" id="medi_cat"
-                                                                                            class="form-select @error('medi_cat') is-invalid @enderror">
-                                                                                        <option value="">Select</option>
-                                                                                        @foreach($medicineCategories as $cat)
-                                                                                            <option value="{{ $cat->id }}" {{ old('medi_cat') == $cat->id ? 'selected' : '' }}>
+                                                                                        class="form-select @error('medi_cat') is-invalid @enderror">
+                                                                                        <option value="">Select
+                                                                                        </option>
+                                                                                        @foreach ($medicineCategories as $cat)
+                                                                                            <option
+                                                                                                value="{{ $cat->id }}"
+                                                                                                {{ old('medi_cat') == $cat->id ? 'selected' : '' }}>
                                                                                                 {{ $cat->medicine_category }}
                                                                                             </option>
                                                                                         @endforeach
                                                                                     </select>
                                                                                     @error('medi_cat')
-                                                                                        <div class="text-danger small">{{ $message }}</div>
+                                                                                        <div class="text-danger small">
+                                                                                            {{ $message }}</div>
                                                                                     @enderror
                                                                                 </div>
 
                                                                                 {{-- Medicine Name (filtered by category via JS if needed) --}}
                                                                                 <div class="col-md-6">
-                                                                                    <label for="med_name" class="form-label">Medicine Name <span class="text-danger">*</span></label>
+                                                                                    <label for="med_name"
+                                                                                        class="form-label">Medicine Name
+                                                                                        <span
+                                                                                            class="text-danger">*</span></label>
                                                                                     <select name="med_name" id="med_name"
-                                                                                            class="form-select @error('med_name') is-invalid @enderror">
-                                                                                        <option value="">Select</option>
+                                                                                        class="form-select @error('med_name') is-invalid @enderror">
+                                                                                        <option value="">Select
+                                                                                        </option>
                                                                                     </select>
                                                                                     @error('med_name')
-                                                                                        <div class="text-danger small">{{ $message }}</div>
+                                                                                        <div class="text-danger small">
+                                                                                            {{ $message }}</div>
                                                                                     @enderror
                                                                                 </div>
 
                                                                                 {{-- Dosage --}}
                                                                                 <div class="col-md-6">
-                                                                                    <label for="dosage" class="form-label">Dosage <span class="text-danger">*</span></label>
+                                                                                    <label for="dosage"
+                                                                                        class="form-label">Dosage <span
+                                                                                            class="text-danger">*</span></label>
                                                                                     <select name="dosage" id="dosage"
-                                                                                            class="form-select @error('dosage') is-invalid @enderror">
-                                                                                        <option value="">Select</option>
-                                                                                        
+                                                                                        class="form-select @error('dosage') is-invalid @enderror">
+                                                                                        <option value="">Select
+                                                                                        </option>
+
                                                                                     </select>
                                                                                     @error('dosage')
-                                                                                        <div class="text-danger small">{{ $message }}</div>
+                                                                                        <div class="text-danger small">
+                                                                                            {{ $message }}</div>
                                                                                     @enderror
                                                                                 </div>
 
                                                                                 {{-- Remarks --}}
                                                                                 <div class="col-md-6">
-                                                                                    <label for="remark" class="form-label">Remarks</label>
-                                                                                    <textarea name="remark" id="remark"
-                                                                                            class="form-control">{{ old('remark') }}</textarea>
+                                                                                    <label for="remark"
+                                                                                        class="form-label">Remarks</label>
+                                                                                    <textarea name="remark" id="remark" class="form-control">{{ old('remark') }}</textarea>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
 
                                                                         <div class="modal-footer">
-                                                                            <button type="submit" class="btn btn-primary">Save</button>
+                                                                            <button type="submit"
+                                                                                class="btn btn-primary">Save</button>
                                                                         </div>
                                                                     </form>
 
@@ -1668,108 +1994,149 @@
                                                                     </td>
                                                                     <td>
                                                                         <div class="d-flex gap-2">
-                                                                            <a href="javascript:void(0);" 
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill editMedicationBtn"
-                                                                            data-id="{{ $medication->id }}"
-                                                                            data-date="{{ $medication->date }}"
-                                                                            data-time="{{ $medication->time }}"
-                                                                            data-cat="{{ $medication->pharmacy->medicine_category_id }}"  
-                                                                            data-med="{{ $medication->pharmacy_id }}"           
-                                                                            data-dose="{{ $medication->medicine_dosage_id }}" 
-                                                                            data-remark="{{ $medication->remark }}"
-                                                                            data-bs-toggle="modal"
-                                                                            data-bs-target="#edit_medication">
+                                                                            <a href="javascript:void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill editMedicationBtn"
+                                                                                data-id="{{ $medication->id }}"
+                                                                                data-date="{{ $medication->date }}"
+                                                                                data-time="{{ $medication->time }}"
+                                                                                data-cat="{{ $medication->pharmacy->medicine_category_id }}"
+                                                                                data-med="{{ $medication->pharmacy_id }}"
+                                                                                data-dose="{{ $medication->medicine_dosage_id }}"
+                                                                                data-remark="{{ $medication->remark }}"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#edit_medication">
                                                                                 <i class="ti ti-pencil"></i>
                                                                             </a>
-                                                                            <!-- <a href="javascript:void(0);" 
-                                                                                onclick="confirmDelete('{{ route('medication.delete', $medication->id) }}')" 
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                                    <i class="ti ti-trash" data-bs-toggle="tooltip" title="Delete"></i>
-                                                                            </a> -->
+                                                                            <!-- <a href="javascript:void(0);"
+                                                                                                    onclick="confirmDelete('{{ route('medication.delete', $medication->id) }}')"
+                                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                                                                        <i class="ti ti-trash" data-bs-toggle="tooltip" title="Delete"></i>
+                                                                                                </a> -->
 
                                                                         </div>
                                                                     </td>
                                                                 </tr>
-                                                                <div class="modal fade" id="edit_medication" tabindex="-1" aria-hidden="true">
-                                                                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                                <div class="modal fade" id="edit_medication"
+                                                                    tabindex="-1" aria-hidden="true">
+                                                                    <div
+                                                                        class="modal-dialog modal-dialog-centered modal-lg">
                                                                         <div class="modal-content">
 
-                                                                            <div class="modal-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                                                                <h5 class="modal-title">Edit Medication Dose</h5>
-                                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                                            <div class="modal-header"
+                                                                                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                                                                <h5 class="modal-title">Edit Medication
+                                                                                    Dose</h5>
+                                                                                <button type="button" class="btn-close"
+                                                                                    data-bs-dismiss="modal"></button>
                                                                             </div>
 
-                                                                            <form method="POST" action="{{ route('medication.update') }}">
+                                                                            <form method="POST"
+                                                                                action="{{ route('medication.update') }}">
                                                                                 @csrf
                                                                                 @method('PUT')
 
-                                                                                <input type="hidden" name="id" id="edit_id">
-                                                                                <input type="hidden" name="ipd_id" value="{{ $ipd->id }}">
+                                                                                <input type="hidden" name="id"
+                                                                                    id="edit_id">
+                                                                                <input type="hidden" name="ipd_id"
+                                                                                    value="{{ $ipd->id }}">
 
                                                                                 <div class="modal-body">
                                                                                     <div class="row gy-3 py-4 mx-1">
 
                                                                                         {{-- Date --}}
                                                                                         <div class="col-md-6">
-                                                                                            <label class="form-label">Date</label>
-                                                                                            <input type="date" name="date" id="edit_date" class="form-control">
+                                                                                            <label
+                                                                                                class="form-label">Date</label>
+                                                                                            <input type="date"
+                                                                                                name="date"
+                                                                                                id="edit_date"
+                                                                                                class="form-control">
                                                                                         </div>
 
                                                                                         {{-- Time --}}
                                                                                         <div class="col-md-6">
-                                                                                            <label class="form-label">Time</label>
-                                                                                            <input type="time" name="time" id="edit_time" class="form-control">
+                                                                                            <label
+                                                                                                class="form-label">Time</label>
+                                                                                            <input type="time"
+                                                                                                name="time"
+                                                                                                id="edit_time"
+                                                                                                class="form-control">
                                                                                         </div>
 
                                                                                         {{-- Category --}}
                                                                                         <div class="col-md-6">
-                                                                                            <label class="form-label">Medicine Category</label>
-                                                                                            <select name="medi_cat" id="edit_medi_cat" class="form-select">
-                                                                                                <option value="">Select</option>
-                                                                                                @foreach($medicineCategories as $cat)
-                                                                                                    <option value="{{ $cat->id }}">{{ $cat->medicine_category }}</option>
+                                                                                            <label
+                                                                                                class="form-label">Medicine
+                                                                                                Category</label>
+                                                                                            <select name="medi_cat"
+                                                                                                id="edit_medi_cat"
+                                                                                                class="form-select">
+                                                                                                <option value="">
+                                                                                                    Select</option>
+                                                                                                @foreach ($medicineCategories as $cat)
+                                                                                                    <option
+                                                                                                        value="{{ $cat->id }}">
+                                                                                                        {{ $cat->medicine_category }}
+                                                                                                    </option>
                                                                                                 @endforeach
                                                                                             </select>
                                                                                         </div>
 
                                                                                         {{-- Medicine --}}
                                                                                         <div class="col-md-6">
-                                                                                            <label class="form-label">Medicine Name</label>
-                                                                                            <select name="med_name" id="edit_med_name" class="form-select">
-                                                                                                @foreach($pharmacyDetails as $med)
-                                                                                                    <option value="{{ $med->id }}">{{ $med->medicine_name }}</option>
+                                                                                            <label
+                                                                                                class="form-label">Medicine
+                                                                                                Name</label>
+                                                                                            <select name="med_name"
+                                                                                                id="edit_med_name"
+                                                                                                class="form-select">
+                                                                                                @foreach ($pharmacyDetails as $med)
+                                                                                                    <option
+                                                                                                        value="{{ $med->id }}">
+                                                                                                        {{ $med->medicine_name }}
+                                                                                                    </option>
                                                                                                 @endforeach
                                                                                             </select>
                                                                                         </div>
 
                                                                                         {{-- Dosage --}}
                                                                                         <div class="col-md-6">
-                                                                                            <label class="form-label">Dosage</label>
-                                                                                            <select name="dosage" id="edit_dosage" class="form-select">
-                                                                                                @foreach($medDosages as $dose)
-                                                                                                    <option value="{{ $dose->id }}">{{ $dose->dosage }}</option>
+                                                                                            <label
+                                                                                                class="form-label">Dosage</label>
+                                                                                            <select name="dosage"
+                                                                                                id="edit_dosage"
+                                                                                                class="form-select">
+                                                                                                @foreach ($medDosages as $dose)
+                                                                                                    <option
+                                                                                                        value="{{ $dose->id }}">
+                                                                                                        {{ $dose->dosage }}
+                                                                                                    </option>
                                                                                                 @endforeach
                                                                                             </select>
                                                                                         </div>
 
                                                                                         {{-- Remarks --}}
                                                                                         <div class="col-md-6">
-                                                                                            <label class="form-label">Remarks</label>
-                                                                                            <input type="text" name="remark" id="edit_remark" class="form-control">
+                                                                                            <label
+                                                                                                class="form-label">Remarks</label>
+                                                                                            <input type="text"
+                                                                                                name="remark"
+                                                                                                id="edit_remark"
+                                                                                                class="form-control">
                                                                                         </div>
 
                                                                                     </div>
                                                                                 </div>
 
                                                                                 <div class="modal-footer">
-                                                                                    <button class="btn btn-primary">Update</button>
+                                                                                    <button
+                                                                                        class="btn btn-primary">Update</button>
                                                                                 </div>
                                                                             </form>
 
                                                                         </div>
                                                                     </div>
                                                                 </div>
-
                                                             @endforeach
                                                         </tbody>
                                                     </table>
@@ -1830,7 +2197,7 @@
                                                                     <td>
                                                                         {{ $lab->pathology->test_name .
                                                                             "
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        (" .
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                (" .
                                                                             $lab->pathology->short_name .
                                                                             ')' }}
                                                                     </td>
@@ -1881,137 +2248,178 @@
                                     <div class="col-lg-12">
                                         <div class="card">
                                             <div class="card-body">
-                                                <div class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
+                                                <div
+                                                    class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
                                                     <!-- Search Bar -->
                                                     <div class="input-icon-start position-relative me-2">
                                                         <span class="input-icon-addon">
                                                             <i class="ti ti-search"></i>
                                                         </span>
-                                                        <input type="text" class="form-control shadow-sm" placeholder="Search">
+                                                        <input type="text" class="form-control shadow-sm"
+                                                            placeholder="Search">
                                                     </div>
 
                                                     <!-- Add Operation Button -->
-                                                    <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#addOperationModal">
+                                                    <button type="button" class="btn btn-primary shadow-sm"
+                                                        data-bs-toggle="modal" data-bs-target="#addOperationModal">
                                                         <i class="ti ti-plus me-1"></i> Add Operation
                                                     </button>
 
                                                 </div>
 
-                                                    <!-- Modal -->
-                                                    <div class="modal fade" id="addOperationModal" tabindex="-1" aria-hidden="true">
-                                                        <div class="modal-dialog modal-lg modal-dialog-centered">
-                                                            <div class="modal-content">
+                                                <!-- Modal -->
+                                                <div class="modal fade" id="addOperationModal" tabindex="-1"
+                                                    aria-hidden="true">
+                                                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                                                        <div class="modal-content">
 
-                                                                <div class="modal-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                                                    <h5 class="modal-title" style="color:#750096"><i class="fas fa-cogs me-2"></i>Add Operation</h5>
-                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                                </div>
-
-                                                                <div class="modal-body">
-                                                                    <!-- Include the Operation Form -->
-                                                                    <form action="{{ route('operation.store') }}" method="POST">
-                                                                        @csrf
-                                                                        <input type="text" name="ipd_details_id" class="form-control" value="{{$ipd->id}}" hidden>
-                                                                        <div class="row gy-3 py-4 mx-1">                                          
-
-                                                                            <div class="col-md-4 mb-3">
-                                                                                <label class="form-label">Customer Type</label>
-                                                                                <select name="customer_type" class="form-control" required>
-                                                                                    <option value="">Select</option>
-                                                                                    <option value="General">General</option>
-                                                                                    <option value="VIP">VIP</option>
-                                                                                    <option value="Corporate">Corporate</option>
-                                                                                </select>
-                                                                            </div>
-
-                                                                             
-                                                                            <div class="col-md-6">
-                                                                                <label class="form-label">Operation Category</label>
-                                                                                <select name="operation_category_id" id="operation_category" class="form-select">
-                                                                                    <option value="">Select Category</option>
-                                                                                    @foreach($operationCategories as $cat)
-                                                                                        <option value="{{ $cat->id }}">{{ $cat->category }}</option>
-                                                                                    @endforeach
-                                                                                </select>
-                                                                            </div>
-
-                                                                            
-                                                                            <div class="col-md-6">
-                                                                                <label class="form-label">Operations</label>
-                                                                                <select name="operation_id" id="operation_type" class="form-select">
-                                                                                    <option value="">Select Operation</option>
-                                                                                    {{-- Options will be populated via JS --}}
-                                                                                </select>
-                                                                            </div>
-
-                                                                            <div class="col-md-4 mb-3">
-                                                                                <label class="form-label">Operation Date & Time</label>
-                                                                                <input type="datetime-local" name="date" class="form-control" required>
-                                                                            </div>
-
-                                                                            <div class="col-md-4 mb-3">
-                                                                                <label class="form-label">Consultant Doctor</label>
-                                                                                <select name="consultant_doctor" class="form-select">
-                                                                                    <option value="">Select Doctor</option>
-                                                                                    @foreach($doctors as $doctor)
-                                                                                        <option value="{{ $doctor->id }}">{{ $doctor->name }}</option>
-                                                                                    @endforeach
-                                                                                </select>
-                                                                            </div>
-
-                                                                            <div class="col-md-4 mb-3">
-                                                                                <label class="form-label">Assistant Consultant 1</label>
-                                                                                <input type="text" name="ass_consultant_1" class="form-control">
-                                                                            </div>
-
-                                                                            <div class="col-md-4 mb-3">
-                                                                                <label class="form-label">Assistant Consultant 2</label>
-                                                                                <input type="text" name="ass_consultant_2" class="form-control">
-                                                                            </div>
-
-                                                                            <div class="col-md-4 mb-3">
-                                                                                <label class="form-label">Anesthetist</label>
-                                                                                <input type="text" name="anesthetist" class="form-control">
-                                                                            </div>
-
-                                                                            <div class="col-md-4 mb-3">
-                                                                                <label class="form-label">Anaesthesia Type</label>
-                                                                                <input type="text" name="anaethesia_type" class="form-control">
-                                                                            </div>
-
-                                                                            <div class="col-md-4 mb-3">
-                                                                                <label class="form-label">OT Technician</label>
-                                                                                <input type="text" name="ot_technician" class="form-control">
-                                                                            </div>
-
-                                                                            <div class="col-md-4 mb-3">
-                                                                                <label class="form-label">OT Assistant</label>
-                                                                                <input type="text" name="ot_assistant" class="form-control">
-                                                                            </div>
-
-                                                                            <div class="col-md-4 mb-3">
-                                                                                <label class="form-label">Result</label>
-                                                                                <input type="text" name="result" class="form-control">
-                                                                            </div>
-
-                                                                            <div class="col-md-12 mb-3">
-                                                                                <label class="form-label">Remark</label>
-                                                                                <textarea name="remark" rows="3" class="form-control"></textarea>
-                                                                            </div>
-
-                                                                           
-
-                                                                        </div>
-
-                                                                        <div class="mt-3 text-end modal-footer">
-                                                                            <button type="submit" class="btn btn-primary">Save Operation</button>
-                                                                        </div>
-                                                                    </form>
-                                                                </div>
-
+                                                            <div class="modal-header"
+                                                                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                                                <h5 class="modal-title" style="color:#750096"><i
+                                                                        class="fas fa-cogs me-2"></i>Add Operation</h5>
+                                                                <button type="button" class="btn-close"
+                                                                    data-bs-dismiss="modal"></button>
                                                             </div>
+
+                                                            <div class="modal-body">
+                                                                <!-- Include the Operation Form -->
+                                                                <form action="{{ route('operation.store') }}"
+                                                                    method="POST">
+                                                                    @csrf
+                                                                    <input type="text" name="ipd_details_id"
+                                                                        class="form-control" value="{{ $ipd->id }}"
+                                                                        hidden>
+                                                                    <div class="row gy-3 py-4 mx-1">
+
+                                                                        <div class="col-md-4 mb-3">
+                                                                            <label class="form-label">Customer
+                                                                                Type</label>
+                                                                            <select name="customer_type"
+                                                                                class="form-control" required>
+                                                                                <option value="">Select</option>
+                                                                                <option value="General">General</option>
+                                                                                <option value="VIP">VIP</option>
+                                                                                <option value="Corporate">Corporate
+                                                                                </option>
+                                                                            </select>
+                                                                        </div>
+
+
+                                                                        <div class="col-md-6">
+                                                                            <label class="form-label">Operation
+                                                                                Category</label>
+                                                                            <select name="operation_category_id"
+                                                                                id="operation_category"
+                                                                                class="form-select">
+                                                                                <option value="">Select Category
+                                                                                </option>
+                                                                                @foreach ($operationCategories as $cat)
+                                                                                    <option value="{{ $cat->id }}">
+                                                                                        {{ $cat->category }}</option>
+                                                                                @endforeach
+                                                                            </select>
+                                                                        </div>
+
+
+                                                                        <div class="col-md-6">
+                                                                            <label class="form-label">Operations</label>
+                                                                            <select name="operation_id"
+                                                                                id="operation_type" class="form-select">
+                                                                                <option value="">Select Operation
+                                                                                </option>
+                                                                                {{-- Options will be populated via JS --}}
+                                                                            </select>
+                                                                        </div>
+
+                                                                        <div class="col-md-4 mb-3">
+                                                                            <label class="form-label">Operation Date &
+                                                                                Time</label>
+                                                                            <input type="datetime-local" name="date"
+                                                                                class="form-control" required>
+                                                                        </div>
+
+                                                                        <div class="col-md-4 mb-3">
+                                                                            <label class="form-label">Consultant
+                                                                                Doctor</label>
+                                                                            <select name="consultant_doctor"
+                                                                                class="form-select">
+                                                                                <option value="">Select Doctor
+                                                                                </option>
+                                                                                @foreach ($doctors as $doctor)
+                                                                                    <option value="{{ $doctor->id }}">
+                                                                                        {{ $doctor->name }}</option>
+                                                                                @endforeach
+                                                                            </select>
+                                                                        </div>
+
+                                                                        <div class="col-md-4 mb-3">
+                                                                            <label class="form-label">Assistant Consultant
+                                                                                1</label>
+                                                                            <input type="text"
+                                                                                name="ass_consultant_1"
+                                                                                class="form-control">
+                                                                        </div>
+
+                                                                        <div class="col-md-4 mb-3">
+                                                                            <label class="form-label">Assistant Consultant
+                                                                                2</label>
+                                                                            <input type="text"
+                                                                                name="ass_consultant_2"
+                                                                                class="form-control">
+                                                                        </div>
+
+                                                                        <div class="col-md-4 mb-3">
+                                                                            <label class="form-label">Anesthetist</label>
+                                                                            <input type="text" name="anesthetist"
+                                                                                class="form-control">
+                                                                        </div>
+
+                                                                        <div class="col-md-4 mb-3">
+                                                                            <label class="form-label">Anaesthesia
+                                                                                Type</label>
+                                                                            <input type="text" name="anaethesia_type"
+                                                                                class="form-control">
+                                                                        </div>
+
+                                                                        <div class="col-md-4 mb-3">
+                                                                            <label class="form-label">OT
+                                                                                Technician</label>
+                                                                            <input type="text" name="ot_technician"
+                                                                                class="form-control">
+                                                                        </div>
+
+                                                                        <div class="col-md-4 mb-3">
+                                                                            <label class="form-label">OT Assistant</label>
+                                                                            <input type="text" name="ot_assistant"
+                                                                                class="form-control">
+                                                                        </div>
+
+                                                                        <div class="col-md-4 mb-3">
+                                                                            <label class="form-label">Result</label>
+                                                                            <input type="text" name="result"
+                                                                                class="form-control">
+                                                                        </div>
+
+                                                                        <div class="col-md-12 mb-3">
+                                                                            <label class="form-label">Remark</label>
+                                                                            <textarea name="remark" rows="3" class="form-control"></textarea>
+                                                                        </div>
+
+
+
+                                                                    </div>
+
+                                                                    <div class="mt-3 text-end modal-footer">
+                                                                        <button type="submit"
+                                                                            class="btn btn-primary">Save
+                                                                            Operation</button>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+
                                                         </div>
                                                     </div>
+                                                </div>
 
                                                 <!-- Table start -->
                                                 <div class="table-responsive table-nowrap">
@@ -2041,50 +2449,82 @@
                                                                     <td>{{ $operation->ot_technician }}</td>
                                                                     <td>
                                                                         <div class="d-flex gap-2">
-                                                                            <a href="#" data-bs-toggle="modal" data-bs-target="#editOperationModal{{ $operation->id }}"
-   class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
-    <i class="ti ti-pencil"></i>
-</a>
+                                                                            <a href="#" data-bs-toggle="modal"
+                                                                                data-bs-target="#editOperationModal{{ $operation->id }}"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
+                                                                                <i class="ti ti-pencil"></i>
+                                                                            </a>
                                                                             <!-- <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                                <i class="ti ti-trash"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    title="Show"></i></a> -->
+                                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                                                                    <i class="ti ti-trash"
+                                                                                                        data-bs-toggle="tooltip"
+                                                                                                        title="Show"></i></a> -->
                                                                         </div>
                                                                     </td>
                                                                 </tr>
                                                                 <!-- EDIT OPERATION MODAL -->
-                                                                <div class="modal fade" id="editOperationModal{{ $operation->id }}" tabindex="-1" aria-hidden="true">
-                                                                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                                                                <div class="modal fade"
+                                                                    id="editOperationModal{{ $operation->id }}"
+                                                                    tabindex="-1" aria-hidden="true">
+                                                                    <div
+                                                                        class="modal-dialog modal-lg modal-dialog-centered">
                                                                         <div class="modal-content">
 
-                                                                            <div class="modal-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                                                                <h5 class="modal-title" style="color:#750096"><i class="fas fa-cogs me-2"></i>Edit Operation</h5>
-                                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                                            <div class="modal-header"
+                                                                                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                                                                <h5 class="modal-title"
+                                                                                    style="color:#750096"><i
+                                                                                        class="fas fa-cogs me-2"></i>Edit
+                                                                                    Operation</h5>
+                                                                                <button type="button" class="btn-close"
+                                                                                    data-bs-dismiss="modal"></button>
                                                                             </div>
 
                                                                             <div class="modal-body">
-                                                                                <form action="{{ route('operation.update', $operation->id) }}" method="POST">
+                                                                                <form
+                                                                                    action="{{ route('operation.update', $operation->id) }}"
+                                                                                    method="POST">
                                                                                     @csrf
                                                                                     @method('PUT')
-                                                                                    <input type="text" name="ipd_details_id" class="form-control" value="{{ $ipd->id }}" hidden>
+                                                                                    <input type="text"
+                                                                                        name="ipd_details_id"
+                                                                                        class="form-control"
+                                                                                        value="{{ $ipd->id }}"
+                                                                                        hidden>
                                                                                     <div class="row gy-3 py-4 mx-1">
-                                                                                                                <div class="col-md-4 mb-3">
-                                                                                            <label class="form-label">Customer Type</label>
-                                                                                            <select name="customer_type" class="form-control" required>
-                                                                                                <option value="">Select</option>
-                                                                                                <option value="General" {{ $operation->customer_type == 'General' ? 'selected' : '' }}>General</option>
-                                                                                                <option value="VIP" {{ $operation->customer_type == 'VIP' ? 'selected' : '' }}>VIP</option>
-                                                                                                <option value="Corporate" {{ $operation->customer_type == 'Corporate' ? 'selected' : '' }}>Corporate</option>
+                                                                                        <div class="col-md-4 mb-3">
+                                                                                            <label
+                                                                                                class="form-label">Customer
+                                                                                                Type</label>
+                                                                                            <select name="customer_type"
+                                                                                                class="form-control"
+                                                                                                required>
+                                                                                                <option value="">
+                                                                                                    Select</option>
+                                                                                                <option value="General"
+                                                                                                    {{ $operation->customer_type == 'General' ? 'selected' : '' }}>
+                                                                                                    General</option>
+                                                                                                <option value="VIP"
+                                                                                                    {{ $operation->customer_type == 'VIP' ? 'selected' : '' }}>
+                                                                                                    VIP</option>
+                                                                                                <option value="Corporate"
+                                                                                                    {{ $operation->customer_type == 'Corporate' ? 'selected' : '' }}>
+                                                                                                    Corporate</option>
                                                                                             </select>
                                                                                         </div>
 
                                                                                         <div class="col-md-6">
-                                                                                            <label class="form-label">Operation Category</label>
-                                                                                            <select name="operation_category_id" class="form-select">
-                                                                                                <option value="">Select Category</option>
-                                                                                                @foreach($operationCategories as $cat)
-                                                                                                    <option value="{{ $cat->id }}" 
+                                                                                            <label
+                                                                                                class="form-label">Operation
+                                                                                                Category</label>
+                                                                                            <select
+                                                                                                name="operation_category_id"
+                                                                                                class="form-select">
+                                                                                                <option value="">
+                                                                                                    Select Category</option>
+                                                                                                @foreach ($operationCategories as $cat)
+                                                                                                    <option
+                                                                                                        value="{{ $cat->id }}"
                                                                                                         {{ $operation->operation->category_id == $cat->id ? 'selected' : '' }}>
                                                                                                         {{ $cat->category }}
                                                                                                     </option>
@@ -2093,11 +2533,16 @@
                                                                                         </div>
 
                                                                                         <div class="col-md-6">
-                                                                                            <label class="form-label">Operations</label>
-                                                                                            <select name="operation_id" class="form-select">
-                                                                                                <option value="">Select Operation</option>
-                                                                                                @foreach($operations as $op)
-                                                                                                    <option value="{{ $op->id }}" 
+                                                                                            <label
+                                                                                                class="form-label">Operations</label>
+                                                                                            <select name="operation_id"
+                                                                                                class="form-select">
+                                                                                                <option value="">
+                                                                                                    Select Operation
+                                                                                                </option>
+                                                                                                @foreach ($operations as $op)
+                                                                                                    <option
+                                                                                                        value="{{ $op->id }}"
                                                                                                         {{ $operation->operation_id == $op->id ? 'selected' : '' }}>
                                                                                                         {{ $op->operation }}
                                                                                                     </option>
@@ -2106,17 +2551,28 @@
                                                                                         </div>
 
                                                                                         <div class="col-md-4 mb-3">
-                                                                                            <label class="form-label">Operation Date & Time</label>
-                                                                                            <input type="datetime-local" name="date" class="form-control"
-                                                                                                value="{{ \Carbon\Carbon::parse($operation->date)->format('Y-m-d\TH:i') }}" required>
+                                                                                            <label
+                                                                                                class="form-label">Operation
+                                                                                                Date & Time</label>
+                                                                                            <input type="datetime-local"
+                                                                                                name="date"
+                                                                                                class="form-control"
+                                                                                                value="{{ \Carbon\Carbon::parse($operation->date)->format('Y-m-d\TH:i') }}"
+                                                                                                required>
                                                                                         </div>
 
                                                                                         <div class="col-md-4 mb-3">
-                                                                                            <label class="form-label">Consultant Doctor</label>
-                                                                                            <select name="consultant_doctor" class="form-select">
-                                                                                                <option value="">Select Doctor</option>
-                                                                                                @foreach($doctors as $doctor)
-                                                                                                    <option value="{{ $doctor->id }}" 
+                                                                                            <label
+                                                                                                class="form-label">Consultant
+                                                                                                Doctor</label>
+                                                                                            <select
+                                                                                                name="consultant_doctor"
+                                                                                                class="form-select">
+                                                                                                <option value="">
+                                                                                                    Select Doctor</option>
+                                                                                                @foreach ($doctors as $doctor)
+                                                                                                    <option
+                                                                                                        value="{{ $doctor->id }}"
                                                                                                         {{ $operation->consultant_doctor == $doctor->id ? 'selected' : '' }}>
                                                                                                         {{ $doctor->name }}
                                                                                                     </option>
@@ -2125,55 +2581,83 @@
                                                                                         </div>
 
                                                                                         <div class="col-md-4 mb-3">
-                                                                                            <label class="form-label">Assistant Consultant 1</label>
-                                                                                            <input type="text" name="ass_consultant_1" class="form-control"
+                                                                                            <label
+                                                                                                class="form-label">Assistant
+                                                                                                Consultant 1</label>
+                                                                                            <input type="text"
+                                                                                                name="ass_consultant_1"
+                                                                                                class="form-control"
                                                                                                 value="{{ $operation->ass_consultant_1 }}">
                                                                                         </div>
 
                                                                                         <div class="col-md-4 mb-3">
-                                                                                            <label class="form-label">Assistant Consultant 2</label>
-                                                                                            <input type="text" name="ass_consultant_2" class="form-control"
+                                                                                            <label
+                                                                                                class="form-label">Assistant
+                                                                                                Consultant 2</label>
+                                                                                            <input type="text"
+                                                                                                name="ass_consultant_2"
+                                                                                                class="form-control"
                                                                                                 value="{{ $operation->ass_consultant_2 }}">
                                                                                         </div>
 
                                                                                         <div class="col-md-4 mb-3">
-                                                                                            <label class="form-label">Anesthetist</label>
-                                                                                            <input type="text" name="anesthetist" class="form-control"
+                                                                                            <label
+                                                                                                class="form-label">Anesthetist</label>
+                                                                                            <input type="text"
+                                                                                                name="anesthetist"
+                                                                                                class="form-control"
                                                                                                 value="{{ $operation->anesthetist }}">
                                                                                         </div>
 
                                                                                         <div class="col-md-4 mb-3">
-                                                                                            <label class="form-label">Anaesthesia Type</label>
-                                                                                            <input type="text" name="anaethesia_type" class="form-control"
+                                                                                            <label
+                                                                                                class="form-label">Anaesthesia
+                                                                                                Type</label>
+                                                                                            <input type="text"
+                                                                                                name="anaethesia_type"
+                                                                                                class="form-control"
                                                                                                 value="{{ $operation->anaethesia_type }}">
                                                                                         </div>
 
                                                                                         <div class="col-md-4 mb-3">
-                                                                                            <label class="form-label">OT Technician</label>
-                                                                                            <input type="text" name="ot_technician" class="form-control"
+                                                                                            <label class="form-label">OT
+                                                                                                Technician</label>
+                                                                                            <input type="text"
+                                                                                                name="ot_technician"
+                                                                                                class="form-control"
                                                                                                 value="{{ $operation->ot_technician }}">
                                                                                         </div>
 
                                                                                         <div class="col-md-4 mb-3">
-                                                                                            <label class="form-label">OT Assistant</label>
-                                                                                            <input type="text" name="ot_assistant" class="form-control"
+                                                                                            <label class="form-label">OT
+                                                                                                Assistant</label>
+                                                                                            <input type="text"
+                                                                                                name="ot_assistant"
+                                                                                                class="form-control"
                                                                                                 value="{{ $operation->ot_assistant }}">
                                                                                         </div>
 
                                                                                         <div class="col-md-4 mb-3">
-                                                                                            <label class="form-label">Result</label>
-                                                                                            <input type="text" name="result" class="form-control"
+                                                                                            <label
+                                                                                                class="form-label">Result</label>
+                                                                                            <input type="text"
+                                                                                                name="result"
+                                                                                                class="form-control"
                                                                                                 value="{{ $operation->result }}">
                                                                                         </div>
 
                                                                                         <div class="col-md-12 mb-3">
-                                                                                            <label class="form-label">Remark</label>
+                                                                                            <label
+                                                                                                class="form-label">Remark</label>
                                                                                             <textarea name="remark" rows="3" class="form-control">{{ $operation->remark }}</textarea>
                                                                                         </div>
 
                                                                                     </div>
-                                                                                    <div class="mt-3 text-end modal-footer">
-                                                                                        <button type="submit" class="btn btn-primary">Update Operation</button>
+                                                                                    <div
+                                                                                        class="mt-3 text-end modal-footer">
+                                                                                        <button type="submit"
+                                                                                            class="btn btn-primary">Update
+                                                                                            Operation</button>
                                                                                     </div>
                                                                                 </form>
                                                                             </div>
@@ -2181,7 +2665,6 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-
                                                             @endforeach
                                                         </tbody>
                                                     </table>
@@ -2267,7 +2750,8 @@
                                                                         @csrf
                                                                         <div class="modal-body">
                                                                             <div class="row gy-3 py-4 mx-1">
-                                                                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                                <div
+                                                                                    class="col-lg-12 col-md-12 col-sm-12">
 
                                                                                     <div class="row ptt10">
                                                                                         <div class="col-sm-2">
@@ -2287,7 +2771,8 @@
                                                                                                     style="width: 100%"
                                                                                                     tabindex="-1"
                                                                                                     aria-hidden="true">
-                                                                                                    <option value="">
+                                                                                                    <option
+                                                                                                        value="">
                                                                                                         Select
                                                                                                     </option>
 
@@ -2309,7 +2794,8 @@
                                                                                                     class="form-control select2 charge_category2 reset_value select2-hidden-accessible"
                                                                                                     tabindex="-1"
                                                                                                     aria-hidden="true">
-                                                                                                    <option value="">
+                                                                                                    <option
+                                                                                                        value="">
                                                                                                         Select
                                                                                                     </option>
                                                                                                 </select>
@@ -2328,7 +2814,8 @@
                                                                                                     class="form-control addcharge  select2 reset_value select2-hidden-accessible"
                                                                                                     tabindex="-1"
                                                                                                     aria-hidden="true">
-                                                                                                    <option value="">
+                                                                                                    <option
+                                                                                                        value="">
                                                                                                         Select
                                                                                                     </option>
                                                                                                 </select>
@@ -2341,7 +2828,7 @@
                                                                                                     Charge
                                                                                                     (INR)</label>
                                                                                                 <input type="text"
-                                                                                                    
+
                                                                                                     name="standard_charge"
                                                                                                     id="addstandard_charge"
                                                                                                     class="form-control reset_value standard_charge"
@@ -2356,7 +2843,7 @@
                                                                                                     class="form-label">TPA
                                                                                                     Charge (INR)</label>
                                                                                                 <input type="text"
-                                                                                                    
+
                                                                                                     name="schedule_charge"
                                                                                                     id="addscd_charge"
                                                                                                     placeholder=""
@@ -2624,7 +3111,7 @@
                                                                     <td class="text-right">
                                                                         {{ $charge->chargeCategory->name }}
                                                                     </td>
-                                                                   
+
                                                                     <td class="text-right">
                                                                         {{ $charge->qty }}</td>
                                                                     <td class="text-right">
@@ -2937,7 +3424,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="tab-pane" id="timeline">
                 <!-- row start -->
                 <div class="row">
@@ -2979,80 +3466,106 @@
                                                                     <div class="modal-header"
                                                                         style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
-                                                                        <h5 class="modal-title" id="addSpecializationLabel">
+                                                                        <h5 class="modal-title"
+                                                                            id="addSpecializationLabel">
                                                                             Add Timeline
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
                                                                             data-bs-dismiss="modal"></button>
 
                                                                     </div>
-                                                                    <form method="POST" action="{{ isset($timeline) ? route('patient-timeline.update', $timeline->id) : route('patient-timeline.store') }}" enctype="multipart/form-data">
-                                                                            @csrf
-                                                                            @if(isset($timeline))
-                                                                                @method('PUT')
-                                                                            @endif
+                                                                    <form method="POST"
+                                                                        action="{{ isset($timeline) ? route('patient-timeline.update', $timeline->id) : route('patient-timeline.store') }}"
+                                                                        enctype="multipart/form-data">
+                                                                        @csrf
+                                                                        @if (isset($timeline))
+                                                                            @method('PUT')
+                                                                        @endif
 
-                                                                            <input type="hidden" name="patient_id" value="{{ $ipd->patient_id ?? '' }}">
+                                                                        <input type="hidden" name="patient_id"
+                                                                            value="{{ $ipd->patient_id ?? '' }}">
 
-                                                                            <div class="modal-body">
-                                                                                <div class="row gy-3 py-4 mx-1">
-                                                                                    <!-- Title -->
-                                                                                    <div class="col-md-12">
-                                                                                        <label for="title" class="form-label">
-                                                                                            Title <span class="text-danger">*</span>
-                                                                                        </label>
-                                                                                        <input type="text" name="title" id="title" class="form-control"
-                                                                                            value="{{ old('title', $timeline->title ?? '') }}" required>
-                                                                                    </div>
+                                                                        <div class="modal-body">
+                                                                            <div class="row gy-3 py-4 mx-1">
+                                                                                <!-- Title -->
+                                                                                <div class="col-md-12">
+                                                                                    <label for="title"
+                                                                                        class="form-label">
+                                                                                        Title <span
+                                                                                            class="text-danger">*</span>
+                                                                                    </label>
+                                                                                    <input type="text" name="title"
+                                                                                        id="title"
+                                                                                        class="form-control"
+                                                                                        value="{{ old('title', $timeline->title ?? '') }}"
+                                                                                        required>
+                                                                                </div>
 
-                                                                                    <!-- Date -->
-                                                                                    <div class="col-md-12">
-                                                                                        <label for="date" class="form-label">
-                                                                                            Date <span class="text-danger">*</span>
-                                                                                        </label>
-                                                                                        <input type="date" name="date" id="date" class="form-control"
-                                                                                            value="{{ old('date', isset($timeline->date) ? \Carbon\Carbon::parse($timeline->date)->format('Y-m-d') : '') }}" required>
-                                                                                    </div>
+                                                                                <!-- Date -->
+                                                                                <div class="col-md-12">
+                                                                                    <label for="date"
+                                                                                        class="form-label">
+                                                                                        Date <span
+                                                                                            class="text-danger">*</span>
+                                                                                    </label>
+                                                                                    <input type="date" name="date"
+                                                                                        id="date"
+                                                                                        class="form-control"
+                                                                                        value="{{ old('date', isset($timeline->date) ? \Carbon\Carbon::parse($timeline->date)->format('Y-m-d') : '') }}"
+                                                                                        required>
+                                                                                </div>
 
-                                                                                    <!-- Description -->
-                                                                                    <div class="col-md-12">
-                                                                                        <label for="description" class="form-label">
-                                                                                            Description
-                                                                                        </label>
-                                                                                        <textarea name="description" id="description" class="form-control" rows="3">{{ old('description', $timeline->description ?? '') }}</textarea>
-                                                                                    </div>
+                                                                                <!-- Description -->
+                                                                                <div class="col-md-12">
+                                                                                    <label for="description"
+                                                                                        class="form-label">
+                                                                                        Description
+                                                                                    </label>
+                                                                                    <textarea name="description" id="description" class="form-control" rows="3">{{ old('description', $timeline->description ?? '') }}</textarea>
+                                                                                </div>
 
-                                                                                    <!-- Attach Document -->
-                                                                                    <div class="col-md-12">
-                                                                                        <label for="attch_doc" class="form-label">
-                                                                                            Attach Document
-                                                                                        </label>
-                                                                                        <input type="file" name="attch_doc" id="attch_doc" class="form-control">
-                                                                                        @if(isset($timeline) && $timeline->attch_doc)
-                                                                                            <small class="text-muted d-block mt-1">
-                                                                                                Current File:
-                                                                                                <a href="{{ asset('storage/timeline_docs/' . $timeline->attch_doc) }}" target="_blank">
-                                                                                                    View Document
-                                                                                                </a>
-                                                                                            </small>
-                                                                                        @endif
-                                                                                    </div>
+                                                                                <!-- Attach Document -->
+                                                                                <div class="col-md-12">
+                                                                                    <label for="attch_doc"
+                                                                                        class="form-label">
+                                                                                        Attach Document
+                                                                                    </label>
+                                                                                    <input type="file"
+                                                                                        name="attch_doc" id="attch_doc"
+                                                                                        class="form-control">
+                                                                                    @if (isset($timeline) && $timeline->attch_doc)
+                                                                                        <small
+                                                                                            class="text-muted d-block mt-1">
+                                                                                            Current File:
+                                                                                            <a href="{{ asset('storage/timeline_docs/' . $timeline->attch_doc) }}"
+                                                                                                target="_blank">
+                                                                                                View Document
+                                                                                            </a>
+                                                                                        </small>
+                                                                                    @endif
+                                                                                </div>
 
-                                                                                    <!-- Visible to Person -->
-                                                                                    <div class="col-md-12 form-check">
-                                                                                        <input type="checkbox" name="visible_person" id="visible_person" class="form-check-input"
-                                                                                            {{ old('visible_person', $timeline->visible_person ?? false) ? 'checked' : '' }}>
-                                                                                        <label for="visible_person" class="form-check-label">Visible to this person</label>
-                                                                                    </div>
+                                                                                <!-- Visible to Person -->
+                                                                                <div class="col-md-12 form-check">
+                                                                                    <input type="checkbox"
+                                                                                        name="visible_person"
+                                                                                        id="visible_person"
+                                                                                        class="form-check-input"
+                                                                                        {{ old('visible_person', $timeline->visible_person ?? false) ? 'checked' : '' }}>
+                                                                                    <label for="visible_person"
+                                                                                        class="form-check-label">Visible
+                                                                                        to this person</label>
                                                                                 </div>
                                                                             </div>
+                                                                        </div>
 
-                                                                            <div class="modal-footer">
-                                                                                <button type="submit" class="btn btn-primary">
-                                                                                    {{ isset($timeline) ? 'Update' : 'Save' }}
-                                                                                </button>
-                                                                            </div>
-                                                                        </form>
+                                                                        <div class="modal-footer">
+                                                                            <button type="submit"
+                                                                                class="btn btn-primary">
+                                                                                {{ isset($timeline) ? 'Update' : 'Save' }}
+                                                                            </button>
+                                                                        </div>
+                                                                    </form>
 
                                                                 </div>
                                                             </div>
@@ -3064,7 +3577,7 @@
                                                     <table class="table border">
                                                         <thead class="thead-light">
                                                             <tr>
-                                                                
+
                                                                 <th>Patient Name</th>
                                                                 <th>Title</th>
                                                                 <th>Description</th>
@@ -3073,37 +3586,39 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                             @forelse($PatientTimelines as $timeline)
-                                                            <tr>
-                                                                <td>
-                                                                    <h6 class="fs-14 mb-1">
-                                                                        <a href="#" class="fw-semibold">{{ $timeline->patient->patient_name ?? '-' }}</a>
-                                                                    </h6>
-                                                                </td>
-                                                                
-                                                                
-                                                                <td>{{ $timeline->title ?? '-' }}</td>
-                                                                <td>{{ $timeline->description ?? '-' }}</td>
-                                                                <td>
-                                                                    @if(!empty($timeline->timeline_date))
-                                                                        {{ \Carbon\Carbon::parse($timeline->timeline_date)->format('d/m/Y h:i A') }}
-                                                                    @else
-                                                                        -
-                                                                    @endif
-                                                                </td>
-                                                                <td>
-                                                                    <div class="d-flex gap-2">
-                                                                        <a href="#"
-                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
-                                                                        data-bs-toggle="tooltip" title="Show">
-                                                                            <i class="ti ti-menu"></i>
-                                                                        </a>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
+                                                            @forelse($PatientTimelines as $timeline)
+                                                                <tr>
+                                                                    <td>
+                                                                        <h6 class="fs-14 mb-1">
+                                                                            <a href="#"
+                                                                                class="fw-semibold">{{ $timeline->patient->patient_name ?? '-' }}</a>
+                                                                        </h6>
+                                                                    </td>
+
+
+                                                                    <td>{{ $timeline->title ?? '-' }}</td>
+                                                                    <td>{{ $timeline->description ?? '-' }}</td>
+                                                                    <td>
+                                                                        @if (!empty($timeline->timeline_date))
+                                                                            {{ \Carbon\Carbon::parse($timeline->timeline_date)->format('d/m/Y h:i A') }}
+                                                                        @else
+                                                                            -
+                                                                        @endif
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="d-flex gap-2">
+                                                                            <a href="#"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
+                                                                                data-bs-toggle="tooltip" title="Show">
+                                                                                <i class="ti ti-menu"></i>
+                                                                            </a>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
                                                             @empty
                                                                 <tr>
-                                                                    <td colspan="6" class="text-center text-muted">No timeline records found</td>
+                                                                    <td colspan="6" class="text-center text-muted">No
+                                                                        timeline records found</td>
                                                                 </tr>
                                                             @endforelse
                                                         </tbody>
@@ -3126,7 +3641,8 @@
                         <div class="card shadow-sm flex-fill w-100">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Treatment History
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Treatment
+                                    History
                                 </h5>
                             </div>
                             <div class="card-body">
@@ -3158,10 +3674,12 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                        <td>{{$ipd->ipd_no}}</td>
-                                                        <td>{{$ipd->patient_id}}</td>
-                                                        <td>{{$ipd->doctor->name}} {{$ipd->doctor->surname}}</td>
-                                                         <td>{{$ipd->bedGroup->name}}-{{$ipd->bedDetail->name}}</td>   
+                                                            <td>{{ $ipd->ipd_no }}</td>
+                                                            <td>{{ $ipd->patient_id }}</td>
+                                                            <td>{{ $ipd->doctor->name }} {{ $ipd->doctor->surname }}
+                                                            </td>
+                                                            <td>{{ $ipd->bedGroup->name }}-{{ $ipd->bedDetail->name }}
+                                                            </td>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -3383,7 +3901,7 @@
                                                                 <tr>
                                                                     <td>
                                                                         <h6 class="fs-14 mb-1">
-                                                                            {{ $history->bedGroup->name?? '-' }}</h6>
+                                                                            {{ $history->bedGroup->name ?? '-' }}</h6>
                                                                     </td>
                                                                     <td>{{ $history->bed->name }}</td>
                                                                     <td>{{ \Carbon\Carbon::parse($history->from_date)->format('d/m/Y h:i A') }}
@@ -3419,50 +3937,53 @@
                                 </h5>
                             </div>
                             <div class="card-body">
-                                <form action = "{{ route('assignNewBed')}}" method = "POST">
+                                <form action = "{{ route('assignNewBed') }}" method = "POST">
                                     @csrf
                                     <div class="row">
                                         <div class="col-lg-12">
                                             <div class="row gy-4">
                                                 <div class="col-md-6">
                                                     <span class="text-primary"> <b>Old Assigned Bed : </b> </span>
-                                                    
-                                                        <span>
-                                                            {{ $bedShiftHistory->bed->name ?? '-' }}
-                                                            -
-                                                            {{ $bedShiftHistory->bedGroup->name ?? 'No Ward' }}
-                                                            -
-                                                            {{ $bedShiftHistory->bedGroup->floorDetail->name ?? '-' }}
-                                                        </span>
-                                                   
-                                                        
+
+                                                    <span>
+                                                        {{ $bedShiftHistory->bed->name ?? '-' }}
+                                                        -
+                                                        {{ $bedShiftHistory->bedGroup->name ?? 'No Ward' }}
+                                                        -
+                                                        {{ $bedShiftHistory->bedGroup->floorDetail->name ?? '-' }}
+                                                    </span>
+
+
                                                 </div>
                                                 <input type="hidden" name="ipd_id" value="{{ $ipd->id }}">
                                                 <div class="col-md-6">
                                                     <span class="text-primary"><b>Assigned Date : </b></span>
                                                     <span>
-                                                        @if($bedShiftHistory)
+                                                        @if ($bedShiftHistory)
                                                             {{ $bedShiftHistory->from_date ? \Carbon\Carbon::parse($bedShiftHistory->from_date)->format('jS F Y h:i:s a') : '-' }}
                                                         @else
                                                             <span class="text-danger">No active bed history</span>
                                                         @endif
-                                                        </span>
+                                                    </span>
                                                 </div>
-                                                
+
                                                 <div class="col-md-4">
-                                                    <label for="released_date" class="form-label">Select Released Date <span
+                                                    <label for="released_date" class="form-label">Select Released Date
+                                                        <span class="text-danger">*</span></label>
+                                                    <input type="datetime-local" name="released_date"
+                                                        id="released_date" class="form-control">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="bed_group" class="form-label">Select Bed Group <span
                                                             class="text-danger">*</span></label>
-                                                    <input type="datetime-local" name="released_date" id="released_date" class="form-control">
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <label for="bed_group" class="form-label">Select Bed Group <span class="text-danger">*</span></label>
                                                     <select name="bed_group" id="bed_group" class="form-select">
                                                         <option value="">Select Bed Group</option>
                                                     </select>
                                                 </div>
 
                                                 <div class="col-md-4">
-                                                    <label for="new_bed" class="form-label">Select New Bed <span class="text-danger">*</span></label>
+                                                    <label for="new_bed" class="form-label">Select New Bed <span
+                                                            class="text-danger">*</span></label>
                                                     <select name="new_bed" id="new_bed" class="form-select">
                                                         <option value="">Select New Bed</option>
                                                     </select>
@@ -3471,7 +3992,7 @@
                                                 <div class="col-md-12 text-end mt-4">
                                                     <button type="submit" class="btn btn-primary">Assign</button>
                                                 </div>
-                                                
+
                                             </div>
                                         </div>
                                     </div>
@@ -3496,7 +4017,8 @@
                                     <div class="col-lg-12">
                                         <div class="card">
                                             <div class="card-body">
-                                                <div class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
+                                                <div
+                                                    class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
                                                     <div class="input-icon-start position-relative me-2">
                                                         <span class="input-icon-addon">
                                                             <i class="ti ti-search"></i>
@@ -3521,46 +4043,69 @@
                                                                     <div class="modal-header"
                                                                         style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
-                                                                        <h5 class="modal-title" id="addSpecializationLabel">
+                                                                        <h5 class="modal-title"
+                                                                            id="addSpecializationLabel">
                                                                             Add Vitals
                                                                         </h5>
                                                                         <button type="button" class="btn-close"
                                                                             data-bs-dismiss="modal"></button>
 
                                                                     </div>
-                                                                    <form method="POST" action="{{ route('patient-vitals.store') }}">
+                                                                    <form method="POST"
+                                                                        action="{{ route('patient-vitals.store') }}">
                                                                         @csrf
-                                                                            <input type="hidden" name="patient_id" value="{{ $ipd->patient_id }}">
+                                                                        <input type="hidden" name="patient_id"
+                                                                            value="{{ $ipd->patient_id }}">
                                                                         <div class="modal-body p-4 mx-1">
                                                                             <div id="vitalFields">
                                                                                 <div class="row gy-3 vital-row mb-2">
                                                                                     <!-- Vital Name -->
-                                                                                      
+
                                                                                     <div class="col-md-4">
-                                                                                        <label for="vital_name" class="form-label">Vital Name</label>
-                                                                                        <select class="form-select" name="vital_name[]" id="vital_name">
-                                                                                            <option value="">Select</option>
-                                                                                            @foreach($vitals as $vital)
-                                                                                                <option value="{{ $vital->id }}">{{ $vital->name . ' (' . $vital->reference_range . ')' }} </option>
+                                                                                        <label for="vital_name"
+                                                                                            class="form-label">Vital
+                                                                                            Name</label>
+                                                                                        <select class="form-select"
+                                                                                            name="vital_name[]"
+                                                                                            id="vital_name">
+                                                                                            <option value="">Select
+                                                                                            </option>
+                                                                                            @foreach ($vitals as $vital)
+                                                                                                <option
+                                                                                                    value="{{ $vital->id }}">
+                                                                                                    {{ $vital->name . ' (' . $vital->reference_range . ')' }}
+                                                                                                </option>
                                                                                             @endforeach
                                                                                         </select>
                                                                                     </div>
 
                                                                                     <!-- Vital Value -->
                                                                                     <div class="col-md-4">
-                                                                                        <label for="vital_value" class="form-label">Vital Value</label>
-                                                                                        <input type="text" name="vital_value[]" id="vital_value" class="form-control" />
+                                                                                        <label for="vital_value"
+                                                                                            class="form-label">Vital
+                                                                                            Value</label>
+                                                                                        <input type="text"
+                                                                                            name="vital_value[]"
+                                                                                            id="vital_value"
+                                                                                            class="form-control" />
                                                                                     </div>
 
                                                                                     <!-- Date -->
                                                                                     <div class="col-md-3">
-                                                                                        <label for="date" class="form-label">Date</label>
-                                                                                        <input type="date" name="date[]" id="date" class="form-control" />
+                                                                                        <label for="date"
+                                                                                            class="form-label">Date</label>
+                                                                                        <input type="date"
+                                                                                            name="date[]"
+                                                                                            id="date"
+                                                                                            class="form-control" />
                                                                                     </div>
 
                                                                                     <!-- Remove -->
-                                                                                    <div class="col-md-1 d-flex align-items-end">
-                                                                                        <button type="button" class="btn btn-danger remove-btn" style="display:none;">
+                                                                                    <div
+                                                                                        class="col-md-1 d-flex align-items-end">
+                                                                                        <button type="button"
+                                                                                            class="btn btn-danger remove-btn"
+                                                                                            style="display:none;">
                                                                                             <i class="ti ti-trash"></i>
                                                                                         </button>
                                                                                     </div>
@@ -3568,14 +4113,17 @@
                                                                             </div>
 
                                                                             <div class="mt-2">
-                                                                                <button type="button" class="btn btn-primary" id="addBtn">
+                                                                                <button type="button"
+                                                                                    class="btn btn-primary"
+                                                                                    id="addBtn">
                                                                                     <i class="ti ti-plus"></i> Add Vital
                                                                                 </button>
                                                                             </div>
                                                                         </div>
 
                                                                         <div class="modal-footer">
-                                                                            <button type="submit" class="btn btn-primary">Save</button>
+                                                                            <button type="submit"
+                                                                                class="btn btn-primary">Save</button>
                                                                         </div>
                                                                     </form>
 
@@ -3589,53 +4137,56 @@
                                                     <table class="table border">
                                                         <thead class="thead-light">
                                                             <tr>
-                                                                
+
                                                                 <th>Messure Date</th>
-                                                                 {{-- Dynamically generate vital headers --}}
-                                                                @foreach($vitals as $vital)
+                                                                {{-- Dynamically generate vital headers --}}
+                                                                @foreach ($vitals as $vital)
                                                                     <th>{{ $vital->name }}</th>
                                                                 @endforeach
                                                                 <!-- <th>Action</th> -->
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                              @forelse($vitalDetails->groupBy('patient_id') as $caseId => $caseVitals)
-                                                        @php
-                                                            $firstRecord = $caseVitals->first();
-                                                        @endphp
-                                                        <tr>
-
-                                                        <td>
-                                                            @if(!empty($firstRecord->messure_date))
-                                                                {{ \Carbon\Carbon::parse($firstRecord->messure_date)->format('d/m/Y h:i A') }}
-                                                            @else
-                                                                -
-                                                            @endif
-                                                        </td>
-
-                                                            {{-- Loop through all vitals dynamically --}}
-                                                            @foreach($vitals as $vital)
+                                                            @forelse($vitalDetails->groupBy('patient_id') as $caseId => $caseVitals)
                                                                 @php
-                                                                    $record = $caseVitals->where('vital_id', $vital->id)->first();
+                                                                    $firstRecord = $caseVitals->first();
                                                                 @endphp
-                                                                <td>
-                                                                    {{ $record->reference_range ?? '-' }}
-                                                                </td>
-                                                            @endforeach
+                                                                <tr>
+
+                                                                    <td>
+                                                                        @if (!empty($firstRecord->messure_date))
+                                                                            {{ \Carbon\Carbon::parse($firstRecord->messure_date)->format('d/m/Y h:i A') }}
+                                                                        @else
+                                                                            -
+                                                                        @endif
+                                                                    </td>
+
+                                                                    {{-- Loop through all vitals dynamically --}}
+                                                                    @foreach ($vitals as $vital)
+                                                                        @php
+                                                                            $record = $caseVitals
+                                                                                ->where('vital_id', $vital->id)
+                                                                                ->first();
+                                                                        @endphp
+                                                                        <td>
+                                                                            {{ $record->reference_range ?? '-' }}
+                                                                        </td>
+                                                                    @endforeach
 
                                                                     <!-- <td>
-                                                                        <div class="d-flex gap-2">
-                                                                            <a href="#"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
-                                                                                data-bs-toggle="tooltip" title="Show">
-                                                                                <i class="ti ti-menu"></i>
-                                                                            </a>
-                                                                        </div>
-                                                                    </td> -->
-                                                                    </tr>
+                                                                                            <div class="d-flex gap-2">
+                                                                                                <a href="#"
+                                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
+                                                                                                    data-bs-toggle="tooltip" title="Show">
+                                                                                                    <i class="ti ti-menu"></i>
+                                                                                                </a>
+                                                                                            </div>
+                                                                                        </td> -->
+                                                                </tr>
                                                             @empty
                                                                 <tr>
-                                                                    <td colspan="{{ 4 + $vitals->count() }}" class="text-center text-muted">
+                                                                    <td colspan="{{ 4 + $vitals->count() }}"
+                                                                        class="text-center text-muted">
                                                                         No vital records found
                                                                     </td>
                                                                 </tr>
@@ -3659,7 +4210,202 @@
     </div>
     <!-- tab content end -->
     </div>
-    
+
+    {{-- discharge details modal --}}
+    <div class="modal fade" id="dischargeDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-clipboard-check"></i>
+                        Discharge Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body">
+
+                    <!-- Common Details Section -->
+                    <div class="section-card">
+                        <div class="section-header primary">
+                            <div class="section-icon primary">
+                                <i class="bi bi-file-medical"></i>
+                            </div>
+                            <h6 class="section-title pb-0 mb-0">General Information</h6>
+                        </div>
+                        <div class="section-body">
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-calendar-event"></i>
+                                        Discharge Date
+                                    </div>
+                                    <div class="info-value" id="dc_discharge_date">January 15, 2025</div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-check-circle"></i>
+                                        Status
+                                    </div>
+                                    <div class="info-value">
+                                        <span class="status-badge discharged" id="dc_status">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                            Discharged
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-bandaid"></i>
+                                        Operation
+                                    </div>
+                                    <div class="info-value" id="dc_operation">Appendectomy</div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-heart-pulse"></i>
+                                        Diagnosis
+                                    </div>
+                                    <div class="info-value" id="dc_diagnosis">Acute Appendicitis</div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-clipboard2-pulse"></i>
+                                        Investigations
+                                    </div>
+                                    <div class="info-value" id="dc_investigations">CT Scan, Blood Tests, Ultrasound
+                                    </div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-house-heart"></i>
+                                        Treatment Home
+                                    </div>
+                                    <div class="info-value" id="dc_treatment_home">Rest, prescribed medications,
+                                        follow-up in 2 weeks</div>
+                                </div>
+                            </div>
+
+                            <div class="info-grid full mt-3">
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-journal-text"></i>
+                                        Note
+                                    </div>
+                                    <div class="info-value long-text" id="dc_note">Patient recovered well
+                                        post-surgery. No complications observed. Advised to continue medication and maintain
+                                        proper diet. Follow-up required after 2 weeks.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Death Details Section -->
+                    <div id="deathSection" class="section-card d-none">
+                        <div class="section-header danger">
+                            <div class="section-icon danger">
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                            </div>
+                            <h6 class="section-title pb-0 mb-0">Death Details</h6>
+                        </div>
+                        <div class="section-body">
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-calendar-x"></i>
+                                        Death Date
+                                    </div>
+                                    <div class="info-value" id="dc_death_date">--</div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-person"></i>
+                                        Guardian Name
+                                    </div>
+                                    <div class="info-value" id="dc_guardian_name">--</div>
+                                </div>
+                            </div>
+
+                            <div class="info-grid full mt-3">
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-file-earmark-text"></i>
+                                        Report
+                                    </div>
+                                    <div class="info-value long-text" id="dc_report">--</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Referral Details Section -->
+                    <div id="referralSection" class="section-card d-none">
+                        <div class="section-header warning">
+                            <div class="section-icon warning">
+                                <i class="bi bi-arrow-right-circle-fill"></i>
+                            </div>
+                            <h6 class="section-title pb-0 mb-0">Referral Details</h6>
+                        </div>
+                        <div class="section-body">
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-calendar-check"></i>
+                                        Referral Date
+                                    </div>
+                                    <div class="info-value" id="dc_referral_date">--</div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-hospital"></i>
+                                        Hospital Name
+                                    </div>
+                                    <div class="info-value" id="dc_refer_to_hospital">--</div>
+                                </div>
+                            </div>
+
+                            <div class="info-grid full mt-3">
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-chat-left-text"></i>
+                                        Reason for Referral
+                                    </div>
+                                    <div class="info-value long-text" id="dc_reason_for_referral">--</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-close-modal" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i>
+                        Close
+                    </button>
+                    <button type="button" class="btn btn-print">
+                        <i class="bi bi-printer"></i>
+                        Print Details
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    {{-- modal ends --}}
+    @include('components.modals.discharge-modal')
     <!-- Chart JS -->
     <script src="assets/plugins/chartjs/chart.min.js"></script>
     <script src="assets/plugins/chartjs/chart-data.js"></script>
@@ -3667,16 +4413,16 @@
         let operations = @json($operations); // All operations from DB
 
         document.getElementById('operation_category').addEventListener('change', function() {
-            
+
             let catId = this.value;
             let operationDropdown = document.getElementById('operation_type');
 
             // Clear old options
             operationDropdown.innerHTML = '<option value="">Select Operation</option>';
 
-            if(catId) {
+            if (catId) {
                 operations.forEach(op => {
-                    if(op.category_id == catId) {
+                    if (op.category_id == catId) {
                         operationDropdown.innerHTML += `<option value="${op.id}">${op.operation}</option>`;
                     }
                 });
@@ -3684,58 +4430,57 @@
         });
     </script>
 
-   
-<script>
-    $(document).on('click', '.editMedicationBtn', function() {
-    $('#edit_id').val($(this).data('id'));
-    $('#edit_date').val($(this).data('date'));
-    $('#edit_time').val($(this).data('time'));
-    $('#edit_medi_cat').val($(this).data('cat'));
-    $('#edit_med_name').val($(this).data('med'));
-    $('#edit_dosage').val($(this).data('dose'));
-    $('#edit_remark').val($(this).data('remark'));
-});
-</script>
 
-<script>
-    let medicines = @json($medicinesByCategory);
-    let dosages = @json($dosages); // grouped by medicine_id
+    <script>
+        $(document).on('click', '.editMedicationBtn', function() {
+            $('#edit_id').val($(this).data('id'));
+            $('#edit_date').val($(this).data('date'));
+            $('#edit_time').val($(this).data('time'));
+            $('#edit_medi_cat').val($(this).data('cat'));
+            $('#edit_med_name').val($(this).data('med'));
+            $('#edit_dosage').val($(this).data('dose'));
+            $('#edit_remark').val($(this).data('remark'));
+        });
+    </script>
 
-    let mediCatDropdown = document.getElementById('medi_cat');
-    let medDropdown = document.getElementById('med_name');
-    let doseDropdown = document.getElementById('dosage');
+    <script>
+        let medicines = @json($medicinesByCategory);
+        let dosages = @json($dosages); // grouped by medicine_id
 
-    mediCatDropdown.addEventListener('change', function () {
-        let categoryId = this.value;
+        let mediCatDropdown = document.getElementById('medi_cat');
+        let medDropdown = document.getElementById('med_name');
+        let doseDropdown = document.getElementById('dosage');
 
-        // Reset medicine dropdown
-        medDropdown.innerHTML = '<option value="">Select</option>';
-        doseDropdown.innerHTML = '<option value="">Select</option>';
+        mediCatDropdown.addEventListener('change', function() {
+            let categoryId = this.value;
 
-        if (categoryId && medicines[categoryId]) {
-            medicines[categoryId].forEach(med => {
-                medDropdown.innerHTML += `<option value="${med.id}">${med.medicine_name}</option>`;
-            });
-        }
-    });
+            // Reset medicine dropdown
+            medDropdown.innerHTML = '<option value="">Select</option>';
+            doseDropdown.innerHTML = '<option value="">Select</option>';
 
-    // When user selects medicine, load its dosage
-    medDropdown.addEventListener('change', function () {
-        let medId = this.value;
+            if (categoryId && medicines[categoryId]) {
+                medicines[categoryId].forEach(med => {
+                    medDropdown.innerHTML += `<option value="${med.id}">${med.medicine_name}</option>`;
+                });
+            }
+        });
 
-        doseDropdown.innerHTML = '<option value="">Select</option>';
+        // When user selects medicine, load its dosage
+        medDropdown.addEventListener('change', function() {
+            let medId = this.value;
 
-        if (medId && dosages[medId]) {
-            dosages[medId].forEach(dose => {
-                doseDropdown.innerHTML += `<option value="${dose.id}">${dose.dosage}</option>`;
-            });
-        }
-    });
-</script>
+            doseDropdown.innerHTML = '<option value="">Select</option>';
+
+            if (medId && dosages[medId]) {
+                dosages[medId].forEach(dose => {
+                    doseDropdown.innerHTML += `<option value="${dose.id}">${dose.dosage}</option>`;
+                });
+            }
+        });
+    </script>
 
 
 
-   
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -4033,76 +4778,130 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     </script>
     <script>
-$(document).ready(function() {
+        $(document).ready(function() {
 
-    // Load bed groups on page load
-    $.get("{{ route('getBedGroups') }}", function(data){
-        let options = '<option value="">Select Bed Group</option>';
-        data.forEach(function(group){
-            options += `<option value="${group.id}">${group.name} - ${group.floor_detail?.name ?? '-'}</option>`;
-        });
-        $('#bed_group').html(options);
-    });
-
-    // Load available beds when bed group changes
-    $('#bed_group').on('change', function () {
-        let groupId = $(this).val();
-        $('#new_bed').html('<option value="">Loading...</option>');
-
-        if (groupId) {
-            $.get("{{ route('get.available.beds') }}", { bed_group_id: groupId }, function(data){
-                let options = '<option value="">Select New Bed</option>';
-                data.forEach(function(bed){
-                    options += `<option value="${bed.id}"> ${bed.name}</option>`;
+            // Load bed groups on page load
+            $.get("{{ route('getBedGroups') }}", function(data) {
+                let options = '<option value="">Select Bed Group</option>';
+                data.forEach(function(group) {
+                    options +=
+                        `<option value="${group.id}">${group.name} - ${group.floor_detail?.name ?? '-'}</option>`;
                 });
-                $('#new_bed').html(options);
+                $('#bed_group').html(options);
             });
-        } else {
-            $('#new_bed').html('<option value="">Select New Bed</option>');
-        }
-    });
 
-});
-</script>
-<script>
-   function confirmDelete(url) {
-    Swal.fire({
-        title: "Are you sure?",
-        text: "This record will be permanently deleted.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "Yes, delete it!"
-    }).then((result) => {
+            // Load available beds when bed group changes
+            $('#bed_group').on('change', function() {
+                let groupId = $(this).val();
+                $('#new_bed').html('<option value="">Loading...</option>');
 
-        if (result.isConfirmed) {
-            console.log("DELETE URL:", url);
-            console.log("Form created:", form);
-            // Get CSRF token
-            const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
+                if (groupId) {
+                    $.get("{{ route('get.available.beds') }}", {
+                        bed_group_id: groupId
+                    }, function(data) {
+                        let options = '<option value="">Select New Bed</option>';
+                        data.forEach(function(bed) {
+                            options += `<option value="${bed.id}"> ${bed.name}</option>`;
+                        });
+                        $('#new_bed').html(options);
+                    });
+                } else {
+                    $('#new_bed').html('<option value="">Select New Bed</option>');
+                }
+            });
 
-            // Create form
-            const form = document.createElement("form");
-            form.style.display = "none"; // keep it invisible
-            form.method = "POST";
-            form.action = url;
+        });
+    </script>
+    <script>
+        function confirmDelete(url) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "This record will be permanently deleted.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
 
-            // Add hidden inputs
-            form.innerHTML = `
+                if (result.isConfirmed) {
+                    console.log("DELETE URL:", url);
+                    console.log("Form created:", form);
+                    // Get CSRF token
+                    const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
+
+                    // Create form
+                    const form = document.createElement("form");
+                    form.style.display = "none"; // keep it invisible
+                    form.method = "POST";
+                    form.action = url;
+
+                    // Add hidden inputs
+                    form.innerHTML = `
                 <input type="hidden" name="_token" value="${csrfToken}">
                 <input type="hidden" name="_method" value="DELETE">
             `;
 
-            // Append to body
-            document.body.appendChild(form);
+                    // Append to body
+                    document.body.appendChild(form);
 
-            // Submit
-            form.submit();
+                    // Submit
+                    form.submit();
+                }
+            });
         }
-    });
-}
+    </script>
 
+    <script>
+        const modal = document.getElementById('dischargeDetailsModal');
 
-</script>
+        modal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const data = JSON.parse(button.getAttribute('data-discharge'));
+
+            // Common fields
+            document.getElementById('dc_discharge_date').innerText = data.discharge_date ?? '-';
+            document.getElementById('dc_operation').innerText = data.operation ?? '-';
+            document.getElementById('dc_diagnosis').innerText = data.diagnosis ?? '-';
+            document.getElementById('dc_investigations').innerText = data.investigations ?? '-';
+            document.getElementById('dc_treatment_home').innerText = data.treatment_home ?? '-';
+            document.getElementById('dc_note').innerText = data.note ?? '-';
+
+            // Status badge
+            const statusEl = document.getElementById('dc_status');
+            statusEl.className = 'badge';
+
+            if (data.discharge_status == "death") {
+                statusEl.innerText = 'Death';
+                statusEl.classList.add('bg-danger');
+            } else if (data.discharge_status == "referral") {
+                statusEl.innerText = 'Referral';
+                statusEl.classList.add('bg-warning');
+            } else {
+                statusEl.innerText = 'Normal';
+                statusEl.classList.add('bg-success');
+            }
+
+            // Hide sections initially
+            document.getElementById('deathSection').classList.add('d-none');
+            document.getElementById('referralSection').classList.add('d-none');
+
+            // Death section
+            if (data.discharge_status == "death") {
+                document.getElementById('deathSection').classList.remove('d-none');
+                document.getElementById('dc_death_date').innerText = data.death_date ?? '-';
+                document.getElementById('dc_guardian_name').innerText = data.guardian_name ?? '-';
+                document.getElementById('dc_report').innerText = data.report ?? '-';
+            }
+
+            // Referral section
+            if (data.discharge_status == "referral") {
+                document.getElementById('referralSection').classList.remove('d-none');
+                document.getElementById('dc_referral_date').innerText = data.refer_date ?? '-';
+                document.getElementById('dc_refer_to_hospital').innerText = data.refer_to_hospital ?? '-';
+                document.getElementById('dc_reason_for_referral').innerText = data.reason_for_referral ?? '-';
+            }
+        });
+    </script>
+
 @endsection
