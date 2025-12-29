@@ -313,6 +313,7 @@ Route::middleware(['admin'])->group(function () {
 
     Route::get('/birth', [BirthController::class, 'index'])->name('birth');
     Route::get('/importbirth', [BirthController::class, 'importbirth'])->name('importbirth');
+    Route::get('/exportbirth', [BirthController::class, 'exportBirthExcel'])->name('birth.export');
     Route::post('/birth/create', [BirthController::class, 'create'])->name('birth.create');
     Route::put('/birth/update/{id}', [BirthController::class, 'update'])->name('birth.update');
     Route::delete('/birth/delete/{id}', [BirthController::class, 'delete'])->name('birth.delete');
@@ -339,7 +340,6 @@ Route::middleware(['admin'])->group(function () {
     Route::put('/dispatch-receive/update/{id}', [\App\Http\Controllers\DispatchReceiveController::class, 'update'])->name('dispatch.update');
     Route::get('/dispatch-receive/{id}', [\App\Http\Controllers\DispatchReceiveController::class, 'show'])->name('dispatch.show');
     Route::delete('/dispatch-receive/delete/{id}', [\App\Http\Controllers\DispatchReceiveController::class, 'destroy'])->name('dispatch.destroy');
-
 
 });
 
@@ -554,6 +554,8 @@ Route::post('/ipd_charge', [IpdController::class, 'addIpdCharge'])->name('ipd.ad
 Route::post('/assignNewBed', [IpdController::class, 'assignNewBed'])->name('assignNewBed');
 //
 Route::get('/ipd/{id}/pdf', [PdfController::class, 'generatePdf'])->name('ipd.pdf');;
+Route::post('/discharge-card/store', [IpdController::class, 'storeDischarge'])
+    ->name('discharge.store');
 
 Route::get('/billing', function () {
     return view('admin.billing.billing');

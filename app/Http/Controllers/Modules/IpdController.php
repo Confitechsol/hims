@@ -4,7 +4,11 @@ namespace App\Http\Controllers\Modules;
 use App\Http\Controllers\Controller;
 use App\Models\Bed;
 use App\Models\BedGroup;
+use App\Models\DischargeCard;
 use App\Models\Doctor;
+use App\Models\ChargeCategory;
+use App\Models\Charge;
+use App\Models\ChargeTypeMaster;
 use App\Models\IpdCharges;
 use App\Models\IpdDetail;
 use App\Models\IpdMedicine;
@@ -23,6 +27,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class IpdController extends Controller
 {
@@ -32,7 +37,8 @@ class IpdController extends Controller
         $isIpdTab  = $request->get('tab', 'ipd') == 'ipd';
         $doctors   = Doctor::all();
         $bedGroups = BedGroup::with('floorDetail')->get();
-
+        $chargeType = ChargeTypeMaster::all();
+        $charges = Charge::all();
         if ($isIpdTab) {
             $ipd = IpdDetail::with('patient', 'doctor', 'bedDetail', 'bedGroup.floorDetail')
                 ->when($search, function ($query) use ($search) {
@@ -71,20 +77,20 @@ class IpdController extends Controller
     {
         //dd($request->all());
         $validator = Validator::make($request->all(), [
-            'patient_id'           => 'required|exists:patients,id',
-            'admission_date'       => 'required|date',
-            'patient_type'         => 'required|string',
-            'case'                 => 'required|string',
-            'casualty'             => 'required|string',
+            'patient_id'           => 'nullable|exists:patients,id',
+            'admission_date'       => 'date',
+            'patient_type'         => 'string',
+            'case'                 => 'nullable|numeric',
+            'casualty'             => 'string',
             'reference'            => 'nullable|string',
-            'doctor_id'            => 'required|exists:doctor,id',
-            'credit_limit'         => 'required|numeric|min:0',
+            'doctor_id'            => 'nullable|exists:doctor,id',
+            'credit_limit'         => 'nullable|numeric|min:0',
             'live_consultation'    => 'nullable|string|max:100',
-            'bed_group'            => 'required|exists:bed_group,id',
-            'bed_number'           => 'required|exists:bed,id',
-            'symptoms_type'        => 'required|array',
+            'bed_group'            => 'nullable|exists:bed_group,id',
+            'bed_number'           => 'nullable|exists:bed,id',
+            'symptoms_type'        => 'nullable|array',
             'symptoms_type.*'      => 'string',
-            'symptoms_title'       => 'required|array',
+            'symptoms_title'       => 'array',
             'symptoms_title.*'     => 'string',
             'symptoms_description' => 'nullable|string',
             'note'                 => 'nullable|string',
@@ -106,8 +112,8 @@ class IpdController extends Controller
             return redirect()->back()->with('error', 'User not authenticated or hospital ID missing.');
         }
         try {
-            $symptomType          = array_filter($request->symptoms_type, fn($type) => $type !== null && $type !== '');
-            $symptomTitle         = array_filter($request->symptoms_title, fn($title) => $title !== null && $title !== '');
+           $symptomType  = array_filter($request->input('symptoms_type', []));
+$symptomTitle = array_filter($request->input('symptoms_title', []));
             $implodedSymptomType  = implode(", ", $symptomType);
             $implodedSymptomTitle = implode(", ", $symptomTitle);
 
@@ -549,4 +555,105 @@ class IpdController extends Controller
         return redirect()->back()->with('success', 'Bed assigned successfully.');
     }
 
+    public function storeDischarge(Request $request)
+    {
+        // -------------------------------
+        // 🔹 Base validation rules
+        // -------------------------------
+        $rules = [
+            'ipd_details_id'   => ['nullable', 'integer', 'exists:ipd_details,id'],
+            'discharge_date'   => ['required', 'date'],
+            'discharge_status' => ['required', Rule::in(['death', 'referral', 'normal'])],
+            'note'             => ['nullable', 'string'],
+
+            'operation'        => ['nullable', 'string', 'max:255'],
+            'diagnosis'        => ['nullable', 'string', 'max:255'],
+            'investigation'    => ['nullable', 'string', 'max:255'],
+            'treatment_home'   => ['nullable', 'string', 'max:255'],
+        ];
+
+        // -------------------------------
+        // 🔹 Conditional validation
+        // -------------------------------
+        if ($request->discharge_status === 'death') {
+            $rules = array_merge($rules, [
+                'death_date'    => ['required', 'date'],
+                'guardian_name' => ['required', 'string', 'max:255'],
+                'attachment'    => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png,doc,docx', 'max:5120'],
+                'report'        => ['nullable', 'string'],
+            ]);
+        }
+
+        if ($request->discharge_status === 'referral') {
+            $rules = array_merge($rules, [
+                'referral_date'          => ['required', 'date'],
+                'referral_hospital_name' => ['required', 'string', 'max:255'],
+                'referral_reason'        => ['required', 'string', 'max:255'],
+            ]);
+        }
+
+        // -------------------------------
+        // 🔹 Validate request
+        // -------------------------------
+        $validated = $request->validate($rules);
+
+        // -------------------------------
+        DB::beginTransaction();
+        try {
+            // -------------------------------
+            // 🔹 Handle file upload (death case)
+            // -------------------------------
+            $attachmentPath = null;
+
+            if ($request->hasFile('attachment')) {
+                $attachmentPath = $request->file('attachment')
+                    ->store('discharge_attachments', 'public');
+            }
+
+            // -------------------------------
+            // 🔹 Create Discharge Card
+            // -------------------------------
+            // dd($validated);
+            $discharge = DischargeCard::create([
+                'hospital_id'         => Auth::user()->hospital_id ?? null,
+                'branch_id'           => Auth::user()->branch_id ?? null,
+                'case_reference_id'   => $request->case_reference_id ?? null,
+                'opd_details_id'      => $request->opd_details_id ?? null,
+                'ipd_details_id'      => intval($validated['ipd_details_id']),
+
+                'discharge_by'        => Auth::id(),
+                'discharge_date'      => $validated['discharge_date'],
+                'discharge_status'    => $validated['discharge_status'],
+
+                'death_date'          => $validated['death_date'] ?? null,
+                'refer_date'          => $validated['referral_date'] ?? null,
+                'refer_to_hospital'   => $validated['referral_hospital_name'] ?? null,
+                'reason_for_referral' => $validated['referral_reason'] ?? null,
+
+                'operation'           => $validated['operation'] ?? null,
+                'diagnosis'           => $validated['diagnosis'] ?? null,
+                'investigations'      => $validated['investigation'] ?? null,
+                'treatment_home'      => $validated['treatment_home'] ?? null,
+                'note'                => $validated['note'] ?? null,
+            ]);
+
+            IpdDetail::where('id', intval($validated['ipd_details_id']))
+                ->update(['discharged' => 'yes']);
+            // dd($discharge);
+
+            DB::commit();
+
+            return redirect()
+                ->back()
+                ->with('success', 'Patient discharged successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return redirect()
+                ->back()
+                ->withErrors(['error' => 'Something went wrong while saving discharge details.'])
+                ->withInput();
+        }
+    }
 }

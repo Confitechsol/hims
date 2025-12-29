@@ -1,6 +1,6 @@
-{{-- resources/views/settings.blade.php --}}
-@extends('layouts.adminLayout')
-@section('content')
+
+
+<?php $__env->startSection('content'); ?>
 <style>
     .guidelines-box {
         max-height: 0;
@@ -35,7 +35,7 @@
 </style>
 
 <div class="row justify-content-center">
-    {{-- Settings Form --}}
+    
     <div class="col-md-11">
         <div class="card shadow-sm border-0 mt-4">
             <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
@@ -45,7 +45,7 @@
             <div class="card-body">
 
 
-                {{-- Hospital Name & Code --}}
+                
                 <div class="row">
 
                     <div class="col-lg-12">
@@ -69,7 +69,7 @@
 
 
                                         <div class="text-end d-flex">
-                                            <a href="{{ route('birth.export') }}" class="btn btn-primary text-white ms-2 fs-13 btn-md"><i
+                                            <a href="<?php echo e(route('birth.export')); ?>" class="btn btn-primary text-white ms-2 fs-13 btn-md"><i
                                                     class="ti ti-download me-1"></i>Download Sample Data</a>
                                             
                                         </div>
@@ -97,24 +97,24 @@
                                         </ol>
                                     </div>
                                 </div>
-                                @if (session('success'))
-                                    <div class="alert alert-success">{{ session('success') }}</div>
-                                @endif
+                                <?php if(session('success')): ?>
+                                    <div class="alert alert-success"><?php echo e(session('success')); ?></div>
+                                <?php endif; ?>
 
-                                @if (session('error'))
-                                    <div class="alert alert-danger">{{ session('error') }}</div>
-                                @endif
-                                @if ($errors->any())
+                                <?php if(session('error')): ?>
+                                    <div class="alert alert-danger"><?php echo e(session('error')); ?></div>
+                                <?php endif; ?>
+                                <?php if($errors->any()): ?>
                                     <div class="alert alert-danger">
                                         <strong>There were some problems with your
                                             input:</strong>
                                         <ul class="mb-0">
-                                            @foreach ($errors->all() as $error)
-                                                <li>{{ $error }}</li>
-                                            @endforeach
+                                            <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <li><?php echo e($error); ?></li>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </ul>
                                     </div>
-                                @endif
+                                <?php endif; ?>
                                 <div class="table-responsive">
                                     <table class="table table-bordered mb-0" id="table">
                                         <thead>
@@ -180,9 +180,9 @@
 
 
                                 <div class="import_form">
-                                    <form action="{{ route('doctors.import') }}" method="POST"
+                                    <form action="<?php echo e(route('doctors.import')); ?>" method="POST"
                                         enctype="multipart/form-data">
-                                        @csrf
+                                        <?php echo csrf_field(); ?>
                                         <div class="row">
                                            
                                             <div class="col-md-12">
@@ -247,4 +247,5 @@
 
 
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\hims\resources\views/admin/birthordeath/importbirth.blade.php ENDPATH**/ ?>
