@@ -181,7 +181,8 @@ $symptomTitle = array_filter($request->input('symptoms_title', []));
             $bedDetail->save();
             DB::commit();
 
-            return redirect()->route('ipd')->with('success', 'IPD record created successfully . ');
+            return redirect()->route('ipd')->with('success', 'IPD record created successfully . ')
+            ->with('pdf_url', route('ipd.pdf', $ipd->id));
         } catch (\Exception $e) {
             DB::rollBack();
             dd($e);

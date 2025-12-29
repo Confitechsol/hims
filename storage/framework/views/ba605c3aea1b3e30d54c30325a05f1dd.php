@@ -108,6 +108,31 @@ unset($__errorArgs, $__bag); ?>
 
                         
                         <div class="col-md-6">
+                            <label for="guardian_relation" class="form-label">Guardian Relationship</label>
+                            <input type="text" id="guardian_relation" name="guardian_relation"
+                                class="form-control <?php $__errorArgs = ['guardian_relation'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                value="<?php echo e(old('guardian_relation')); ?>" />
+                            <?php $__errorArgs = ['guardian_phone'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <div class="invalid-feedback"><?php echo e($message); ?></div>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                        </div>
+
+                        
+                        <div class="col-md-6">
                             <label for="emergency_contact_no" class="form-label">Emergency Contact No.</label>
                             <input type="text" id="emergency_contact_no" name="emergency_contact_no"
                                 class="form-control <?php $__errorArgs = ['emergency_contact_no'];
@@ -200,7 +225,7 @@ unset($__errorArgs, $__bag); ?>
                                     <label class="form-label">Age
                                         (yy-mm-dd)</label>
                                     <div style="clear: both; overflow: hidden;">
-                                        <input type="text" name="age[year]" id="age_year" placeholder="YY"
+                                        <input type="numeric" name="age[year]" id="age_year" placeholder="YY"
                                             value="<?php echo e(old('age.year')); ?>"
                                             class="form-control patient_age_year <?php $__errorArgs = ['age.year'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -211,7 +236,7 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>"
                                             style="width: 30%; float: left;" />
-                                        <input type="text" name="age[month]" id="age_month" placeholder="MM"
+                                        <input type="numeric" name="age[month]" id="age_month" placeholder="MM"
                                             value="<?php echo e(old('age.month')); ?>"
                                             class="form-control patient_age_month <?php $__errorArgs = ['age.month'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -222,7 +247,7 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>"
                                             style="width: 36%; float: left; margin-left: 4px;" />
-                                        <input type="text" name="age[day]" id="age_day" placeholder="DD"
+                                        <input type="numeric" name="age[day]" id="age_day" placeholder="DD"
                                             value="<?php echo e(old('age.day')); ?>"
                                             class="form-control patient_age_day <?php $__errorArgs = ['age.day'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');

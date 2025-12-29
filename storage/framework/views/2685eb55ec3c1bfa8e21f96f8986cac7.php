@@ -26,7 +26,7 @@
 
         <!-- start row -->
         <div class="row">
-            <div class="col-xl-3 col-md-6">
+            <div class="col-xl-4 col-md-6">
                 <div class="position-relative border card rounded-2 shadow-sm">
                     <img src="<?php echo e(asset('assets/img/bg/bg-01.svg')); ?>" alt="img"
                         class="position-absolute start-0 top-0">
@@ -42,7 +42,7 @@
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
                                 <p class="mb-1">Doctors</p>
-                                <h3 class="fw-bold mb-0">247</h3>
+                                <h3 class="fw-bold mb-0"><?php echo e($doctorsCount); ?></h3>
                             </div>
                             <div>
                                 <div id="s-col" class="chart-set"></div>
@@ -52,7 +52,7 @@
                 </div>
             </div>
             <!-- end col -->
-            <div class="col-xl-3 col-md-6">
+            <div class="col-xl-4 col-md-6">
                 <div class="position-relative border card rounded-2 shadow-sm">
                     <img src="<?php echo e(asset('assets/img/bg/bg-02.svg')); ?>" alt="img"
                         class="position-absolute start-0 top-0">
@@ -68,7 +68,7 @@
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
                                 <p class="mb-1">Patients</p>
-                                <h3 class="fw-bold mb-0">4178</h3>
+                                <h3 class="fw-bold mb-0"><?php echo e($patientsCount); ?></h3>
                             </div>
                             <div>
                                 <div id="s-col-2" class="chart-set"></div>
@@ -78,7 +78,7 @@
                 </div>
             </div>
             <!-- end col -->
-            <div class="col-xl-3 col-md-6">
+            <div class="col-xl-4 col-md-6">
                 <div class="position-relative border card rounded-2 shadow-sm">
                     <img src="<?php echo e(asset('assets/img/bg/bg-03.svg')); ?>" alt="img"
                         class="position-absolute start-0 top-0">
@@ -94,7 +94,7 @@
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
                                 <p class="mb-1">Appointment</p>
-                                <h3 class="fw-bold mb-0">12178</h3>
+                                <h3 class="fw-bold mb-0"><?php echo e($appointmentsCount); ?></h3>
                             </div>
                             <div>
                                 <div id="s-col-3" class="chart-set"></div>
@@ -104,31 +104,7 @@
                 </div>
             </div>
             <!-- end col -->
-            <div class="col-xl-3 col-md-6">
-                <div class="position-relative border card rounded-2 shadow-sm">
-                    <img src="<?php echo e(asset('assets/img/bg/bg-04.svg')); ?>" alt="img"
-                        class="position-absolute start-0 top-0">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-2 justify-content-between">
-                            <span class="avatar bg-success rounded-circle"><i class="ti ti-calendar-heart fs-24"></i></span>
-                            <div class="text-end">
-                                <span class="badge px-2 py-1 fs-12 fw-medium d-inline-flex mb-1 bg-success">+25%</span>
-                                <p class="fs-13 mb-0">in last 7 Days
-                                </p>
-                            </div>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-between overflow-hidden">
-                            <div>
-                                <p class="mb-1">Revenue</p>
-                                <h3 class="fw-bold mb-0 text-truncate">$55,1240</h3>
-                            </div>
-                            <div>
-                                <div id="s-col-4" class="chart-set"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            
             <!-- end col -->
         </div>
         <!-- end row -->
@@ -146,18 +122,18 @@
                         <div class="dropdown">
                             <a href="javascript:void(0);"
                                 class="btn btn-sm px-2 border shadow-sm btn-outline-white d-inline-flex align-items-center"
-                                data-bs-toggle="dropdown">
-                                Monthly <i class="ti ti-chevron-down ms-1"></i>
+                                data-bs-toggle="dropdown" style="text-transform: capitalize">
+                                <?php echo e(request('period') ?? "Monthly"); ?> <i class="ti ti-chevron-down ms-1"></i>
                             </a>
                             <ul class="dropdown-menu">
                                 <li>
-                                    <a class="dropdown-item" href="#">Monthly</a>
+                                    <a class="dropdown-item" href="?period=monthly">Monthly</a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="#">Weekly</a>
+                                    <a class="dropdown-item" href="?period=weekly">Weekly</a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="#">Yearly</a>
+                                    <a class="dropdown-item" href="?period=yearly">Yearly</a>
                                 </li>
                             </ul>
                         </div>
@@ -169,28 +145,28 @@
                                     <p class="mb-1 text-body text-truncate"><i
                                             class="ti ti-point-filled me-1 text-primary"></i>All
                                         Appointments</p>
-                                    <h5 class="fw-bold mb-0">6314</h5>
+                                    <h5 class="fw-bold mb-0"><?php echo e($appointmentsCount); ?></h5>
                                 </div>
                             </div>
                             <div class="col-md-3 col-sm-6">
                                 <div class="bg-light border p-2 text-center rounded-2">
                                     <p class="mb-1 text-body"><i class="ti ti-point-filled me-1 text-danger"></i>Cancelled
                                     </p>
-                                    <h5 class="fw-bold mb-0">456</h5>
+                                    <h5 class="fw-bold mb-0"><?php echo e($cancelledAppointmentsCount); ?></h5>
                                 </div>
                             </div>
                             <div class="col-md-3 col-sm-6">
                                 <div class="bg-light border p-2 text-center rounded-2">
                                     <p class="mb-1 text-body"><i
                                             class="ti ti-point-filled me-1 text-warning"></i>Reschedule</p>
-                                    <h5 class="fw-bold mb-0">745</h5>
+                                    <h5 class="fw-bold mb-0"><?php echo e($rescheduledAppointmentsCount); ?></h5>
                                 </div>
                             </div>
                             <div class="col-md-3 col-sm-6">
                                 <div class="bg-light border p-2 text-center rounded-2">
                                     <p class="mb-1 text-body"><i
                                             class="ti ti-point-filled me-1 text-success"></i>Completed</p>
-                                    <h5 class="fw-bold mb-0">4578</h5>
+                                    <h5 class="fw-bold mb-0"><?php echo e($completedAppointmentsCount); ?></h5>
                                 </div>
                             </div>
                         </div>
@@ -225,6 +201,7 @@
                     </div>
                     <div class="card-body">
                         <div class="row row-gap-3">
+                            <?php $__currentLoopData = $doctors; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $doctor): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="col-md-4">
                                 <div class="border shadow-sm p-3 rounded-2">
                                     <div class="d-flex align-items-center mb-3">
@@ -236,50 +213,20 @@
                                         </a>
                                         <div>
                                             <h6 class="fs-14 mb-1 text-truncate"><a href="doctor-details.html"
-                                                    class="fw-semibold">Dr. Vikram Patel</a></h6>
-                                            <p class="mb-0 fs-13">Cardiologist</p>
+                                                    class="fw-semibold">Dr. <?php echo e($doctor->name); ?></a></h6>
+                                            <p class="mb-0 fs-13" style="
+                                            white-space: nowrap;
+                                            text-overflow: ellipsis;
+                                            max-width: 120px;
+                                            overflow: hidden;"><?php echo e($doctor->department->department_name ?? 'N/A'); ?></p>
                                         </div>
                                     </div>
-                                    <p class="mb-0"><span class="text-dark fw-semibold">258</span>
+                                    <p class="mb-0"><span class="text-dark fw-semibold"><?php echo e($doctor->appointments_count); ?></span>
                                         Bookings</p>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="border shadow-sm p-3 rounded-2">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <a href="doctor-details.html" class="avatar me-2 flex-shrink-0 position-relative">
-                                            <span class="online text-success position-absolute end-0 bottom-0 pe-1"><i
-                                                    class="ti ti-circle-filled d-flex bg-white fs-6 rounded-circle border border-1 border-white"></i></span>
-                                            <img src="<?php echo e(asset('assets/img/doctors/doctor-03.jpg')); ?>" alt="img"
-                                                class="rounded-circle">
-                                        </a>
-                                        <div>
-                                            <h6 class="fs-14 mb-1 text-truncate"><a href="doctor-details.html"
-                                                    class="fw-semibold">Dr. Ashok Seth</a></h6>
-                                            <p class="mb-0 fs-13">Pediatrician</p>
-                                        </div>
-                                    </div>
-                                    <p class="mb-0"><span class="text-dark fw-semibold">125</span>
-                                        Bookings</p>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="border shadow-sm p-3 rounded-2">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <a href="doctor-details.html" class="avatar me-2 flex-shrink-0 position-relative">
-                                            <img src="<?php echo e(asset('assets/img/doctors/doctor-04.jpg')); ?>" alt="img"
-                                                class="rounded-circle">
-                                        </a>
-                                        <div>
-                                            <h6 class="fs-14 mb-1 text-truncate"><a href="doctor-details.html"
-                                                    class="fw-semibold">Dr. Indira Hinduja</a></h6>
-                                            <p class="mb-0 fs-13">Gynecologist</p>
-                                        </div>
-                                    </div>
-                                    <p class="mb-0"><span class="text-dark fw-semibold">115</span>
-                                        Bookings</p>
-                                </div>
-                            </div>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            
                         </div>
                     </div>
                 </div>

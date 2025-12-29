@@ -85,6 +85,7 @@ class PatientController extends Controller
             'name'                  => 'required|string|max:255',
             'guardian_name'         => 'nullable|string|max:255',
             'guardian_phone'        => 'nullable|string|max:20',
+            'guardian_relation'     => 'nullable|string|max:255',
             'gender'                => 'required',
             'birth_date'            => 'nullable|date',
             'age.year'              => 'nullable|integer|min:0',
@@ -133,6 +134,7 @@ class PatientController extends Controller
             'patient_name'          => $data['name'],
             'guardian_name'         => $data['guardian_name'] ?? null,
             'guardian_phone'        => $data['guardian_phone'] ?? null,
+            'guardian_relation'     => $data['guardian_relation'] ?? null,
             'gender'                => $data['gender'],
             'dob'                   => $data['birth_date'] ?? null,
 
@@ -184,6 +186,7 @@ class PatientController extends Controller
             'name'                  => 'required|string|max:255',
             'guardian_name'         => 'nullable|string|max:255',
             'guardian_phone'        => 'nullable|string|max:20',
+            'guardian_relation'     => 'nullable|string|max:255',
             'gender'                => 'required|in:Male,Female',
             'birth_date'            => 'nullable|date',
             'age.year'              => 'nullable|integer|min:0',
@@ -234,6 +237,7 @@ class PatientController extends Controller
            'patient_name'          => $data['name'],
         'guardian_name'         => $data['guardian_name'] ?? null,
         'guardian_phone'        => $data['guardian_phone'] ?? null,
+        'guardian_relation'     => $data['guardian_relation'] ?? null,
         'gender'                => $data['gender'],
         'dob'                   => $data['birth_date'] ?? null,
 
@@ -390,7 +394,7 @@ class PatientController extends Controller
             "Patient", "Gender", "Blood Group", "Age(Year)", "Age(Month)", "Age(Day)",
             "Marital Status", "Phone", "Email", "Address", "Remarks", "Known Allergies",
             "Height","Weight","Temperature","Identification Number", "TPA", "TPA ID", "TPA Validity",
-            "Gaurdian Name", "Gaurdian Phone No.", "Emergency Phone No.", "Languages Speak", "Newspaper Preference"
+            "Gaurdian Name", "Gaurdian Phone No.", "Gaurdian Phone No.", "Emergency Phone No.", "Languages Speak", "Newspaper Preference"
         ];
 
         // Add header row

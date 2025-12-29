@@ -345,7 +345,12 @@
             });
         });
     </script>
-
+    
+@if(session('pdf_url'))
+<script>
+    window.open("{{ session('pdf_url') }}", "_blank");
+</script>
+@endif
 
     <!-- {{-- <script>
         // const editButton = document.querySelector('.edit-opd')
