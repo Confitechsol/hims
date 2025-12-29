@@ -184,7 +184,7 @@
       <div class="admission_info">
         <div class="admission_item">
           <p>
-            <b>ADMISSION NO.</b> : <span class="red">A-002249/25-26</span>
+            <b>ADMISSION NO.</b> : <span class="red">{{$IpdPatient->ipd['ipd_no']}}</span>
           </p>
         </div>
         <div class="admission_item">
@@ -280,7 +280,7 @@
             </div>
             :
             <div class="patient_data">
-              NORTH 24 PARAGANAS
+              {{$IpdPatient->patient['address']}}
             </div>
           </div>
           <div class="patient_items">
@@ -334,7 +334,7 @@
             </div>
             :
             <div class="patient_data">
-              .
+              {{$IpdPatient->patient['guardian_name']}}
             </div>
           </div>
 
@@ -348,7 +348,7 @@
             </div>
             :
             <div class="patient_data">
-              HUBAND
+              {{$IpdPatient->patient['guardian_relation']}}
             </div>
           </div>
 
@@ -546,7 +546,7 @@
         </div>
         <div class="admission_item">
           <p>
-            <b>Admission No</b> : <span class="red">A-002249/25-26</span>
+            <b>Admission No</b> : <span class="red">{{$IpdPatient->ipd['ipd_no']}}</span>
           </p>
         </div>
         <div class="admission_item">
