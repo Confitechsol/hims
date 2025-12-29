@@ -250,7 +250,12 @@
             });
         });
     </script>
-
+    
+<?php if(session('pdf_url')): ?>
+<script>
+    window.open("<?php echo e(session('pdf_url')); ?>", "_blank");
+</script>
+<?php endif; ?>
 
     <!--  -->
 <?php $__env->stopSection(); ?>

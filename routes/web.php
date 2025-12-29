@@ -73,6 +73,8 @@ use App\Http\Controllers\VitalController;
 use App\Http\Controllers\TransactionReportController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PdfController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -100,9 +102,7 @@ Route::post('/login', [LoginController::class, 'login'])->name('login');
 Route::middleware(['auth'])->get('/hr-portal/redirect', [AppSwitchController::class, 'switchToClient'])->name('hrms.switch');
 
 Route::middleware(['admin'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard',[DashboardController::class,'index'])->name('dashboard');
 
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
     // Route::get('/profile', function () {
@@ -552,6 +552,8 @@ Route::post('/add_nurse_note', [IpdController::class, 'addNurseNote'])->name('nu
 Route::post('/ipd/add_prescription', [IpdController::class, 'storePrescription'])->name('ipd.addPrescription');
 Route::post('/ipd_charge', [IpdController::class, 'addIpdCharge'])->name('ipd.addIpdCharge');
 Route::post('/assignNewBed', [IpdController::class, 'assignNewBed'])->name('assignNewBed');
+//
+Route::get('/ipd/{id}/pdf', [PdfController::class, 'generatePdf'])->name('ipd.pdf');;
 
 Route::get('/billing', function () {
     return view('admin.billing.billing');
