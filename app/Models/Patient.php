@@ -38,6 +38,7 @@ class Patient extends Model
         'address',
         'guardian_name',
         'guardian_phone',
+        'guardian_relation',
         'patient_type',
         'identification_number',
         'known_allergies',

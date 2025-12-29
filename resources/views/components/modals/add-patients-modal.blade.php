@@ -64,6 +64,17 @@
                             @enderror
                         </div>
 
+                        {{-- Guardian Relation --}}
+                        <div class="col-md-6">
+                            <label for="guardian_relation" class="form-label">Guardian Relationship</label>
+                            <input type="text" id="guardian_relation" name="guardian_relation"
+                                class="form-control @error('guardian_relation') is-invalid @enderror"
+                                value="{{ old('guardian_relation') }}" />
+                            @error('guardian_phone')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
                         {{-- Emergency Contact --}}
                         <div class="col-md-6">
                             <label for="emergency_contact_no" class="form-label">Emergency Contact No.</label>
@@ -114,15 +125,15 @@
                                     <label class="form-label">Age
                                         (yy-mm-dd)</label>
                                     <div style="clear: both; overflow: hidden;">
-                                        <input type="text" name="age[year]" id="age_year" placeholder="YY"
+                                        <input type="numeric" name="age[year]" id="age_year" placeholder="YY"
                                             value="{{ old('age.year') }}"
                                             class="form-control patient_age_year @error('age.year') is-invalid @enderror"
                                             style="width: 30%; float: left;" />
-                                        <input type="text" name="age[month]" id="age_month" placeholder="MM"
+                                        <input type="numeric" name="age[month]" id="age_month" placeholder="MM"
                                             value="{{ old('age.month') }}"
                                             class="form-control patient_age_month @error('age.month') is-invalid @enderror"
                                             style="width: 36%; float: left; margin-left: 4px;" />
-                                        <input type="text" name="age[day]" id="age_day" placeholder="DD"
+                                        <input type="numeric" name="age[day]" id="age_day" placeholder="DD"
                                             value="{{ old('age.day') }}"
                                             class="form-control patient_age_day @error('age.day') is-invalid @enderror"
                                             style="width: 26%; float: left; margin-left: 4px;" />
