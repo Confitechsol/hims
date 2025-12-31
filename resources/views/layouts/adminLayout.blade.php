@@ -551,8 +551,8 @@
 
                             <!-- Item-->
                             <div class="pt-2 mt-2 border-top">
-                                <form action="{{ route('logout') }}" method="POST" class="dropdown-item text-danger"
-                                    style="cursor: pointer">
+                                <form action="{{ route('logout') }}" method="POST"
+                                    class="dropdown-item text-danger" style="cursor: pointer">
                                     @csrf
                                     <button type="submit" class="btn w-100 justify-content-start p-0">
                                         <i class="ti ti-logout me-1 fs-17 align-middle text-danger fw-bold"></i>
@@ -715,7 +715,7 @@
                     initSelect($(this));
                 });
 
-               
+
 
                 // Initialize selects that appear inside modals when they open
                 $('.modal').off('shown.bs.modal.select2init').on('shown.bs.modal.select2init', function() {

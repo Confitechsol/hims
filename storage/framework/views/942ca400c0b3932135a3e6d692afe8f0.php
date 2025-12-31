@@ -1,3 +1,8 @@
+<?php $__env->startSection('select2cdn'); ?>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    
+    
+<?php $__env->stopSection(); ?>
 <?php $__env->startSection('content'); ?>
     <style>
         .nav-tabs .nav-link.active {
@@ -250,12 +255,12 @@
             });
         });
     </script>
-    
-<?php if(session('pdf_url')): ?>
-<script>
-    window.open("<?php echo e(session('pdf_url')); ?>", "_blank");
-</script>
-<?php endif; ?>
+
+    <?php if(session('pdf_url')): ?>
+        <script>
+            window.open("<?php echo e(session('pdf_url')); ?>", "_blank");
+        </script>
+    <?php endif; ?>
 
     <!--  -->
 <?php $__env->stopSection(); ?>

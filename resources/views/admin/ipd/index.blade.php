@@ -1,5 +1,9 @@
 @extends('layouts.adminLayout')
-
+@section('select2cdn')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    {{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> --}}
+    {{-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> --}}
+@endsection
 @section('content')
     <style>
         .nav-tabs .nav-link.active {
@@ -345,12 +349,12 @@
             });
         });
     </script>
-    
-@if(session('pdf_url'))
-<script>
-    window.open("{{ session('pdf_url') }}", "_blank");
-</script>
-@endif
+
+    @if (session('pdf_url'))
+        <script>
+            window.open("{{ session('pdf_url') }}", "_blank");
+        </script>
+    @endif
 
     <!-- {{-- <script>
         // const editButton = document.querySelector('.edit-opd')
