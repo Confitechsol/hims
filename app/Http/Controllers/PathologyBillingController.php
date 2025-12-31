@@ -9,8 +9,12 @@ use App\Models\Pathology;
 use App\Models\Patient;
 use App\Models\Doctor;
 use App\Models\CaseReference;
+use App\Models\OpdDetail;
 use App\Models\Organisation;
 use App\Models\OrganisationsCharge;
+use App\Models\IpdPrescription;
+use App\Models\IpdDetail;
+use App\Models\IpdPrescriptionTest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,7 +25,7 @@ class PathologyBillingController extends Controller
      */
     public function index()
     {
-        $bills = PathologyBilling::with(['patient', 'doctor'])
+        $bills = PathologyBilling::with(['patient', 'doctor', 'organisation'])
             ->orderBy('id', 'desc')
             ->paginate(15);
         
@@ -53,8 +57,8 @@ class PathologyBillingController extends Controller
     {
         $validated = $request->validate([
             'patient_id' => 'required|exists:patients,id',
-            'case_reference_id' => 'nullable|exists:case_references,id',
-            'doctor_id' => 'nullable|exists:doctors,id',
+            'case_reference_id' => 'nullable',
+            'doctor_id' => 'nullable|exists:doctor,id',
             'doctor_name' => 'nullable|string|max:100',
             'date' => 'required|date',
             'total' => 'required|numeric|min:0',
@@ -65,7 +69,7 @@ class PathologyBillingController extends Controller
             'net_amount' => 'required|numeric|min:0',
             'note' => 'nullable|string',
             'organisation_id' => 'nullable|exists:organisation,id',
-            'activate_tpa' => 'nullable|boolean',
+            'activate_tpa' => 'nullable',
             'tests' => 'required|array|min:1',
             'tests.*.pathology_id' => 'required|exists:pathology,id',
             'tests.*.report_days' => 'required|integer|min:0',
@@ -80,13 +84,22 @@ class PathologyBillingController extends Controller
             // Get bill number
             $billNo = 'PATB' . str_pad(PathologyBilling::max('id') + 1, 2, '0', STR_PAD_LEFT);
             
+            // Get doctor name if doctor_id is provided
+            $doctorName = $validated['doctor_name'] ?? null;
+            if (!$doctorName && $validated['doctor_id']) {
+                $doctor = Doctor::find($validated['doctor_id']);
+                if ($doctor) {
+                    $doctorName = 'Dr. ' . trim($doctor->name . ' ' . ($doctor->surname ?? ''));
+                }
+            }
+            
             // Create pathology bill
             $bill = PathologyBilling::create([
                 'date' => $validated['date'],
                 'patient_id' => $validated['patient_id'],
                 'case_reference_id' => $validated['case_reference_id'] ?? null,
                 'doctor_id' => $validated['doctor_id'] ?? null,
-                'doctor_name' => $validated['doctor_name'] ?? null,
+                'doctor_name' => $doctorName ?? '',
                 'total' => $validated['total'],
                 'discount_percentage' => $validated['discount_percentage'] ?? 0,
                 'discount' => $validated['discount'] ?? 0,
@@ -97,7 +110,7 @@ class PathologyBillingController extends Controller
                 'organisation_id' => ($request->has('activate_tpa') && $request->activate_tpa) ? ($validated['organisation_id'] ?? null) : null,
                 'generated_by' => Auth::id(),
             ]);
-
+            
             // Create pathology reports
             foreach ($validated['tests'] as $test) {
                 PathologyReport::create([
@@ -116,8 +129,18 @@ class PathologyBillingController extends Controller
             return redirect()->route('pathology.billing.index')
                 ->with('success', 'Pathology bill created successfully!');
                 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            \Log::error('Validation error creating pathology bill: ' . json_encode($e->errors()));
+            return redirect()->back()
+                ->withInput()
+                ->withErrors($e->errors())
+                ->with('error', 'Please check the form for errors.');
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('Error creating pathology bill: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            \Log::error('Request data: ' . json_encode($request->all()));
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Error creating pathology bill: ' . $e->getMessage());
@@ -129,7 +152,7 @@ class PathologyBillingController extends Controller
      */
     public function show($id)
     {
-        $bill = PathologyBilling::with(['patient', 'doctor', 'reports.pathology'])
+        $bill = PathologyBilling::with(['patient', 'doctor', 'reports.pathology', 'organisation'])
             ->findOrFail($id);
         
         return view('admin.pathology.billing.show', compact('bill'));
@@ -140,7 +163,7 @@ class PathologyBillingController extends Controller
      */
     public function edit($id)
     {
-        $bill = PathologyBilling::with(['patient', 'doctor', 'reports.pathology'])->findOrFail($id);
+        $bill = PathologyBilling::with(['patient.organisation', 'doctor', 'reports.pathology.charge.taxCategory', 'organisation'])->findOrFail($id);
         $patients = Patient::select('id', 'patient_name', 'mobileno')->get();
         $doctors = Doctor::select('id', 'name', 'surname', 'doctor_id')
             ->where(function($query) {
@@ -161,8 +184,8 @@ class PathologyBillingController extends Controller
     {
         $validated = $request->validate([
             'patient_id' => 'required|exists:patients,id',
-            'case_reference_id' => 'nullable|exists:case_references,id',
-            'doctor_id' => 'nullable|exists:doctors,id',
+            'case_reference_id' => 'nullable',
+            'doctor_id' => 'nullable|exists:doctor,id',
             'doctor_name' => 'nullable|string|max:100',
             'date' => 'required|date',
             'total' => 'required|numeric|min:0',
@@ -173,7 +196,7 @@ class PathologyBillingController extends Controller
             'net_amount' => 'required|numeric|min:0',
             'note' => 'nullable|string',
             'organisation_id' => 'nullable|exists:organisation,id',
-            'activate_tpa' => 'nullable|boolean',
+            'activate_tpa' => 'nullable',
             'tests' => 'required|array|min:1',
             'tests.*.pathology_id' => 'required|exists:pathology,id',
             'tests.*.report_days' => 'required|integer|min:0',
@@ -187,13 +210,22 @@ class PathologyBillingController extends Controller
         try {
             $bill = PathologyBilling::findOrFail($id);
             
+            // Get doctor name if doctor_id is provided
+            $doctorName = $validated['doctor_name'] ?? null;
+            if (!$doctorName && $validated['doctor_id']) {
+                $doctor = Doctor::find($validated['doctor_id']);
+                if ($doctor) {
+                    $doctorName = 'Dr. ' . trim($doctor->name . ' ' . ($doctor->surname ?? ''));
+                }
+            }
+            
             // Update pathology bill
             $bill->update([
                 'date' => $validated['date'],
                 'patient_id' => $validated['patient_id'],
                 'case_reference_id' => $validated['case_reference_id'] ?? null,
                 'doctor_id' => $validated['doctor_id'] ?? null,
-                'doctor_name' => $validated['doctor_name'] ?? null,
+                'doctor_name' => $doctorName ?? '',
                 'total' => $validated['total'],
                 'discount_percentage' => $validated['discount_percentage'] ?? 0,
                 'discount' => $validated['discount'] ?? 0,
@@ -227,6 +259,8 @@ class PathologyBillingController extends Controller
                 
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('Error updating pathology bill: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Error updating pathology bill: ' . $e->getMessage());
@@ -262,25 +296,62 @@ class PathologyBillingController extends Controller
     }
 
     /**
-     * API: Get patient prescriptions
+     * API: Get patient prescriptions (OPD Case References and IPD Prescriptions)
      */
     public function getPatientPrescriptions($patientId)
     {
-        $caseReferences = CaseReference::where('patient_id', $patientId)
-            ->orderBy('created_at', 'desc')
-            ->select('id', 'case_id', 'appointment_date as date', 'symptoms', 'reference_doctor')
-            ->get()
-            ->map(function($case) {
-                return [
-                    'id' => $case->id,
-                    'case_id' => $case->case_id ?? 'Case #' . $case->id,
-                    'date' => $case->date ? date('Y-m-d', strtotime($case->date)) : null,
-                    'symptoms' => $case->symptoms,
-                    'doctor' => $case->reference_doctor,
-                ];
-            });
-        
-        return response()->json($caseReferences);
+        try {
+            \Log::info('Getting prescriptions for patient ID: ' . $patientId);
+            
+            $prescriptions = collect();
+            
+            // Get OPD Visits (instead of case_references which doesn't have the needed fields)
+            $opdVisits = OpdDetail::where('patient_id', $patientId)
+                ->with('doctor')
+                ->orderBy('appointment_date', 'desc')
+                ->get()
+                ->map(function($opd) {
+                    return [
+                        'id' => $opd->id,
+                        'case_id' => $opd->opd_no ?? 'OPD' . str_pad($opd->id, 4, '0', STR_PAD_LEFT),
+                        'date' => $opd->appointment_date ? date('Y-m-d', strtotime($opd->appointment_date)) : null,
+                        'symptoms' => $opd->symptoms_description ?? $opd->symptoms_title ?? '',
+                        'doctor' => $opd->doctor ? $opd->doctor->name : null,
+                        'type' => 'opd',
+                    ];
+                });
+            
+            $prescriptions = $prescriptions->merge($opdVisits);
+            \Log::info('OPD Visits found: ' . $opdVisits->count());
+            
+            // Get IPD Prescriptions - try direct join first
+            $ipdPrescriptions = IpdPrescription::join('ipd_details', 'ipd_prescription.ipd_id', '=', 'ipd_details.id')
+                ->where('ipd_details.patient_id', $patientId)
+                ->select('ipd_prescription.*')
+                ->with(['ipd', 'prescribedBy'])
+                ->orderBy('ipd_prescription.date', 'desc')
+                ->get()
+                ->map(function($prescription) {
+                    return [
+                        'id' => $prescription->id,
+                        'case_id' => $prescription->prescription_number ?? 'IPDP' . str_pad($prescription->id, 4, '0', STR_PAD_LEFT),
+                        'date' => $prescription->date ? $prescription->date->format('Y-m-d') : null,
+                        'symptoms' => $prescription->finding_description ?? '',
+                        'doctor' => $prescription->prescribedBy ? $prescription->prescribedBy->name : null,
+                        'type' => 'ipd',
+                        'prescription_id' => $prescription->id,
+                    ];
+                });
+            
+            $prescriptions = $prescriptions->merge($ipdPrescriptions);
+            \Log::info('IPD Prescriptions found: ' . $ipdPrescriptions->count());
+            \Log::info('Total prescriptions: ' . $prescriptions->count());
+            
+            return response()->json($prescriptions->values());
+        } catch (\Exception $e) {
+            \Log::error('Error getting patient prescriptions: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -306,25 +377,165 @@ class PathologyBillingController extends Controller
     }
 
     /**
-     * API: Get TPA names for a patient from previous pathology bills
+     * API: Get TPA names for a patient from previous pathology bills, IPD records, and Patient record
      */
     public function getPatientTpas($patientId)
     {
-        $tpas = PathologyBilling::where('patient_id', $patientId)
-            ->whereNotNull('organisation_id')
-            ->with('organisation')
-            ->select('organisation_id')
-            ->distinct()
+        try {
+            \Log::info('Getting TPAs for patient ID: ' . $patientId);
+            
+            $tpas = collect();
+            
+            // FIRST: Get TPA directly from Patient record (this is the primary source)
+            $patient = Patient::with('organisation')->find($patientId);
+            if ($patient && $patient->organisation_id && $patient->organisation) {
+                $tpas->push([
+                    'id' => $patient->organisation_id,
+                    'name' => $patient->organisation->organisation_name ?? 'Unknown TPA',
+                    'code' => $patient->organisation->code ?? null,
+                ]);
+                \Log::info('TPA from Patient record: ' . ($patient->organisation->organisation_name ?? 'N/A'));
+            }
+            
+            // Get TPAs from previous pathology bills
+            $pathologyTpas = PathologyBilling::where('patient_id', $patientId)
+                ->whereNotNull('organisation_id')
+                ->with('organisation')
+                ->select('organisation_id')
+                ->distinct()
+                ->get()
+                ->filter(function($billing) {
+                    return $billing->organisation !== null;
+                })
+                ->map(function($billing) {
+                    return [
+                        'id' => $billing->organisation_id,
+                        'name' => $billing->organisation->organisation_name ?? 'Unknown TPA',
+                        'code' => $billing->organisation->code ?? null,
+                    ];
+                });
+            
+            $tpas = $tpas->merge($pathologyTpas);
+            \Log::info('TPAs from pathology bills: ' . $pathologyTpas->count());
+            
+            // Get TPAs from IPD records
+            $ipdTpas = IpdDetail::where('patient_id', $patientId)
+                ->whereNotNull('organisation_id')
+                ->with('organisation')
+                ->select('organisation_id')
+                ->distinct()
+                ->get()
+                ->filter(function($ipd) {
+                    return $ipd->organisation !== null; // Filter out null organisations
+                })
+                ->map(function($ipd) {
+                    return [
+                        'id' => $ipd->organisation_id,
+                        'name' => $ipd->organisation->organisation_name ?? 'Unknown TPA',
+                        'code' => $ipd->organisation->code ?? null,
+                    ];
+                });
+            
+            $tpas = $tpas->merge($ipdTpas);
+            \Log::info('TPAs from IPD records: ' . $ipdTpas->count());
+            
+            // Also get TPAs from IPD Prescriptions (if the prescription has an IPD with TPA)
+            $ipdPrescriptionTpas = IpdPrescription::whereHas('ipd', function($query) use ($patientId) {
+                    $query->where('patient_id', $patientId)
+                          ->whereNotNull('organisation_id');
+                })
+                ->with('ipd.organisation')
+                ->get()
+                ->map(function($prescription) {
+                    if ($prescription->ipd && $prescription->ipd->organisation) {
+                        return [
+                            'id' => $prescription->ipd->organisation_id,
+                            'name' => $prescription->ipd->organisation->organisation_name ?? 'Unknown TPA',
+                            'code' => $prescription->ipd->organisation->code ?? null,
+                        ];
+                    }
+                    return null;
+                })
+                ->filter(); // Remove nulls
+            
+            $tpas = $tpas->merge($ipdPrescriptionTpas);
+            \Log::info('TPAs from IPD Prescriptions: ' . $ipdPrescriptionTpas->count());
+            
+            // Remove duplicates based on ID
+            $uniqueTpas = $tpas->unique('id')->values();
+            \Log::info('Total unique TPAs: ' . $uniqueTpas->count());
+            
+            return response()->json($uniqueTpas);
+        } catch (\Exception $e) {
+            \Log::error('Error getting patient TPAs: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * API: Get prescription tests (pathology tests from IPD prescription)
+     */
+    public function getPrescriptionTests($prescriptionId)
+    {
+        $prescription = IpdPrescription::with(['tests.pathology', 'ipd.patient.organisation', 'ipd.organisation'])
+            ->find($prescriptionId);
+        
+        if (!$prescription) {
+            return response()->json(['error' => 'Prescription not found'], 404);
+        }
+        
+        // Get pathology tests from the prescription
+        $pathologyTests = $prescription->tests()
+            ->whereNotNull('pathology_id')
+            ->with('pathology.charge.taxCategory')
             ->get()
-            ->map(function($billing) {
+            ->filter(function($test) {
+                return $test->pathology !== null; // Filter out tests with null pathology
+            })
+            ->map(function($test) {
+                $pathology = $test->pathology;
                 return [
-                    'id' => $billing->organisation_id,
-                    'name' => $billing->organisation ? $billing->organisation->organisation_name : 'Unknown TPA',
-                    'code' => $billing->organisation ? $billing->organisation->code : null,
+                    'id' => $pathology->id,
+                    'test_name' => $pathology->test_name,
+                    'report_days' => $pathology->report_days ?? 0,
+                    'tax_percentage' => $pathology->charge && $pathology->charge->taxCategory 
+                        ? $pathology->charge->taxCategory->percentage 
+                        : 0,
+                    'amount' => $pathology->amount ?? ($pathology->charge ? $pathology->charge->standard_charge : 0),
                 ];
             });
         
-        return response()->json($tpas);
+        // Get TPA - Priority: Patient's TPA > IPD's TPA
+        $tpa = null;
+        if ($prescription->ipd && $prescription->ipd->patient) {
+            // First check patient's TPA (primary source)
+            if ($prescription->ipd->patient->organisation_id && $prescription->ipd->patient->organisation) {
+                $tpa = [
+                    'id' => $prescription->ipd->patient->organisation_id,
+                    'name' => $prescription->ipd->patient->organisation->organisation_name,
+                    'code' => $prescription->ipd->patient->organisation->code,
+                ];
+            }
+            // Fallback to IPD's TPA if patient doesn't have one
+            elseif ($prescription->ipd->organisation_id && $prescription->ipd->organisation) {
+                $tpa = [
+                    'id' => $prescription->ipd->organisation_id,
+                    'name' => $prescription->ipd->organisation->organisation_name,
+                    'code' => $prescription->ipd->organisation->code,
+                ];
+            }
+        }
+        
+        return response()->json([
+            'prescription' => [
+                'id' => $prescription->id,
+                'prescription_number' => $prescription->prescription_number,
+                'date' => $prescription->date ? $prescription->date->format('Y-m-d') : null,
+                'doctor' => $prescription->prescribedBy ? $prescription->prescribedBy->name : null,
+            ],
+            'tests' => $pathologyTests,
+            'tpa' => $tpa, // Include TPA if available
+        ]);
     }
 
     /**
@@ -339,20 +550,39 @@ class PathologyBillingController extends Controller
             return response()->json(['error' => 'Test ID and Organisation ID are required'], 400);
         }
         
-        $test = Pathology::find($testId);
+        $test = Pathology::with('charge')->find($testId);
         
-        if (!$test || !$test->charge_id) {
-            return response()->json(['tpa_charge' => null, 'standard_charge' => $test->amount ?? 0]);
+        if (!$test) {
+            return response()->json(['error' => 'Test not found'], 404);
+        }
+        
+        $standardCharge = $test->amount ?? ($test->charge ? $test->charge->standard_charge : 0);
+        
+        if (!$test->charge_id) {
+            \Log::info("Test {$testId} has no charge_id, returning standard charge");
+            return response()->json([
+                'tpa_charge' => null, 
+                'standard_charge' => $standardCharge
+            ]);
         }
         
         $tpaCharge = OrganisationsCharge::where('charge_id', $test->charge_id)
             ->where('org_id', $organisationId)
             ->first();
         
-        $standardCharge = $test->amount ?? ($test->charge ? $test->charge->standard_charge : 0);
+        \Log::info("TPA charge lookup - Test: {$testId}, Org: {$organisationId}, Charge ID: {$test->charge_id}, Found: " . ($tpaCharge ? 'Yes' : 'No'));
         
+        if ($tpaCharge && $tpaCharge->org_charge !== null) {
+            \Log::info("TPA charge found: {$tpaCharge->org_charge}");
+            return response()->json([
+                'tpa_charge' => (float)$tpaCharge->org_charge,
+                'standard_charge' => $standardCharge,
+            ]);
+        }
+        
+        \Log::info("No TPA charge found, returning standard charge: {$standardCharge}");
         return response()->json([
-            'tpa_charge' => $tpaCharge ? $tpaCharge->org_charge : null,
+            'tpa_charge' => null,
             'standard_charge' => $standardCharge,
         ]);
     }

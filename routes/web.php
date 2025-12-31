@@ -516,6 +516,11 @@ Route::get('/getIpdById/{id}', [IpdController::class, 'getIpdById'])->name('getI
 Route::get('/getIpdMedicineById/{id}', [IpdController::class, 'getIpdMedicineById'])->name('getIpdMedicineById');
 Route::post('/add_nurse_note', [IpdController::class, 'addNurseNote'])->name('nurseNote.store');
 Route::post('/ipd/add_prescription', [IpdController::class, 'storePrescription'])->name('ipd.addPrescription');
+Route::get('/ipd/prescription/{id}', [IpdController::class, 'showPrescription'])->name('ipd.prescription.show');
+Route::get('/ipd/prescription/{id}/edit', [IpdController::class, 'editPrescription'])->name('ipd.prescription.edit');
+Route::get('/ipd/prescription/{id}/print', [IpdController::class, 'printPrescription'])->name('ipd.prescription.print');
+Route::put('/ipd/prescription/{id}', [IpdController::class, 'updatePrescription'])->name('ipd.prescription.update');
+Route::delete('/ipd/prescription/{id}', [IpdController::class, 'deletePrescription'])->name('ipd.prescription.delete');
 Route::post('/ipd_charge', [IpdController::class, 'addIpdCharge'])->name('ipd.addIpdCharge');
 
 Route::get('/billing', function () {
@@ -772,6 +777,7 @@ Route::prefix('pathology/billing/api')->group(function () {
     Route::get('/test-details', [PathologyBillingController::class, 'getTestDetails'])->name('pathology.billing.api.test-details');
     Route::get('/patient-tpas/{patientId}', [PathologyBillingController::class, 'getPatientTpas'])->name('pathology.billing.api.patient-tpas');
     Route::get('/tpa-charge', [PathologyBillingController::class, 'getTpaCharge'])->name('pathology.billing.api.tpa-charge');
+    Route::get('/prescription-tests/{prescriptionId}', [PathologyBillingController::class, 'getPrescriptionTests'])->name('pathology.billing.api.prescription-tests');
 });
 
 // Radiology Test Routes
@@ -809,6 +815,7 @@ Route::prefix('radiology/billing/api')->group(function () {
     Route::get('/test-details', [RadiologyBillingController::class, 'getTestDetails'])->name('radiology.billing.api.test-details');
     Route::get('/patient-tpas/{patientId}', [RadiologyBillingController::class, 'getPatientTpas'])->name('radiology.billing.api.patient-tpas');
     Route::get('/tpa-charge', [RadiologyBillingController::class, 'getTpaCharge'])->name('radiology.billing.api.tpa-charge');
+    Route::get('/prescription-tests/{prescriptionId}', [RadiologyBillingController::class, 'getPrescriptionTests'])->name('radiology.billing.api.prescription-tests');
 });
 
 // Pharmacy Masters Routes

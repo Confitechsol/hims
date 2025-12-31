@@ -63,6 +63,17 @@
                                 <th>Reference Doctor:</th>
                                 <td>{{ $bill->doctor_name ?? '-' }}</td>
                             </tr>
+                            @if($bill->organisation_id && $bill->organisation)
+                            <tr>
+                                <th>TPA:</th>
+                                <td>
+                                    <span class="badge bg-info">{{ $bill->organisation->organisation_name }}</span>
+                                    @if($bill->organisation->code)
+                                        <small class="text-muted">({{ $bill->organisation->code }})</small>
+                                    @endif
+                                </td>
+                            </tr>
+                            @endif
                             @if($bill->note)
                             <tr>
                                 <th>Note:</th>

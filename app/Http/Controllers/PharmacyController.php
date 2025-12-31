@@ -192,16 +192,43 @@ class PharmacyController extends Controller
      */
     public function getMedicines(Request $request)
     {
-        $search = $request->input('search');
+        try {
+            $search = $request->input('search');
 
-        $medicines = Pharmacy::with(['medicineCategory', 'company', 'batches'])
-            ->when($search, function ($query) use ($search) {
+            $query = Pharmacy::query();
+            
+            // Apply search filter if provided
+            if ($search) {
                 $query->where('medicine_name', 'like', "%{$search}%");
-            })
-            ->active()
-            ->get();
+            }
+            
+            // Filter active medicines only
+            $query->where('is_active', 'yes');
+            
+            // Get medicines without eager loading batches (which might cause issues)
+            $medicines = $query->select('id', 'medicine_name', 'medicine_category_id', 'medicine_company', 'is_active')
+                ->get()
+                ->map(function ($medicine) {
+                    return [
+                        'id' => $medicine->id,
+                        'medicine_name' => $medicine->medicine_name,
+                        'name' => $medicine->medicine_name, // Alias for compatibility
+                    ];
+                });
 
-        return response()->json($medicines);
+            return response()->json($medicines);
+        } catch (\Exception $e) {
+            \Log::error('Error in getMedicines: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+            
+            return response()->json([
+                'error' => 'Failed to load medicines',
+                'message' => config('app.debug') ? $e->getMessage() : 'An error occurred while loading medicines'
+            ], 500);
+        }
     }
 
     /**
