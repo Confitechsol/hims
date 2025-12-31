@@ -10,6 +10,8 @@ class VisitorBook extends Model
     use HasFactory;
 
     protected $table = 'visitors_book';
+    
+    public $timestamps = false;
 
     protected $fillable = [
         'hospital_id',

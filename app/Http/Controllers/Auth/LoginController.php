@@ -13,6 +13,7 @@ class LoginController extends Controller
 {
     public function showLoginForm()
     {
+        
         if (Auth::check()) {
             // Redirect already logged-in users
             $user = Auth::user();
@@ -27,7 +28,7 @@ class LoginController extends Controller
     }
    public function login(Request $request)
     {
-        // ✅ Validation
+        //dd($request->all());
         $validator = Validator::make($request->all(), [
             'email' => 'required|string',
             'password' => 'required|string',

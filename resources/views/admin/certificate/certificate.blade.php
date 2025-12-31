@@ -152,8 +152,6 @@
             color: #750096;
             background: #e7c1f217;
         }
-
- 
     </style>
     <!-- row start -->
 
@@ -331,7 +329,7 @@
                                                 <tr>
                                                     <th>Certificate Template Name</th>
                                                     <th>Background Image</th>
-                                                    <th>Action</th>
+                                                    <!-- <th>Action</th> -->
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -576,22 +574,22 @@
                                                     <td>
                                                         <img src="" alt="Background Image">
                                                     </td>
-                                                    <td>
-                                                        <div class="d-flex gap-2">
-                                                            <a href="javascript: void(0);"
-                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
-                                                                <i class="ti ti-menu" data-bs-toggle="tooltip"
-                                                                    title="Show"></i></a>
-                                                            <a href="javascript: void(0);"
-                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
-                                                                <i class="ti ti-pencil" data-bs-toggle="tooltip"
-                                                                    title="edit"></i></a>
-                                                            <a href="javascript: void(0);"
-                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                <i class="ti ti-trash" data-bs-toggle="tooltip"
-                                                                    title="Delete"></i></a>
-                                                        </div>
-                                                    </td>
+                                                    <!-- <td>
+                                                            <div class="d-flex gap-2">
+                                                                <a href="javascript: void(0);"
+                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
+                                                                    <i class="ti ti-menu" data-bs-toggle="tooltip"
+                                                                        title="Show"></i></a>
+                                                                <a href="javascript: void(0);"
+                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
+                                                                    <i class="ti ti-pencil" data-bs-toggle="tooltip"
+                                                                        title="edit"></i></a>
+                                                                <a href="javascript: void(0);"
+                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                                    <i class="ti ti-trash" data-bs-toggle="tooltip"
+                                                                        title="Delete"></i></a>
+                                                            </div>
+                                                        </td> -->
                                                 </tr>
                                                 <tr>
                                                     <td>
@@ -625,10 +623,11 @@
 
                                                                                 <div class="header">
                                                                                     <div class="logo-box">
-                                                                                        <img src="assets/img/logo.png" alt="">
+                                                                                        <img src="assets/img/logo.png"
+                                                                                            alt="">
                                                                                     </div>
                                                                                     <h1>Birth Certificate</h1>
-                                                                                    
+
                                                                                 </div>
 
                                                                                 <!-- Child Information -->
@@ -807,22 +806,139 @@
                                                     <td>
                                                         <img src="" alt="Background Image">
                                                     </td>
+                                                    <!-- <td>
+                                                            <div class="d-flex gap-2">
+                                                                <a href="javascript: void(0);"
+                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
+                                                                    <i class="ti ti-menu" data-bs-toggle="tooltip"
+                                                                        title="Show"></i></a>
+                                                                <a href="javascript: void(0);"
+                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
+                                                                    <i class="ti ti-pencil" data-bs-toggle="tooltip"
+                                                                        title="edit"></i></a>
+                                                                <a href="javascript: void(0);"
+                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                                    <i class="ti ti-trash" data-bs-toggle="tooltip"
+                                                                        title="Delete"></i></a>
+                                                            </div>
+                                                        </td> -->
+                                                </tr>
+                                                <tr>
                                                     <td>
-                                                        <div class="d-flex gap-2">
-                                                            <a href="javascript: void(0);"
-                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
-                                                                <i class="ti ti-menu" data-bs-toggle="tooltip"
-                                                                    title="Show"></i></a>
-                                                            <a href="javascript: void(0);"
-                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
-                                                                <i class="ti ti-pencil" data-bs-toggle="tooltip"
-                                                                    title="edit"></i></a>
-                                                            <a href="javascript: void(0);"
-                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                <i class="ti ti-trash" data-bs-toggle="tooltip"
-                                                                    title="Delete"></i></a>
+                                                        <div class="d-flex align-items-center flex-wrap gap-2">
+                                                            <div class="text-end d-flex">
+                                                                <a href="" data-bs-toggle="modal"
+                                                                    data-bs-target="#death_certificate">Sample Death
+                                                                    Certificate</a>
+                                                            </div>
+                                                            <!-- First Modal -->
+                                                            <div class="modal fade" id="death_certificate" tabindex="-1"
+                                                                aria-hidden="true">
+                                                                <div class="modal-dialog modal-dialog-centered modal-xl">
+                                                                    <div class="modal-content ">
+
+                                                                        <div class="modal-header"
+                                                                            style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+
+                                                                            <h5 class="modal-title"
+                                                                                id="addSpecializationLabel">
+                                                                                Death Certificate Template
+                                                                            </h5>
+                                                                            <button type="button" class="btn-close"
+                                                                                data-bs-dismiss="modal"></button>
+
+                                                                        </div>
+
+                                                                        <div class="modal-body">
+
+                                                                            <div class="certificate">
+
+                                                                                <div class="header">
+                                                                                    <div class="logo-box">
+                                                                                        <img src="assets/img/logo.png"
+                                                                                            alt="">
+                                                                                    </div>
+                                                                                    <h1>Death Certificate</h1>
+
+                                                                                </div>
+
+                                                                                <!-- Child Information -->
+                                                                                <!-- <h2>Child Information</h2> -->
+
+                                                                                <div class="row">
+                                                                                    <div class="col">
+                                                                                        <label>Patient Name</label>
+                                                                                        <div class="line-data">Abisekh Roy
+                                                                                            (5)
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col">
+                                                                                        <label>Gender</label>
+                                                                                        <div class="line-data">Male</div>
+                                                                                    </div>
+
+                                                                                </div>
+                                                                                
+                                                                                <div class="row">
+                                                                                    
+                                                                                    <div class="col">
+                                                                                        <label>Death Date</label>
+                                                                                        <div class="line-data"> 07/04/2025
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col">
+                                                                                        <label>Death Time</label>
+                                                                                        <div class="line-data">10:10 PM
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col">
+                                                                                        <label>Guardian Name</label>
+                                                                                        <div class="line-data">Anil Roy
+                                                                                        </div>
+                                                                                    </div>
+
+                                                                                </div>
+
+                                                                                <div class="row">
+                                                                                    <div class="col">
+                                                                                        <label>Address</label>
+                                                                                        <div class="line-data">--</div>
+                                                                                    </div>
+                                                                                </div>
+
+
+
+                                                                            </div>
+
+
+                                                                        </div>
+
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
                                                         </div>
+
                                                     </td>
+                                                    <td>
+                                                        <img src="" alt="Background Image">
+                                                    </td>
+                                                    <!-- <td>
+                                                            <div class="d-flex gap-2">
+                                                                <a href="javascript: void(0);"
+                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
+                                                                    <i class="ti ti-menu" data-bs-toggle="tooltip"
+                                                                        title="Show"></i></a>
+                                                                <a href="javascript: void(0);"
+                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
+                                                                    <i class="ti ti-pencil" data-bs-toggle="tooltip"
+                                                                        title="edit"></i></a>
+                                                                <a href="javascript: void(0);"
+                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                                    <i class="ti ti-trash" data-bs-toggle="tooltip"
+                                                                        title="Delete"></i></a>
+                                                            </div>
+                                                        </td> -->
                                                 </tr>
                                             </tbody>
                                         </table>

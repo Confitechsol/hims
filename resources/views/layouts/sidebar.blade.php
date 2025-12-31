@@ -156,6 +156,7 @@
                                             </a></li>
                                 </ul>
                             </li>
+                            
                         </ul>
                     </li>
                     
@@ -325,7 +326,7 @@
                     </li> 
                     <li>
                         <ul>
-                    <li class="submenu">
+                            <li class="submenu">
                                 <a href="javascript:void(0);" class="active subdrop">
                                     <i class="ti ti-layout-dashboard"></i><span>Finance</span>
                                     <span class="menu-arrow"></span>
@@ -338,7 +339,7 @@
                                     
                                 </ul>
                             </li>
-                            </ul>
+                        </ul>
                     </li>
                     <!--<li class="menu-title"><span>Finance &
                             Accounts</span></li>
@@ -394,6 +395,11 @@
                                     <i class="ti ti-users-group"></i><span>Staffs</span>
                                 </a>
                             </li>
+                            <li>
+                                <a href="{{ route('doctors.index') }}">
+                                    <i class="ti ti-users-group"></i><span>Doctors</span>
+                                </a>
+                            </li>
                             <!-- <li>
                                 <a href="hrm-departments.html">
                                     <i class="ti ti-building-bank"></i><span>Departments</span>
@@ -438,13 +444,14 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="income-report.html">Income
+                                    <li><a href="{{ route('finance') }}" class="active">Finance Report
+                                            </a></li>
+                                    
+                                    <li><a href="{{ route('finance') }}">OPD
                                             Report</a></li>
-                                    <li><a href="expense-report.html">Expense
+                                    <li><a href="{{ route('finance') }}">IPD
                                             Report</a></li>
-                                    <li><a href="profit-and-loss.html">Profit
-                                            & Loss</a></li>
-                                    <li><a href="appointment-report.html">Appointment
+                                    <li><a href="{{ route('finance') }}">Appointment
                                             Report</a></li>
                                     <li><a href="patient-report.html">Patient
                                             Report</a></li>
@@ -701,7 +708,7 @@
                                     
                                 </ul>
                             </li>
-                            <li class="submenu">
+                            <!-- <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-world-cog"></i><span>Website
                                         Settings</span>
@@ -720,8 +727,8 @@
                                             & Register</a></li>
                                     <li><a href="preferences-settings.html">Preferences</a></li>
                                 </ul>
-                            </li>
-                            <li class="submenu">
+                            </li> -->
+                            <!-- <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-building-hospital"></i><span>Clinic
                                         Settings</span>
@@ -734,7 +741,7 @@
                                     <li><a href="cancellation-reason-settings.html">Cancellation
                                             Reason</a></li>
                                 </ul>
-                            </li>
+                            </li> -->
                             <!-- <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-device-mobile-cog"></i><span>App
@@ -751,7 +758,7 @@
                                             Fields</a></li>
                                 </ul>
                             </li> -->
-                            <li class="submenu">
+                            <!-- <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-device-desktop-cog"></i><span>System
                                         Settings</span>
@@ -807,7 +814,7 @@
                                     <li><a href="system-update.html">System
                                             Update</a></li>
                                 </ul>
-                            </li>
+                            </li> -->
                         </ul>
                     </li>
                 </ul>

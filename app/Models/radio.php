@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\ChargeCategory;
 
 class Radio extends Model
 {
@@ -29,6 +30,11 @@ class Radio extends Model
     public function radiologyCategory()
     {
         return $this->belongsTo(RadiologyCategory::class, 'radiology_category_id');
+    }
+
+        public function chargeCategory()
+    {
+        return $this->belongsTo(ChargeCategory::class, 'charge_category_id');
     }
 
     public function charge()

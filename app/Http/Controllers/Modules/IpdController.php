@@ -4,16 +4,19 @@ namespace App\Http\Controllers\Modules;
 use App\Http\Controllers\Controller;
 use App\Models\Bed;
 use App\Models\BedGroup;
+use App\Models\DischargeCard;
 use App\Models\Doctor;
-use App\Models\Finding;
+use App\Models\ChargeCategory;
+use App\Models\Charge;
+use App\Models\ChargeTypeMaster;
 use App\Models\IpdCharges;
 use App\Models\IpdDetail;
 use App\Models\IpdMedicine;
 use App\Models\IpdPatient;
 use App\Models\IpdPrescription;
+use App\Models\NurseNote;
 use App\Models\IpdPrescriptionTest;
 use App\Models\MedicationReport;
-use App\Models\NurseNote;
 use App\Models\OperationTheatre;
 use App\Models\Pathology;
 use App\Models\PathologyReport;
@@ -29,48 +32,85 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
 
 class IpdController extends Controller
 {
     public function index(Request $request)
     {
-        $isIpdTab = $request->get('tab', 'ipd') == 'ipd';
-        $doctors  = Doctor::all();
+        $search    = $request->get('search');
+        $isIpdTab  = $request->get('tab', 'ipd') == 'ipd';
+        $doctors   = Doctor::all();
+        $bedGroups = BedGroup::with('floorDetail')->get();
+        $chargeType = ChargeTypeMaster::all();
+        $charges = Charge::all();
         if ($isIpdTab) {
-            $ipd = IpdDetail::with('patient', 'doctor', 'bedDetail', 'bedGroup.floorDetail')->get();
+            $ipd = IpdDetail::with('patient', 'doctor', 'bedDetail', 'bedGroup.floorDetail')
+                ->when($search, function ($query) use ($search) {
+                    $query->where(function ($q) use ($search) {
+                        $q->where('ipd_no', 'LIKE', "%{$search}%")
+                            ->orWhereHas('patient', function ($p) use ($search) {
+                                $p->where('patient_name', 'LIKE', "%{$search}%")
+                                    ->orWhere('mobileno', 'LIKE', "%{$search}%")
+                                    ->orWhere('email', 'LIKE', "%{$search}%");
+                            });
+
+                        // Consultant (Doctor)
+                        //     ->orWhereHas('doctor', function ($d) use ($search) {
+                        //         $d->where('name', 'LIKE', "%{$search}%");
+                        //     });
+                    });
+                })->get();
         } else {
             // $patients = Patient::with(['ipds.doctor'])->get();
-            $patients = IpdDetail::with('patient', 'doctor')->where('discharged', 'yes')->get();
-            // dd($patients);
-            // dd($patients);
+            $patients = IpdDetail::with('patient', 'doctor')->where('discharged', 'yes')
+                ->when($search, function ($query) use ($search) {
+                    $query->where(function ($q) use ($search) {
+                        $q->whereHas('patient', function ($p) use ($search) {
+                            $p->where('patient_name', 'LIKE', "%{$search}%")
+                                ->orWhere('mobileno', 'LIKE', "%{$search}%")
+                                ->orWhere('email', 'LIKE', "%{$search}%");
+                        });
+                    });
+                })->get();
             $ipd = $patients;
         }
-        return view("admin.ipd.index", compact("ipd", 'doctors', 'isIpdTab'));
+        return view("admin.ipd.index", compact("ipd", 'doctors', 'isIpdTab', 'bedGroups'));
     }
 
     public function store(Request $request)
     {
-        // dd($request->all());
-        $request->validate([
-            'patient_id'           => 'required|exists:patients,id',
-            'appointment_date'     => 'required|date',
-            'case_type'            => 'required|string',
-            'casualty'             => 'required|string',
+        //dd($request->all());
+        $validator = Validator::make($request->all(), [
+            'patient_id'           => 'nullable|exists:patients,id',
+            'admission_date'       => 'date',
+            'patient_type'         => 'string',
+            'case'                 => 'nullable|numeric',
+            'casualty'             => 'string',
             'reference'            => 'nullable|string',
-            'doctor_id'            => 'required|exists:doctor,id',
-            'credit_limit'         => 'required|numeric|min:0',
+            'doctor_id'            => 'nullable|exists:doctor,id',
+            'credit_limit'         => 'nullable|numeric|min:0',
             'live_consultation'    => 'nullable|string|max:100',
-            'bed_group'            => 'required|exists:bed_group,id',
-            'bed_number'           => 'required|exists:bed,id',
-            'symptoms_type'        => 'required|array',
+            'bed_group'            => 'nullable|exists:bed_group,id',
+            'bed_number'           => 'nullable|exists:bed,id',
+            'symptoms_type'        => 'nullable|array',
             'symptoms_type.*'      => 'string',
-            'symptoms_title'       => 'required|array',
+            'symptoms_title'       => 'array',
             'symptoms_title.*'     => 'string',
-            'symptoms_description' => 'required|string',
+            'symptoms_description' => 'nullable|string',
             'note'                 => 'nullable|string',
             'apply_tpa'            => 'nullable|string|max:10',
         ]);
+
+        if ($validator->fails()) {
+            // dd($validator->errors()->all());
+            return back()
+                ->withErrors($validator)
+                ->withInput();
+
+        }
 
         DB::beginTransaction();
         $user = Auth::user();
@@ -79,8 +119,8 @@ class IpdController extends Controller
             return redirect()->back()->with('error', 'User not authenticated or hospital ID missing.');
         }
         try {
-            $symptomType          = array_filter($request->symptoms_type, fn($type) => $type !== null && $type !== '');
-            $symptomTitle         = array_filter($request->symptoms_title, fn($title) => $title !== null && $title !== '');
+           $symptomType  = array_filter($request->input('symptoms_type', []));
+$symptomTitle = array_filter($request->input('symptoms_title', []));
             $implodedSymptomType  = implode(", ", $symptomType);
             $implodedSymptomTitle = implode(", ", $symptomTitle);
 
@@ -97,6 +137,7 @@ class IpdController extends Controller
             $ipd        = new IpdDetail();
             $ipdPatient = new IpdPatient();
             $bedDetail  = Bed::where('id', $request->bed_number)->firstOrFail();
+            $bedHistory = new PatientBedHistory();
             // dd($opd);
             $ipd->hospital_id = $user->hospital_id;
             // Patient Details
@@ -107,8 +148,9 @@ class IpdController extends Controller
             // Visit Details
             $ipd->bed_group_id = $request->bed_group;
             $ipd->bed          = $request->bed_number;
-            $ipd->date         = $request->appointment_date;
-            $ipd->patient_old  = $request->case_type;
+            $ipd->date         = $request->admission_date;
+            $ipd->case_type    = $request->case;
+            $ipd->patient_old  = $request->patient_type;
             $ipd->casualty     = $request->casualty;
             $ipd->refference   = $request->reference;
 
@@ -133,11 +175,21 @@ class IpdController extends Controller
 
             $ipdPatient->save();
 
+            //patienthistory
+            $bedHistory->bed_group_id = $request->bed_group;
+            $bedHistory->ipd_id       = $ipd->id ?? null;
+            $bedHistory->bed_group_id = $request->bed_group;
+            $bedHistory->bed_id       = $request->bed_number;
+            $bedHistory->from_date    = $request->admission_date;
+            $bedHistory->is_active    = 'yes';
+            $bedHistory->save();
+
             $bedDetail->is_active = 'no';
             $bedDetail->save();
             DB::commit();
 
-            return redirect()->route('ipd')->with('success', 'IPD record created successfully . ');
+            return redirect()->route('ipd')->with('success', 'IPD record created successfully . ')
+            ->with('pdf_url', route('ipd.pdf', $ipd->id));
         } catch (\Exception $e) {
             DB::rollBack();
             dd($e);
@@ -179,10 +231,10 @@ class IpdController extends Controller
 
     public function update(Request $request, $id)
     {
-        // dd($request->all());
-        $request->validate([
+        //dd($request->all());
+        $validator = Validator::make($request->all(), [
             'patient_id'           => 'required|exists:patients,id',
-            'appointment_date'     => 'required|date',
+            'admission_date'       => 'required|date',
             'old_patient'          => 'required|string',
             'casualty'             => 'required|string',
             'reference'            => 'nullable|string',
@@ -198,6 +250,10 @@ class IpdController extends Controller
             'note'                 => 'nullable|string',
         ]);
 
+        if ($validator->fails()) {
+            dd($validator->errors()->all()); // 👈 will show validation errors
+        }
+
         DB::beginTransaction();
         $user = Auth::user();
         // dd($user);
@@ -212,10 +268,15 @@ class IpdController extends Controller
             // 🔹 Update OPD record
             $ipd        = IpdDetail::findOrFail($id);
             $allotedBed = $ipd->bed;
+            //dd($id, IpdPatient::where('ipd_id', $id)->first());
             $ipdPatient = IpdPatient::where('ipd_id', $id)->firstOrFail();
             if ($request->bed_number != $allotedBed) {
-                $newBedDetail            = Bed::where('id', $request->bed_number)->firstOrFail();
-                $allotedBedDetail        = Bed::where('id', $allotedBed)->firstOrFail();
+                $newBedDetail          = Bed::where('id', $request->bed_number)->firstOrFail();
+                $allotedBedDetail      = Bed::where('id', $allotedBed)->firstOrFail();
+                $bedhistory            = PatientBedHistory::where('ipd_id', $id)->firstOrFail();
+                $bedhistory->bed_group = $request->bed_group_id;
+                $bedhistory->bed_id    = $request->bed_number;
+                $bedhistory->save();
                 $newBedDetail->is_active = 'no';
                 $newBedDetail->save();
                 $allotedBedDetail->is_active = 'yes';
@@ -227,7 +288,7 @@ class IpdController extends Controller
             $ipd->cons_doctor = $request->consultant_doctor;
 
             // Visit Details
-            $ipd->date         = $request->appointment_date;
+            $ipd->date         = $request->admission_date;
             $ipd->bed_group_id = $request->bed_group;
             $ipd->bed          = $request->bed_number;
             $ipd->patient_old  = $request->old_patient;
@@ -267,7 +328,13 @@ class IpdController extends Controller
     public function getBedNumbers(Request $request, $id)
     {
         // dd($id);
-        $bedNumbers = Bed::where('bed_group_id', $id)->where('is_active', 'yes')->get();
+        // $bedNumbers = Bed::where('bed_group_id', $id)->where('is_active', 'yes')->get();
+        $bedNumbers = Bed::where('bed_group_id', $id)
+            ->where('is_active', 'yes')
+            ->whereDoesntHave('patientBedHistory', function ($query) {
+                $query->where('is_active', 'yes'); // means currently occupied
+            })
+            ->get();
         // dd($bedNumbers);
         return response()->json($bedNumbers, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
     }
@@ -370,42 +437,43 @@ class IpdController extends Controller
 
     public function storePrescription(Request $request)
     {
-        try {
-            $request->validate([
-                'ipd_id'              => 'required|exists:ipd_details,id',
-                'prescribe_by'        => 'required|exists:doctor,id',  // NEW - table name is 'doctor' not 'doctors'
-                'header_note'         => 'nullable|string',
-                'footer_note'         => 'nullable|string',
-                'finding_description' => 'nullable|string',
-                'finding_print'       => 'nullable|string',
-                'finding_type'        => 'nullable|array',
-                'finding_type.*'      => 'nullable|string',
-                'findings'            => 'nullable|array',
-                'findings.*'          => 'nullable|string',
-                'pathology'           => 'nullable|array',
-                'pathology.*'         => 'nullable|exists:pathology,id',  // Changed to exists validation
-                'radiology'           => 'nullable|array',
-                'radiology.*'         => 'nullable|exists:radio,id',  // Changed to exists validation
-                'visible'             => 'nullable|array',
-                'visible.*'           => 'nullable|string',
-                'medicines'           => 'nullable|array',
-                'medicines.*'         => 'nullable|string',
-                'dosages'             => 'nullable|array',
-                'dosages.*'           => 'nullable|string',
-                'interval_dosages'    => 'nullable|array',
-                'interval_dosages.*'  => 'nullable|string',
-                'duration_dosages'    => 'nullable|array',
-                'duration_dosages.*'  => 'nullable|string',
-                'instructions'        => 'nullable|array',
-                'instructions.*'      => 'nullable|string',
-                'document'            => 'nullable|file|max:10240|mimes:pdf,doc,docx,jpg,jpeg,png',  // NEW
-            ]);
-            // Filter out null and empty values from arrays
-            $findingTypes         = $request->finding_type ? array_filter($request->finding_type, fn($type) => $type !== null && $type !== '') : [];
-            $findings             = $request->findings ? array_filter($request->findings, fn($title) => $title !== null && $title !== '') : [];
-            $pathology_ids        = $request->pathology ? array_filter($request->pathology, fn($pathology) => $pathology !== null && $pathology !== '') : [];
-            $radiology_ids        = $request->radiology ? array_filter($request->radiology, fn($radio) => $radio !== null && $radio !== '') : [];
-            $notification_to      = $request->visible ? array_filter($request->visible, fn($notify) => $notify !== null && $notify !== '') : [];
+        // dd($request->all());
+        try { $request->validate([
+            'ipd_id'              => 'nullable|string',
+            'header_note'         => 'nullable|string',
+            'footer_note'         => 'nullable|string',
+            'finding_description' => 'nullable|string',
+            'finding_print'       => 'nullable|string',
+            'finding_type'        => 'nullable|array',
+            'finding_type.*'      => 'string',
+            'findings'            => 'nullable|array',
+            'findings.*'          => 'string',
+            'pathology'           => 'nullable|array',
+            'pathology.*'         => 'string',
+            'radiology'           => 'nullable|array',
+            'radiology.*'         => 'string',
+            'visible'             => 'nullable|array',
+            'visible.*'           => 'string',
+            'medicines'           => 'nullable|array',
+            'medicines.*'         => 'string',
+            'dosages'             => 'nullable|array',
+            'dosages.*'           => 'string',
+            'interval_dosages'    => 'nullable|array',
+            'interval_dosages.*'  => 'string',
+            'duration_dosages'    => 'nullable|array',
+            'duration_dosages.*'  => 'string',
+            'instructions'        => 'nullable|array',
+            'instructions.*'      => 'string',
+        ]);
+            $findingTypes = array_filter($request->finding_type, fn($type) => $type !== null && $type !== '');
+            // $findings             = array_filter($request->findings, fn($title) => $title !== null && $title !== '');
+            $findings        = array_filter($request->input('findings', []), fn($title) => $title !== null && $title !== '');
+            $pathology_ids   = array_filter($request->input('pathology', []), fn($pathology) => $pathology !== null && $pathology !== '');
+            $radiology_ids   = array_filter($request->input('radiology', []), fn($radio) => $radio !== null && $radio !== '');
+            $notification_to = array_filter($request->input('visible', []), fn($notify) => $notify !== null && $notify !== '');
+            // $pathology_ids        = array_filter($request->pathology, fn($pathology) => $pathology !== null && $pathology !== '');
+            // $radiology_ids        = array_filter($request->radiology, fn($radio) => $radio !== null && $radio !== '');
+            // $notification_to      = array_filter($request->visible, fn($notify) => $notify !== null && $notify !== '');
             $implodedFindingTypes = implode(", ", $findingTypes);
             $implodedFindings     = implode(", ", $findings);
             $implodedVisibles     = implode(", ", $notification_to);
@@ -766,5 +834,169 @@ class IpdController extends Controller
         }
 
         return redirect()->back()->with('success', 'Charges saved successfully!');
+    }
+
+    public function getAvailableBeds(Request $request)
+    {
+        $bedGroupId = $request->bed_group_id;
+
+        // Beds currently assigned (is_active = 1)
+        $occupiedBeds = PatientBedHistory::where('is_active', 'yes')
+            ->pluck('bed_id')
+            ->toArray();
+
+        // Fetch beds excluding occupied ones
+        $availableBeds = Bed::where('bed_group_id', $bedGroupId)
+            ->where('is_active', 'yes')
+            ->whereNotIn('id', $occupiedBeds)
+            ->get();
+
+        return response()->json($availableBeds);
+    }
+    public function assignNewBed(Request $request)
+    {
+        $request->validate([
+            'released_date' => 'required|date',
+            'bed_group'     => 'required',
+            'new_bed'       => 'required',
+        ]);
+
+        $ipd = IpdDetail::findOrFail($request->ipd_id);
+
+        // --- Release old bed ---
+        if ($ipd->bed) {
+
+            // Mark old history inactive
+            PatientBedHistory::where('ipd_id', $ipd->id)
+                ->where('is_active', 'yes')
+                ->update([
+                    'is_active' => 'no',
+                    'to_date'   => $request->released_date,
+                ]);
+
+            // Make old bed available
+            Bed::where('id', $ipd->bed)->update(['is_active' => 'yes']);
+        }
+
+        // --- Assign new bed ---
+        PatientBedHistory::create([
+            'ipd_id'       => $ipd->id,
+            'bed_id'       => $request->new_bed,
+            'bed_group_id' => $request->bed_group,
+            'from_date'    => $request->released_date,
+            'is_active'    => 'yes',
+        ]);
+
+        // Make new bed occupied
+        Bed::where('id', $request->new_bed)->update(['is_active' => 'no']);
+
+        // Update IPD record
+        $ipd->bed          = $request->new_bed;
+        $ipd->bed_group_id = $request->bed_group;
+        $ipd->save();
+
+        return redirect()->back()->with('success', 'Bed assigned successfully.');
+    }
+
+    public function storeDischarge(Request $request)
+    {
+        // -------------------------------
+        // 🔹 Base validation rules
+        // -------------------------------
+        $rules = [
+            'ipd_details_id'   => ['nullable', 'integer', 'exists:ipd_details,id'],
+            'discharge_date'   => ['required', 'date'],
+            'discharge_status' => ['required', Rule::in(['death', 'referral', 'normal'])],
+            'note'             => ['nullable', 'string'],
+
+            'operation'        => ['nullable', 'string', 'max:255'],
+            'diagnosis'        => ['nullable', 'string', 'max:255'],
+            'investigation'    => ['nullable', 'string', 'max:255'],
+            'treatment_home'   => ['nullable', 'string', 'max:255'],
+        ];
+
+        // -------------------------------
+        // 🔹 Conditional validation
+        // -------------------------------
+        if ($request->discharge_status === 'death') {
+            $rules = array_merge($rules, [
+                'death_date'    => ['required', 'date'],
+                'guardian_name' => ['required', 'string', 'max:255'],
+                'attachment'    => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png,doc,docx', 'max:5120'],
+                'report'        => ['nullable', 'string'],
+            ]);
+        }
+
+        if ($request->discharge_status === 'referral') {
+            $rules = array_merge($rules, [
+                'referral_date'          => ['required', 'date'],
+                'referral_hospital_name' => ['required', 'string', 'max:255'],
+                'referral_reason'        => ['required', 'string', 'max:255'],
+            ]);
+        }
+
+        // -------------------------------
+        // 🔹 Validate request
+        // -------------------------------
+        $validated = $request->validate($rules);
+
+        // -------------------------------
+        DB::beginTransaction();
+        try {
+            // -------------------------------
+            // 🔹 Handle file upload (death case)
+            // -------------------------------
+            $attachmentPath = null;
+
+            if ($request->hasFile('attachment')) {
+                $attachmentPath = $request->file('attachment')
+                    ->store('discharge_attachments', 'public');
+            }
+
+            // -------------------------------
+            // 🔹 Create Discharge Card
+            // -------------------------------
+            // dd($validated);
+            $discharge = DischargeCard::create([
+                'hospital_id'         => Auth::user()->hospital_id ?? null,
+                'branch_id'           => Auth::user()->branch_id ?? null,
+                'case_reference_id'   => $request->case_reference_id ?? null,
+                'opd_details_id'      => $request->opd_details_id ?? null,
+                'ipd_details_id'      => intval($validated['ipd_details_id']),
+
+                'discharge_by'        => Auth::id(),
+                'discharge_date'      => $validated['discharge_date'],
+                'discharge_status'    => $validated['discharge_status'],
+
+                'death_date'          => $validated['death_date'] ?? null,
+                'refer_date'          => $validated['referral_date'] ?? null,
+                'refer_to_hospital'   => $validated['referral_hospital_name'] ?? null,
+                'reason_for_referral' => $validated['referral_reason'] ?? null,
+
+                'operation'           => $validated['operation'] ?? null,
+                'diagnosis'           => $validated['diagnosis'] ?? null,
+                'investigations'      => $validated['investigation'] ?? null,
+                'treatment_home'      => $validated['treatment_home'] ?? null,
+                'note'                => $validated['note'] ?? null,
+            ]);
+
+            IpdDetail::where('id', intval($validated['ipd_details_id']))
+                ->update(['discharged' => 'yes']);
+            // dd($discharge);
+
+            DB::commit();
+
+            return redirect()
+                ->back()
+                ->with('success', 'Patient discharged successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return redirect()
+                ->back()
+                ->withErrors(['error' => 'Something went wrong while saving discharge details.'])
+                ->withInput();
+        }
     }
 }

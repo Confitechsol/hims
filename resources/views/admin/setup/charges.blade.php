@@ -65,7 +65,7 @@
                                             </div>
                                         @endif
                                             <!-- Modal -->
-                                            <div class="modal fade" id="add_charges" tabindex="-1"
+                                            <div class="modal fade" id="createModal" tabindex="-1"
                                                 aria-labelledby="addSpecializationLabel" aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered modal-xl">
                                                     <div class="modal-content modal-xl">

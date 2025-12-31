@@ -27,6 +27,9 @@ class Patient extends Model
         'as_of_date',
         'image',
         'mobileno',
+        'height',
+        'weight',
+        'temperature',
         'email',
         'gender',
         'marital_status',
@@ -34,6 +37,8 @@ class Patient extends Model
         'blood_bank_product_id',
         'address',
         'guardian_name',
+        'guardian_phone',
+        'guardian_relation',
         'patient_type',
         'identification_number',
         'known_allergies',
@@ -50,6 +55,8 @@ class Patient extends Model
         'created_at',
         'tpa_code',
         'tpa_validity',
+        'languages_speak',
+        'newspaper_preference',
     ];
 
     protected $casts = [

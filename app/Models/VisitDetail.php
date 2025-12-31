@@ -14,6 +14,8 @@ class VisitDetail extends Model
     protected $fillable = [
         'hospital_id',
         'branch_id',
+        'checkup_id',
+        'patient_id',
         'opd_details_id',
         'organisation_id',
         'patient_charge_id',
@@ -68,7 +70,7 @@ class VisitDetail extends Model
 
     public function doctor()
     {
-        return $this->belongsTo(User::class, 'cons_doctor'); // assuming doctors are stored in `users` table
+        return $this->belongsTo(Doctor::class, 'cons_doctor'); // assuming doctors are stored in `users` table
     }
 
     public function generatedBy()

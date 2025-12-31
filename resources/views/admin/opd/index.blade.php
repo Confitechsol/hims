@@ -49,21 +49,28 @@
                                     class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
                                     <div class="d-flex align-items-center gap-2">
                                         <form action="{{ route('opd') }}" method="GET">
+                                            <input type="hidden" name="tab" value="{{ request('tab', 'opd') }}">
                                             <div class="d-flex align-items-center">
                                                 <div class="input-icon-start position-relative me-2">
-                                                    <span class="input-icon-addon">
-                                                        <i class="ti ti-search"></i>
-                                                    </span>
-                                                    <input type="text" id="language-search" name="search"
-                                                        value="{{ request('search') }}" class="form-control shadow-sm"
-                                                        placeholder="Search">
+                                                    <div class="input-group">
+                                                        <span class="input-group-text" id="addon-wrapping">⌕</span>
+                                                        <input type="text" id="language-search" name="search"
+                                                            value="{{ request('search') }}" class="form-control shadow-sm"
+                                                            placeholder="Search">
+                                                        <a href="{{ route('opd', ['tab' => request('tab')]) }}"
+                                                            class="btn btn-outline-cgray">
+                                                            <i class="bi bi-x-circle"></i>
+                                                        </a>
+                                                    </div>
                                                 </div>
                                                 <div>
                                                     <button class="btn btn-primary" type="submit">Search</button>
                                                 </div>
                                             </div>
                                         </form>
-                                        <form action="" style="width: 300px;">
+
+                                        {{-- Opd Consultant and Date Range Filters. uncomment this along with the offcanvas div below --}}
+                                        {{-- <form action="" style="width: 300px;">
                                             <div class="input-group shadow-sm">
                                                 <label class="input-group-text" for="inputGroupSelect01">Consultant</label>
                                                 <select class="form-select" id="inputGroupSelect01">
@@ -80,7 +87,7 @@
                                                 data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop"
                                                 aria-controls="offcanvasTop">Apply
                                                 Filter</button>
-                                        </div>
+                                        </div> --}}
                                     </div>
 
                                     <div class="text-end d-flex">
@@ -204,7 +211,8 @@
                                 @endif
                             </div>
 
-                            <div class="offcanvas offcanvas-top" style="height: fit-content;" tabindex="-1"
+                            {{-- Opd Filters Offcanvas. uncomment this along with the Filters button --}}
+                            {{-- <div class="offcanvas offcanvas-top" style="height: fit-content;" tabindex="-1"
                                 id="offcanvasTop" aria-labelledby="offcanvasTopLabel">
                                 <div class="offcanvas-header justify-content-center">
                                     <h4 class="offcanvas-title m-auto font-weight-bold" id="offcanvasTopLabel">FILTERS</h4>
@@ -281,7 +289,7 @@
                                         </form>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
                         </div>
                     </div>
 

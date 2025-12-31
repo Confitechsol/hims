@@ -1,5 +1,9 @@
 @extends('layouts.adminLayout')
-
+@section('select2cdn')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    {{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> --}}
+    {{-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> --}}
+@endsection
 @section('content')
     <style>
         .nav-tabs .nav-link.active {
@@ -41,6 +45,18 @@
                 @if (session('error'))
                     <div class="alert alert-danger alert-dismissible fade show">{{ session('error') }}</div>
                 @endif
+                {{-- Validation Errors --}}
+                @if ($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <strong>There were some problems with your input:</strong>
+                        <ul class="mt-2 mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card">
@@ -49,21 +65,28 @@
                                     class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
                                     <div class="d-flex align-items-center gap-2">
                                         <form action="{{ route('ipd') }}" method="GET">
+                                            <input type="hidden" name="tab" value="{{ request('tab', 'ipd') }}">
                                             <div class="d-flex align-items-center">
                                                 <div class="input-icon-start position-relative me-2">
-                                                    <span class="input-icon-addon">
-                                                        <i class="ti ti-search"></i>
-                                                    </span>
-                                                    <input type="text" id="language-search" name="search"
-                                                        value="{{ request('search') }}" class="form-control shadow-sm"
-                                                        placeholder="Search">
+                                                    <div class="input-group">
+                                                        <span class="input-group-text" id="addon-wrapping">⌕</span>
+                                                        <input type="text" id="language-search" name="search"
+                                                            value="{{ request('search') }}" class="form-control shadow-sm"
+                                                            placeholder="Search">
+                                                        <a href="{{ route('ipd', ['tab' => request('tab')]) }}"
+                                                            class="btn btn-outline-cgray">
+                                                            <i class="bi bi-x-circle"></i>
+                                                        </a>
+                                                    </div>
                                                 </div>
                                                 <div>
                                                     <button class="btn btn-primary" type="submit">Search</button>
                                                 </div>
                                             </div>
                                         </form>
-                                        <form action="" style="width: 300px;">
+
+                                        {{-- IPD consultant and apply filter button --}}
+                                        {{-- <form action="" style="width: 300px;">
                                             <div class="input-group shadow-sm">
                                                 <label class="input-group-text" for="inputGroupSelect01">Consultant</label>
                                                 <select class="form-select" id="inputGroupSelect01">
@@ -80,12 +103,12 @@
                                                 data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop"
                                                 aria-controls="offcanvasTop">Apply
                                                 Filter</button>
-                                        </div>
+                                        </div> --}}
                                     </div>
 
                                     <div class="text-end d-flex">
                                         <button class="btn btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#createIpdModal">Appoint Patient</button>
+                                            data-bs-target="#createIpdModal">Admit Patient</button>
                                     </div>
                                 </div>
                                 @if ($isIpdTab)
@@ -180,7 +203,8 @@
                                 @endif
                             </div>
 
-                            <div class="offcanvas offcanvas-top" style="height: fit-content;" tabindex="-1"
+                            {{-- IPD filters offcanvas, uncomment this to apply filter functionality --}}
+                            {{-- <div class="offcanvas offcanvas-top" style="height: fit-content;" tabindex="-1"
                                 id="offcanvasTop" aria-labelledby="offcanvasTopLabel">
                                 <div class="offcanvas-header justify-content-center">
                                     <h4 class="offcanvas-title m-auto font-weight-bold" id="offcanvasTopLabel">FILTERS</h4>
@@ -257,7 +281,7 @@
                                         </form>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
                         </div>
                     </div>
 
@@ -326,6 +350,11 @@
         });
     </script>
 
+    @if (session('pdf_url'))
+        <script>
+            window.open("{{ session('pdf_url') }}", "_blank");
+        </script>
+    @endif
 
     <!-- {{-- <script>
         // const editButton = document.querySelector('.edit-opd')

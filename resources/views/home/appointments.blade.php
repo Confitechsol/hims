@@ -26,7 +26,7 @@
                     <a href="#home" title="Logo" class="logo scroll">
                         <!--Logo Default-->
                         <!-- <img src="medical/img/logo.png" alt="logo" class="logo-dark default"> -->
-                        <img src="assets/img/logo.png" alt="logo" class="logo-dark default">
+                        <img src="{{ asset('assets/img/logo.png') }}" alt="logo" class="logo-dark default">
                         <!-- <h2>LOGO</h2> -->
                     </a>
 
@@ -177,7 +177,17 @@
         <section class="text-center footer-sec">
             <button id="chatbotButton" class="chatbot-button" onclick="toggleChatbot()"></button>
             <div id="chatbotWrapper" class="chatbot-iframe-wrapper">
-                <iframe src="https://hospital-management-chatbot-eta.vercel.app/" allow="clipboard-write"
+                {{-- <script>
+                    fetch("https://https://hims-chatbot.vercel.app/")
+                        .then(res => res.text())
+                        .then(html => {
+                            document.getElementById("chatbot").innerHTML = html;
+                        });
+                </script> --}}
+                {{-- <script src="https://hospital-management-chatbot-eta.vercel.app/chatbot-widget.iife.js"></script>
+                <hims-chatbot></hims-chatbot> --}}
+                <iframe src="https://hims-chatbot.vercel.app/" allow="microphone; clipboard-write"
+                    sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups"
                     title="Confitech Chatbot"></iframe>
             </div>
             <h2 class="d-none">hidden</h2>

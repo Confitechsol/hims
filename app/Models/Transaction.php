@@ -68,7 +68,7 @@ class Transaction extends Model
 
     public function ipd()
     {
-        return $this->belongsTo(Ipd::class, 'ipd_id');
+        return $this->belongsTo(IpdDetail::class, 'ipd_id');
     }
 
     public function pharmacyBill()

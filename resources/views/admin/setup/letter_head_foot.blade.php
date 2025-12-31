@@ -23,7 +23,7 @@
         }
 
         .btn {
-            background: transparent;
+            /* background: transparent; */
             border: 1px solid #e6e9ef;
             padding: 6px 10px;
             border-radius: 6px;
@@ -213,14 +213,52 @@
                 min-height: 120px;
             }
         }
+
+        .btn-add-category {
+            background: linear-gradient(135deg, #750096 0%, #CB6CE6 100%);
+            color: white;
+            border: none;
+            padding: 0.5rem 2rem;
+            font-weight: 600;
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(233, 30, 99, 0.3);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .btn-add-category:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(233, 30, 99, 0.4);
+        }
+
+        .btn-add-category i {
+            font-size: 1rem;
+        }
     </style>
 
     <!-- Start Content -->
     <div class="content" id="profilePage">
+        {{-- Flash Messages --}}
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show">{{ session('success') }}</div>
+        @endif
+        @if (session('error'))
+            <div class="alert alert-danger alert-dismissible fade show">{{ session('error') }}</div>
+        @endif
 
         <!-- Page Header -->
         <div class="mb-3 border-bottom pb-3">
-            <h4 class="fw-bold mb-0">Settings</h4>
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="fw-bold mb-0">Settings</h4>
+                @if ($letterheadCategory && $letterheadCategory->count() > 0)
+                    <button type="button" class="btn-add-category" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                        <i class="bi bi-plus-circle"></i>
+                        Add Letterhead Category
+                    </button>
+                @endif
+            </div>
         </div>
         <!-- End Page Header -->
 
@@ -228,25 +266,25 @@
         <div class="card">
             <div class="card-body p-0">
                 <div class="settings-wrapper d-flex">
-
-                    <!-- Sidebar -->
-                    <div class="sidebars settings-sidebar" id="sidebar2" style="max-height: 70vh; overflow: auto;">
-                        <div class="sidebar-inner" data-simplebar>
-                            <div id="sidebar-menu5" class="sidebar-menu mt-0 p-0">
-                                <ul class="nav flex-column" id="permissionTabs" role="tablist">
-                                    @foreach ($letterheadCategory as $index => $category)
-                                        <li class="nav-item">
-                                            <a class="nav-link {{ $index == 0 ? 'active' : '' }}"
-                                                id="tab-{{ $category->id }}" data-bs-toggle="tab"
-                                                href="#content-{{ $category->id }}" role="tab"
-                                                aria-controls="content-{{ $category->id }}"
-                                                aria-selected="{{ $index == 0 ? 'true' : 'false' }}">
-                                                <i class="ti ti-device-desktop-cog me-2"></i>
-                                                {{ $category->name }}
-                                            </a>
-                                        </li>
-                                    @endforeach
-                                    {{-- @foreach ($letterheadCategory as $category)
+                    @if ($letterheadCategory && $letterheadCategory->count() > 0)
+                        <!-- Sidebar -->
+                        <div class="sidebars settings-sidebar" id="sidebar2" style="max-height: 70vh; overflow: auto;">
+                            <div class="sidebar-inner" data-simplebar>
+                                <div id="sidebar-menu5" class="sidebar-menu mt-0 p-0">
+                                    <ul class="nav flex-column" id="permissionTabs" role="tablist">
+                                        @foreach ($letterheadCategory as $index => $category)
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ $index == 0 ? 'active' : '' }}"
+                                                    id="tab-{{ $category->id }}" data-bs-toggle="tab"
+                                                    href="#content-{{ $category->id }}" role="tab"
+                                                    aria-controls="content-{{ $category->id }}"
+                                                    aria-selected="{{ $index == 0 ? 'true' : 'false' }}">
+                                                    <i class="ti ti-device-desktop-cog me-2"></i>
+                                                    {{ $category->name }}
+                                                </a>
+                                            </li>
+                                        @endforeach
+                                        {{-- @foreach ($letterheadCategory as $category)
                                         <li class="nav-item">
                                             <a class="nav-link active" id="dashboard-tab" data-bs-toggle="tab"
                                                 href="#dashboard" role="tab" aria-controls="dashboard"
@@ -255,192 +293,202 @@
                                             </a>
                                         </li>
                                     @endforeach --}}
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- End Sidebar -->
-
-                    <!-- Main Card -->
-                    <div class="card flex-fill mb-0 border-0 bg-light-500 shadow-none">
-                        <div class="card-header border-bottom px-0 mx-3">
-
-                            <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
-                                <div class="flex-grow-1">
-                                    <h4 class="fw-bold mb-0" id="dynamic-title">
-                                        {{ $letterheadCategory->first()->name ?? '' }} Header Footer
-                                    </h4>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
+                        <!-- End Sidebar -->
 
-                        <!-- Tab Content -->
-                        <div class="card-body px-0 mx-3">
-                            <div class="tab-content" id="permissionTabsContent">
-                                @foreach ($letterheadCategory as $index => $category)
-                                    @php
-                                        $setting = $letterheadSettings[$category->id] ?? null;
-                                    @endphp
+                        <!-- Main Card -->
+                        <div class="card flex-fill mb-0 border-0 bg-light-500 shadow-none">
+                            <div class="card-header border-bottom px-0 mx-3">
 
-                                    <div class="tab-pane fade {{ $index == 0 ? 'show active' : '' }}"
-                                        id="content-{{ $category->id }}" role="tabpanel"
-                                        aria-labelledby="tab-{{ $category->id }}">
-
-                                        <form id="form-{{ $category->id }}"
-                                            action="{{ route('letterhead.store', $category->id) }}" method="POST"
-                                            enctype="multipart/form-data">
-                                            @csrf
-                                            <input type="hidden" name="letterhead_cat_id" value="{{ $category->id }}">
-
-                                            <div class="row g-4">
-                                                <!-- Header Image Section -->
-                                                <div class="col-lg-6">
-                                                    <div class="form-section">
-                                                        <div class="section-header mb-3">
-                                                            <h5 class="section-title mb-1">Header Image</h5>
-                                                            <p class="section-subtitle text-muted mb-0">
-                                                                {{ $category->name }} • Recommended: 2230×300px
-                                                            </p>
-                                                        </div>
-
-                                                        <div class="upload-area">
-                                                            <div
-                                                                class="upload-container border border-2 border-dashed rounded-3 p-4 text-center position-relative bg-light hover-bg-primary-subtle transition-all">
-                                                                @if ($setting && $setting->print_header)
-                                                                    <div class="current-image mb-3"
-                                                                        id="preview-{{ $category->id }}">
-                                                                        <img src="{{ $setting->print_header }}"
-                                                                            class="img-fluid rounded shadow-sm"
-                                                                            style="max-height: 120px; object-fit: cover;">
-                                                                    </div>
-                                                                    <div class="upload-overlay">
-                                                                        <i
-                                                                            class="bi bi-cloud-upload fs-4 text-primary mb-2"></i>
-                                                                        <p class="mb-1 fw-medium">Click to replace image</p>
-                                                                        <small class="text-muted">or drag and drop</small>
-                                                                    </div>
-                                                                @else
-                                                                    <div class="upload-placeholder">
-                                                                        <div class="current-image mb-3"
-                                                                            id="preview-{{ $category->id }}">
-
-                                                                        </div>
-                                                                        <i class="bi bi-image fs-1 text-muted mb-3"
-                                                                            id="placeholder-logo"></i>
-                                                                        <h6 class="fw-medium mb-2">Upload Header Image</h6>
-                                                                        <p class="text-muted mb-0">Click to browse or drag
-                                                                            and drop</p>
-                                                                        <small class="text-muted">PNG, JPG, SVG up to
-                                                                            5MB</small>
-                                                                    </div>
-                                                                @endif
-
-                                                                <input type="file" id="print_header_{{ $category->id }}"
-                                                                    name="print_header" accept="image/*"
-                                                                    class="position-absolute top-0 start-0 opacity-0 w-100 h-100 cursor-pointer"
-                                                                    accept="image/*">
-                                                            </div>
-
-                                                            <div class="upload-info mt-2">
-                                                                <small class="text-muted">
-                                                                    <i class="bi bi-info-circle me-1"></i>
-                                                                    Optimal dimensions: 2230×300px for best display quality
-                                                                </small>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Footer Content Section -->
-                                                <div class="col-lg-6">
-                                                    <div class="form-section">
-                                                        <div class="section-header mb-3">
-                                                            <h5 class="section-title mb-1">Footer Content</h5>
-                                                            <p class="section-subtitle text-muted mb-0">
-                                                                {{ $category->name }} • Rich text editor
-                                                            </p>
-                                                        </div>
-
-                                                        <div class="editor-section">
-                                                            <div
-                                                                class="editor-toolbar bg-white border rounded-top px-3 py-2">
-                                                                <div class="btn-toolbar" role="toolbar">
-                                                                    <div class="btn-group btn-group-sm me-2">
-                                                                        <button type="button"
-                                                                            class="btn btn-outline-secondary"
-                                                                            data-cmd="bold" title="Bold">
-                                                                            <i class="bi bi-type-bold"></i>
-                                                                        </button>
-                                                                        <button type="button"
-                                                                            class="btn btn-outline-secondary"
-                                                                            data-cmd="italic" title="Italic">
-                                                                            <i class="bi bi-type-italic"></i>
-                                                                        </button>
-                                                                        <button type="button"
-                                                                            class="btn btn-outline-secondary"
-                                                                            data-cmd="underline" title="Underline">
-                                                                            <i class="bi bi-type-underline"></i>
-                                                                        </button>
-                                                                    </div>
-                                                                    <div class="btn-group btn-group-sm">
-                                                                        <button type="button"
-                                                                            class="btn btn-outline-secondary"
-                                                                            data-cmd="insertUnorderedList"
-                                                                            title="Bullet List">
-                                                                            <i class="bi bi-list-ul"></i>
-                                                                        </button>
-                                                                        <button type="button"
-                                                                            class="btn btn-outline-secondary"
-                                                                            data-cmd="insertOrderedList"
-                                                                            title="Numbered List">
-                                                                            <i class="bi bi-list-ol"></i>
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="editor-container">
-                                                                <div id="editor-{{ $category->id }}"
-                                                                    class="form-control editor-content border-top-0 rounded-0 rounded-bottom"
-                                                                    contenteditable="true" spellcheck="true"
-                                                                    aria-label="Footer content editor"
-                                                                    style="min-height: 150px; max-height: 300px; overflow-y: auto;">
-                                                                    {!! $setting->print_footer ?? '<p class="text-muted">Start typing your footer content here...</p>' !!}
-                                                                </div>
-
-                                                                <textarea name="print_footer" class="d-none" id="footer-input-{{ $category->id }}">
-                                                                    {!! $setting->print_footer ?? '' !!}
-                                                                </textarea>
-                                                            </div>
-
-                                                            <div class="editor-footer mt-2">
-                                                                <small class="text-muted">
-                                                                    <i class="bi bi-info-circle me-1"></i>
-                                                                    This content will appear at the bottom of printed
-                                                                    documents
-                                                                </small>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="mt-4 text-end">
-                                                <button type="submit" class="btn btn-primary px-4">
-                                                    <i class="fa fa-save me-1"></i> Save
-                                                </button>
-                                            </div>
-                                        </form>
-
+                                <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
+                                    <div class="flex-grow-1">
+                                        <h4 class="fw-bold mb-0" id="dynamic-title">
+                                            {{ $letterheadCategory->first()->name ?? '' }} Header Footer
+                                        </h4>
                                     </div>
-                                @endforeach
+                                </div>
                             </div>
 
+                            <!-- Tab Content -->
+                            <div class="card-body px-0 mx-3">
+                                <div class="tab-content" id="permissionTabsContent">
+                                    @foreach ($letterheadCategory as $index => $category)
+                                        @php
+                                            $setting = $letterheadSettings[$category->id] ?? null;
+                                        @endphp
+
+                                        <div class="tab-pane fade {{ $index == 0 ? 'show active' : '' }}"
+                                            id="content-{{ $category->id }}" role="tabpanel"
+                                            aria-labelledby="tab-{{ $category->id }}">
+
+                                            <form id="form-{{ $category->id }}"
+                                                action="{{ route('letterhead.store', $category->id) }}" method="POST"
+                                                enctype="multipart/form-data">
+                                                @csrf
+                                                <input type="hidden" name="letterhead_cat_id" value="{{ $category->id }}">
+
+                                                <div class="row g-4">
+                                                    <!-- Header Image Section -->
+                                                    <div class="col-lg-6">
+                                                        <div class="form-section">
+                                                            <div class="section-header mb-3">
+                                                                <h5 class="section-title mb-1">Header Image</h5>
+                                                                <p class="section-subtitle text-muted mb-0">
+                                                                    {{ $category->name }} • Recommended: 2230×300px
+                                                                </p>
+                                                            </div>
+
+                                                            <div class="upload-area">
+                                                                <div
+                                                                    class="upload-container border border-2 border-dashed rounded-3 p-4 text-center position-relative bg-light hover-bg-primary-subtle transition-all">
+                                                                    @if ($setting && $setting->print_header)
+                                                                        <div class="current-image mb-3"
+                                                                            id="preview-{{ $category->id }}">
+                                                                            <img src="{{ $setting->print_header }}"
+                                                                                class="img-fluid rounded shadow-sm"
+                                                                                style="max-height: 120px; object-fit: cover;">
+                                                                        </div>
+                                                                        <div class="upload-overlay">
+                                                                            <i
+                                                                                class="bi bi-cloud-upload fs-4 text-primary mb-2"></i>
+                                                                            <p class="mb-1 fw-medium">Click to replace image
+                                                                            </p>
+                                                                            <small class="text-muted">or drag and
+                                                                                drop</small>
+                                                                        </div>
+                                                                    @else
+                                                                        <div class="upload-placeholder">
+                                                                            <div class="current-image mb-3"
+                                                                                id="preview-{{ $category->id }}">
+
+                                                                            </div>
+                                                                            <i class="bi bi-image fs-1 text-muted mb-3"
+                                                                                id="placeholder-logo"></i>
+                                                                            <h6 class="fw-medium mb-2">Upload Header Image
+                                                                            </h6>
+                                                                            <p class="text-muted mb-0">Click to browse or
+                                                                                drag
+                                                                                and drop</p>
+                                                                            <small class="text-muted">PNG, JPG, SVG up to
+                                                                                5MB</small>
+                                                                        </div>
+                                                                    @endif
+
+                                                                    <input type="file"
+                                                                        id="print_header_{{ $category->id }}"
+                                                                        name="print_header" accept="image/*"
+                                                                        class="position-absolute top-0 start-0 opacity-0 w-100 h-100 cursor-pointer"
+                                                                        accept="image/*">
+                                                                </div>
+
+                                                                <div class="upload-info mt-2">
+                                                                    <small class="text-muted">
+                                                                        <i class="bi bi-info-circle me-1"></i>
+                                                                        Optimal dimensions: 2230×300px for best display
+                                                                        quality
+                                                                    </small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Footer Content Section -->
+                                                    <div class="col-lg-6">
+                                                        <div class="form-section">
+                                                            <div class="section-header mb-3">
+                                                                <h5 class="section-title mb-1">Footer Content</h5>
+                                                                <p class="section-subtitle text-muted mb-0">
+                                                                    {{ $category->name }} • Rich text editor
+                                                                </p>
+                                                            </div>
+
+                                                            <div class="editor-section">
+                                                                <div
+                                                                    class="editor-toolbar bg-white border rounded-top px-3 py-2">
+                                                                    <div class="btn-toolbar" role="toolbar">
+                                                                        <div class="btn-group btn-group-sm me-2">
+                                                                            <button type="button"
+                                                                                class="btn btn-outline-secondary"
+                                                                                data-cmd="bold" title="Bold">
+                                                                                <i class="bi bi-type-bold"></i>
+                                                                            </button>
+                                                                            <button type="button"
+                                                                                class="btn btn-outline-secondary"
+                                                                                data-cmd="italic" title="Italic">
+                                                                                <i class="bi bi-type-italic"></i>
+                                                                            </button>
+                                                                            <button type="button"
+                                                                                class="btn btn-outline-secondary"
+                                                                                data-cmd="underline" title="Underline">
+                                                                                <i class="bi bi-type-underline"></i>
+                                                                            </button>
+                                                                        </div>
+                                                                        <div class="btn-group btn-group-sm">
+                                                                            <button type="button"
+                                                                                class="btn btn-outline-secondary"
+                                                                                data-cmd="insertUnorderedList"
+                                                                                title="Bullet List">
+                                                                                <i class="bi bi-list-ul"></i>
+                                                                            </button>
+                                                                            <button type="button"
+                                                                                class="btn btn-outline-secondary"
+                                                                                data-cmd="insertOrderedList"
+                                                                                title="Numbered List">
+                                                                                <i class="bi bi-list-ol"></i>
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="editor-container">
+                                                                    <div id="editor-{{ $category->id }}"
+                                                                        class="form-control editor-content border-top-0 rounded-0 rounded-bottom"
+                                                                        contenteditable="true" spellcheck="true"
+                                                                        aria-label="Footer content editor"
+                                                                        style="min-height: 150px; max-height: 300px; overflow-y: auto;">
+                                                                        {!! $setting->print_footer ?? '<p class="text-muted">Start typing your footer content here...</p>' !!}
+                                                                    </div>
+
+                                                                    <textarea name="print_footer" class="d-none" id="footer-input-{{ $category->id }}">
+                                                                    {!! $setting->print_footer ?? '' !!}
+                                                                </textarea>
+                                                                </div>
+
+                                                                <div class="editor-footer mt-2">
+                                                                    <small class="text-muted">
+                                                                        <i class="bi bi-info-circle me-1"></i>
+                                                                        This content will appear at the bottom of printed
+                                                                        documents
+                                                                    </small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="mt-4 text-end">
+                                                    <button type="submit" class="btn btn-primary px-4">
+                                                        <i class="fa fa-save me-1"></i> Save
+                                                    </button>
+                                                </div>
+                                            </form>
+
+                                        </div>
+                                    @endforeach
+                                </div>
+
+
+                            </div>
+                            <!-- End Tab Content -->
 
                         </div>
-                        <!-- End Tab Content -->
+                    @else
+                        @include('admin.setup.letterhead_fallback')
+                    @endif
 
-                    </div>
                 </div>
             </div>
         </div>
@@ -451,6 +499,7 @@
 
     </div>
     <!-- End Content -->
+    @include('components.modals.letterhead-category-modal')
 
     {{-- Optional JS for "Select All" functionality --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -637,4 +686,20 @@
             });
         });
     </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.classList.remove('show');
+                    alert.classList.add('fade');
+
+                    setTimeout(() => alert.remove(), 500); // remove after fade-out
+                }, 3000); // 3 seconds
+            });
+        });
+    </script>
+
 @endsection

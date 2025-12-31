@@ -69,6 +69,7 @@ class HospitalChargesController extends Controller
            return redirect()->back()->with("success","Charges Created Sucessfully!");
     }
     public function update(Request $request){
+        //dd($request->all());
         $request->validate ( [
             'charge_id'=>'required',
             'charge_type' => 'required',
@@ -83,7 +84,7 @@ class HospitalChargesController extends Controller
         $organisation_ids = $request->schedule_charge_id;
         $charge = Charge::findOrFail($request->charge_id);
         $charge->update([
-            'charge_category_id' => $request->charge_type,
+            'charge_category_id' => $request->charge_category,
             'tax_category_id' => $request->tax_category,
             'charge_unit_id' => $request->unit_type,
             'name' => $request->charge_name,

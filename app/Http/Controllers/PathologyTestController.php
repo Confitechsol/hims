@@ -103,6 +103,8 @@ class PathologyTestController extends Controller
                 'method' => $validated['method'] ?? '',
                 'report_days' => $validated['report_days'],
                 'charge_id' => $validated['charge_id'],
+                // 'hospital_id' => $user->hospital_id ?? '',
+                // 'branch_id' => $user->branch_id ?? '',
             ];
             
             // Only add columns if they exist in the table

@@ -9,7 +9,7 @@ class Organisation extends Model
 {
     use HasFactory;
 
-    protected $table = 'organisation';
+    protected $table = 'organisation'; 
 
     protected $fillable = [
         'hospital_id',

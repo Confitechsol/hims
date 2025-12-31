@@ -19,6 +19,7 @@ class Staff extends Model
         'hospital_id',
         'branch_id',
         'employee_id',
+        'role_id',
         'lang_id',
         'department_id',
         'staff_designation_id',

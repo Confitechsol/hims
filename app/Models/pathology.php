@@ -11,7 +11,7 @@ class Pathology extends Model
 
     protected $table = 'pathology';
     
-    public $timestamps = false; // Disable timestamps since updated_at column doesn't exist
+    public $timestamps = false; 
 
     protected $fillable = [
         'hospital_id',
