@@ -8,9 +8,9 @@
     /* span.select2-selection.select2-selection--multiple {
         display: none !important;
     } */
-    span.select2 {
+    /* span.select2 {
         display: none !important;
-    }
+    } */
 
     .modal-backdrop.show {
         opacity: 0.6;
@@ -829,8 +829,14 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Reference</label>
-                                <input type="text" class="form-control" name="reference"
-                                    placeholder="Enter reference">
+                                {{-- <input type="text" class="form-control" name="reference"
+                                    placeholder="Enter reference"> --}}
+                                    <select name="reference" id="" class="form-select">
+                                        <option value="">Select Reference</option>
+                                        @foreach ($references as $reference)
+                                            <option value="{{ $reference }}">{{ $reference }}</option>
+                                        @endforeach
+                                    </select>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Consultant Doctor <span class="required">*</span></label>
@@ -1073,7 +1079,7 @@
 
 @include('components.modals.add-patients-modal')
 
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+{{-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> --}}
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -1262,7 +1268,7 @@
                 data.forEach(doc => {
                     const option = document.createElement('option');
                     option.value = doc.id;
-                    option.textContent = doc.name;
+                    option.textContent = doc.name+" "+doc?.surname;
                     if ("{{ old('doctor_id') }}" == doc.id) {
                         option.selected = true;
                     }

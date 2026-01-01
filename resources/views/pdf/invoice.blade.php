@@ -432,7 +432,7 @@
             </div>
             :
             <div class="patient_data">
-              {{$IpdPatient->ipd->organisation['organisation_name']}}
+              {{$IpdPatient->ipd->organisation['organisation_name'] ?? ""}}
             </div>
           </div>
 
@@ -609,7 +609,7 @@
       </div>
       <script>
         window.onload = function () {
-            // window.print();
+            window.print();
         };
     </script>
     </body>
