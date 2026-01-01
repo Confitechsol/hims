@@ -1,10 +1,16 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
-
 <style>
     body {
         background-color: #f0f2f5;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
+
+    /* span.select2-selection.select2-selection--multiple {
+        display: none !important;
+    } */
+    /* span.select2 {
+        display: none !important;
+    } */
 
     .modal-backdrop.show {
         opacity: 0.6;
@@ -39,7 +45,7 @@
     }
 
     .patient-search {
-        background: rgba(255, 255, 255, 0.15);
+        /* background: rgba(255, 255, 255, 0.15); */
         border: 1px solid rgba(255, 255, 255, 0.3);
         /* color: white; */
         border-radius: 8px;
@@ -674,7 +680,7 @@
                                         <i class="bi bi-person-circle"></i> Patient Name
                                     </div>
                                     <div class="info-value" id="patient_name_value">-</div>
-                                        
+
                                     <div class="info-label">
                                         <i class="bi bi-gender-ambiguous"></i> Gender
                                     </div>
@@ -730,7 +736,7 @@
                                         </div>
                                     </div>
                                     <div class="patient-info-grid-tpa">
-                                        
+
 
                                         <div class="info-label">TPA Code</div>
                                         <div class="info-value" id="patient_tpaCode_value">-</div>
@@ -823,8 +829,14 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Reference</label>
-                                <input type="text" class="form-control" name="reference"
-                                    placeholder="Enter reference">
+                                {{-- <input type="text" class="form-control" name="reference"
+                                    placeholder="Enter reference"> --}}
+                                    <select name="reference" id="" class="form-select">
+                                        <option value="">Select Reference</option>
+                                        @foreach ($references as $reference)
+                                            <option value="{{ $reference }}">{{ $reference }}</option>
+                                        @endforeach
+                                    </select>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Consultant Doctor <span class="required">*</span></label>
@@ -1067,7 +1079,7 @@
 
 @include('components.modals.add-patients-modal')
 
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+{{-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> --}}
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -1114,117 +1126,117 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
 
-    const patientSection = document.querySelector(".patient-card");
-    patientSection.style.display = "none";
+        const patientSection = document.querySelector(".patient-card");
+        patientSection.style.display = "none";
 
-    const patientSelect = document.getElementById('patient_select');
-    const photo = document.getElementById('patient_photo');
-    const noImagePlaceholder = document.getElementById('no_image_placeholder');
+        const patientSelect = document.getElementById('patient_select');
+        const photo = document.getElementById('patient_photo');
+        const noImagePlaceholder = document.getElementById('no_image_placeholder');
 
-    patientSelect.innerHTML = '<option value="">Loading...</option>';
+        patientSelect.innerHTML = '<option value="">Loading...</option>';
 
-    fetch("{{ route('getPatients') }}")
-        .then(res => res.json())
-        .then(data => {
-            console.log("Patients Loaded:", data);
-            window.patientsData = data;
+        fetch("{{ route('getPatients') }}")
+            .then(res => res.json())
+            .then(data => {
+                console.log("Patients Loaded:", data);
+                window.patientsData = data;
 
-            patientSelect.innerHTML = '<option value="">Select</option>';
-            data.forEach(patient => {
-                const option = document.createElement('option');
-                option.value = patient.id;
-                option.textContent = patient.patient_name;
-                patientSelect.appendChild(option);
+                patientSelect.innerHTML = '<option value="">Select</option>';
+                data.forEach(patient => {
+                    const option = document.createElement('option');
+                    option.value = patient.id;
+                    option.textContent = patient.patient_name;
+                    patientSelect.appendChild(option);
+                });
+            })
+            .catch(err => {
+                console.error("Error fetching patients:", err);
+                patientSelect.innerHTML = '<option value="">Error loading options</option>';
             });
-        })
-        .catch(err => {
-            console.error("Error fetching patients:", err);
-            patientSelect.innerHTML = '<option value="">Error loading options</option>';
-        });
 
-    // When a patient is selected
-    patientSelect.addEventListener('change', function() {
+        // When a patient is selected
+        patientSelect.addEventListener('change', function() {
 
-        const selected = window.patientsData.find(p => p.id == this.value);
+            const selected = window.patientsData.find(p => p.id == this.value);
 
-        if (selected) {
-            console.log("Selected patient:", selected);
+            if (selected) {
+                console.log("Selected patient:", selected);
 
-            patientSection.style.display = 'block';
+                patientSection.style.display = 'block';
 
-            document.getElementById('patient_name_value').textContent =
-                `${selected.patient_name} (${selected.id})`;
+                document.getElementById('patient_name_value').textContent =
+                    `${selected.patient_name} (${selected.id})`;
 
-            document.getElementById('patient_gender_value').textContent = selected.gender ?? 'N/A';
+                document.getElementById('patient_gender_value').textContent = selected.gender ?? 'N/A';
 
-            document.getElementById('patient_age_value').textContent =
-                `${selected.age} Year ${selected.month} Month ${selected.day} Days`;
+                document.getElementById('patient_age_value').textContent =
+                    `${selected.age} Year ${selected.month} Month ${selected.day} Days`;
 
-            document.getElementById('patient_marital_status_value').textContent =
-                selected.marital_status ?? 'N/A';
+                document.getElementById('patient_marital_status_value').textContent =
+                    selected.marital_status ?? 'N/A';
 
-            document.getElementById('patient_blood_value').textContent =
-                selected.blood_group ?? 'N/A';
+                document.getElementById('patient_blood_value').textContent =
+                    selected.blood_group ?? 'N/A';
 
-            document.getElementById('patient_phone_value').textContent =
-                selected.mobileno ?? 'N/A';
+                document.getElementById('patient_phone_value').textContent =
+                    selected.mobileno ?? 'N/A';
 
-            document.getElementById('patient_location_value').textContent =
-                selected.address ?? 'N/A';
+                document.getElementById('patient_location_value').textContent =
+                    selected.address ?? 'N/A';
 
-            document.getElementById('patient_height_value').textContent =
-                selected.height ?? 'N/A';
+                document.getElementById('patient_height_value').textContent =
+                    selected.height ?? 'N/A';
 
-            document.getElementById('patient_weight_value').textContent =
-                selected.weight ?? 'N/A';
+                document.getElementById('patient_weight_value').textContent =
+                    selected.weight ?? 'N/A';
 
-            document.getElementById('patient_languages_value').textContent =
-                selected.languages_speak ?? 'N/A';
+                document.getElementById('patient_languages_value').textContent =
+                    selected.languages_speak ?? 'N/A';
 
-            document.getElementById('patient_newspaper_value').textContent =
-                selected.newspaper_preference ?? 'N/A';
+                document.getElementById('patient_newspaper_value').textContent =
+                    selected.newspaper_preference ?? 'N/A';
 
-            // Organisation (use optional chaining)
-            document.getElementById('patient_tpa_value').textContent =
-                selected.organisation?.organisation_name ?? 'N/A';
+                // Organisation (use optional chaining)
+                document.getElementById('patient_tpa_value').textContent =
+                    selected.organisation?.organisation_name ?? 'N/A';
 
-            document.getElementById('patient_tpaCode_value').textContent =
-                selected.organisation?.code ?? 'N/A';
+                document.getElementById('patient_tpaCode_value').textContent =
+                    selected.organisation?.code ?? 'N/A';
 
-            document.getElementById('patient_tpa_validity_value').textContent =
-                selected.tpa_validity ?? 'N/A';
+                document.getElementById('patient_tpa_validity_value').textContent =
+                    selected.tpa_validity ?? 'N/A';
 
-            document.getElementById('patient_identification_value').textContent =
-                selected.identification_number ?? 'N/A';
+                document.getElementById('patient_identification_value').textContent =
+                    selected.identification_number ?? 'N/A';
 
-            // ---- PHOTO HANDLING ----
-            if (selected.photo_path) {
-                photo.src = selected.photo_path;
-                photo.style.display = 'block';
-                noImagePlaceholder.style.display = 'none';
+                // ---- PHOTO HANDLING ----
+                if (selected.photo_path) {
+                    photo.src = selected.photo_path;
+                    photo.style.display = 'block';
+                    noImagePlaceholder.style.display = 'none';
+                } else {
+                    photo.style.display = 'none';
+                    noImagePlaceholder.style.display = 'block';
+                }
+
             } else {
+                // RESET ALL FIELDS
+                [
+                    'patient_name_value', 'patient_gender_value', 'patient_age_value',
+                    'patient_marital_status_value', 'patient_blood_value', 'patient_height_value',
+                    'patient_weight_value', 'patient_languages_value', 'patient_newspaper_value',
+                    'patient_phone_value', 'patient_location_value', 'patient_tpa_value',
+                    'patient_tpaCode_value', 'patient_tpa_validity_value',
+                    'patient_identification_value'
+                ].forEach(id => document.getElementById(id).textContent = '—');
+
+                patientSection.style.display = 'none';
                 photo.style.display = 'none';
                 noImagePlaceholder.style.display = 'block';
             }
+        });
 
-        } else {
-            // RESET ALL FIELDS
-            [
-                'patient_name_value','patient_gender_value','patient_age_value',
-                'patient_marital_status_value','patient_blood_value','patient_height_value',
-                'patient_weight_value','patient_languages_value','patient_newspaper_value',
-                'patient_phone_value','patient_location_value','patient_tpa_value',
-                'patient_tpaCode_value','patient_tpa_validity_value','patient_identification_value'
-            ].forEach(id => document.getElementById(id).textContent = '—');
-
-            patientSection.style.display = 'none';
-            photo.style.display = 'none';
-            noImagePlaceholder.style.display = 'block';
-        }
     });
-
-});
-
 </script>
 
 {{-- get doctors --}}
@@ -1256,7 +1268,7 @@
                 data.forEach(doc => {
                     const option = document.createElement('option');
                     option.value = doc.id;
-                    option.textContent = doc.name;
+                    option.textContent = doc.name+" "+doc?.surname;
                     if ("{{ old('doctor_id') }}" == doc.id) {
                         option.selected = true;
                     }

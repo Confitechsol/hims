@@ -119,6 +119,7 @@
             }
         }
     </style>
+    @yield('select2cdn')
 </head>
 
 @yield('content')

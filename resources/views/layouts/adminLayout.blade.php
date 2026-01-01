@@ -551,8 +551,8 @@
 
                             <!-- Item-->
                             <div class="pt-2 mt-2 border-top">
-                                <form action="{{ route('logout') }}" method="POST" class="dropdown-item text-danger"
-                                    style="cursor: pointer">
+                                <form action="{{ route('logout') }}" method="POST"
+                                    class="dropdown-item text-danger" style="cursor: pointer">
                                     @csrf
                                     <button type="submit" class="btn w-100 justify-content-start p-0">
                                         <i class="ti ti-logout me-1 fs-17 align-middle text-danger fw-bold"></i>
@@ -682,60 +682,60 @@
     </script>
     <!-- Resilient global Select2 initializer: waits for Select2 then initializes all selects -->
     <script>
-        (function() {
-            function tryInitSelect2() {
-                if (typeof window.jQuery === 'undefined') return false;
-                var $ = window.jQuery;
-                if (typeof $.fn.select2 === 'undefined') return false;
+        // (function() {
+        //     function tryInitSelect2() {
+        //         if (typeof window.jQuery === 'undefined') return false;
+        //         var $ = window.jQuery;
+        //         if (typeof $.fn.select2 === 'undefined') return false;
 
-                function initSelect($el) {
-                    if ($el.data('select2-inited')) return;
+        //         function initSelect($el) {
+        //             if ($el.data('select2-inited')) return;
 
-                    // skip selects that are hidden (like inside a hidden modal)
-                    if (!$el.is(':visible')) return;
+        //             // skip selects that are hidden (like inside a hidden modal)
+        //             if (!$el.is(':visible')) return;
 
-                    //skip which are inside edit modal
-                    if ($el.closest('#edit_modal').length > 0) return;
+        //             //skip which are inside edit modal
+        //             if ($el.closest('#edit_modal').length > 0) return;
 
-                    var dp = $el.closest('.modal').find('.modal-content').first();
-                    if (!dp || dp.length === 0) dp = $(document.body);
-                    try {
-                        $el.select2({
-                            width: '100%',
-                            dropdownParent: dp,
-                            minimumResultsForSearch: 0
-                        });
-                        $el.data('select2-inited', true);
-                    } catch (e) {
-                        // ignore init errors
-                    }
-                }
+        //             var dp = $el.closest('.modal').find('.modal-content').first();
+        //             if (!dp || dp.length === 0) dp = $(document.body);
+        //             try {
+        //                 $el.select2({
+        //                     width: '100%',
+        //                     dropdownParent: dp,
+        //                     minimumResultsForSearch: 0
+        //                 });
+        //                 $el.data('select2-inited', true);
+        //             } catch (e) {
+        //                 // ignore init errors
+        //             }
+        //         }
 
-                $('select.form-select').each(function() {
-                    initSelect($(this));
-                });
+        //         $('select.form-select').each(function() {
+        //             initSelect($(this));
+        //         });
 
-               
 
-                // Initialize selects that appear inside modals when they open
-                $('.modal').off('shown.bs.modal.select2init').on('shown.bs.modal.select2init', function() {
-                    var $modal = $(this);
-                    if ($modal.attr('id') === 'edit_modal') return;
-                    $modal.find('select.form-select').each(function() {
-                        initSelect($(this));
-                    });
-                });
 
-                return true;
-            }
+        //         // Initialize selects that appear inside modals when they open
+        //         $('.modal').off('shown.bs.modal.select2init').on('shown.bs.modal.select2init', function() {
+        //             var $modal = $(this);
+        //             if ($modal.attr('id') === 'edit_modal') return;
+        //             $modal.find('select.form-select').each(function() {
+        //                 initSelect($(this));
+        //             });
+        //         });
 
-            var attempts = 0;
-            var interval = setInterval(function() {
-                if (tryInitSelect2() || attempts++ > 50) {
-                    clearInterval(interval);
-                }
-            }, 150);
-        })();
+        //         return true;
+        //     }
+
+        //     var attempts = 0;
+        //     var interval = setInterval(function() {
+        //         if (tryInitSelect2() || attempts++ > 50) {
+        //             clearInterval(interval);
+        //         }
+        //     }, 150);
+        // })();
     </script>
 </body>
 

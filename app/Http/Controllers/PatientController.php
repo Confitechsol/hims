@@ -98,11 +98,15 @@ class PatientController extends Controller
             'email'                 => 'nullable|email|max:255',
             'height'                => 'nullable|string|max:255',
             'weight'                => 'nullable|string|max:255',
+            'nationality'           => 'nullable|string|max:255',
             'temperature'           => 'nullable|string|max:255',
             'emergency_contact_no'  => 'nullable|string|max:20',
-            'languages_speak'       => 'nullable|string|max:255',
+            // 'languages_speak'       => 'nullable|string|max:255',
+            'languages_known' => 'nullable|array',
+            'languages_known.*' => 'in:Bengali,Hindi,English,Urdu',
             'newspaper_preference'  => 'nullable|string|max:255',
             'address'               => 'nullable|string|max:500',
+            'religion'               => 'nullable|string|max:500',
             'remarks'               => 'nullable|string|max:500',
             'allergies'             => 'nullable|string|max:255',
             'tpa'                   => 'nullable|in:1,2,3,4,5',
@@ -121,7 +125,7 @@ class PatientController extends Controller
         // Convert validator result to array
         $data = $validated->validated();
 
-    
+        return $data;
 
         // Handle file upload
         $photoPath = null;
@@ -150,11 +154,14 @@ class PatientController extends Controller
             'email'                 => $data['email'] ?? null,
             'height'                => $data['height'] ?? null,
             'weight'                => $data['weight'] ?? null,
+            'nationality'           => $data['nationality'] ?? null,
             'temperature'           => $data['temperature'] ?? null,
             'emergency_contact_no'  => $data['emergency_contact_no'] ?? null,
-            'languages_speak'       => $data['languages_speak'] ?? null,
+            // 'languages_speak'       => $data['languages_speak'] ?? null,
+            'languages_speak' => $data['languages_known'] ?? null,
             'newspaper_preference'  => $data['newspaper_preference'] ?? null,
             'address'               => $data['address'] ?? null,
+            'religion'               => $data['religion'] ?? null,
             'note'                  => $data['remarks'] ?? null,
             'known_allergies'       => $data['allergies'] ?? null,
 

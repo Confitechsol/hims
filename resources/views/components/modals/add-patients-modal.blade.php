@@ -1,8 +1,19 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+@section('select2cdn')
+    {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" /> --}}
+@endsection
 <style>
     .unit-select {
-    flex: 0 0 20%; /* fixed 20% width */
-    max-width: 20%;
-}
+        flex: 0 0 20%;
+        /* fixed 20% width */
+        max-width: 20%;
+    }
+
+    .select2-container--default .select2-selection--multiple {
+        padding: 0.625rem 0.875rem;
+        /* adjust as needed */
+        border-radius: 8px;
+    }
 </style>
 
 <div class="modal fade" id="add_patient" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
@@ -19,16 +30,16 @@
                 <form id="ipdForm" action="{{ route('patient-store') }}" method="POST">
                     @csrf
                     <!-- @if ($errors->any())
-                        <div class="alert alert-danger">
+<div class="alert alert-danger">
                             <strong>There were some problems with your
                                 input:</strong>
                             <ul class="mb-0">
                                 @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
+<li>{{ $error }}</li>
+@endforeach
                             </ul>
                         </div>
-                    @endif -->
+@endif -->
 
                     <div class="row p-4 mx-1 gy-3">
 
@@ -168,7 +179,7 @@
                                     <select name="blood_group"
                                         class="form-control @error('blood_group') is-invalid @enderror">
                                         <option value="">Select</option>
-                                        @foreach($bloodGroups as $group)
+                                        @foreach ($bloodGroups as $group)
                                             <option value="{{ $group->id }}"
                                                 {{ old('blood_group') == $group->id ? 'selected' : '' }}>
                                                 {{ $group->name }}
@@ -252,7 +263,7 @@
                         </div>
 
                         {{-- Address --}}
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="address" class="form-label">Address</label>
                             <input type="text" id="address" name="address"
                                 class="form-control @error('address') is-invalid @enderror"
@@ -261,7 +272,33 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-
+                        {{-- religion --}}
+                        <div class="col-md-4">
+                            <label for="religion" class="form-label">Religion</label>
+                            <select id="religion" name="religion"
+                                class="form-select @error('religion') is-invalid @enderror">
+                                <option value="">Select</option>
+                                <option value="Hinduism" {{ old('religion') == 'Hinduism' ? 'selected' : '' }}>
+                                    Hinduism
+                                </option>
+                                <option value="Islam" {{ old('religion') == 'Islam' ? 'selected' : '' }}>Islam
+                                </option>
+                                <option value="Christianity"
+                                    {{ old('religion') == 'Christianity' ? 'selected' : '' }}>Christianity</option>
+                                <option value="Sikhism" {{ old('religion') == 'Sikhism' ? 'selected' : '' }}>Sikhism
+                                </option>
+                                <option value="Buddhism" {{ old('religion') == 'Buddhism' ? 'selected' : '' }}>
+                                    Buddhism
+                                </option>
+                                <option value="Jainism" {{ old('religion') == 'Jainism' ? 'selected' : '' }}>Jainism
+                                </option>
+                                <option value="Other" {{ old('religion') == 'Other' ? 'selected' : '' }}>Other
+                                </option>
+                                @error('religion')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </select>
+                        </div>
                         {{-- Allergies --}}
                         <div class="col-md-4">
                             <label for="allergies" class="form-label">Any Known
@@ -275,18 +312,34 @@
                         </div>
 
                         {{-- Languages Speak --}}
-                        <div class="col-md-4">
-                            <label for="languages_speak" class="form-label">Languages Speak</label>
-                            <input type="text" id="languages_speak" name="languages_speak"
+                        <div class="col-md-3">
+                            <label for="languages_speak" class="form-label">Languages Known</label>
+                            {{-- <input type="text" id="languages_speak" name="languages_speak"
                                 class="form-control @error('languages_speak') is-invalid @enderror"
-                                value="{{ old('languages_speak') }}" />
-                            @error('languages_speak')
+                                value="{{ old('languages_speak') }}" /> --}}
+                            <select id="languages_known" name="languages_known[]"
+                                class="form-control @error('languages_known') is-invalid @enderror" multiple>
+                                <option value="Bengali"
+                                    {{ collect(old('languages_known'))->contains('Bengali') ? 'selected' : '' }}>
+                                    Bengali</option>
+                                <option value="Hindi"
+                                    {{ collect(old('languages_known'))->contains('Hindi') ? 'selected' : '' }}>
+                                    Hindi</option>
+                                <option value="English"
+                                    {{ collect(old('languages_known'))->contains('English') ? 'selected' : '' }}>
+                                    English</option>
+                                <option value="Urdu"
+                                    {{ collect(old('languages_known'))->contains('Urdu') ? 'selected' : '' }}>
+                                    Urdu</option>
+                                <!-- Add more languages as needed -->
+                            </select>
+                            @error('languages_known')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
 
                         {{-- Newspaper Preference --}}
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label for="newspaper_preference" class="form-label">Newspaper Preference</label>
                             <input type="text" id="newspaper_preference" name="newspaper_preference"
                                 class="form-control @error('newspaper_preference') is-invalid @enderror"
@@ -297,11 +350,12 @@
                         </div>
 
                         {{-- Height --}}
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label for="height_value" class="form-label">Height</label>
 
                             <div class="input-group d-flex">
-                                <input type="text" id="height_value" class="form-control @error('height') is-invalid @enderror"
+                                <input type="text" id="height_value"
+                                    class="form-control @error('height') is-invalid @enderror"
                                     placeholder="Enter height" value="{{ old('height') }}">
 
                                 <select id="height_unit" class="form-select unit-select">
@@ -316,13 +370,13 @@
                             @enderror
                         </div>
 
-
                         {{-- Weight --}}
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label for="weight_value" class="form-label">Weight</label>
 
                             <div class="input-group d-flex">
-                                <input type="text" id="weight_value" class="form-control @error('weight') is-invalid @enderror"
+                                <input type="text" id="weight_value"
+                                    class="form-control @error('weight') is-invalid @enderror"
                                     placeholder="Enter weight" value="{{ old('weight') }}">
 
                                 <select id="weight_unit" class="form-select unit-select">
@@ -333,6 +387,19 @@
 
                             <input type="hidden" name="weight" id="weight">
                             @error('weight')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="nationality" class="form-label">Nationality</label>
+                            <select id="nationality" class="form-select @error('nationality') is-invalid @enderror" name="nationality">
+                                <option value="">Select your nationality</option>
+                                <option value="Indian" {{ old('nationality') == 'Indian' ? 'selected' : '' }}>Indian</option>
+                                <option value="American" {{ old('nationality') == 'American' ? 'selected' : '' }}>American</option>
+                                <option value="British" {{ old('nationality') == 'British' ? 'selected' : '' }}>British</option>
+                            </select>
+                            @error('nationality')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
@@ -423,40 +490,43 @@
 
                     </div>
 
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Save Patient</button>
-                    </div>
-                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Save Patient</button>
+            </div>
+            </form>
         </div>
     </div>
 </div>
+<!-- Include jQuery and Select2 JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
 
-    const form = document.getElementById("ipdForm");
+        const form = document.getElementById("ipdForm");
 
-    form.addEventListener("submit", function (e) {
+        form.addEventListener("submit", function(e) {
 
-        // HEIGHT
-        const hVal = document.getElementById("height_value")?.value ?? "";
-        const hUnit = document.getElementById("height_unit")?.value ?? "";
-        document.getElementById("height").value = (hVal && hUnit) ? (hVal + hUnit) : "";
+            // HEIGHT
+            const hVal = document.getElementById("height_value")?.value ?? "";
+            const hUnit = document.getElementById("height_unit")?.value ?? "";
+            document.getElementById("height").value = (hVal && hUnit) ? (hVal + hUnit) : "";
 
-        // WEIGHT
-        const wVal = document.getElementById("weight_value")?.value ?? "";
-        const wUnit = document.getElementById("weight_unit")?.value ?? "";
-        document.getElementById("weight").value = (wVal && wUnit) ? (wVal + wUnit) : "";
+            // WEIGHT
+            const wVal = document.getElementById("weight_value")?.value ?? "";
+            const wUnit = document.getElementById("weight_unit")?.value ?? "";
+            document.getElementById("weight").value = (wVal && wUnit) ? (wVal + wUnit) : "";
 
-        // TEMPERATURE
-        const tVal = document.getElementById("temperature_value")?.value ?? "";
-        const tUnit = document.getElementById("temperature_unit")?.value ?? "";
-        document.getElementById("temperature").value = (tVal && tUnit) ? (tVal + tUnit) : "";
+            // TEMPERATURE
+            const tVal = document.getElementById("temperature_value")?.value ?? "";
+            const tUnit = document.getElementById("temperature_unit")?.value ?? "";
+            document.getElementById("temperature").value = (tVal && tUnit) ? (tVal + tUnit) : "";
 
-        console.log("FORM SUBMITTED: height =", document.getElementById("height").value);
+            console.log("FORM SUBMITTED: height =", document.getElementById("height").value);
 
+        });
     });
-});
 </script>
 
 
@@ -486,84 +556,95 @@ document.addEventListener("DOMContentLoaded", function () {
                 tpaSelect.innerHTML = '<option value="">Error loading options</option>';
             });
 
-            // Listen for dropdown change
-            tpaSelect.addEventListener('change', function() {
-                const selectedId = this.value;
-                const selectedOrg = window.organizationsData.find(org => org.id == selectedId);
-                tpaIdInput.value = selectedOrg ? selectedOrg.code : '';
+        // Listen for dropdown change
+        tpaSelect.addEventListener('change', function() {
+            const selectedId = this.value;
+            const selectedOrg = window.organizationsData.find(org => org.id == selectedId);
+            tpaIdInput.value = selectedOrg ? selectedOrg.code : '';
+        });
+        // Elements
+        const birthDateInput = document.getElementById('birth_date');
+        const ageYearInput = document.getElementById('age_year');
+        const ageMonthInput = document.getElementById('age_month');
+        const ageDayInput = document.getElementById('age_day');
+
+        // ------------------ DOB → AUTO CALCULATE AGE ------------------
+        birthDateInput.addEventListener('change', function() {
+            const birthDate = new Date(this.value);
+            if (!this.value || isNaN(birthDate)) {
+                ageYearInput.value = '';
+                ageMonthInput.value = '';
+                ageDayInput.value = '';
+                return;
+            }
+
+            const today = new Date();
+            let years = today.getFullYear() - birthDate.getFullYear();
+            let months = today.getMonth() - birthDate.getMonth();
+            let days = today.getDate() - birthDate.getDate();
+
+            if (days < 0) {
+                months--;
+                const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+                days += prevMonth.getDate();
+            }
+
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+
+            ageYearInput.value = years;
+            ageMonthInput.value = months;
+            ageDayInput.value = days;
+        });
+
+        // ------------------ AGE → AUTO CALCULATE DOB ------------------
+        function updateDOB() {
+            const years = parseInt(ageYearInput.value) || 0;
+            const months = parseInt(ageMonthInput.value) || 0;
+            const days = parseInt(ageDayInput.value) || 0;
+
+            // If no age entered → do nothing
+            if (!years && !months && !days) return;
+
+            const today = new Date();
+
+            // Subtract entered values
+            let dob = new Date(
+                today.getFullYear() - years,
+                today.getMonth() - months,
+                today.getDate() - days
+            );
+
+            // If month+day not given → approximate DOB = Jan 1st of that year
+            if (!ageMonthInput.value && !ageDayInput.value) {
+                dob = new Date(today.getFullYear() - years, 0, 1); // 1st Jan
+            }
+
+            // Format YYYY-MM-DD
+            const yyyy = dob.getFullYear();
+            const mm = String(dob.getMonth() + 1).padStart(2, '0');
+            const dd = String(dob.getDate()).padStart(2, '0');
+
+            birthDateInput.value = `${yyyy}-${mm}-${dd}`;
+        }
+
+        // Trigger when age fields are typed/changed
+        ageYearInput.addEventListener('input', updateDOB);
+        ageMonthInput.addEventListener('input', updateDOB);
+        ageDayInput.addEventListener('input', updateDOB);
+
+    });
+    $('#add_patient').on('shown.bs.modal', function() {
+        let select = $('#languages_known');
+        if (!select.hasClass('select2-hidden-accessible')) {
+            select.select2({
+                dropdownParent: $('#add_patient'),
+                placeholder: 'Select languages',
+                allowClear: true,
+                width: '100%'
             });
-      // Elements
-const birthDateInput = document.getElementById('birth_date');
-const ageYearInput = document.getElementById('age_year');
-const ageMonthInput = document.getElementById('age_month');
-const ageDayInput = document.getElementById('age_day');
-
-// ------------------ DOB → AUTO CALCULATE AGE ------------------
-birthDateInput.addEventListener('change', function () {
-    const birthDate = new Date(this.value);
-    if (!this.value || isNaN(birthDate)) {
-        ageYearInput.value = '';
-        ageMonthInput.value = '';
-        ageDayInput.value = '';
-        return;
-    }
-
-    const today = new Date();
-    let years = today.getFullYear() - birthDate.getFullYear();
-    let months = today.getMonth() - birthDate.getMonth();
-    let days = today.getDate() - birthDate.getDate();
-
-    if (days < 0) {
-        months--;
-        const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-        days += prevMonth.getDate();
-    }
-
-    if (months < 0) {
-        years--;
-        months += 12;
-    }
-
-    ageYearInput.value = years;
-    ageMonthInput.value = months;
-    ageDayInput.value = days;
-});
-
-// ------------------ AGE → AUTO CALCULATE DOB ------------------
-function updateDOB() {
-    const years = parseInt(ageYearInput.value) || 0;
-    const months = parseInt(ageMonthInput.value) || 0;
-    const days = parseInt(ageDayInput.value) || 0;
-
-    // If no age entered → do nothing
-    if (!years && !months && !days) return;
-
-    const today = new Date();
-
-    // Subtract entered values
-    let dob = new Date(
-        today.getFullYear() - years,
-        today.getMonth() - months,
-        today.getDate() - days
-    );
-
-    // If month+day not given → approximate DOB = Jan 1st of that year
-    if (!ageMonthInput.value && !ageDayInput.value) {
-        dob = new Date(today.getFullYear() - years, 0, 1); // 1st Jan
-    }
-
-    // Format YYYY-MM-DD
-    const yyyy = dob.getFullYear();
-    const mm = String(dob.getMonth() + 1).padStart(2, '0');
-    const dd = String(dob.getDate()).padStart(2, '0');
-
-    birthDateInput.value = `${yyyy}-${mm}-${dd}`;
-}
-
-// Trigger when age fields are typed/changed
-ageYearInput.addEventListener('input', updateDOB);
-ageMonthInput.addEventListener('input', updateDOB);
-ageDayInput.addEventListener('input', updateDOB);
-
+        }
     });
 </script>
