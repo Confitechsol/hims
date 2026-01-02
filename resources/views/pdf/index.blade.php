@@ -155,7 +155,7 @@
   </style>
   <body>
 
-    <div class="main_box">
+    <div class="main_box" id="pdf-content">
 
       <div class="top_head">
         <div class="first_logo">
@@ -229,7 +229,7 @@
             </div>
             :
             <div class="patient_data">
-              HINDUISM
+              {{$IpdPatient->patient['religion'] ?? ""}}
             </div>
           </div>
           <div class="patient_items">
@@ -298,7 +298,7 @@
             </div>
             :
             <div class="patient_data">
-              {{$IpdPatient->patient['mobileno']}}
+              {{$IpdPatient->patient['mobileno'] ?? ""}}
             </div>
           </div>
           <div class="patient_items">
@@ -307,7 +307,7 @@
             </div>
             :
             <div class="patient_data">
-              INDIAN
+              {{$IpdPatient->patient['nationality'] ?? ""}}
             </div>
           </div>
         </div>
@@ -348,7 +348,7 @@
             </div>
             :
             <div class="patient_data">
-              {{$IpdPatient->patient['guardian_relation']}}
+              {{$IpdPatient->patient['guardian_relation'] ?? ""}}
             </div>
           </div>
 
@@ -358,7 +358,7 @@
             </div>
             :
             <div class="patient_data">
-              {{$IpdPatient->patient['guardian_phone']}}
+              {{$IpdPatient->patient['guardian_phone'] ?? ""}}
             </div>
           </div>
 
@@ -607,10 +607,6 @@
         <p><b>DATE : </b></p>
         <p><b>{{\Carbon\Carbon::parse($IpdPatient->created_at)->format('d-m-Y') ?? ''}}</b></p>
       </div>
-      <script>
-        window.onload = function () {
-            window.print();
-        };
-    </script>
+    </div>
     </body>
   </html>

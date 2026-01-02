@@ -125,7 +125,6 @@ class PatientController extends Controller
         // Convert validator result to array
         $data = $validated->validated();
 
-        return $data;
 
         // Handle file upload
         $photoPath = null;

@@ -1176,7 +1176,7 @@
                     selected.marital_status ?? 'N/A';
 
                 document.getElementById('patient_blood_value').textContent =
-                    selected.blood_group ?? 'N/A';
+                    selected?.blood_group?.name ?? 'N/A';
 
                 document.getElementById('patient_phone_value').textContent =
                     selected.mobileno ?? 'N/A';
