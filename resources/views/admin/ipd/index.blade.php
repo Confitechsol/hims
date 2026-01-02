@@ -294,6 +294,11 @@
     {{-- create IPD modal --}}
     @include('components.modals.ipd-create-modal')
 
+    @if (session('pdf_url'))
+        <script>
+            window.open("{{ session('pdf_url') }}", "_blank");
+        </script>
+    @endif
     {{-- filters --}}
 
     <script>
@@ -350,11 +355,7 @@
         });
     </script>
 
-    @if (session('pdf_url'))
-        <script>
-            window.open("{{ session('pdf_url') }}", "_blank");
-        </script>
-    @endif
+
 
     <!-- {{-- <script>
         // const editButton = document.querySelector('.edit-opd')
