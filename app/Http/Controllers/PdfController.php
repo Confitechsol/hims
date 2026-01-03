@@ -13,6 +13,6 @@ class PdfController extends Controller
     public function generatePdf($id,Request $request)
     {
         $IpdPatient = IpdPatient::with(['patient','ipd.bedDetail.bedGroup','doctor','ipd.organisation'])->findOrFail($id);
-        return view('pdf.invoice',compact('IpdPatient'));
+        return view('pdf.index',compact('IpdPatient'));
     }
 }
