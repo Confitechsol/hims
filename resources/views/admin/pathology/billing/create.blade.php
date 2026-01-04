@@ -344,8 +344,26 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Select2 is applied:', testSelect.classList.contains('select2-hidden-accessible'));
     
     // Test selection handler - Using jQuery with Select2
+    // Updated: 2026-01-04 - Fixed activateTpa scope issue
     $(document).on('change', '.test_name', function(e) {
         console.log('Test dropdown changed! (Select2 event)');
+        
+        // CRITICAL: Declare activateTpa and organisationId FIRST - function-scoped with var
+        var activateTpa = false;
+        var organisationId = null;
+        
+        // Get TPA elements
+        var activateTpaElement = document.getElementById('activate_tpa');
+        if (activateTpaElement) {
+            activateTpa = activateTpaElement.checked === true;
+        }
+        
+        var tpaDropdown = document.getElementById('tpa_dropdown');
+        if (tpaDropdown && tpaDropdown.value) {
+            organisationId = tpaDropdown.value;
+        }
+        
+        console.log('TPA variables - activateTpa:', activateTpa, 'organisationId:', organisationId);
         
         const selectedOption = this.options[this.selectedIndex];
         const row = $(this).closest('tr');
@@ -372,10 +390,6 @@ document.addEventListener('DOMContentLoaded', function() {
             row.find('.tax_percentage').val(tax);
             
             // Check if TPA is active and get TPA charge
-            const activateTpa = document.getElementById('activate_tpa').checked;
-            const tpaDropdown = document.getElementById('tpa_dropdown');
-            const organisationId = tpaDropdown ? tpaDropdown.value : null;
-            
             if (activateTpa && organisationId) {
                 // Fetch TPA charge
                 const url = `{{ url('/pathology/billing/api/tpa-charge') }}?test_id=${testId}&organisation_id=${organisationId}`;
@@ -415,14 +429,18 @@ document.addEventListener('DOMContentLoaded', function() {
             row.find('.report_date').val(reportingDate.toISOString().split('T')[0]);
             
             console.log('Values set successfully!');
+            
+            // Only calculate totals if TPA is not active or no organisation ID
+            if (!activateTpa || !organisationId) {
+                calculateTotals();
+            }
         } else {
             row.find('.report_days').val(0);
             row.find('.tax_percentage').val(0);
             row.find('.test_amount').val(0);
             row.find('.report_date').val(today);
-        }
-        
-        if (!activateTpa || !organisationId) {
+            
+            // Calculate totals for empty test selection
             calculateTotals();
         }
     });

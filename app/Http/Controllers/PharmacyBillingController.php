@@ -14,6 +14,9 @@ use App\Models\MedicineUnit;
 use App\Models\Patient;
 use App\Models\Doctor;
 use App\Models\CaseReference;
+use App\Models\OpdDetail;
+use App\Models\IpdPrescription;
+use App\Models\IpdMedicine;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
@@ -397,20 +400,103 @@ class PharmacyBillingController extends Controller
      */
     public function getPatientPrescriptions($patientId)
     {
-        $caseReferences = CaseReference::where('patient_id', $patientId)
-            ->orderBy('created_at', 'desc')
-            ->select('id', 'case_id', 'appointment_date as date', 'symptoms', 'reference_doctor')
-            ->get()
-            ->map(function($case) {
-                return [
-                    'id' => $case->id,
-                    'case_id' => $case->case_id ?? 'Case #' . $case->id,
-                    'date' => $case->date ? date('Y-m-d', strtotime($case->date)) : null,
-                    'symptoms' => $case->symptoms,
-                    'doctor' => $case->reference_doctor,
-                ];
-            });
+        try {
+            $prescriptions = collect();
+            
+            // Get OPD Visits (instead of case_references which doesn't have the needed fields)
+            $opdVisits = OpdDetail::where('patient_id', $patientId)
+                ->with('doctor')
+                ->orderBy('appointment_date', 'desc')
+                ->get()
+                ->map(function($opd) {
+                    return [
+                        'id' => $opd->id,
+                        'case_id' => $opd->opd_no ?? 'OPD' . str_pad($opd->id, 4, '0', STR_PAD_LEFT),
+                        'date' => $opd->appointment_date ? date('Y-m-d', strtotime($opd->appointment_date)) : null,
+                        'symptoms' => $opd->symptoms_description ?? $opd->symptoms_title ?? '',
+                        'doctor' => $opd->doctor ? $opd->doctor->name : null,
+                        'type' => 'opd',
+                    ];
+                });
+            
+            $prescriptions = $prescriptions->merge($opdVisits);
+            
+            // Get IPD Prescriptions
+            $ipdPrescriptions = IpdPrescription::join('ipd_details', 'ipd_prescription.ipd_id', '=', 'ipd_details.id')
+                ->where('ipd_details.patient_id', $patientId)
+                ->select('ipd_prescription.*')
+                ->with(['ipd', 'prescribedBy'])
+                ->orderBy('ipd_prescription.date', 'desc')
+                ->get()
+                ->map(function($prescription) {
+                    return [
+                        'id' => $prescription->id,
+                        'case_id' => $prescription->prescription_number ?? 'IPDP' . str_pad($prescription->id, 4, '0', STR_PAD_LEFT),
+                        'date' => $prescription->date ? $prescription->date->format('Y-m-d') : null,
+                        'symptoms' => $prescription->finding_description ?? '',
+                        'doctor' => $prescription->prescribedBy ? $prescription->prescribedBy->name : null,
+                        'type' => 'ipd',
+                        'prescription_id' => $prescription->id,
+                    ];
+                });
+            
+            $prescriptions = $prescriptions->merge($ipdPrescriptions);
+            
+            return response()->json($prescriptions->values());
+        } catch (\Exception $e) {
+            \Log::error('Error getting patient prescriptions: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 
-        return response()->json($caseReferences);
+    /**
+     * API: Get prescription medicines (AJAX)
+     */
+    public function getPrescriptionMedicines($prescriptionId)
+    {
+        try {
+            $prescription = IpdPrescription::with(['medicines.pharmacy.medicineCategory', 'medicines.medicineDosage', 'medicines.doseInterval', 'medicines.doseDuration', 'prescribedBy'])
+                ->find($prescriptionId);
+            
+            if (!$prescription) {
+                return response()->json(['error' => 'Prescription not found'], 404);
+            }
+            
+            // Get medicines from the prescription
+            $medicines = $prescription->medicines()
+                ->with(['pharmacy.medicineCategory', 'medicineDosage', 'doseInterval', 'doseDuration'])
+                ->get()
+                ->map(function($medicine) {
+                    $pharmacy = $medicine->pharmacy;
+                    return [
+                        'id' => $pharmacy ? $pharmacy->id : null,
+                        'medicine_name' => $pharmacy ? $pharmacy->medicine_name : 'N/A',
+                        'medicine_category_id' => $pharmacy && $pharmacy->medicineCategory ? $pharmacy->medicineCategory->id : null,
+                        'dosage_id' => $medicine->medicine_dosage_id,
+                        'dosage' => $medicine->medicineDosage ? $medicine->medicineDosage->dosage : null,
+                        'interval_id' => $medicine->dose_interval_id,
+                        'interval' => $medicine->doseInterval ? $medicine->doseInterval->interval : null,
+                        'duration_id' => $medicine->dose_duration_id,
+                        'duration' => $medicine->doseDuration ? $medicine->doseDuration->duration : null,
+                        'instruction' => $medicine->instruction,
+                    ];
+                })
+                ->filter(function($medicine) {
+                    return $medicine['id'] !== null; // Filter out medicines with null pharmacy
+                });
+            
+            return response()->json([
+                'prescription' => [
+                    'id' => $prescription->id,
+                    'prescription_number' => $prescription->prescription_number,
+                    'date' => $prescription->date ? $prescription->date->format('Y-m-d') : null,
+                    'doctor' => $prescription->prescribedBy ? $prescription->prescribedBy->name : null,
+                ],
+                'medicines' => $medicines->values(),
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error getting prescription medicines: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }

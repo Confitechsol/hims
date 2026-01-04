@@ -736,6 +736,26 @@
                 }
             }, 150);
         })();
+        
+        // Hide loader when page is ready
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const loader = document.querySelector('.loader');
+                if (loader) {
+                    loader.style.display = 'none';
+                }
+            }, 100);
+        });
+        
+        // Also hide loader on DOMContentLoaded as fallback
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const loader = document.querySelector('.loader');
+                if (loader) {
+                    loader.style.display = 'none';
+                }
+            }, 500);
+        });
     </script>
 </body>
 

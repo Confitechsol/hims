@@ -124,7 +124,12 @@
                             <div id="medicineContainer">
                                 @if($prescription->medicines && $prescription->medicines->count() > 0)
                                     @foreach($prescription->medicines as $index => $medicine)
-                                        <div class="medicine-row row mt-3" data-row="{{ $index + 1 }}" id="row{{ $index + 1 }}">
+                                        <div class="medicine-row row mt-3" data-row="{{ $index + 1 }}" id="row{{ $index + 1 }}" 
+                                             data-category-id="{{ $medicine->pharmacy->medicine_category_id ?? ($medicine->pharmacy->medicineCategory->id ?? '') }}"
+                                             data-medicine-id="{{ $medicine->pharmacy_id }}"
+                                             data-dosage-id="{{ $medicine->medicine_dosage_id }}"
+                                             data-interval-id="{{ $medicine->dose_interval_id }}"
+                                             data-duration-id="{{ $medicine->dose_duration_id }}">
                                             <div class="col-lg-2 col-md-4 col-sm-6 col-xs-6">
                                                 <div>
                                                     <label class="form-label">Medicine Category</label>
@@ -350,8 +355,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const addButton = document.getElementById("addMedicineBtn");
     const addButtonContainer = document.getElementById("addMedicineContainer");
 
-    // Store existing medicine data
+    // Store existing medicine data with all relationships
     const existingMedicines = @json($prescription->medicines ?? []);
+    console.log('Existing medicines data:', existingMedicines);
 
     // Fetch base dropdown data once
     Promise.all([
@@ -391,14 +397,73 @@ document.addEventListener('DOMContentLoaded', function() {
         const intervalSelect = row.querySelector(".interval_dosage");
         const durationSelect = row.querySelector(".duration_dosage");
 
+        if (!categorySelect || !medicineSelect || !dosageSelect || !intervalSelect || !durationSelect) {
+            console.error('Required select elements not found in row');
+            return;
+        }
+
+        // Fill base selects
         fillSelect(categorySelect, window.medicineCategories, "medicine_category");
         fillSelect(intervalSelect, window.doseIntervals, "name");
         fillSelect(durationSelect, window.doseDurations, "name");
 
+        // Get values from data attributes (preferred) or from existingMedicine object
+        const rowCategoryId = row.getAttribute('data-category-id');
+        const rowMedicineId = row.getAttribute('data-medicine-id');
+        const rowDosageId = row.getAttribute('data-dosage-id');
+        const rowIntervalId = row.getAttribute('data-interval-id');
+        const rowDurationId = row.getAttribute('data-duration-id');
+        
+        const medicineId = existingMedicine?.pharmacy_id || rowMedicineId || medicineSelect.getAttribute('data-medicine-id');
+        const dosageId = existingMedicine?.medicine_dosage_id || rowDosageId || dosageSelect.getAttribute('data-dosage-id');
+        const intervalId = existingMedicine?.dose_interval_id || rowIntervalId || intervalSelect.getAttribute('data-interval-id');
+        const durationId = existingMedicine?.dose_duration_id || rowDurationId || durationSelect.getAttribute('data-duration-id');
+        
+        // Get category ID - try multiple sources
+        let categoryId = null;
+        if (rowCategoryId && rowCategoryId !== '') {
+            categoryId = rowCategoryId;
+        } else if (existingMedicine) {
+            // Try multiple paths to get category ID from existingMedicine
+            categoryId = existingMedicine.pharmacy?.medicine_category_id || 
+                        existingMedicine.pharmacy?.medicine_category?.id ||
+                        (existingMedicine.pharmacy && existingMedicine.pharmacy.medicine_category_id) ||
+                        (existingMedicine.pharmacy && existingMedicine.pharmacy.medicine_category && existingMedicine.pharmacy.medicine_category.id);
+        }
+        
+        console.log('Row data attributes:', {
+            rowCategoryId,
+            rowMedicineId,
+            rowDosageId,
+            rowIntervalId,
+            rowDurationId
+        });
+        
+        console.log('Extracted values:', {
+            categoryId,
+            medicineId,
+            dosageId,
+            intervalId,
+            durationId,
+            existingMedicine: existingMedicine ? {
+                pharmacy_id: existingMedicine.pharmacy_id,
+                pharmacy: existingMedicine.pharmacy ? {
+                    medicine_category_id: existingMedicine.pharmacy.medicine_category_id,
+                    medicine_category: existingMedicine.pharmacy.medicine_category
+                } : null
+            } : null
+        });
+
         // If editing existing medicine, populate values
-        if (existingMedicine) {
-            // Set category and load medicines
-            const categoryId = existingMedicine.pharmacy?.medicine_category_id || existingMedicine.pharmacy?.medicine_category?.id;
+        if (medicineId || categoryId) {
+            console.log('Initializing row with existing data:', {
+                medicineId,
+                categoryId,
+                dosageId,
+                intervalId,
+                durationId
+            });
+            
             if (categoryId) {
                 // Set category value first
                 categorySelect.value = categoryId;
@@ -411,8 +476,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     .then(res => res.json())
                     .then(data => {
                         fillSelect(medicineSelect, data, "medicine_name");
-                        if (existingMedicine.pharmacy_id) {
-                            medicineSelect.value = existingMedicine.pharmacy_id;
+                        if (medicineId) {
+                            medicineSelect.value = medicineId;
                         }
                         
                         // Load dosages
@@ -422,20 +487,54 @@ document.addEventListener('DOMContentLoaded', function() {
                             .then(res => res.json())
                             .then(data => {
                                 fillSelect(dosageSelect, data, "dosage");
-                                if (existingMedicine.medicine_dosage_id) {
-                                    dosageSelect.value = existingMedicine.medicine_dosage_id;
+                                if (dosageId) {
+                                    dosageSelect.value = dosageId;
                                 }
+                                
+                                // Initialize Select2 after all values are set
+                                initializeSelect2ForRow(row, {
+                                    categoryId,
+                                    medicineId,
+                                    dosageId,
+                                    intervalId,
+                                    durationId
+                                });
+                            })
+                            .catch(error => {
+                                console.error('Error loading doses:', error);
+                                initializeSelect2ForRow(row, {
+                                    categoryId,
+                                    medicineId,
+                                    dosageId,
+                                    intervalId,
+                                    durationId
+                                });
                             });
+                    })
+                    .catch(error => {
+                        console.error('Error loading medicines:', error);
+                        initializeSelect2ForRow(row, {
+                            categoryId,
+                            medicineId,
+                            dosageId,
+                            intervalId,
+                            durationId
+                        });
                     });
+            } else {
+                // If no category but we have medicine ID, try to load all medicines
+                // This is a fallback - ideally we should have category
+                initializeSelect2ForRow(row, {
+                    categoryId: null,
+                    medicineId,
+                    dosageId,
+                    intervalId,
+                    durationId
+                });
             }
-
-            // Set interval and duration
-            if (existingMedicine.dose_interval_id) {
-                intervalSelect.value = existingMedicine.dose_interval_id;
-            }
-            if (existingMedicine.dose_duration_id) {
-                durationSelect.value = existingMedicine.dose_duration_id;
-            }
+        } else {
+            // No existing medicine, just initialize Select2
+            initializeSelect2ForRow(row);
         }
 
         // Category change → fetch medicines
@@ -466,23 +565,51 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // Initialize select2 after a short delay to ensure values are set
+    }
+    
+    function initializeSelect2ForRow(row, values = {}) {
+        const categorySelect = row.querySelector(".medicine_category");
+        const medicineSelect = row.querySelector(".medicine_name");
+        const dosageSelect = row.querySelector(".medicine_dosage");
+        const intervalSelect = row.querySelector(".interval_dosage");
+        const durationSelect = row.querySelector(".duration_dosage");
+        
         setTimeout(() => {
             if (window.jQuery && $.fn.select2) {
-                $(row).find(".select2").select2({
-                    width: "100%"
+                // Destroy existing Select2 instances
+                [categorySelect, medicineSelect, dosageSelect, intervalSelect, durationSelect].forEach(select => {
+                    if (select && $(select).hasClass('select2-hidden-accessible')) {
+                        $(select).select2('destroy');
+                    }
                 });
                 
-                // If editing existing medicine, trigger change events to update Select2 display
-                if (existingMedicine) {
-                    $(categorySelect).trigger('change');
-                    $(medicineSelect).trigger('change');
-                    $(dosageSelect).trigger('change');
-                    $(intervalSelect).trigger('change');
-                    $(durationSelect).trigger('change');
+                // Initialize Select2 for all selects
+                $(row).find(".select2").select2({
+                    width: "100%",
+                    placeholder: "Select",
+                    allowClear: true
+                });
+                
+                // Set values and trigger change to update Select2 display
+                if (values.categoryId && categorySelect) {
+                    $(categorySelect).val(values.categoryId).trigger('change');
                 }
+                if (values.medicineId && medicineSelect) {
+                    $(medicineSelect).val(values.medicineId).trigger('change');
+                }
+                if (values.dosageId && dosageSelect) {
+                    $(dosageSelect).val(values.dosageId).trigger('change');
+                }
+                if (values.intervalId && intervalSelect) {
+                    $(intervalSelect).val(values.intervalId).trigger('change');
+                }
+                if (values.durationId && durationSelect) {
+                    $(durationSelect).val(values.durationId).trigger('change');
+                }
+                
+                console.log('Select2 initialized for row with values:', values);
             }
-        }, 200);
+        }, 300); // Increased delay to ensure all async operations complete
     }
 
     function fillSelect(selectElement, data, textKey) {

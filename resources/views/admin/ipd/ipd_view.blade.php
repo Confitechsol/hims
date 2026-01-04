@@ -3693,9 +3693,9 @@
                                                         <tbody>
                                                             <td>{{ $ipd->ipd_no }}</td>
                                                             <td>{{ $ipd->patient_id }}</td>
-                                                            <td>{{ $ipd->doctor->name }} {{ $ipd->doctor->surname }}
+                                                            <td>{{ $ipd->doctor ? ($ipd->doctor->name . ' ' . $ipd->doctor->surname) : '--' }}
                                                             </td>
-                                                            <td>{{ $ipd->bedGroup->name }}-{{ $ipd->bedDetail->name }}
+                                                            <td>{{ ($ipd->bedGroup ? $ipd->bedGroup->name : '--') }}-{{ ($ipd->bedDetail ? $ipd->bedDetail->name : '--') }}
                                                             </td>
                                                         </tbody>
                                                     </table>

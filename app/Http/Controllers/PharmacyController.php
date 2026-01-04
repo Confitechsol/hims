@@ -195,38 +195,65 @@ class PharmacyController extends Controller
         try {
             $search = $request->input('search');
 
+            // Start with a simple query using the model
             $query = Pharmacy::query();
             
             // Apply search filter if provided
-            if ($search) {
-                $query->where('medicine_name', 'like', "%{$search}%");
+            if ($search && trim($search) !== '') {
+                $query->where('medicine_name', 'like', '%' . trim($search) . '%');
             }
             
-            // Filter active medicines only
-            $query->where('is_active', 'yes');
+            // Filter active medicines only (handle both 'yes' and null cases)
+            $query->where(function($q) {
+                $q->where('is_active', 'yes')
+                  ->orWhereNull('is_active');
+            });
             
-            // Get medicines without eager loading batches (which might cause issues)
-            $medicines = $query->select('id', 'medicine_name', 'medicine_category_id', 'medicine_company', 'is_active')
-                ->get()
-                ->map(function ($medicine) {
-                    return [
-                        'id' => $medicine->id,
-                        'medicine_name' => $medicine->medicine_name,
-                        'name' => $medicine->medicine_name, // Alias for compatibility
-                    ];
-                });
+            // Get medicines - don't specify columns, let Eloquent handle it
+            $medicines = $query->orderBy('medicine_name', 'asc')->get();
+            
+            // Map to response format
+            $result = $medicines->map(function ($medicine) {
+                return [
+                    'id' => (int) $medicine->id,
+                    'medicine_name' => (string) ($medicine->medicine_name ?? ''),
+                    'name' => (string) ($medicine->medicine_name ?? ''), // Alias for compatibility
+                ];
+            });
 
-            return response()->json($medicines);
-        } catch (\Exception $e) {
-            \Log::error('Error in getMedicines: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
+            return response()->json($result);
+        } catch (\Illuminate\Database\QueryException $e) {
+            \Log::error('Database error in getMedicines: ' . $e->getMessage(), [
+                'sql' => $e->getSql(),
+                'bindings' => $e->getBindings(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine()
             ]);
             
+            $errorMessage = config('app.debug') 
+                ? 'Database error: ' . $e->getMessage()
+                : 'An error occurred while loading medicines';
+            
             return response()->json([
                 'error' => 'Failed to load medicines',
-                'message' => config('app.debug') ? $e->getMessage() : 'An error occurred while loading medicines'
+                'message' => $errorMessage
+            ], 500);
+        } catch (\Exception $e) {
+            \Log::error('Error in getMedicines: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'request' => $request->all()
+            ]);
+            
+            // Return error response with details if in debug mode
+            $errorMessage = config('app.debug') 
+                ? $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine()
+                : 'An error occurred while loading medicines';
+            
+            return response()->json([
+                'error' => 'Failed to load medicines',
+                'message' => $errorMessage
             ], 500);
         }
     }

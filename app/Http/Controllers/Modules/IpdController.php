@@ -27,6 +27,7 @@ use App\Models\Prefix;
 use App\Models\Staff;
 use App\Models\Symptom;
 use App\Models\SymptomsClassification;
+use App\Models\Finding;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -437,6 +438,77 @@ $symptomTitle = array_filter($request->input('symptoms_title', []));
 
     public function storePrescription(Request $request)
     {
+        // Debug: Log what we're receiving
+        \Log::info('=== Prescription Form Data Received ===');
+        \Log::info('All request data:', $request->all());
+        \Log::info('Medicines:', $request->input('medicines', []));
+        \Log::info('Dosages:', $request->input('dosages', []));
+        \Log::info('Interval dosages:', $request->input('interval_dosages', []));
+        \Log::info('Duration dosages:', $request->input('duration_dosages', []));
+        \Log::info('Instructions:', $request->input('instructions', []));
+        
+        // Check types
+        if ($request->has('medicines')) {
+            $medicines = $request->input('medicines', []);
+            foreach ($medicines as $index => $medicine) {
+                \Log::info("Medicine[$index]: value = " . var_export($medicine, true) . ", type = " . gettype($medicine));
+            }
+        }
+        
+        // Pre-process request data to ensure all array values are strings
+        $medicines = $request->input('medicines', []);
+        $dosages = $request->input('dosages', []);
+        $intervalDosages = $request->input('interval_dosages', []);
+        $durationDosages = $request->input('duration_dosages', []);
+        $instructions = $request->input('instructions', []);
+        
+        // Convert all to strings explicitly
+        $medicines = array_map(function($val) {
+            return $val !== null && $val !== '' ? (string)$val : '';
+        }, $medicines);
+        
+        $dosages = array_map(function($val) {
+            return $val !== null && $val !== '' ? (string)$val : '';
+        }, $dosages);
+        
+        $intervalDosages = array_map(function($val) {
+            return $val !== null && $val !== '' ? (string)$val : '';
+        }, $intervalDosages);
+        
+        $durationDosages = array_map(function($val) {
+            return $val !== null && $val !== '' ? (string)$val : '';
+        }, $durationDosages);
+        
+        $instructions = array_map(function($val) {
+            return $val !== null && $val !== '' ? (string)$val : '';
+        }, $instructions);
+        
+        // Pre-process pathology and radiology arrays to ensure all values are strings
+        $pathology = $request->input('pathology', []);
+        $radiology = $request->input('radiology', []);
+        
+        $pathology = array_map(function($val) {
+            return $val !== null && $val !== '' ? (string)$val : '';
+        }, $pathology);
+        
+        $radiology = array_map(function($val) {
+            return $val !== null && $val !== '' ? (string)$val : '';
+        }, $radiology);
+        
+        // Merge back into request
+        $request->merge([
+            'medicines' => $medicines,
+            'dosages' => $dosages,
+            'interval_dosages' => $intervalDosages,
+            'duration_dosages' => $durationDosages,
+            'instructions' => $instructions,
+            'pathology' => $pathology,
+            'radiology' => $radiology,
+        ]);
+        
+        \Log::info('After conversion - Medicines:', $medicines);
+        \Log::info('After conversion - Types:', array_map('gettype', $medicines));
+        
         // dd($request->all());
         try { $request->validate([
             'ipd_id'              => 'nullable|string',
@@ -465,7 +537,7 @@ $symptomTitle = array_filter($request->input('symptoms_title', []));
             'instructions'        => 'nullable|array',
             'instructions.*'      => 'string',
         ]);
-            $findingTypes = array_filter($request->finding_type, fn($type) => $type !== null && $type !== '');
+            $findingTypes = array_filter($request->input('finding_type', []), fn($type) => $type !== null && $type !== '');
             // $findings             = array_filter($request->findings, fn($title) => $title !== null && $title !== '');
             $findings        = array_filter($request->input('findings', []), fn($title) => $title !== null && $title !== '');
             $pathology_ids   = array_filter($request->input('pathology', []), fn($pathology) => $pathology !== null && $pathology !== '');

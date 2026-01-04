@@ -763,6 +763,7 @@ Route::prefix('pharmacy')->group(function () {
     Route::get('/api/batches/{pharmacyId}', [App\Http\Controllers\PharmacyBillingController::class, 'getMedicineBatches'])->name('pharmacy.api.batches');
     Route::get('/api/batch-details', [App\Http\Controllers\PharmacyBillingController::class, 'getBatchDetails'])->name('pharmacy.api.batch-details');
     Route::get('/api/patient-prescriptions/{patientId}', [App\Http\Controllers\PharmacyBillingController::class, 'getPatientPrescriptions'])->name('pharmacy.api.patient-prescriptions');
+    Route::get('/api/prescription-medicines/{prescriptionId}', [App\Http\Controllers\PharmacyBillingController::class, 'getPrescriptionMedicines'])->name('pharmacy.api.prescription-medicines');
 
     // Medicine Management
     Route::get('/create', [App\Http\Controllers\PharmacyController::class, 'create'])->name('pharmacy.create');

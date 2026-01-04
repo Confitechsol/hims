@@ -94,10 +94,23 @@ class PathologyBillingController extends Controller
             }
             
             // Create pathology bill
+            // Ensure case_reference_id is null if empty or invalid
+            $caseReferenceId = null;
+            if (!empty($validated['case_reference_id'])) {
+                $caseRefId = $validated['case_reference_id'];
+                // Verify it exists in the database
+                if (CaseReference::where('id', $caseRefId)->exists()) {
+                    $caseReferenceId = $caseRefId;
+                } else {
+                    \Log::warning('Invalid case_reference_id provided: ' . $caseRefId . '. Setting to null.');
+                    $caseReferenceId = null;
+                }
+            }
+            
             $bill = PathologyBilling::create([
                 'date' => $validated['date'],
                 'patient_id' => $validated['patient_id'],
-                'case_reference_id' => $validated['case_reference_id'] ?? null,
+                'case_reference_id' => $caseReferenceId,
                 'doctor_id' => $validated['doctor_id'] ?? null,
                 'doctor_name' => $doctorName ?? '',
                 'total' => $validated['total'],
