@@ -47,6 +47,7 @@ class IpdController extends Controller
         $bedGroups = BedGroup::with('floorDetail')->get();
         $chargeType = ChargeTypeMaster::all();
         $charges = Charge::all();
+        $references = ['Direct', 'Doctor', 'Marketer','Other'];
         if ($isIpdTab) {
             $ipd = IpdDetail::with('patient', 'doctor', 'bedDetail', 'bedGroup.floorDetail')
                 ->when($search, function ($query) use ($search) {
@@ -78,7 +79,7 @@ class IpdController extends Controller
                 })->get();
             $ipd = $patients;
         }
-        return view("admin.ipd.index", compact("ipd", 'doctors', 'isIpdTab', 'bedGroups'));
+        return view("admin.ipd.index", compact("ipd", 'doctors', 'isIpdTab', 'bedGroups','references'));
     }
 
     public function store(Request $request)
@@ -190,7 +191,7 @@ $symptomTitle = array_filter($request->input('symptoms_title', []));
             DB::commit();
 
             return redirect()->route('ipd')->with('success', 'IPD record created successfully . ')
-            ->with('pdf_url', route('ipd.pdf', $ipd->id));
+            ->with('pdf_url', route('ipd.pdf', $ipdPatient->id));
         } catch (\Exception $e) {
             DB::rollBack();
             dd($e);

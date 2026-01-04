@@ -8685,7 +8685,7 @@ select.form-control-sm:not([size]):not([multiple]) {
     left: 12px;
     right: auto;
 }
-
+/* 
 .select2-container {
     width: 100% !important;
 }
@@ -8845,7 +8845,7 @@ select.form-control-sm:not([size]):not([multiple]) {
     box-shadow: var(--box-shadow);
     background-color: var(--white);
     z-index: 1056;
-}
+} */
 
 .select2-results__options {
     scrollbar-width: thin;
@@ -16125,7 +16125,7 @@ Author URL: https://themeforest.net/user/dreamstechnologies
 .select2-container {
     width: 100% !important;
 }
-
+/* 
 .select2-container .select2-selection--single {
     border: 1px solid var(--border-color);
     height: 38px;
@@ -16146,7 +16146,6 @@ Author URL: https://themeforest.net/user/dreamstechnologies
     width: 38px;
     position: absolute;
     top: 1px;
-    /*rtl:ignore*/
     right: 3px;
 }
 
@@ -16234,12 +16233,10 @@ Author URL: https://themeforest.net/user/dreamstechnologies
     .select2-selection__arrow {
     border-radius: 4px;
     cursor: text;
-    /*rtl:ignore*/
     right: 1px;
-    /*rtl:ignore*/
     left: auto;
-}
-
+} */
+/* 
 .select2-container .select2-selection--multiple {
     min-height: 38px;
     border: 1px solid var(--border-color) !important;
@@ -16294,9 +16291,9 @@ Author URL: https://themeforest.net/user/dreamstechnologies
     .select2-selection--multiple
     .select2-selection__choice {
     padding: 0 0 0 7px;
-}
+} */
 
-.select2-container--default .select2-selection--multiple {
+/* .select2-container--default .select2-selection--multiple {
     padding-bottom: 4px;
     margin-top: 4px;
 }
@@ -16336,7 +16333,7 @@ Author URL: https://themeforest.net/user/dreamstechnologies
     display: inline;
     list-style: none;
     padding: 0;
-}
+} */
 
 .choices__list--multiple .choices__item {
     vertical-align: initial;
