@@ -2299,8 +2299,10 @@
                     }, 100);
                 }
                 
-                categorySelect.addEventListener("change", function() {
-                    const categoryId = this.value;
+                // Add change event listener (works for both native and Select2)
+                const handleCategoryChange = function() {
+                    const categoryId = this.value || $(this).val();
+                    console.log('Category changed (event handler):', categoryId);
                     
                     if (categoryId && categoryId !== '') {
                         // Fetch medicines by category
@@ -2371,10 +2373,25 @@
                             .catch(error => {
                                 console.error('Error loading medicines:', error);
                                 if (window.jQuery && $.fn.select2) {
+                                    if ($(medicineSelect).hasClass('select2-hidden-accessible')) {
+                                        $(medicineSelect).select2('destroy');
+                                    }
                                     $(medicineSelect).html('<option value="">Error loading medicines</option>');
                                     $(medicineSelect).prop('disabled', false);
                                 }
                             });
+                };
+                
+                // Attach native change event
+                categorySelect.addEventListener("change", handleCategoryChange);
+                
+                // Also attach Select2 change event if jQuery is available
+                if (window.jQuery && $.fn.select2) {
+                    $(categorySelect).off('select2:select select2:clear').on('select2:select select2:clear', function() {
+                        console.log('Category changed via Select2 event');
+                        handleCategoryChange.call(this);
+                    });
+                }
 
                         // Clear medicine and dose selects when category changes
                         if (window.jQuery && $(doseSelect).hasClass('select2-hidden-accessible')) {
@@ -3397,6 +3414,113 @@
                                                         minimumResultsForSearch: 0,
                                                         dropdownParent: $('#addPrescriptionModal')
                                                     });
+                                                    
+                                                    // Ensure change event works with Select2
+                                                    $(categorySelect).off('change.select2-medicine select2:select select2:clear').on('change.select2-medicine select2:select select2:clear', function() {
+                                                        const categoryId = $(this).val();
+                                                        const medicineSelect = $(this).closest('.medicine-row').find('.medicine_name')[0];
+                                                        const doseSelect = $(this).closest('.medicine-row').find('.medicine_dosage')[0];
+                                                        
+                                                        if (categoryId && categoryId !== '') {
+                                                            console.log('Category changed via Select2:', categoryId);
+                                                            
+                                                            // Fetch medicines by category
+                                                            const baseUrl = "{{ route('getMedicines', ['categoryId' => 'ID']) }}";
+                                                            const finalUrl = baseUrl.replace('ID', categoryId);
+                                                            
+                                                            console.log('Fetching medicines from:', finalUrl);
+                                                            
+                                                            // Show loading state
+                                                            if (window.jQuery && $.fn.select2 && medicineSelect) {
+                                                                $(medicineSelect).prop('disabled', true);
+                                                                if ($(medicineSelect).hasClass('select2-hidden-accessible')) {
+                                                                    $(medicineSelect).select2('destroy');
+                                                                }
+                                                                medicineSelect.innerHTML = '<option value="">Loading medicines...</option>';
+                                                            }
+                                                            
+                                                            fetch(finalUrl)
+                                                                .then(res => {
+                                                                    if (!res.ok) throw new Error('Failed to fetch medicines');
+                                                                    return res.json();
+                                                                })
+                                                                .then(data => {
+                                                                    console.log('Medicines loaded for category:', data);
+                                                                    
+                                                                    if (!medicineSelect) return;
+                                                                    
+                                                                    // Destroy Select2 before filling
+                                                                    if (window.jQuery && $(medicineSelect).hasClass('select2-hidden-accessible')) {
+                                                                        $(medicineSelect).select2('destroy');
+                                                                    }
+                                                                    
+                                                                    // Fill medicines
+                                                                    if (typeof window.fillSelect === 'function') {
+                                                                        window.fillSelect(medicineSelect, data, "medicine_name");
+                                                                    } else {
+                                                                        // Manual fill
+                                                                        medicineSelect.innerHTML = '<option value="">Select Medicine</option>';
+                                                                        if (Array.isArray(data)) {
+                                                                            data.forEach(item => {
+                                                                                if (item && item.id) {
+                                                                                    const opt = document.createElement("option");
+                                                                                    opt.value = item.id;
+                                                                                    opt.textContent = item.medicine_name || item.name || 'Unknown';
+                                                                                    medicineSelect.appendChild(opt);
+                                                                                }
+                                                                            });
+                                                                        }
+                                                                    }
+                                                                    
+                                                                    // Reinitialize Select2 after filling
+                                                                    if (window.jQuery && $.fn.select2) {
+                                                                        setTimeout(() => {
+                                                                            $(medicineSelect).select2({
+                                                                                width: "100%",
+                                                                                placeholder: "Search Medicine...",
+                                                                                allowClear: true,
+                                                                                minimumResultsForSearch: 0,
+                                                                                dropdownParent: $('#addPrescriptionModal'),
+                                                                                language: {
+                                                                                    noResults: function() {
+                                                                                        return "No medicines found";
+                                                                                    },
+                                                                                    searching: function() {
+                                                                                        return "Searching...";
+                                                                                    }
+                                                                                }
+                                                                            });
+                                                                            $(medicineSelect).prop('disabled', false);
+                                                                        }, 100);
+                                                                    }
+                                                                    
+                                                                    // Clear dose select
+                                                                    if (doseSelect) {
+                                                                        if (window.jQuery && $(doseSelect).hasClass('select2-hidden-accessible')) {
+                                                                            $(doseSelect).select2('destroy');
+                                                                        }
+                                                                        doseSelect.innerHTML = '<option value="">Select Dose (Choose Medicine First)</option>';
+                                                                    }
+                                                                })
+                                                                .catch(error => {
+                                                                    console.error('Error loading medicines:', error);
+                                                                    if (window.jQuery && $.fn.select2 && medicineSelect) {
+                                                                        if ($(medicineSelect).hasClass('select2-hidden-accessible')) {
+                                                                            $(medicineSelect).select2('destroy');
+                                                                        }
+                                                                        medicineSelect.innerHTML = '<option value="">Error loading medicines</option>';
+                                                                        $(medicineSelect).prop('disabled', false);
+                                                                    }
+                                                                });
+                                                        } else {
+                                                            if (medicineSelect) {
+                                                                medicineSelect.innerHTML = '<option value="">Select Medicine</option>';
+                                                                if (window.jQuery && $(medicineSelect).hasClass('select2-hidden-accessible')) {
+                                                                    $(medicineSelect).trigger('change');
+                                                                }
+                                                            }
+                                                        }
+                                                    });
                                                 }, 100);
                                             }
                                             console.log('Category select filled manually');
@@ -3722,8 +3846,34 @@
                     initSelect($select);
                 }
             });
-            $row.off('change.cat').on('change.cat', '.medicine_category', function() {
-                populateMedicines($(this).val(), $row.find('.medicine_name'), idx);
+            // Handle category change - works with both native select and Select2
+            $row.off('change.cat change.select2-cat').on('change.cat change.select2-cat', '.medicine_category', function() {
+                const categoryId = $(this).val();
+                const medicineSelect = $row.find('.medicine_name');
+                console.log('Category changed:', categoryId);
+                if (categoryId && categoryId !== '') {
+                    populateMedicines(categoryId, medicineSelect, idx);
+                } else {
+                    medicineSelect.empty().append('<option value="">Select Medicine</option>');
+                    if (medicineSelect.hasClass('select2-hidden-accessible')) {
+                        medicineSelect.trigger('change');
+                    }
+                }
+            });
+            
+            // Also handle Select2 change event specifically
+            $row.find('.medicine_category').off('select2:select select2:clear').on('select2:select select2:clear', function() {
+                const categoryId = $(this).val();
+                const medicineSelect = $row.find('.medicine_name');
+                console.log('Category changed via Select2 event:', categoryId);
+                if (categoryId && categoryId !== '') {
+                    populateMedicines(categoryId, medicineSelect, idx);
+                } else {
+                    medicineSelect.empty().append('<option value="">Select Medicine</option>');
+                    if (medicineSelect.hasClass('select2-hidden-accessible')) {
+                        medicineSelect.trigger('change');
+                    }
+                }
             });
             $row.find('input[type!="hidden"], textarea').val('');
             $row.find('select').val(null).trigger('change');
