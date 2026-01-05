@@ -737,13 +737,13 @@
         //     }, 150);
         // })();
 
-        var attempts = 0;
-            var interval = setInterval(function() {
-                if (tryInitSelect2() || attempts++ > 50) {
-                    clearInterval(interval);
-                }
-            }, 150);
-        })();
+        // Note: tryInitSelect2 function should be defined elsewhere or this code should be removed
+        // var attempts = 0;
+        // var interval = setInterval(function() {
+        //     if (tryInitSelect2() || attempts++ > 50) {
+        //         clearInterval(interval);
+        //     }
+        // }, 150);
         
         // Hide loader when page is ready
         window.addEventListener('load', function() {

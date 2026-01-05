@@ -729,7 +729,9 @@ function loadPrescriptionMedicines(prescriptionId) {
                             const categoryOption = Array.from(categorySelect.options).find(opt => opt.value === categoryIdStr);
                             if (categoryOption) {
                                 // First deselect all options
-                                Array.from(categorySelect.options).forEach(opt => opt.selected = false);
+                                Array.from(categorySelect.options).forEach(opt => {
+                                    opt.selected = false;
+                                });
                                 // Then select the target option
                                 categoryOption.selected = true;
                                 categorySelect.value = categoryIdStr;
@@ -776,7 +778,9 @@ function loadPrescriptionMedicines(prescriptionId) {
                                     const medicineOption = Array.from(medicineSelect.options).find(opt => opt.value === medicineIdStr);
                                     if (medicineOption) {
                                         // First deselect all options
-                                        Array.from(medicineSelect.options).forEach(opt => opt.selected = false);
+                                        Array.from(medicineSelect.options).forEach(opt => {
+                                            opt.selected = false;
+                                        });
                                         // Then select the target option
                                         medicineOption.selected = true;
                                         medicineSelect.value = medicineIdStr;
