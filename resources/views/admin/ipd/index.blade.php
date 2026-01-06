@@ -1,5 +1,9 @@
 @extends('layouts.adminLayout')
-
+@section('select2cdn')
+    {{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> --}}
+    {{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> --}}
+    {{-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> --}}
+@endsection
 @section('content')
     <style>
         .nav-tabs .nav-link.active {
@@ -290,6 +294,64 @@
     {{-- create IPD modal --}}
     @include('components.modals.ipd-create-modal')
 
+    <div class="modal fade" id="pdfModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header justify-content-between">
+                    <h5 class="modal-title">PDF Preview</h5>
+                    <div class="d-flex gap-2">                        
+                        <!-- Download button -->
+                        <a id="downloadPdfBtn" href="#" class="btn btn-sm btn-success">
+                            Download
+                        </a>
+
+                        <button type="button" class="btn-close" data-bs-dismiss="modal">
+                        </button>
+                    </div>
+                </div>
+
+                <div class="modal-body p-0">
+                    <iframe id="pdfFrame" src="{{ session('pdf_url') }}"
+                        style="width:100%; height:80vh; border:none;">
+                    </iframe>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById("downloadPdfBtn").addEventListener("click", function(event) {
+            event.preventDefault(); // Prevent default anchor behavior
+            savePdf();
+        });
+        function savePdf(){
+            const iframe = document.getElementById('pdfFrame');
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            
+            const targetElement = iframeDoc.getElementById("pdf-content");
+            html2canvas(targetElement, {
+                scale: 2
+            }).then(canvas => {
+                const {
+                    jsPDF
+                } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgData = canvas.toDataURL('image/png');
+                const imgProps = pdf.getImageProperties(imgData);
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save('admission_form.pdf');
+            });
+        }
+    </script>
+    @if (session('pdf_url'))
+        <script>
+            const modal = new bootstrap.Modal(document.getElementById('pdfModal'));
+            modal.show();
+        </script>
+    @endif
     {{-- filters --}}
 
     <script>
@@ -345,6 +407,7 @@
             });
         });
     </script>
+
 
 
     <!-- {{-- <script>

@@ -10,6 +10,8 @@ class PathologyReport extends Model
     use HasFactory;
 
     protected $table = 'pathology_report';
+    
+    public $timestamps = false; // Disable timestamps if table doesn't have created_at/updated_at
 
     protected $fillable = [
         'hospital_id',

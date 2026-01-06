@@ -26,19 +26,20 @@ jQuery(function ($) {
     });
 
     /*----- counter js ----*/
-    $(".demo-banner").appear(function () {
-        $('.count').each(function () {
-            $(this).prop('Counter', 0).animate({
-                Counter: $(this).text()
-            }, {
-                duration: 5000,
+    if (typeof $.fn.appear !== 'undefined') {
+        $(".demo-banner").appear(function () {
+            $('.count').each(function () {
+                $(this).prop('Counter', 0).animate({
+                    Counter: $(this).text()
+                }, {
+                    duration: 5000,
                 easing: 'swing',
                 step: function (now) {
                     $(this).text(Math.ceil(now));
                 }
             });
         });
-    });
+    }
 
     /*  end of counter js * /
 
@@ -202,14 +203,16 @@ $('[data-fancybox]').fancybox({
         ====================================== */
 
 // progress bar
-$('.skills-progress').appear(function () {
-    $(".skills-progress span").each(function () {
-        let myVal = $(this).attr('data-value');
-        $(this).css({
-            width: myVal
+if (typeof $.fn.appear !== 'undefined') {
+    $('.skills-progress').appear(function () {
+        $(".skills-progress span").each(function () {
+            let myVal = $(this).attr('data-value');
+            $(this).css({
+                width: myVal
+            });
         });
     });
-});
+}
 
 /* ===================================
               search popup

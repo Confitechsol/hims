@@ -73,6 +73,8 @@ use App\Http\Controllers\VitalController;
 use App\Http\Controllers\TransactionReportController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PdfController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -100,9 +102,7 @@ Route::post('/login', [LoginController::class, 'login'])->name('login');
 Route::middleware(['auth'])->get('/hr-portal/redirect', [AppSwitchController::class, 'switchToClient'])->name('hrms.switch');
 
 Route::middleware(['admin'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard',[DashboardController::class,'index'])->name('dashboard');
 
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
     // Route::get('/profile', function () {
@@ -550,8 +550,15 @@ Route::get('/getIpdById/{id}', [IpdController::class, 'getIpdById'])->name('getI
 Route::get('/getIpdMedicineById/{id}', [IpdController::class, 'getIpdMedicineById'])->name('getIpdMedicineById');
 Route::post('/add_nurse_note', [IpdController::class, 'addNurseNote'])->name('nurseNote.store');
 Route::post('/ipd/add_prescription', [IpdController::class, 'storePrescription'])->name('ipd.addPrescription');
+Route::get('/ipd/prescription/{id}', [IpdController::class, 'showPrescription'])->name('ipd.prescription.show');
+Route::get('/ipd/prescription/{id}/edit', [IpdController::class, 'editPrescription'])->name('ipd.prescription.edit');
+Route::get('/ipd/prescription/{id}/print', [IpdController::class, 'printPrescription'])->name('ipd.prescription.print');
+Route::put('/ipd/prescription/{id}', [IpdController::class, 'updatePrescription'])->name('ipd.prescription.update');
+Route::delete('/ipd/prescription/{id}', [IpdController::class, 'deletePrescription'])->name('ipd.prescription.delete');
 Route::post('/ipd_charge', [IpdController::class, 'addIpdCharge'])->name('ipd.addIpdCharge');
 Route::post('/assignNewBed', [IpdController::class, 'assignNewBed'])->name('assignNewBed');
+//
+Route::get('/ipd/{id}/pdf', [PdfController::class, 'generatePdf'])->name('ipd.pdf');;
 Route::post('/discharge-card/store', [IpdController::class, 'storeDischarge'])
     ->name('discharge.store');
 
@@ -756,6 +763,7 @@ Route::prefix('pharmacy')->group(function () {
     Route::get('/api/batches/{pharmacyId}', [App\Http\Controllers\PharmacyBillingController::class, 'getMedicineBatches'])->name('pharmacy.api.batches');
     Route::get('/api/batch-details', [App\Http\Controllers\PharmacyBillingController::class, 'getBatchDetails'])->name('pharmacy.api.batch-details');
     Route::get('/api/patient-prescriptions/{patientId}', [App\Http\Controllers\PharmacyBillingController::class, 'getPatientPrescriptions'])->name('pharmacy.api.patient-prescriptions');
+    Route::get('/api/prescription-medicines/{prescriptionId}', [App\Http\Controllers\PharmacyBillingController::class, 'getPrescriptionMedicines'])->name('pharmacy.api.prescription-medicines');
 
     // Medicine Management
     Route::get('/create', [App\Http\Controllers\PharmacyController::class, 'create'])->name('pharmacy.create');
@@ -828,6 +836,7 @@ Route::prefix('pathology/billing/api')->group(function () {
     Route::get('/test-details', [PathologyBillingController::class, 'getTestDetails'])->name('pathology.billing.api.test-details');
     Route::get('/patient-tpas/{patientId}', [PathologyBillingController::class, 'getPatientTpas'])->name('pathology.billing.api.patient-tpas');
     Route::get('/tpa-charge', [PathologyBillingController::class, 'getTpaCharge'])->name('pathology.billing.api.tpa-charge');
+    Route::get('/prescription-tests/{prescriptionId}', [PathologyBillingController::class, 'getPrescriptionTests'])->name('pathology.billing.api.prescription-tests');
 });
 
 // Radiology Test Routes
@@ -865,6 +874,7 @@ Route::prefix('radiology/billing/api')->group(function () {
     Route::get('/test-details', [RadiologyBillingController::class, 'getTestDetails'])->name('radiology.billing.api.test-details');
     Route::get('/patient-tpas/{patientId}', [RadiologyBillingController::class, 'getPatientTpas'])->name('radiology.billing.api.patient-tpas');
     Route::get('/tpa-charge', [RadiologyBillingController::class, 'getTpaCharge'])->name('radiology.billing.api.tpa-charge');
+    Route::get('/prescription-tests/{prescriptionId}', [RadiologyBillingController::class, 'getPrescriptionTests'])->name('radiology.billing.api.prescription-tests');
 });
 
 // Pharmacy Masters Routes
