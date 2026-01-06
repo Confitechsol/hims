@@ -32,7 +32,7 @@
                     <tbody>
                         @forelse($dosages as $dosage)
                         <tr>
-                            <td>{{ $dosage->category->category_name ?? 'N/A' }}</td>
+                            <td>{{ $dosage->category->medicine_category ?? 'N/A' }}</td>
                             <td>{{ $dosage->dosage }}</td>
                             <td>{{ $dosage->unit->unit_name ?? 'N/A' }}</td>
                             <td>
@@ -76,7 +76,7 @@
                         <select name="medicine_category_id" class="form-select" required>
                             <option value="">Select</option>
                             @foreach($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->category_name }}</option>
+                                <option value="{{ $category->id }}">{{ $category->medicine_category }}</option>
                             @endforeach
                         </select>
                     </div>
