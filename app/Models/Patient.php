@@ -29,6 +29,7 @@ class Patient extends Model
         'mobileno',
         'height',
         'weight',
+        'nationality',
         'temperature',
         'email',
         'gender',
@@ -36,8 +37,10 @@ class Patient extends Model
         'blood_group',
         'blood_bank_product_id',
         'address',
+        'religion',
         'guardian_name',
         'guardian_phone',
+        'guardian_relation',
         'patient_type',
         'identification_number',
         'known_allergies',
@@ -64,6 +67,7 @@ class Patient extends Model
         'insurance_validity' => 'date',
         'disable_at'         => 'date',
         'created_at'         => 'datetime',
+        'languages_speak' => 'array',
     ];
 
     /**

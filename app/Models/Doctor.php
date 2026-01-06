@@ -89,4 +89,8 @@ class Doctor extends Model
     {
         return $this->hasMany(DoctorGlobalShift::class, 'doctor_id', 'id');
     }
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class, 'doctor');
+    }
 }

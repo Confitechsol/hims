@@ -182,9 +182,6 @@ class ExcelImportController extends Controller
         }
     }
 
-
-
-
     public function exportPathologyTestExcel()
     {
         $spreadsheet = new Spreadsheet();
@@ -295,212 +292,212 @@ class ExcelImportController extends Controller
     }
 
     public function importRadiology()
-{
-    $radiology     = Radio::with(['radiologyCategory', 'charge', 'chargeCategory'])->get();
-    $categories    = RadiologyCategory::all();
-    $charges       = Charge::all();
-    $chargeUnits   = ChargeUnit::all();
-    $chargeTypes   = ChargeTypeModule::all();
+    {
+        $radiology     = Radio::with(['radiologyCategory', 'charge', 'chargeCategory'])->get();
+        $categories    = RadiologyCategory::all();
+        $charges       = Charge::all();
+        $chargeUnits   = ChargeUnit::all();
+        $chargeTypes   = ChargeTypeModule::all();
 
-    return view('admin.radiology.test.importTest', compact(
-        'radiology',
-        'categories',
-        'charges',
-        'chargeUnits',
-        'chargeTypes'
-    ));
+        return view('admin.radiology.test.importTest', compact(
+            'radiology',
+            'categories',
+            'charges',
+            'chargeUnits',
+            'chargeTypes'
+        ));
 
-    
-}
-public function exportRadiologyTestExcel()
-{
-    $spreadsheet = new Spreadsheet();
-    $sheet = $spreadsheet->getActiveSheet();
-    $sheet->setTitle('Radiology Test');
+        
+    }
+    public function exportRadiologyTestExcel()
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Radiology Test');
 
-    $organisations = Organisation::all();
-    $categories    = RadiologyCategory::all();
-    $chargeCats    = ChargeCategory::all();
-    $charges       = Charge::all();
+        $organisations = Organisation::all();
+        $categories    = RadiologyCategory::all();
+        $chargeCats    = ChargeCategory::all();
+        $charges       = Charge::all();
 
-    $headers = [
-        'Test Name', 'Short Name', 'Test Type', 'Category Name',
-        'Sub Category', 'Method', 'Report Days',
-        'Charge Category', 'Charge Name', 'Tax (%)',
-        'Standard Charge', 'Amount', 'Unit (optional)'
-    ];
+        $headers = [
+            'Test Name', 'Short Name', 'Test Type', 'Category Name',
+            'Sub Category', 'Method', 'Report Days',
+            'Charge Category', 'Charge Name', 'Tax (%)',
+            'Standard Charge', 'Amount', 'Unit (optional)'
+        ];
 
-    foreach ($organisations as $org) {
-        $headers[] = "TPA {$org->organisation_name} Charge";
-        $headers[] = "TPA {$org->organisation_name} Code";
+        foreach ($organisations as $org) {
+            $headers[] = "TPA {$org->organisation_name} Charge";
+            $headers[] = "TPA {$org->organisation_name} Code";
+        }
+
+        $col = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($col . '1', $header);
+            $col++;
+        }
+
+        // Dropdown sheet
+        $dropdown = $spreadsheet->createSheet();
+        $dropdown->setTitle('DropdownData');
+
+        $row = 1;
+        foreach ($categories as $cat) {
+            $dropdown->setCellValue("A$row", $cat->name);
+            $row++;
+        }
+
+        $row = 1;
+        foreach ($chargeCats as $cc) {
+            $dropdown->setCellValue("B$row", $cc->name);
+            $row++;
+        }
+
+        $row = 1;
+        foreach ($charges as $charge) {
+            $dropdown->setCellValue("C$row", $charge->name);
+            $row++;
+        }
+
+        // Apply dropdowns
+        $this->setDropdown($sheet, 'D2:D500', 'DropdownData', 'A', count($categories));
+        $this->setDropdown($sheet, 'H2:H500', 'DropdownData', 'B', count($chargeCats));
+        $this->setDropdown($sheet, 'I2:I500', 'DropdownData', 'C', count($charges));
+
+        $writer = new Xlsx($spreadsheet);
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="RadiologyTestTemplate.xlsx"');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        exit;
     }
 
-    $col = 'A';
-    foreach ($headers as $header) {
-        $sheet->setCellValue($col . '1', $header);
-        $col++;
-    }
+    public function importRadiologyExcel(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv'
+        ]);
 
-    // Dropdown sheet
-    $dropdown = $spreadsheet->createSheet();
-    $dropdown->setTitle('DropdownData');
+        try {
+            $file        = $request->file('file');
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file);
+            $sheet       = $spreadsheet->getActiveSheet();
+            $rows        = $sheet->toArray(null, true, true, true);
 
-    $row = 1;
-    foreach ($categories as $cat) {
-        $dropdown->setCellValue("A$row", $cat->name);
-        $row++;
-    }
+            DB::beginTransaction();
 
-    $row = 1;
-    foreach ($chargeCats as $cc) {
-        $dropdown->setCellValue("B$row", $cc->name);
-        $row++;
-    }
+            foreach ($rows as $index => $row) {
 
-    $row = 1;
-    foreach ($charges as $charge) {
-        $dropdown->setCellValue("C$row", $charge->name);
-        $row++;
-    }
+                if ($index == 1) continue;      // skip header
+                if (empty($row['A'])) continue; // skip blank
 
-    // Apply dropdowns
-    $this->setDropdown($sheet, 'D2:D500', 'DropdownData', 'A', count($categories));
-    $this->setDropdown($sheet, 'H2:H500', 'DropdownData', 'B', count($chargeCats));
-    $this->setDropdown($sheet, 'I2:I500', 'DropdownData', 'C', count($charges));
+                // Excel columns
+                $testName       = trim($row['A']);
+                $shortName      = trim($row['B']);
+                $testType       = trim($row['C']);
+                $categoryName   = trim($row['D']);
+                $subCategory    = trim($row['E']);
+                $method         = trim($row['F']);
+                $reportDays     = trim($row['G']);
+                $chargeCategory = trim($row['H']);
+                $chargeName     = trim($row['I']);
+                $standardCharge = trim($row['J']);
+                $amount         = trim($row['K']);
+                $unitName       = trim($row['L']);
 
-    $writer = new Xlsx($spreadsheet);
+                // Convert names → IDs
+                $categoryId        = RadiologyCategory::where('name', $categoryName)->value('id');
+                $chargeId          = Charge::where('name', $chargeName)->value('id');
+                $chargeCategoryId  = ChargeCategory::where('name', $chargeCategory)->value('id');
+                $unitId            = ChargeUnit::where('unit', $unitName)->value('id');
 
-    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    header('Content-Disposition: attachment; filename="RadiologyTestTemplate.xlsx"');
-    header('Cache-Control: max-age=0');
+                // Skip duplicates
+                if (Radio::where('test_name', $testName)->exists()) {
+                    continue;
+                }
 
-    $writer->save('php://output');
-    exit;
-}
+                // Prepare Insert
+                $createData = [
+                    'test_name'             => $testName,
+                    'short_name'            => $shortName,
+                    'test_type'             => $testType ?? '',
+                    'radiology_category_id' => $categoryId,
+                    'sub_category'          => $subCategory ?? '',
+                    'method'                => $method ?? '',
+                    'report_days'           => is_numeric($reportDays) ? $reportDays : 0,
+                    'charge_id'             => $chargeId,
+                ];
 
-public function importRadiologyExcel(Request $request)
-{
-    $request->validate([
-        'file' => 'required|mimes:xlsx,xls,csv'
-    ]);
+                if (Schema::hasColumn('radiology', 'standard_charge')) {
+                    $createData['standard_charge'] = $standardCharge ?: 0;
+                }
 
-    try {
-        $file        = $request->file('file');
-        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file);
-        $sheet       = $spreadsheet->getActiveSheet();
-        $rows        = $sheet->toArray(null, true, true, true);
+                if (Schema::hasColumn('radiology', 'amount')) {
+                    $createData['amount'] = $amount ?: 0;
+                }
 
-        DB::beginTransaction();
+                if (Schema::hasColumn('radiology', 'charge_category_id')) {
+                    $createData['charge_category_id'] = $chargeCategoryId;
+                }
 
-        foreach ($rows as $index => $row) {
+                if (Schema::hasColumn('radiology', 'unit')) {
+                    $createData['unit'] = $unitId;
+                }
 
-            if ($index == 1) continue;      // skip header
-            if (empty($row['A'])) continue; // skip blank
+                $radiology = Radio::create($createData);
 
-            // Excel columns
-            $testName       = trim($row['A']);
-            $shortName      = trim($row['B']);
-            $testType       = trim($row['C']);
-            $categoryName   = trim($row['D']);
-            $subCategory    = trim($row['E']);
-            $method         = trim($row['F']);
-            $reportDays     = trim($row['G']);
-            $chargeCategory = trim($row['H']);
-            $chargeName     = trim($row['I']);
-            $standardCharge = trim($row['J']);
-            $amount         = trim($row['K']);
-            $unitName       = trim($row['L']);
+                /**
+                 * Add/Update TPA Charges
+                 */
+                $user = Auth::user();
+                $hospitalId = $user->hospital_id ?? null;
+                $branchId   = $user->branch_id ?? null;
 
-            // Convert names → IDs
-            $categoryId        = RadiologyCategory::where('name', $categoryName)->value('id');
-            $chargeId          = Charge::where('name', $chargeName)->value('id');
-            $chargeCategoryId  = ChargeCategory::where('name', $chargeCategory)->value('id');
-            $unitId            = ChargeUnit::where('unit', $unitName)->value('id');
+                if ($hospitalId) {
+                    $organisations = Organisation::all();
 
-            // Skip duplicates
-            if (Radio::where('test_name', $testName)->exists()) {
-                continue;
-            }
+                    foreach ($organisations as $organisation) {
 
-            // Prepare Insert
-            $createData = [
-                'test_name'             => $testName,
-                'short_name'            => $shortName,
-                'test_type'             => $testType ?? '',
-                'radiology_category_id' => $categoryId,
-                'sub_category'          => $subCategory ?? '',
-                'method'                => $method ?? '',
-                'report_days'           => is_numeric($reportDays) ? $reportDays : 0,
-                'charge_id'             => $chargeId,
-            ];
+                        $orgCharge = floatval($standardCharge ?? $amount ?? 0);
+                        if ($orgCharge <= 0) continue;
 
-            if (Schema::hasColumn('radiology', 'standard_charge')) {
-                $createData['standard_charge'] = $standardCharge ?: 0;
-            }
+                        $existing = OrganisationsCharge::where('charge_id', $chargeId)
+                            ->where('org_id', $organisation->id)
+                            ->first();
 
-            if (Schema::hasColumn('radiology', 'amount')) {
-                $createData['amount'] = $amount ?: 0;
-            }
+                        if ($existing) {
+                            $existing->org_charge = $orgCharge;
+                            $existing->save();
+                        } else {
+                            $tpaData = [
+                                'charge_id'  => $chargeId,
+                                'org_id'     => $organisation->id,
+                                'org_charge' => $orgCharge,
+                            ];
 
-            if (Schema::hasColumn('radiology', 'charge_category_id')) {
-                $createData['charge_category_id'] = $chargeCategoryId;
-            }
+                            if (Schema::hasColumn('organisations_charges', 'hospital_id'))
+                                $tpaData['hospital_id'] = $hospitalId;
 
-            if (Schema::hasColumn('radiology', 'unit')) {
-                $createData['unit'] = $unitId;
-            }
+                            if (Schema::hasColumn('organisations_charges', 'branch_id'))
+                                $tpaData['branch_id'] = $branchId;
 
-            $radiology = Radio::create($createData);
-
-            /**
-             * Add/Update TPA Charges
-             */
-            $user = Auth::user();
-            $hospitalId = $user->hospital_id ?? null;
-            $branchId   = $user->branch_id ?? null;
-
-            if ($hospitalId) {
-                $organisations = Organisation::all();
-
-                foreach ($organisations as $organisation) {
-
-                    $orgCharge = floatval($standardCharge ?? $amount ?? 0);
-                    if ($orgCharge <= 0) continue;
-
-                    $existing = OrganisationsCharge::where('charge_id', $chargeId)
-                        ->where('org_id', $organisation->id)
-                        ->first();
-
-                    if ($existing) {
-                        $existing->org_charge = $orgCharge;
-                        $existing->save();
-                    } else {
-                        $tpaData = [
-                            'charge_id'  => $chargeId,
-                            'org_id'     => $organisation->id,
-                            'org_charge' => $orgCharge,
-                        ];
-
-                        if (Schema::hasColumn('organisations_charges', 'hospital_id'))
-                            $tpaData['hospital_id'] = $hospitalId;
-
-                        if (Schema::hasColumn('organisations_charges', 'branch_id'))
-                            $tpaData['branch_id'] = $branchId;
-
-                        OrganisationsCharge::create($tpaData);
+                            OrganisationsCharge::create($tpaData);
+                        }
                     }
                 }
             }
+
+            DB::commit();
+            return back()->with('success', 'Radiology Excel imported successfully!');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Error importing file: ' . $e->getMessage());
         }
-
-        DB::commit();
-        return back()->with('success', 'Radiology Excel imported successfully!');
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return back()->with('error', 'Error importing file: ' . $e->getMessage());
     }
-}
 
 
 
@@ -509,24 +506,24 @@ public function importRadiologyExcel(Request $request)
     // Helper: Apply dropdown
     // =========================
     private function setDropdown($sheet, $cellRange, $dropdownSheet, $column, $count)
-{
-    $validation = $sheet->getCell(explode(':', $cellRange)[0])->getDataValidation();
-    $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
-    $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_STOP);
-    $validation->setAllowBlank(true);
-    $validation->setShowInputMessage(true);
-    $validation->setShowErrorMessage(true);
-    $validation->setShowDropDown(true);
+    {
+        $validation = $sheet->getCell(explode(':', $cellRange)[0])->getDataValidation();
+        $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
+        $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_STOP);
+        $validation->setAllowBlank(true);
+        $validation->setShowInputMessage(true);
+        $validation->setShowErrorMessage(true);
+        $validation->setShowDropDown(true);
 
-    $formula = "'$dropdownSheet'!\$".$column."\$1:\$".$column."\$".$count;
-    $validation->setFormula1($formula);
+        $formula = "'$dropdownSheet'!\$".$column."\$1:\$".$column."\$".$count;
+        $validation->setFormula1($formula);
 
-    foreach ($sheet->getCellCollection() as $cell) {
-        if ($cell->isInRange($cellRange)) {
-            $cell->setDataValidation(clone $validation);
+        foreach ($sheet->getCellCollection() as $cell) {
+            if ($cell->isInRange($cellRange)) {
+                $cell->setDataValidation(clone $validation);
+            }
         }
     }
-}
 
 
     private function formatExcelDate($value)

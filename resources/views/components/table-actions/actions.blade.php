@@ -3,7 +3,7 @@
         <a href="javascript:void(0);" class="btn btn-primary text-white fs-13 btn-md" data-bs-toggle="modal"
             data-bs-target="#createModal"><i class="ti ti-plus me-1"></i>Add {{$name}}</a>
             @if($name === 'Birth Record' || $name === 'Death Record')
-        <a href="javascript:void(0);" class="btn btn-primary text-white fs-13 btn-md ms-2" data-bs-toggle="modal"
+        <a href="{{ route('importbirth') }}" class="btn btn-primary text-white fs-13 btn-md ms-2" data-bs-toggle="modal"
             data-bs-target="">Import {{$name}}</a>
         @endif
           

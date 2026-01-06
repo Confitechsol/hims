@@ -8,6 +8,25 @@
                 <h5 class="mb-0" style="color: #750096"><i class="fas fa-plus-circle me-2"></i>Generate Pathology Bill</h5>
             </div>
             <div class="card-body">
+                @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Error!</strong> {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+                
+                @if($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Validation Errors:</strong>
+                        <ul class="mb-0">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+                
                 <form action="{{ route('pathology.billing.store') }}" method="POST" id="pathologyBillForm">
                     @csrf
                     
@@ -256,14 +275,95 @@ document.addEventListener('DOMContentLoaded', function() {
     initPatientAutocomplete();
     initPrescriptionAutocomplete();
     
+    // Form submission handler
+    document.getElementById('pathologyBillForm').addEventListener('submit', function(e) {
+        console.log('Form submission started');
+        
+        // Validate patient is selected
+        const patientId = document.getElementById('patient_id').value;
+        if (!patientId) {
+            e.preventDefault();
+            alert('Please select a patient');
+            return false;
+        }
+        
+        // Validate at least one test is selected
+        const testRows = document.querySelectorAll('.test-row');
+        let hasTest = false;
+        testRows.forEach(row => {
+            const testSelect = row.querySelector('.test_name');
+            if (testSelect && testSelect.value) {
+                hasTest = true;
+            }
+        });
+        
+        if (!hasTest) {
+            e.preventDefault();
+            alert('Please add at least one test');
+            return false;
+        }
+        
+        // Validate TPA if checkbox is checked
+        const activateTpa = document.getElementById('activate_tpa').checked;
+        if (activateTpa) {
+            const tpaDropdown = document.getElementById('tpa_dropdown');
+            if (!tpaDropdown.value) {
+                e.preventDefault();
+                alert('Please select a TPA');
+                return false;
+            }
+        }
+        
+        // Clean up empty test rows before submission
+        testRows.forEach((row, index) => {
+            const testSelect = row.querySelector('.test_name');
+            if (!testSelect || !testSelect.value) {
+                // Remove empty rows except the first one
+                if (index > 0) {
+                    row.remove();
+                }
+            }
+        });
+        
+        // Ensure totals are calculated
+        calculateTotals();
+        
+        // Log form data before submission
+        const formData = new FormData(this);
+        console.log('Form data being submitted:');
+        for (let [key, value] of formData.entries()) {
+            console.log(key + ': ' + value);
+        }
+        
+        console.log('Form validation passed, submitting...');
+    });
+    
     // Check if test select exists
     const testSelect = document.querySelector('.test_name');
     console.log('Test select found:', testSelect);
     console.log('Select2 is applied:', testSelect.classList.contains('select2-hidden-accessible'));
     
     // Test selection handler - Using jQuery with Select2
+    // Updated: 2026-01-04 - Fixed activateTpa scope issue
     $(document).on('change', '.test_name', function(e) {
         console.log('Test dropdown changed! (Select2 event)');
+        
+        // CRITICAL: Declare activateTpa and organisationId FIRST - function-scoped with var
+        var activateTpa = false;
+        var organisationId = null;
+        
+        // Get TPA elements
+        var activateTpaElement = document.getElementById('activate_tpa');
+        if (activateTpaElement) {
+            activateTpa = activateTpaElement.checked === true;
+        }
+        
+        var tpaDropdown = document.getElementById('tpa_dropdown');
+        if (tpaDropdown && tpaDropdown.value) {
+            organisationId = tpaDropdown.value;
+        }
+        
+        console.log('TPA variables - activateTpa:', activateTpa, 'organisationId:', organisationId);
         
         const selectedOption = this.options[this.selectedIndex];
         const row = $(this).closest('tr');
@@ -290,23 +390,32 @@ document.addEventListener('DOMContentLoaded', function() {
             row.find('.tax_percentage').val(tax);
             
             // Check if TPA is active and get TPA charge
-            const activateTpa = document.getElementById('activate_tpa').checked;
-            const tpaDropdown = document.getElementById('tpa_dropdown');
-            const organisationId = tpaDropdown ? tpaDropdown.value : null;
-            
             if (activateTpa && organisationId) {
                 // Fetch TPA charge
-                fetch(`/hims/pathology/billing/api/tpa-charge?test_id=${testId}&organisation_id=${organisationId}`)
-                    .then(response => response.json())
+                const url = `{{ url('/pathology/billing/api/tpa-charge') }}?test_id=${testId}&organisation_id=${organisationId}`;
+                console.log('Fetching TPA charge for test', testId, 'and org', organisationId);
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
-                        const amountToUse = (data.tpa_charge !== null && data.tpa_charge !== undefined) 
-                            ? data.tpa_charge 
-                            : standardAmount;
+                        console.log('TPA charge response:', data);
+                        let amountToUse = standardAmount;
+                        if (data.tpa_charge !== null && data.tpa_charge !== undefined && data.tpa_charge !== '') {
+                            amountToUse = parseFloat(data.tpa_charge);
+                            console.log('Using TPA charge:', amountToUse);
+                        } else {
+                            console.log('No TPA charge found, using standard charge:', standardAmount);
+                        }
                         row.find('.test_amount').val(amountToUse.toFixed(2));
                         calculateTotals();
                     })
                     .catch(error => {
                         console.error('Error fetching TPA charge:', error);
+                        // Fallback to standard charge on error
                         row.find('.test_amount').val(standardAmount.toFixed(2));
                         calculateTotals();
                     });
@@ -320,14 +429,18 @@ document.addEventListener('DOMContentLoaded', function() {
             row.find('.report_date').val(reportingDate.toISOString().split('T')[0]);
             
             console.log('Values set successfully!');
+            
+            // Only calculate totals if TPA is not active or no organisation ID
+            if (!activateTpa || !organisationId) {
+                calculateTotals();
+            }
         } else {
             row.find('.report_days').val(0);
             row.find('.tax_percentage').val(0);
             row.find('.test_amount').val(0);
             row.find('.report_date').val(today);
-        }
-        
-        if (!activateTpa || !organisationId) {
+            
+            // Calculate totals for empty test selection
             calculateTotals();
         }
     });
@@ -495,16 +608,29 @@ document.addEventListener('DOMContentLoaded', function() {
             const searchTerm = this.value.toLowerCase();
             suggestionsDiv.innerHTML = '';
 
-            if (!searchTerm || prescriptionData.length === 0) {
+            if (!searchTerm) {
                 suggestionsDiv.style.display = 'none';
                 hiddenInput.value = '';
                 return;
             }
+            
+            if (!prescriptionData || prescriptionData.length === 0) {
+                suggestionsDiv.style.display = 'none';
+                hiddenInput.value = '';
+                console.warn('No prescription data available. Please select a patient first.');
+                return;
+            }
 
             const filtered = prescriptionData.filter(prescription => {
-                return prescription.case_id.toLowerCase().includes(searchTerm) ||
-                       (prescription.symptoms && prescription.symptoms.toLowerCase().includes(searchTerm));
+                const caseId = (prescription.case_id || '').toLowerCase();
+                const symptoms = (prescription.symptoms || '').toLowerCase();
+                const prescriptionNumber = (prescription.prescription_number || prescription.case_id || '').toLowerCase();
+                return caseId.includes(searchTerm) || 
+                       symptoms.includes(searchTerm) || 
+                       prescriptionNumber.includes(searchTerm);
             });
+            
+            console.log('Filtered prescriptions:', filtered.length, 'for search term:', searchTerm);
 
             if (filtered.length > 0) {
                 filtered.forEach(prescription => {
@@ -518,6 +644,16 @@ document.addEventListener('DOMContentLoaded', function() {
                         searchInput.value = prescription.case_id;
                         hiddenInput.value = prescription.id;
                         suggestionsDiv.style.display = 'none';
+                        
+                        // If it's an IPD prescription, load the tests and also reload TPAs
+                        if (prescription.type === 'ipd' && prescription.prescription_id) {
+                            loadPrescriptionTests(prescription.prescription_id);
+                            // Reload TPAs in case this prescription's IPD has a TPA
+                            const patientId = document.getElementById('patient_id').value;
+                            if (patientId) {
+                                loadPatientTpas(patientId);
+                            }
+                        }
                     });
                     suggestionsDiv.appendChild(div);
                 });
@@ -535,41 +671,72 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function loadPatientPrescriptions(patientId) {
-        fetch(`/hims/pathology/billing/api/patient-prescriptions/${patientId}`)
-            .then(response => response.json())
+        console.log('Loading prescriptions for patient ID:', patientId);
+        const url = `{{ url('/pathology/billing/api/patient-prescriptions') }}/${patientId}`;
+        console.log('Fetching from URL:', url);
+        
+        fetch(url)
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
-                prescriptionData = data;
+                console.log('Prescriptions loaded:', data);
+                prescriptionData = Array.isArray(data) ? data : [];
                 const prescriptionSearch = document.getElementById('prescription_search');
                 const prescriptionHidden = document.getElementById('case_reference_id');
                 prescriptionSearch.value = '';
                 prescriptionHidden.value = '';
-                console.log('Loaded prescriptions:', data.length);
+                console.log('Total prescriptions loaded:', prescriptionData.length);
+                
+                // Show message if no prescriptions found
+                if (prescriptionData.length === 0) {
+                    console.warn('No prescriptions found for this patient');
+                }
             })
             .catch(error => {
                 console.error('Error loading prescriptions:', error);
+                alert('Error loading prescriptions: ' + error.message);
             });
     }
 
     function loadPatientTpas(patientId) {
+        console.log('Loading TPAs for patient ID:', patientId);
         const helpText = document.getElementById('tpa_help_text');
         helpText.textContent = 'Loading TPAs...';
         helpText.className = 'text-muted';
         
-        fetch(`/hims/pathology/billing/api/patient-tpas/${patientId}`)
-            .then(response => response.json())
+        const url = `{{ url('/pathology/billing/api/patient-tpas') }}/${patientId}`;
+        console.log('Fetching TPAs from URL:', url);
+        
+        fetch(url)
+            .then(response => {
+                console.log('TPA Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('TPAs loaded:', data);
                 const tpaDropdown = document.getElementById('tpa_dropdown');
                 tpaDropdown.innerHTML = '<option value="">Select TPA</option>';
                 
-                if (data && data.length > 0) {
+                if (data && Array.isArray(data) && data.length > 0) {
                     data.forEach(tpa => {
-                        const option = document.createElement('option');
-                        option.value = tpa.id;
-                        option.textContent = tpa.name + (tpa.code ? ' (' + tpa.code + ')' : '');
-                        tpaDropdown.appendChild(option);
+                        if (tpa && tpa.id) {
+                            const option = document.createElement('option');
+                            option.value = tpa.id;
+                            option.textContent = tpa.name + (tpa.code ? ' (' + tpa.code + ')' : '');
+                            tpaDropdown.appendChild(option);
+                        }
                     });
                     helpText.textContent = `${data.length} TPA(s) found for this patient`;
                     helpText.className = 'text-success';
+                    console.log('TPAs loaded successfully:', data.length);
                 } else {
                     const option = document.createElement('option');
                     option.value = '';
@@ -578,12 +745,146 @@ document.addEventListener('DOMContentLoaded', function() {
                     tpaDropdown.appendChild(option);
                     helpText.textContent = 'No TPA found for this patient. TPA charges will not be available.';
                     helpText.className = 'text-warning';
+                    console.warn('No TPAs found for this patient');
                 }
             })
             .catch(error => {
                 console.error('Error loading TPAs:', error);
                 helpText.textContent = 'Error loading TPAs. Please try again.';
                 helpText.className = 'text-danger';
+                alert('Error loading TPAs: ' + error.message);
+            });
+    }
+
+    function loadPrescriptionTests(prescriptionId) {
+        console.log('Loading prescription tests for ID:', prescriptionId);
+        const url = `{{ url('/pathology/billing/api/prescription-tests') }}/${prescriptionId}`;
+        console.log('Fetching prescription tests from URL:', url);
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Prescription tests loaded:', data);
+                if (data.error) {
+                    console.error('Error:', data.error);
+                    alert('Error loading prescription: ' + data.error);
+                    return;
+                }
+                
+                // Clear existing test rows (except the first one)
+                const tbody = document.getElementById('testTableBody');
+                const existingRows = tbody.querySelectorAll('.test-row');
+                existingRows.forEach((row, index) => {
+                    if (index > 0) {
+                        row.remove();
+                    }
+                });
+                
+                // Clear the first row
+                const firstRow = tbody.querySelector('.test-row');
+                if (firstRow) {
+                    const testSelect = firstRow.querySelector('.test_name');
+                    testSelect.value = '';
+                    firstRow.querySelector('.report_days').value = '0';
+                    firstRow.querySelector('.report_date').value = '';
+                    firstRow.querySelector('.tax_percentage').value = '0';
+                    firstRow.querySelector('.test_amount').value = '';
+                }
+                
+                // Add tests from prescription
+                if (data.tests && data.tests.length > 0) {
+                    data.tests.forEach((test, index) => {
+                        let row;
+                        if (index === 0 && firstRow) {
+                            row = firstRow;
+                        } else {
+                            // Create new row by cloning the first row structure
+                            const newRow = firstRow.cloneNode(true);
+                            // Update the name attributes
+                            const rowIndex = index;
+                            newRow.querySelectorAll('input, select').forEach(input => {
+                                if (input.name) {
+                                    input.name = input.name.replace(/tests\[\d+\]/, `tests[${rowIndex}]`);
+                                }
+                            });
+                            tbody.appendChild(newRow);
+                            row = newRow;
+                        }
+                        
+                        // Set test values
+                        const testSelect = row.querySelector('.test_name');
+                        if (testSelect) {
+                            testSelect.value = test.id;
+                            
+                            // Trigger change event to populate other fields
+                            if (window.jQuery && $.fn.select2) {
+                                $(testSelect).trigger('change');
+                            } else {
+                                const event = new Event('change', { bubbles: true });
+                                testSelect.dispatchEvent(event);
+                            }
+                        }
+                    });
+                    
+                    // Update doctor if available
+                    if (data.prescription && data.prescription.doctor) {
+                        const doctorSelect = document.getElementById('doctor_id');
+                        // Try to find and select the doctor by name
+                        for (let option of doctorSelect.options) {
+                            if (option.text.toLowerCase().includes(data.prescription.doctor.toLowerCase())) {
+                                doctorSelect.value = option.value;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // If TPA is available from the prescription, add it to the dropdown
+                    if (data.tpa && data.tpa.id) {
+                        const tpaDropdown = document.getElementById('tpa_dropdown');
+                        const helpText = document.getElementById('tpa_help_text');
+                        
+                        // Check if TPA already exists in dropdown
+                        let tpaExists = false;
+                        for (let option of tpaDropdown.options) {
+                            if (option.value == data.tpa.id) {
+                                tpaExists = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!tpaExists) {
+                            // Clear the "No TPA found" option if it exists
+                            if (tpaDropdown.options.length > 0 && tpaDropdown.options[0].disabled) {
+                                tpaDropdown.remove(0);
+                            }
+                            
+                            const option = document.createElement('option');
+                            option.value = data.tpa.id;
+                            option.textContent = data.tpa.name + (data.tpa.code ? ' (' + data.tpa.code + ')' : '');
+                            // Insert after the "Select TPA" option
+                            if (tpaDropdown.options.length > 0) {
+                                tpaDropdown.insertBefore(option, tpaDropdown.options[1] || null);
+                            } else {
+                                tpaDropdown.appendChild(option);
+                            }
+                            helpText.textContent = 'TPA found from prescription';
+                            helpText.className = 'text-success';
+                            console.log('TPA added from prescription:', data.tpa);
+                        }
+                    }
+                    
+                    calculateTotals();
+                } else {
+                    alert('No pathology tests found in this prescription.');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading prescription tests:', error);
+                alert('Error loading prescription tests. Please try again.');
             });
     }
 
@@ -615,6 +916,17 @@ document.addEventListener('DOMContentLoaded', function() {
             revertToStandardCharges();
         }
     });
+    
+    // Show TPA dropdown if checkbox is already checked when TPAs are loaded
+    const originalLoadPatientTpas = loadPatientTpas;
+    loadPatientTpas = function(patientId) {
+        originalLoadPatientTpas(patientId);
+        // If TPA checkbox is already checked, show the dropdown
+        const tpaCheckbox = document.getElementById('activate_tpa');
+        if (tpaCheckbox && tpaCheckbox.checked) {
+            document.getElementById('tpa_dropdown_container').style.display = 'block';
+        }
+    };
 
     // TPA dropdown change handler
     document.getElementById('tpa_dropdown').addEventListener('change', function() {
@@ -642,16 +954,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 // Fetch TPA charge for this test
-                const promise = fetch(`/hims/pathology/billing/api/tpa-charge?test_id=${testId}&organisation_id=${organisationId}`)
-                    .then(response => response.json())
+                const url = `{{ url('/pathology/billing/api/tpa-charge') }}?test_id=${testId}&organisation_id=${organisationId}`;
+                console.log('Fetching TPA charge from:', url);
+                const promise = fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
+                        console.log('TPA charge response for test', testId, ':', data);
                         const amountInput = row.querySelector('.test_amount');
-                        if (data.tpa_charge !== null && data.tpa_charge !== undefined) {
-                            amountInput.value = data.tpa_charge.toFixed(2);
+                        if (data.tpa_charge !== null && data.tpa_charge !== undefined && data.tpa_charge !== '') {
+                            amountInput.value = parseFloat(data.tpa_charge).toFixed(2);
+                            console.log('Applied TPA charge:', data.tpa_charge);
                         } else {
                             // If no TPA charge found, use standard charge
-                            amountInput.value = data.standard_charge.toFixed(2);
+                            amountInput.value = parseFloat(data.standard_charge).toFixed(2);
+                            console.log('No TPA charge found, using standard charge:', data.standard_charge);
                         }
+                        calculateTotals();
                     })
                     .catch(error => {
                         console.error('Error fetching TPA charge:', error);
