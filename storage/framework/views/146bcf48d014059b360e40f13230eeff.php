@@ -44,18 +44,7 @@
                                     </form>
                                 </div>
 
-                                <div class="input-icon-start position-relative mb-3">
-                                    <span class="input-icon-addon">
-                                        <i class="ti ti-search"></i>
-                                    </span>
-                                    <form method="GET" class="d-flex gap-2">
-                                        <input type="text" name="search" class="form-control shadow-sm" 
-                                               placeholder="Search by Name, Phone, or Purpose" 
-                                               value="<?php echo e(request('search')); ?>">
-                                        <button type="submit" class="btn btn-outline-primary">Search</button>
-                                    </form>
-                                </div>
-
+                                
                                 <div class="table-responsive table-nowrap">
                                     <table class="table table-striped" id="callLogsTable">
                                         <thead class="thead-light">
