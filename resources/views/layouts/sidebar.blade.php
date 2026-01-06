@@ -533,6 +533,11 @@
                                     
                                 </ul>
                             </li>
+                            <li>
+                                <a href="{{ route('packages.index') }}">
+                                    <i class="ti ti-package"></i><span>Package Master</span>
+                                </a>
+                            </li>
                             
                             <li class="submenu">
                                 <a href="javascript:void(0);">

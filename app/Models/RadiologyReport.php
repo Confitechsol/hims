@@ -14,6 +14,9 @@ class RadiologyReport extends Model
 
     // Primary key
     protected $primaryKey = 'id';
+    
+    // Disable timestamps if table doesn't have created_at/updated_at
+    public $timestamps = false;
 
     // Fillable fields
     protected $fillable = [
