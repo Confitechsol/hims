@@ -86,10 +86,10 @@ class ExcelImportController extends Controller
                // dd($categoryId, $chargeId );
 
                 // Skip duplicate test names
-                if (Pathology::where('test_name', $testName)->exists()) {
-                    Log::warning("Duplicate test skipped: $testName");
-                    continue;
-                }
+                // if (Pathology::where('test_name', $testName)->exists()) {
+                //     Log::warning("Duplicate test skipped: $testName");
+                //     continue;
+                // }
 
                 // Prepare payload similar to store() logic
                 $createData = [
@@ -415,9 +415,9 @@ class ExcelImportController extends Controller
                 $unitId            = ChargeUnit::where('unit', $unitName)->value('id');
 
                 // Skip duplicates
-                if (Radio::where('test_name', $testName)->exists()) {
-                    continue;
-                }
+                // if (Radio::where('test_name', $testName)->exists()) {
+                //     continue;
+                // }
 
                 // Prepare Insert
                 $createData = [
