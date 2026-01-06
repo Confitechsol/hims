@@ -40,6 +40,7 @@
                     @csrf
                     
                     <input type="hidden" name="date" value="{{ now()->format('Y-m-d H:i:s') }}">
+                    <input type="hidden" name="supplier_id" id="form_supplier_id" value="{{ old('supplier_id') }}">
                     
                     {{-- Bill No --}}
                     <div class="row mb-3">
@@ -278,21 +279,110 @@ $(document).ready(function() {
         }
     });
 
-    // Form validation
+    // Sync supplier_id from header select to form hidden input
+    document.getElementById('supplier_id').addEventListener('change', function() {
+        document.getElementById('form_supplier_id').value = this.value;
+    });
+    
+    // Initialize supplier_id on page load
+    if (document.getElementById('supplier_id').value) {
+        document.getElementById('form_supplier_id').value = document.getElementById('supplier_id').value;
+    }
+
+    // Form validation and submission
     document.getElementById('purchaseForm').addEventListener('submit', function(e) {
+        console.log('Form submit event triggered');
+        
+        // Sync supplier_id before validation
         const supplierId = document.getElementById('supplier_id').value;
+        document.getElementById('form_supplier_id').value = supplierId;
+        
+        console.log('Supplier ID:', supplierId);
+        
         if (!supplierId) {
             e.preventDefault();
             alert('Please select a supplier');
+            document.getElementById('supplier_id').focus();
             return false;
         }
 
-        // Add supplier_id to form data
-        const hiddenInput = document.createElement('input');
-        hiddenInput.type = 'hidden';
-        hiddenInput.name = 'supplier_id';
-        hiddenInput.value = supplierId;
-        this.appendChild(hiddenInput);
+        // Check if at least one medicine is added
+        const medicineRows = document.querySelectorAll('.medicine-row');
+        let hasValidMedicine = false;
+        let validationErrors = [];
+        
+        medicineRows.forEach((row, index) => {
+            const pharmacyId = row.querySelector('.medicine-name').value;
+            const batchNo = row.querySelector('input[name*="[batch_no]"]').value;
+            const expiryInput = row.querySelector('.expiry-date');
+            const expiry = expiryInput.getAttribute('data-db-value') || expiryInput.value;
+            const quantity = row.querySelector('.quantity').value;
+            const purchasePrice = row.querySelector('.purchase-price').value;
+            const mrp = row.querySelector('.mrp').value;
+            const saleRate = row.querySelector('.sale-price').value;
+            
+            if (!pharmacyId) validationErrors.push(`Row ${index + 1}: Please select a medicine`);
+            if (!batchNo) validationErrors.push(`Row ${index + 1}: Please enter batch number`);
+            if (!expiry) validationErrors.push(`Row ${index + 1}: Please select expiry date`);
+            if (!quantity || quantity <= 0) validationErrors.push(`Row ${index + 1}: Please enter valid quantity`);
+            if (!purchasePrice || purchasePrice <= 0) validationErrors.push(`Row ${index + 1}: Please enter valid purchase price`);
+            if (!mrp || mrp <= 0) validationErrors.push(`Row ${index + 1}: Please enter valid MRP`);
+            if (!saleRate || saleRate <= 0) validationErrors.push(`Row ${index + 1}: Please enter valid sale rate`);
+            
+            if (pharmacyId && batchNo && expiry && quantity && purchasePrice && mrp && saleRate) {
+                hasValidMedicine = true;
+            }
+        });
+        
+        if (!hasValidMedicine) {
+            e.preventDefault();
+            if (validationErrors.length > 0) {
+                alert('Please fix the following errors:\n\n' + validationErrors.slice(0, 5).join('\n') + (validationErrors.length > 5 ? '\n...and more' : ''));
+            } else {
+                alert('Please add at least one medicine with all required fields filled');
+            }
+            return false;
+        }
+        
+        // Ensure expiry dates are in correct format (YYYY-MM) before submission
+        $('.expiry-date').each(function() {
+            const dbValue = $(this).attr('data-db-value');
+            if (dbValue) {
+                $(this).val(dbValue);
+            } else {
+                const currentValue = $(this).val();
+                if (currentValue && currentValue.includes('/')) {
+                    // Convert from Mar/2026 to 2026-03
+                    const parts = currentValue.split('/');
+                    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    const monthIndex = monthNames.indexOf(parts[0]);
+                    if (monthIndex !== -1) {
+                        const month = String(monthIndex + 1).padStart(2, '0');
+                        const year = parts[1];
+                        $(this).val(year + '-' + month);
+                        $(this).attr('data-db-value', year + '-' + month);
+                    }
+                }
+            }
+        });
+        
+        // Show loading state
+        const submitBtn = this.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="ti ti-loader me-1"></i>Processing...';
+        }
+        
+        // Log form data before submission
+        const formData = new FormData(this);
+        console.log('Form data being submitted:');
+        for (let [key, value] of formData.entries()) {
+            console.log(key + ':', value);
+        }
+        
+        console.log('Form validation passed, allowing submission');
+        // Allow form to submit - don't prevent default
+        // return true; // This doesn't actually do anything, form will submit naturally
     });
 });
 
@@ -518,14 +608,38 @@ function showMonthPicker(input, year, month) {
     });
 }
 
-// Update form submission to use data-db-value
-$(document).on('submit', '#purchaseForm', function() {
-    $('.monthpicker').each(function() {
+// Update form submission to use data-db-value (this runs FIRST, before native handler)
+// This handler only converts date formats, doesn't prevent submission
+$(document).on('submit', '#purchaseForm', function(e) {
+    console.log('jQuery submit handler - converting dates');
+    
+    // Convert all expiry dates to YYYY-MM format
+    $('.monthpicker, .expiry-date').each(function() {
         const dbValue = $(this).attr('data-db-value');
         if (dbValue) {
             $(this).val(dbValue); // Submit as YYYY-MM for backend
+            console.log('Set expiry from data-db-value:', dbValue);
+        } else {
+            const currentValue = $(this).val();
+            if (currentValue && currentValue.includes('/')) {
+                // Convert from Mar/2026 to 2026-03
+                const parts = currentValue.split('/');
+                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const monthIndex = monthNames.indexOf(parts[0]);
+                if (monthIndex !== -1) {
+                    const month = String(monthIndex + 1).padStart(2, '0');
+                    const year = parts[1];
+                    const convertedValue = year + '-' + month;
+                    $(this).val(convertedValue);
+                    $(this).attr('data-db-value', convertedValue);
+                    console.log('Converted expiry:', currentValue, '->', convertedValue);
+                }
+            }
         }
     });
+    
+    // Don't prevent default - let native handler run validation
+    // Native handler will prevent if validation fails, allow if it passes
 });
 </script>
 @endsection

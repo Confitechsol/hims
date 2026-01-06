@@ -12,15 +12,20 @@ class MedicineBatchDetail extends Model
     protected $table = 'medicine_batch_details';
 
     protected $fillable = [
+        'supplier_bill_basic_id',
         'pharmacy_id',
         'batch_no',
         'expiry',
         'packing_qty',
+        'purchase_rate_packing',
         'purchase_price',
         'sale_rate',
         'mrp',
         'quantity',
         'amount',
+        'batch_amount',
+        'tax',
+        'available_quantity',
         'inward_date',
         'purchase_no',
     ];

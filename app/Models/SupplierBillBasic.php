@@ -10,6 +10,9 @@ class SupplierBillBasic extends Model
     use HasFactory;
 
     protected $table = 'supplier_bill_basic';
+    
+    // Disable timestamps since table only has created_at, not updated_at
+    public $timestamps = false;
 
     protected $fillable = [
         'invoice_no',
