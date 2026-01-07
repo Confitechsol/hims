@@ -638,7 +638,7 @@
 </style>
 
 <!-- Modal -->
-<div class="modal fade" id="createIpdModal" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
+<div class="modal use-select2 fade" id="createIpdModal" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <form action="{{ route('ipd.store') }}" id="ipdForm" method="POST">
@@ -840,7 +840,7 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Consultant Doctor <span class="required">*</span></label>
-                                <select class="form-select" name="doctor_id" id="doctor_select">
+                                <select class="form-select select2-input" name="doctor_id" id="doctor_select">
                                     <option value="">Loading...</option>
                                 </select>
                             </div>
