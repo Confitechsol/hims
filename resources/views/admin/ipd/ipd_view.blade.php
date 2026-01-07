@@ -2784,7 +2784,7 @@
                                                                                                     value="{{ $ipd->id }}">
                                                                                                 <select name="charge_type"
                                                                                                     id="add_charge_type"
-                                                                                                    class="form-control charge_type select2 reset_value select2-hidden-accessible"
+                                                                                                    class="form-control charge_type select2 reset_value "
                                                                                                     style="width: 100%"
                                                                                                     tabindex="-1"
                                                                                                     aria-hidden="true">
@@ -2808,7 +2808,7 @@
                                                                                                     name="charge_category2"
                                                                                                     id="charge_category2"
                                                                                                     style="width: 100%"
-                                                                                                    class="form-control select2 charge_category2 reset_value select2-hidden-accessible"
+                                                                                                    class="form-control select2 charge_category2 reset_value "
                                                                                                     tabindex="-1"
                                                                                                     aria-hidden="true">
                                                                                                     <option
@@ -2828,7 +2828,7 @@
                                                                                                 <select name="charge_id"
                                                                                                     id="charge_id"
                                                                                                     style="width: 100%"
-                                                                                                    class="form-control addcharge  select2 reset_value select2-hidden-accessible"
+                                                                                                    class="form-control addcharge  select2 reset_value "
                                                                                                     tabindex="-1"
                                                                                                     aria-hidden="true">
                                                                                                     <option
