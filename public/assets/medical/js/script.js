@@ -39,8 +39,8 @@ jQuery(function ($) {
                 }
             });
         });
-    }
-
+    });
+}
     /*  end of counter js * /
 
 
@@ -128,45 +128,43 @@ $('.js-example-basic-single').select2();
             Testimonial slider
    =================================== */
 
-
-$("#testimonial_slider").owlCarousel({
-    items: 1,
-    dots: true,
-    nav: false,
-    responsive:{
-        992:{
-            items:3
-        },
-        768:{
-            items:2
-        },
-        600:{
-            items:1
+   if ($("#testimonial_slider").length) {
+    $("#testimonial_slider").owlCarousel({
+        items: 1,
+        dots: true,
+        nav: false,
+        responsive: {
+            992: { items: 3 },
+            768: { items: 2 },
+            600: { items: 1 }
         }
-    }
-});
+    });
+}
 
-/* ===================================
-            blog slider
-   =================================== */
-$("#blog-slider").owlCarousel({
-    items: 1,
-    dots: false,
-    autoplay:true,
-    autoplayTimeout:5000,
-    smartSpeed:500,
-    nav: false,
-    loop: true,
-});
-$("#blog-slider-1").owlCarousel({
-    items: 1,
-    dots: false,
-    autoplay:true,
-    autoplayTimeout:6000,
-    smartSpeed:500,
-    nav: false,
-    loop: true,
-});
+if ($("#blog-slider").length) {
+    $("#blog-slider").owlCarousel({
+        items: 1,
+        dots: false,
+        autoplay: true,
+        autoplayTimeout: 5000,
+        smartSpeed: 500,
+        nav: false,
+        loop: true
+    });
+}
+
+if ($("#blog-slider-1").length) {
+    $("#blog-slider-1").owlCarousel({
+        items: 1,
+        dots: false,
+        autoplay: true,
+        autoplayTimeout: 6000,
+        smartSpeed: 500,
+        nav: false,
+        loop: true
+    });
+}
+
 
 
 /* ===================================
@@ -194,8 +192,10 @@ $(".blog-image2").on("mouseleave", function () {
 /* ===================================
       Fancy Box
       ====================================== */
-$('[data-fancybox]').fancybox({
-
+$(document).ready(function () {
+    if ($.fn.fancybox) {
+        $('[data-fancybox]').fancybox();
+    }
 });
 
 /* ===================================
@@ -284,12 +284,13 @@ if ($(".side-right-btn").length) {
 
 /*Portfolio Two*/
 
-var $gallery = $('.gallery').isotope({
-    // options
-    itemSelector: '.items'
-});
+$(document).ready(function () {
+    if ($.fn.isotope) {
+      var $gallery = $('.gallery').isotope({
+        itemSelector: '.items'
+      });
 
-// filter items on button click
+      // filter items on button click
 $('.filtering').on('click', 'span', function () {
 
     var filterValue = $(this).attr('data-filter');
@@ -297,11 +298,11 @@ $('.filtering').on('click', 'span', function () {
     $(this).addClass('active').siblings().removeClass('active');
 
 });
-
-
-setTimeout(function (){
-    $('.filtering .active').click();
-}, 1500);
+      setTimeout(function (){
+        $('.filtering .active').click();
+    }, 1500);
+    }
+  });
 
     /* ===================================
         Revolution Slider Initialized
