@@ -166,7 +166,7 @@
             </div>
             <div class="second_logo">
                 @if (file_exists(public_path('assets/images/nabh-logo.png')))
-                    <img src="{{ asset('assets/images/nabh-logo.png') }}" alt="LOGO2" style="height: 50px">
+                    <img src="{{ asset('assets/images/nabh-logo.png') }}" alt="LOGO2" style="height: 70px; width:auto;">
                 @endif
             </div>
             <div class="about_info">
