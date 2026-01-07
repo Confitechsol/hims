@@ -16,6 +16,7 @@ use App\Models\Operation;
 use App\Models\OperationCategory;
 use App\Models\OperationTheatre;
 use App\Models\PathologyReport;
+use App\Models\RadiologyReport;
 use App\Models\Patient;
 use App\Models\PatientBedHistory;
 use App\Models\PatientTimeline;
@@ -93,6 +94,7 @@ class IpdViewController extends Controller
 
         $PatientTimelines = PatientTimeline::with('patient')->where('patient_id', $patient_id)->get();
         $vitalDetails     = PatientVital::with('vital')->where('patient_id', $patient_id)->get();
+        $radiologyReports = RadiologyReport::with('radiology')->where('patient_id', $ipd->patient->id)->get();
         if ($ipd->discharged == 'yes') {
             $ipd->dischargeCard = DischargeCard::where('ipd_details_id', $id)->firstOrFail();
         }
@@ -107,6 +109,7 @@ class IpdViewController extends Controller
             'nurseNotes',
             'medicationReport',
             'labInvestigations',
+            'radiologyReports',
             'ipdPrescriptions',
             'ipdFindings',
             'bedHistories',

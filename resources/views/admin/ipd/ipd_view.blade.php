@@ -553,6 +553,13 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="#radiology_reports" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-solid fa-flask text-primary pe-1"></i>
+                        <span>Radiology Details</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="#operations" data-bs-toggle="tab" aria-expanded="true"
                         class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
                             class="fa-solid fa-scissors text-primary pe-1"></i>
@@ -1081,6 +1088,48 @@
                                                     <td>Pathology</td>
                                                     <td>{{ '--' }}</td>
                                                     <td>{{ \Carbon\Carbon::today()->copy()->addDays(intval($lab->pathology->report_days))->format('d-M-Y') }}
+                                                    </td>
+                                                    <td>{{ $lab->approved_by ?? '--' }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- Table end -->
+                            </div>
+                        </div>
+                        <div class="card shadow-sm border-0 mt-2">
+                            <div class="card-header"
+                                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Radiology
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Table start -->
+                                <div class="table-responsive table-nowrap">
+                                    <table class="table border">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>Test Name</th>
+                                                <th>Radiology</th>
+                                                <th>Sample Collected</th>
+                                                <th>Expected Date</th>
+                                                <th>Approved By</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($radiologyReports as $lab)
+                                                <tr>
+                                                    <td>
+                                                        {{ $lab->radiology->test_name .
+                                                            "
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    (" .
+                                                            $lab->radiology->short_name .
+                                                            ')' }}
+                                                    </td>
+                                                    <td>Radiology</td>
+                                                    <td>{{ '--' }}</td>
+                                                    <td>{{ \Carbon\Carbon::today()->copy()->addDays(intval($lab->radiology->report_days))->format('d-M-Y') }}
                                                     </td>
                                                     <td>{{ $lab->approved_by ?? '--' }}</td>
                                                 </tr>
@@ -2221,6 +2270,88 @@
                                                                     <td>Pathology</td>
                                                                     <td>{{ '--' }}</td>
                                                                     <td>{{ \Carbon\Carbon::today()->copy()->addDays(intval($lab->pathology->report_days))->format('d-M-Y') }}
+                                                                    </td>
+                                                                    <td>{{ $lab->approved_by ?? '--' }}</td>
+                                                                    <td>
+                                                                        <div class="d-flex gap-2">
+                                                                            <a href="javascript: void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
+                                                                                <i class="ti ti-menu"
+                                                                                    data-bs-toggle="tooltip"
+                                                                                    title="Show"></i></a>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+
+
+
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <!-- Table end -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane" id="radiology_reports">
+                <!-- row start -->
+                <div class="row">
+                    <div class="col-12 d-flex">
+                        <div class="card shadow-sm flex-fill w-100">
+                            <div class="card-header"
+                                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Radiology
+                                    Reports
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div
+                                                    class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
+                                                    <div class="input-icon-start position-relative me-2">
+                                                        <span class="input-icon-addon">
+                                                            <i class="ti ti-search"></i>
+                                                        </span>
+                                                        <input type="text" class="form-control shadow-sm"
+                                                            placeholder="Search">
+
+                                                    </div>
+                                                </div>
+                                                <!-- Table start -->
+                                                <div class="table-responsive table-nowrap">
+                                                    <table class="table border">
+                                                        <thead class="thead-light">
+                                                            <tr>
+                                                                <th>Test Name</th>
+                                                                <th>Radiology</th>
+                                                                <th>Sample Collected</th>
+                                                                <th>Expected Date</th>
+                                                                <th>Approved By</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach ($radiologyReports as $lab)
+                                                                <tr>
+                                                                    <td>
+                                                                        {{ $lab->radiology->test_name .
+                                                                            "
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                (" .
+                                                                            $lab->radiology->short_name .
+                                                                            ')' }}
+                                                                    </td>
+                                                                    <td>Radiology</td>
+                                                                    <td>{{ '--' }}</td>
+                                                                    <td>{{ \Carbon\Carbon::today()->copy()->addDays(intval($lab->radiology->report_days))->format('d-M-Y') }}
                                                                     </td>
                                                                     <td>{{ $lab->approved_by ?? '--' }}</td>
                                                                     <td>
@@ -3855,7 +3986,8 @@
                                                                                 data-pres-id = "{{ $prescription->id }}">
                                                                                 <i class="fa-solid fa-prescription"
                                                                                     data-bs-toggle="tooltip"
-                                                                                    title="Show"></i></a>
+                                                                                    title="Show"></i>
+                                                                            </a>
                                                                             <a href="{{ route('ipd.prescription.edit', $prescription->id) }}"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-warning rounded-pill"
                                                                                 data-bs-toggle="tooltip"

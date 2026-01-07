@@ -71,7 +71,7 @@
 
                         <!-- Items -->
                         <div class="mb-4">
-                            <h6 class="mb-3 fs-16 fw-bold text-center" id="pres_type">Cardiology Prescription</h6>
+                            <h6 class="mb-3 fs-16 fw-bold text-center" id="pres_type">Prescription for Medicines</h6>
                             <div class="">
                                 <!-- Table List -->
                                 <div class="table-responsive border bg-white">
@@ -79,13 +79,38 @@
                                         <thead>
                                             <tr>
                                                 <th>SNO</th>
-                                                <th>Medecine Name</th>
+                                                <th>Medicine Name</th>
                                                 <th>Dosage</th>
                                                 <th> Duration </th>
                                                 <th> Timings</th>
                                             </tr>
                                         </thead>
                                         <tbody id="medicineTableBody">
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- /Table List -->
+                            </div>
+                        </div>
+
+                        <!-- Items -->
+                         <!-- Items -->
+                        <div class="mb-4">
+                            <h6 class="mb-3 fs-16 fw-bold text-center" id="pres_type">Prescription for Tests</h6>
+                            <div class="">
+                                <!-- Table List -->
+                                <div class="table-responsive border bg-white">
+                                    <table class="table table-nowrap">
+                                        <thead>
+                                            <tr>
+                                                <th>SNO</th>
+                                                <th>Pathology Test Name</th>
+                                                <th>Radiology Test Name</th>
+                                                
+                                            </tr>
+                                        </thead>
+                                        <tbody id="pathologyTableBody">
 
                                         </tbody>
                                     </table>
