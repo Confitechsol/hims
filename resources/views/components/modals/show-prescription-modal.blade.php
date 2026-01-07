@@ -198,6 +198,7 @@
                         department.innerHTML = data.doctor.department.department_name
                         ipdDate.innerHTML = data.date
                         pName.innerHTML = data.patient.patient_name
+                        console.log('PName:', data.patient.patient_name);
                         ageGender.innerHTML = data.patient.age + ' Y/ ' + data.patient.gender
                         bGrp.innerHTML = data.patient.blood_group.name
                         pId.innerHTML = '--'
