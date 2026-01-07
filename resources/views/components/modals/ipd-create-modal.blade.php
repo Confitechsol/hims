@@ -638,7 +638,7 @@
 </style>
 
 <!-- Modal -->
-<div class="modal fade" id="createIpdModal" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
+<div class="modal fade use-select2" id="createIpdModal" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <form action="{{ route('ipd.store') }}" id="ipdForm" method="POST">
@@ -648,7 +648,7 @@
                     <div class="flex-grow-1">
                         <h5 class="modal-title mb-3">Patient Admission</h5>
                         <div class="d-flex gap-3 align-items-center">
-                            <select type="text" class="form-select patient-search flex-grow-1"
+                            <select type="text" class="form-select select2-input patient-search flex-grow-1"
                                 placeholder="Search patient by name or ID..." id="patient_select" name="patient_id">
                                 <option value="">Loading...</option>
                             </select>
@@ -840,7 +840,7 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Consultant Doctor <span class="required">*</span></label>
-                                <select class="form-select" name="doctor_id" id="doctor_select">
+                                <select class="form-select select2-input" name="doctor_id" id="doctor_select">
                                     <option value="">Loading...</option>
                                 </select>
                             </div>
