@@ -638,7 +638,8 @@
 </style>
 
 <!-- Modal -->
-<div class="modal fade use-select2" id="createIpdModal" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
+<div class="modal fade use-select2" id="createIpdModal" tabindex="-1" aria-labelledby="addSpecializationLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <form action="{{ route('ipd.store') }}" id="ipdForm" method="POST">
@@ -831,12 +832,12 @@
                                 <label class="form-label">Reference</label>
                                 {{-- <input type="text" class="form-control" name="reference"
                                     placeholder="Enter reference"> --}}
-                                    <select name="reference" id="" class="form-select">
-                                        <option value="">Select Reference</option>
-                                        @foreach ($references as $reference)
-                                            <option value="{{ $reference }}">{{ $reference }}</option>
-                                        @endforeach
-                                    </select>
+                                <select name="reference" id="" class="form-select">
+                                    <option value="">Select Reference</option>
+                                    @foreach ($references as $reference)
+                                        <option value="{{ $reference }}">{{ $reference }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Consultant Doctor <span class="required">*</span></label>
@@ -1243,8 +1244,8 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const doctorSelect = document.getElementById('doctor_select');
-        const bedGroupSelect = document.getElementById('bed_group_select');
-        const bedNumberSelect = document.getElementById('bed_number_select');
+        // const bedGroupSelect = document.getElementById('bed_group_select');
+        // const bedNumberSelect = document.getElementById('bed_number_select');
 
         // const standardCharge = document.getElementById('standard_charge');
         // const appliedCharge = document.getElementById('applied_charge');
@@ -1255,8 +1256,8 @@
         const symptomTypesSelect = document.getElementById('symptoms_type');
 
         doctorSelect.innerHTML = '<option value="">Loading...</option>';
-        bedGroupSelect.innerHTML = '<option value="">Loading...</option>';
-        bedNumberSelect.innerHTML = '<option value="">Loading...</option>';
+        // bedGroupSelect.innerHTML = '<option value="">Loading...</option>';
+        // bedNumberSelect.innerHTML = '<option value="">Loading...</option>';
         symptomTypesSelect.innerHTML = '<option value="">Loading...</option>';
 
         //doctor
@@ -1268,7 +1269,7 @@
                 data.forEach(doc => {
                     const option = document.createElement('option');
                     option.value = doc.id;
-                    option.textContent = doc.name+" "+doc?.surname;
+                    option.textContent = doc.name + " " + doc?.surname;
                     if ("{{ old('doctor_id') }}" == doc.id) {
                         option.selected = true;
                     }
@@ -1281,57 +1282,57 @@
             });
 
         //charge category
-        fetch("{{ route('getBedGroups') }}")
-            .then(response => response.json())
-            .then(data => {
-                window.bedGroupData = data;
-                bedGroupSelect.innerHTML = '<option value="">Select</option>';
-                data.forEach(bedGroup => {
-                    const option = document.createElement('option');
-                    option.value = bedGroup.id;
-                    console.log();
-                    option.textContent = bedGroup.name + ' - ' + bedGroup.floor_detail.name;
-                    if ("{{ old('bed_group') }}" == bedGroup.id) {
-                        option.selected = true;
-                    }
-                    bedGroupSelect.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching bed groups:', error);
-                bedGroupSelect.innerHTML = '<option value="">Error loading options</option>';
-            });
+        // fetch("{{ route('getBedGroups') }}")
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         window.bedGroupData = data;
+        //         bedGroupSelect.innerHTML = '<option value="">Select</option>';
+        //         data.forEach(bedGroup => {
+        //             const option = document.createElement('option');
+        //             option.value = bedGroup.id;
+        //             console.log();
+        //             option.textContent = bedGroup.name + ' - ' + bedGroup.floor_detail.name;
+        //             if ("{{ old('bed_group') }}" == bedGroup.id) {
+        //                 option.selected = true;
+        //             }
+        //             bedGroupSelect.appendChild(option);
+        //         });
+        //     })
+        //     .catch(error => {
+        //         console.error('Error fetching bed groups:', error);
+        //         bedGroupSelect.innerHTML = '<option value="">Error loading options</option>';
+        //     });
 
         // Listen for Charge Category dropdown change
-        bedGroupSelect.addEventListener('change', function() {
-            const selectedId = this.value;
-            const baseUrl = "{{ route('getBedNumbers', ['id' => 'ID']) }}";
-            const finalUrl = baseUrl.replace('ID', selectedId);
-            fetch(finalUrl)
-                .then(response => response.json())
-                .then(data => {
-                    window.bedNumberData = data;
-                    bedNumberSelect.innerHTML = '<option value="">Select</option>';
-                    bedNumberSelect.disabled = false
-                    if (data.length <= 0) {
-                        bedNumberSelect.innerHTML = '<option value="">No Bed Available</option>';
-                        bedNumberSelect.disabled = true
-                    } else {
-                        data.forEach(bedNumber => {
-                            const option = document.createElement('option');
-                            option.value = bedNumber.id;
-                            option.textContent = bedNumber.name;
-                            if ("{{ old('bed_number') }}" == bedNumber.id) {
-                                option.selected = true;
-                            }
-                            bedNumberSelect.appendChild(option);
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching Bed Numbers:', error);
-                    bedNumberSelect.innerHTML = '<option value="">Error loading options</option>';
-                });
+        // bedGroupSelect.addEventListener('change', function() {
+        //     const selectedId = this.value;
+        //     const baseUrl = "{{ route('getBedNumbers', ['id' => 'ID']) }}";
+        //     const finalUrl = baseUrl.replace('ID', selectedId);
+        //     fetch(finalUrl)
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             window.bedNumberData = data;
+        //             bedNumberSelect.innerHTML = '<option value="">Select</option>';
+        //             bedNumberSelect.disabled = false
+        //             if (data.length <= 0) {
+        //                 bedNumberSelect.innerHTML = '<option value="">No Bed Available</option>';
+        //                 bedNumberSelect.disabled = true
+        //             } else {
+        //                 data.forEach(bedNumber => {
+        //                     const option = document.createElement('option');
+        //                     option.value = bedNumber.id;
+        //                     option.textContent = bedNumber.name;
+        //                     if ("{{ old('bed_number') }}" == bedNumber.id) {
+        //                         option.selected = true;
+        //                     }
+        //                     bedNumberSelect.appendChild(option);
+        //                 });
+        //             }
+        //         })
+        //         .catch(error => {
+        //             console.error('Error fetching Bed Numbers:', error);
+        //             bedNumberSelect.innerHTML = '<option value="">Error loading options</option>';
+        //         });
 
             // bedNumberSelect.addEventListener('change', function() {
             //     const selectedCharge = window.bedNumberData[0];
@@ -1361,7 +1362,7 @@
             //     amount.value = totalAmount.toFixed(2);
             //     paidAmount.value = totalAmount.toFixed(2);
             // }
-        });
+        // });
 
 
         fetch("{{ route('getSymptomsTypes') }}")
@@ -1386,7 +1387,109 @@
 
     });
 </script>
+@section('script')
+    <script>
+        $(document).on('shown.bs.modal', '.use-select2', function() {
+            const $modal = $(this);
+            const bedGroupSelect = $modal.find('#bed_group_select');
+            const bedNumberSelect = $modal.find('#bed_number_select');
+            if (!bedGroupSelect.length) return;
+            // Init Select2 safely inside modal
+            function initSelect2($el) {
+                if (!$el.hasClass('select2-hidden-accessible')) {
+                    $el.select2({
+                        placeholder: 'Select',
+                        allowClear: true,
+                        width: '100%',
+                        dropdownParent: $modal
+                    });
+                }
+            }
 
+            initSelect2(bedGroupSelect);
+            initSelect2(bedNumberSelect);
+
+            // Fetch Bed Groups
+            fetch("{{ route('getBedGroups') }}")
+                .then(response => response.json())
+                .then(data => {
+                    window.bedGroupData = data;
+
+                    bedGroupSelect.empty().append('<option value=""></option>');
+
+                    data.forEach(bedGroup => {
+                        const option = new Option(
+                            bedGroup.name + ' - ' + bedGroup.floor_detail.name,
+                            bedGroup.id,
+                            false,
+                            "{{ old('bed_group') }}" == bedGroup.id
+                        );
+                        bedGroupSelect.append(option);
+                    });
+
+                    bedGroupSelect.trigger('change.select2');
+                })
+                .catch(error => {
+                    console.error('Error fetching bed groups:', error);
+                    bedGroupSelect
+                        .empty()
+                        .append('<option value="">Error loading options</option>')
+                        .trigger('change.select2');
+                });
+
+            // Bed Group Change → Load Bed Numbers
+            bedGroupSelect.off('change.select2load').on('change.select2load', function() {
+                const selectedId = $(this).val();
+
+                bedNumberSelect
+                    .prop('disabled', true)
+                    .empty()
+                    .append('<option value=""></option>')
+                    .trigger('change.select2');
+
+                if (!selectedId) return;
+
+                const baseUrl = "{{ route('getBedNumbers', ['id' => 'ID']) }}";
+                const finalUrl = baseUrl.replace('ID', selectedId);
+
+                fetch(finalUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        window.bedNumberData = data;
+
+                        bedNumberSelect.empty().append('<option value=""></option>');
+
+                        if (data.length <= 0) {
+                            bedNumberSelect
+                                .append('<option value="">No Bed Available</option>')
+                                .prop('disabled', true);
+                        } else {
+                            bedNumberSelect.prop('disabled', false);
+
+                            data.forEach(bedNumber => {
+                                const option = new Option(
+                                    bedNumber.name,
+                                    bedNumber.id,
+                                    false,
+                                    "{{ old('bed_number') }}" == bedNumber.id
+                                );
+                                bedNumberSelect.append(option);
+                            });
+                        }
+
+                        bedNumberSelect.trigger('change.select2');
+                    })
+                    .catch(error => {
+                        console.error('Error fetching Bed Numbers:', error);
+                        bedNumberSelect
+                            .empty()
+                            .append('<option value="">Error loading options</option>')
+                            .trigger('change.select2');
+                    });
+            });
+        })
+    </script>
+@endsection
 
 
 {{-- symptoms type multiselect --}}
