@@ -5678,6 +5678,7 @@ fieldset:disabled .btn {
 .btn-outline-primary {
     color: var(--primary);
     background-color: var(--white);
+    border: 1px solid !important;
     border-color: var(--primary);
 }
 

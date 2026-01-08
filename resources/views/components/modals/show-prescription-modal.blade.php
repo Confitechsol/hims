@@ -71,7 +71,7 @@
 
                         <!-- Items -->
                         <div class="mb-4">
-                            <h6 class="mb-3 fs-16 fw-bold text-center" id="pres_type">IPD Prescription</h6>
+                            <h6 class="mb-3 fs-16 fw-bold text-center" id="pres_type">Prescription</h6>
                             <div class="">
                                 <h6 class="mb-3 fs-16 fw-bold text-center">Medicines</h6>
                                 <!-- Table List -->
@@ -242,10 +242,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     const tableBody = document.getElementById("pathRadTableBody");
                     tableBody.innerHTML = "";
 
-                     const pathologyName = data?.pathology?.test_name ?? '-';
-                    const radiologyName = data?.radiology?.test_name ?? '-';
+                    const pathology = data.pathology || [];
+                    const radiology = data.radiology || [];
 
-                    if (pathologyName === '-' && radiologyName === '-') {
+                    const maxLength = Math.max(pathology.length, radiology.length);
+
+                    if (maxLength === 0) {
                         tableBody.innerHTML = `
                             <tr>
                                 <td colspan="3" class="text-center">No Records Found</td>
@@ -254,16 +256,18 @@ document.addEventListener('DOMContentLoaded', () => {
                         return;
                     }
 
-                    const row = `
-                        <tr>
-                            <td>1</td>
-                            <td>${pathologyName}</td>
-                            <td>${radiologyName}</td>
-                        </tr>
-                    `;
+                    for (let i = 0; i < maxLength; i++) {
+                        tableBody.insertAdjacentHTML("beforeend", `
+                            <tr>
+                                <td>${i + 1}</td>
+                                <td>${pathology[i]?.test_name ?? '-'}</td>
+                                <td>${radiology[i]?.test_name ?? '-'}</td>
+                            </tr>
+                        `);
+                    }
 
-                    tableBody.insertAdjacentHTML("beforeend", row);
-                            })
+                    
+                })
                 
                 .catch(err => console.error('Error loading tests:', err));
         }

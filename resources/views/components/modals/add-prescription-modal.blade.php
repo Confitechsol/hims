@@ -525,7 +525,7 @@
                                             <label class="form-label">Advice</label>
                                             
 
-                                            <textarea id="advice" contenteditable="true" class="editor-area w-100" name="header_note"></textarea>
+                                            <textarea id="advice" name="advice" contenteditable="true" class="editor-area w-100" name="header_note"></textarea>
                                             <hr>
                                         </div>
                                         <div class="col-sm-12 mt-2">
