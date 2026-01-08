@@ -119,6 +119,7 @@
             }
         }
     </style>
+    <?php echo $__env->yieldContent('select2cdn'); ?>
 </head>
 
 <?php echo $__env->yieldContent('content'); ?>

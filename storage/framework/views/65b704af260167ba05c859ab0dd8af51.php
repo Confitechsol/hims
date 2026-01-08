@@ -16,7 +16,7 @@
 </script>
 
 
-    
+
 <!-- Or for RTL support -->
 <!-- Datetimepicker CSS -->
 <!-- jQuery (if not already included) -->
@@ -59,8 +59,13 @@
 <!-- Include SimpleBar JavaScript -->
 <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
 
-<!-- Main CSS -->
 
+<link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/47.3.0/ckeditor5.css" />
+<script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
+
+
+
+<!-- Main CSS -->
 <link rel="stylesheet" href="<?php echo e(asset('assets/css/adminstyle.css')); ?>">
 
 

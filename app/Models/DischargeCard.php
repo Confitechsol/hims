@@ -18,29 +18,44 @@ class DischargeCard extends Model
     protected $fillable = [
         'hospital_id',
         'branch_id',
-        'case_reference_id',
         'opd_details_id',
         'ipd_details_id',
-        'discharge_by',
+        'case_reference_id',
+
+        'patient_name',
+        'admission_no',
         'discharge_date',
-        'discharge_status',
-        'death_date',
-        'refer_date',
-        'refer_to_hospital',
-        'reason_for_referral',
-        'operation',
+        'discharge_time',
+        'admission_date',
+        'admit_time',
+        'bed',
+        'age',
+        'gender',
+        'phone',
+        'marital_status',
+        'address',
+        'guardian',
+        'relation',
+        'nationality',
+        'under_care_dr',
+        'referral',
+        'corporate',
+        'reason_discharge',
+        'ot_date',
+        'ot_type',
+        'ot_name',
+        'ot_done',
+        'ot_done_by',
         'diagnosis',
-        'investigations',
-        'treatment_home',
-        'note',
+        'ot_note',
+        'discharge_advice',
+        'present_complaints',
+        'remarks',
+        'discharged_by',
+        'created_by',
     ];
 
     // Casts for date/datetime fields
-    protected $casts = [
-        'discharge_date' => 'datetime',
-        'death_date'     => 'datetime',
-        'refer_date'     => 'datetime',
-    ];
 
     // Relationships
     public function caseReference()
@@ -58,8 +73,8 @@ class DischargeCard extends Model
         return $this->belongsTo(IpdDetail::class, 'ipd_details_id');
     }
 
-    public function dischargedBy()
-    {
-        return $this->belongsTo(User::class, 'discharge_by');
-    }
+    // public function dischargedBy()
+    // {
+    //     return $this->belongsTo(User::class, 'discharge_by');
+    // }
 }

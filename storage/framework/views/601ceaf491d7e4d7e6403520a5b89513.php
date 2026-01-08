@@ -211,11 +211,11 @@
         }
 
 
-         /* Modal Styling */
+        /* Modal Styling */
         .modal-content {
             border: none;
             border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
             overflow: hidden;
         }
 
@@ -261,7 +261,7 @@
             margin: 1rem;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .section-header {
@@ -646,7 +646,7 @@
                                                 class="bi bi-clipboard-pulse text-white"></i></button>
                                     <?php else: ?>
                                         <button class="bg-transparent border-0" data-bs-toggle="modal"
-                                            data-bs-target="#patientDischargeModal" data-id="<?php echo e($ipd->id); ?>"><i
+                                            data-bs-target="#patientDischargeModal" data-ipd="<?php echo e($ipd); ?>" data-doctors="<?php echo e($doctors); ?>" data-user="<?php echo e($currentUser); ?>"><i
                                                 class="bi bi-clipboard-pulse text-white"></i></button>
                                     <?php endif; ?>
                                 </div>
@@ -654,7 +654,7 @@
                             <div class="card-body">
                                 <div class="d-sm-flex position-relative z-0 overflow-hidden p-2">
                                     <!-- <img src="assets/img/icons/shape-01.svg" alt="img"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
                                     <a href="javascript:void(0);"
                                         class="avatar avatar-xxxl patient-avatar me-2 flex-shrink-0">
                                         <img src="<?php echo e(asset('assets/img/patient.png')); ?>" alt="product" class="rounded">
@@ -743,19 +743,19 @@
                                         </div>
                                     </div>
                                     <!-- <div class="row">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-5">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="col-sm-5">
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-7">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="col-sm-7">
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-5">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="col-sm-5">
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-7">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="col-sm-7">
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </div> -->
                                 </div>
                                 <hr>
                                 <div class="d-flex align-items-center mb-3">
@@ -1051,7 +1051,7 @@
                                                     <td>
                                                         <?php echo e($lab->pathology->test_name .
                                                             "
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    (" .
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    (" .
                                                             $lab->pathology->short_name .
                                                             ')'); ?>
 
@@ -1189,41 +1189,41 @@
                                         </thead>
                                         <tbody>
                                             <?php $__empty_1 = true; $__currentLoopData = $transactions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $transaction): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                                                                <tr>
-                                                                    <td>
-                                                                        <?php echo e($transaction->transaction_no ?? 'TRID'.$transaction->id); ?>
+                                                <tr>
+                                                    <td>
+                                                        <?php echo e($transaction->transaction_no ?? 'TRID' . $transaction->id); ?>
 
-                                                                    </td>
+                                                    </td>
 
-                                                                    <td>
-                                                                        <?php echo e(\Carbon\Carbon::parse($transaction->transaction_date)->format('d/m/Y h:i A')); ?>
+                                                    <td>
+                                                        <?php echo e(\Carbon\Carbon::parse($transaction->transaction_date)->format('d/m/Y h:i A')); ?>
 
-                                                                    </td>
+                                                    </td>
 
-                                                                    <td>
-                                                                        <?php echo e($transaction->note ?? '-'); ?>
+                                                    <td>
+                                                        <?php echo e($transaction->note ?? '-'); ?>
 
-                                                                    </td>
+                                                    </td>
 
-                                                                    <td>
-                                                                        <?php echo e($transaction->payment_mode == 1 ? 'Cash' : '-'); ?>
+                                                    <td>
+                                                        <?php echo e($transaction->payment_mode == 1 ? 'Cash' : '-'); ?>
 
-                                                                    </td>
+                                                    </td>
 
-                                                                    <td class="text-end">
-                                                                        <?php echo e(number_format($transaction->amount, 2)); ?>
+                                                    <td class="text-end">
+                                                        <?php echo e(number_format($transaction->amount, 2)); ?>
 
-                                                                    </td>
+                                                    </td>
 
 
-                                                                </tr>
-                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                                                                <tr>
-                                                                    <td colspan="6" class="text-center text-muted">
-                                                                        No payments found
-                                                                    </td>
-                                                                </tr>
-                                                            <?php endif; ?>
+                                                </tr>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                                <tr>
+                                                    <td colspan="6" class="text-center text-muted">
+                                                        No payments found
+                                                    </td>
+                                                </tr>
+                                            <?php endif; ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -2090,10 +2090,10 @@ unset($__errorArgs, $__bag); ?>
                                                                                 <i class="ti ti-pencil"></i>
                                                                             </a>
                                                                             <!-- <a href="javascript:void(0);"
-                                                                                                    onclick="confirmDelete('<?php echo e(route('medication.delete', $medication->id)); ?>')"
-                                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                                                        <i class="ti ti-trash" data-bs-toggle="tooltip" title="Delete"></i>
-                                                                                                </a> -->
+                                                                                                            onclick="confirmDelete('<?php echo e(route('medication.delete', $medication->id)); ?>')"
+                                                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                                                                                <i class="ti ti-trash" data-bs-toggle="tooltip" title="Delete"></i>
+                                                                                                        </a> -->
 
                                                                         </div>
                                                                     </td>
@@ -2282,7 +2282,7 @@ unset($__errorArgs, $__bag); ?>
                                                                     <td>
                                                                         <?php echo e($lab->pathology->test_name .
                                                                             "
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                (" .
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                (" .
                                                                             $lab->pathology->short_name .
                                                                             ')'); ?>
 
@@ -2544,10 +2544,10 @@ unset($__errorArgs, $__bag); ?>
                                                                                 <i class="ti ti-pencil"></i>
                                                                             </a>
                                                                             <!-- <a href="javascript: void(0);"
-                                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                                                    <i class="ti ti-trash"
-                                                                                                        data-bs-toggle="tooltip"
-                                                                                                        title="Show"></i></a> -->
+                                                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                                                                            <i class="ti ti-trash"
+                                                                                                                data-bs-toggle="tooltip"
+                                                                                                                title="Show"></i></a> -->
                                                                         </div>
                                                                     </td>
                                                                 </tr>
@@ -2859,7 +2859,7 @@ unset($__errorArgs, $__bag); ?>
                                                                                                     value="<?php echo e($ipd->id); ?>">
                                                                                                 <select name="charge_type"
                                                                                                     id="add_charge_type"
-                                                                                                    class="form-control charge_type select2 reset_value select2-hidden-accessible"
+                                                                                                    class="form-control charge_type reset_value"
                                                                                                     style="width: 100%"
                                                                                                     tabindex="-1"
                                                                                                     aria-hidden="true">
@@ -2876,14 +2876,14 @@ unset($__errorArgs, $__bag); ?>
                                                                                             <div class="form-group">
                                                                                                 <label
                                                                                                     class="form-label">Charge
-                                                                                                    Category</label><small
-                                                                                                    class="req">
-                                                                                                    *</small>
+                                                                                                    Category<small
+                                                                                                        class="req">
+                                                                                                        *</small></label>
                                                                                                 <select
                                                                                                     name="charge_category2"
                                                                                                     id="charge_category2"
                                                                                                     style="width: 100%"
-                                                                                                    class="form-control select2 charge_category2 reset_value select2-hidden-accessible"
+                                                                                                    class="form-control charge_category2 reset_value"
                                                                                                     tabindex="-1"
                                                                                                     aria-hidden="true">
                                                                                                     <option
@@ -2897,13 +2897,13 @@ unset($__errorArgs, $__bag); ?>
                                                                                             <div class="form-group">
                                                                                                 <label
                                                                                                     class="form-label">Charge
-                                                                                                    Name</label><small
-                                                                                                    class="req">
-                                                                                                    *</small>
+                                                                                                    Name<small
+                                                                                                        class="req">
+                                                                                                        *</small></label>
                                                                                                 <select name="charge_id"
                                                                                                     id="charge_id"
                                                                                                     style="width: 100%"
-                                                                                                    class="form-control addcharge  select2 reset_value select2-hidden-accessible"
+                                                                                                    class="form-control addcharge reset_value"
                                                                                                     tabindex="-1"
                                                                                                     aria-hidden="true">
                                                                                                     <option
@@ -2920,7 +2920,6 @@ unset($__errorArgs, $__bag); ?>
                                                                                                     Charge
                                                                                                     (INR)</label>
                                                                                                 <input type="text"
-
                                                                                                     name="standard_charge"
                                                                                                     id="addstandard_charge"
                                                                                                     class="form-control reset_value standard_charge"
@@ -2935,7 +2934,6 @@ unset($__errorArgs, $__bag); ?>
                                                                                                     class="form-label">TPA
                                                                                                     Charge (INR)</label>
                                                                                                 <input type="text"
-
                                                                                                     name="schedule_charge"
                                                                                                     id="addscd_charge"
                                                                                                     placeholder=""
@@ -2948,9 +2946,9 @@ unset($__errorArgs, $__bag); ?>
                                                                                         <div class="col-sm-2">
                                                                                             <div class="form-group">
                                                                                                 <label
-                                                                                                    class="form-label">Qty</label><small
-                                                                                                    class="req">
-                                                                                                    *</small>
+                                                                                                    class="form-label">Qty<small
+                                                                                                        class="req">
+                                                                                                        *</small></label>
                                                                                                 <input type="text"
                                                                                                     name="qty"
                                                                                                     id="qty"
@@ -2980,8 +2978,7 @@ unset($__errorArgs, $__bag); ?>
                                                                                                                 name="apply_charge"
                                                                                                                 id="apply_charge"
                                                                                                                 style="width: 30%; float: right"
-                                                                                                                class="form-control total apply_charge_add_charge"
-                                                                                                                >
+                                                                                                                class="form-control total apply_charge_add_charge">
                                                                                                         </td>
                                                                                                     </tr>
                                                                                                     <tr>
@@ -3011,8 +3008,7 @@ unset($__errorArgs, $__bag); ?>
                                                                                                                 value="0"
                                                                                                                 id="discount_percentage_amount"
                                                                                                                 style="width: 50%; float: right"
-                                                                                                                class="form-control discount_percentage_amount"
-                                                                                                                >
+                                                                                                                class="form-control discount_percentage_amount">
                                                                                                         </td>
                                                                                                     </tr>
                                                                                                     <tr>
@@ -3039,8 +3035,7 @@ unset($__errorArgs, $__bag); ?>
                                                                                                                 value="0"
                                                                                                                 id="tax_amt"
                                                                                                                 style="width: 50%; float: right"
-                                                                                                                class="form-control tax"
-                                                                                                                >
+                                                                                                                class="form-control tax">
                                                                                                         </td>
                                                                                                     </tr>
                                                                                                     <tr>
@@ -3055,8 +3050,7 @@ unset($__errorArgs, $__bag); ?>
                                                                                                                 name="amount"
                                                                                                                 id="final_amount"
                                                                                                                 style="width: 30%; float: right"
-                                                                                                                class="form-control net_amount"
-                                                                                                                >
+                                                                                                                class="form-control net_amount">
                                                                                                         </td>
                                                                                                     </tr>
                                                                                                 </tbody>
@@ -3079,9 +3073,9 @@ unset($__errorArgs, $__bag); ?>
                                                                                         <div class="col-sm-3">
                                                                                             <div class="form-group mb-2">
                                                                                                 <label for=""
-                                                                                                    class="form-label">Date</label>
-                                                                                                <small class="req">
-                                                                                                    *</small>
+                                                                                                    class="form-label">Date
+                                                                                                    <small class="req">
+                                                                                                        *</small></label>
                                                                                                 <input id="charge_date"
                                                                                                     name="date"
                                                                                                     placeholder=""
@@ -3192,7 +3186,7 @@ unset($__errorArgs, $__bag); ?>
                                                                 ?>
                                                                 <tr>
                                                                     <td>
-                                                                         <?php echo e(\Carbon\Carbon::parse($charge->date)->format('d-m-Y')); ?>
+                                                                        <?php echo e(\Carbon\Carbon::parse($charge->date)->format('d-m-Y')); ?>
 
                                                                     </td>
                                                                     <td>
@@ -3219,25 +3213,25 @@ unset($__errorArgs, $__bag); ?>
                                                                     </td>
                                                                     <td><?php echo e($amount); ?></td>
                                                                     <!-- <td>
-                                                                        <div class="d-flex gap-2">
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
-                                                                                <i class="fa-solid fa-print"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    title="Print"></i></a>
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                                                <i class="ti ti-pencil"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    title="Edit"></i></a>
+                                                                                <div class="d-flex gap-2">
+                                                                                    <a href="javascript: void(0);"
+                                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
+                                                                                        <i class="fa-solid fa-print"
+                                                                                            data-bs-toggle="tooltip"
+                                                                                            title="Print"></i></a>
+                                                                                    <a href="javascript: void(0);"
+                                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+                                                                                        <i class="ti ti-pencil"
+                                                                                            data-bs-toggle="tooltip"
+                                                                                            title="Edit"></i></a>
 
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                                <i class="ti ti-trash"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    title="Delete"></i></a>
-                                                                        </div>
-                                                                    </td> -->
+                                                                                    <a href="javascript: void(0);"
+                                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
+                                                                                        <i class="ti ti-trash"
+                                                                                            data-bs-toggle="tooltip"
+                                                                                            title="Delete"></i></a>
+                                                                                </div>
+                                                                            </td> -->
                                                                 </tr>
                                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
@@ -3305,59 +3299,66 @@ unset($__errorArgs, $__bag); ?>
                                                                     </div>
 
                                                                     <div class="modal-body">
-                                                                        <form action="<?php echo e(route('transactions.store')); ?>" method="POST">
+                                                                        <form action="<?php echo e(route('transactions.store')); ?>"
+                                                                            method="POST">
                                                                             <?php echo csrf_field(); ?>
-                                                                            <input type="hidden" name="ipd_id" value="<?php echo e($ipd->id); ?>">
-                                                                            <input type="hidden" name="patient_id" value="<?php echo e($ipd->patient_id); ?>">
-                                                                            <input type="hidden" name="type" value="payment">
-                                                                            <input type="hidden" name="section" value="ipd">
-                                                                                <div class="row gy-3 py-4 mx-1">
+                                                                            <input type="hidden" name="ipd_id"
+                                                                                value="<?php echo e($ipd->id); ?>">
+                                                                            <input type="hidden" name="patient_id"
+                                                                                value="<?php echo e($ipd->patient_id); ?>">
+                                                                            <input type="hidden" name="type"
+                                                                                value="payment">
+                                                                            <input type="hidden" name="section"
+                                                                                value="ipd">
+                                                                            <div class="row gy-3 py-4 mx-1">
 
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="date"
-                                                                                            class="form-label">Date
-                                                                                            <span class="text-danger">*</span>
-                                                                                        </label>
-                                                                                        <input type="date" name="date"
-                                                                                            id="date" class="form-control"
-                                                                                            required>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="amount"
-                                                                                            class="form-label">Amount (INR)
-                                                                                            <span class="text-danger">*</span>
-                                                                                        </label>
-                                                                                        <input type="text" name="amount"
-                                                                                            id="amount" class="form-control"
-                                                                                            required>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="payment_mode"
-                                                                                            class="form-label">Payment Mode
-
-                                                                                        </label>
-                                                                                        <select name="payment_mode"
-                                                                                            id="payment_mode"
-                                                                                            class="form-select"
-                                                                                            data-placeholder="Enter Patient Name or Id…">
-                                                                                            <option value="0">Select</option>
-                                                                                            <option value="1">Cash</option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="note"
-                                                                                            class="form-label">Note
-                                                                                        </label>
-                                                                                        <textarea name="note" id="note" class="form-control"></textarea>
-                                                                                    </div>
+                                                                                <div class="col-md-6">
+                                                                                    <label for="date"
+                                                                                        class="form-label">Date
+                                                                                        <span class="text-danger">*</span>
+                                                                                    </label>
+                                                                                    <input type="date" name="date"
+                                                                                        id="date"
+                                                                                        class="form-control" required>
                                                                                 </div>
+                                                                                <div class="col-md-6">
+                                                                                    <label for="amount"
+                                                                                        class="form-label">Amount (INR)
+                                                                                        <span class="text-danger">*</span>
+                                                                                    </label>
+                                                                                    <input type="text" name="amount"
+                                                                                        id="amount"
+                                                                                        class="form-control" required>
+                                                                                </div>
+                                                                                <div class="col-md-6">
+                                                                                    <label for="payment_mode"
+                                                                                        class="form-label">Payment Mode
 
+                                                                                    </label>
+                                                                                    <select name="payment_mode"
+                                                                                        id="payment_mode"
+                                                                                        class="form-select"
+                                                                                        data-placeholder="Enter Patient Name or Id…">
+                                                                                        <option value="0">Select
+                                                                                        </option>
+                                                                                        <option value="1">Cash
+                                                                                        </option>
+                                                                                    </select>
+                                                                                </div>
+                                                                                <div class="col-md-6">
+                                                                                    <label for="note"
+                                                                                        class="form-label">Note
+                                                                                    </label>
+                                                                                    <textarea name="note" id="note" class="form-control"></textarea>
+                                                                                </div>
                                                                             </div>
-                                                                            <div class="modal-footer">
-                                                                                <button type="submit"
-                                                                                    class="btn btn-primary">Save</button>
-                                                                            </div>
-                                                                        </form>
+
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="submit"
+                                                                            class="btn btn-primary">Save</button>
+                                                                    </div>
+                                                                    </form>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -3380,7 +3381,7 @@ unset($__errorArgs, $__bag); ?>
                                                             <?php $__empty_1 = true; $__currentLoopData = $transactions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $transaction): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                                                 <tr>
                                                                     <td>
-                                                                        <?php echo e($transaction->transaction_no ?? 'TRID'.$transaction->id); ?>
+                                                                        <?php echo e($transaction->transaction_no ?? 'TRID' . $transaction->id); ?>
 
                                                                     </td>
 
@@ -3405,35 +3406,35 @@ unset($__errorArgs, $__bag); ?>
                                                                     </td>
 
                                                                     <!-- <td>
-                                                                        <div class="d-flex gap-2">
-                                                                            
-                                                                            <a href="<?php echo e(route('transactions.print', $transaction->id)); ?>"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill"
-                                                                            data-bs-toggle="tooltip" title="Print">
-                                                                                <i class="fa-solid fa-print"></i>
-                                                                            </a>
+                                                                                <div class="d-flex gap-2">
+                                                                                    
+                                                                                    <a href="<?php echo e(route('transactions.print', $transaction->id)); ?>"
+                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill"
+                                                                                    data-bs-toggle="tooltip" title="Print">
+                                                                                        <i class="fa-solid fa-print"></i>
+                                                                                    </a>
 
-                                                                            
-                                                                            <a href="<?php echo e(route('transactions.show', $transaction->id)); ?>"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill"
-                                                                            data-bs-toggle="tooltip" title="Show">
-                                                                                <i class="ti ti-pencil"></i>
-                                                                            </a>
+                                                                                    
+                                                                                    <a href="<?php echo e(route('transactions.show', $transaction->id)); ?>"
+                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill"
+                                                                                    data-bs-toggle="tooltip" title="Show">
+                                                                                        <i class="ti ti-pencil"></i>
+                                                                                    </a>
 
-                                                                            
-                                                                            <form action="<?php echo e(route('transactions.destroy', $transaction->id)); ?>"
-                                                                                method="POST"
-                                                                                onsubmit="return confirm('Delete this payment?')">
-                                                                                <?php echo csrf_field(); ?>
-                                                                                <?php echo method_field('DELETE'); ?>
-                                                                                <button type="submit"
-                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
-                                                                                    data-bs-toggle="tooltip" title="Delete">
-                                                                                    <i class="ti ti-trash"></i>
-                                                                                </button>
-                                                                            </form>
-                                                                        </div>
-                                                                    </td> -->
+                                                                                    
+                                                                                    <form action="<?php echo e(route('transactions.destroy', $transaction->id)); ?>"
+                                                                                        method="POST"
+                                                                                        onsubmit="return confirm('Delete this payment?')">
+                                                                                        <?php echo csrf_field(); ?>
+                                                                                        <?php echo method_field('DELETE'); ?>
+                                                                                        <button type="submit"
+                                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
+                                                                                            data-bs-toggle="tooltip" title="Delete">
+                                                                                            <i class="ti ti-trash"></i>
+                                                                                        </button>
+                                                                                    </form>
+                                                                                </div>
+                                                                            </td> -->
                                                                 </tr>
                                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                                                 <tr>
@@ -4289,14 +4290,14 @@ unset($__errorArgs, $__bag); ?>
                                                                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
                                                                     <!-- <td>
-                                                                                            <div class="d-flex gap-2">
-                                                                                                <a href="#"
-                                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
-                                                                                                    data-bs-toggle="tooltip" title="Show">
-                                                                                                    <i class="ti ti-menu"></i>
-                                                                                                </a>
-                                                                                            </div>
-                                                                                        </td> -->
+                                                                                                    <div class="d-flex gap-2">
+                                                                                                        <a href="#"
+                                                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
+                                                                                                            data-bs-toggle="tooltip" title="Show">
+                                                                                                            <i class="ti ti-menu"></i>
+                                                                                                        </a>
+                                                                                                    </div>
+                                                                                                </td> -->
                                                                 </tr>
                                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                                                 <tr>
@@ -4596,143 +4597,144 @@ unset($__errorArgs, $__bag); ?>
 
 
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
 
-    const chargeTypeSelect     = document.getElementById("add_charge_type");
-    const chargeCategorySelect = document.getElementById("charge_category2");
-    const chargeSelect         = document.getElementById("charge_id");
+            const chargeTypeSelect = document.getElementById("add_charge_type");
+            const chargeCategorySelect = document.getElementById("charge_category2");
+            const chargeSelect = document.getElementById("charge_id");
 
-    const standardChargeInp = document.getElementById("addstandard_charge");
-    const tpaChargeInp      = document.getElementById("addscd_charge");
-    const qtyInp            = document.getElementById("qty");
-    const totalInp          = document.getElementById("apply_charge");
-    const discountPercInp   = document.getElementById("discount_percentage_add_charge");
-    const discountAmtInp    = document.getElementById("discount_percentage_amount");
-    const taxPercInp        = document.getElementById("charge_tax");
-    const taxAmtInp         = document.getElementById("tax_amt");
-    const netAmountInp      = document.getElementById("final_amount");
+            const standardChargeInp = document.getElementById("addstandard_charge");
+            const tpaChargeInp = document.getElementById("addscd_charge");
+            const qtyInp = document.getElementById("qty");
+            const totalInp = document.getElementById("apply_charge");
+            const discountPercInp = document.getElementById("discount_percentage_add_charge");
+            const discountAmtInp = document.getElementById("discount_percentage_amount");
+            const taxPercInp = document.getElementById("charge_tax");
+            const taxAmtInp = document.getElementById("tax_amt");
+            const netAmountInp = document.getElementById("final_amount");
 
-    const previewBody = document.getElementById("preview_charges");
-    const addBtn = document.querySelector("button[name='charge_data']");
+            const previewBody = document.getElementById("preview_charges");
+            const addBtn = document.querySelector("button[name='charge_data']");
 
-    /*--------------------------------------------------
-     | FETCH CHARGE TYPES
-     --------------------------------------------------*/
-    fetch("<?php echo e(route('getChargeTypes')); ?>")
-        .then(res => res.json())
-        .then(data => {
-            window.chargeTypeData = data;
-            chargeTypeSelect.innerHTML = `<option value="">Select</option>`;
-            data.forEach(type => {
-                chargeTypeSelect.innerHTML += `
+            /*--------------------------------------------------
+             | FETCH CHARGE TYPES
+             --------------------------------------------------*/
+            fetch("<?php echo e(route('getChargeTypes')); ?>")
+                .then(res => res.json())
+                .then(data => {
+                    window.chargeTypeData = data;
+                    chargeTypeSelect.innerHTML = `<option value="">Select</option>`;
+                    data.forEach(type => {
+                        chargeTypeSelect.innerHTML += `
                     <option value="${type.id}">${type.charge_type}</option>
                 `;
-            });
-        });
+                    });
+                });
 
-    /*--------------------------------------------------
-     | FETCH CATEGORIES BY TYPE
-     --------------------------------------------------*/
-    chargeTypeSelect.addEventListener("change", function () {
+            /*--------------------------------------------------
+             | FETCH CATEGORIES BY TYPE
+             --------------------------------------------------*/
+            chargeTypeSelect.addEventListener("change", function() {
 
-        chargeCategorySelect.innerHTML = `<option value="">Select</option>`;
-        chargeSelect.innerHTML = `<option value="">Select</option>`;
+                chargeCategorySelect.innerHTML = `<option value="">Select</option>`;
+                chargeSelect.innerHTML = `<option value="">Select</option>`;
 
-        if (!this.value) return;
+                if (!this.value) return;
 
-        fetch("<?php echo e(route('getChargeCategoriesByTypeId', ['id' => 'ID'])); ?>".replace('ID', this.value))
-            .then(res => res.json())
-            .then(data => {
-                window.chargeCategoryData = data;
-                data.forEach(cat => {
-                    chargeCategorySelect.innerHTML += `
+                fetch("<?php echo e(route('getChargeCategoriesByTypeId', ['id' => 'ID'])); ?>".replace('ID', this
+                        .value))
+                    .then(res => res.json())
+                    .then(data => {
+                        window.chargeCategoryData = data;
+                        data.forEach(cat => {
+                            chargeCategorySelect.innerHTML += `
                         <option value="${cat.id}">${cat.name}</option>
                     `;
-                });
+                        });
+                    });
             });
-    });
 
-    /*--------------------------------------------------
-     | FETCH CHARGES BY CATEGORY
-     --------------------------------------------------*/
-    chargeCategorySelect.addEventListener("change", function () {
+            /*--------------------------------------------------
+             | FETCH CHARGES BY CATEGORY
+             --------------------------------------------------*/
+            chargeCategorySelect.addEventListener("change", function() {
 
-        chargeSelect.innerHTML = `<option value="">Select</option>`;
+                chargeSelect.innerHTML = `<option value="">Select</option>`;
 
-        if (!this.value) return;
+                if (!this.value) return;
 
-        fetch("<?php echo e(route('getCharges', ['id' => 'ID'])); ?>".replace('ID', this.value))
-            .then(res => res.json())
-            .then(data => {
-                window.chargeData = data;
-                data.forEach(charge => {
-                    chargeSelect.innerHTML += `
+                fetch("<?php echo e(route('getCharges', ['id' => 'ID'])); ?>".replace('ID', this.value))
+                    .then(res => res.json())
+                    .then(data => {
+                        window.chargeData = data;
+                        data.forEach(charge => {
+                            chargeSelect.innerHTML += `
                         <option value="${charge.id}">${charge.name}</option>
                     `;
-                });
+                        });
+                    });
             });
-    });
 
-    /*--------------------------------------------------
-     | AUTO-FILL ON CHARGE SELECT (ONCE)
-     --------------------------------------------------*/
-    chargeSelect.addEventListener("change", function () {
+            /*--------------------------------------------------
+             | AUTO-FILL ON CHARGE SELECT (ONCE)
+             --------------------------------------------------*/
+            chargeSelect.addEventListener("change", function() {
 
-        const chargeId = this.value;
-        const selectedCharge = window.chargeData.find(c => c.id == chargeId);
-        if (!selectedCharge) return;
+                const chargeId = this.value;
+                const selectedCharge = window.chargeData.find(c => c.id == chargeId);
+                if (!selectedCharge) return;
 
-        standardChargeInp.value = selectedCharge.standard_charge ?? 0;
-        tpaChargeInp.value      = 0;
-        qtyInp.value            = 1;
-        discountPercInp.value   = 0;
-        taxPercInp.value        = selectedCharge.tax_category?.percentage ?? 0;
+                standardChargeInp.value = selectedCharge.standard_charge ?? 0;
+                tpaChargeInp.value = 0;
+                qtyInp.value = 1;
+                discountPercInp.value = 0;
+                taxPercInp.value = selectedCharge.tax_category?.percentage ?? 0;
 
-        calculateAmount();
-    });
+                calculateAmount();
+            });
 
-    /*--------------------------------------------------
-     | REAL-TIME CALCULATION (EDITABLE SAFE)
-     --------------------------------------------------*/
-    [
-        standardChargeInp,
-        qtyInp,
-        discountPercInp,
-        taxPercInp
-    ].forEach(el => el.addEventListener("input", calculateAmount));
+            /*--------------------------------------------------
+             | REAL-TIME CALCULATION (EDITABLE SAFE)
+             --------------------------------------------------*/
+            [
+                standardChargeInp,
+                qtyInp,
+                discountPercInp,
+                taxPercInp
+            ].forEach(el => el.addEventListener("input", calculateAmount));
 
-    function calculateAmount() {
+            function calculateAmount() {
 
-        const standard = parseFloat(standardChargeInp.value) || 0;
-        const qty      = parseFloat(qtyInp.value) || 1;
+                const standard = parseFloat(standardChargeInp.value) || 0;
+                const qty = parseFloat(qtyInp.value) || 1;
 
-        const discountPerc = parseFloat(discountPercInp.value) || 0;
-        const taxPerc      = parseFloat(taxPercInp.value) || 0;
+                const discountPerc = parseFloat(discountPercInp.value) || 0;
+                const taxPerc = parseFloat(taxPercInp.value) || 0;
 
-        const appliedCharge = standard * qty;
-        const discountAmt   = appliedCharge * (discountPerc / 100);
-        const taxAmt        = appliedCharge * (taxPerc / 100);
-        const netAmount     = appliedCharge + taxAmt - discountAmt;
+                const appliedCharge = standard * qty;
+                const discountAmt = appliedCharge * (discountPerc / 100);
+                const taxAmt = appliedCharge * (taxPerc / 100);
+                const netAmount = appliedCharge + taxAmt - discountAmt;
 
-        totalInp.value       = appliedCharge.toFixed(2);
-        discountAmtInp.value = discountAmt.toFixed(2);
-        taxAmtInp.value      = taxAmt.toFixed(2);
-        netAmountInp.value   = netAmount.toFixed(2);
-    }
+                totalInp.value = appliedCharge.toFixed(2);
+                discountAmtInp.value = discountAmt.toFixed(2);
+                taxAmtInp.value = taxAmt.toFixed(2);
+                netAmountInp.value = netAmount.toFixed(2);
+            }
 
-    /*--------------------------------------------------
-     | ADD ROW TO PREVIEW TABLE
-     --------------------------------------------------*/
-    addBtn.addEventListener("click", function (e) {
-        e.preventDefault();
+            /*--------------------------------------------------
+             | ADD ROW TO PREVIEW TABLE
+             --------------------------------------------------*/
+            addBtn.addEventListener("click", function(e) {
+                e.preventDefault();
 
-        if (!chargeTypeSelect.value || !chargeCategorySelect.value || !chargeSelect.value) {
-            alert("Please fill required fields");
-            return;
-        }
+                if (!chargeTypeSelect.value || !chargeCategorySelect.value || !chargeSelect.value) {
+                    alert("Please fill required fields");
+                    return;
+                }
 
-        const row = `
+                const row = `
         <tr>
             <td>${document.getElementById("charge_date").value}</td>
             <td>${chargeTypeSelect.selectedOptions[0].text}</td>
@@ -4766,23 +4768,23 @@ document.addEventListener("DOMContentLoaded", function () {
         </tr>
         `;
 
-        previewBody.insertAdjacentHTML("beforeend", row);
+                previewBody.insertAdjacentHTML("beforeend", row);
 
-        document.getElementById("addChargeForm").reset();
-        totalInp.value = discountAmtInp.value = taxAmtInp.value = netAmountInp.value = 0;
-    });
+                document.getElementById("addChargeForm").reset();
+                totalInp.value = discountAmtInp.value = taxAmtInp.value = netAmountInp.value = 0;
+            });
 
-    /*--------------------------------------------------
-     | DELETE ROW
-     --------------------------------------------------*/
-    document.addEventListener("click", function (e) {
-        if (e.target.classList.contains("delete-charge-row")) {
-            e.target.closest("tr").remove();
-        }
-    });
+            /*--------------------------------------------------
+             | DELETE ROW
+             --------------------------------------------------*/
+            document.addEventListener("click", function(e) {
+                if (e.target.classList.contains("delete-charge-row")) {
+                    e.target.closest("tr").remove();
+                }
+            });
 
-});
-</script>
+        });
+    </script>
 
     <script>
         $(document).ready(function() {

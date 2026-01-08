@@ -208,6 +208,7 @@
             display: block !important;
         }
     </style>
+    <?php echo $__env->yieldContent('select2cdn'); ?>
 </head>
 
 <body>

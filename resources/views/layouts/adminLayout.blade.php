@@ -208,6 +208,7 @@
             display: block !important;
         }
     </style>
+    @yield('select2cdn')
 </head>
 
 <body>
