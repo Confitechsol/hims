@@ -1005,5 +1005,9 @@
         </div>
     </div>
 </div>
-
+@section("script")
+<script>
+    console.log('add staff page');
+</script>
+@endsection
 @endsection

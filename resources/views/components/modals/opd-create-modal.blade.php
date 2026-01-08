@@ -632,7 +632,7 @@
 </style>
 
 <!-- Modal -->
-<div class="modal fade" id="createOpdModal" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
+<div class="modal fade use-select2"  id="createOpdModal" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
             <form action="{{ route('opd.store') }}" id="opdForm" method="POST">
@@ -643,7 +643,7 @@
                         <h5 class="modal-title mb-3" id="patient-header">Patient Appointment</h5>
                         
                         <div class="d-flex gap-3 align-items-center" id="patient-loader">
-                            <select type="text" class="form-select patient-search flex-grow-1"
+                            <select type="text" class="form-select select2-input patient-search flex-grow-1"
                                 placeholder="Search patient by name or ID..." id="patient_select" name="patient_id">
                                 <option value="">Loading...</option>
                             </select>
@@ -814,7 +814,7 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Consultant Doctor <span class="required">*</span></label>
-                                <select class="form-select" name="doctor_id" id="doctor_select">
+                                <select class="form-select select2-input" name="doctor_id" id="doctor_select">
                                     <option value="">Loading...</option>
                                 </select>
                             </div>
