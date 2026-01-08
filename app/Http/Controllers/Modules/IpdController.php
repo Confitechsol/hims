@@ -122,7 +122,7 @@ class IpdController extends Controller
         }
         try {
            $symptomType  = array_filter($request->input('symptoms_type', []));
-$symptomTitle = array_filter($request->input('symptoms_title', []));
+        $symptomTitle = array_filter($request->input('symptoms_title', []));
             $implodedSymptomType  = implode(", ", $symptomType);
             $implodedSymptomTitle = implode(", ", $symptomTitle);
 
@@ -406,6 +406,19 @@ $symptomTitle = array_filter($request->input('symptoms_title', []));
         return response()->json($ipdMedicines, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
 
     }
+    public function getIpdRadPathById($id)
+{
+    $prescription = IpdPrescription::with([
+    'pathology',
+    'radiology'
+])->where('id', $id)->first();
+
+return response()->json([
+    'prescription' => $prescription, 
+    'pathology' => $prescription?->pathology ?? [],
+    'radiology' => $prescription?->radiology ?? [],
+]);
+}
 
     public function addNurseNote(Request $request)
     {
@@ -515,6 +528,7 @@ $symptomTitle = array_filter($request->input('symptoms_title', []));
             'ipd_id'              => 'nullable|string',
             'header_note'         => 'nullable|string',
             'footer_note'         => 'nullable|string',
+            'advice'              => 'nullable|string',
             'finding_description' => 'nullable|string',
             'finding_print'       => 'nullable|string',
             'finding_type'        => 'nullable|array',
@@ -584,6 +598,7 @@ $symptomTitle = array_filter($request->input('symptoms_title', []));
                     'prescribed_by'        => $request->prescribe_by,  // NEW
                     'header_note'         => $request->header_note ?? null,
                     'footer_note'         => $request->footer_note ?? null,
+                    'advice'              => $request->advice ?? null,
                     'finding_description' => $request->finding_description ?? null,
                     'is_finding_print'    => $request->finding_print ?? 'no',
                     'date'                => Carbon::now()->toDateString(),
@@ -714,6 +729,7 @@ $symptomTitle = array_filter($request->input('symptoms_title', []));
                 'prescribe_by'        => 'required|exists:doctor,id',  // Table name is 'doctor' not 'doctors'
                 'header_note'         => 'nullable|string',
                 'footer_note'         => 'nullable|string',
+                'advice'              => 'nullable|string',
                 'finding_description' => 'nullable|string',
                 'finding_print'       => 'nullable|string',
                 'finding_type'        => 'nullable|array',
@@ -776,6 +792,7 @@ $symptomTitle = array_filter($request->input('symptoms_title', []));
                     'prescribed_by'       => $prescribeBy,
                     'header_note'         => $request->header_note ?? null,
                     'footer_note'         => $request->footer_note ?? null,
+                    'advice'              => $request->advice ?? null,
                     'finding_description' => $request->finding_description ?? null,
                     'is_finding_print'    => $request->finding_print ?? 'no',
                     'finding_categories'  => $implodedFindingTypes,
