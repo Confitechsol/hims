@@ -207,10 +207,12 @@
         .select2-container .select2-search__field {
             display: block !important;
         }
-        .select2-container .select2-selection--single{
+
+        .select2-container .select2-selection--single {
             height: auto;
         }
-        .select2-container--default .select2-selection--single .select2-selection__rendered{
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
             padding-top: 4px;
             padding-bottom: 3px;
         }
@@ -801,8 +803,15 @@
                 }
             });
         });
+        $(document).ready(function() {
+            $('.add-select2').each(function() {
+                if (!$(this).hasClass('select2-hidden-accessible')) {
+                    $(this).select2();
+                }
+            });
+        });
     </script>
-    @yield("script")
+    @yield('script')
 </body>
 
 </html>
