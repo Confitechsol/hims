@@ -236,29 +236,40 @@
                                                 <tbody>
                                                 @foreach($charges as $charge)
                                                     <tr>
-                                                        <td>
-                                                            <h6 class="mb-0 fs-14 fw-semibold"> {{$charge->name}}</h6>
-                                                        </td>
-                                                        <td>{{$charge->category['name']}}</td>
-                                                        <td>{{$charge->category["chargeType"]->charge_type}}</td>
-                                                        <td>{{$charge->unit['unit']}}</td>
-                                                        <td>{{$charge->taxCategory['percentage'] ?? ""}}</td>
-                                                        <td>{{$charge->standard_charge}}</td>
-                                                        <td>
-                                                            <a href="javascript: void(0);"
-                                                           onclick="editCharge({{$charge->id}})"
-                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                                <i class="ti ti-pencil"></i></a>
-                                                                <form class="d-inline" action="{{ route('charges.destroy') }}" method="POST">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                    <input type="hidden" name="id" value="{{$charge->id}}">
-                                                                    <button onclick="return confirm('Are you sure you want to delete this charge?')" type="submit" class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                        <i class="ti ti-trash"></i>
-                                                                    </button>
-                                                                </form>
-                                                        </td>
-                                                    </tr>
+    <td>
+        <h6 class="mb-0 fs-14 fw-semibold">{{ $charge->name }}</h6>
+    </td>
+
+    <td>{{ optional($charge->category)->name }}</td>
+
+    <td>{{ optional(optional($charge->category)->chargeType)->charge_type }}</td>
+
+    <td>{{ optional($charge->unit)->unit }}</td>
+
+    <td>{{ optional($charge->taxCategory)->percentage }}</td>
+
+    <td>{{ $charge->standard_charge }}</td>
+
+    <td>
+        <a href="javascript:void(0);"
+           onclick="editCharge({{ $charge->id }})"
+           class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+            <i class="ti ti-pencil"></i>
+        </a>
+
+        <form class="d-inline" action="{{ route('charges.destroy') }}" method="POST">
+            @csrf
+            @method('DELETE')
+            <input type="hidden" name="id" value="{{ $charge->id }}">
+            <button onclick="return confirm('Are you sure you want to delete this charge?')"
+                    type="submit"
+                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                <i class="ti ti-trash"></i>
+            </button>
+        </form>
+    </td>
+</tr>
+
                                                     @endforeach
 
                                                 </tbody>

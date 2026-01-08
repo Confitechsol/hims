@@ -48,6 +48,7 @@ use App\Http\Controllers\Setup\HospitalChargesController;
 use App\Http\Controllers\Setup\HospitalChargeTypeController;
 use App\Http\Controllers\Setup\HospitalTaxCategoryController;
 use App\Http\Controllers\Setup\HospitalUnitTypeController;
+use App\Http\Controllers\Setup\PackageController;
 use App\Http\Controllers\Setup\HrController;
 use App\Http\Controllers\Setup\InventoryController;
 use App\Http\Controllers\Setup\LanguagesController;
@@ -532,6 +533,8 @@ Route::get('/ipd', [IpdController::class, 'index'])->name('ipd');
 Route::post('/ipd/store', [IpdController::class, 'store'])->name('ipd.store');
 Route::get('/ipd/edit/{id}', [IpdController::class, 'edit'])->name('ipd.edit');
 Route::put('/ipd/update/{id}', [IpdController::class, 'update'])->name('ipd.update');
+Route::post('/ipd/{id}/apply-package', [IpdController::class, 'applyPackage'])->name('ipd.apply-package');
+Route::delete('/ipd/{id}/remove-package', [IpdController::class, 'removePackage'])->name('ipd.remove-package');
 Route::get('/getBedGroups', [IpdController::class, 'getBedGroups'])->name('getBedGroups');
 Route::get('/get-available-beds', [IpdController::class, 'getAvailableBeds'])->name('get.available.beds');
 Route::get('/getBedNumbers/{id}', [IpdController::class, 'getBedNumbers'])->name('getBedNumbers');
@@ -550,6 +553,11 @@ Route::get('/getIpdById/{id}', [IpdController::class, 'getIpdById'])->name('getI
 Route::get('/getIpdMedicineById/{id}', [IpdController::class, 'getIpdMedicineById'])->name('getIpdMedicineById');
 Route::post('/add_nurse_note', [IpdController::class, 'addNurseNote'])->name('nurseNote.store');
 Route::post('/ipd/add_prescription', [IpdController::class, 'storePrescription'])->name('ipd.addPrescription');
+Route::get('/ipd/prescription/{id}', [IpdController::class, 'showPrescription'])->name('ipd.prescription.show');
+Route::get('/ipd/prescription/{id}/edit', [IpdController::class, 'editPrescription'])->name('ipd.prescription.edit');
+Route::get('/ipd/prescription/{id}/print', [IpdController::class, 'printPrescription'])->name('ipd.prescription.print');
+Route::put('/ipd/prescription/{id}', [IpdController::class, 'updatePrescription'])->name('ipd.prescription.update');
+Route::delete('/ipd/prescription/{id}', [IpdController::class, 'deletePrescription'])->name('ipd.prescription.delete');
 Route::post('/ipd_charge', [IpdController::class, 'addIpdCharge'])->name('ipd.addIpdCharge');
 Route::post('/assignNewBed', [IpdController::class, 'assignNewBed'])->name('assignNewBed');
 //
@@ -758,6 +766,7 @@ Route::prefix('pharmacy')->group(function () {
     Route::get('/api/batches/{pharmacyId}', [App\Http\Controllers\PharmacyBillingController::class, 'getMedicineBatches'])->name('pharmacy.api.batches');
     Route::get('/api/batch-details', [App\Http\Controllers\PharmacyBillingController::class, 'getBatchDetails'])->name('pharmacy.api.batch-details');
     Route::get('/api/patient-prescriptions/{patientId}', [App\Http\Controllers\PharmacyBillingController::class, 'getPatientPrescriptions'])->name('pharmacy.api.patient-prescriptions');
+    Route::get('/api/prescription-medicines/{prescriptionId}', [App\Http\Controllers\PharmacyBillingController::class, 'getPrescriptionMedicines'])->name('pharmacy.api.prescription-medicines');
 
     // Medicine Management
     Route::get('/create', [App\Http\Controllers\PharmacyController::class, 'create'])->name('pharmacy.create');
@@ -830,6 +839,7 @@ Route::prefix('pathology/billing/api')->group(function () {
     Route::get('/test-details', [PathologyBillingController::class, 'getTestDetails'])->name('pathology.billing.api.test-details');
     Route::get('/patient-tpas/{patientId}', [PathologyBillingController::class, 'getPatientTpas'])->name('pathology.billing.api.patient-tpas');
     Route::get('/tpa-charge', [PathologyBillingController::class, 'getTpaCharge'])->name('pathology.billing.api.tpa-charge');
+    Route::get('/prescription-tests/{prescriptionId}', [PathologyBillingController::class, 'getPrescriptionTests'])->name('pathology.billing.api.prescription-tests');
 });
 
 // Radiology Test Routes
@@ -867,6 +877,7 @@ Route::prefix('radiology/billing/api')->group(function () {
     Route::get('/test-details', [RadiologyBillingController::class, 'getTestDetails'])->name('radiology.billing.api.test-details');
     Route::get('/patient-tpas/{patientId}', [RadiologyBillingController::class, 'getPatientTpas'])->name('radiology.billing.api.patient-tpas');
     Route::get('/tpa-charge', [RadiologyBillingController::class, 'getTpaCharge'])->name('radiology.billing.api.tpa-charge');
+    Route::get('/prescription-tests/{prescriptionId}', [RadiologyBillingController::class, 'getPrescriptionTests'])->name('radiology.billing.api.prescription-tests');
 });
 
 // Pharmacy Masters Routes
@@ -918,6 +929,16 @@ Route::prefix('setup')->group(function () {
     Route::post('/medicine-group/store', [SetupMedicineGroupController::class, 'store'])->name('setup.medicine-group.store');
     Route::put('/medicine-group/update/{id}', [SetupMedicineGroupController::class, 'update'])->name('setup.medicine-group.update');
     Route::delete('/medicine-group/destroy/{id}', [SetupMedicineGroupController::class, 'destroy'])->name('setup.medicine-group.destroy');
+
+    // Package Management Routes
+    Route::get('/packages', [PackageController::class, 'index'])->name('packages.index');
+    Route::get('/packages/create', [PackageController::class, 'create'])->name('packages.create');
+    Route::post('/packages', [PackageController::class, 'store'])->name('packages.store');
+    Route::get('/packages/{id}', [PackageController::class, 'show'])->name('packages.show');
+    Route::get('/packages/{id}/edit', [PackageController::class, 'edit'])->name('packages.edit');
+    Route::put('/packages/{id}', [PackageController::class, 'update'])->name('packages.update');
+    Route::delete('/packages/{id}', [PackageController::class, 'destroy'])->name('packages.destroy');
+    Route::get('/packages/{id}/charges', [PackageController::class, 'getPackageCharges'])->name('packages.charges');
 });
 
 Route::get('/getMedicineCategories', [MedicineController::class, 'getCategories'])->name('getMedicineCategories');

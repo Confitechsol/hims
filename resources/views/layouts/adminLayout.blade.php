@@ -207,6 +207,15 @@
         .select2-container .select2-search__field {
             display: block !important;
         }
+
+        .select2-container .select2-selection--single {
+            height: auto;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            padding-top: 4px;
+            padding-bottom: 3px;
+        }
     </style>
     @yield('select2cdn')
 </head>
@@ -683,61 +692,127 @@
     </script>
     <!-- Resilient global Select2 initializer: waits for Select2 then initializes all selects -->
     <script>
-        (function() {
-            function tryInitSelect2() {
-                if (typeof window.jQuery === 'undefined') return false;
-                var $ = window.jQuery;
-                if (typeof $.fn.select2 === 'undefined') return false;
+        // (function() {
+        //     function tryInitSelect2() {
+        //         if (typeof window.jQuery === 'undefined') return false;
+        //         var $ = window.jQuery;
+        //         if (typeof $.fn.select2 === 'undefined') return false;
 
-                function initSelect($el) {
-                    if ($el.data('select2-inited')) return;
+        //         function initSelect($el) {
+        //             if ($el.data('select2-inited')) return;
 
-                    // skip selects that are hidden (like inside a hidden modal)
-                    if (!$el.is(':visible')) return;
+        //             // skip selects that are hidden (like inside a hidden modal)
+        //             if (!$el.is(':visible')) return;
 
-                    //skip which are inside edit modal
-                    if ($el.closest('#edit_modal').length > 0) return;
+        //             //skip which are inside edit modal
+        //             if ($el.closest('#edit_modal').length > 0) return;
 
-                    var dp = $el.closest('.modal').find('.modal-content').first();
-                    if (!dp || dp.length === 0) dp = $(document.body);
-                    try {
-                        $el.select2({
-                            width: '100%',
-                            dropdownParent: dp,
-                            minimumResultsForSearch: 0
-                        });
-                        $el.data('select2-inited', true);
-                    } catch (e) {
-                        // ignore init errors
-                    }
+        //             var dp = $el.closest('.modal').find('.modal-content').first();
+        //             if (!dp || dp.length === 0) dp = $(document.body);
+        //             try {
+        //                 $el.select2({
+        //                     width: '100%',
+        //                     dropdownParent: dp,
+        //                     minimumResultsForSearch: 0
+        //                 });
+        //                 $el.data('select2-inited', true);
+        //             } catch (e) {
+        //                 // ignore init errors
+        //             }
+        //         }
+
+        //         $('select.form-select').each(function() {
+        //             initSelect($(this));
+        //         });
+
+
+
+        //         // Initialize selects that appear inside modals when they open
+        //         $('.modal').off('shown.bs.modal.select2init').on('shown.bs.modal.select2init', function() {
+        //             var $modal = $(this);
+        //             if ($modal.attr('id') === 'edit_modal') return;
+        //             $modal.find('select.form-select').each(function() {
+        //                 initSelect($(this));
+        //             });
+        //         });
+
+        //         return true;
+        //     }
+
+        //     var attempts = 0;
+        //     var interval = setInterval(function() {
+        //         if (tryInitSelect2() || attempts++ > 50) {
+        //             clearInterval(interval);
+        //         }
+        //     }, 150);
+        // })();
+
+        // Note: tryInitSelect2 function should be defined elsewhere or this code should be removed
+        // var attempts = 0;
+        // var interval = setInterval(function() {
+        //     if (tryInitSelect2() || attempts++ > 50) {
+        //         clearInterval(interval);
+        //     }
+        // }, 150);
+
+        // Hide loader when page is ready
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const loader = document.querySelector('.loader');
+                if (loader) {
+                    loader.style.display = 'none';
+                }
+            }, 100);
+        });
+
+        // Also hide loader on DOMContentLoaded as fallback
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const loader = document.querySelector('.loader');
+                if (loader) {
+                    loader.style.display = 'none';
+                }
+            }, 500);
+        });
+
+        $(document).on('shown.bs.modal', '.use-select2', function() {
+            const $modal = $(this);
+
+            $modal.find('.select2-input').each(function() {
+                const $select = $(this);
+
+                // Prevent double initialization
+                if ($select.hasClass('select2-hidden-accessible')) {
+                    return;
                 }
 
-                $('select.form-select').each(function() {
-                    initSelect($(this));
+                $select.select2({
+                    dropdownParent: $modal,
+                    width: '100%'
                 });
+            });
+        });
 
+        $(document).on('hidden.bs.modal', '.use-select2', function() {
+            const $modal = $(this);
 
+            $modal.find('.select2-input').each(function() {
+                const $select = $(this);
 
-                // Initialize selects that appear inside modals when they open
-                $('.modal').off('shown.bs.modal.select2init').on('shown.bs.modal.select2init', function() {
-                    var $modal = $(this);
-                    if ($modal.attr('id') === 'edit_modal') return;
-                    $modal.find('select.form-select').each(function() {
-                        initSelect($(this));
-                    });
-                });
-
-                return true;
-            }
-
-            var attempts = 0;
-            var interval = setInterval(function() {
-                if (tryInitSelect2() || attempts++ > 50) {
-                    clearInterval(interval);
+                if ($select.hasClass('select2-hidden-accessible')) {
+                    $select.select2('destroy');
                 }
-            }, 150);
-        })();
+            });
+        });
+        $(document).ready(function() {
+            $('.add-select2').each(function() {
+                if (!$(this).hasClass('select2-hidden-accessible')) {
+                    $(this).select2();
+                }
+            });
+        });
     </script>
+    @yield('script')
 </body>
 
 </html>

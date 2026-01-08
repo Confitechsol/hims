@@ -61,6 +61,7 @@ class RadiologyTestController extends Controller
             'sub_category' => 'nullable|string|max:25',
             'report_days' => 'required|integer',
             'charge_id' => 'required|exists:charges,id',
+            
         ]);
 
         DB::beginTransaction();

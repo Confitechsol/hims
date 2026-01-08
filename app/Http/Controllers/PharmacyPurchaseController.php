@@ -55,7 +55,34 @@ class PharmacyPurchaseController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        // Log incoming request data for debugging
+        \Log::info('=== PURCHASE STORE METHOD CALLED ===');
+        \Log::info('Purchase Store Request:', [
+            'supplier_id' => $request->supplier_id,
+            'date' => $request->date,
+            'medicines_count' => count($request->medicines ?? []),
+            'medicines' => $request->medicines,
+            'all_request_data' => $request->except(['_token']),
+        ]);
+        
+        // Check if request has required data
+        if (!$request->has('supplier_id')) {
+            \Log::error('Missing supplier_id in request');
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Supplier ID is missing. Please select a supplier.');
+        }
+        
+        if (!$request->has('medicines') || !is_array($request->medicines) || count($request->medicines) == 0) {
+            \Log::error('Missing or empty medicines array');
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Please add at least one medicine to the purchase order.');
+        }
+
+        try {
+            \Log::info('Starting validation');
+            $validated = $request->validate([
             'invoice_no' => 'nullable|string|max:100',
             'date' => 'required|date',
             'supplier_id' => 'required|exists:medicine_supplier,id',
@@ -77,9 +104,38 @@ class PharmacyPurchaseController extends Controller
             'note' => 'nullable|string',
             'payment_note' => 'nullable|string',
             'attachment' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-        ]);
+            ]);
+            \Log::info('Validation passed successfully');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Purchase Validation Failed:', [
+                'errors' => $e->errors(),
+                'request_data' => $request->except(['_token']),
+                'message' => $e->getMessage(),
+            ]);
+            
+            $errorMessages = [];
+            foreach ($e->errors() as $field => $messages) {
+                $errorMessages[] = $field . ': ' . implode(', ', $messages);
+            }
+            
+            return redirect()->back()
+                ->withInput()
+                ->withErrors($e->errors())
+                ->with('error', 'Validation failed: ' . implode(' | ', $errorMessages));
+        } catch (\Exception $e) {
+            \Log::error('Purchase Validation Exception:', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Error: ' . $e->getMessage());
+        }
 
         try {
+            \Log::info('Starting purchase creation transaction');
             DB::beginTransaction();
 
             // Calculate totals
@@ -95,6 +151,8 @@ class PharmacyPurchaseController extends Controller
             $discount = $validated['discount'] ?? 0;
             $netAmount = $total + $totalTax - $discount;
 
+            \Log::info('Calculated totals', ['total' => $total, 'tax' => $totalTax, 'discount' => $discount, 'net_amount' => $netAmount]);
+
             // Handle file upload
             $attachmentPath = null;
             $attachmentName = null;
@@ -105,10 +163,12 @@ class PharmacyPurchaseController extends Controller
             }
 
             // Create supplier bill
+            \Log::info('Creating supplier bill');
             $supplierBill = SupplierBillBasic::create([
                 'invoice_no' => $validated['invoice_no'] ?? '',
                 'date' => $validated['date'],
                 'supplier_id' => $validated['supplier_id'],
+                'file' => '', // Required field but can be empty
                 'total' => $total,
                 'tax' => $totalTax,
                 'discount' => $discount,
@@ -124,13 +184,22 @@ class PharmacyPurchaseController extends Controller
                 'received_by' => Auth::id(),
             ]);
 
+            \Log::info('Supplier bill created', ['bill_id' => $supplierBill->id]);
+
             // Create medicine batches
-            foreach ($validated['medicines'] as $medicine) {
+            foreach ($validated['medicines'] as $index => $medicine) {
                 $batchAmount = $medicine['batch_amount'] ?? ($medicine['quantity'] * $medicine['purchase_price']);
                 
                 // Convert month format (YYYY-MM) to last day of month
                 $expiryDate = $medicine['expiry'] . '-01'; // First convert to YYYY-MM-01
                 $expiryDate = date('Y-m-t', strtotime($expiryDate)); // Then get last day of month
+
+                \Log::info("Creating batch {$index}", [
+                    'supplier_bill_basic_id' => $supplierBill->id,
+                    'pharmacy_id' => $medicine['pharmacy_id'],
+                    'batch_no' => $medicine['batch_no'],
+                    'expiry' => $expiryDate,
+                ]);
 
                 MedicineBatchDetail::create([
                     'supplier_bill_basic_id' => $supplierBill->id,
@@ -152,11 +221,18 @@ class PharmacyPurchaseController extends Controller
             }
 
             DB::commit();
+            \Log::info('Transaction committed successfully', ['bill_id' => $supplierBill->id]);
 
             return redirect()->route('pharmacy.purchase.show', $supplierBill->id)
                 ->with('success', 'Purchase order created successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('Purchase creation failed', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Failed to create purchase order: ' . $e->getMessage());

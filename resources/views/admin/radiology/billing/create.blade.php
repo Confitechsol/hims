@@ -8,6 +8,25 @@
                 <h5 class="mb-0" style="color: #750096"><i class="fas fa-plus-circle me-2"></i>Generate Radiology Bill</h5>
             </div>
             <div class="card-body">
+                @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Error!</strong> {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+                
+                @if($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Validation Errors:</strong>
+                        <ul class="mb-0">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+                
                 <form action="{{ route('radiology.billing.store') }}" method="POST" id="radiologyBillForm">
                     @csrf
                     
@@ -31,8 +50,8 @@
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Reference Doctor ({{ count($doctors ?? []) }} found)</label>
-                            <select name="doctor_id" id="doctor_id" class="form-select">
+                            <label class="form-label ">Reference Doctor ({{ count($doctors ?? []) }} found)</label>
+                            <select name="doctor_id" id="doctor_id" class="form-select add-select2">
                                 <option value="">Select Doctor</option>
                                 @if(isset($doctors) && count($doctors) > 0)
                                     @foreach($doctors as $doctor)
@@ -257,8 +276,24 @@ document.addEventListener('DOMContentLoaded', function() {
     initPrescriptionAutocomplete();
     
     // Test selection handler - Using jQuery with Select2
+    // Updated: 2026-01-04 - Fixed activateTpa scope issue
     $(document).on('change', '.test_name', function(e) {
         console.log('Test dropdown changed! (Select2 event)');
+        
+        // CRITICAL: Declare activateTpa and organisationId FIRST - function-scoped with var
+        var activateTpa = false;
+        var organisationId = null;
+        
+        // Get TPA elements
+        var activateTpaElement = document.getElementById('activate_tpa');
+        if (activateTpaElement) {
+            activateTpa = activateTpaElement.checked === true;
+        }
+        
+        var tpaDropdown = document.getElementById('tpa_dropdown');
+        if (tpaDropdown && tpaDropdown.value) {
+            organisationId = tpaDropdown.value;
+        }
         
         const selectedOption = this.options[this.selectedIndex];
         const row = $(this).closest('tr');
@@ -276,13 +311,12 @@ document.addEventListener('DOMContentLoaded', function() {
             row.find('.tax_percentage').val(tax);
             
             // Check if TPA is active and get TPA charge
-            const activateTpa = document.getElementById('activate_tpa').checked;
-            const tpaDropdown = document.getElementById('tpa_dropdown');
-            const organisationId = tpaDropdown ? tpaDropdown.value : null;
             
             if (activateTpa && organisationId) {
                 // Fetch TPA charge
-                fetch(`/hims/radiology/billing/api/tpa-charge?test_id=${testId}&organisation_id=${organisationId}`)
+                const url = `{{ url('/radiology/billing/api/tpa-charge') }}?test_id=${testId}&organisation_id=${organisationId}`;
+                console.log('Fetching TPA charge from:', url);
+                fetch(url)
                     .then(response => response.json())
                     .then(data => {
                         const amountToUse = (data.tpa_charge !== null && data.tpa_charge !== undefined) 
@@ -502,6 +536,21 @@ document.addEventListener('DOMContentLoaded', function() {
                         searchInput.value = prescription.case_id;
                         hiddenInput.value = prescription.id;
                         suggestionsDiv.style.display = 'none';
+                        
+                        console.log('Prescription selected:', prescription);
+                        
+                        // If it's an IPD prescription, load the tests
+                        if (prescription.type === 'ipd') {
+                            const prescriptionId = prescription.prescription_id || prescription.id;
+                            console.log('Loading tests for IPD prescription ID:', prescriptionId);
+                            if (prescriptionId) {
+                                loadPrescriptionTests(prescriptionId);
+                            } else {
+                                console.warn('No prescription ID found for IPD prescription');
+                            }
+                        } else {
+                            console.log('OPD prescription selected, no tests to load');
+                        }
                     });
                     suggestionsDiv.appendChild(div);
                 });
@@ -519,7 +568,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function loadPatientPrescriptions(patientId) {
-        fetch(`/hims/radiology/billing/api/patient-prescriptions/${patientId}`)
+        const url = `{{ url('/radiology/billing/api/patient-prescriptions') }}/${patientId}`;
+        console.log('Fetching prescriptions from URL:', url);
+        fetch(url)
             .then(response => response.json())
             .then(data => {
                 prescriptionData = data;
@@ -539,7 +590,9 @@ document.addEventListener('DOMContentLoaded', function() {
         helpText.textContent = 'Loading TPAs...';
         helpText.className = 'text-muted';
         
-        fetch(`/hims/radiology/billing/api/patient-tpas/${patientId}`)
+        const url = `{{ url('/radiology/billing/api/patient-tpas') }}/${patientId}`;
+        console.log('Fetching TPAs from URL:', url);
+        fetch(url)
             .then(response => response.json())
             .then(data => {
                 const tpaDropdown = document.getElementById('tpa_dropdown');
@@ -626,16 +679,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 // Fetch TPA charge for this test
-                const promise = fetch(`/hims/radiology/billing/api/tpa-charge?test_id=${testId}&organisation_id=${organisationId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        const amountInput = row.querySelector('.test_amount');
-                        if (data.tpa_charge !== null && data.tpa_charge !== undefined) {
-                            amountInput.value = data.tpa_charge.toFixed(2);
-                        } else {
-                            // If no TPA charge found, use standard charge
-                            amountInput.value = data.standard_charge.toFixed(2);
+                const url = `{{ url('/radiology/billing/api/tpa-charge') }}?test_id=${testId}&organisation_id=${organisationId}`;
+                console.log('Fetching TPA charge from:', url);
+                const promise = fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
                         }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('TPA charge response for test', testId, ':', data);
+                        const amountInput = row.querySelector('.test_amount');
+                        if (data.tpa_charge !== null && data.tpa_charge !== undefined && data.tpa_charge !== '') {
+                            amountInput.value = parseFloat(data.tpa_charge).toFixed(2);
+                            console.log('Applied TPA charge:', data.tpa_charge);
+                        } else {
+                            amountInput.value = parseFloat(data.standard_charge).toFixed(2);
+                            console.log('No TPA charge found, using standard charge:', data.standard_charge);
+                        }
+                        calculateTotals();
                     })
                     .catch(error => {
                         console.error('Error fetching TPA charge:', error);
@@ -702,7 +765,211 @@ document.addEventListener('DOMContentLoaded', function() {
         if (currentFocus < 0) currentFocus = suggestions.length - 1;
     }
 
+    // Load prescription tests (for IPD prescriptions)
+    function loadPrescriptionTests(prescriptionId) {
+        console.log('Loading prescription tests for prescription ID:', prescriptionId);
+        const url = `{{ url('/radiology/billing/api/prescription-tests') }}/${prescriptionId}`;
+        console.log('Fetching prescription tests from URL:', url);
+        
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Prescription tests loaded:', data);
+                
+                if (data.error) {
+                    console.error('Error:', data.error);
+                    alert('Error loading prescription: ' + data.error);
+                    return;
+                }
+                
+                // Clear existing test rows (except the first one)
+                const tbody = document.getElementById('testTableBody');
+                const existingRows = tbody.querySelectorAll('.test-row');
+                existingRows.forEach((row, index) => {
+                    if (index > 0) {
+                        row.remove();
+                    }
+                });
+                
+                // Clear the first row
+                const firstRow = tbody.querySelector('.test-row');
+                if (firstRow) {
+                    const testSelect = firstRow.querySelector('.test_name');
+                    testSelect.value = '';
+                    firstRow.querySelector('.report_days').value = '0';
+                    firstRow.querySelector('.report_date').value = '';
+                    firstRow.querySelector('.tax_percentage').value = '0';
+                    firstRow.querySelector('.test_amount').value = '';
+                }
+                
+                // Add tests from prescription
+                if (data.tests && data.tests.length > 0) {
+                    data.tests.forEach((test, index) => {
+                        let row;
+                        if (index === 0 && firstRow) {
+                            row = firstRow;
+                        } else {
+                            // Create new row by cloning the first row structure
+                            const newRow = firstRow.cloneNode(true);
+                            // Update the name attributes
+                            const rowIndex = index;
+                            newRow.querySelectorAll('input, select').forEach(input => {
+                                if (input.name) {
+                                    input.name = input.name.replace(/tests\[\d+\]/, `tests[${rowIndex}]`);
+                                }
+                            });
+                            tbody.appendChild(newRow);
+                            row = newRow;
+                        }
+                        
+                        // Set test values
+                        const testSelect = row.querySelector('.test_name');
+                        if (testSelect) {
+                            testSelect.value = test.id;
+                            
+                            // Trigger change event to populate other fields
+                            if (window.jQuery && $.fn.select2) {
+                                $(testSelect).trigger('change');
+                            } else {
+                                const event = new Event('change', { bubbles: true });
+                                testSelect.dispatchEvent(event);
+                            }
+                        }
+                    });
+                    
+                    // Update doctor if available
+                    if (data.prescription && data.prescription.doctor) {
+                        const doctorSelect = document.getElementById('doctor_id');
+                        // Try to find and select the doctor by name
+                        for (let option of doctorSelect.options) {
+                            if (option.text.toLowerCase().includes(data.prescription.doctor.toLowerCase())) {
+                                doctorSelect.value = option.value;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // If TPA is available from the prescription, add it to the dropdown
+                    if (data.tpa && data.tpa.id) {
+                        const tpaDropdown = document.getElementById('tpa_dropdown');
+                        const helpText = document.getElementById('tpa_help_text');
+                        
+                        // Check if TPA already exists in dropdown
+                        let tpaExists = false;
+                        for (let option of tpaDropdown.options) {
+                            if (option.value == data.tpa.id) {
+                                tpaExists = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!tpaExists) {
+                            // Clear the "No TPA found" option if it exists
+                            if (tpaDropdown.options.length > 0 && tpaDropdown.options[0].disabled) {
+                                tpaDropdown.remove(0);
+                            }
+                            
+                            const option = document.createElement('option');
+                            option.value = data.tpa.id;
+                            option.textContent = data.tpa.name + (data.tpa.code ? ' (' + data.tpa.code + ')' : '');
+                            tpaDropdown.appendChild(option);
+                        }
+                        
+                        // Activate TPA checkbox and select the TPA
+                        const activateTpaCheckbox = document.getElementById('activate_tpa');
+                        if (!activateTpaCheckbox.checked) {
+                            activateTpaCheckbox.checked = true;
+                            activateTpaCheckbox.dispatchEvent(new Event('change'));
+                        }
+                        
+                        // Wait a bit for TPA dropdown to populate, then select
+                        setTimeout(() => {
+                            tpaDropdown.value = data.tpa.id;
+                            tpaDropdown.dispatchEvent(new Event('change'));
+                        }, 500);
+                    }
+                    
+                    calculateTotals();
+                } else {
+                    console.log('No tests found in prescription');
+                    alert('No radiology tests found in this prescription.');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading prescription tests:', error);
+                alert('Error loading prescription tests: ' + error.message);
+            });
+    }
+
     calculateTotals();
+    
+    // Form submission validation
+    document.getElementById('radiologyBillForm').addEventListener('submit', function(e) {
+        console.log('Form submission started');
+        
+        // Validate patient is selected
+        const patientId = document.getElementById('patient_id').value;
+        if (!patientId) {
+            e.preventDefault();
+            alert('Please select a patient');
+            return false;
+        }
+        
+        // Validate at least one test is selected
+        const testRows = document.querySelectorAll('.test-row');
+        let hasTest = false;
+        testRows.forEach(row => {
+            const testSelect = row.querySelector('.test_name');
+            if (testSelect && testSelect.value) {
+                hasTest = true;
+            }
+        });
+        
+        if (!hasTest) {
+            e.preventDefault();
+            alert('Please add at least one test');
+            return false;
+        }
+        
+        // Validate TPA if checkbox is checked
+        const activateTpa = document.getElementById('activate_tpa').checked;
+        if (activateTpa) {
+            const tpaDropdown = document.getElementById('tpa_dropdown');
+            if (!tpaDropdown.value) {
+                e.preventDefault();
+                alert('Please select a TPA');
+                return false;
+            }
+        }
+        
+        // Clean up empty test rows before submission
+        testRows.forEach((row, index) => {
+            const testSelect = row.querySelector('.test_name');
+            if (!testSelect || !testSelect.value) {
+                // Remove empty rows except the first one
+                if (index > 0) {
+                    row.remove();
+                }
+            }
+        });
+        
+        // Ensure totals are calculated
+        calculateTotals();
+        
+        // Log form data before submission
+        const formData = new FormData(this);
+        console.log('Form data being submitted:');
+        for (let [key, value] of formData.entries()) {
+            console.log(key + ': ' + value);
+        }
+        
+        console.log('Form validation passed, submitting...');
+    });
 });
 </script>
 @endsection

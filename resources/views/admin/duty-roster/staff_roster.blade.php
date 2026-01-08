@@ -40,7 +40,7 @@
                                 <i class="ti ti-plus me-1"></i>Add Roster</a>
                         </div>
                         <!-- First Modal -->
-                        <div class="modal fade" id="add_appointment" tabindex="-1" aria-hidden="true">
+                        <div class="modal fade use-select2" id="add_appointment" tabindex="-1" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered modal-lg">
                                 <div class="modal-content">
                                     <form method="POST" action="{{ route('dutyroster.assignStaff') }}">
@@ -118,7 +118,7 @@
                                                     <div class="col-sm-6">
                                                         <div class="form-group">
                                                             <label>Department</label>
-                                                            <select class="form-control" id="duty_roster_department" name="department_id">
+                                                            <select class="form-control select2-input" id="duty_roster_department" name="department_id">
                                                                 <option value="">Select</option>
                                                                 @foreach($departments as $dept)
                                                                     <option value="{{ $dept->id }}">{{ $dept->department_name }}</option>

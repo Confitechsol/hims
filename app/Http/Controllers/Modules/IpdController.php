@@ -8,15 +8,22 @@ use App\Models\Charge;
 use App\Models\ChargeTypeMaster;
 use App\Models\DischargeCard;
 use App\Models\Doctor;
+use App\Models\Finding;
 use App\Models\IpdCharges;
 use App\Models\IpdDetail;
 use App\Models\IpdMedicine;
 use App\Models\IpdPatient;
 use App\Models\IpdPrescription;
+use App\Models\IpdPrescriptionTest;
+use App\Models\MedicationReport;
 use App\Models\NurseNote;
+use App\Models\OperationTheatre;
+use App\Models\Pathology;
+use App\Models\PathologyReport;
 use App\Models\Patient;
 use App\Models\PatientBedHistory;
 use App\Models\Prefix;
+use App\Models\Radio;
 use App\Models\Staff;
 use App\Models\Symptom;
 use App\Models\SymptomsClassification;
@@ -25,6 +32,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class IpdController extends Controller
@@ -37,6 +45,7 @@ class IpdController extends Controller
         $bedGroups  = BedGroup::with('floorDetail')->get();
         $chargeType = ChargeTypeMaster::all();
         $charges    = Charge::all();
+        $references = ['Direct', 'Doctor', 'Marketer', 'Other'];
         if ($isIpdTab) {
             $ipd = IpdDetail::with('patient', 'doctor', 'bedDetail', 'bedGroup.floorDetail')
                 ->when($search, function ($query) use ($search) {
@@ -68,7 +77,7 @@ class IpdController extends Controller
                 })->get();
             $ipd = $patients;
         }
-        return view("admin.ipd.index", compact("ipd", 'doctors', 'isIpdTab', 'bedGroups'));
+        return view("admin.ipd.index", compact("ipd", 'doctors', 'isIpdTab', 'bedGroups', 'references'));
     }
 
     public function store(Request $request)
@@ -180,7 +189,7 @@ class IpdController extends Controller
             DB::commit();
 
             return redirect()->route('ipd')->with('success', 'IPD record created successfully . ')
-                ->with('pdf_url', route('ipd.pdf', $ipd->id));
+                ->with('pdf_url', route('ipd.pdf', $ipdPatient->id));
         } catch (\Exception $e) {
             DB::rollBack();
             dd($e);
@@ -330,6 +339,53 @@ class IpdController extends Controller
         return response()->json($bedNumbers, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
     }
 
+    public function showIpd(Request $request, $id)
+    {
+        $ipd        = IpdDetail::with('patient.bloodGroup', 'patient.organisation', 'doctor', 'bedDetail', 'bedGroup')->where('id', $id)->firstOrFail();
+        $symptomIds = array_filter(
+            explode(',', $ipd->symptoms_title),
+            fn($id) => $id !== null && trim($id) !== ''
+        );
+
+        // Fetch symptoms related to this OPD
+        $symptoms = ! empty($symptomIds)
+            ? Symptom::whereIn('id', $symptomIds)->get()
+            : collect();
+        $nurseNotes        = NurseNote::with('staff')->where('ipd_id', $id)->get();
+        $medicationReport  = MedicationReport::with('medicineDosage.unit', 'pharmacy', 'generatedBy.userRole')->where('ipd_id', $id)->get();
+        $ipdCharges        = IpdCharges::with('ipd', 'charge.taxCategory', 'chargeCategory.chargeType')->where('ipd_id', $id)->get();
+        $labInvestigations = PathologyReport::with('pathology')->where('patient_id', $ipd->patient->id)->get();
+        $ipdPrescriptions  = IpdPrescription::where('ipd_id', $id)->get();
+        $ipdFindings       = [];
+        foreach ($ipdPrescriptions as $pres) {
+            // Split comma-separated symptom IDs and clean up
+            $findingIds = array_filter(
+                explode(',', $pres->findings),
+                fn($id) => $id !== null && trim($id) !== ''
+            );
+
+            // Fetch symptoms related to this OPD
+            $findings = ! empty($findingIds)
+                ? Finding::whereIn('id', $findingIds)->get()
+                : collect();
+
+            // Store in array using OPD number as key
+            $ipdFindings[$pres->ipd_id] = $findings;
+        }
+        $bedHistories    = PatientBedHistory::with('bedGroup', 'bed')->where('ipd_id', $id)->get();
+        $operationDetail = OperationTheatre::with('operation.category')->where('ipd_details_id', $id)->get();
+
+        // Load pathology and radiology tests for prescription modal
+        $pathologies = Pathology::all();
+        $radiologies = Radio::all();
+
+        // $opdCharges        = OpdCharges::with('opd', 'charge.taxCategory', 'chargeCategory.chargeType')->where('opd_id', $id)->get();
+        // $opdSymptoms       = [];
+
+        // Store in array using OPD number as key
+        return view('admin.ipd.ipd_view', compact('ipd', 'symptoms', 'nurseNotes', 'medicationReport', 'labInvestigations', 'ipdPrescriptions', 'ipdFindings', 'bedHistories', 'operationDetail', 'ipdCharges', 'pathologies', 'radiologies'));
+    }
+
     public function getNurses(Request $request)
     {
         $nurses = Staff::where('employee_id', 'LIKE', 'NUR%')->get();
@@ -381,6 +437,77 @@ class IpdController extends Controller
 
     public function storePrescription(Request $request)
     {
+        // Debug: Log what we're receiving
+        \Log::info('=== Prescription Form Data Received ===');
+        \Log::info('All request data:', $request->all());
+        \Log::info('Medicines:', $request->input('medicines', []));
+        \Log::info('Dosages:', $request->input('dosages', []));
+        \Log::info('Interval dosages:', $request->input('interval_dosages', []));
+        \Log::info('Duration dosages:', $request->input('duration_dosages', []));
+        \Log::info('Instructions:', $request->input('instructions', []));
+
+        // Check types
+        if ($request->has('medicines')) {
+            $medicines = $request->input('medicines', []);
+            foreach ($medicines as $index => $medicine) {
+                \Log::info("Medicine[$index]: value = " . var_export($medicine, true) . ", type = " . gettype($medicine));
+            }
+        }
+
+        // Pre-process request data to ensure all array values are strings
+        $medicines       = $request->input('medicines', []);
+        $dosages         = $request->input('dosages', []);
+        $intervalDosages = $request->input('interval_dosages', []);
+        $durationDosages = $request->input('duration_dosages', []);
+        $instructions    = $request->input('instructions', []);
+
+        // Convert all to strings explicitly
+        $medicines = array_map(function ($val) {
+            return $val !== null && $val !== '' ? (string) $val : '';
+        }, $medicines);
+
+        $dosages = array_map(function ($val) {
+            return $val !== null && $val !== '' ? (string) $val : '';
+        }, $dosages);
+
+        $intervalDosages = array_map(function ($val) {
+            return $val !== null && $val !== '' ? (string) $val : '';
+        }, $intervalDosages);
+
+        $durationDosages = array_map(function ($val) {
+            return $val !== null && $val !== '' ? (string) $val : '';
+        }, $durationDosages);
+
+        $instructions = array_map(function ($val) {
+            return $val !== null && $val !== '' ? (string) $val : '';
+        }, $instructions);
+
+        // Pre-process pathology and radiology arrays to ensure all values are strings
+        $pathology = $request->input('pathology', []);
+        $radiology = $request->input('radiology', []);
+
+        $pathology = array_map(function ($val) {
+            return $val !== null && $val !== '' ? (string) $val : '';
+        }, $pathology);
+
+        $radiology = array_map(function ($val) {
+            return $val !== null && $val !== '' ? (string) $val : '';
+        }, $radiology);
+
+        // Merge back into request
+        $request->merge([
+            'medicines'        => $medicines,
+            'dosages'          => $dosages,
+            'interval_dosages' => $intervalDosages,
+            'duration_dosages' => $durationDosages,
+            'instructions'     => $instructions,
+            'pathology'        => $pathology,
+            'radiology'        => $radiology,
+        ]);
+
+        \Log::info('After conversion - Medicines:', $medicines);
+        \Log::info('After conversion - Types:', array_map('gettype', $medicines));
+
         // dd($request->all());
         try { $request->validate([
             'ipd_id'              => 'nullable|string',
@@ -409,7 +536,7 @@ class IpdController extends Controller
             'instructions'        => 'nullable|array',
             'instructions.*'      => 'string',
         ]);
-            $findingTypes = array_filter($request->finding_type, fn($type) => $type !== null && $type !== '');
+            $findingTypes = array_filter($request->input('finding_type', []), fn($type) => $type !== null && $type !== '');
             // $findings             = array_filter($request->findings, fn($title) => $title !== null && $title !== '');
             $findings        = array_filter($request->input('findings', []), fn($title) => $title !== null && $title !== '');
             $pathology_ids   = array_filter($request->input('pathology', []), fn($pathology) => $pathology !== null && $pathology !== '');
@@ -420,10 +547,19 @@ class IpdController extends Controller
             // $notification_to      = array_filter($request->visible, fn($notify) => $notify !== null && $notify !== '');
             $implodedFindingTypes = implode(", ", $findingTypes);
             $implodedFindings     = implode(", ", $findings);
-            $implodedPathologies  = implode(", ", $pathology_ids);
-            $implodedRadiologies  = implode(", ", $radiology_ids);
             $implodedVisibles     = implode(", ", $notification_to);
-            $lastPrescription     = IpdPrescription::orderBy('id', 'desc')->first();
+
+            // Handle file upload
+            $attachment     = null;
+            $attachmentName = null;
+            if ($request->hasFile('document')) {
+                $file           = $request->file('document');
+                $attachmentName = $file->getClientOriginalName();
+                $attachment     = $file->store('prescription_documents', 'public');
+            }
+
+            // Generate prescription number
+            $lastPrescription = IpdPrescription::orderBy('id', 'desc')->first();
             if ($lastPrescription && preg_match('/IPDP(\d+)/', $lastPrescription->prescription_number, $matches)) {
                 $lastNumber = intval($matches[1]);
             } else {
@@ -432,36 +568,315 @@ class IpdController extends Controller
             $prescriptionPrefix = Prefix::where("type", 'ipd_pre')->firstOrFail();
             $nextNumber         = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
             $prescriptionNo     = $prescriptionPrefix->prefix . $nextNumber;
-            $prescription       = IpdPrescription::create([
-                'prescription_number' => $prescriptionNo,
-                'ipd_id'              => $request->ipd_id,
-                'header_note'         => $request->header_note ?? null,
-                'footer_note'         => $request->footer_note ?? null,
-                'finding_description' => $request->finding_description ?? null,
-                'is_finding_print'    => $request->finding_print ?? null,
-                'date'                => Carbon::now()->toDateString(),
-                'finding_categories'  => $implodedFindingTypes,
-                'findings'            => $implodedFindings,
-                'pathology_id'        => $implodedPathologies,
-                'radiology_id'        => $implodedRadiologies,
-                'notification_to'     => $implodedVisibles,
-            ]);
 
-            foreach ($request->medicines as $i => $med) {
+            // Get user info for hospital_id and branch_id
+            $user = Auth::user();
 
-                IpdMedicine::create([
-                    "prescription_id"    => $prescription->id,
-                    "pharmacy_id"        => intval($med),
-                    "medicine_dosage_id" => intval($request->dosages[$i]), //$input['hsn_code'][$i],
-                    "dose_interval_id"   => intval($request->interval_dosages[$i]),
-                    "dose_duration_id"   => intval($request->duration_dosages[$i]),
-                    "instruction"        => $request->instructions[$i],
+            DB::beginTransaction();
+
+            try {
+                // Create prescription
+                $prescription = IpdPrescription::create([
+                    'prescription_number' => $prescriptionNo,
+                    'ipd_id'              => $request->ipd_id,
+                    'prescribed_by'       => $request->prescribe_by, // NEW
+                    'header_note'         => $request->header_note ?? null,
+                    'footer_note'         => $request->footer_note ?? null,
+                    'finding_description' => $request->finding_description ?? null,
+                    'is_finding_print'    => $request->finding_print ?? 'no',
+                    'date'                => Carbon::now()->toDateString(),
+                    'finding_categories'  => $implodedFindingTypes,
+                    'findings'            => $implodedFindings,
+                    'pathology_id'        => ! empty($pathology_ids) ? implode(", ", $pathology_ids) : null, // Keep for backward compatibility
+                    'radiology_id'        => ! empty($radiology_ids) ? implode(", ", $radiology_ids) : null, // Keep for backward compatibility
+                    'notification_to'     => $implodedVisibles,
+                    'attachment'          => $attachment,     // NEW
+                    'attachment_name'     => $attachmentName, // NEW
                 ]);
-            }
-            return redirect()->back()->with('success', 'Prescription created successfully.');} catch (Exception $e) {
+
+                // Store tests in normalized table
+                if (! empty($pathology_ids)) {
+                    foreach ($pathology_ids as $pathologyId) {
+                        IpdPrescriptionTest::create([
+                            'ipd_prescription_id' => $prescription->id,
+                            'pathology_id'        => (int) $pathologyId,
+                            'radiology_id'        => null,
+                            'hospital_id'         => $user->hospital_id ?? '00000001',
+                            'branch_id'           => $user->branch_id ?? '00000001',
+                        ]);
+                    }
+                }
+
+                if (! empty($radiology_ids)) {
+                    foreach ($radiology_ids as $radiologyId) {
+                        IpdPrescriptionTest::create([
+                            'ipd_prescription_id' => $prescription->id,
+                            'pathology_id'        => null,
+                            'radiology_id'        => (int) $radiologyId,
+                            'hospital_id'         => $user->hospital_id ?? '00000001',
+                            'branch_id'           => $user->branch_id ?? '00000001',
+                        ]);
+                    }
+                }
+
+                // Store medicines
+                if (! empty($request->medicines)) {
+                    foreach ($request->medicines as $i => $med) {
+                        IpdMedicine::create([
+                            "prescription_id"    => $prescription->id,
+                            "pharmacy_id"        => intval($med),
+                            "medicine_dosage_id" => intval($request->dosages[$i]),
+                            "dose_interval_id"   => intval($request->interval_dosages[$i]),
+                            "dose_duration_id"   => intval($request->duration_dosages[$i]),
+                            "instruction"        => $request->instructions[$i] ?? null,
+                        ]);
+                    }
+                }
+
+                DB::commit();
+                return redirect()->back()->with('success', 'Prescription created successfully.');
+            } catch (Exception $e) {
+                DB::rollBack();
+                // Delete uploaded file if prescription creation failed
+                if ($attachment) {
+                    Storage::disk('public')->delete($attachment);
+                }
+                return back()->with('error', 'Something went wrong: ' . $e->getMessage());
+            }} catch (Exception $e) {
             // dd($e);
             return back()->with('error', 'Something went wrong: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Show prescription details
+     */
+    public function showPrescription($id)
+    {
+        $prescription = IpdPrescription::with([
+            'ipd.patient',
+            'prescribedBy',
+            'tests.pathology',
+            'tests.radiology',
+            'medicines.pharmacy',
+            'medicines.medicineDosage.unit',
+            'medicines.doseInterval',
+            'medicines.doseDuration',
+        ])->findOrFail($id);
+
+        return view('admin.ipd.prescription.show', compact('prescription'));
+    }
+
+    /**
+     * Show edit prescription form
+     */
+    public function editPrescription($id)
+    {
+        $prescription = IpdPrescription::with([
+            'tests',
+            'medicines.pharmacy.medicineCategory',
+            'medicines.medicineDosage.unit',
+            'medicines.doseInterval',
+            'medicines.doseDuration',
+        ])->findOrFail($id);
+
+        $doctors     = Doctor::all();
+        $findings    = Finding::all();
+        $pathologies = DB::table('pathology')->get();
+        $radiologies = DB::table('radio')->get();
+
+        // Get selected test IDs
+        $selectedPathologyIds = $prescription->tests->whereNotNull('pathology_id')->pluck('pathology_id')->toArray();
+        $selectedRadiologyIds = $prescription->tests->whereNotNull('radiology_id')->pluck('radiology_id')->toArray();
+
+        return view('admin.ipd.prescription.edit', compact(
+            'prescription',
+            'doctors',
+            'findings',
+            'pathologies',
+            'radiologies',
+            'selectedPathologyIds',
+            'selectedRadiologyIds'
+        ));
+    }
+
+    /**
+     * Update prescription
+     */
+    public function updatePrescription(Request $request, $id)
+    {
+        try {
+            $request->validate([
+                'ipd_id'              => 'required|exists:ipd_details,id',
+                'prescribe_by'        => 'required|exists:doctor,id', // Table name is 'doctor' not 'doctors'
+                'header_note'         => 'nullable|string',
+                'footer_note'         => 'nullable|string',
+                'finding_description' => 'nullable|string',
+                'finding_print'       => 'nullable|string',
+                'finding_type'        => 'nullable|array',
+                'finding_type.*'      => 'nullable|string',
+                'findings'            => 'nullable|array',
+                'findings.*'          => 'nullable|string',
+                'pathology'           => 'nullable|array',
+                'pathology.*'         => 'nullable|exists:pathology,id',
+                'radiology'           => 'nullable|array',
+                'radiology.*'         => 'nullable|exists:radio,id',
+                'visible'             => 'nullable|array',
+                'visible.*'           => 'nullable|string',
+                'medicines'           => 'nullable|array',
+                'medicines.*'         => 'nullable|integer',
+                'dosages'             => 'nullable|array',
+                'dosages.*'           => 'nullable|integer',
+                'interval_dosages'    => 'nullable|array',
+                'interval_dosages.*'  => 'nullable|integer',
+                'duration_dosages'    => 'nullable|array',
+                'duration_dosages.*'  => 'nullable|integer',
+                'instructions'        => 'nullable|array',
+                'instructions.*'      => 'nullable|string',
+                'document'            => 'nullable|file|max:10240|mimes:pdf,doc,docx,jpg,jpeg,png',
+            ]);
+
+            $prescription = IpdPrescription::findOrFail($id);
+            $user         = Auth::user();
+
+            $findingTypes    = array_filter($request->finding_type ?? [], fn($type) => $type !== null && $type !== '');
+            $findings        = array_filter($request->findings ?? [], fn($title) => $title !== null && $title !== '');
+            $pathology_ids   = array_filter($request->pathology ?? [], fn($pathology) => $pathology !== null && $pathology !== '');
+            $radiology_ids   = array_filter($request->radiology ?? [], fn($radio) => $radio !== null && $radio !== '');
+            $notification_to = array_filter($request->visible ?? [], fn($notify) => $notify !== null && $notify !== '');
+
+            $implodedFindingTypes = implode(", ", $findingTypes);
+            $implodedFindings     = implode(", ", $findings);
+            $implodedVisibles     = implode(", ", $notification_to);
+
+            // Handle file upload
+            $attachment     = $prescription->attachment;
+            $attachmentName = $prescription->attachment_name;
+            if ($request->hasFile('document')) {
+                // Delete old file if exists
+                if ($attachment) {
+                    Storage::disk('public')->delete($attachment);
+                }
+                $file           = $request->file('document');
+                $attachmentName = $file->getClientOriginalName();
+                $attachment     = $file->store('prescription_documents', 'public');
+            }
+
+            DB::beginTransaction();
+
+            try {
+                // Update prescription - ensure prescribe_by is properly set
+                $prescribeBy = $request->prescribe_by ?? $prescription->prescribed_by;
+
+                $prescription->update([
+                    'ipd_id'              => $request->ipd_id,
+                    'prescribed_by'       => $prescribeBy,
+                    'header_note'         => $request->header_note ?? null,
+                    'footer_note'         => $request->footer_note ?? null,
+                    'finding_description' => $request->finding_description ?? null,
+                    'is_finding_print'    => $request->finding_print ?? 'no',
+                    'finding_categories'  => $implodedFindingTypes,
+                    'findings'            => $implodedFindings,
+                    'pathology_id'        => ! empty($pathology_ids) ? implode(", ", $pathology_ids) : null,
+                    'radiology_id'        => ! empty($radiology_ids) ? implode(", ", $radiology_ids) : null,
+                    'notification_to'     => $implodedVisibles,
+                    'attachment'          => $attachment,
+                    'attachment_name'     => $attachmentName,
+                ]);
+
+                // Delete existing tests
+                IpdPrescriptionTest::where('ipd_prescription_id', $prescription->id)->delete();
+
+                // Store new tests
+                if (! empty($pathology_ids)) {
+                    foreach ($pathology_ids as $pathologyId) {
+                        IpdPrescriptionTest::create([
+                            'ipd_prescription_id' => $prescription->id,
+                            'pathology_id'        => (int) $pathologyId,
+                            'radiology_id'        => null,
+                            'hospital_id'         => $user->hospital_id ?? '00000001',
+                            'branch_id'           => $user->branch_id ?? '00000001',
+                        ]);
+                    }
+                }
+
+                if (! empty($radiology_ids)) {
+                    foreach ($radiology_ids as $radiologyId) {
+                        IpdPrescriptionTest::create([
+                            'ipd_prescription_id' => $prescription->id,
+                            'pathology_id'        => null,
+                            'radiology_id'        => (int) $radiologyId,
+                            'hospital_id'         => $user->hospital_id ?? '00000001',
+                            'branch_id'           => $user->branch_id ?? '00000001',
+                        ]);
+                    }
+                }
+
+                // Delete existing medicines
+                IpdMedicine::where('prescription_id', $prescription->id)->delete();
+
+                // Store new medicines
+                if (! empty($request->medicines)) {
+                    foreach ($request->medicines as $i => $med) {
+                        IpdMedicine::create([
+                            "prescription_id"    => $prescription->id,
+                            "pharmacy_id"        => intval($med),
+                            "medicine_dosage_id" => intval($request->dosages[$i]),
+                            "dose_interval_id"   => intval($request->interval_dosages[$i]),
+                            "dose_duration_id"   => intval($request->duration_dosages[$i]),
+                            "instruction"        => $request->instructions[$i] ?? null,
+                        ]);
+                    }
+                }
+
+                DB::commit();
+                return redirect()->route('ipd.show', $prescription->ipd_id)
+                    ->with('success', 'Prescription updated successfully.');
+            } catch (Exception $e) {
+                DB::rollBack();
+                return back()->with('error', 'Something went wrong: ' . $e->getMessage());
+            }
+        } catch (Exception $e) {
+            return back()->with('error', 'Something went wrong: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Delete prescription
+     */
+    public function deletePrescription($id)
+    {
+        try {
+            $prescription = IpdPrescription::findOrFail($id);
+
+            // Delete associated file
+            if ($prescription->attachment) {
+                Storage::disk('public')->delete($prescription->attachment);
+            }
+
+            // Delete associated tests and medicines (cascade should handle this, but being explicit)
+            IpdPrescriptionTest::where('ipd_prescription_id', $prescription->id)->delete();
+            IpdMedicine::where('prescription_id', $prescription->id)->delete();
+
+            $ipdId = $prescription->ipd_id;
+            $prescription->delete();
+
+            return redirect()->route('ipd.show', $ipdId)
+                ->with('success', 'Prescription deleted successfully.');
+        } catch (Exception $e) {
+            return back()->with('error', 'Something went wrong: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Print prescription
+     */
+    public function printPrescription($id)
+    {
+        $prescription = IpdPrescription::with(['ipd', 'prescribedBy', 'tests.pathology', 'tests.radiology', 'medicines'])
+            ->findOrFail($id);
+
+        return view('admin.ipd.prescription.print', compact('prescription'));
     }
 
     public function addIpdCharge(Request $request)
@@ -670,6 +1085,7 @@ class IpdController extends Controller
         }
 
     }
+
 // public function storeDischarge(Request $request)
 // {
 //     // -------------------------------

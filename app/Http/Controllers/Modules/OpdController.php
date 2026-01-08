@@ -92,7 +92,7 @@ class OpdController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->all());
+        dd($request->all());
         $request->validate([
             'patient_id'           => 'required|exists:patients,id',
             'appointment_date'     => 'required|date',
