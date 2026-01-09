@@ -714,6 +714,54 @@
 
                                                     </select>
                                                 </div>
+                                                <div class="field-group">
+                                                    <label for="consultant_doctor" class="form-label">
+                                                        Consultant Doctor 2 
+                                                    </label>
+                                                    <select name="consultant_doctor2" id="consultant_doctor2"
+                                                        class="form-select" >
+                                                        <option value="">Select Doctor</option>
+                                                        @foreach ($doctors as $doctor)
+                                                            <option value="{{ $doctor->id }}"
+                                                                {{ old('consultant_doctor', $ipd->cons_doctor2 ?? '') == $doctor->id ? 'selected' : '' }}>
+                                                                {{ $doctor->name }}
+                                                            </option>
+                                                        @endforeach
+
+                                                    </select>
+                                                </div>
+                                                <div class="field-group">
+                                                    <label for="consultant_doctor 3" class="form-label">
+                                                        Consultant Doctor 3
+                                                    </label>
+                                                    <select name="consultant_doctor3" id="consultant_doctor3"
+                                                        class="form-select" >
+                                                        <option value="">Select Doctor</option>
+                                                        @foreach ($doctors as $doctor)
+                                                            <option value="{{ $doctor->id }}"
+                                                                {{ old('consultant_doctor', $ipd->cons_doctor3 ?? '') == $doctor->id ? 'selected' : '' }}>
+                                                                {{ $doctor->name }}
+                                                            </option>
+                                                        @endforeach
+
+                                                    </select>
+                                                </div>
+                                                <div class="field-group">
+                                                    <label for="consultant_doctor" class="form-label">
+                                                        Consultant Doctor 4
+                                                    </label>
+                                                    <select name="consultant_doctor4" id="consultant_doctor4"
+                                                        class="form-select">
+                                                        <option value="">Select Doctor</option>
+                                                        @foreach ($doctors as $doctor)
+                                                            <option value="{{ $doctor->id }}"
+                                                                {{ old('consultant_doctor', $ipd->cons_doctor4 ?? '') == $doctor->id ? 'selected' : '' }}>
+                                                                {{ $doctor->name }}
+                                                            </option>
+                                                        @endforeach
+
+                                                    </select>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
