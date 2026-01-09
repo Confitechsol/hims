@@ -207,7 +207,17 @@
         .select2-container .select2-search__field {
             display: block !important;
         }
+
+        .select2-container .select2-selection--single {
+            height: auto;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            padding-top: 4px;
+            padding-bottom: 3px;
+        }
     </style>
+    @yield('select2cdn')
 </head>
 
 <body>
@@ -744,7 +754,7 @@
         //         clearInterval(interval);
         //     }
         // }, 150);
-        
+
         // Hide loader when page is ready
         window.addEventListener('load', function() {
             setTimeout(function() {
@@ -754,7 +764,7 @@
                 }
             }, 100);
         });
-        
+
         // Also hide loader on DOMContentLoaded as fallback
         document.addEventListener('DOMContentLoaded', function() {
             setTimeout(function() {
@@ -764,7 +774,45 @@
                 }
             }, 500);
         });
+
+        $(document).on('shown.bs.modal', '.use-select2', function() {
+            const $modal = $(this);
+
+            $modal.find('.select2-input').each(function() {
+                const $select = $(this);
+
+                // Prevent double initialization
+                if ($select.hasClass('select2-hidden-accessible')) {
+                    return;
+                }
+
+                $select.select2({
+                    dropdownParent: $modal,
+                    width: '100%'
+                });
+            });
+        });
+
+        $(document).on('hidden.bs.modal', '.use-select2', function() {
+            const $modal = $(this);
+
+            $modal.find('.select2-input').each(function() {
+                const $select = $(this);
+
+                if ($select.hasClass('select2-hidden-accessible')) {
+                    $select.select2('destroy');
+                }
+            });
+        });
+        $(document).ready(function() {
+            $('.add-select2').each(function() {
+                if (!$(this).hasClass('select2-hidden-accessible')) {
+                    $(this).select2();
+                }
+            });
+        });
     </script>
+    @yield('script')
 </body>
 
 </html>

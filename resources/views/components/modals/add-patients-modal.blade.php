@@ -1,7 +1,3 @@
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
-@section('select2cdn')
-    {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" /> --}}
-@endsection
 <style>
     .unit-select {
         flex: 0 0 20%;
@@ -16,7 +12,8 @@
     }
 </style>
 
-<div class="modal fade" id="add_patient" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
+<div class="modal fade use-select2" id="add_patient" tabindex="-1" aria-labelledby="addSpecializationLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content modal-xl">
             <div class="modal-header modal-xl rounded-0"
@@ -263,7 +260,7 @@
                         </div>
 
                         {{-- Address --}}
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label for="address" class="form-label">Address</label>
                             <input type="text" id="address" name="address"
                                 class="form-control @error('address') is-invalid @enderror"
@@ -272,8 +269,18 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+                        {{-- Area --}}
+                        <div class="col-md-3">
+                            <label for="area" class="form-label">Area</label>
+                            <input type="text" id="area" name="area"
+                                class="form-control @error('area') is-invalid @enderror"
+                                value="{{ old('area') }}" />
+                            @error('area')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
                         {{-- religion --}}
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label for="religion" class="form-label">Religion</label>
                             <select id="religion" name="religion"
                                 class="form-select @error('religion') is-invalid @enderror">
@@ -300,7 +307,7 @@
                             </select>
                         </div>
                         {{-- Allergies --}}
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label for="allergies" class="form-label">Any Known
                                 Allergies</label>
                             <input type="text" id="allergies" name="allergies"
@@ -393,11 +400,15 @@
 
                         <div class="col-md-4">
                             <label for="nationality" class="form-label">Nationality</label>
-                            <select id="nationality" class="form-select @error('nationality') is-invalid @enderror" name="nationality">
+                            <select id="nationality" class="form-select @error('nationality') is-invalid @enderror"
+                                name="nationality">
                                 <option value="">Select your nationality</option>
-                                <option value="Indian" {{ old('nationality') == 'Indian' ? 'selected' : '' }}>Indian</option>
-                                <option value="American" {{ old('nationality') == 'American' ? 'selected' : '' }}>American</option>
-                                <option value="British" {{ old('nationality') == 'British' ? 'selected' : '' }}>British</option>
+                                <option value="Indian" {{ old('nationality') == 'Indian' ? 'selected' : '' }}>Indian
+                                </option>
+                                <option value="American" {{ old('nationality') == 'American' ? 'selected' : '' }}>
+                                    American</option>
+                                <option value="British" {{ old('nationality') == 'British' ? 'selected' : '' }}>
+                                    British</option>
                             </select>
                             @error('nationality')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -536,25 +547,25 @@
         const tpaIdInput = document.getElementById('tpa_id');
         tpaSelect.innerHTML = '<option value="">Loading...</option>';
 
-        fetch("{{ route('getOrganizations') }}")
-            .then(response => response.json())
-            .then(data => {
-                window.organizationsData = data;
-                tpaSelect.innerHTML = '<option value="">Select</option>';
-                data.forEach(org => {
-                    const option = document.createElement('option');
-                    option.value = org.id;
-                    option.textContent = org.organisation_name;
-                    if ("{{ old('tpa') }}" == org.id) {
-                        option.selected = true;
-                    }
-                    tpaSelect.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching organizations:', error);
-                tpaSelect.innerHTML = '<option value="">Error loading options</option>';
-            });
+        // fetch("{{ route('getOrganizations') }}")
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         window.organizationsData = data;
+        //         tpaSelect.innerHTML = '<option value="">Select</option>';
+        //         data.forEach(org => {
+        //             const option = document.createElement('option');
+        //             option.value = org.id;
+        //             option.textContent = org.organisation_name;
+        //             if ("{{ old('tpa') }}" == org.id) {
+        //                 option.selected = true;
+        //             }
+        //             tpaSelect.appendChild(option);
+        //         });
+        //     })
+        //     .catch(error => {
+        //         console.error('Error fetching organizations:', error);
+        //         tpaSelect.innerHTML = '<option value="">Error loading options</option>';
+        //     });
 
         // Listen for dropdown change
         tpaSelect.addEventListener('change', function() {
@@ -636,6 +647,63 @@
         ageDayInput.addEventListener('input', updateDOB);
 
     });
+    $(document).on('shown.bs.modal', '.use-select2', function() {
+        const $modal = $(this);
+        const $tpaSelect = $modal.find('#tpa');
+        const $tpaIdInput = $modal.find('#tpa_id');
+
+        if (!$tpaSelect.length) return;
+
+        // Reset select
+        $tpaSelect.html('<option value="">Loading...</option>');
+
+        fetch("{{ route('getOrganizations') }}")
+            .then(response => response.json())
+            .then(data => {
+                window.organizationsData = data;
+
+                $tpaSelect.html('<option value="">Select</option>');
+
+                data.forEach(org => {
+                    const selected = "{{ old('tpa') }}" == org.id ? 'selected' : '';
+                    $tpaSelect.append(
+                        `<option value="${org.id}" ${selected}>${org.organisation_name}</option>`
+                    );
+                });
+
+                // Init Select2 (only once)
+                if (!$tpaSelect.hasClass('select2-hidden-accessible')) {
+                    $tpaSelect.select2({
+                        dropdownParent: $modal,
+                        width: '100%'
+                    });
+                }
+
+                // Trigger change for old value
+                $tpaSelect.trigger('change');
+            })
+            .catch(error => {
+                console.error('Error fetching organizations:', error);
+                $tpaSelect.html('<option value="">Error loading options</option>');
+            });
+
+        // Change event (Select2 compatible)
+        $tpaSelect.off('change.select2sync').on('change.select2sync', function() {
+            const selectedId = this.value;
+            const selectedOrg = window.organizationsData?.find(
+                org => org.id == selectedId
+            );
+
+            $tpaIdInput.val(selectedOrg ? selectedOrg.code : '');
+        });
+    });
+    $(document).on('hidden.bs.modal', '.use-select2', function () {
+    const $tpaSelect = $(this).find('#tpa');
+
+    if ($tpaSelect.hasClass('select2-hidden-accessible')) {
+        $tpaSelect.select2('destroy');
+    }
+});
     $('#add_patient').on('shown.bs.modal', function() {
         let select = $('#languages_known');
         if (!select.hasClass('select2-hidden-accessible')) {

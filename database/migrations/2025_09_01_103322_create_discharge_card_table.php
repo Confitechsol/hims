@@ -13,58 +13,62 @@ return new class extends Migration
     {
         Schema::create('discharge_card', function (Blueprint $table) {
             $table->id();
-            $table->string('hospital_id', 8);
-            $table->string('branch_id', 8);
+            $table->string('hospital_id', 8)->nullable()->index();
+            $table->string('branch_id', 8)->nullable()->index();
+
+            // 🔹 Relations
             $table->unsignedBigInteger('case_reference_id')->nullable()->index();
-            // INT(11), NULL, indexed
-
             $table->unsignedBigInteger('opd_details_id')->nullable()->index();
-            // INT(11), NULL, indexed
-
             $table->unsignedBigInteger('ipd_details_id')->nullable()->index();
-            // INT(11), NULL, indexed
 
-            $table->unsignedBigInteger('discharge_by')->nullable()->index();
-            // INT(11), NULL, indexed
+            // 🔹 Patient & Admission
+            $table->string('patient_name');
+            $table->string('admission_no')->nullable();
+            $table->string('bed')->nullable();
 
-            $table->dateTime('discharge_date')->nullable();
-            // DATETIME, NULL
+            $table->date('admission_date')->nullable();
+            $table->time('admit_time')->nullable();
 
-            $table->integer('discharge_status');
-            // INT(11), NOT NULL
+            // 🔹 Discharge
+            $table->date('discharge_date');
+            $table->time('discharge_time')->nullable();
+            $table->string('reason_discharge')->nullable();
 
-            $table->dateTime('death_date')->nullable();
-            // DATETIME, NULL
+            // 🔹 Patient Details
+            $table->string('age', 50)->nullable();
+            $table->string('gender', 10)->nullable();
+            $table->string('phone', 20)->nullable();
+            $table->string('marital_status', 20)->nullable();
+            $table->text('address')->nullable();
 
-            $table->dateTime('refer_date')->nullable();
-            // DATETIME, NULL
+            $table->string('guardian')->nullable();
+            $table->string('relation')->nullable();
+            $table->string('nationality')->nullable();
 
-            $table->string('refer_to_hospital', 255)->nullable();
-            // VARCHAR(255), NULL
+            // 🔹 Medical / Admin
+            $table->string('under_care_dr')->nullable();
+            $table->string('referral')->nullable();
+            $table->string('corporate')->nullable();
 
-            $table->string('reason_for_referral', 255)->nullable();
-            // VARCHAR(255), NULL
+            // 🔹 OT Details
+            $table->date('ot_date')->nullable();
+            $table->string('ot_type')->nullable();
+            $table->string('ot_name')->nullable();
+            $table->integer('ot_done')->nullable();
+            $table->text('ot_done_by')->nullable(); // comma-separated IDs
 
-            $table->string('operation', 225);
-            // VARCHAR(225), NOT NULL
+            // 🔹 Diagnosis
+            $table->text('diagnosis')->nullable();
+            $table->text('ot_note')->nullable();
+            $table->text('discharge_advice')->nullable();
+            $table->text('present_complaints')->nullable();
+            $table->text('remarks')->nullable();
 
-            $table->string('diagnosis', 255);
-            // VARCHAR(255), NOT NULL
+            // 🔹 Meta
+            $table->string('discharged_by', 255)->nullable()->index();
+            $table->unsignedBigInteger('created_by')->nullable()->index();
 
-            $table->text('investigations')->nullable();
-            // TEXT, NULL
-
-            $table->string('treatment_home', 255);
-            // VARCHAR(255), NOT NULL
-
-            $table->text('note')->nullable();
             $table->timestamps();
-
-            //$table->foreign('case_reference_id')->references('id')->on('case_references')->onDelete('set null');
-            //$table->foreign('opd_details_id')->references('id')->on('opd_details')->onDelete('set null');
-            //$table->foreign('ipd_details_id')->references('id')->on('ipd_details')->onDelete('set null');
-            //
-            // $table->foreign('discharge_by')->references('id')->on('users')->onDelete('set null');
         });
     }
 

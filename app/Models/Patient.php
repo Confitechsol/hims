@@ -37,6 +37,7 @@ class Patient extends Model
         'blood_group',
         'blood_bank_product_id',
         'address',
+        'area',
         'religion',
         'guardian_name',
         'guardian_phone',

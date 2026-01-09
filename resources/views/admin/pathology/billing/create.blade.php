@@ -51,7 +51,7 @@
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Reference Doctor ({{ count($doctors ?? []) }} found)</label>
-                            <select name="doctor_id" id="doctor_id" class="form-select">
+                            <select name="doctor_id" id="doctor_id" class="form-select add-select2">
                                 <option value="">Select Doctor</option>
                                 @if(isset($doctors) && count($doctors) > 0)
                                     @foreach($doctors as $doctor)

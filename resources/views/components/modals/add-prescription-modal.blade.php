@@ -346,7 +346,7 @@
 </style>
 <div class="modal fade" id="addPrescriptionModal" tabindex="-1" aria-labelledby="addPrescriptionModalLabel"
     aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen ">
+    <div class="modal-dialog modal-xl ">
         <!-- inline overflow override so .modal-content {overflow: hidden;} in global CSS doesn't block scrolling -->
         <div class="modal-content" style="overflow: visible;">
             <!-- Modal Header -->
@@ -519,6 +519,14 @@
                                                     id="addMedicineBtn"><i class="fa fa-plus"></i> Add Medicine</a>
 
                                             </div>
+                                        </div>
+                                        <hr>
+                                        <div class="form-group mt-2">
+                                            <label class="form-label">Advice</label>
+                                            
+
+                                            <textarea id="advice" name="advice" contenteditable="true" class="editor-area w-100" name="header_note"></textarea>
+                                            <hr>
                                         </div>
                                         <div class="col-sm-12 mt-2">
                                             <label class="form-label">Attachment</label>

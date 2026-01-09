@@ -18,6 +18,7 @@ class IpdPrescription extends Model
         'visit_details_id',  // NEW
         'header_note',
         'footer_note',
+        'advice',
         'finding_description',
         'finding_categories',
         'findings',
@@ -84,6 +85,16 @@ class IpdPrescription extends Model
     public function medicines()
     {
         return $this->hasMany(IpdMedicine::class, 'prescription_id');
+    }
+
+        public function pathology()
+    {
+        return $this->belongsTo(Pathology::class, 'pathology_id');
+    }
+
+    public function radiology()
+    {
+        return $this->belongsTo(Radio::class, 'radiology_id');
     }
 
 }

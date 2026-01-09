@@ -17,6 +17,7 @@ class OpdPrescription extends Model
         'visit_id',
         'header_note',
         'footer_note',
+        'advice',
         'finding_description',
         'finding_categories',
         'findings',
