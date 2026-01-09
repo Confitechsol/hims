@@ -840,12 +840,29 @@
                                 </select>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Consultant Doctor <span class="required">*</span></label>
+                                <label class="form-label">Consultant Doctor 1 <span class="required">*</span></label>
                                 <select class="form-select select2-input" name="doctor_id" id="doctor_select">
                                     <option value="">Loading...</option>
                                 </select>
                             </div>
-
+                            <div class="col-md-4">
+                                <label class="form-label">Consultant Doctor 2 <span class="required">*</span></label>
+                                <select class="form-select select2-input" name="doctor_id_2" id="doctor_select_2">
+                                    <option value="">Loading...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Consultant Doctor 3 <span class="required">*</span></label>
+                                <select class="form-select select2-input" name="doctor_id_3" id="doctor_select_3">
+                                    <option value="">Loading...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Consultant Doctor 4 <span class="required">*</span></label>
+                                <select class="form-select select2-input" name="doctor_id_4" id="doctor_select_4">
+                                    <option value="">Loading...</option>
+                                </select>
+                            </div>
 
                         </div>
                     </div>
@@ -1244,6 +1261,9 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const doctorSelect = document.getElementById('doctor_select');
+        const doctor2Select = document.getElementById('doctor_select2');
+        const doctor3Select = document.getElementById('doctor_select3');
+        const doctor4Select = document.getElementById('doctor_select4');
         // const bedGroupSelect = document.getElementById('bed_group_select');
         // const bedNumberSelect = document.getElementById('bed_number_select');
 
@@ -1266,6 +1286,7 @@
             .then(data => {
                 window.doctorsData = data;
                 doctorSelect.innerHTML = '<option value="">Select</option>';
+                
                 data.forEach(doc => {
                     const option = document.createElement('option');
                     option.value = doc.id;

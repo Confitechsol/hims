@@ -408,7 +408,7 @@ class IpdController extends Controller
     }
   public function getIpdRadPathById($id)
 {
-    $prescription = IpdPrescription::find($id);
+    $prescription = IpdPrescription::with('prescribedBy')->find($id);
 
     if (!$prescription) {
         return response()->json([

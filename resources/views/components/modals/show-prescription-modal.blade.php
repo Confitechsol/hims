@@ -123,8 +123,8 @@
                         <div
                             class="pb-3 mb-3 border-1 border-bottom d-flex align-items-center justify-content-between flex-wrap gap-2">
                             <div class="">
-                                <h6 class="mb-1 fs-16 fw-semibold"> Follow Up </h6>
-                                <p> Follow u p after 3 months, Have to come on empty stomach</p>
+                                <h6 class="mb-1 fs-16 fw-semibold" > Follow Up </h6>
+                                <p id="pres_followup"></p>
                             </div>
                             <div class="">
                                 <img src="../assets/img/icons/signature-img.svg" alt="" class="img-fluid ">
@@ -162,6 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const qualification = document.getElementById('qualification');
         const dAdvice = document.getElementById('prescription_advice');
         const department = document.getElementById('department');
+        const followup = document.getElementById('pres_followup');
         const ipdDate = document.getElementById('ipd_date');
         const pName = document.getElementById('patient_name');
         const ageGender = document.getElementById('age_gender');
@@ -183,8 +184,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(res => res.json())
                 .then(data => {
 
-                    drName.innerHTML = data.doctor?.name ?? '-';
-                    drSign.innerHTML = data.doctor?.name ?? '-';
+                    // drName.innerHTML = data.doctor?.name ?? '-';
+                    // drSign.innerHTML = data.doctor?.name ?? '-';
                     specialization.innerHTML = data.doctor?.specialization ?? '-';
                     qualification.innerHTML = data.doctor?.qualification ?? '-';
                     department.innerHTML = data.doctor?.department?.department_name ?? '-';
@@ -235,9 +236,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(res => res.json())
                 .then(data => {
                     console.log('Path/Rad API:', data);
-                    
+
+                    drName.innerHTML = data.prescription?.prescribed_by?.name ?? '-';
+                    drSign.innerHTML = data.prescription?.prescribed_by?.name ?? '-';
+
+                    console.log('Advice value:', data.prescription.advice);
                     dAdvice.innerHTML = data?.prescription?.advice ?? '-';
-                    console.log('Prescription object:', data.prescription);
+                    followup.innerHTML = data?.prescription?.footer_note ?? '-';
+                    console.log('Full Prescription:', data.prescription);
+                    console.log('Prescription doctor:',data.prescription?.prescribed_by?.name);
                     console.log('Advice value:', data.prescription.advice);
                     const tableBody = document.getElementById("pathRadTableBody");
                     tableBody.innerHTML = "";
