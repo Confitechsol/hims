@@ -818,11 +818,7 @@ Route::prefix('pathology/test')->group(function () {
 
 });
 
-// Pathology Test API Routes
-Route::prefix('pathology/api')->group(function () {
-    Route::get('/charge-names', [PathologyTestController::class, 'getChargeNames'])->name('pathology.api.charge-names');
-    Route::get('/charge-details', [PathologyTestController::class, 'getChargeDetails'])->name('pathology.api.charge-details');
-});
+// Pathology Test API Routes - Removed charge-names and charge-details as charges are now stored directly in pathology table
 
 // Pathology Billing Routes
 Route::prefix('pathology/billing')->group(function () {
