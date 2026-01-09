@@ -608,12 +608,22 @@ class RadiologyBillingController extends Controller
             }
         }
         
+        // Get full doctor name with surname
+        $doctorName = null;
+        $doctorId = null;
+        if ($prescription->prescribedBy) {
+            $name = trim($prescription->prescribedBy->name . ' ' . ($prescription->prescribedBy->surname ?? ''));
+            $doctorName = $name;
+            $doctorId = $prescription->prescribedBy->id;
+        }
+        
         return response()->json([
             'prescription' => [
                 'id' => $prescription->id,
                 'prescription_number' => $prescription->prescription_number,
                 'date' => $prescription->date ? $prescription->date->format('Y-m-d') : null,
-                'doctor' => $prescription->prescribedBy ? $prescription->prescribedBy->name : null,
+                'doctor' => $doctorName,
+                'doctor_id' => $doctorId,
             ],
             'tests' => $radiologyTests,
             'tpa' => $tpa,

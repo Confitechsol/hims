@@ -121,24 +121,37 @@
                                                             @endif
                                                         </td>
                                                         <td>
-                                                            @if($ipdCharge || $opdCharge)
-                                                                <button type="button" class="btn btn-sm btn-warning text-white" 
-                                                                        data-bs-toggle="modal" 
+                                                            <div class="d-flex gap-1">
+                                                                @if($ipdCharge)
+                                                                    <button
+                                                                        class="btn btn-sm btn-soft-success rounded-pill edit-tpa-charge-btn"
+                                                                        data-id="{{ $ipdCharge->id }}"
+                                                                        data-org_charge="{{ $ipdCharge->org_charge }}"
+                                                                        data-org_name="{{ $organisation->organisation_name ?? 'TPA' }}"
+                                                                        data-charge-type="IPD"
+                                                                        data-bs-toggle="modal"
                                                                         data-bs-target="#editTpaChargeModal"
-                                                                        data-org-id="{{ $organisation->id }}"
-                                                                        data-org-name="{{ $organisation->organisation_name }}"
-                                                                        data-ipd-charge-id="{{ $ipdCharge->id ?? '' }}"
-                                                                        data-ipd-charge="{{ $ipdCharge->org_charge ?? '' }}"
-                                                                        data-opd-charge-id="{{ $opdCharge->id ?? '' }}"
-                                                                        data-opd-charge="{{ $opdCharge->org_charge ?? '' }}"
-                                                                        data-standard-charge-ipd="{{ $test->standard_charge_ipd ?? 0 }}"
-                                                                        data-standard-charge-opd="{{ $test->standard_charge_opd ?? 0 }}"
-                                                                        onclick="editTpaCharge(this)">
-                                                                    <i class="ti ti-edit"></i> Edit
-                                                                </button>
-                                                            @else
-                                                                <span class="text-muted">-</span>
-                                                            @endif
+                                                                        title="Edit IPD Charge">
+                                                                        <i class="ti ti-pencil"></i> IPD
+                                                                    </button>
+                                                                @endif
+                                                                @if($opdCharge)
+                                                                    <button
+                                                                        class="btn btn-sm btn-soft-info rounded-pill edit-tpa-charge-btn"
+                                                                        data-id="{{ $opdCharge->id }}"
+                                                                        data-org_charge="{{ $opdCharge->org_charge }}"
+                                                                        data-org_name="{{ $organisation->organisation_name ?? 'TPA' }}"
+                                                                        data-charge-type="OPD"
+                                                                        data-bs-toggle="modal"
+                                                                        data-bs-target="#editTpaChargeModal"
+                                                                        title="Edit OPD Charge">
+                                                                        <i class="ti ti-pencil"></i> OPD
+                                                                    </button>
+                                                                @endif
+                                                                @if(!$ipdCharge && !$opdCharge)
+                                                                    <span class="text-muted">-</span>
+                                                                @endif
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -172,40 +185,32 @@
                     <h5 class="modal-title" id="editTpaChargeModalLabel">Edit TPA Charge</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ route('radiology.test.updateTpaCharge') }}" method="POST" id="editTpaChargeForm">
+                <form action="{{ route('radiology.test.update-tpa-charge') }}" method="POST">
                     @csrf
+                    @method('PUT')
+                    <input type="hidden" name="id" id="tpa_charge_id">
                     <div class="modal-body">
-                        <input type="hidden" name="id" id="edit_tpa_charge_id">
-                        <input type="hidden" name="charge_type" id="edit_charge_type">
-                        
                         <div class="mb-3">
-                            <label class="form-label">TPA Organization:</label>
-                            <input type="text" class="form-control" id="edit_org_name" readonly>
+                            <label class="form-label">TPA Organization</label>
+                            <input type="text" class="form-control" id="tpa_org_name" readonly>
                         </div>
-                        
                         <div class="mb-3">
-                            <label class="form-label">Standard Charge IPD (INR):</label>
-                            <input type="text" class="form-control" id="edit_standard_charge_ipd" readonly>
+                            <label class="form-label">Charge Type</label>
+                            <input type="text" class="form-control" id="tpa_charge_type_display" readonly>
+                            <input type="hidden" name="charge_type" id="tpa_charge_type">
                         </div>
-                        
                         <div class="mb-3">
-                            <label class="form-label">TPA Charge IPD (INR): <span class="text-danger">*</span></label>
-                            <input type="number" name="org_charge" id="edit_tpa_charge_ipd" class="form-control" step="0.01" min="0" required>
+                            <label class="form-label">Standard Charge (INR)</label>
+                            <input type="text" class="form-control" id="tpa_standard_charge" readonly>
                         </div>
-                        
                         <div class="mb-3">
-                            <label class="form-label">Standard Charge OPD (INR):</label>
-                            <input type="text" class="form-control" id="edit_standard_charge_opd" readonly>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">TPA Charge OPD (INR): <span class="text-danger">*</span></label>
-                            <input type="number" name="org_charge_opd" id="edit_tpa_charge_opd" class="form-control" step="0.01" min="0" required>
+                            <label class="form-label">TPA Charge (INR) <span class="text-danger">*</span></label>
+                            <input type="number" name="org_charge" id="tpa_org_charge" class="form-control" step="0.01" min="0" required>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Update</button>
+                        <button type="submit" class="btn btn-primary">Update TPA Charge</button>
                     </div>
                 </form>
             </div>
@@ -213,36 +218,28 @@
     </div>
 
     <script>
-        function editTpaCharge(button) {
-            const orgId = button.getAttribute('data-org-id');
-            const orgName = button.getAttribute('data-org-name');
-            const ipdChargeId = button.getAttribute('data-ipd-charge-id');
-            const ipdCharge = button.getAttribute('data-ipd-charge');
-            const opdChargeId = button.getAttribute('data-opd-charge-id');
-            const opdCharge = button.getAttribute('data-opd-charge');
-            const standardChargeIpd = button.getAttribute('data-standard-charge-ipd');
-            const standardChargeOpd = button.getAttribute('data-standard-charge-opd');
-            
-            document.getElementById('edit_org_name').value = orgName;
-            document.getElementById('edit_standard_charge_ipd').value = '₹' + parseFloat(standardChargeIpd || 0).toFixed(2);
-            document.getElementById('edit_standard_charge_opd').value = '₹' + parseFloat(standardChargeOpd || 0).toFixed(2);
-            
-            // For now, we'll edit IPD charge first, then OPD separately
-            // This is a simplified version - you may want to create separate endpoints for IPD/OPD
-            if (ipdChargeId) {
-                document.getElementById('edit_tpa_charge_id').value = ipdChargeId;
-                document.getElementById('edit_charge_type').value = 'IPD';
-                document.getElementById('edit_tpa_charge_ipd').value = ipdCharge || '';
-            } else {
-                document.getElementById('edit_tpa_charge_id').value = '';
-                document.getElementById('edit_tpa_charge_ipd').value = '';
-            }
-            
-            if (opdChargeId) {
-                document.getElementById('edit_tpa_charge_opd').value = opdCharge || '';
-            } else {
-                document.getElementById('edit_tpa_charge_opd').value = '';
-            }
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle edit TPA charge button click
+            document.querySelectorAll('.edit-tpa-charge-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const orgCharge = this.getAttribute('data-org_charge');
+                    const orgName = this.getAttribute('data-org_name');
+                    const chargeType = this.getAttribute('data-charge-type');
+                    
+                    document.getElementById('tpa_charge_id').value = id;
+                    document.getElementById('tpa_org_charge').value = orgCharge;
+                    document.getElementById('tpa_org_name').value = orgName;
+                    document.getElementById('tpa_charge_type').value = chargeType;
+                    document.getElementById('tpa_charge_type_display').value = chargeType;
+                    
+                    // Set standard charge based on type
+                    const standardCharge = chargeType === 'IPD' 
+                        ? {{ $test->standard_charge_ipd ?? 0 }}
+                        : {{ $test->standard_charge_opd ?? 0 }};
+                    document.getElementById('tpa_standard_charge').value = '₹' + standardCharge.toFixed(2);
+                });
+            });
+        });
     </script>
 @endsection
