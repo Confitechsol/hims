@@ -5,9 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Radio;
 use App\Models\RadiologyCategory;
-use App\Models\ChargeCategory;
-use App\Models\Charge;
-use App\Models\TaxCategory;
 use App\Models\Organisation;
 use App\Models\OrganisationsCharge;
 use Illuminate\Support\Facades\DB;
@@ -22,12 +19,7 @@ class RadiologyTestController extends Controller
      */
     public function index()
     {
-        $tests = Radio::with([
-            'radiologyCategory', 
-            'charge', 
-            'charge.taxCategory',
-            'charge.category'
-        ])
+        $tests = Radio::with(['radiologyCategory'])
             ->orderBy('id', 'desc')
             ->get();
         
@@ -40,10 +32,9 @@ class RadiologyTestController extends Controller
     public function create()
     {
         $categories = RadiologyCategory::all();
-        $chargeCategories = ChargeCategory::all();
         $organisations = Organisation::all();
         
-        return view('admin.radiology.test.create', compact('categories', 'chargeCategories', 'organisations'));
+        return view('admin.radiology.test.create', compact('categories', 'organisations'));
     }
 
     /**
@@ -60,14 +51,18 @@ class RadiologyTestController extends Controller
             'radiology_category_id' => 'required|exists:radiology_category,id',
             'sub_category' => 'nullable|string|max:25',
             'report_days' => 'required|integer',
-            'charge_id' => 'required|exists:charges,id',
-            
+            'standard_charge_ipd' => 'required|numeric|min:0',
+            'standard_charge_opd' => 'required|numeric|min:0',
+            'parameters' => 'nullable|array',
+            'parameters.*' => 'exists:radiology_parameter,id',
         ]);
 
         DB::beginTransaction();
         
         try {
             $user = Auth::user();
+            $hospitalId = $user->hospital_id ?? null;
+            $branchId = $user->branch_id ?? null;
             
             $createData = [
                 'test_name' => $validated['test_name'],
@@ -76,76 +71,164 @@ class RadiologyTestController extends Controller
                 'radiology_category_id' => $validated['radiology_category_id'],
                 'sub_category' => $validated['sub_category'] ?? '',
                 'report_days' => $validated['report_days'],
-                'charge_id' => $validated['charge_id'],
-                // 'hospital_id' => $user->hospital_id ?? '',
-                // 'branch_id' => $user->branch_id ?? '',
+                'standard_charge_ipd' => $validated['standard_charge_ipd'],
+                'standard_charge_opd' => $validated['standard_charge_opd'],
             ];
+            
+            if ($hospitalId) {
+                $createData['hospital_id'] = $hospitalId;
+            }
+            if ($branchId) {
+                $createData['branch_id'] = $branchId ?? '';
+            }
             
             $radiology = Radio::create($createData);
 
             Log::info('Radiology test created:', ['id' => $radiology->id]);
 
-            // Create/Update TPA charges for all TPA organizations
-            $hospitalId = $user->hospital_id ?? null;
-            $branchId = $user->branch_id ?? null;
+            // Process TPA charges even if hospital_id is not set (use empty string)
+            $organisations = Organisation::all();
+            
+            // Debug: Log all TPA charge inputs from form
+            $tpaInputs = [];
+            foreach ($organisations as $org) {
+                $tpaInputs['tpa_charge_ipd_' . $org->id] = $request->input('tpa_charge_ipd_' . $org->id);
+                $tpaInputs['tpa_charge_opd_' . $org->id] = $request->input('tpa_charge_opd_' . $org->id);
+            }
+            Log::info('TPA Charges from form (create):', $tpaInputs);
+            
+            // Check if radiology_id and charge_type columns exist
+            $hasRadiologyIdColumn = Schema::hasColumn('organisations_charges', 'radiology_id');
+            $hasChargeTypeColumn = Schema::hasColumn('organisations_charges', 'charge_type');
+            
+            Log::info('Database columns check:', [
+                'has_radiology_id' => $hasRadiologyIdColumn,
+                'has_charge_type' => $hasChargeTypeColumn
+            ]);
             
             $tpaChargesCreated = 0;
-            $tpaChargesUpdated = 0;
-            if ($hospitalId) {
-                $organisations = Organisation::all();
+            if (!$hasRadiologyIdColumn || !$hasChargeTypeColumn) {
+                Log::error('Missing database columns for TPA charges!', [
+                    'radiology_id_column' => $hasRadiologyIdColumn,
+                    'charge_type_column' => $hasChargeTypeColumn,
+                    'message' => 'Please run the SQL migration: radiology_changes_step2_update_organisations_charges.sql'
+                ]);
+            } else {
+                Log::info('Creating/Updating TPA charges for radiology test', [
+                    'radiology_id' => $radiology->id,
+                    'organisations_count' => $organisations->count(),
+                    'hospital_id' => $hospitalId
+                ]);
                 
                 foreach ($organisations as $organisation) {
-                    $tpaChargeKey = 'tpa_charge_' . $organisation->id;
-                    $tpaChargeValue = $request->input($tpaChargeKey);
+                    // Process IPD TPA charges
+                    $tpaChargeIpdKey = 'tpa_charge_ipd_' . $organisation->id;
+                    $tpaChargeIpdValue = $request->input($tpaChargeIpdKey);
                     
-                    $floatValue = ($tpaChargeValue !== null && $tpaChargeValue !== '' && is_numeric($tpaChargeValue)) 
-                        ? floatval($tpaChargeValue) 
-                        : 0;
+                    // Check if value exists and is valid (not empty, not null, not "0" as string)
+                    if ($tpaChargeIpdValue !== null && $tpaChargeIpdValue !== '' && $tpaChargeIpdValue !== '0') {
+                        $floatValue = is_numeric($tpaChargeIpdValue) ? floatval($tpaChargeIpdValue) : 0;
+                        if ($floatValue > 0) {
+                            try {
+                                // Delete any existing IPD charges for this radiology and organization to prevent duplicates
+                                OrganisationsCharge::where('radiology_id', $radiology->id)
+                                    ->where('org_id', $organisation->id)
+                                    ->where('charge_type', 'IPD')
+                                    ->delete();
+                                
+                                // Create new IPD TPA charge
+                                $tpaChargeData = [
+                                    'radiology_id' => $radiology->id,
+                                    'org_id' => $organisation->id,
+                                    'charge_type' => 'IPD',
+                                    'org_charge' => $floatValue,
+                                ];
+                                
+                                if (Schema::hasColumn('organisations_charges', 'hospital_id')) {
+                                    $tpaChargeData['hospital_id'] = $hospitalId;
+                                }
+                                if (Schema::hasColumn('organisations_charges', 'branch_id')) {
+                                    $tpaChargeData['branch_id'] = $branchId ?? '';
+                                }
+                                
+                                OrganisationsCharge::create($tpaChargeData);
+                                $tpaChargesCreated++;
+                                Log::info('TPA charge IPD created:', [
+                                    'radiology_id' => $radiology->id,
+                                    'org_id' => $organisation->id,
+                                    'org_charge' => $floatValue
+                                ]);
+                            } catch (\Exception $e) {
+                                Log::error('Error creating/updating IPD TPA charge:', [
+                                    'error' => $e->getMessage(),
+                                    'radiology_id' => $radiology->id,
+                                    'org_id' => $organisation->id,
+                                    'trace' => $e->getTraceAsString()
+                                ]);
+                            }
+                        }
+                    }
                     
-                    if ($floatValue > 0) {
-                        $orgCharge = $floatValue;
-                        
-                        $existingTpaCharge = OrganisationsCharge::where('charge_id', $validated['charge_id'])
-                            ->where('org_id', $organisation->id)
-                            ->first();
-
-                        if ($existingTpaCharge) {
-                            $existingTpaCharge->org_charge = $orgCharge;
-                            $existingTpaCharge->save();
-                            $tpaChargesUpdated++;
-                        } else {
-                            $tpaChargeData = [
-                                'charge_id' => $validated['charge_id'],
-                                'org_id' => $organisation->id,
-                                'org_charge' => $orgCharge,
-                            ];
-                            
-                            if (Schema::hasColumn('organisations_charges', 'hospital_id')) {
-                                $tpaChargeData['hospital_id'] = $hospitalId;
+                    // Process OPD TPA charges
+                    $tpaChargeOpdKey = 'tpa_charge_opd_' . $organisation->id;
+                    $tpaChargeOpdValue = $request->input($tpaChargeOpdKey);
+                    
+                    // Check if value exists and is valid (not empty, not null, not "0" as string)
+                    if ($tpaChargeOpdValue !== null && $tpaChargeOpdValue !== '' && $tpaChargeOpdValue !== '0') {
+                        $floatValue = is_numeric($tpaChargeOpdValue) ? floatval($tpaChargeOpdValue) : 0;
+                        if ($floatValue > 0) {
+                            try {
+                                // Delete any existing OPD charges for this radiology and organization to prevent duplicates
+                                OrganisationsCharge::where('radiology_id', $radiology->id)
+                                    ->where('org_id', $organisation->id)
+                                    ->where('charge_type', 'OPD')
+                                    ->delete();
+                                
+                                // Create new OPD TPA charge
+                                $tpaChargeData = [
+                                    'radiology_id' => $radiology->id,
+                                    'org_id' => $organisation->id,
+                                    'charge_type' => 'OPD',
+                                    'org_charge' => $floatValue,
+                                ];
+                                
+                                if (Schema::hasColumn('organisations_charges', 'hospital_id')) {
+                                    $tpaChargeData['hospital_id'] = $hospitalId;
+                                }
+                                if (Schema::hasColumn('organisations_charges', 'branch_id')) {
+                                    $tpaChargeData['branch_id'] = $branchId ?? '';
+                                }
+                                
+                                OrganisationsCharge::create($tpaChargeData);
+                                $tpaChargesCreated++;
+                                Log::info('TPA charge OPD created:', [
+                                    'radiology_id' => $radiology->id,
+                                    'org_id' => $organisation->id,
+                                    'org_charge' => $floatValue
+                                ]);
+                            } catch (\Exception $e) {
+                                Log::error('Error creating/updating OPD TPA charge:', [
+                                    'error' => $e->getMessage(),
+                                    'radiology_id' => $radiology->id,
+                                    'org_id' => $organisation->id,
+                                    'trace' => $e->getTraceAsString()
+                                ]);
                             }
-                            if (Schema::hasColumn('organisations_charges', 'branch_id')) {
-                                $tpaChargeData['branch_id'] = $branchId ?? '';
-                            }
-                            
-                            OrganisationsCharge::create($tpaChargeData);
-                            $tpaChargesCreated++;
                         }
                     }
                 }
+                
+                Log::info('TPA charges creation completed', [
+                    'total_created' => $tpaChargesCreated,
+                    'total_organisations' => $organisations->count()
+                ]);
             }
 
             DB::commit();
             
             $successMessage = 'Radiology test created successfully!';
-            if ($tpaChargesCreated > 0 || $tpaChargesUpdated > 0) {
-                $messageParts = [];
-                if ($tpaChargesCreated > 0) {
-                    $messageParts[] = "{$tpaChargesCreated} TPA charge(s) created";
-                }
-                if ($tpaChargesUpdated > 0) {
-                    $messageParts[] = "{$tpaChargesUpdated} TPA charge(s) updated";
-                }
-                $successMessage .= " " . implode(", ", $messageParts) . ".";
+            if ($tpaChargesCreated > 0) {
+                $successMessage .= " {$tpaChargesCreated} TPA charge(s) created.";
             }
             
             return redirect()->route('radiology.test.index')
@@ -166,22 +249,34 @@ class RadiologyTestController extends Controller
     public function show($id)
     {
         $test = Radio::with([
-            'radiologyCategory', 
-            'charge', 
-            'charge.taxCategory',
-            'charge.category'
+            'radiologyCategory',
         ])
             ->findOrFail($id);
         
-        // Load TPA charges for this radiology test's charge_id
-        $tpaCharges = [];
-        if ($test->charge_id) {
-            $tpaCharges = OrganisationsCharge::with(['organisation', 'charge.category.chargeType'])
-                ->where('charge_id', $test->charge_id)
-                ->get();
-        }
+        // Load TPA charges for this radiology test - get latest record for each org_id and charge_type combination
+        $tpaCharges = OrganisationsCharge::with(['organisation'])
+            ->where('radiology_id', $test->id)
+            ->orderBy('id', 'desc') // Get latest records first
+            ->get();
         
-        return view('admin.radiology.test.show', compact('test', 'tpaCharges'));
+        // Group by organisation_id and charge_type, then get the latest (first) record for each combination
+        $groupedTpaCharges = $tpaCharges->groupBy('org_id')->map(function($charges) {
+            // For each organization, get the latest IPD and OPD charges (first one since we ordered by id desc)
+            $ipdCharges = $charges->where('charge_type', 'IPD');
+            $opdCharges = $charges->where('charge_type', 'OPD');
+            
+            // Get the latest record (first after ordering by id desc)
+            $ipdCharge = $ipdCharges->first();
+            $opdCharge = $opdCharges->first();
+            
+            return [
+                'organisation' => $charges->first()->organisation ?? null,
+                'ipd_charge' => $ipdCharge,
+                'opd_charge' => $opdCharge,
+            ];
+        });
+        
+        return view('admin.radiology.test.show', compact('test', 'groupedTpaCharges'));
     }
 
     /**
@@ -189,21 +284,28 @@ class RadiologyTestController extends Controller
      */
     public function edit($id)
     {
-        $test = Radio::with(['charge', 'charge.category', 'charge.taxCategory', 'radiologyCategory'])->findOrFail($id);
+        $test = Radio::with(['radiologyCategory'])->findOrFail($id);
         $categories = RadiologyCategory::all();
-        $chargeCategories = ChargeCategory::all();
         $organisations = Organisation::all();
         
-        // Load existing TPA charges for this test's charge_id
+        // Load existing TPA charges for this radiology test
+        $tpaCharges = OrganisationsCharge::with(['organisation'])
+            ->where('radiology_id', $test->id)
+            ->orderBy('id', 'desc')
+            ->get();
+        
+        // Group by organisation_id and charge_type
         $existingTpaCharges = [];
-        if ($test->charge_id) {
-            $tpaCharges = OrganisationsCharge::where('charge_id', $test->charge_id)->get();
-            foreach ($tpaCharges as $tpaCharge) {
-                $existingTpaCharges[$tpaCharge->org_id] = $tpaCharge->org_charge;
-            }
+        foreach ($tpaCharges->groupBy('org_id') as $orgId => $charges) {
+            $ipdCharge = $charges->where('charge_type', 'IPD')->first();
+            $opdCharge = $charges->where('charge_type', 'OPD')->first();
+            $existingTpaCharges[$orgId] = [
+                'ipd' => $ipdCharge ? $ipdCharge->org_charge : null,
+                'opd' => $opdCharge ? $opdCharge->org_charge : null,
+            ];
         }
         
-        return view('admin.radiology.test.edit', compact('test', 'categories', 'chargeCategories', 'organisations', 'existingTpaCharges'));
+        return view('admin.radiology.test.edit', compact('test', 'categories', 'organisations', 'existingTpaCharges'));
     }
 
     /**
@@ -220,12 +322,17 @@ class RadiologyTestController extends Controller
             'radiology_category_id' => 'required|exists:radiology_category,id',
             'sub_category' => 'nullable|string|max:25',
             'report_days' => 'required|integer',
-            'charge_id' => 'required|exists:charges,id',
+            'standard_charge_ipd' => 'required|numeric|min:0',
+            'standard_charge_opd' => 'required|numeric|min:0',
         ]);
 
         DB::beginTransaction();
         
         try {
+            $user = Auth::user();
+            $hospitalId = $user->hospital_id ?? null;
+            $branchId = $user->branch_id ?? null;
+            
             $radiology = Radio::findOrFail($id);
             
             $updateData = [
@@ -235,48 +342,128 @@ class RadiologyTestController extends Controller
                 'radiology_category_id' => $validated['radiology_category_id'],
                 'sub_category' => $validated['sub_category'] ?? '',
                 'report_days' => $validated['report_days'],
-                'charge_id' => $validated['charge_id'],
+                'standard_charge_ipd' => $validated['standard_charge_ipd'],
+                'standard_charge_opd' => $validated['standard_charge_opd'],
             ];
             
             $radiology->update($updateData);
 
-            // Handle TPA charges
-            $user = Auth::user();
-            $hospitalId = $user->hospital_id ?? null;
-            $branchId = $user->branch_id ?? null;
+            // Process TPA charges
+            $organisations = Organisation::all();
+            
+            // Debug: Log all TPA charge inputs from form
+            $tpaInputs = [];
+            foreach ($organisations as $org) {
+                $tpaInputs['tpa_charge_ipd_' . $org->id] = $request->input('tpa_charge_ipd_' . $org->id);
+                $tpaInputs['tpa_charge_opd_' . $org->id] = $request->input('tpa_charge_opd_' . $org->id);
+            }
+            Log::info('TPA Charges from form (update):', $tpaInputs);
+            
+            // Check if radiology_id and charge_type columns exist
+            $hasRadiologyIdColumn = Schema::hasColumn('organisations_charges', 'radiology_id');
+            $hasChargeTypeColumn = Schema::hasColumn('organisations_charges', 'charge_type');
             
             $tpaChargesCreated = 0;
-            if ($hospitalId) {
-                // Delete all existing TPA charges for this charge_id first
-                OrganisationsCharge::where('charge_id', $validated['charge_id'])->delete();
-                
-                $organisations = Organisation::all();
+            if (!$hasRadiologyIdColumn || !$hasChargeTypeColumn) {
+                Log::error('Missing database columns for TPA charges!', [
+                    'radiology_id_column' => $hasRadiologyIdColumn,
+                    'charge_type_column' => $hasChargeTypeColumn,
+                    'message' => 'Please run the SQL migration: radiology_changes_step2_update_organisations_charges.sql'
+                ]);
+            } else {
                 foreach ($organisations as $organisation) {
-                    $tpaChargeKey = 'tpa_charge_' . $organisation->id;
-                    $tpaChargeValue = $request->input($tpaChargeKey);
+                    // Process IPD TPA charges
+                    $tpaChargeIpdKey = 'tpa_charge_ipd_' . $organisation->id;
+                    $tpaChargeIpdValue = $request->input($tpaChargeIpdKey);
                     
-                    $floatValue = ($tpaChargeValue !== null && $tpaChargeValue !== '' && is_numeric($tpaChargeValue)) 
-                        ? floatval($tpaChargeValue) 
-                        : 0;
+                    if ($tpaChargeIpdValue !== null && $tpaChargeIpdValue !== '' && $tpaChargeIpdValue !== '0') {
+                        $floatValue = is_numeric($tpaChargeIpdValue) ? floatval($tpaChargeIpdValue) : 0;
+                        if ($floatValue > 0) {
+                            try {
+                                // Delete any existing IPD charges for this radiology and organization to prevent duplicates
+                                OrganisationsCharge::where('radiology_id', $radiology->id)
+                                    ->where('org_id', $organisation->id)
+                                    ->where('charge_type', 'IPD')
+                                    ->delete();
+                                
+                                // Create new IPD TPA charge
+                                $tpaChargeData = [
+                                    'radiology_id' => $radiology->id,
+                                    'org_id' => $organisation->id,
+                                    'charge_type' => 'IPD',
+                                    'org_charge' => $floatValue,
+                                ];
+                                
+                                if (Schema::hasColumn('organisations_charges', 'hospital_id')) {
+                                    $tpaChargeData['hospital_id'] = $hospitalId;
+                                }
+                                if (Schema::hasColumn('organisations_charges', 'branch_id')) {
+                                    $tpaChargeData['branch_id'] = $branchId ?? '';
+                                }
+                                
+                                OrganisationsCharge::create($tpaChargeData);
+                                $tpaChargesCreated++;
+                                Log::info('TPA charge IPD created:', [
+                                    'radiology_id' => $radiology->id,
+                                    'org_id' => $organisation->id,
+                                    'org_charge' => $floatValue
+                                ]);
+                            } catch (\Exception $e) {
+                                Log::error('Error creating/updating IPD TPA charge:', [
+                                    'error' => $e->getMessage(),
+                                    'radiology_id' => $radiology->id,
+                                    'org_id' => $organisation->id,
+                                    'trace' => $e->getTraceAsString()
+                                ]);
+                            }
+                        }
+                    }
                     
-                    if ($floatValue > 0) {
-                        $orgCharge = $floatValue;
-                        
-                        $tpaChargeData = [
-                            'charge_id' => $validated['charge_id'],
-                            'org_id' => $organisation->id,
-                            'org_charge' => $orgCharge,
-                        ];
-                        
-                        if (Schema::hasColumn('organisations_charges', 'hospital_id')) {
-                            $tpaChargeData['hospital_id'] = $hospitalId;
+                    // Process OPD TPA charges
+                    $tpaChargeOpdKey = 'tpa_charge_opd_' . $organisation->id;
+                    $tpaChargeOpdValue = $request->input($tpaChargeOpdKey);
+                    
+                    if ($tpaChargeOpdValue !== null && $tpaChargeOpdValue !== '' && $tpaChargeOpdValue !== '0') {
+                        $floatValue = is_numeric($tpaChargeOpdValue) ? floatval($tpaChargeOpdValue) : 0;
+                        if ($floatValue > 0) {
+                            try {
+                                // Delete any existing OPD charges for this radiology and organization to prevent duplicates
+                                OrganisationsCharge::where('radiology_id', $radiology->id)
+                                    ->where('org_id', $organisation->id)
+                                    ->where('charge_type', 'OPD')
+                                    ->delete();
+                                
+                                // Create new OPD TPA charge
+                                $tpaChargeData = [
+                                    'radiology_id' => $radiology->id,
+                                    'org_id' => $organisation->id,
+                                    'charge_type' => 'OPD',
+                                    'org_charge' => $floatValue,
+                                ];
+                                
+                                if (Schema::hasColumn('organisations_charges', 'hospital_id')) {
+                                    $tpaChargeData['hospital_id'] = $hospitalId;
+                                }
+                                if (Schema::hasColumn('organisations_charges', 'branch_id')) {
+                                    $tpaChargeData['branch_id'] = $branchId ?? '';
+                                }
+                                
+                                OrganisationsCharge::create($tpaChargeData);
+                                $tpaChargesCreated++;
+                                Log::info('TPA charge OPD created:', [
+                                    'radiology_id' => $radiology->id,
+                                    'org_id' => $organisation->id,
+                                    'org_charge' => $floatValue
+                                ]);
+                            } catch (\Exception $e) {
+                                Log::error('Error creating/updating OPD TPA charge:', [
+                                    'error' => $e->getMessage(),
+                                    'radiology_id' => $radiology->id,
+                                    'org_id' => $organisation->id,
+                                    'trace' => $e->getTraceAsString()
+                                ]);
+                            }
                         }
-                        if (Schema::hasColumn('organisations_charges', 'branch_id')) {
-                            $tpaChargeData['branch_id'] = $branchId ?? '';
-                        }
-                        
-                        OrganisationsCharge::create($tpaChargeData);
-                        $tpaChargesCreated++;
                     }
                 }
             }
@@ -295,7 +482,7 @@ class RadiologyTestController extends Controller
                 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error updating radiology test:', ['error' => $e->getMessage()]);
+            Log::error('Error updating radiology test:', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Error updating radiology test: ' . $e->getMessage());
@@ -340,7 +527,7 @@ class RadiologyTestController extends Controller
             $organisationCharge->org_charge = $validated['org_charge'];
             $organisationCharge->save();
 
-            $radiology = Radio::where('charge_id', $organisationCharge->charge_id)->first();
+            $radiology = Radio::where('id', $organisationCharge->radiology_id)->first();
             
             if ($radiology) {
                 return redirect()->route('radiology.test.show', $radiology->id)
@@ -355,49 +542,4 @@ class RadiologyTestController extends Controller
                 ->with('error', 'Error updating TPA charge: ' . $e->getMessage());
         }
     }
-
-    /**
-     * API: Get charge names by charge category
-     */
-    public function getChargeNames(Request $request)
-    {
-        $chargeCategoryId = $request->input('charge_category_id');
-        
-        $charges = Charge::where('charge_category_id', $chargeCategoryId)
-            ->with('taxCategory')
-            ->get()
-            ->map(function($charge) {
-                return [
-                    'id' => $charge->id,
-                    'name' => $charge->name,
-                    'standard_charge' => $charge->standard_charge,
-                    'tax_percentage' => $charge->taxCategory ? $charge->taxCategory->percentage : 0,
-                ];
-            });
-        
-        return response()->json($charges);
-    }
-
-    /**
-     * API: Get charge details by charge ID
-     */
-    public function getChargeDetails(Request $request)
-    {
-        $chargeId = $request->input('charge_id');
-        
-        $charge = Charge::with('taxCategory')->find($chargeId);
-        
-        if (!$charge) {
-            return response()->json(['error' => 'Charge not found'], 404);
-        }
-        
-        return response()->json([
-            'id' => $charge->id,
-            'name' => $charge->name,
-            'standard_charge' => $charge->standard_charge,
-            'tax_percentage' => $charge->taxCategory ? $charge->taxCategory->percentage : 0,
-            'amount' => $charge->standard_charge + ($charge->standard_charge * ($charge->taxCategory ? $charge->taxCategory->percentage : 0) / 100),
-        ]);
-    }
 }
-

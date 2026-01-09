@@ -37,7 +37,7 @@
                                                         class="ti ti-plus me-1"></i>Add Finding</a>
                                             </div>
                                             <!-- Modal -->
-                                            <div class="modal fade" id="add_finding" tabindex="-1" aria-hidden="true">
+                                            <div class="modal fade use-select2" id="add_finding" tabindex="-1" aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered">
                                                     <div class="modal-content">
                                                         <div class="modal-header rounded-0"
@@ -65,7 +65,7 @@
                                                                         <label for="category" class="form-label">Category
                                                                             <span class="text-danger">*</span></label>
                                                                         <select name="category" id="category"
-                                                                            class="form-select" required>
+                                                                            class="form-select select2-input" required>
                                                                             <option value="">Select</option>
                                                                             @foreach ($findingCategories as $category)
                                                                                 <option value="{{ $category->id }}">

@@ -74,53 +74,17 @@
                             </div>
 
                             <div class="col-md-3">
-                                <label class="form-label">Charge Category <span class="text-danger">*</span></label>
-                                <select name="charge_category_id" id="charge_category_id" class="form-control" required>
-                                    <option value="">Select</option>
-                                    @foreach($chargeCategories as $chargeCategory)
-                                        <option value="{{ $chargeCategory->id }}" {{ old('charge_category_id') == $chargeCategory->id ? 'selected' : '' }}>
-                                            {{ $chargeCategory->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('charge_category_id')
+                                <label class="form-label">Standard Charge IPD (INR) <span class="text-danger">*</span></label>
+                                <input type="number" name="standard_charge_ipd" id="standard_charge_ipd" class="form-control" value="{{ old('standard_charge_ipd') }}" step="0.01" min="0" required>
+                                @error('standard_charge_ipd')
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="col-md-3">
-                                <label class="form-label">Charge Name <span class="text-danger">*</span></label>
-                                <select name="charge_id" id="charge_id" class="form-control" required>
-                                    <option value="">Select</option>
-                                </select>
-                                @error('charge_id')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <!-- Row 3 -->
-                        <div class="row mb-3">
-                            <div class="col-md-3">
-                                <label class="form-label">Tax (%)</label>
-                                <div class="input-group">
-                                    <input type="number" name="tax_percentage" id="tax_percentage" class="form-control" value="0" step="0.01" min="0" readonly>
-                                    <span class="input-group-text">%</span>
-                                </div>
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="form-label">Standard Charge (INR)</label>
-                                <input type="number" name="standard_charge" id="standard_charge" class="form-control" value="{{ old('standard_charge') }}" step="0.01" min="0" readonly>
-                                @error('standard_charge')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="form-label">Amount (INR)</label>
-                                <input type="number" name="amount" id="amount" class="form-control" value="{{ old('amount') }}" step="0.01" min="0" readonly>
-                                @error('amount')
+                                <label class="form-label">Standard Charge OPD (INR) <span class="text-danger">*</span></label>
+                                <input type="number" name="standard_charge_opd" id="standard_charge_opd" class="form-control" value="{{ old('standard_charge_opd') }}" step="0.01" min="0" required>
+                                @error('standard_charge_opd')
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -138,9 +102,10 @@
                                             <table class="table table-bordered table-sm">
                                                 <thead>
                                                     <tr>
-                                                        <th width="40%">TPA Organization</th>
-                                                        <th width="40%">TPA Charge (INR)</th>
-                                                        <th width="20%">Code</th>
+                                                        <th width="30%">TPA Organization</th>
+                                                        <th width="30%">TPA Charge IPD (INR)</th>
+                                                        <th width="30%">TPA Charge OPD (INR)</th>
+                                                        <th width="10%">Code</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -151,13 +116,25 @@
                                                             </td>
                                                             <td>
                                                                 <input type="number" 
-                                                                       name="tpa_charge_{{ $organisation->id }}" 
-                                                                       id="tpa_charge_{{ $organisation->id }}"
+                                                                       name="tpa_charge_ipd_{{ $organisation->id }}" 
+                                                                       id="tpa_charge_ipd_{{ $organisation->id }}"
                                                                        class="form-control form-control-sm tpa-charge-input" 
                                                                        step="0.01" 
                                                                        min="0" 
-                                                                       placeholder="Auto: Standard Charge"
-                                                                       data-org-id="{{ $organisation->id }}">
+                                                                       placeholder="Auto: Standard IPD"
+                                                                       data-org-id="{{ $organisation->id }}"
+                                                                       data-charge-type="IPD">
+                                                            </td>
+                                                            <td>
+                                                                <input type="number" 
+                                                                       name="tpa_charge_opd_{{ $organisation->id }}" 
+                                                                       id="tpa_charge_opd_{{ $organisation->id }}"
+                                                                       class="form-control form-control-sm tpa-charge-input" 
+                                                                       step="0.01" 
+                                                                       min="0" 
+                                                                       placeholder="Auto: Standard OPD"
+                                                                       data-org-id="{{ $organisation->id }}"
+                                                                       data-charge-type="OPD">
                                                             </td>
                                                             <td>
                                                                 <small class="text-muted">{{ $organisation->code ?? '-' }}</small>
@@ -190,33 +167,12 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const chargeCategorySelect = document.getElementById('charge_category_id');
-            const chargeSelect = document.getElementById('charge_id');
-            const standardChargeInput = document.getElementById('standard_charge');
-            const taxPercentageInput = document.getElementById('tax_percentage');
-            const amountInput = document.getElementById('amount');
-
-            // Initialize Select2 for dropdowns
+            // Initialize Select2 for radiology category dropdown
             setTimeout(function() {
                 if (typeof jQuery !== 'undefined' && typeof jQuery.fn.select2 !== 'undefined') {
-                    // Initialize radiology category
                     jQuery('#radiology_category_id').select2({
                         width: '100%',
                         placeholder: 'Select Category',
-                        allowClear: false
-                    });
-                    
-                    // Initialize charge category
-                    jQuery('#charge_category_id').select2({
-                        width: '100%',
-                        placeholder: 'Select Charge Category',
-                        allowClear: false
-                    });
-                    
-                    // Initialize charge name dropdown
-                    jQuery('#charge_id').select2({
-                        width: '100%',
-                        placeholder: 'Select Charge',
                         allowClear: false
                     });
                     
@@ -224,77 +180,32 @@
                 }
             }, 500);
 
-            // Load charge names when charge category is selected
-            jQuery('#charge_category_id').on('change', function() {
-                const chargeCategoryId = jQuery(this).val();
+            // Update TPA charge placeholders when standard charges change
+            const standardChargeIpdInput = document.getElementById('standard_charge_ipd');
+            const standardChargeOpdInput = document.getElementById('standard_charge_opd');
+
+            function updateTpaPlaceholders() {
+                const ipdValue = standardChargeIpdInput.value || '0';
+                const opdValue = standardChargeOpdInput.value || '0';
                 
-                // Clear the charge dropdown
-                jQuery('#charge_id').empty().append('<option value="">Select</option>');
-                standardChargeInput.value = '';
-                taxPercentageInput.value = '0';
-                amountInput.value = '';
+                jQuery('.tpa-charge-input[data-charge-type="IPD"]').each(function() {
+                    jQuery(this).attr('placeholder', 'Auto: ₹' + parseFloat(ipdValue).toFixed(2));
+                });
+                
+                jQuery('.tpa-charge-input[data-charge-type="OPD"]').each(function() {
+                    jQuery(this).attr('placeholder', 'Auto: ₹' + parseFloat(opdValue).toFixed(2));
+                });
+            }
 
-                if (chargeCategoryId) {
-                    const url = `{{ route('radiology.api.charge-names') }}?charge_category_id=${chargeCategoryId}`;
-                    
-                    fetch(url)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error(`HTTP error! status: ${response.status}`);
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            if (data.length === 0) {
-                                alert('No charges found for this category');
-                            }
-                            
-                            // Add new options
-                            data.forEach(charge => {
-                                const option = new Option(charge.name, charge.id);
-                                jQuery('#charge_id').append(option);
-                            });
-                            
-                            // Trigger Select2 to refresh
-                            jQuery('#charge_id').trigger('change.select2');
-                        })
-                        .catch(error => {
-                            alert('Error loading charges. Please try again.');
-                        });
-                }
-            });
+            if (standardChargeIpdInput) {
+                standardChargeIpdInput.addEventListener('input', updateTpaPlaceholders);
+            }
+            if (standardChargeOpdInput) {
+                standardChargeOpdInput.addEventListener('input', updateTpaPlaceholders);
+            }
 
-            // Load charge details when charge is selected
-            jQuery('#charge_id').on('change', function() {
-                const chargeId = jQuery(this).val();
-
-                if (chargeId) {
-                    fetch(`{{ route('radiology.api.charge-details') }}?charge_id=${chargeId}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            standardChargeInput.value = data.standard_charge;
-                            taxPercentageInput.value = data.tax_percentage;
-                            amountInput.value = data.amount;
-                            
-                            // Update TPA charge placeholder with standard charge
-                            jQuery('.tpa-charge-input').each(function() {
-                                jQuery(this).attr('placeholder', 'Auto: ₹' + parseFloat(data.standard_charge).toFixed(2));
-                            });
-                        })
-                        .catch(error => {
-                            alert('Error loading charge details. Please try again.');
-                        });
-                } else {
-                    standardChargeInput.value = '';
-                    taxPercentageInput.value = '0';
-                    amountInput.value = '';
-                    // Clear TPA charge placeholders
-                    jQuery('.tpa-charge-input').each(function() {
-                        jQuery(this).attr('placeholder', 'Auto: Standard Charge');
-                    });
-                }
-            });
+            // Initialize placeholders on page load
+            updateTpaPlaceholders();
         });
     </script>
 @endsection
-

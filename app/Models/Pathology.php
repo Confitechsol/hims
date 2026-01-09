@@ -23,14 +23,16 @@ class Pathology extends Model
         'sub_category',
         'report_days',
         'method',
-        'charge_category_id',
-        'charge_id',
-        'standard_charge',
-        'amount',
+        'standard_charge_ipd',
+        'standard_charge_opd',
+        'standard_charge', // Keep for backward compatibility
+        'amount', // Keep for backward compatibility
     ];
 
     protected $casts = [
         'report_days' => 'integer',
+        'standard_charge_ipd' => 'decimal:2',
+        'standard_charge_opd' => 'decimal:2',
         'standard_charge' => 'decimal:2',
         'amount' => 'decimal:2',
     ];
@@ -44,19 +46,11 @@ class Pathology extends Model
     }
 
     /**
-     * Relationship with Charge
+     * Relationship with OrganisationsCharge for TPA charges
      */
-    public function charge()
+    public function tpaCharges()
     {
-        return $this->belongsTo(Charge::class, 'charge_id');
-    }
-
-    /**
-     * Relationship with ChargeCategory
-     */
-    public function chargeCategory()
-    {
-        return $this->belongsTo(ChargeCategory::class, 'charge_category_id');
+        return $this->hasMany(OrganisationsCharge::class, 'pathology_id');
     }
 
     /**

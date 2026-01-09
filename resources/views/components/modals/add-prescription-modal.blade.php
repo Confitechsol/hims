@@ -346,7 +346,7 @@
 </style>
 <div class="modal fade" id="addPrescriptionModal" tabindex="-1" aria-labelledby="addPrescriptionModalLabel"
     aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen ">
+    <div class="modal-dialog modal-xl ">
         <!-- inline overflow override so .modal-content {overflow: hidden;} in global CSS doesn't block scrolling -->
         <div class="modal-content" style="overflow: visible;">
             <!-- Modal Header -->
@@ -520,6 +520,14 @@
 
                                             </div>
                                         </div>
+                                        <hr>
+                                        <div class="form-group mt-2">
+                                            <label class="form-label">Advice</label>
+                                            
+
+                                            <textarea id="advice" name="advice" contenteditable="true" class="editor-area w-100" name="header_note"></textarea>
+                                            <hr>
+                                        </div>
                                         <div class="col-sm-12 mt-2">
                                             <label class="form-label">Attachment</label>
                                             <input type="file" data-height="30" class="filestyle form-control"
@@ -530,7 +538,7 @@
                                         </div>
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                <label class="form-label">Footer Note</label>
+                                                <label class="form-label">follow Up Advice</label>
                                                 <div class="toolbar" data-editor="footer" id="toolbar-footer">
                                                     <select id="formatBlock-footer">
                                                         <option value="p">Normal text</option>

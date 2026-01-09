@@ -14,6 +14,9 @@ class IpdPatient extends Model
         'patient_id',
         'ipd_id',
         'doctor_id',
+        'doctor2_id',
+        'doctor3_id',
+        'doctor4_id',
     ];
 
     public function patient()

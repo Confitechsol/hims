@@ -733,7 +733,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label class="form-label">Department</label>
-                                            <select id="department" name="department" class="form-control"
+                                            <select id="department" name="department" class="form-control add-select2"
                                                     onchange="loadSpecialists(this.value)">
                                                 <option value="">Select</option>
                                                 @foreach ($departments as $dept)
@@ -750,7 +750,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label class="form-label">Designation</label>
-                                            <select id="designation" name="designation" class="form-control">
+                                            <select id="designation" name="designation" class="form-control add-select2">
                                                 <option value="">Select</option>
                                                 @foreach ($designations as $des)
                                                     <option value="{{ $des->id }}"
@@ -766,7 +766,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label class="form-label">Specialist</label>
-                                            <select name="specialist" class="form-control" id="specialist">
+                                            <select name="specialist" class="form-control add-select2" id="specialist">
                                                 <option value="">Select</option>
 
                                                 @foreach ($specialists as $specialist)

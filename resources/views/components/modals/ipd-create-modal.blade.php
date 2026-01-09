@@ -840,12 +840,29 @@
                                 </select>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Consultant Doctor <span class="required">*</span></label>
+                                <label class="form-label">Consultant Doctor 1 <span class="required">*</span></label>
                                 <select class="form-select select2-input" name="doctor_id" id="doctor_select">
                                     <option value="">Loading...</option>
                                 </select>
                             </div>
-
+                            <div class="col-md-4">
+                                <label class="form-label">Consultant Doctor 2 <span class="required">*</span></label>
+                                <select class="form-select select2-input" name="doctor2_id" id="doctor2_select">
+                                    <option value="">Loading...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Consultant Doctor 3 <span class="required">*</span></label>
+                                <select class="form-select select2-input" name="doctor3_id" id="doctor3_select">
+                                    <option value="">Loading...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Consultant Doctor 4 <span class="required">*</span></label>
+                                <select class="form-select select2-input" name="doctor4_id" id="doctor4_select">
+                                    <option value="">Loading...</option>
+                                </select>
+                            </div>
 
                         </div>
                     </div>
@@ -1244,6 +1261,15 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const doctorSelect = document.getElementById('doctor_select');
+        const doctor2Select = document.getElementById('doctor2_select');
+        const doctor3Select = document.getElementById('doctor3_select');
+        const doctor4Select = document.getElementById('doctor4_select');
+        const selects = [
+    doctorSelect,
+    doctor2Select,
+    doctor3Select,
+    doctor4Select
+];
         // const bedGroupSelect = document.getElementById('bed_group_select');
         // const bedNumberSelect = document.getElementById('bed_number_select');
 
@@ -1263,17 +1289,25 @@
         //doctor
         fetch("{{ route('getDoctors') }}")
             .then(response => response.json())
-            .then(data => {
-                window.doctorsData = data;
-                doctorSelect.innerHTML = '<option value="">Select</option>';
+                .then(data => {
+                    window.doctorsData = data;
+                    selects.forEach(select => {
+                    select.innerHTML = '<option value="">Select</option>';
+                });
+                const oldDoctorId = "{{ old('doctor_id') }}";
+
                 data.forEach(doc => {
-                    const option = document.createElement('option');
-                    option.value = doc.id;
-                    option.textContent = doc.name + " " + doc?.surname;
-                    if ("{{ old('doctor_id') }}" == doc.id) {
-                        option.selected = true;
-                    }
-                    doctorSelect.appendChild(option);
+                    selects.forEach(select => {
+                        const option = document.createElement('option');
+                        option.value = doc.id;
+                        option.textContent = `${doc.name} ${doc.surname ?? ''}`.trim();
+
+                        if (oldDoctorId && parseInt(oldDoctorId) === doc.id) {
+                            option.selected = true;
+                        }
+
+                        select.appendChild(option);
+                    });
                 });
             })
             .catch(error => {
