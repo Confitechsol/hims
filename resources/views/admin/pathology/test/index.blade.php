@@ -49,14 +49,11 @@
                                                     <th>Short Name</th>
                                                     <th>Test Type</th>
                                                     <th>Category</th>
-                                                    <th>Charge Category</th>
-                                                    <th>Charge Name</th>
                                                     <th>Sub Category</th>
                                                     <th>Method</th>
                                                     <th>Report Days</th>
-                                                    <th>Tax (%)</th>
-                                                    <th>Charge (INR)</th>
-                                                    <th>Amount (INR)</th>
+                                                    <th>Charge IPD (INR)</th>
+                                                    <th>Charge OPD (INR)</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -68,14 +65,11 @@
                                                         <td>{{ $test->short_name }}</td>
                                                         <td>{{ $test->test_type ?? '-' }}</td>
                                                         <td>{{ $test->category->category_name ?? '-' }}</td>
-                                                        <td>{{ $test->chargeCategory->name ?? ($test->charge && $test->charge->category ? $test->charge->category->name : '-') }}</td>
-                                                        <td>{{ $test->charge->name ?? '-' }}</td>
                                                         <td>{{ $test->sub_category ?? '-' }}</td>
                                                         <td>{{ $test->method ?? '-' }}</td>
                                                         <td>{{ $test->report_days ?? '-' }}</td>
-                                                        <td>{{ $test->charge && $test->charge->taxCategory ? number_format($test->charge->taxCategory->percentage, 2) : '0.00' }}%</td>
-                                                        <td>₹{{ number_format($test->standard_charge ?? ($test->charge ? $test->charge->standard_charge : 0), 2) }}</td>
-                                                        <td class="fw-bold">₹{{ number_format($test->amount ?? ($test->charge ? ($test->charge->standard_charge + ($test->charge->standard_charge * ($test->charge->taxCategory ? $test->charge->taxCategory->percentage : 0) / 100)) : 0), 2) }}</td>
+                                                        <td class="fw-bold">₹{{ number_format($test->standard_charge_ipd ?? 0, 2) }}</td>
+                                                        <td class="fw-bold">₹{{ number_format($test->standard_charge_opd ?? 0, 2) }}</td>
                                                         <td>
                                                             <div class="d-flex gap-2">
                                                                 <a href="{{ route('pathology.test.show', $test->id) }}" class="btn btn-sm btn-info text-white" title="View">
@@ -96,7 +90,7 @@
                                                     </tr>
                                                 @empty
                                                     <tr>
-                                                        <td colspan="12" class="text-center py-4">
+                                                        <td colspan="11" class="text-center py-4">
                                                             <div class="text-muted">
                                                                 <i class="ti ti-inbox fs-48 mb-2"></i>
                                                                 <p>No pathology tests found. Add your first test!</p>

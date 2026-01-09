@@ -45,7 +45,7 @@ class RadiologyBillingController extends Controller
                       ->orWhere('is_active', 'yes');
             })
             ->get();
-        $tests = Radio::with(['radiologyCategory', 'charge.taxCategory'])->get();
+        $tests = Radio::with(['radiologyCategory'])->get();
         
         return view('admin.radiology.billing.create', compact('patients', 'doctors', 'tests'));
     }
@@ -179,7 +179,7 @@ class RadiologyBillingController extends Controller
                       ->orWhere('is_active', 'yes');
             })
             ->get();
-        $tests = Radio::with(['radiologyCategory', 'charge.taxCategory'])->get();
+        $tests = Radio::with(['radiologyCategory'])->get();
         
         return view('admin.radiology.billing.edit', compact('bill', 'patients', 'doctors', 'tests'));
     }
@@ -383,19 +383,25 @@ class RadiologyBillingController extends Controller
     public function getTestDetails(Request $request)
     {
         $testId = $request->input('test_id');
+        $customerType = $request->input('customer_type', 'OPD'); // Default to OPD if not provided
         
-        $test = Radio::with(['charge.taxCategory'])->find($testId);
+        $test = Radio::find($testId);
         
         if (!$test) {
             return response()->json(['error' => 'Test not found'], 404);
         }
         
+        // Select the appropriate charge based on customer type
+        $amount = ($customerType === 'IPD') ? ($test->standard_charge_ipd ?? 0) : ($test->standard_charge_opd ?? 0);
+        
         return response()->json([
             'id' => $test->id,
             'test_name' => $test->test_name,
             'report_days' => $test->report_days,
-            'tax_percentage' => $test->charge && $test->charge->taxCategory ? $test->charge->taxCategory->percentage : 0,
-            'amount' => $test->charge ? $test->charge->standard_charge : 0,
+            'tax_percentage' => 0, // Tax is now handled separately in billing
+            'amount' => $amount,
+            'standard_charge_ipd' => $test->standard_charge_ipd ?? 0,
+            'standard_charge_opd' => $test->standard_charge_opd ?? 0,
         ]);
     }
 
@@ -502,44 +508,42 @@ class RadiologyBillingController extends Controller
     {
         $testId = $request->input('test_id');
         $organisationId = $request->input('organisation_id');
+        $customerType = $request->input('customer_type', 'OPD'); // Default to OPD if not provided
         
         if (!$testId || !$organisationId) {
             return response()->json(['error' => 'Test ID and Organisation ID are required'], 400);
         }
         
-        $test = Radio::with('charge')->find($testId);
+        $test = Radio::find($testId);
         
         if (!$test) {
             return response()->json(['error' => 'Test not found'], 404);
         }
         
-        $standardCharge = $test->charge ? $test->charge->standard_charge : 0;
+        // Get standard charge based on customer type
+        $standardCharge = ($customerType === 'IPD') ? ($test->standard_charge_ipd ?? 0) : ($test->standard_charge_opd ?? 0);
         
-        if (!$test->charge_id) {
-            \Log::info("Test {$testId} has no charge_id, returning standard charge");
-            return response()->json([
-                'tpa_charge' => null, 
-                'standard_charge' => $standardCharge
-            ]);
-        }
-        
-        $tpaCharge = OrganisationsCharge::where('charge_id', $test->charge_id)
+        // Look for TPA charge using radiology_id and charge_type
+        $tpaCharge = OrganisationsCharge::where('radiology_id', $testId)
             ->where('org_id', $organisationId)
+            ->where('charge_type', $customerType)
             ->first();
         
-        \Log::info("TPA charge lookup - Test: {$testId}, Org: {$organisationId}, Charge ID: {$test->charge_id}, Found: " . ($tpaCharge ? 'Yes' : 'No'));
+        \Log::info("TPA charge lookup - Test: {$testId}, Org: {$organisationId}, Customer Type: {$customerType}, Found: " . ($tpaCharge ? 'Yes' : 'No'));
         
         if ($tpaCharge && $tpaCharge->org_charge !== null) {
             \Log::info("TPA charge found: {$tpaCharge->org_charge}");
             return response()->json([
-                'tpa_charge' => (float)$tpaCharge->org_charge,
+                'tpa_charge_ipd' => ($customerType === 'IPD') ? (float)$tpaCharge->org_charge : null,
+                'tpa_charge_opd' => ($customerType === 'OPD') ? (float)$tpaCharge->org_charge : null,
                 'standard_charge' => $standardCharge,
             ]);
         }
         
         \Log::info("No TPA charge found, returning standard charge: {$standardCharge}");
         return response()->json([
-            'tpa_charge' => null,
+            'tpa_charge_ipd' => null,
+            'tpa_charge_opd' => null,
             'standard_charge' => $standardCharge,
         ]);
     }
@@ -557,27 +561,31 @@ class RadiologyBillingController extends Controller
         }
         
         // Get radiology tests from the prescription
+        // Determine if this is IPD or OPD based on prescription type
+        $isIpd = $prescription->ipd !== null;
+        $customerType = $isIpd ? 'IPD' : 'OPD';
+        
         $radiologyTests = $prescription->tests()
             ->whereNotNull('radiology_id')
-            ->with('radiology.charge.taxCategory')
+            ->with('radiology')
             ->get()
             ->filter(function($test) {
                 return $test->radiology !== null;
             })
-            ->map(function($test) {
+            ->map(function($test) use ($isIpd) {
                 $radiology = $test->radiology;
-                $standardCharge = $radiology->charge ? $radiology->charge->standard_charge : 0;
-                $taxPercentage = $radiology->charge && $radiology->charge->taxCategory 
-                    ? $radiology->charge->taxCategory->percentage 
-                    : 0;
-                $amount = $radiology->amount ?? ($standardCharge + ($standardCharge * $taxPercentage / 100));
+                // Use IPD charge for IPD prescriptions, OPD charge for OPD
+                $standardCharge = $isIpd ? ($radiology->standard_charge_ipd ?? 0) : ($radiology->standard_charge_opd ?? 0);
+                $amount = $test->amount ?? $standardCharge;
                 
                 return [
                     'id' => $radiology->id,
                     'test_name' => $radiology->test_name,
                     'report_days' => $radiology->report_days ?? 0,
-                    'tax_percentage' => $taxPercentage,
+                    'tax_percentage' => 0, // Tax is handled separately in billing
                     'amount' => $amount,
+                    'standard_charge_ipd' => $radiology->standard_charge_ipd ?? 0,
+                    'standard_charge_opd' => $radiology->standard_charge_opd ?? 0,
                 ];
             });
         
