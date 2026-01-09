@@ -70,20 +70,14 @@ class ExcelImportController extends Controller
                 $subCategory    = trim($row['E']);
                 $method         = trim($row['F']);
                 $reportDays     = trim($row['G']);
-                $chargeCategory = trim($row['H']);
-                $chargeName     = trim($row['I']);
-                $standardCharge = trim($row['J']);
-                $amount         = trim($row['K']);
-                $description    = trim($row['L']); // optional field
-                $unitName       = trim($row['M']); // if required
+                $standardChargeIpd = trim($row['H']); // Changed from charge category
+                $standardChargeOpd = trim($row['I']); // Changed from charge name
+                $description    = trim($row['J']); // optional field (shifted columns)
+                $unitName       = trim($row['K']); // if required (shifted columns)
 
                 // Convert Names → IDs
-                //dd($categoryName, $chargeName );
                 $categoryId = PathologyCategory::where('category_name', $categoryName)->value('id');
-                $chargeId   = Charge::where('name', $chargeName)->value('id');
-                $chargeCategoryId = ChargeCategory::where('name', $chargeCategory)->value('id');
                 $unitId = ChargeUnit::where('unit', $unitName)->value('id');
-               // dd($categoryId, $chargeId );
 
                 // Skip duplicate test names
                 // if (Pathology::where('test_name', $testName)->exists()) {
@@ -100,21 +94,9 @@ class ExcelImportController extends Controller
                     'sub_category'          => $subCategory ?? '',
                     'method'                => $method ?? '',
                     'report_days'           => is_numeric($reportDays) ? $reportDays : 0,
-                    'charge_id'             => $chargeId,
+                    'standard_charge_ipd'   => is_numeric($standardChargeIpd) ? $standardChargeIpd : 0,
+                    'standard_charge_opd'   => is_numeric($standardChargeOpd) ? $standardChargeOpd : 0,
                 ];
-
-                // Only add optional fields if exist in DB
-                if (Schema::hasColumn('pathology', 'standard_charge')) {
-                    $createData['standard_charge'] = $standardCharge ?: 0;
-                }
-
-                if (Schema::hasColumn('pathology', 'amount')) {
-                    $createData['amount'] = $amount ?: 0;
-                }
-
-                if (Schema::hasColumn('pathology', 'charge_category_id')) {
-                    $createData['charge_category_id'] = $chargeCategoryId;
-                }
 
                 if (Schema::hasColumn('pathology', 'unit')) {
                     $createData['unit'] = $unitId;
@@ -134,41 +116,54 @@ class ExcelImportController extends Controller
                 $hospitalId = $user->hospital_id ?? null;
                 $branchId   = $user->branch_id ?? null;
 
+                // TPA charges are now optional and can be set manually after import
+                // If needed, TPA charges can be created using standard charges as default
+                // This section is commented out as TPA charges should be set individually per organization
+                /*
                 if ($hospitalId) {
                     $organisations = Organisation::all();
+                    $standardChargeIpd = is_numeric($standardChargeIpd) ? floatval($standardChargeIpd) : 0;
+                    $standardChargeOpd = is_numeric($standardChargeOpd) ? floatval($standardChargeOpd) : 0;
 
                     foreach ($organisations as $organisation) {
-
-                        // Excel does not include TPA charges → set amount = standard charge
-                        $orgCharge = floatval($standardCharge ?? $amount ?? 0);
-
-                        // If TPA charge is empty skip
-                        if ($orgCharge <= 0) continue;
-
-                        $existing = OrganisationsCharge::where('charge_id', $chargeId)
-                            ->where('org_id', $organisation->id)
-                            ->first();
-
-                        if ($existing) {
-                            $existing->org_charge = $orgCharge;
-                            $existing->save();
-                        } else {
-                            $tpaChargeData = [
-                                'charge_id'  => $chargeId,
-                                'org_id'     => $organisation->id,
-                                'org_charge' => $orgCharge,
+                        // Create IPD TPA charge if standard charge IPD > 0
+                        if ($standardChargeIpd > 0) {
+                            $tpaChargeDataIpd = [
+                                'pathology_id' => $pathology->id,
+                                'org_id' => $organisation->id,
+                                'charge_type' => 'IPD',
+                                'org_charge' => $standardChargeIpd,
                             ];
 
                             if (Schema::hasColumn('organisations_charges', 'hospital_id'))
-                                $tpaChargeData['hospital_id'] = $hospitalId;
+                                $tpaChargeDataIpd['hospital_id'] = $hospitalId;
 
                             if (Schema::hasColumn('organisations_charges', 'branch_id'))
-                                $tpaChargeData['branch_id'] = $branchId;
+                                $tpaChargeDataIpd['branch_id'] = $branchId;
 
-                            OrganisationsCharge::create($tpaChargeData);
+                            OrganisationsCharge::create($tpaChargeDataIpd);
+                        }
+
+                        // Create OPD TPA charge if standard charge OPD > 0
+                        if ($standardChargeOpd > 0) {
+                            $tpaChargeDataOpd = [
+                                'pathology_id' => $pathology->id,
+                                'org_id' => $organisation->id,
+                                'charge_type' => 'OPD',
+                                'org_charge' => $standardChargeOpd,
+                            ];
+
+                            if (Schema::hasColumn('organisations_charges', 'hospital_id'))
+                                $tpaChargeDataOpd['hospital_id'] = $hospitalId;
+
+                            if (Schema::hasColumn('organisations_charges', 'branch_id'))
+                                $tpaChargeDataOpd['branch_id'] = $branchId;
+
+                            OrganisationsCharge::create($tpaChargeDataOpd);
                         }
                     }
                 }
+                */
             }
 
             DB::commit();

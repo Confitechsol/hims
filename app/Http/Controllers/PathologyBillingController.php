@@ -45,7 +45,7 @@ class PathologyBillingController extends Controller
                       ->orWhere('is_active', 'yes');
             })
             ->get();
-        $tests = Pathology::with(['category', 'charge.taxCategory'])->get();
+        $tests = Pathology::with(['category'])->get();
         
         return view('admin.pathology.billing.create', compact('patients', 'doctors', 'tests'));
     }
@@ -176,7 +176,7 @@ class PathologyBillingController extends Controller
      */
     public function edit($id)
     {
-        $bill = PathologyBilling::with(['patient.organisation', 'doctor', 'reports.pathology.charge.taxCategory', 'organisation'])->findOrFail($id);
+        $bill = PathologyBilling::with(['patient.organisation', 'doctor', 'reports.pathology', 'organisation'])->findOrFail($id);
         $patients = Patient::select('id', 'patient_name', 'mobileno')->get();
         $doctors = Doctor::select('id', 'name', 'surname', 'doctor_id')
             ->where(function($query) {
@@ -185,7 +185,7 @@ class PathologyBillingController extends Controller
                       ->orWhere('is_active', 'yes');
             })
             ->get();
-        $tests = Pathology::with(['category', 'charge.taxCategory'])->get();
+        $tests = Pathology::with(['category'])->get();
         
         return view('admin.pathology.billing.edit', compact('bill', 'patients', 'doctors', 'tests'));
     }
@@ -373,19 +373,24 @@ class PathologyBillingController extends Controller
     public function getTestDetails(Request $request)
     {
         $testId = $request->input('test_id');
+        $customerType = $request->input('customer_type', 'OPD'); // Default to OPD
         
-        $test = Pathology::with(['charge.taxCategory'])->find($testId);
+        $test = Pathology::find($testId);
         
         if (!$test) {
             return response()->json(['error' => 'Test not found'], 404);
         }
         
+        // Determine which charge to use based on customer type (IPD or OPD)
+        $standardCharge = ($customerType === 'IPD') ? ($test->standard_charge_ipd ?? 0) : ($test->standard_charge_opd ?? 0);
+        
         return response()->json([
             'id' => $test->id,
             'test_name' => $test->test_name,
             'report_days' => $test->report_days,
-            'tax_percentage' => $test->charge && $test->charge->taxCategory ? $test->charge->taxCategory->percentage : 0,
-            'amount' => $test->amount ?? 0,
+            'standard_charge_ipd' => $test->standard_charge_ipd ?? 0,
+            'standard_charge_opd' => $test->standard_charge_opd ?? 0,
+            'amount' => $standardCharge,
         ]);
     }
 
@@ -500,21 +505,22 @@ class PathologyBillingController extends Controller
         // Get pathology tests from the prescription
         $pathologyTests = $prescription->tests()
             ->whereNotNull('pathology_id')
-            ->with('pathology.charge.taxCategory')
+            ->with('pathology')
             ->get()
             ->filter(function($test) {
                 return $test->pathology !== null; // Filter out tests with null pathology
             })
             ->map(function($test) {
                 $pathology = $test->pathology;
+                // Use IPD charge since this is from IPD prescription
+                $standardCharge = $pathology->standard_charge_ipd ?? 0;
                 return [
                     'id' => $pathology->id,
                     'test_name' => $pathology->test_name,
                     'report_days' => $pathology->report_days ?? 0,
-                    'tax_percentage' => $pathology->charge && $pathology->charge->taxCategory 
-                        ? $pathology->charge->taxCategory->percentage 
-                        : 0,
-                    'amount' => $pathology->amount ?? ($pathology->charge ? $pathology->charge->standard_charge : 0),
+                    'standard_charge_ipd' => $pathology->standard_charge_ipd ?? 0,
+                    'standard_charge_opd' => $pathology->standard_charge_opd ?? 0,
+                    'amount' => $standardCharge,
                 ];
             });
         
@@ -558,36 +564,36 @@ class PathologyBillingController extends Controller
     {
         $testId = $request->input('test_id');
         $organisationId = $request->input('organisation_id');
+        $customerType = $request->input('customer_type', 'OPD'); // Default to OPD
         
         if (!$testId || !$organisationId) {
             return response()->json(['error' => 'Test ID and Organisation ID are required'], 400);
         }
         
-        $test = Pathology::with('charge')->find($testId);
+        $test = Pathology::find($testId);
         
         if (!$test) {
             return response()->json(['error' => 'Test not found'], 404);
         }
         
-        $standardCharge = $test->amount ?? ($test->charge ? $test->charge->standard_charge : 0);
+        // Determine which standard charge to use based on customer type
+        $standardCharge = ($customerType === 'IPD') ? ($test->standard_charge_ipd ?? 0) : ($test->standard_charge_opd ?? 0);
         
-        if (!$test->charge_id) {
-            \Log::info("Test {$testId} has no charge_id, returning standard charge");
-            return response()->json([
-                'tpa_charge' => null, 
-                'standard_charge' => $standardCharge
-            ]);
-        }
-        
-        $tpaCharge = OrganisationsCharge::where('charge_id', $test->charge_id)
+        // Look for TPA charge for this pathology, organization, and charge type
+        $tpaCharge = OrganisationsCharge::where('pathology_id', $test->id)
             ->where('org_id', $organisationId)
+            ->where('charge_type', $customerType)
             ->first();
         
-        \Log::info("TPA charge lookup - Test: {$testId}, Org: {$organisationId}, Charge ID: {$test->charge_id}, Found: " . ($tpaCharge ? 'Yes' : 'No'));
+        \Log::info("TPA charge lookup - Test: {$testId}, Org: {$organisationId}, Type: {$customerType}, Found: " . ($tpaCharge ? 'Yes' : 'No'));
         
         if ($tpaCharge && $tpaCharge->org_charge !== null) {
             \Log::info("TPA charge found: {$tpaCharge->org_charge}");
             return response()->json([
+                'tpa_charge_ipd' => ($customerType === 'IPD') ? (float)$tpaCharge->org_charge : null,
+                'tpa_charge_opd' => ($customerType === 'OPD') ? (float)$tpaCharge->org_charge : null,
+                'standard_charge_ipd' => $test->standard_charge_ipd ?? 0,
+                'standard_charge_opd' => $test->standard_charge_opd ?? 0,
                 'tpa_charge' => (float)$tpaCharge->org_charge,
                 'standard_charge' => $standardCharge,
             ]);
@@ -595,6 +601,10 @@ class PathologyBillingController extends Controller
         
         \Log::info("No TPA charge found, returning standard charge: {$standardCharge}");
         return response()->json([
+            'tpa_charge_ipd' => null,
+            'tpa_charge_opd' => null,
+            'standard_charge_ipd' => $test->standard_charge_ipd ?? 0,
+            'standard_charge_opd' => $test->standard_charge_opd ?? 0,
             'tpa_charge' => null,
             'standard_charge' => $standardCharge,
         ]);
