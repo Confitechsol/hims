@@ -91,6 +91,9 @@ class IpdController extends Controller
             'casualty'             => 'string',
             'reference'            => 'nullable|string',
             'doctor_id'            => 'nullable|exists:doctor,id',
+            'doctor2_id'            => 'nullable|exists:doctor,id',
+            'doctor3_id'            => 'nullable|exists:doctor,id',
+            'doctor4_id'            => 'nullable|exists:doctor,id',
             'credit_limit'         => 'nullable|numeric|min:0',
             'live_consultation'    => 'nullable|string|max:100',
             'bed_group'            => 'nullable|exists:bed_group,id',
@@ -146,6 +149,9 @@ class IpdController extends Controller
             $ipd->patient_id = $request->patient_id;
             // Doctor Details
             $ipd->cons_doctor = $request->doctor_id;
+            $ipd->cons_doctor2 = $request->doctor2_id;
+            $ipd->cons_doctor3 = $request->doctor3_id;
+            $ipd->cons_doctor4 = $request->doctor4_id;
 
             // Visit Details
             $ipd->bed_group_id = $request->bed_group;
@@ -174,6 +180,9 @@ class IpdController extends Controller
             $ipdPatient->patient_id = $request->patient_id ?? null;
             $ipdPatient->ipd_id     = $ipd->id ?? null;
             $ipdPatient->doctor_id  = $request->doctor_id ?? null;
+            $ipdPatient->doctor2_id  = $request->doctor2_id ?? null;
+            $ipdPatient->doctor3_id  = $request->doctor3_id ?? null;
+            $ipdPatient->doctor4_id  = $request->doctor4_id ?? null;
 
             $ipdPatient->save();
 
@@ -408,7 +417,7 @@ class IpdController extends Controller
     }
   public function getIpdRadPathById($id)
 {
-    $prescription = IpdPrescription::find($id);
+    $prescription = IpdPrescription::with('prescribedBy')->find($id);
 
     if (!$prescription) {
         return response()->json([

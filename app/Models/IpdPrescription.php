@@ -76,7 +76,7 @@ class IpdPrescription extends Model
      */
     public function prescribedBy()
     {
-        return $this->belongsTo(Doctor::class, 'prescribed_by');
+        return $this->belongsTo(Doctor::class, 'prescribed_by','doctor_id');
     }
 
     /**

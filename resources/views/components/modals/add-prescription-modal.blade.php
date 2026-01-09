@@ -538,7 +538,7 @@
                                         </div>
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                <label class="form-label">Footer Note</label>
+                                                <label class="form-label">follow Up Advice</label>
                                                 <div class="toolbar" data-editor="footer" id="toolbar-footer">
                                                     <select id="formatBlock-footer">
                                                         <option value="p">Normal text</option>
