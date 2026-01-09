@@ -10,8 +10,10 @@ use App\Http\Controllers\BedTypeController;
 use App\Http\Controllers\BirthController;
 use App\Http\Controllers\BloodBankController;
 use App\Http\Controllers\BloodDonorController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\DeathController;
+use App\Http\Controllers\DischargePdfController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\DutyRosterController;
 use App\Http\Controllers\EmailController;
@@ -33,6 +35,7 @@ use App\Http\Controllers\PathologyBillingController;
 use App\Http\Controllers\PathologyController;
 use App\Http\Controllers\PathologyTestController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\PdfController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PharmacyCompanyController;
 use App\Http\Controllers\RadiologyBillingController;
@@ -48,7 +51,6 @@ use App\Http\Controllers\Setup\HospitalChargesController;
 use App\Http\Controllers\Setup\HospitalChargeTypeController;
 use App\Http\Controllers\Setup\HospitalTaxCategoryController;
 use App\Http\Controllers\Setup\HospitalUnitTypeController;
-use App\Http\Controllers\Setup\PackageController;
 use App\Http\Controllers\Setup\HrController;
 use App\Http\Controllers\Setup\InventoryController;
 use App\Http\Controllers\Setup\LanguagesController;
@@ -61,6 +63,7 @@ use App\Http\Controllers\Setup\MedicineGroupController as SetupMedicineGroupCont
 use App\Http\Controllers\Setup\MedicineSupplierController;
 use App\Http\Controllers\Setup\MedicineSupplierController as SetupMedicineSupplierController;
 use App\Http\Controllers\Setup\MedicineUnitController as SetupMedicineUnitController;
+use App\Http\Controllers\Setup\PackageController;
 use App\Http\Controllers\Setup\PrefixesController;
 use App\Http\Controllers\Setup\ProfileController;
 use App\Http\Controllers\Setup\RadiologyController;
@@ -69,13 +72,11 @@ use App\Http\Controllers\Setup\UsersController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\TpamanagmentController;
+use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\TransactionReportController;
 use App\Http\Controllers\VisitorsController;
 use App\Http\Controllers\VitalController;
-use App\Http\Controllers\TransactionReportController;
-use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\PdfController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -103,7 +104,7 @@ Route::post('/login', [LoginController::class, 'login'])->name('login');
 Route::middleware(['auth'])->get('/hr-portal/redirect', [AppSwitchController::class, 'switchToClient'])->name('hrms.switch');
 
 Route::middleware(['admin'])->group(function () {
-    Route::get('/dashboard',[DashboardController::class,'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
     // Route::get('/profile', function () {
@@ -561,7 +562,7 @@ Route::delete('/ipd/prescription/{id}', [IpdController::class, 'deletePrescripti
 Route::post('/ipd_charge', [IpdController::class, 'addIpdCharge'])->name('ipd.addIpdCharge');
 Route::post('/assignNewBed', [IpdController::class, 'assignNewBed'])->name('assignNewBed');
 //
-Route::get('/ipd/{id}/pdf', [PdfController::class, 'generatePdf'])->name('ipd.pdf');;
+Route::get('/ipd/{id}/pdf', [PdfController::class, 'generatePdf'])->name('ipd.pdf');
 Route::post('/discharge-card/store', [IpdController::class, 'storeDischarge'])
     ->name('discharge.store');
 
@@ -736,8 +737,8 @@ Route::prefix('pharmacy')->group(function () {
             return 'Purchase route is working! Route order fixed.';
         });
         Route::get('/test-create', function () {
-            $suppliers = \App\Models\MedicineSupplier::all();
-            $medicines = \App\Models\Pharmacy::where('is_active', 'yes')->get();
+            $suppliers  = \App\Models\MedicineSupplier::all();
+            $medicines  = \App\Models\Pharmacy::where('is_active', 'yes')->get();
             $categories = \App\Models\MedicineCategory::all();
             return view('admin.pharmacy.purchase.test', compact('suppliers', 'medicines', 'categories'));
         });
@@ -985,7 +986,6 @@ Route::get('/processingTransactionReport', function () {
     return view('admin.reports.finance.processing-transaction-report');
 })->name('processingTransactionReport');
 
-
 // OPD
 Route::get('/opdReportsIndex', function () {
     return view('admin.reports.opd.index');
@@ -1013,3 +1013,6 @@ Route::get('/ipdBalanceReports', function () {
 Route::get('/ipdDischargePatient', function () {
     return view('admin.reports.ipd.ipd_discharge_patient');
 })->name('ipdDischargePatient');
+
+Route::get('/discharge/pdf/{id}', [DischargePdfController::class, 'generate'])
+    ->name('discharge.pdf');

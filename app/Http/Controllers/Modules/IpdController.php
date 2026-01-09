@@ -34,6 +34,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Milon\Barcode\Facades\DNS1DFacade as DNS1D;
 
 class IpdController extends Controller
 {
@@ -1017,13 +1018,69 @@ class IpdController extends Controller
             // -------------------------------
             // 🔹 Create Discharge Card
             // -------------------------------
+            $lastDischarge = DischargeCard::orderBy('id', 'desc')->first();
+            if ($lastDischarge && preg_match('/D-(\d+)/', $lastDischarge->discharge_number, $matches)) {
+                $lastNumber = intval($matches[1]);
+            } else {
+                $lastNumber = 0;
+            }
+            $nextNumber     = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+            $dischargeNo    = 'D-' . $nextNumber;
+            $barcodePayload = [
+                'type'               => 'DISCHARGE',
+                'discharge_no'       => $dischargeNo,
+                'ipd_details_id'     => $validated['ipd_details_id'],
+                'patient_name'       => $validated['patient_name'],
+                'admission_no'       => $validated['admission_no'] ?? null,
+                'admission_date'     => $validated['admission_date'] ?? null,
+                'admit_time'         => $validated['admit_time'] ?? null,
+                'discharge_date'     => $validated['discharge_date'],
+                'discharge_time'     => $validated['discharge_time'] ?? null,
+                'bed'                => $validated['bed'] ?? null,
+                'age'                => $validated['age'] ?? null,
+                'gender'             => $validated['gender'] ?? null,
+                'phone'              => $validated['phone'] ?? null,
+                'marital_status'     => $validated['marital_status'] ?? null,
+                'address'            => $validated['address'] ?? null,
+                'guardian'           => $validated['guardian'] ?? null,
+                'relation'           => $validated['relation'] ?? null,
+                'nationality'        => $validated['nationality'] ?? null,
+                'under_care_dr'      => $validated['under_care_dr'] ?? null,
+                'referral'           => $validated['referral'] ?? null,
+                'corporate'          => $validated['corporate'] ?? null,
+                'reason_discharge'   => $validated['reason_discharge'] ?? null,
+                'ot_date'            => $validated['ot_date'] ?? null,
+                'ot_type'            => $validated['ot_type'] ?? null,
+                'ot_name'            => $validated['ot_name'] ?? null,
+                'ot_done'            => $validated['ot_done'] ?? null,
+                'ot_done_by'         => $request->ot_done_by ?? [],
+                'diagnosis'          => $validated['diagnosis'] ?? null,
+                'ot_note'            => $validated['ot_note'] ?? null,
+                'discharge_advice'   => $validated['discharge_advice'] ?? null,
+                'present_complaints' => $validated['present_complaints'] ?? null,
+                'remarks'            => $validated['remarks'] ?? null,
+                'discharged_by'      => $validated['discharged_by'] ?? null,
+            ];
+
+            $json             = json_encode($barcodePayload, JSON_UNESCAPED_UNICODE);
+            $compressed       = gzcompress($json, 9);
+            $barcodeValue     = base64_encode($compressed);
+            $barcodePngBase64 = DNS1D::getBarcodePNG(
+                $barcodeValue,
+                'C128',
+                2,
+                60
+            );
+            $barcodeBinary = base64_decode($barcodePngBase64);
+            // dd($barcodeBinary);
             $discharge = DischargeCard::create([
                 'hospital_id'        => Auth::user()->hospital_id ?? null,
                 'branch_id'          => Auth::user()->branch_id ?? null,
                 'ipd_details_id'     => $validated['ipd_details_id'],
-
+                'discharge_number'   => $dischargeNo,
                 'patient_name'       => $validated['patient_name'],
                 'admission_no'       => $validated['admission_no'] ?? null,
+                'barcode'            => $barcodeBinary,
 
                 'discharge_date'     => $validated['discharge_date'],
                 'discharge_time'     => $validated['discharge_time'] ?? null,
@@ -1056,8 +1113,8 @@ class IpdController extends Controller
                     : null,
 
                 'diagnosis'          => $validated['diagnosis'] ?? null,
-                'ot_note'            => $validated['diagnosis'] ?? null,
-                'discharge_advice'   => $validated['diagnosis'] ?? null,
+                'ot_note'            => $validated['ot_note'] ?? null,
+                'discharge_advice'   => $validated['discharge_advice'] ?? null,
                 'present_complaints' => $validated['present_complaints'] ?? null,
                 'remarks'            => $validated['remarks'] ?? null,
 
@@ -1078,7 +1135,8 @@ class IpdController extends Controller
                 ->with('success', 'Patient discharged successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            dd($e);
+            // dd($e);
+            \Log::error($e);
             return back()
                 ->with('error', 'Something went wrong while saving discharge details.')
                 ->withInput();

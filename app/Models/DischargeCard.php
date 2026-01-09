@@ -21,6 +21,7 @@ class DischargeCard extends Model
         'opd_details_id',
         'ipd_details_id',
         'case_reference_id',
+        'discharge_number',
 
         'patient_name',
         'admission_no',
@@ -52,6 +53,7 @@ class DischargeCard extends Model
         'present_complaints',
         'remarks',
         'discharged_by',
+        'barcode',
         'created_by',
     ];
 
