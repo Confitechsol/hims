@@ -48,7 +48,7 @@ class IpdController extends Controller
         $charges    = Charge::all();
         $references = ['Direct', 'Doctor', 'Marketer', 'Other'];
         if ($isIpdTab) {
-            $ipd = IpdDetail::with('patient', 'doctor', 'bedDetail', 'bedGroup.floorDetail')
+            $ipd = IpdDetail::with('patient','ipdPatients', 'doctor', 'bedDetail', 'bedGroup.floorDetail')
                 ->when($search, function ($query) use ($search) {
                     $query->where(function ($q) use ($search) {
                         $q->where('ipd_no', 'LIKE', "%{$search}%")
@@ -66,7 +66,7 @@ class IpdController extends Controller
                 })->get();
         } else {
             // $patients = Patient::with(['ipds.doctor'])->get();
-            $patients = IpdDetail::with('patient', 'doctor')->where('discharged', 'yes')
+            $patients = IpdDetail::with('patient','ipdPatients', 'doctor')->where('discharged', 'yes')
                 ->when($search, function ($query) use ($search) {
                     $query->where(function ($q) use ($search) {
                         $q->whereHas('patient', function ($p) use ($search) {

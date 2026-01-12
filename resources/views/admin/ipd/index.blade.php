@@ -147,8 +147,13 @@
                                                         <td>{{ $ipdDetails->credit_limit }}</td>
                                                         <td>
                                                             <a href="{{ route('ipd.edit', [$ipdDetails->id]) }}"
-                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill" title="Edit">
                                                                 <i class="ti ti-pencil"></i>
+                                                            </a>
+                                                            <a href="{{ route('ipd.pdf', [$ipdDetails->ipdPatients['id'] ?? 0]) }}"
+                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
+                                                                target="_blank" title="View Admission Form">
+                                                                <i class="ti ti-eye"></i>
                                                             </a>
                                                         </td>
                                                     </tr>

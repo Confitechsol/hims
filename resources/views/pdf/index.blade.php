@@ -96,7 +96,7 @@
     }
 
     .general_list li {
-        margin-bottom: 10px;
+        margin-bottom: 6px;
     }
 
     .bottom_box {
@@ -137,7 +137,7 @@
         align-items: end;
         gap: 10px;
         font-size: 10px;
-        margin-top: 30px;
+        margin-top: 8px;
     }
 
     .wreeti_sig p {
@@ -192,12 +192,11 @@
                 @endif
             </div>
             <div class="about_info">
-                <p>Samaritan Clinic Pvt.Ltd. </p>
-                <p>10/4D, ELGIN ROAD , KOLKATA - 700 020</p>
-                <p>Phone - 033 4060 8313</p>
-                <p> 033 4029 2156</p>
+                <p>{{$hospital->name ?? ""}} </p>
+                <p>{{$hospital->address ?? ""}}</p>
+                <p>Phone - {{$hospital->phone ?? ""}}</p>
                 <p>Ambulance :- 96747 77261</p>
-                <p>E-mail: samaritan84@gmail.com</p>
+                <p>E-mail: {{$hospital->email ?? ""}}</p>
             </div>
         </div>
 
@@ -220,8 +219,8 @@
             <div class="admission_item">
                 <p>
                     <b>ADMISSION TIME</b> : <span
-                        class="red">{{ \Carbon\Carbon::parse($IpdPatient->created_at)->format('h:i') ?? '' }}
-                        {{ \Carbon\Carbon::parse($IpdPatient->created_at)->format('A') ?? '' }}</span>
+                        class="red">{{ \Carbon\Carbon::parse($IpdPatient->ipd['date'])->format('h:i') ?? '' }}
+                        {{ \Carbon\Carbon::parse($IpdPatient->ipd['date'])->format('A') ?? '' }}</span>
                 </p>
             </div>
         </div>
@@ -427,8 +426,26 @@
                     </div>
                     :
                     <div class="patient_data">
-                        Dr. {{ $IpdPatient->doctor['name'] }} {{ $IpdPatient->doctor['surname'] }}
-                        ({{ $IpdPatient->doctor['registration_no'] }})
+                        {{-- Dr. {{ $IpdPatient->doctor['name'] }} {{ $IpdPatient->doctor['surname'] }}
+                        ({{ $IpdPatient->doctor['registration_no'] }}) --}}
+                        @php
+                        $doctors = [];
+            
+                        if(!empty($IpdPatient->doctor)) {
+                            $doctors[] = 'Dr. '.$IpdPatient->doctor['name'] . ' ' . $IpdPatient->doctor['surname'] . ' (' . $IpdPatient->doctor['registration_no'] . ')';
+                        }
+                        if(!empty($IpdPatient->doctor2)) {
+                            $doctors[] = 'Dr. '.$IpdPatient->doctor2['name'] . ' ' . ($IpdPatient->doctor2['surname'] ?? '') . ' (' . ($IpdPatient->doctor2['registration_no'] ?? '') . ')';
+                        }
+                        if(!empty($IpdPatient->doctor3)) {
+                            $doctors[] = ''.$IpdPatient->doctor3['name'] . ' ' . ($IpdPatient->doctor3['surname'] ?? '') . ' (' . ($IpdPatient->doctor3['registration_no'] ?? '') . ')';
+                        }
+                        if(!empty($IpdPatient->doctor4)) {
+                            $doctors[] = 'Dr. '.$IpdPatient->doctor4['name'] . ' ' . ($IpdPatient->doctor4['surname'] ?? '') . ' (' . ($IpdPatient->doctor4['registration_no'] ?? '') . ')';
+                        }
+                    @endphp
+            
+                    {{ implode(', ', $doctors) }}
                     </div>
                 </div>
 
@@ -460,7 +477,7 @@
                     </div>
                     :
                     <div class="patient_data">
-                        {{ $IpdPatient->ipd->organisation['organisation_name'] ?? '' }}
+                        {{ $IpdPatient->patient->organisation['organisation_name'] ?? '' }}
                     </div>
                 </div>
 
@@ -474,7 +491,6 @@
                     </div>
                     :
                     <div class="patient_data">
-                        United India Insurance Company Ltd.
                     </div>
                 </div>
 
@@ -541,6 +557,7 @@
                     patient. Yes [ ] No. [ ] If you don t disclose in the consent form
                     by ticking Yes/No, then Samaritan Clinic Pvt. Ltd. will not be
                     liable for any reimbursement insu</li>
+                <li>In the event of a delay in body release due to unavoidable reasons, the deceased will be respectfully transferred to the mortuary freezer after four hours (4 hours), subject to consent from the next of kin.</li>    
             </ol>
             <p>Witness Signature with relation</p>
         </div>
@@ -565,13 +582,13 @@
             <div class="admission_item">
                 <p>
                     <b>Date of Admission </b>:
-                    {{ \Carbon\Carbon::parse($IpdPatient->created_at)->format('d-m-Y') ?? '' }}
+                    {{ \Carbon\Carbon::parse($IpdPatient->ipd['date'])->format('d-m-Y') ?? '' }}
                 </p>
             </div>
             <div class="admission_item">
                 <p>
-                    <b>ADMISSION TIME.</b> : {{ \Carbon\Carbon::parse($IpdPatient->created_at)->format('h:i') ?? '' }}
-                    {{ \Carbon\Carbon::parse($IpdPatient->created_at)->format('A') ?? '' }}
+                    <b>ADMISSION TIME.</b> : {{ \Carbon\Carbon::parse($IpdPatient->ipd['date'])->format('h:i') ?? '' }}
+                    {{ \Carbon\Carbon::parse($IpdPatient->ipd['date'])->format('A') ?? '' }}
                 </p>
             </div>
             <div class="admission_item">
@@ -586,9 +603,25 @@
             </div>
             <div class="admission_item">
                 <p>
-                    <b>Under Care Docto</b> : Dr. {{ $IpdPatient->doctor['name'] }}
-                    {{ $IpdPatient->doctor['surname'] }}
-                    ({{ $IpdPatient->doctor['registration_no'] }})
+                    <b>Under Care Doctor</b> :       
+                    @php
+                    $doctors = [];
+        
+                    if(!empty($IpdPatient->doctor)) {
+                        $doctors[] = 'Dr. '.$IpdPatient->doctor['name'] . ' ' . $IpdPatient->doctor['surname'] . ' (' . $IpdPatient->doctor['registration_no'] . ')';
+                    }
+                    if(!empty($IpdPatient->doctor2)) {
+                        $doctors[] = 'Dr. '.$IpdPatient->doctor2['name'] . ' ' . ($IpdPatient->doctor2['surname'] ?? '') . ' (' . ($IpdPatient->doctor2['registration_no'] ?? '') . ')';
+                    }
+                    if(!empty($IpdPatient->doctor3)) {
+                        $doctors[] = ''.$IpdPatient->doctor3['name'] . ' ' . ($IpdPatient->doctor3['surname'] ?? '') . ' (' . ($IpdPatient->doctor3['registration_no'] ?? '') . ')';
+                    }
+                    if(!empty($IpdPatient->doctor4)) {
+                        $doctors[] = 'Dr. '.$IpdPatient->doctor4['name'] . ' ' . ($IpdPatient->doctor4['surname'] ?? '') . ' (' . ($IpdPatient->doctor4['registration_no'] ?? '') . ')';
+                    }
+                @endphp
+        
+                {{ implode(', ', $doctors) }}
                 </p>
             </div>
         </div>
