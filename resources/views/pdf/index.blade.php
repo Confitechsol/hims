@@ -152,6 +152,28 @@
     .text {
         font-size: 10px;
     }
+    @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+
+            #pdf-content {
+                transform-origin: top left;
+                page-break-inside: avoid;
+            }
+
+            * {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+        }
 </style>
 
 <body>
