@@ -112,12 +112,21 @@
     .under_care {
         width: 25%;
     }
+
+    .hidden {
+        visibility: hidden;
+    }
+
+    /* .header,
+    .footer {
+        height: 120px;
+    } */
 </style>
 
 <div class="main_box">
 
     {{-- HEADER --}}
-    <div class="header">
+    <div class="header {{ !$showHeaderFooter ? 'hidden' : '' }}">
         <img src="{{ public_path('assets/images/header.webp') }}">
     </div>
 
@@ -223,7 +232,7 @@
     </div>
 
     {{-- FOOTER --}}
-    <div class="footer">
+    <div class="footer {{ !$showHeaderFooter ? 'hidden' : '' }}">
         <img src="{{ public_path('assets/images/footer.webp') }}">
     </div>
 

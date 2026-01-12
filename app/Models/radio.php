@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\ChargeCategory;
 
 class Radio extends Model
 {
@@ -20,18 +21,7 @@ class Radio extends Model
         'radiology_category_id',
         'sub_category',
         'report_days',
-        'standard_charge_ipd',
-        'standard_charge_opd',
-        'standard_charge', // Keep for backward compatibility
-        'amount', // Keep for backward compatibility
-    ];
-
-    protected $casts = [
-        'report_days' => 'integer',
-        'standard_charge_ipd' => 'decimal:2',
-        'standard_charge_opd' => 'decimal:2',
-        'standard_charge' => 'decimal:2',
-        'amount' => 'decimal:2',
+        'charge_id',
     ];
 
     /**
@@ -42,8 +32,13 @@ class Radio extends Model
         return $this->belongsTo(RadiologyCategory::class, 'radiology_category_id');
     }
 
-    public function tpaCharges()
+        public function chargeCategory()
     {
-        return $this->hasMany(OrganisationsCharge::class, 'radiology_id');
+        return $this->belongsTo(ChargeCategory::class, 'charge_category_id');
+    }
+
+    public function charge()
+    {
+        return $this->belongsTo(Charge::class, 'charge_id');
     }
 }

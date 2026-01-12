@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DischargeCard;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
 
 class DischargePdfController extends Controller
 {
@@ -17,16 +18,18 @@ class DischargePdfController extends Controller
         }
         return null;
     }
-    public function generate($id)
+    public function generate($id, Request $request)
     {
         $ipd = DischargeCard::where('ipd_details_id', $id)->firstOrFail();
         if ($ipd->barcode) {
             $ipd->barcode = $this->encodeImage($ipd->barcode);
 
         }
+        $showHeaderFooter = $request->query('hf', 1);
 
         $pdf = Pdf::loadView('admin.ipd.pdf.discharge-summary', [
-            'data' => $ipd,
+            'data'             => $ipd,
+            'showHeaderFooter' => (bool) $showHeaderFooter,
         ])->setPaper('A4', 'portrait');
 
         return $pdf->stream('Discharge_Summary.pdf', [
