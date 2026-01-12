@@ -16,21 +16,33 @@ use App\Models\Operation;
 use App\Models\OperationCategory;
 use App\Models\OperationTheatre;
 use App\Models\PathologyReport;
-use App\Models\RadiologyReport;
 use App\Models\Patient;
 use App\Models\PatientBedHistory;
 use App\Models\PatientTimeline;
 use App\Models\PatientVital;
 use App\Models\Pharmacy;
+use App\Models\RadiologyReport;
 use App\Models\Symptom;
-use App\Models\Vital;
 use App\Models\Transaction;
+use App\Models\User;
+use App\Models\Vital;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class IpdViewController extends Controller
 {
+    private function encodeImage($content)
+    {
+        if ($content) {
+            // Detect MIME type
+            $finfo    = finfo_open(FILEINFO_MIME_TYPE);
+            $mimeType = finfo_buffer($finfo, $content);
+            finfo_close($finfo);
+            return 'data:' . $mimeType . ';base64,' . base64_encode($content);
+        }
+        return null;
+    }
     public function showIpd(Request $request, $id)
     {
         $ipd             = IpdDetail::with('patient.bloodGroup', 'patient.organisation', 'doctor', 'bedDetail', 'bedGroup', 'treatmentHistory')->where('id', $id)->firstOrFail();
@@ -54,7 +66,7 @@ class IpdViewController extends Controller
         // $transactions = Transaction::where('ipd_id', $ipd->id)->where('section', 'ipd')->where('type', 'payment')
         // ->orderBy('transaction_date', 'desc')
         // ->get();
-        $doctors           = Doctor::all();
+        $doctors = Doctor::all();
         //dd($id);
         $ipdFindings = [];
         foreach ($ipdPrescriptions as $pres) {
@@ -97,7 +109,14 @@ class IpdViewController extends Controller
         $radiologyReports = RadiologyReport::with('radiology')->where('patient_id', $ipd->patient->id)->get();
         if ($ipd->discharged == 'yes') {
             $ipd->dischargeCard = DischargeCard::where('ipd_details_id', $id)->firstOrFail();
+
+            if ($ipd->dischargeCard->barcode) {
+                $ipd->dischargeCard->barcode = $this->encodeImage($ipd->dischargeCard->barcode);
+
+            }
         }
+        $currentUser = User::with('userRole')->where('id', Auth::id())->firstOrFail();
+        // dd($currentUser->username);
         return view('admin.ipd.ipd_view', compact(
             'ipd',
             'doctors',
@@ -122,7 +141,8 @@ class IpdViewController extends Controller
             'PatientTimelines',
             'vitalDetails',
             'vitals',
-            'dosages'
+            'dosages',
+            'currentUser'
         ));
     }
     public function store(Request $request)

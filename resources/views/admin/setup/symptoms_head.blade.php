@@ -38,7 +38,7 @@
                                                         class="ti ti-plus me-1"></i>Add Symptoms Head</a>
                                             </div>
                                             <!-- Modal -->
-                                            <div class="modal fade" id="add_symptom_head" tabindex="-1" aria-hidden="true">
+                                            <div class="modal fade use-select2" id="add_symptom_head" tabindex="-1" aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered">
                                                     <div class="modal-content">
                                                         <div class="modal-header rounded-0"
@@ -68,7 +68,7 @@
                                                                         <label for="type" class="form-label">Symptoms Type
                                                                             <span class="text-danger">*</span></label>
                                                                         <select name="type" id="type" onchange=""
-                                                                            class="form-select">
+                                                                            class="form-select select2-input">
                                                                             <option value="">Select</option>
                                                                             @foreach($classifications as $classification)
                                                                                 <option value="{{ $classification->id }}">

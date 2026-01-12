@@ -226,6 +226,7 @@
             bottom: -17px;
         }
     </style>
+    @yield('select2cdn')
 </head>
 
 <body>

@@ -1,3 +1,8 @@
+@section('select2cdn')
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
+@endsection
+
 <style>
     .modal-backdrop.show {
         opacity: 0.6;
@@ -283,6 +288,36 @@
             transform: translateY(0);
         }
     }
+
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #ab00db66;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #ab00db66 !important;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem 1rem 0;
+        background: white;
+        border-top: 2px solid var(--border-color);
+        justify-content: flex-end;
+    }
+
+    .ts-wrapper .ts-control {
+        padding: 0.625rem 0.875rem;
+        border-radius: 8px;
+    }
+
+    .ck-editor__editable {
+        min-height: 300px;
+    }
 </style>
 
 <div class="modal fade" id="patientDischargeModal" tabindex="-1" aria-labelledby="patientDischargeModalLabel"
@@ -296,298 +331,495 @@
                     Patient Discharge
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
             </div>
 
-            <!-- Modal Body -->
+            <!-- Form Body -->
             <div class="modal-body">
-                <!-- Warning Alert -->
                 <div class="alert-custom">
                     <i class="bi bi-exclamation-triangle-fill alert-icon"></i>
                     <p class="alert-text">Please note that before discharging, check patient bill.</p>
                 </div>
-
-                <!-- Discharge Form -->
                 <form id="patientDischargeForm" method="POST" action="{{ route('discharge.store') }}"
                     enctype="multipart/form-data">
                     @csrf
-                    <!-- Row 1: Discharge Date & Status -->
+                    <!-- Basic Information Section -->
                     <input type="hidden" name="ipd_details_id" id="ipd-id">
-                    <div class="form-row">
-                        <div class="field-group">
+
+                    <h5 class="section-title mt-4">
+                        <i class="bi bi-person-badge"></i>
+                        Basic Information
+                    </h5>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label for="patient_name" class="form-label">
+                                <i class="bi bi-person"></i>
+                                Patient Name <span class="required">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="patient_name" name="patient_name" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="admission_no" class="form-label">
+                                <i class="bi bi-credit-card"></i>
+                                Admission No.
+                            </label>
+                            <input type="text" class="form-control" id="admission_no" name="admission_no">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="bed" class="form-label">
+                                <i class="bi bi-hospital"></i>
+                                Bed
+                            </label>
+                            <input type="text" class="form-control" id="bed" name="bed">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="discharge_time" class="form-label">
+                                <i class="bi bi-clock"></i>
+                                Discharge Time
+                            </label>
+                            <input type="time" class="form-control" id="discharge_time" name="discharge_time">
+                        </div>
+
+                        <div class="col-md-3">
                             <label for="discharge_date" class="form-label">
                                 <i class="bi bi-calendar-event"></i>
-                                Discharge Date
-                                <span class="required">*</span>
+                                Discharge Date <span class="required">*</span>
                             </label>
-                            <input type="datetime-local" name="discharge_date" id="discharge_date" class="form-control"
+                            <input type="date" class="form-control" id="discharge_date" name="discharge_date"
                                 required>
                         </div>
 
-                        <div class="field-group">
-                            <label for="discharge_status" class="form-label">
-                                <i class="bi bi-check-circle"></i>
-                                Discharge Status
-                                <span class="required">*</span>
+
+
+                        <div class="col-md-3">
+                            <label for="admit_time" class="form-label">
+                                <i class="bi bi-clock-history"></i>
+                                Admit Time
                             </label>
-                            <select name="discharge_status" id="discharge_status" class="form-select" required>
+                            <input type="time" class="form-control" id="admit_time" name="admit_time" readonly>
+                        </div>
+                    </div>
+
+                    <!-- Patient Details Section -->
+
+                    <h5 class="section-title mt-4">
+                        <i class="bi bi-person-lines-fill"></i>
+                        Patient Details
+                    </h5>
+
+                    <div class="row g-3">
+                        <div class="col-md-2">
+                            <label for="age" class="form-label">
+                                <i class="bi bi-calendar3"></i>
+                                Age
+                            </label>
+                            <input type="text" class="form-control" id="age" name="age" step="0.01">
+                        </div>
+
+                        <div class="col-md-2">
+                            <label for="gender" class="form-label">
+                                <i class="bi bi-gender-ambiguous"></i>
+                                Gender
+                            </label>
+                            <select class="form-select" id="gender" name="gender">
                                 <option value="">Select</option>
-                                <option value="death">Death</option>
-                                <option value="referral">Referral</option>
-                                <option value="normal">Normal</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
                             </select>
                         </div>
-                    </div>
 
-                    <!-- Row 2: Note (Full Width) -->
-                    <div class="field-group">
-                        <label for="note" class="form-label">
-                            <i class="bi bi-journal-text"></i>
-                            Note
-                        </label>
-                        <textarea name="note" id="note" class="form-control" rows="3"
-                            placeholder="Enter discharge notes or instructions..."></textarea>
-                    </div>
-
-                    <div class="section-divider"></div>
-
-                    <!-- Row 3: Operation & Diagnosis -->
-                    <div class="form-row">
-                        <div class="field-group">
-                            <label for="operation" class="form-label">
-                                <i class="bi bi-scissors"></i>
-                                Operation
+                        <div class="col-md-4">
+                            <label for="phone" class="form-label">
+                                <i class="bi bi-telephone"></i>
+                                Phone
                             </label>
-                            <input type="text" name="operation" id="operation" class="form-control"
-                                placeholder="Enter operation details">
+                            <input type="tel" class="form-control" id="phone" name="phone">
                         </div>
 
-                        <div class="field-group">
+                        <div class="col-md-4">
+                            <label for="marital_status" class="form-label">
+                                <i class="bi bi-heart"></i>
+                                Marital Status
+                            </label>
+                            <select class="form-select" id="marital_status" name="marital_status">
+                                <option value="">Select</option>
+                                <option value="Married">Married</option>
+                                <option value="Single">Single</option>
+                                <option value="Divorced">Divorced</option>
+                                <option value="Widowed">Widowed</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-8">
+                            <label for="address" class="form-label">
+                                <i class="bi bi-geo-alt"></i>
+                                Address
+                            </label>
+                            <textarea class="form-control" id="address" name="address" rows="3"></textarea>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="admission_date" class="form-label">
+                                <i class="bi bi-calendar-check"></i>
+                                Admission Date
+                            </label>
+                            <input type="date" class="form-control" id="admission_date" name="admission_date">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="guardian" class="form-label">
+                                <i class="bi bi-person-check"></i>
+                                W/O S/O D/O
+                            </label>
+                            <input type="text" class="form-control" id="guardian" name="guardian">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="relation" class="form-label">
+                                <i class="bi bi-people"></i>
+                                Relation
+                            </label>
+                            <input type="text" class="form-control" id="relation" name="relation">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="nationality" class="form-label">
+                                <i class="bi bi-flag"></i>
+                                Nationality
+                            </label>
+                            <input type="text" class="form-control" id="nationality" name="nationality">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="under_care_dr" class="form-label">
+                                <i class="bi bi-person-badge"></i>
+                                Under Care Dr
+                            </label>
+                            <input type="text" class="form-control" id="under_care_dr" name="under_care_dr">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="referral" class="form-label">
+                                <i class="bi bi-arrow-right-circle"></i>
+                                Referral
+                            </label>
+                            <input type="text" class="form-control" id="referral" name="referral">
+                        </div>
+
+                        <div class="col-md-12">
+                            <label for="corporate" class="form-label">
+                                <i class="bi bi-building"></i>
+                                Corporate
+                            </label>
+                            <input type="text" class="form-control" id="corporate" name="corporate">
+                        </div>
+                    </div>
+
+                    <!-- Medical Information Section -->
+
+                    <h5 class="section-title mt-4">
+                        <i class="bi bi-heart-pulse"></i>
+                        Medical Information
+                    </h5>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="reason_discharge" class="form-label">
+                                <i class="bi bi-clipboard-check"></i>
+                                Discharge Type
+                            </label>
+                            <select class="form-select" id="reason_discharge" name="reason_discharge" required>
+                                <option value="">Select</option>
+                                <option value="DORB">DORB</option>
+                                <option value="Transfer To Higher Setup">Transfer To Higher Setup</option>
+                                <option value="Discharge On Request">Discharge On Request</option>
+                                <option value="Doctor Refer">Doctor Refer</option>
+                                <option value="Normal Discharge">Normal Discharge</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="ot_date" class="form-label">
+                                <i class="bi bi-calendar-plus"></i>
+                                OT Date
+                            </label>
+                            <input type="date" class="form-control" id="ot_date" name="ot_date">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="ot_type" class="form-label">
+                                <i class="bi bi-activity"></i>
+                                O.T Type
+                            </label>
+                            <input type="text" class="form-control" id="ot_type" name="ot_type">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="ot_name" class="form-label">
+                                <i class="bi bi-activity"></i>
+                                O.T Name
+                            </label>
+                            <input type="text" class="form-control" id="ot_name" name="ot_name">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="ot_done" class="form-label">
+                                <i class="bi bi-activity"></i>
+                                O.T Count
+                            </label>
+                            <input type="number" class="form-control" id="ot_done" name="ot_done">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="ot_done_by">
+                                <i class="bi bi-person-badge-fill"></i>
+                                OT Done By
+                            </label>
+                            <select multiple name="ot_done_by[]" id="ot_done_by" class="form-select p-0">
+                                <option>select</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label for="remarks" class="form-label">
+                                <i class="bi bi-chat-left-text"></i>
+                                Remarks
+                            </label>
+                            <textarea class="form-control" id="remarks" name="remarks" rows="3"></textarea>
+                        </div>
+                    </div>
+
+
+                    <!-- Diagnosis & Complaints Section -->
+                    <h5 class="section-title mt-4">
+                        <i class="bi bi-file-medical"></i>
+                        Diagnosis & Complaints
+                    </h5>
+
+                    <div class="row g-3">
+                        <div class="col-md-12">
                             <label for="diagnosis" class="form-label">
-                                <i class="bi bi-heart-pulse"></i>
+                                <i class="bi bi-clipboard2-pulse"></i>
                                 Diagnosis
                             </label>
-                            <input type="text" name="diagnosis" id="diagnosis" class="form-control"
-                                placeholder="Enter diagnosis">
+                            <textarea class="form-control" id="diagnosis" name="diagnosis" rows="6"></textarea>
                         </div>
-                    </div>
 
-                    <!-- Row 4: Investigation & Treatment Home -->
-                    <div class="form-row">
-                        <div class="field-group">
-                            <label for="investigation" class="form-label">
-                                <i class="bi bi-file-medical"></i>
-                                Investigation
+                        <div class="col-md-12">
+                            <label for="present_complaints" class="form-label">
+                                <i class="bi bi-clipboard-data"></i>
+                                Present Complaints (Reason for Admission)
                             </label>
-                            <input type="text" name="investigation" id="investigation" class="form-control"
-                                placeholder="Enter investigation details">
+                            <textarea class="form-control" id="present_complaints" name="present_complaints" rows="4"></textarea>
                         </div>
-
-                        <div class="field-group">
-                            <label for="treatment_home" class="form-label">
-                                <i class="bi bi-house-heart"></i>
-                                Treatment Home
+                        <div class="col-md-12">
+                            <label for="ot_note" class="form-label">
+                                <i class="bi bi-clipboard-data"></i>
+                                Treatment Done / OT Note
                             </label>
-                            <input type="text" name="treatment_home" id="treatment_home" class="form-control"
-                                placeholder="Enter home treatment instructions">
+                            <textarea class="form-control" id="ot_note" name="ot_note" rows="4"></textarea>
+                        </div>
+                        <div class="col-md-12">
+                            <label for="discharge_advice" class="form-label">
+                                <i class="bi bi-clipboard-data"></i>
+                                Discharge Advice
+                            </label>
+                            <textarea class="form-control" id="discharge_advice" name="discharge_advice" rows="4"></textarea>
                         </div>
                     </div>
 
-                    <!-- Death Related Fields (Hidden by default) -->
-                    <div id="deathFields" style="display: none;">
-                        <div class="section-divider"></div>
+                    <!-- Discharge Information Section -->
 
-                        <div class="alert-custom"
-                            style="background: #ffe5e5; border-color: #dc3545; border-left-color: #dc3545;">
-                            <i class="bi bi-info-circle-fill alert-icon" style="color: #dc3545;"></i>
-                            <p class="alert-text" style="color: #721c24;">Additional death-related information
-                                required.</p>
+                    <h5 class="section-title mt-4">
+                        <i class="bi bi-file-earmark-text"></i>
+                        Discharge Information
+                    </h5>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="discharged_by" class="form-label">
+                                <i class="bi bi-person-check-fill"></i>
+                                Discharged By
+                            </label>
+                            <input type="text" class="form-control" id="discharged_by" name="discharged_by">
                         </div>
 
-                        <div class="form-row">
-                            <div class="field-group">
-                                <label for="death_date" class="form-label">
-                                    <i class="bi bi-calendar-x"></i>
-                                    Death Date
-                                    <span class="required">*</span>
-                                </label>
-                                <input type="datetime-local" name="death_date" id="death_date" class="form-control">
-                            </div>
-
-                            <div class="field-group">
-                                <label for="guardian_name" class="form-label">
-                                    <i class="bi bi-person"></i>
-                                    Guardian Name
-                                    <span class="required">*</span>
-                                </label>
-                                <input type="text" name="guardian_name" id="guardian_name" class="form-control"
-                                    placeholder="Enter guardian name">
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="field-group">
-                                <label for="attachment" class="form-label">
-                                    <i class="bi bi-paperclip"></i>
-                                    Attachment
-                                </label>
-                                <div class="file-upload-wrapper">
-                                    <input type="file" name="attachment" id="attachment"
-                                        class="form-control file-input" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
-                                    <label for="attachment" class="file-upload-label">
-                                        <i class="bi bi-cloud-upload"></i>
-                                        <span class="file-upload-text">Drop a file here or click</span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="field-group">
-                                <label for="report" class="form-label">
-                                    <i class="bi bi-file-earmark-text"></i>
-                                    Report
-                                </label>
-                                <textarea name="report" id="report" class="form-control" rows="3"
-                                    placeholder="Enter death report details"></textarea>
-                            </div>
+                        <div class="col-md-6">
+                            <label for="current_user" class="form-label">
+                                <i class="bi bi-person-circle"></i>
+                                Current User
+                            </label>
+                            <input type="text" class="form-control" id="current_user" name="current_user">
                         </div>
                     </div>
-
-                    <div id="referralFields" style="display: none;">
-                        <div class="section-divider"></div>
-
-                        <div class="alert-custom"
-                            style="background: #ffe5e5; border-color: #dc3545; border-left-color: #dc3545;">
-                            <i class="bi bi-info-circle-fill alert-icon" style="color: #dc3545;"></i>
-                            <p class="alert-text" style="color: #721c24;">Additional referral-related information
-                                required.</p>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="field-group">
-                                <label for="referral_date" class="form-label">
-                                    <i class="bi bi-calendar-x"></i>
-                                    Referral Date
-                                    <span class="required">*</span>
-                                </label>
-                                <input type="datetime-local" name="referral_date" id="referral_date"
-                                    class="form-control">
-                            </div>
-
-                            <div class="field-group">
-                                <label for="referral_hospital_name" class="form-label">
-                                    <i class="bi bi-person"></i>
-                                    Referral Hospital Name
-                                    <span class="required">*</span>
-                                </label>
-                                <input type="text" name="referral_hospital_name" id="referral_hospital_name"
-                                    class="form-control" placeholder="Enter referral hospital name">
-                            </div>
-                            <div class="field-group">
-                                <label for="referral_reason" class="form-label">
-                                    <i class="bi bi-person"></i>
-                                    Reason For Referral
-                                    <span class="required">*</span>
-                                </label>
-                                <input type="text" name="referral_reason" id="referral_reason"
-                                    class="form-control" placeholder="Enter reason for referral">
-                            </div>
-                        </div>
+                    <!-- Action Buttons -->
+                    <div class="action-buttons mt-4">
+                        <button type="button" class="btn btn-outline-primary">
+                            <i class="bi bi-x-circle"></i>
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i>
+                            Submit
+                        </button>
                     </div>
                 </form>
-            </div>
 
-            <!-- Modal Footer -->
-            <div class="modal-footer">
-                <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">
-                    <i class="bi bi-x-circle"></i>
-                    Cancel
-                </button>
-                <button type="submit" form="patientDischargeForm" class="btn btn-save">
-                    <i class="bi bi-check-circle"></i>
-                    Save Discharge
-                </button>
+
+
             </div>
         </div>
     </div>
 </div>
+{{-- <script>
+    new TomSelect("#ot_done_by", {
+        create: true,
+        persist: false,
+    });
+</script> --}}
+<script>
+    ClassicEditor
+        .create(document.querySelector('#diagnosis'))
+        .catch(error => {
+            console.error(error);
+        });
+</script>
+<script>
+    ClassicEditor
+        .create(document.querySelector('#discharge_advice'))
+        .catch(error => {
+            console.error(error);
+        });
+</script>
+<script>
+    ClassicEditor
+        .create(document.querySelector('#ot_note'))
+        .catch(error => {
+            console.error(error);
+        });
+</script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('patientDischargeForm');
-        const dischargeStatusSelect = document.getElementById('discharge_status');
-        const deathFields = document.getElementById('deathFields');
-        const deathDateInput = document.getElementById('death_date');
-        const guardianNameInput = document.getElementById('guardian_name');
-        const referralFields = document.getElementById('referralFields');
-        const referralDateInput = document.getElementById('referral_date');
-        const referralHospitalNameInput = document.getElementById('referral_hospital_name');
-        const referralReasonInput = document.getElementById('referral_reason');
-
-
 
         const dischargeModal = document.getElementById('patientDischargeModal');
+
         dischargeModal.addEventListener('show.bs.modal', function(event) {
             const button = event.relatedTarget;
-            document.getElementById('ipd-id').value = button.getAttribute('data-id');
+
+            // 🔹 Parse data attributes
+            const ipd = JSON.parse(button.getAttribute('data-ipd') || '{}');
+            const doctors = JSON.parse(button.getAttribute('data-doctors') || '[]');
+            const currentUser = JSON.parse(button.getAttribute('data-user') || '{}')
+            window.currentUser = currentUser.role
+            // 🔹 Basic identifiers
+            document.getElementById('ipd-id').value = ipd.id ?? '';
+
+            // 🔹 Basic Information
+            setValue('patient_name', ipd.patient?.patient_name);
+            setValue('admission_no', ipd.ipd_no);
+            // setValue('admission_no', ipd.admission_no);
+            setValue('bed', `${ipd.bed_detail?.name} - ${ipd.bed_group?.name}`);
+
+            // setValue('admission_date', ipd.admission_date);
+            // setValue('admit_time', ipd.admit_time);
+
+            // 🔹 Patient Details
+            setValue('age',
+                `${ipd.patient?.age} Years ${ipd.patient?.month} Months ${ipd.patient?.day} Days`);
+            setSelectValue('gender', ipd.patient?.gender);
+            setValue('phone', ipd.patient?.mobileno);
+            setSelectValue('marital_status', ipd.patient?.marital_status);
+            setValue('address', ipd.patient?.address);
+
+            setValue('guardian', ipd.patient?.guardian_name);
+            setValue('nationality', "Indian");
+            setValue('admission_date', formatDateYYYYMMDD(ipd.date));
+            setValue('admit_time', getTimeOnly(ipd.date));
+
+            // 🔹 Medical
+            setValue('under_care_dr', ipd.doctor?.name);
+            setValue('discharged_by', currentUser.username);
+            setValue('current_user', currentUser.user_role.name);
+            // setValue('corporate', ipd.corporate);
+
+            // 🔹 OT Done By (MULTI SELECT)
+            // const otSelect = document.getElementById('ot_done_by');
+            // otSelect.innerHTML = ''; // reset
+
+            // doctors.forEach(doc => {
+            //     const option = document.createElement('option');
+            //     option.value = doc.name;
+            //     option.textContent = doc.name;
+            //     otSelect.appendChild(option);
+            // });
+            new TomSelect('#ot_done_by', {
+                options: doctors.map(doc => ({
+                    value: `${doc.name} ${doc.surname}`,
+                    label: `${doc.name} ${doc.surname}`
+                })),
+                valueField: 'value',
+                labelField: 'label',
+                searchField: 'label',
+                create: false,
+                persist: false,
+                placeholder: 'Select doctors',
+            });
+
+
+            // 🔹 Discharge Date & Time default
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+
+            document.getElementById('discharge_date').value =
+                now.toISOString().split('T')[0];
+
+            document.getElementById('discharge_time').value =
+                now.toISOString().split('T')[1].slice(0, 5);
         });
 
-
-
-        // Set current date/time as default
-        const now = new Date();
-        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-        document.getElementById('discharge_date').value = now.toISOString().slice(0, 16);
-
-        // Handle discharge status change
-        dischargeStatusSelect.addEventListener('change', function() {
-            if (this.value === 'death') {
-                deathFields.style.display = 'block';
-                deathDateInput.required = true;
-                guardianNameInput.required = true;
-
-                // Set death date to current date/time by default
-                deathDateInput.value = now.toISOString().slice(0, 16);
-            } else {
-                deathFields.style.display = 'none';
-                deathDateInput.required = false;
-                guardianNameInput.required = false;
-
-                // Clear death fields when not death
-                deathDateInput.value = '';
-                guardianNameInput.value = '';
-                document.getElementById('attachment').value = '';
-                document.getElementById('report').value = '';
+        /**
+         * Helper: safely set input value
+         */
+        function setValue(id, value) {
+            const el = document.getElementById(id);
+            if (el && value !== undefined && value !== null) {
+                el.value = value;
             }
+        }
 
-            if (this.value === 'referral') {
-                referralFields.style.display = 'block';
-                referralDateInput.required = true;
-                referralHospitalNameInput.required = true;
-                // referralReasonInput.required = true;
+        function setSelectValue(selectId, value) {
+            const select = document.getElementById(selectId);
+            if (!select || value === null || value === undefined) return;
 
-                // Set referral date to current date/time by default
-                referralDateInput.value = now.toISOString().slice(0, 16);
-            } else {
-                referralFields.style.display = 'none';
-                referralDateInput.required = false;
-                referralHospitalNameInput.required = false;
-                // referralReasonInput.required = false;
-                referralDateInput.value = '';
-                referralHospitalNameInput.value = '';
-                referralReasonInput.value = '';
-            }
-        });
+            [...select.options].forEach(option => {
+                option.selected = option.value.toLowerCase() === String(value).toLowerCase();
+            });
+        }
 
-        // File upload handler
-        const fileInput = document.getElementById('attachment');
-        const fileLabel = document.querySelector('.file-upload-text');
+        function formatDateYYYYMMDD(dateInput) {
+            const date = new Date(dateInput);
 
-        fileInput.addEventListener('change', function() {
-            if (this.files && this.files.length > 0) {
-                fileLabel.textContent = this.files[0].name;
-            } else {
-                fileLabel.textContent = 'Drop a file here or click';
-            }
-        });
-    })
+            const dd = String(date.getDate()).padStart(2, '0');
+            const mm = String(date.getMonth() + 1).padStart(2, '0'); // Months start at 0
+            const yyyy = date.getFullYear();
+
+            return `${yyyy}-${mm}-${dd}`;
+        }
+
+        function getTimeOnly(dateInput) {
+            const date = new Date(dateInput);
+
+            const hh = String(date.getHours()).padStart(2, '0');
+            const mm = String(date.getMinutes()).padStart(2, '0');
+            const ss = String(date.getSeconds()).padStart(2, '0');
+
+            return `${hh}:${mm}:${ss}`;
+        }
+
+
+    });
 </script>
 
 <script>
@@ -608,8 +840,18 @@
                 confirmButtonColor: '#28a745',
                 cancelButtonColor: '#dc3545',
             }).then((result) => {
-                if (result.isConfirmed) {
+                if (result.isConfirmed && window.currentUser === 1) {
                     e.target.submit(); // ✅ submit form manually
+                } else {
+                    Swal.fire({
+                        title: 'Contact Admin',
+                        text: 'Payment is Not clear. Please Contact Admin.',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false,
+                    }).then(() => {
+                        e.target.submit(); // ✅ submit form
+                    });
                 }
             });
         } else {

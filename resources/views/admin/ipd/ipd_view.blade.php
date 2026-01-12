@@ -213,11 +213,11 @@
         }
 
 
-         /* Modal Styling */
+        /* Modal Styling */
         .modal-content {
             border: none;
             border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
             overflow: hidden;
         }
 
@@ -263,7 +263,7 @@
             margin: 1rem;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .section-header {
@@ -649,12 +649,12 @@
                                     </h5>
                                     @if ($ipd->discharged == 'yes')
                                         <button class="bg-transparent border-0" data-bs-toggle="modal"
-                                            data-bs-target="#dischargeDetailsModal"
+                                            data-bs-target="#dischargePreviewModal"
                                             data-discharge='@json($ipd->dischargeCard)'><i
                                                 class="bi bi-clipboard-pulse text-white"></i></button>
                                     @else
                                         <button class="bg-transparent border-0" data-bs-toggle="modal"
-                                            data-bs-target="#patientDischargeModal" data-id="{{ $ipd->id }}"><i
+                                            data-bs-target="#patientDischargeModal" data-ipd="{{ $ipd }}" data-doctors="{{$doctors}}" data-user="{{$currentUser}}"><i
                                                 class="bi bi-clipboard-pulse text-white"></i></button>
                                     @endif
                                 </div>
@@ -662,7 +662,7 @@
                             <div class="card-body">
                                 <div class="d-sm-flex position-relative z-0 overflow-hidden p-2">
                                     <!-- <img src="assets/img/icons/shape-01.svg" alt="img"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
                                     <a href="javascript:void(0);"
                                         class="avatar avatar-xxxl patient-avatar me-2 flex-shrink-0">
                                         <img src="{{ asset('assets/img/patient.png') }}" alt="product" class="rounded">
@@ -750,19 +750,19 @@
                                         </div>
                                     </div>
                                     <!-- <div class="row">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-5">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="col-sm-5">
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-7">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="col-sm-7">
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-5">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="col-sm-5">
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-7">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="col-sm-7">
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </div> -->
                                 </div>
                                 <hr>
                                 <div class="d-flex align-items-center mb-3">
@@ -1081,7 +1081,7 @@
                                                     <td>
                                                         {{ $lab->pathology->test_name .
                                                             "
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    (" .
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    (" .
                                                             $lab->pathology->short_name .
                                                             ')' }}
                                                     </td>
@@ -1254,36 +1254,36 @@
                                         </thead>
                                         <tbody>
                                             @forelse($transactions as $transaction)
-                                                                <tr>
-                                                                    <td>
-                                                                        {{ $transaction->transaction_no ?? 'TRID'.$transaction->id }}
-                                                                    </td>
+                                                <tr>
+                                                    <td>
+                                                        {{ $transaction->transaction_no ?? 'TRID' . $transaction->id }}
+                                                    </td>
 
-                                                                    <td>
-                                                                        {{ \Carbon\Carbon::parse($transaction->transaction_date)->format('d/m/Y h:i A') }}
-                                                                    </td>
+                                                    <td>
+                                                        {{ \Carbon\Carbon::parse($transaction->transaction_date)->format('d/m/Y h:i A') }}
+                                                    </td>
 
-                                                                    <td>
-                                                                        {{ $transaction->note ?? '-' }}
-                                                                    </td>
+                                                    <td>
+                                                        {{ $transaction->note ?? '-' }}
+                                                    </td>
 
-                                                                    <td>
-                                                                        {{ $transaction->payment_mode == 1 ? 'Cash' : '-' }}
-                                                                    </td>
+                                                    <td>
+                                                        {{ $transaction->payment_mode == 1 ? 'Cash' : '-' }}
+                                                    </td>
 
-                                                                    <td class="text-end">
-                                                                        {{ number_format($transaction->amount, 2) }}
-                                                                    </td>
+                                                    <td class="text-end">
+                                                        {{ number_format($transaction->amount, 2) }}
+                                                    </td>
 
 
-                                                                </tr>
-                                                            @empty
-                                                                <tr>
-                                                                    <td colspan="6" class="text-center text-muted">
-                                                                        No payments found
-                                                                    </td>
-                                                                </tr>
-                                                            @endforelse
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="6" class="text-center text-muted">
+                                                        No payments found
+                                                    </td>
+                                                </tr>
+                                            @endforelse
                                         </tbody>
                                     </table>
                                 </div>
@@ -2074,10 +2074,10 @@
                                                                                 <i class="ti ti-pencil"></i>
                                                                             </a>
                                                                             <!-- <a href="javascript:void(0);"
-                                                                                                    onclick="confirmDelete('{{ route('medication.delete', $medication->id) }}')"
-                                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                                                        <i class="ti ti-trash" data-bs-toggle="tooltip" title="Delete"></i>
-                                                                                                </a> -->
+                                                                                                            onclick="confirmDelete('{{ route('medication.delete', $medication->id) }}')"
+                                                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                                                                                <i class="ti ti-trash" data-bs-toggle="tooltip" title="Delete"></i>
+                                                                                                        </a> -->
 
                                                                         </div>
                                                                     </td>
@@ -2263,7 +2263,7 @@
                                                                     <td>
                                                                         {{ $lab->pathology->test_name .
                                                                             "
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                (" .
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                (" .
                                                                             $lab->pathology->short_name .
                                                                             ')' }}
                                                                     </td>
@@ -2603,10 +2603,10 @@
                                                                                 <i class="ti ti-pencil"></i>
                                                                             </a>
                                                                             <!-- <a href="javascript: void(0);"
-                                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                                                    <i class="ti ti-trash"
-                                                                                                        data-bs-toggle="tooltip"
-                                                                                                        title="Show"></i></a> -->
+                                                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                                                                            <i class="ti ti-trash"
+                                                                                                                data-bs-toggle="tooltip"
+                                                                                                                title="Show"></i></a> -->
                                                                         </div>
                                                                     </td>
                                                                 </tr>
@@ -2915,7 +2915,7 @@
                                                                                                     value="{{ $ipd->id }}">
                                                                                                 <select name="charge_type"
                                                                                                     id="add_charge_type"
-                                                                                                    class="form-control charge_type select2 reset_value "
+                                                                                                    class="form-control charge_type reset_value"
                                                                                                     style="width: 100%"
                                                                                                     tabindex="-1"
                                                                                                     aria-hidden="true">
@@ -2932,9 +2932,9 @@
                                                                                             <div class="form-group">
                                                                                                 <label
                                                                                                     class="form-label">Charge
-                                                                                                    Category</label><small
-                                                                                                    class="req">
-                                                                                                    *</small>
+                                                                                                    Category<small
+                                                                                                        class="req">
+                                                                                                        *</small></label>
                                                                                                 <select
                                                                                                     name="charge_category2"
                                                                                                     id="charge_category2"
@@ -2953,9 +2953,9 @@
                                                                                             <div class="form-group">
                                                                                                 <label
                                                                                                     class="form-label">Charge
-                                                                                                    Name</label><small
-                                                                                                    class="req">
-                                                                                                    *</small>
+                                                                                                    Name<small
+                                                                                                        class="req">
+                                                                                                        *</small></label>
                                                                                                 <select name="charge_id"
                                                                                                     id="charge_id"
                                                                                                     style="width: 100%"
@@ -2976,7 +2976,6 @@
                                                                                                     Charge
                                                                                                     (INR)</label>
                                                                                                 <input type="text"
-
                                                                                                     name="standard_charge"
                                                                                                     id="addstandard_charge"
                                                                                                     class="form-control reset_value standard_charge"
@@ -2991,7 +2990,6 @@
                                                                                                     class="form-label">TPA
                                                                                                     Charge (INR)</label>
                                                                                                 <input type="text"
-
                                                                                                     name="schedule_charge"
                                                                                                     id="addscd_charge"
                                                                                                     placeholder=""
@@ -3004,9 +3002,9 @@
                                                                                         <div class="col-sm-2">
                                                                                             <div class="form-group">
                                                                                                 <label
-                                                                                                    class="form-label">Qty</label><small
-                                                                                                    class="req">
-                                                                                                    *</small>
+                                                                                                    class="form-label">Qty<small
+                                                                                                        class="req">
+                                                                                                        *</small></label>
                                                                                                 <input type="text"
                                                                                                     name="qty"
                                                                                                     id="qty"
@@ -3036,8 +3034,7 @@
                                                                                                                 name="apply_charge"
                                                                                                                 id="apply_charge"
                                                                                                                 style="width: 30%; float: right"
-                                                                                                                class="form-control total apply_charge_add_charge"
-                                                                                                                >
+                                                                                                                class="form-control total apply_charge_add_charge">
                                                                                                         </td>
                                                                                                     </tr>
                                                                                                     <tr>
@@ -3067,8 +3064,7 @@
                                                                                                                 value="0"
                                                                                                                 id="discount_percentage_amount"
                                                                                                                 style="width: 50%; float: right"
-                                                                                                                class="form-control discount_percentage_amount"
-                                                                                                                >
+                                                                                                                class="form-control discount_percentage_amount">
                                                                                                         </td>
                                                                                                     </tr>
                                                                                                     <tr>
@@ -3095,8 +3091,7 @@
                                                                                                                 value="0"
                                                                                                                 id="tax_amt"
                                                                                                                 style="width: 50%; float: right"
-                                                                                                                class="form-control tax"
-                                                                                                                >
+                                                                                                                class="form-control tax">
                                                                                                         </td>
                                                                                                     </tr>
                                                                                                     <tr>
@@ -3111,8 +3106,7 @@
                                                                                                                 name="amount"
                                                                                                                 id="final_amount"
                                                                                                                 style="width: 30%; float: right"
-                                                                                                                class="form-control net_amount"
-                                                                                                                >
+                                                                                                                class="form-control net_amount">
                                                                                                         </td>
                                                                                                     </tr>
                                                                                                 </tbody>
@@ -3135,9 +3129,9 @@
                                                                                         <div class="col-sm-3">
                                                                                             <div class="form-group mb-2">
                                                                                                 <label for=""
-                                                                                                    class="form-label">Date</label>
-                                                                                                <small class="req">
-                                                                                                    *</small>
+                                                                                                    class="form-label">Date
+                                                                                                    <small class="req">
+                                                                                                        *</small></label>
                                                                                                 <input id="charge_date"
                                                                                                     name="date"
                                                                                                     placeholder=""
@@ -3248,7 +3242,7 @@
                                                                 @endphp
                                                                 <tr>
                                                                     <td>
-                                                                         {{ \Carbon\Carbon::parse($charge->date)->format('d-m-Y') }}
+                                                                        {{ \Carbon\Carbon::parse($charge->date)->format('d-m-Y') }}
                                                                     </td>
                                                                     <td>
                                                                         {{ $charge->charge->name }}
@@ -3271,25 +3265,25 @@
                                                                     </td>
                                                                     <td>{{ $amount }}</td>
                                                                     <!-- <td>
-                                                                        <div class="d-flex gap-2">
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
-                                                                                <i class="fa-solid fa-print"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    title="Print"></i></a>
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                                                <i class="ti ti-pencil"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    title="Edit"></i></a>
+                                                                                <div class="d-flex gap-2">
+                                                                                    <a href="javascript: void(0);"
+                                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
+                                                                                        <i class="fa-solid fa-print"
+                                                                                            data-bs-toggle="tooltip"
+                                                                                            title="Print"></i></a>
+                                                                                    <a href="javascript: void(0);"
+                                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+                                                                                        <i class="ti ti-pencil"
+                                                                                            data-bs-toggle="tooltip"
+                                                                                            title="Edit"></i></a>
 
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                                <i class="ti ti-trash"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    title="Delete"></i></a>
-                                                                        </div>
-                                                                    </td> -->
+                                                                                    <a href="javascript: void(0);"
+                                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
+                                                                                        <i class="ti ti-trash"
+                                                                                            data-bs-toggle="tooltip"
+                                                                                            title="Delete"></i></a>
+                                                                                </div>
+                                                                            </td> -->
                                                                 </tr>
                                                             @endforeach
 
@@ -3357,59 +3351,66 @@
                                                                     </div>
 
                                                                     <div class="modal-body">
-                                                                        <form action="{{ route('transactions.store') }}" method="POST">
+                                                                        <form action="{{ route('transactions.store') }}"
+                                                                            method="POST">
                                                                             @csrf
-                                                                            <input type="hidden" name="ipd_id" value="{{ $ipd->id }}">
-                                                                            <input type="hidden" name="patient_id" value="{{ $ipd->patient_id }}">
-                                                                            <input type="hidden" name="type" value="payment">
-                                                                            <input type="hidden" name="section" value="ipd">
-                                                                                <div class="row gy-3 py-4 mx-1">
+                                                                            <input type="hidden" name="ipd_id"
+                                                                                value="{{ $ipd->id }}">
+                                                                            <input type="hidden" name="patient_id"
+                                                                                value="{{ $ipd->patient_id }}">
+                                                                            <input type="hidden" name="type"
+                                                                                value="payment">
+                                                                            <input type="hidden" name="section"
+                                                                                value="ipd">
+                                                                            <div class="row gy-3 py-4 mx-1">
 
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="date"
-                                                                                            class="form-label">Date
-                                                                                            <span class="text-danger">*</span>
-                                                                                        </label>
-                                                                                        <input type="date" name="date"
-                                                                                            id="date" class="form-control"
-                                                                                            required>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="amount"
-                                                                                            class="form-label">Amount (INR)
-                                                                                            <span class="text-danger">*</span>
-                                                                                        </label>
-                                                                                        <input type="text" name="amount"
-                                                                                            id="amount" class="form-control"
-                                                                                            required>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="payment_mode"
-                                                                                            class="form-label">Payment Mode
-
-                                                                                        </label>
-                                                                                        <select name="payment_mode"
-                                                                                            id="payment_mode"
-                                                                                            class="form-select"
-                                                                                            data-placeholder="Enter Patient Name or Id…">
-                                                                                            <option value="0">Select</option>
-                                                                                            <option value="1">Cash</option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="note"
-                                                                                            class="form-label">Note
-                                                                                        </label>
-                                                                                        <textarea name="note" id="note" class="form-control"></textarea>
-                                                                                    </div>
+                                                                                <div class="col-md-6">
+                                                                                    <label for="date"
+                                                                                        class="form-label">Date
+                                                                                        <span class="text-danger">*</span>
+                                                                                    </label>
+                                                                                    <input type="date" name="date"
+                                                                                        id="date"
+                                                                                        class="form-control" required>
                                                                                 </div>
+                                                                                <div class="col-md-6">
+                                                                                    <label for="amount"
+                                                                                        class="form-label">Amount (INR)
+                                                                                        <span class="text-danger">*</span>
+                                                                                    </label>
+                                                                                    <input type="text" name="amount"
+                                                                                        id="amount"
+                                                                                        class="form-control" required>
+                                                                                </div>
+                                                                                <div class="col-md-6">
+                                                                                    <label for="payment_mode"
+                                                                                        class="form-label">Payment Mode
 
+                                                                                    </label>
+                                                                                    <select name="payment_mode"
+                                                                                        id="payment_mode"
+                                                                                        class="form-select"
+                                                                                        data-placeholder="Enter Patient Name or Id…">
+                                                                                        <option value="0">Select
+                                                                                        </option>
+                                                                                        <option value="1">Cash
+                                                                                        </option>
+                                                                                    </select>
+                                                                                </div>
+                                                                                <div class="col-md-6">
+                                                                                    <label for="note"
+                                                                                        class="form-label">Note
+                                                                                    </label>
+                                                                                    <textarea name="note" id="note" class="form-control"></textarea>
+                                                                                </div>
                                                                             </div>
-                                                                            <div class="modal-footer">
-                                                                                <button type="submit"
-                                                                                    class="btn btn-primary">Save</button>
-                                                                            </div>
-                                                                        </form>
+
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="submit"
+                                                                            class="btn btn-primary">Save</button>
+                                                                    </div>
+                                                                    </form>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -3432,7 +3433,7 @@
                                                             @forelse($transactions as $transaction)
                                                                 <tr>
                                                                     <td>
-                                                                        {{ $transaction->transaction_no ?? 'TRID'.$transaction->id }}
+                                                                        {{ $transaction->transaction_no ?? 'TRID' . $transaction->id }}
                                                                     </td>
 
                                                                     <td>
@@ -3452,35 +3453,35 @@
                                                                     </td>
 
                                                                     <!-- <td>
-                                                                        <div class="d-flex gap-2">
-                                                                            {{-- Print --}}
-                                                                            <a href="{{ route('transactions.print', $transaction->id) }}"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill"
-                                                                            data-bs-toggle="tooltip" title="Print">
-                                                                                <i class="fa-solid fa-print"></i>
-                                                                            </a>
+                                                                                <div class="d-flex gap-2">
+                                                                                    {{-- Print --}}
+                                                                                    <a href="{{ route('transactions.print', $transaction->id) }}"
+                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill"
+                                                                                    data-bs-toggle="tooltip" title="Print">
+                                                                                        <i class="fa-solid fa-print"></i>
+                                                                                    </a>
 
-                                                                            {{-- View --}}
-                                                                            <a href="{{ route('transactions.show', $transaction->id) }}"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill"
-                                                                            data-bs-toggle="tooltip" title="Show">
-                                                                                <i class="ti ti-pencil"></i>
-                                                                            </a>
+                                                                                    {{-- View --}}
+                                                                                    <a href="{{ route('transactions.show', $transaction->id) }}"
+                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill"
+                                                                                    data-bs-toggle="tooltip" title="Show">
+                                                                                        <i class="ti ti-pencil"></i>
+                                                                                    </a>
 
-                                                                            {{-- Delete --}}
-                                                                            <form action="{{ route('transactions.destroy', $transaction->id) }}"
-                                                                                method="POST"
-                                                                                onsubmit="return confirm('Delete this payment?')">
-                                                                                @csrf
-                                                                                @method('DELETE')
-                                                                                <button type="submit"
-                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
-                                                                                    data-bs-toggle="tooltip" title="Delete">
-                                                                                    <i class="ti ti-trash"></i>
-                                                                                </button>
-                                                                            </form>
-                                                                        </div>
-                                                                    </td> -->
+                                                                                    {{-- Delete --}}
+                                                                                    <form action="{{ route('transactions.destroy', $transaction->id) }}"
+                                                                                        method="POST"
+                                                                                        onsubmit="return confirm('Delete this payment?')">
+                                                                                        @csrf
+                                                                                        @method('DELETE')
+                                                                                        <button type="submit"
+                                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
+                                                                                            data-bs-toggle="tooltip" title="Delete">
+                                                                                            <i class="ti ti-trash"></i>
+                                                                                        </button>
+                                                                                    </form>
+                                                                                </div>
+                                                                            </td> -->
                                                                 </tr>
                                                             @empty
                                                                 <tr>
@@ -4336,14 +4337,14 @@
                                                                     @endforeach
 
                                                                     <!-- <td>
-                                                                                            <div class="d-flex gap-2">
-                                                                                                <a href="#"
-                                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
-                                                                                                    data-bs-toggle="tooltip" title="Show">
-                                                                                                    <i class="ti ti-menu"></i>
-                                                                                                </a>
-                                                                                            </div>
-                                                                                        </td> -->
+                                                                                                    <div class="d-flex gap-2">
+                                                                                                        <a href="#"
+                                                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
+                                                                                                            data-bs-toggle="tooltip" title="Show">
+                                                                                                            <i class="ti ti-menu"></i>
+                                                                                                        </a>
+                                                                                                    </div>
+                                                                                                </td> -->
                                                                 </tr>
                                                             @empty
                                                                 <tr>
@@ -4373,201 +4374,9 @@
     <!-- tab content end -->
     </div>
 
-    {{-- discharge details modal --}}
-    <div class="modal fade" id="dischargeDetailsModal" tabindex="-1">
-        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
-
-                <!-- Modal Header -->
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="bi bi-clipboard-check"></i>
-                        Discharge Details
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-
-                <!-- Modal Body -->
-                <div class="modal-body">
-
-                    <!-- Common Details Section -->
-                    <div class="section-card">
-                        <div class="section-header primary">
-                            <div class="section-icon primary">
-                                <i class="bi bi-file-medical"></i>
-                            </div>
-                            <h6 class="section-title pb-0 mb-0">General Information</h6>
-                        </div>
-                        <div class="section-body">
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="bi bi-calendar-event"></i>
-                                        Discharge Date
-                                    </div>
-                                    <div class="info-value" id="dc_discharge_date">January 15, 2025</div>
-                                </div>
-
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="bi bi-check-circle"></i>
-                                        Status
-                                    </div>
-                                    <div class="info-value">
-                                        <span class="status-badge discharged" id="dc_status">
-                                            <i class="bi bi-check-circle-fill"></i>
-                                            Discharged
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="bi bi-bandaid"></i>
-                                        Operation
-                                    </div>
-                                    <div class="info-value" id="dc_operation">Appendectomy</div>
-                                </div>
-
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="bi bi-heart-pulse"></i>
-                                        Diagnosis
-                                    </div>
-                                    <div class="info-value" id="dc_diagnosis">Acute Appendicitis</div>
-                                </div>
-
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="bi bi-clipboard2-pulse"></i>
-                                        Investigations
-                                    </div>
-                                    <div class="info-value" id="dc_investigations">CT Scan, Blood Tests, Ultrasound
-                                    </div>
-                                </div>
-
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="bi bi-house-heart"></i>
-                                        Treatment Home
-                                    </div>
-                                    <div class="info-value" id="dc_treatment_home">Rest, prescribed medications,
-                                        follow-up in 2 weeks</div>
-                                </div>
-                            </div>
-
-                            <div class="info-grid full mt-3">
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="bi bi-journal-text"></i>
-                                        Note
-                                    </div>
-                                    <div class="info-value long-text" id="dc_note">Patient recovered well
-                                        post-surgery. No complications observed. Advised to continue medication and maintain
-                                        proper diet. Follow-up required after 2 weeks.</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Death Details Section -->
-                    <div id="deathSection" class="section-card d-none">
-                        <div class="section-header danger">
-                            <div class="section-icon danger">
-                                <i class="bi bi-exclamation-triangle-fill"></i>
-                            </div>
-                            <h6 class="section-title pb-0 mb-0">Death Details</h6>
-                        </div>
-                        <div class="section-body">
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="bi bi-calendar-x"></i>
-                                        Death Date
-                                    </div>
-                                    <div class="info-value" id="dc_death_date">--</div>
-                                </div>
-
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="bi bi-person"></i>
-                                        Guardian Name
-                                    </div>
-                                    <div class="info-value" id="dc_guardian_name">--</div>
-                                </div>
-                            </div>
-
-                            <div class="info-grid full mt-3">
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="bi bi-file-earmark-text"></i>
-                                        Report
-                                    </div>
-                                    <div class="info-value long-text" id="dc_report">--</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Referral Details Section -->
-                    <div id="referralSection" class="section-card d-none">
-                        <div class="section-header warning">
-                            <div class="section-icon warning">
-                                <i class="bi bi-arrow-right-circle-fill"></i>
-                            </div>
-                            <h6 class="section-title pb-0 mb-0">Referral Details</h6>
-                        </div>
-                        <div class="section-body">
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="bi bi-calendar-check"></i>
-                                        Referral Date
-                                    </div>
-                                    <div class="info-value" id="dc_referral_date">--</div>
-                                </div>
-
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="bi bi-hospital"></i>
-                                        Hospital Name
-                                    </div>
-                                    <div class="info-value" id="dc_refer_to_hospital">--</div>
-                                </div>
-                            </div>
-
-                            <div class="info-grid full mt-3">
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="bi bi-chat-left-text"></i>
-                                        Reason for Referral
-                                    </div>
-                                    <div class="info-value long-text" id="dc_reason_for_referral">--</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Modal Footer -->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-close-modal" data-bs-dismiss="modal">
-                        <i class="bi bi-x-circle"></i>
-                        Close
-                    </button>
-                    <button type="button" class="btn btn-print">
-                        <i class="bi bi-printer"></i>
-                        Print Details
-                    </button>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
     {{-- modal ends --}}
     @include('components.modals.discharge-modal')
+    @include('components.modals.discharge-details-modal')
     <!-- Chart JS -->
     <script src="assets/plugins/chartjs/chart.min.js"></script>
     <script src="assets/plugins/chartjs/chart-data.js"></script>
@@ -4643,143 +4452,144 @@
 
 
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
 
-    const chargeTypeSelect     = document.getElementById("add_charge_type");
-    const chargeCategorySelect = document.getElementById("charge_category2");
-    const chargeSelect         = document.getElementById("charge_id");
+            const chargeTypeSelect = document.getElementById("add_charge_type");
+            const chargeCategorySelect = document.getElementById("charge_category2");
+            const chargeSelect = document.getElementById("charge_id");
 
-    const standardChargeInp = document.getElementById("addstandard_charge");
-    const tpaChargeInp      = document.getElementById("addscd_charge");
-    const qtyInp            = document.getElementById("qty");
-    const totalInp          = document.getElementById("apply_charge");
-    const discountPercInp   = document.getElementById("discount_percentage_add_charge");
-    const discountAmtInp    = document.getElementById("discount_percentage_amount");
-    const taxPercInp        = document.getElementById("charge_tax");
-    const taxAmtInp         = document.getElementById("tax_amt");
-    const netAmountInp      = document.getElementById("final_amount");
+            const standardChargeInp = document.getElementById("addstandard_charge");
+            const tpaChargeInp = document.getElementById("addscd_charge");
+            const qtyInp = document.getElementById("qty");
+            const totalInp = document.getElementById("apply_charge");
+            const discountPercInp = document.getElementById("discount_percentage_add_charge");
+            const discountAmtInp = document.getElementById("discount_percentage_amount");
+            const taxPercInp = document.getElementById("charge_tax");
+            const taxAmtInp = document.getElementById("tax_amt");
+            const netAmountInp = document.getElementById("final_amount");
 
-    const previewBody = document.getElementById("preview_charges");
-    const addBtn = document.querySelector("button[name='charge_data']");
+            const previewBody = document.getElementById("preview_charges");
+            const addBtn = document.querySelector("button[name='charge_data']");
 
-    /*--------------------------------------------------
-     | FETCH CHARGE TYPES
-     --------------------------------------------------*/
-    fetch("{{ route('getChargeTypes') }}")
-        .then(res => res.json())
-        .then(data => {
-            window.chargeTypeData = data;
-            chargeTypeSelect.innerHTML = `<option value="">Select</option>`;
-            data.forEach(type => {
-                chargeTypeSelect.innerHTML += `
+            /*--------------------------------------------------
+             | FETCH CHARGE TYPES
+             --------------------------------------------------*/
+            fetch("{{ route('getChargeTypes') }}")
+                .then(res => res.json())
+                .then(data => {
+                    window.chargeTypeData = data;
+                    chargeTypeSelect.innerHTML = `<option value="">Select</option>`;
+                    data.forEach(type => {
+                        chargeTypeSelect.innerHTML += `
                     <option value="${type.id}">${type.charge_type}</option>
                 `;
-            });
-        });
+                    });
+                });
 
-    /*--------------------------------------------------
-     | FETCH CATEGORIES BY TYPE
-     --------------------------------------------------*/
-    chargeTypeSelect.addEventListener("change", function () {
+            /*--------------------------------------------------
+             | FETCH CATEGORIES BY TYPE
+             --------------------------------------------------*/
+            chargeTypeSelect.addEventListener("change", function() {
 
-        chargeCategorySelect.innerHTML = `<option value="">Select</option>`;
-        chargeSelect.innerHTML = `<option value="">Select</option>`;
+                chargeCategorySelect.innerHTML = `<option value="">Select</option>`;
+                chargeSelect.innerHTML = `<option value="">Select</option>`;
 
-        if (!this.value) return;
+                if (!this.value) return;
 
-        fetch("{{ route('getChargeCategoriesByTypeId', ['id' => 'ID']) }}".replace('ID', this.value))
-            .then(res => res.json())
-            .then(data => {
-                window.chargeCategoryData = data;
-                data.forEach(cat => {
-                    chargeCategorySelect.innerHTML += `
+                fetch("{{ route('getChargeCategoriesByTypeId', ['id' => 'ID']) }}".replace('ID', this
+                        .value))
+                    .then(res => res.json())
+                    .then(data => {
+                        window.chargeCategoryData = data;
+                        data.forEach(cat => {
+                            chargeCategorySelect.innerHTML += `
                         <option value="${cat.id}">${cat.name}</option>
                     `;
-                });
+                        });
+                    });
             });
-    });
 
-    /*--------------------------------------------------
-     | FETCH CHARGES BY CATEGORY
-     --------------------------------------------------*/
-    chargeCategorySelect.addEventListener("change", function () {
+            /*--------------------------------------------------
+             | FETCH CHARGES BY CATEGORY
+             --------------------------------------------------*/
+            chargeCategorySelect.addEventListener("change", function() {
 
-        chargeSelect.innerHTML = `<option value="">Select</option>`;
+                chargeSelect.innerHTML = `<option value="">Select</option>`;
 
-        if (!this.value) return;
+                if (!this.value) return;
 
-        fetch("{{ route('getCharges', ['id' => 'ID']) }}".replace('ID', this.value))
-            .then(res => res.json())
-            .then(data => {
-                window.chargeData = data;
-                data.forEach(charge => {
-                    chargeSelect.innerHTML += `
+                fetch("{{ route('getCharges', ['id' => 'ID']) }}".replace('ID', this.value))
+                    .then(res => res.json())
+                    .then(data => {
+                        window.chargeData = data;
+                        data.forEach(charge => {
+                            chargeSelect.innerHTML += `
                         <option value="${charge.id}">${charge.name}</option>
                     `;
-                });
+                        });
+                    });
             });
-    });
 
-    /*--------------------------------------------------
-     | AUTO-FILL ON CHARGE SELECT (ONCE)
-     --------------------------------------------------*/
-    chargeSelect.addEventListener("change", function () {
+            /*--------------------------------------------------
+             | AUTO-FILL ON CHARGE SELECT (ONCE)
+             --------------------------------------------------*/
+            chargeSelect.addEventListener("change", function() {
 
-        const chargeId = this.value;
-        const selectedCharge = window.chargeData.find(c => c.id == chargeId);
-        if (!selectedCharge) return;
+                const chargeId = this.value;
+                const selectedCharge = window.chargeData.find(c => c.id == chargeId);
+                if (!selectedCharge) return;
 
-        standardChargeInp.value = selectedCharge.standard_charge ?? 0;
-        tpaChargeInp.value      = 0;
-        qtyInp.value            = 1;
-        discountPercInp.value   = 0;
-        taxPercInp.value        = selectedCharge.tax_category?.percentage ?? 0;
+                standardChargeInp.value = selectedCharge.standard_charge ?? 0;
+                tpaChargeInp.value = 0;
+                qtyInp.value = 1;
+                discountPercInp.value = 0;
+                taxPercInp.value = selectedCharge.tax_category?.percentage ?? 0;
 
-        calculateAmount();
-    });
+                calculateAmount();
+            });
 
-    /*--------------------------------------------------
-     | REAL-TIME CALCULATION (EDITABLE SAFE)
-     --------------------------------------------------*/
-    [
-        standardChargeInp,
-        qtyInp,
-        discountPercInp,
-        taxPercInp
-    ].forEach(el => el.addEventListener("input", calculateAmount));
+            /*--------------------------------------------------
+             | REAL-TIME CALCULATION (EDITABLE SAFE)
+             --------------------------------------------------*/
+            [
+                standardChargeInp,
+                qtyInp,
+                discountPercInp,
+                taxPercInp
+            ].forEach(el => el.addEventListener("input", calculateAmount));
 
-    function calculateAmount() {
+            function calculateAmount() {
 
-        const standard = parseFloat(standardChargeInp.value) || 0;
-        const qty      = parseFloat(qtyInp.value) || 1;
+                const standard = parseFloat(standardChargeInp.value) || 0;
+                const qty = parseFloat(qtyInp.value) || 1;
 
-        const discountPerc = parseFloat(discountPercInp.value) || 0;
-        const taxPerc      = parseFloat(taxPercInp.value) || 0;
+                const discountPerc = parseFloat(discountPercInp.value) || 0;
+                const taxPerc = parseFloat(taxPercInp.value) || 0;
 
-        const appliedCharge = standard * qty;
-        const discountAmt   = appliedCharge * (discountPerc / 100);
-        const taxAmt        = appliedCharge * (taxPerc / 100);
-        const netAmount     = appliedCharge + taxAmt - discountAmt;
+                const appliedCharge = standard * qty;
+                const discountAmt = appliedCharge * (discountPerc / 100);
+                const taxAmt = appliedCharge * (taxPerc / 100);
+                const netAmount = appliedCharge + taxAmt - discountAmt;
 
-        totalInp.value       = appliedCharge.toFixed(2);
-        discountAmtInp.value = discountAmt.toFixed(2);
-        taxAmtInp.value      = taxAmt.toFixed(2);
-        netAmountInp.value   = netAmount.toFixed(2);
-    }
+                totalInp.value = appliedCharge.toFixed(2);
+                discountAmtInp.value = discountAmt.toFixed(2);
+                taxAmtInp.value = taxAmt.toFixed(2);
+                netAmountInp.value = netAmount.toFixed(2);
+            }
 
-    /*--------------------------------------------------
-     | ADD ROW TO PREVIEW TABLE
-     --------------------------------------------------*/
-    addBtn.addEventListener("click", function (e) {
-        e.preventDefault();
+            /*--------------------------------------------------
+             | ADD ROW TO PREVIEW TABLE
+             --------------------------------------------------*/
+            addBtn.addEventListener("click", function(e) {
+                e.preventDefault();
 
-        if (!chargeTypeSelect.value || !chargeCategorySelect.value || !chargeSelect.value) {
-            alert("Please fill required fields");
-            return;
-        }
+                if (!chargeTypeSelect.value || !chargeCategorySelect.value || !chargeSelect.value) {
+                    alert("Please fill required fields");
+                    return;
+                }
 
-        const row = `
+                const row = `
         <tr>
             <td>${document.getElementById("charge_date").value}</td>
             <td>${chargeTypeSelect.selectedOptions[0].text}</td>
@@ -4813,23 +4623,23 @@ document.addEventListener("DOMContentLoaded", function () {
         </tr>
         `;
 
-        previewBody.insertAdjacentHTML("beforeend", row);
+                previewBody.insertAdjacentHTML("beforeend", row);
 
-        document.getElementById("addChargeForm").reset();
-        totalInp.value = discountAmtInp.value = taxAmtInp.value = netAmountInp.value = 0;
-    });
+                document.getElementById("addChargeForm").reset();
+                totalInp.value = discountAmtInp.value = taxAmtInp.value = netAmountInp.value = 0;
+            });
 
-    /*--------------------------------------------------
-     | DELETE ROW
-     --------------------------------------------------*/
-    document.addEventListener("click", function (e) {
-        if (e.target.classList.contains("delete-charge-row")) {
-            e.target.closest("tr").remove();
-        }
-    });
+            /*--------------------------------------------------
+             | DELETE ROW
+             --------------------------------------------------*/
+            document.addEventListener("click", function(e) {
+                if (e.target.classList.contains("delete-charge-row")) {
+                    e.target.closest("tr").remove();
+                }
+            });
 
-});
-</script>
+        });
+    </script>
 
     <script>
         $(document).ready(function() {
@@ -5012,58 +4822,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
         }
-    </script>
-
-    <script>
-        const modal = document.getElementById('dischargeDetailsModal');
-
-        modal.addEventListener('show.bs.modal', function(event) {
-            const button = event.relatedTarget;
-            const data = JSON.parse(button.getAttribute('data-discharge'));
-
-            // Common fields
-            document.getElementById('dc_discharge_date').innerText = data.discharge_date ?? '-';
-            document.getElementById('dc_operation').innerText = data.operation ?? '-';
-            document.getElementById('dc_diagnosis').innerText = data.diagnosis ?? '-';
-            document.getElementById('dc_investigations').innerText = data.investigations ?? '-';
-            document.getElementById('dc_treatment_home').innerText = data.treatment_home ?? '-';
-            document.getElementById('dc_note').innerText = data.note ?? '-';
-
-            // Status badge
-            const statusEl = document.getElementById('dc_status');
-            statusEl.className = 'badge';
-
-            if (data.discharge_status == "death") {
-                statusEl.innerText = 'Death';
-                statusEl.classList.add('bg-danger');
-            } else if (data.discharge_status == "referral") {
-                statusEl.innerText = 'Referral';
-                statusEl.classList.add('bg-warning');
-            } else {
-                statusEl.innerText = 'Normal';
-                statusEl.classList.add('bg-success');
-            }
-
-            // Hide sections initially
-            document.getElementById('deathSection').classList.add('d-none');
-            document.getElementById('referralSection').classList.add('d-none');
-
-            // Death section
-            if (data.discharge_status == "death") {
-                document.getElementById('deathSection').classList.remove('d-none');
-                document.getElementById('dc_death_date').innerText = data.death_date ?? '-';
-                document.getElementById('dc_guardian_name').innerText = data.guardian_name ?? '-';
-                document.getElementById('dc_report').innerText = data.report ?? '-';
-            }
-
-            // Referral section
-            if (data.discharge_status == "referral") {
-                document.getElementById('referralSection').classList.remove('d-none');
-                document.getElementById('dc_referral_date').innerText = data.refer_date ?? '-';
-                document.getElementById('dc_refer_to_hospital').innerText = data.refer_to_hospital ?? '-';
-                document.getElementById('dc_reason_for_referral').innerText = data.reason_for_referral ?? '-';
-            }
-        });
     </script>
 
 @endsection
