@@ -250,6 +250,9 @@ class IpdController extends Controller
             'casualty'             => 'required|string',
             'reference'            => 'nullable|string',
             'consultant_doctor'    => 'required|exists:doctor,id',
+            'consultant_doctor2'   => 'nullable|exists:doctor,id',
+            'consultant_doctor3'   => 'nullable|exists:doctor,id',
+            'consultant_doctor4'   => 'nullable|exists:doctor,id',
             'credit_limit'         => 'required|numeric|min:0',
             'bed_group'            => 'required|exists:bed_group,id',
             'bed_number'           => 'required|exists:bed,id',
@@ -297,6 +300,9 @@ class IpdController extends Controller
             // Doctor Details
             $ipd->patient_id  = $request->patient_id;
             $ipd->cons_doctor = $request->consultant_doctor;
+            $ipd->cons_doctor2  = $request->consultant_doctor2 ?? null;
+            $ipd->cons_doctor3  = $request->consultant_doctor3 ?? null;
+            $ipd->cons_doctor4  = $request->consultant_doctor4 ?? null;
 
             // Visit Details
             $ipd->date         = $request->admission_date;
@@ -319,6 +325,9 @@ class IpdController extends Controller
 
             $ipdPatient->patient_id = $request->patient_id ?? null;
             $ipdPatient->doctor_id  = $request->consultant_doctor ?? null;
+            $ipdPatient->doctor2_id  = $request->consultant_doctor2 ?? null;
+            $ipdPatient->doctor3_id  = $request->consultant_doctor3 ?? null;
+            $ipdPatient->doctor4_id  = $request->consultant_doctor4 ?? null;
             $ipdPatient->save();
 
             DB::commit();

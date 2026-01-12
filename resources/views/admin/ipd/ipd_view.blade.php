@@ -2274,11 +2274,23 @@
                                                                     <td>{{ $lab->approved_by ?? '--' }}</td>
                                                                     <td>
                                                                         <div class="d-flex gap-2">
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                                <i class="ti ti-menu"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    title="Show"></i></a>
+                                                                            <!-- Edit -->
+                                                                            <a href="javascript:void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-warning rounded-pill editLabBtn"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#editLabModal"
+                                                                                data-lab-id="{{ $lab->id }}"
+                                                                                title="Edit">
+                                                                                    <i class="ti ti-edit"></i>
+                                                                            </a>
+
+                                                                            <!-- Download -->
+                                                                            <a href="javascript:void(0);"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                                            data-bs-toggle="tooltip"
+                                                                            title="Download">
+                                                                                <i class="ti ti-download"></i>
+                                                                            </a>
                                                                         </div>
                                                                     </td>
                                                                 </tr>
