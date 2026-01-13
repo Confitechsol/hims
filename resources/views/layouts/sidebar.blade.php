@@ -254,9 +254,14 @@
                                     <i class="ti ti-map-pin"></i><span>Blood Bank</span>
                                 </a>
                             </li>
-                            <li>
+                            <!-- <li>
                                 <a href="#">
                                     <i class="ti ti-map-pin"></i><span>Ambulance Call</span>
+                                </a>
+                            </li> -->
+                            <li>
+                                <a href="{{ route('doctor-visit.create') }}">
+                                    <i class="ti ti-map-pin"></i><span>Doctor Visit</span>
                                 </a>
                             </li>
                             <!-- <li>
