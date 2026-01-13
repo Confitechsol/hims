@@ -138,7 +138,7 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <input type="number" name="tests[0][amount]" class="form-control test_amount" step="0.01" min="0" readonly>
+                                                <input type="number" name="tests[0][amount]" class="form-control test_amount" step="0.01" min="0">
                                             </td>
                                             <td>
                                                 <button type="button" class="btn btn-sm btn-danger remove-row">
@@ -374,6 +374,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Discount handler
     document.getElementById('discount_percentage').addEventListener('input', calculateTotals);
+    
+    // Add event listener for manual amount changes
+    document.addEventListener('input', function(e) {
+        if (e.target.classList.contains('test_amount')) {
+            calculateTotals();
+        }
+    });
 
     // Add test row
     document.getElementById('addTestRow').addEventListener('click', function() {

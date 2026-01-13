@@ -170,7 +170,7 @@ class RadiologyBillingController extends Controller
      */
     public function edit($id)
     {
-        $bill = RadiologyBilling::with(['patient.organisation', 'doctor', 'reports.radiology', 'organisation'])->findOrFail($id);
+        $bill = RadiologyBilling::with(['patient.organisation', 'doctor', 'reports.radiology', 'organisation', 'prescription'])->findOrFail($id);
         $patients = Patient::select('id', 'patient_name', 'mobileno')->get();
         $doctors = Doctor::select('id', 'name', 'surname', 'doctor_id')
             ->where(function($query) {
@@ -181,7 +181,13 @@ class RadiologyBillingController extends Controller
             ->get();
         $tests = Radio::with(['radiologyCategory'])->get();
         
-        return view('admin.radiology.billing.edit', compact('bill', 'patients', 'doctors', 'tests'));
+        // Get prescription number for display
+        $prescriptionNumber = '';
+        if ($bill->prescription) {
+            $prescriptionNumber = $bill->prescription->prescription_number ?? 'IPDP' . str_pad($bill->prescription->id, 4, '0', STR_PAD_LEFT);
+        }
+        
+        return view('admin.radiology.billing.edit', compact('bill', 'patients', 'doctors', 'tests', 'prescriptionNumber'));
     }
 
     /**
