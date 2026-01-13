@@ -532,13 +532,13 @@
                                 <i class="bi bi-clipboard-check"></i>
                                 Discharge Type
                             </label>
-                            <select class="form-select" id="reason_discharge" name="reason_discharge">
+                            <select class="form-select" id="reason_discharge" name="reason_discharge" required>
                                 <option value="">Select</option>
-                                <option value="dorb">DORB</option>
-                                <option value="transfer_to_higher_setup">Transfer To Higher Setup</option>
-                                <option value="discharge_on_request">Discharge On Request</option>
-                                <option value="doctor_refer">Doctor Refer</option>
-                                <option value="normal_discharge">Normal Discharge</option>
+                                <option value="DORB">DORB</option>
+                                <option value="Transfer To Higher Setup">Transfer To Higher Setup</option>
+                                <option value="Discharge On Request">Discharge On Request</option>
+                                <option value="Doctor Refer">Doctor Refer</option>
+                                <option value="Normal Discharge">Normal Discharge</option>
                             </select>
                         </div>
 

@@ -5704,6 +5704,7 @@ fieldset:disabled .btn {
 .btn-outline-secondary {
     color: var(--secondary);
     background-color: var(--white);
+    border: 1px solid !important;
     border-color: var(--secondary);
 }
 
@@ -8686,7 +8687,7 @@ select.form-control-sm:not([size]):not([multiple]) {
     left: 12px;
     right: auto;
 }
-/* 
+/*
 .select2-container {
     width: 100% !important;
 }
@@ -16126,7 +16127,7 @@ Author URL: https://themeforest.net/user/dreamstechnologies
 .select2-container {
     width: 100% !important;
 }
-/* 
+/*
 .select2-container .select2-selection--single {
     border: 1px solid var(--border-color);
     height: 38px;
@@ -16237,7 +16238,7 @@ Author URL: https://themeforest.net/user/dreamstechnologies
     right: 1px;
     left: auto;
 } */
-/* 
+/*
 .select2-container .select2-selection--multiple {
     min-height: 38px;
     border: 1px solid var(--border-color) !important;

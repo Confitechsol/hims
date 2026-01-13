@@ -354,15 +354,58 @@
                     <div class="section-icon">
                         <i class="bi bi-person-badge"></i>
                     </div>
-                    Add Prescription
+                    Report Details
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
             <form action="{{ route('ipd.updateReport', $lab->id) }}" id="prescriptionForm" method="post" enctype="multipart/form-data">@csrf
+                @csrf
+                <input type="hidden" name="lab_id" id="edit_lab_id">
                 <div class="modal-body" style="max-height: calc(100vh - 160px); overflow-x:hiden;">
+                    <!-- Attachment -->
+                    <div class="mb-3">
+                        <label class="form-label">Attachment</label>
+                        <input type="file" name="attachment" class="form-control">
+                    </div>
+
+                    <!-- Collected By -->
+                    <div class="mb-3">
+                        <label class="form-label">Collected By</label>
+                        <input type="text" name="collected_by" class="form-control" required>
+                    </div>
+
+                    <!-- Approved By -->
+                   
+                    <input type="hidden" name="approved_by" value=1>
+                    <!-- Collection Date -->
+                    <div class="mb-3">
+                        <label class="form-label">Collection Date</label>
+                        <input type="date" name="collection_date" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-            
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.editLabBtn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.getElementById('edit_lab_id').value = this.dataset.labId;
+            });
+        });
+    });
+</script>

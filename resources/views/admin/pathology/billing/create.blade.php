@@ -868,13 +868,60 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     
                     // Update doctor if available
-                    if (data.prescription && data.prescription.doctor) {
+                    if (data.prescription) {
                         const doctorSelect = document.getElementById('doctor_id');
-                        // Try to find and select the doctor by name
-                        for (let option of doctorSelect.options) {
-                            if (option.text.toLowerCase().includes(data.prescription.doctor.toLowerCase())) {
-                                doctorSelect.value = option.value;
-                                break;
+                        let doctorFound = false;
+                        
+                        // First try to match by doctor_id if available
+                        if (data.prescription.doctor_id) {
+                            for (let option of doctorSelect.options) {
+                                if (option.value == data.prescription.doctor_id) {
+                                    doctorSelect.value = option.value;
+                                    doctorFound = true;
+                                    console.log('Doctor found by ID:', option.value, option.text);
+                                    
+                                    // Trigger Select2 update if it's initialized
+                                    if (window.jQuery && $.fn.select2) {
+                                        $(doctorSelect).trigger('change');
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        // If not found by ID, try to match by name
+                        if (!doctorFound && data.prescription.doctor) {
+                            const doctorName = data.prescription.doctor.toLowerCase().trim();
+                            console.log('Looking for doctor by name:', doctorName);
+                            
+                            // Remove "Dr." prefix if present for matching
+                            const doctorNameClean = doctorName.replace(/^dr\.?\s*/i, '').trim();
+                            
+                            for (let option of doctorSelect.options) {
+                                const optionText = option.text.toLowerCase().trim();
+                                const optionTextClean = optionText.replace(/^dr\.?\s*/i, '').trim();
+                                
+                                // Check if option text contains doctor name or vice versa
+                                if (optionTextClean.includes(doctorNameClean) || doctorNameClean.includes(optionTextClean)) {
+                                    doctorSelect.value = option.value;
+                                    doctorFound = true;
+                                    console.log('Doctor found by name:', option.value, option.text);
+                                    
+                                    // Trigger Select2 update if it's initialized
+                                    if (window.jQuery && $.fn.select2) {
+                                        $(doctorSelect).trigger('change');
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        if (!doctorFound) {
+                            console.warn('Doctor not found in dropdown:', data.prescription.doctor);
+                            // Try to set doctor_name field if it exists
+                            const doctorNameInput = document.querySelector('input[name="doctor_name"]');
+                            if (doctorNameInput) {
+                                doctorNameInput.value = data.prescription.doctor || '';
                             }
                         }
                     }
