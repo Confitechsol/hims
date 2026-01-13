@@ -30,6 +30,21 @@ class IpdPatient extends Model
     }
     public function doctor()
     {
-        return $this->belongsTo(Doctor::class);
+        // return $this->belongsTo(Doctor::class);
+        return $this->belongsTo(Doctor::class, 'doctor_id');
+    }
+    public function doctor2()
+    {
+        return $this->belongsTo(Doctor::class, 'doctor2_id');
+    }
+
+    public function doctor3()
+    {
+        return $this->belongsTo(Doctor::class, 'doctor3_id');
+    }
+
+    public function doctor4()
+    {
+        return $this->belongsTo(Doctor::class, 'doctor4_id');
     }
 }

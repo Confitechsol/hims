@@ -619,7 +619,7 @@
                     <a href="#bed_issue" data-bs-toggle="tab" aria-expanded="true"
                         class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
                             class="fa-solid fa-bed text-primary pe-1"></i>
-                        <span>Bed Issue</span>
+                        <span>Bed Transfer</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -649,7 +649,7 @@
                                     </h5>
                                     @if ($ipd->discharged == 'yes')
                                         <button class="bg-transparent border-0" data-bs-toggle="modal"
-                                            data-bs-target="#dischargeDetailsModal"
+                                            data-bs-target="#dischargePreviewModal"
                                             data-discharge='@json($ipd->dischargeCard)'><i
                                                 class="bi bi-clipboard-pulse text-white"></i></button>
                                     @else
@@ -2241,6 +2241,15 @@
                                                         </span>
                                                         <input type="text" class="form-control shadow-sm"
                                                             placeholder="Search">
+                                                        @if ($errors->any())
+                                                            <div class="alert alert-danger">
+                                                                <ul class="mb-0">
+                                                                    @foreach ($errors->all() as $error)
+                                                                        <li>{{ $error }}</li>
+                                                                    @endforeach
+                                                                </ul>
+                                                            </div>
+                                                        @endif
 
                                                     </div>
                                                 </div>
@@ -2274,18 +2283,37 @@
                                                                     <td>{{ $lab->approved_by ?? '--' }}</td>
                                                                     <td>
                                                                         <div class="d-flex gap-2">
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                                <i class="ti ti-menu"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    title="Show"></i></a>
+                                                                            <!-- Edit -->
+                                                                            <a href="javascript:void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-warning rounded-pill editLabBtn"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#addPathLabModal"
+                                                                                data-lab-id="{{ $lab->id }}"
+                                                                                title="Edit">
+                                                                                    <i class="ti ti-edit"></i>
+                                                                            </a>
+
+                                                                            <!-- Download -->
+                                                                            @if($lab->path_doc_path)
+                                                                                <a href="{{ route('path.report.download', $lab->id) }}"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                                                title="Download"
+                                                                                download>
+                                                                                    <i class="ti ti-download"></i>
+                                                                                </a>
+                                                                            @else
+                                                                                <a href="javascript:void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill disabled"
+                                                                                title="No file available"
+                                                                                >
+                                                                                    <i class="ti ti-download"></i>
+                                                                                </a>
+                                                                            @endif
                                                                         </div>
                                                                     </td>
                                                                 </tr>
+                                                                @include('components.modals.add-pathlab-report')
                                                             @endforeach
-
-
-
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -2356,14 +2384,36 @@
                                                                     <td>{{ $lab->approved_by ?? '--' }}</td>
                                                                     <td>
                                                                         <div class="d-flex gap-2">
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                                <i class="ti ti-menu"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    title="Show"></i></a>
+                                                                            <!-- Edit -->
+                                                                            <a href="javascript:void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-warning rounded-pill editLabBtn"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#addRadioLabModal"
+                                                                                data-lab-id="{{ $lab->id }}"
+                                                                                title="Edit">
+                                                                                    <i class="ti ti-edit"></i>
+                                                                            </a>
+
+                                                                            <!-- Download -->
+                                                                            @if($lab->radio_doc_path)
+                                                                                <a href="{{ route('radio.report.download', $lab->id) }}"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                                                title="Download"
+                                                                                download>
+                                                                                    <i class="ti ti-download"></i>
+                                                                                </a>
+                                                                            @else
+                                                                                <a href="javascript:void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill disabled"
+                                                                                title="No file available"
+                                                                                >
+                                                                                    <i class="ti ti-download"></i>
+                                                                                </a>
+                                                                            @endif
                                                                         </div>
                                                                     </td>
                                                                 </tr>
+                                                                @include('components.modals.add-radlab-report')
                                                             @endforeach
 
 
@@ -2956,17 +3006,17 @@
                                                                                                     Name<small
                                                                                                         class="req">
                                                                                                         *</small></label>
-                                                                                                <select name="charge_id"
-                                                                                                    id="charge_id"
-                                                                                                    style="width: 100%"
-                                                                                                    class="form-control addcharge  select2 reset_value "
-                                                                                                    tabindex="-1"
-                                                                                                    aria-hidden="true">
-                                                                                                    <option
-                                                                                                        value="">
-                                                                                                        Select
-                                                                                                    </option>
-                                                                                                </select>
+                                                                                                        <select name="charge_id"
+                                                                                                            id="charge_id"
+                                                                                                            style="width: 100%"
+                                                                                                            class="form-control addcharge  select2 reset_value "
+                                                                                                            tabindex="-1"
+                                                                                                            aria-hidden="true">
+                                                                                                            <option
+                                                                                                                value="">
+                                                                                                                Select
+                                                                                                            </option>
+                                                                                                        </select>
                                                                                             </div>
                                                                                         </div>
                                                                                         <div class="col-md-2">
@@ -2975,13 +3025,12 @@
                                                                                                     class="form-label">Standard
                                                                                                     Charge
                                                                                                     (INR)</label>
-                                                                                                <input type="text"
-                                                                                                    name="standard_charge"
-                                                                                                    id="addstandard_charge"
-                                                                                                    class="form-control reset_value standard_charge"
-                                                                                                    value="">
-                                                                                                <span
-                                                                                                    class="text-danger"></span>
+                                                                                                    <input type="text"
+                                                                                                        name="standard_charge"
+                                                                                                        id="addstandard_charge"
+                                                                                                        class="form-control reset_value standard_charge"
+                                                                                                        value="">
+                                                                                                        <span class="text-danger"></span>
                                                                                             </div>
                                                                                         </div>
                                                                                         <div class="col-md-2">
@@ -4096,7 +4145,7 @@
                         <div class="card shadow-sm flex-fill w-100">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Bed Assign
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>New Bed Assign
                                 </h5>
                             </div>
                             <div class="card-body">
@@ -4374,201 +4423,9 @@
     <!-- tab content end -->
     </div>
 
-    {{-- discharge details modal --}}
-    <div class="modal fade" id="dischargeDetailsModal" tabindex="-1">
-        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
-
-                <!-- Modal Header -->
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="bi bi-clipboard-check"></i>
-                        Discharge Details
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-
-                <!-- Modal Body -->
-                <div class="modal-body">
-
-                    <!-- Common Details Section -->
-                    <div class="section-card">
-                        <div class="section-header primary">
-                            <div class="section-icon primary">
-                                <i class="bi bi-file-medical"></i>
-                            </div>
-                            <h6 class="section-title pb-0 mb-0">General Information</h6>
-                        </div>
-                        <div class="section-body">
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="bi bi-calendar-event"></i>
-                                        Discharge Date
-                                    </div>
-                                    <div class="info-value" id="dc_discharge_date">January 15, 2025</div>
-                                </div>
-
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="bi bi-check-circle"></i>
-                                        Status
-                                    </div>
-                                    <div class="info-value">
-                                        <span class="status-badge discharged" id="dc_status">
-                                            <i class="bi bi-check-circle-fill"></i>
-                                            Discharged
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="bi bi-bandaid"></i>
-                                        Operation
-                                    </div>
-                                    <div class="info-value" id="dc_operation">Appendectomy</div>
-                                </div>
-
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="bi bi-heart-pulse"></i>
-                                        Diagnosis
-                                    </div>
-                                    <div class="info-value" id="dc_diagnosis">Acute Appendicitis</div>
-                                </div>
-
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="bi bi-clipboard2-pulse"></i>
-                                        Investigations
-                                    </div>
-                                    <div class="info-value" id="dc_investigations">CT Scan, Blood Tests, Ultrasound
-                                    </div>
-                                </div>
-
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="bi bi-house-heart"></i>
-                                        Treatment Home
-                                    </div>
-                                    <div class="info-value" id="dc_treatment_home">Rest, prescribed medications,
-                                        follow-up in 2 weeks</div>
-                                </div>
-                            </div>
-
-                            <div class="info-grid full mt-3">
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="bi bi-journal-text"></i>
-                                        Note
-                                    </div>
-                                    <div class="info-value long-text" id="dc_note">Patient recovered well
-                                        post-surgery. No complications observed. Advised to continue medication and maintain
-                                        proper diet. Follow-up required after 2 weeks.</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Death Details Section -->
-                    <div id="deathSection" class="section-card d-none">
-                        <div class="section-header danger">
-                            <div class="section-icon danger">
-                                <i class="bi bi-exclamation-triangle-fill"></i>
-                            </div>
-                            <h6 class="section-title pb-0 mb-0">Death Details</h6>
-                        </div>
-                        <div class="section-body">
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="bi bi-calendar-x"></i>
-                                        Death Date
-                                    </div>
-                                    <div class="info-value" id="dc_death_date">--</div>
-                                </div>
-
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="bi bi-person"></i>
-                                        Guardian Name
-                                    </div>
-                                    <div class="info-value" id="dc_guardian_name">--</div>
-                                </div>
-                            </div>
-
-                            <div class="info-grid full mt-3">
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="bi bi-file-earmark-text"></i>
-                                        Report
-                                    </div>
-                                    <div class="info-value long-text" id="dc_report">--</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Referral Details Section -->
-                    <div id="referralSection" class="section-card d-none">
-                        <div class="section-header warning">
-                            <div class="section-icon warning">
-                                <i class="bi bi-arrow-right-circle-fill"></i>
-                            </div>
-                            <h6 class="section-title pb-0 mb-0">Referral Details</h6>
-                        </div>
-                        <div class="section-body">
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="bi bi-calendar-check"></i>
-                                        Referral Date
-                                    </div>
-                                    <div class="info-value" id="dc_referral_date">--</div>
-                                </div>
-
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="bi bi-hospital"></i>
-                                        Hospital Name
-                                    </div>
-                                    <div class="info-value" id="dc_refer_to_hospital">--</div>
-                                </div>
-                            </div>
-
-                            <div class="info-grid full mt-3">
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="bi bi-chat-left-text"></i>
-                                        Reason for Referral
-                                    </div>
-                                    <div class="info-value long-text" id="dc_reason_for_referral">--</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Modal Footer -->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-close-modal" data-bs-dismiss="modal">
-                        <i class="bi bi-x-circle"></i>
-                        Close
-                    </button>
-                    <button type="button" class="btn btn-print">
-                        <i class="bi bi-printer"></i>
-                        Print Details
-                    </button>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
     {{-- modal ends --}}
     @include('components.modals.discharge-modal')
+    @include('components.modals.discharge-details-modal')
     <!-- Chart JS -->
     <script src="assets/plugins/chartjs/chart.min.js"></script>
     <script src="assets/plugins/chartjs/chart-data.js"></script>
@@ -5014,58 +4871,6 @@
                 }
             });
         }
-    </script>
-
-    <script>
-        const modal = document.getElementById('dischargeDetailsModal');
-
-        modal.addEventListener('show.bs.modal', function(event) {
-            const button = event.relatedTarget;
-            const data = JSON.parse(button.getAttribute('data-discharge'));
-
-            // Common fields
-            document.getElementById('dc_discharge_date').innerText = data.discharge_date ?? '-';
-            document.getElementById('dc_operation').innerText = data.operation ?? '-';
-            document.getElementById('dc_diagnosis').innerText = data.diagnosis ?? '-';
-            document.getElementById('dc_investigations').innerText = data.investigations ?? '-';
-            document.getElementById('dc_treatment_home').innerText = data.treatment_home ?? '-';
-            document.getElementById('dc_note').innerText = data.note ?? '-';
-
-            // Status badge
-            const statusEl = document.getElementById('dc_status');
-            statusEl.className = 'badge';
-
-            if (data.discharge_status == "death") {
-                statusEl.innerText = 'Death';
-                statusEl.classList.add('bg-danger');
-            } else if (data.discharge_status == "referral") {
-                statusEl.innerText = 'Referral';
-                statusEl.classList.add('bg-warning');
-            } else {
-                statusEl.innerText = 'Normal';
-                statusEl.classList.add('bg-success');
-            }
-
-            // Hide sections initially
-            document.getElementById('deathSection').classList.add('d-none');
-            document.getElementById('referralSection').classList.add('d-none');
-
-            // Death section
-            if (data.discharge_status == "death") {
-                document.getElementById('deathSection').classList.remove('d-none');
-                document.getElementById('dc_death_date').innerText = data.death_date ?? '-';
-                document.getElementById('dc_guardian_name').innerText = data.guardian_name ?? '-';
-                document.getElementById('dc_report').innerText = data.report ?? '-';
-            }
-
-            // Referral section
-            if (data.discharge_status == "referral") {
-                document.getElementById('referralSection').classList.remove('d-none');
-                document.getElementById('dc_referral_date').innerText = data.refer_date ?? '-';
-                document.getElementById('dc_refer_to_hospital').innerText = data.refer_to_hospital ?? '-';
-                document.getElementById('dc_reason_for_referral').innerText = data.reason_for_referral ?? '-';
-            }
-        });
     </script>
 
 @endsection

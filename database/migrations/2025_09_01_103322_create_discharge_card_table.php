@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -22,6 +23,7 @@ return new class extends Migration
             $table->unsignedBigInteger('ipd_details_id')->nullable()->index();
 
             // 🔹 Patient & Admission
+            $table->string('discharge_number', 20)->nullable();
             $table->string('patient_name');
             $table->string('admission_no')->nullable();
             $table->string('bed')->nullable();
@@ -70,6 +72,7 @@ return new class extends Migration
 
             $table->timestamps();
         });
+        DB::statement('ALTER TABLE discharge_card ADD barcode LONGBLOB NULL AFTER id');
     }
 
     /**

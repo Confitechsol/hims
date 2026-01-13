@@ -216,6 +216,15 @@
             padding-top: 4px;
             padding-bottom: 3px;
         }
+        /* CSS for validation error */
+        .input-group{
+            position: relative;
+        }
+        .input-group .invalid-feedback{
+            position: absolute;
+            left: 0;
+            bottom: -17px;
+        }
     </style>
     @yield('select2cdn')
 </head>
@@ -785,11 +794,15 @@
                 if ($select.hasClass('select2-hidden-accessible')) {
                     return;
                 }
+                const oldValue = $select.val();
 
                 $select.select2({
                     dropdownParent: $modal,
                     width: '100%'
                 });
+                if (oldValue) {
+                    $select.val(oldValue).trigger('change');
+                }
             });
         });
 

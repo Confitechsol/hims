@@ -317,6 +317,7 @@
             const weekFilterInput = document.querySelector('input[name="weekFilter"]');
 
             const selectedFilter = "{{ request('filter_type', 'dateRange') }}";
+            if(!filterTypeSelect) return;
             filterTypeSelect.value = selectedFilter;
 
             function showSelectedFilter(filterType) {
