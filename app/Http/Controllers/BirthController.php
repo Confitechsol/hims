@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
+use App\Models\Doctor;
 
 class BirthController extends Controller
 {
@@ -45,8 +46,9 @@ class BirthController extends Controller
             });
         }
         $birthReports = $query->paginate($perPage);
+        $doctors = Doctor::where('is_active',1)->select('id','name')->get();
         //return response()->json($birthReports, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);~
-        return view('admin.birthordeath.index', compact('birthReports'));
+        return view('admin.birthordeath.index', compact('birthReports','doctors'));
     }
 
     public function create(Request $request)

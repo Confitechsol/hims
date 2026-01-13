@@ -45,7 +45,7 @@
                         <div class="col-md-3">
                             <label class="form-label">Case Reference</label>
                             <div class="autocomplete-container">
-                                <input type="text" id="prescription_search" class="form-control" placeholder="Search prescriptions" autocomplete="off" value="{{ $bill->case_reference_id ?? '' }}">
+                                <input type="text" id="prescription_search" class="form-control" placeholder="Search prescriptions" autocomplete="off" value="{{ $prescriptionNumber ?? '' }}">
                                 <input type="hidden" name="case_reference_id" id="case_reference_id" value="{{ $bill->case_reference_id ?? '' }}">
                                 <div id="prescription_suggestions" class="autocomplete-suggestions"></div>
                             </div>
@@ -145,7 +145,7 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <input type="number" name="tests[{{ $index }}][amount]" class="form-control test_amount" value="{{ $report->apply_charge ?? 0 }}" step="0.01" min="0" readonly>
+                                                <input type="number" name="tests[{{ $index }}][amount]" class="form-control test_amount" value="{{ $report->apply_charge ?? 0 }}" step="0.01" min="0">
                                             </td>
                                             <td>
                                                 <button type="button" class="btn btn-sm btn-danger remove-row">
@@ -398,6 +398,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Discount percentage change
     $('#discount_percentage').on('input', function() {
+        calculateTotals();
+    });
+    
+    // Add event listener for manual amount changes
+    $(document).on('input', '.test_amount', function() {
         calculateTotals();
     });
     

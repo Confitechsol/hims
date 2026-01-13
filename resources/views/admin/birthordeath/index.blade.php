@@ -508,6 +508,7 @@ function loadBirthCertDesign(birthId) {
                 'type' => 'text',
                 'size' => '5',
             ],
+            [ 'name' => 'doctor', 'label' => 'Doctors', 'type' => 'select', 'required' => true, 'options' => $doctors->pluck('name','id')->toArray(),  'size' => '5'],
            
         ]" :columns="4" />
     <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Birth"
