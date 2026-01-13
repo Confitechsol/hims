@@ -15,6 +15,7 @@ use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\DeathController;
 use App\Http\Controllers\DischargePdfController;
 use App\Http\Controllers\DoctorController;
+use App\Http\Controllers\DoctorVisitController;
 use App\Http\Controllers\DutyRosterController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\ExcelImportController;
@@ -348,6 +349,13 @@ Route::middleware(['admin'])->group(function () {
 // Route::get('/medicine-group', function () {
 //     return view('admin.setup.medicine_group');
 // })->name('medicine-group');
+
+Route::prefix('doctor-visit')->group(function () {
+    Route::get('/create', [DoctorVisitController::class, 'create'])->name('doctor-visit.create');
+    Route::post('/store', [DoctorVisitController::class, 'store'])->name('doctor-visit.store');
+
+
+});
 
 Route::prefix('pathology-category')->group(function () {
     Route::get('/', [PathologyController::class, 'pathologyCategories'])->name('pathology-category');
