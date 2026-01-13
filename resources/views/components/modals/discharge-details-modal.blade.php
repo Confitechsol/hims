@@ -233,6 +233,20 @@
       .footer {
           width: 100%;
       }
+
+      .hide-header .header,
+      .hide-footer .footer {
+          visibility: hidden;
+      }
+
+      /* Keep space */
+      /* .header,
+      .footer {
+          min-height: 120px;
+      } */
+      .toggle-switch {
+          cursor: pointer;
+      }
   </style>
   <div class="modal fade" id="dischargePreviewModal" tabindex="-1">
       <div class="modal-dialog modal-fullscreen">
@@ -429,18 +443,24 @@
                   </div>
               </div>
               <div class="modal-footer pb-0">
-                  <div class="d-flex gap-2 ms-auto me-3">
+                  <div class="d-flex align-items-center gap-2 ms-auto me-3">
                       <button type="button" class="btn btn-outline-secondary" onclick="downloadDocument()">
                           <i class="bi bi-download"></i>
                           Download
                       </button>
-                      <a href="{{ route('discharge.pdf', $ipd->id) }}" target="_blank" class="btn btn-primary">
+                      <div class="form-check form-switch toggle-switch">
+                          <input class="form-check-input toggle-switch" type="checkbox" role="switch"
+                              id="toggleHeaderFooter" checked>
+                          <label class="form-check-label toggle-switch" for="toggleHeaderFooter">Print Header &
+                              Footer</label>
+                      </div>
+                      {{-- <a href="{{ route('discharge.pdf', $ipd->id) }}" target="_blank" class="btn btn-primary">
                           <i class="bi bi-printer"></i> Print
-                      </a>
-                      {{-- <button type="button" class="btn btn-primary" onclick="openPdf({{ $ipd->id }})">
+                      </a> --}}
+                      <button type="button" class="btn btn-primary" onclick="openPdf({{ $ipd->id }})">
                           <i class="bi bi-printer"></i>
                           Print
-                      </button> --}}
+                      </button>
                   </div>
               </div>
           </div>
@@ -547,11 +567,25 @@
           }
       }
   </script>
+  <script>
+      document.getElementById('toggleHeaderFooter')
+          .addEventListener('change', function() {
 
+              const container = document.getElementById('dischargeSummary');
+
+              if (this.checked) {
+                  container.classList.remove('hide-header', 'hide-footer');
+              } else {
+                  container.classList.add('hide-header', 'hide-footer');
+              }
+          });
+  </script>
   <script>
       function openPdf(id) {
           const baseUrl = "{{ route('discharge.pdf', ['id' => 'ID']) }}";
-          const finalUrl = baseUrl.replace('ID', id);
+          const withHF = document.getElementById('toggleHeaderFooter').checked ? 1 : 0;
+
+          const finalUrl = baseUrl.replace('ID', id) + '?hf=' + withHF;
           window.open(finalUrl, '_blank');
       }
 

@@ -147,8 +147,13 @@
                                                         <td>{{ $ipdDetails->credit_limit }}</td>
                                                         <td>
                                                             <a href="{{ route('ipd.edit', [$ipdDetails->id]) }}"
-                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill" title="Edit">
                                                                 <i class="ti ti-pencil"></i>
+                                                            </a>
+                                                            <a href="{{ route('ipd.pdf', [$ipdDetails->ipdPatients['id'] ?? 0]) }}"
+                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
+                                                                target="_blank" title="View Admission Form">
+                                                                <i class="ti ti-eye"></i>
                                                             </a>
                                                         </td>
                                                     </tr>
@@ -300,12 +305,12 @@
 
                 <div class="modal-header justify-content-between">
                     <h5 class="modal-title">PDF Preview</h5>
-                    <div class="d-flex gap-2">                        
+                    <div class="d-flex gap-2">
                         <!-- Download button -->
                         <a id="downloadPdfBtn" href="#" class="btn btn-sm btn-success">
                             Download
                         </a>
-
+                        <button class="btn btn-info" onclick="printPdf()">Print</button>
                         <button type="button" class="btn-close" data-bs-dismiss="modal">
                         </button>
                     </div>
@@ -313,7 +318,7 @@
 
                 <div class="modal-body p-0">
                     <iframe id="pdfFrame" src="{{ session('pdf_url') }}"
-                        style="width:100%; height:80vh; border:none;">
+                    style="width:100%; height:80vh; border:none;">
                     </iframe>
                 </div>
 
@@ -325,10 +330,11 @@
             event.preventDefault(); // Prevent default anchor behavior
             savePdf();
         });
-        function savePdf(){
+
+        function savePdf() {
             const iframe = document.getElementById('pdfFrame');
             const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-            
+
             const targetElement = iframeDoc.getElementById("pdf-content");
             html2canvas(targetElement, {
                 scale: 2
@@ -345,12 +351,58 @@
                 pdf.save('admission_form.pdf');
             });
         }
+
+        function generatePdf() {
+            return new Promise((resolve) => {
+                const iframe = document.getElementById('pdfFrame');
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                const targetElement = iframeDoc.getElementById("pdf-content");
+
+                html2canvas(targetElement, {
+                    scale: 2,
+                    useCORS: true
+                }).then(canvas => {
+                    const {
+                        jsPDF
+                    } = window.jspdf;
+
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+
+                    const imgData = canvas.toDataURL('image/png');
+
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
+
+                    const imgWidth = pdfWidth;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                    // Center vertically if smaller than A4
+                    const y = imgHeight < pdfHeight ? (pdfHeight - imgHeight) / 2 : 0;
+
+                    pdf.addImage(imgData, 'PNG', 0, y, imgWidth, imgHeight);
+
+                    resolve(pdf);
+                });
+            });
+        }
+
+        function printPdf() {
+            generatePdf().then(pdf => {
+                const blob = pdf.output('bloburl');
+
+                const printWindow = window.open(blob);
+                printWindow.onload = () => {
+                    printWindow.focus();
+                    printWindow.print();
+                };
+            });
+        }
     </script>
     @if (session('pdf_url'))
-        <script>
-            const modal = new bootstrap.Modal(document.getElementById('pdfModal'));
-            modal.show();
-        </script>
+    <script>
+        const modal = new bootstrap.Modal(document.getElementById('pdfModal'));
+        modal.show();
+    </script>
     @endif
     {{-- filters --}}
 
@@ -367,7 +419,7 @@
             const weekFilterInput = document.querySelector('input[name="weekFilter"]');
 
             const selectedFilter = "{{ request('filter_type', 'dateRange') }}";
-            if(!filterTypeSelect) return;
+            if (!filterTypeSelect) return;
             filterTypeSelect.value = selectedFilter;
 
             function showSelectedFilter(filterType) {
