@@ -43,9 +43,10 @@ class HospitalChargesController extends Controller
         'schedule_charge_id'=>'required|array',
         'schedule_charge_id.*'=>'required|exists:organisations_charges,id',
     ]);
+    // dd(request->all());
     $organisation_ids = $request->schedule_charge_id;
     $charge =  Charge::create([
-            'charge_category_id'=>$request->charge_type,
+            'charge_category_id'=>$request->charge_category,
             'tax_category_id'=>$request->tax_category,
             'charge_unit_id'=>$request->unit_type,
             'name'=>$request->charge_name,
