@@ -8,6 +8,13 @@
                 <h5 class="mb-0" style="color: #750096"><i class="fas fa-plus-circle me-2"></i>Doctor Visit</h5>
             </div>
             <div class="card-body">
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong>Success!</strong> {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+                
                 @if(session('error'))
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
                         <strong>Error!</strong> {{ session('error') }}
@@ -35,28 +42,31 @@
                         <div class="col-md-3">
                             <label class="form-label">Patient <span class="text-danger">*</span></label>
                             <div class="autocomplete-container">
-                                <input type="text" id="patient_search" class="form-control" placeholder="Search by name, ID, or mobile" autocomplete="off" required>
-                                <input type="hidden" name="patient_id" id="patient_id" required>
+                                <input type="text" id="patient_search" class="form-control @error('patient_id') is-invalid @enderror" placeholder="Search by name, ID, or mobile" autocomplete="off" required>
+                                <input type="hidden" name="patient_id" id="patient_id" value="{{ old('patient_id') }}" required>
                                 <div id="patient_suggestions" class="autocomplete-suggestions"></div>
                             </div>
                             <small class="text-muted">Start typing to see suggestions</small>
+                            @error('patient_id')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class="col-md-3">
+                        <!-- <div class="col-md-3">
                             <label class="form-label">Case Reference</label>
                             <div class="autocomplete-container">
                                 <input type="text" id="prescription_search" class="form-control" placeholder="Search prescriptions" autocomplete="off">
                                 <input type="hidden" name="case_reference_id" id="case_reference_id">
                                 <div id="prescription_suggestions" class="autocomplete-suggestions"></div>
                             </div>
-                        </div>
+                        </div> -->
                         
                         <div class="col-md-3">
                             <label class="form-label">Reference Doctor ({{ count($doctors ?? []) }} found)</label>
-                            <select name="doctor_id" id="doctor_id" class="form-select add-select2">
+                            <select name="doctor_id" id="doctor_id" class="form-select add-select2 @error('doctor_id') is-invalid @enderror">
                                 <option value="">Select Doctor</option>
                                 @if(isset($doctors) && count($doctors) > 0)
                                     @foreach($doctors as $doctor)
-                                        <option value="{{ $doctor->id }}">
+                                        <option value="{{ $doctor->id }}" {{ old('doctor_id') == $doctor->id ? 'selected' : '' }}>
                                             Dr. {{ $doctor->name }} {{ $doctor->surname }}
                                         </option>
                                     @endforeach
@@ -64,10 +74,16 @@
                                     <option disabled>No doctors found</option>
                                 @endif
                             </select>
+                            @error('doctor_id')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Reporting Date <span class="text-danger">*</span></label>
-                            <input type="datetime-local" name="date" id="date" class="form-control" value="{{ date('Y-m-d\TH:i') }}" required>
+                            <input type="datetime-local" name="date" id="date" class="form-control @error('date') is-invalid @enderror" value="{{ old('date', date('Y-m-d\TH:i')) }}" required>
+                            @error('date')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
 
@@ -77,48 +93,79 @@
                     <div class="row mb-4">
                         <div class="col-md-3">
                             <label class="form-label">Visit Type <span class="text-danger">*</span></label>
-                            <select name="visit_type" class="form-select" required>
+                            <select name="visit_type" class="form-select @error('visit_type') is-invalid @enderror" required>
                                 <option value="">Select</option>
-                                <option value="OPD">OPD</option>
-                                <option value="IPD">IPD</option>
-                                <option value="Emergency">Emergency</option>
-                                <option value="Follow-up">Follow-up</option>
+                                @if(isset($charges) && count($charges) > 0)
+                                    @foreach($charges as $charge)
+                                        <option value="{{ $charge->id }}" data-standard-charge="{{ $charge->standard_charge ?? 0 }}" {{ old('visit_type') == $charge->id ? 'selected' : '' }}>
+                                            {{ $charge->name }}
+                                        </option>
+                                    @endforeach
+                                @else
+                                    <option disabled>No charges found</option>
+                                @endif
                             </select>
+                            @error('visit_type')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <div class="col-md-3">
                             <label class="form-label">Rate (₹) <span class="text-danger">*</span></label>
-                            <input type="number" name="rate" class="form-control" step="0.01" required>
+                            <input type="number" name="rate" id="rate" class="form-control @error('rate') is-invalid @enderror" step="0.01" value="{{ old('rate') }}" required>
+                            @error('rate')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">No of Visit <span class="text-danger">*</span></label>
+                            <input type="number" name="no_of_visit" id="no_of_visit" value="{{ old('no_of_visit', 1) }}" class="form-control @error('no_of_visit') is-invalid @enderror" step="0.01" required>
+                            @error('no_of_visit')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <div class="col-md-3">
                             <label class="form-label">Amount (₹) <span class="text-danger">*</span></label>
-                            <input type="number" name="amount" class="form-control" step="0.01" required>
+                            <input type="number" name="amount" id="amount" class="form-control @error('amount') is-invalid @enderror" step="0.01" value="{{ old('amount') }}" required readonly>
+                            @error('amount')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
                         </div>
 
-                        <div class="col-md-3">
+                        <!-- <div class="col-md-3">
                             <label class="form-label">Doctor Pay Type</label>
                             <select name="doctor_pay_type" class="form-select">
                                 <option value="fixed">Fixed</option>
                                 <option value="percentage">Percentage</option>
                             </select>
-                        </div>
+                        </div> -->
                     </div>
 
                     <div class="row mb-3">
                         <div class="col-md-3">
                             <label class="form-label">Doctor Pay Amount</label>
-                            <input type="number" name="doctor_pay_amount" class="form-control" step="0.01">
+                            <input type="number" name="doctor_pay_amount" class="form-control @error('doctor_pay_amount') is-invalid @enderror" step="0.01" value="{{ old('doctor_pay_amount') }}" readonly>
+                            @error('doctor_pay_amount')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <div class="col-md-3">
                             <label class="form-label">Visit Date</label>
-                            <input type="date" name="visit_date" class="form-control" required>
+                            <input type="date" name="visit_date" class="form-control @error('visit_date') is-invalid @enderror" value="{{ old('visit_date') }}" required>
+                            @error('visit_date')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <div class="col-md-3">
                             <label class="form-label">Visit Time</label>
-                            <input type="time" name="visit_time" class="form-control" required>
+                            <input type="time" name="visit_time" class="form-control @error('visit_time') is-invalid @enderror" value="{{ old('visit_time') }}" required>
+                            @error('visit_time')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
 
@@ -143,31 +190,19 @@
                                         </tr>
                                     </thead>
                                     <tbody id="testTableBody">
-                                        <tr class="test-row">
-                                            <td>
-                                                
-                                            </td>
-                                            <td>
-                                               
-                                            </td>
-                                            <td>
-                                                
-                                            </td>
-                                            <td>
-                                                
-                                            </td>
-                                            <td>
-                                                
-                                            </td>
-                                            <td>
-                                                
-                                            </td>
+                                        <tr>
+                                            <td colspan="10" class="text-center text-muted">Please select a patient to view previous visits</td>
                                         </tr>
                                     </tbody>
                                 </table>
                                 
                             </div>
                         </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a href="{{ route('doctor-visit.create') }}" class="btn btn-secondary">Reset</a>
+                        <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
 
                 </form>
@@ -223,5 +258,235 @@
 }
 </style>
 
+<script>
+let patientData = @json($patients);
+let currentFocus = -1;
+
+document.addEventListener('DOMContentLoaded', function() {
+    initPatientAutocomplete();
+    initVisitTypeHandler();
+    initAmountCalculator();
+    
+    // Load visits if patient is already selected (from old form data)
+    const patientIdOnLoad = document.getElementById('patient_id').value;
+    if (patientIdOnLoad) {
+        loadPatientVisits(patientIdOnLoad);
+    }
+});
+
+// Visit Type change handler
+function initVisitTypeHandler() {
+    const visitTypeSelect = document.querySelector('select[name="visit_type"]');
+    const doctorPayAmountInput = document.querySelector('input[name="doctor_pay_amount"]');
+    
+    if (visitTypeSelect && doctorPayAmountInput) {
+        visitTypeSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const standardCharge = selectedOption.getAttribute('data-standard-charge');
+            
+            if (standardCharge && this.value !== '') {
+                doctorPayAmountInput.value = parseFloat(standardCharge).toFixed(2);
+            } else {
+                doctorPayAmountInput.value = '';
+            }
+        });
+    }
+}
+
+// Amount Calculator - Rate * No of Visit
+function initAmountCalculator() {
+    const rateInput = document.getElementById('rate');
+    const noOfVisitInput = document.getElementById('no_of_visit');
+    const amountInput = document.getElementById('amount');
+    
+    function calculateAmount() {
+        const rate = parseFloat(rateInput.value) || 0;
+        const noOfVisit = parseFloat(noOfVisitInput.value) || 0;
+        const amount = rate * noOfVisit;
+        
+        if (amount > 0) {
+            amountInput.value = amount.toFixed(2);
+        } else {
+            amountInput.value = '';
+        }
+    }
+    
+    if (rateInput && noOfVisitInput && amountInput) {
+        rateInput.addEventListener('input', calculateAmount);
+        rateInput.addEventListener('change', calculateAmount);
+        noOfVisitInput.addEventListener('input', calculateAmount);
+        noOfVisitInput.addEventListener('change', calculateAmount);
+    }
+}
+
+// Patient autocomplete
+function initPatientAutocomplete() {
+    const searchInput = document.getElementById('patient_search');
+    const hiddenInput = document.getElementById('patient_id');
+    const suggestionsDiv = document.getElementById('patient_suggestions');
+    currentFocus = -1;
+    
+    // Restore patient name if old value exists
+    const oldPatientId = hiddenInput.value;
+    if (oldPatientId) {
+        const patient = patientData.find(p => p.id == oldPatientId);
+        if (patient) {
+            searchInput.value = patient.patient_name;
+        }
+    }
+
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        suggestionsDiv.innerHTML = '';
+        currentFocus = -1;
+
+        if (!searchTerm) {
+            suggestionsDiv.style.display = 'none';
+            hiddenInput.value = '';
+            return;
+        }
+
+        const filtered = patientData.filter(patient => {
+            return patient.patient_name.toLowerCase().includes(searchTerm) ||
+                   patient.id.toString().includes(searchTerm) ||
+                   (patient.mobileno && patient.mobileno.includes(searchTerm));
+        });
+
+        if (filtered.length > 0) {
+            filtered.forEach(patient => {
+                const div = document.createElement('div');
+                div.className = 'autocomplete-suggestion';
+                div.innerHTML = `
+                    <div class="suggestion-name">${patient.patient_name}</div>
+                    <div class="suggestion-details">ID: ${patient.id} | Mobile: ${patient.mobileno || 'N/A'}</div>
+                `;
+                div.addEventListener('click', function() {
+                    searchInput.value = patient.patient_name;
+                    hiddenInput.value = patient.id;
+                    suggestionsDiv.style.display = 'none';
+                    loadPatientVisits(patient.id);
+                });
+                suggestionsDiv.appendChild(div);
+            });
+            suggestionsDiv.style.display = 'block';
+        } else {
+            suggestionsDiv.style.display = 'none';
+        }
+    });
+
+    searchInput.addEventListener('keydown', function(e) {
+        handleKeyNavigation(e, suggestionsDiv);
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.autocomplete-container')) {
+            suggestionsDiv.style.display = 'none';
+        }
+    });
+}
+
+function handleKeyNavigation(e, suggestionsDiv) {
+    const suggestions = suggestionsDiv.querySelectorAll('.autocomplete-suggestion');
+    if (e.keyCode === 40) { // Down
+        currentFocus++;
+        updateHighlight(suggestions);
+        e.preventDefault();
+    } else if (e.keyCode === 38) { // Up
+        currentFocus--;
+        updateHighlight(suggestions);
+        e.preventDefault();
+    } else if (e.keyCode === 13) { // Enter
+        e.preventDefault();
+        if (currentFocus > -1 && suggestions[currentFocus]) {
+            suggestions[currentFocus].click();
+        }
+    }
+}
+
+function updateHighlight(suggestions) {
+    suggestions.forEach((s, i) => {
+        s.classList.remove('highlighted');
+        if (i === currentFocus) {
+            s.classList.add('highlighted');
+        }
+    });
+    if (currentFocus >= suggestions.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = suggestions.length - 1;
+}
+
+// Load patient visits
+function loadPatientVisits(patientId) {
+    const tbody = document.getElementById('testTableBody');
+    tbody.innerHTML = '<tr><td colspan="10" class="text-center">Loading...</td></tr>';
+    
+    const url = `{{ url('/doctor-visit/api/patient-visits') }}/${patientId}`;
+    
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            tbody.innerHTML = '';
+            
+            if (data && data.length > 0) {
+                data.forEach(visit => {
+                    const row = document.createElement('tr');
+                    const doctorName = visit.doctor ? `Dr. ${visit.doctor.name} ${visit.doctor.surname || ''}` : 'N/A';
+                    const visitType = visit.charge ? visit.charge.name : 'N/A';
+                    
+                    // Format visit_date to dd/mm/yyyy
+                    let visitDate = 'N/A';
+                    if (visit.visit_date) {
+                        const date = new Date(visit.visit_date);
+                        if (!isNaN(date.getTime())) {
+                            const day = String(date.getDate()).padStart(2, '0');
+                            const month = String(date.getMonth() + 1).padStart(2, '0');
+                            const year = date.getFullYear();
+                            visitDate = `${day}/${month}/${year}`;
+                        }
+                    }
+                    
+                    const visitTime = visit.visit_time || 'N/A';
+                    
+                    // Format entryDate (created_at) to dd/mm/yyyy
+                    let entryDate = 'N/A';
+                    if (visit.created_at) {
+                        const date = new Date(visit.created_at);
+                        if (!isNaN(date.getTime())) {
+                            const day = String(date.getDate()).padStart(2, '0');
+                            const month = String(date.getMonth() + 1).padStart(2, '0');
+                            const year = date.getFullYear();
+                            entryDate = `${day}/${month}/${year}`;
+                        }
+                    }
+                    
+                    row.innerHTML = `
+                        <td>${doctorName}</td>
+                        <td>₹${parseFloat(visit.rate || 0).toFixed(2)}</td>
+                        <td>${visit.no_of_visit || 0}</td>
+                        <td>₹${parseFloat(visit.amount || 0).toFixed(2)}</td>
+                        <td>₹${parseFloat(visit.doctor_pay_amount || 0).toFixed(2)}</td>
+                        <td>${visitDate}</td>
+                        <td>${visitTime}</td>
+                        <td>${entryDate}</td>
+                        <td>${visitType}</td>
+                        <td>Action</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">No previous visits found</td></tr>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading patient visits:', error);
+            tbody.innerHTML = '<tr><td colspan="10" class="text-center text-danger">Error loading visits</td></tr>';
+        });
+}
+
+</script>
 
 @endsection
