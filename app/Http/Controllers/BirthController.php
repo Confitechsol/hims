@@ -50,9 +50,9 @@ class BirthController extends Controller
         }
         $birthReports = $query->paginate($perPage);
         $doctors = Doctor::where('is_active',1)->select('id','name')->get();
-        $hospitals = Hospital::where('is_active',1)->select('hospital_id','name')->firstOrFail();
+        $hospital = Hospital::where('is_active',1)->select('hospital_id','name')->first();
     // return response()->json($birthReports, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
-     return view('admin.birthordeath.index', compact('birthReports','doctors','hospitals'));
+     return view('admin.birthordeath.index', compact('birthReports','doctors','hospital'));
 
 //     return response()->json([
 //     'birthReports' => $birthReports,
@@ -84,10 +84,12 @@ class BirthController extends Controller
             'father_address' => 'required|string|max:255',
             'father_blood_group' => 'nullable|string|max:10',
             'father_age' => 'required|string|max:255',
-            'hospital_id' => 'required|exists:hospital,hospital_id',
+            
 
 
         ]);
+
+        $hospitals = Hospital::where('is_active',1)->select('hospital_id','name')->firstOrFail();
 
     
         if ($request->hasFile('baby_image')) {
@@ -139,7 +141,7 @@ class BirthController extends Controller
             'father_blood_group' => $validated['father_blood_group'],
             'doctor_id' => $validated['doctor'],
             'father_age' => $validated['father_age'],
-            'hospital_id' => $validated['hospital_id'],
+            'hospital_id' => $hospitals->hospital_id,
 
         ]);
 

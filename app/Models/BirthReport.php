@@ -59,10 +59,9 @@ class BirthReport extends Model
         return $this->belongsTo(Doctor::class, 'doctor_id'); // 'doctor_id' is your column in birth_reports
     }
 
-    // app/Models/BirthReport.php
     public function hospital()
-    {
+{
     return $this->belongsTo(Hospital::class, 'hospital_id', 'hospital_id');
-    }
+}
 
 }

@@ -320,7 +320,7 @@
                                                                                                                                     <h2>Authentication</h2>
                                                                                                                                     <div class="seal-section">
                                                                                                                                         <div class="sign-box">{{ $report->doctor->name ?? 'N/A' }}<br></div>
-                                                                                                                                        <div class="seal-box">Samaritan Hospital</div>
+                                                                                                                                        <div class="seal-box"> {{ $report->hospital->name ?? ($hospital->name ?? 'N/A') }}</div>
                                                                                                                                     </div>
                                                                                                                                 </div>
                                                                                                                                 </div>
@@ -518,14 +518,7 @@ function loadBirthCertDesign(birthId) {
 
          [ 'name' => 'doctor', 'label' => 'Doctors', 'type' => 'select', 'required' => true, 'options' => $doctors->pluck('name','id')->toArray(),  'size' => '5'],
      
-        [
-                'name' => 'hospital_id',
-                'label' => 'Hospital',
-                'type' => 'hidden',
-                'required' => true,
-                'options' => isset($hospitals) ? [$hospitals->hospital_id => $hospitals->name] : [],
-                'size' => '5',
-            ],
+       
 
 
 
