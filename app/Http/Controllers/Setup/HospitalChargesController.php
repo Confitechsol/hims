@@ -116,17 +116,23 @@ class HospitalChargesController extends Controller
         }
         return redirect()->back()->with("success",$charge->name." Charge Updated Sucessfully!");
     }
-    public function destroy(Request $request){
+    public function destroy(Request $request)
+    {
         $request->validate([
-            'id'=>'required|exists:charges,id',
+            'id' => 'required|exists:charges,id',
         ]);
-        $id = $request->id;
-        $charge = Charge::find($id);
+
+        $charge = Charge::findOrFail($request->id);
+
+        // Soft delete related organisation charges
+        OrganisationsCharge::where('charge_id', $charge->id)->delete();
+
+        // Soft delete main charge
         $charge->delete();
-        $organisations_charge = OrganisationsCharge::where('charge_id',$id)->get();
-        foreach($organisations_charge as $org_charge){
-            $org_charge->delete();
-        }
-        return redirect()->back()->with("success",$charge->name." Charge Deleted Sucessfully!");
+
+        return redirect()->back()->with(
+            'success',
+            $charge->name . ' Charge Deleted Successfully!'
+        );
     }
 }

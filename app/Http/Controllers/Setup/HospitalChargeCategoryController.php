@@ -50,7 +50,8 @@ class HospitalChargeCategoryController extends Controller
     
     }
 
-    public function destroy(Request $request){
+    public function destroy(Request $request)
+    {
             $validator = $request->validate ([
                 'id'=>'required'
             ]);

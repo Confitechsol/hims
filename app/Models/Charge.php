@@ -6,11 +6,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\ChargeTypeMaster;
 use App\Models\ChargeCategory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 class Charge extends Model
 {
     use HasFactory;
 
     protected $table = 'charges';
+
+    use SoftDeletes;
 
     protected $fillable = [
         'hospital_id',
