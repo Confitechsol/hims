@@ -353,6 +353,7 @@ Route::middleware(['admin'])->group(function () {
 Route::prefix('doctor-visit')->group(function () {
     Route::get('/create', [DoctorVisitController::class, 'create'])->name('doctor-visit.create');
     Route::post('/store', [DoctorVisitController::class, 'store'])->name('doctor-visit.store');
+    Route::get('/api/patient-visits/{patientId}', [DoctorVisitController::class, 'getPatientVisits'])->name('doctor-visit.api.patient-visits');
 
 
 });
