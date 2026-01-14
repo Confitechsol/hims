@@ -245,7 +245,8 @@
 
                                             <td>{{ number_format($appointment->discount_percentage ?? 0, 2) }}</td>
 
-                                            <td>{{ number_format($appointment->amount ?? 0, 2) }}</td>
+                                            <td>{{ number_format((float) preg_replace('/[^0-9.]/', '', $appointment->amount ?? 0), 2) }}</td>
+
 
                                             <td>
                                                 @if($appointment->appointment_status === 'confirmed')

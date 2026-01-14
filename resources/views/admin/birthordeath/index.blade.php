@@ -33,33 +33,8 @@
                                             {{ session('success') }}
                                         </div>
                                     @endif
-                                    {{-- <div
-                                    class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
-                                            <div class="d-flex align-items-center">
-                                                <div class="input-icon-start position-relative me-2">
-                                                    <span class="input-icon-addon">
-                                                        <i class="ti ti-search"></i>
-                                                    </span>
-                                                    <input onkeyup="dataSearch()" type="text" id="language-search" name="search"
-                                                         class="form-control shadow-sm"
-                                                        placeholder="Search">
-                                                </div>
-                                               
-                                            </div>
-                
-                                    <div class="d-flex align-items-center flex-wrap gap-2">
-                                        <div class="text-end d-flex">
-                                            <a href="javascript:void(0);"
-                                                class="btn btn-primary text-white ms-2 btn-md"
-                                                data-bs-toggle="modal" data-bs-target="#add_tpa"><i
-                                                    class="ti ti-plus me-1"></i>Add Expense</a>
-                                        </div>
-                                        <!-- First Modal -->
-                                        
-                                    </div>
-
-                                </div> --}}
-                                    <x-table-actions.actions id="birth" name="Birth Record" />
+                                   
+                                    <x-table-actions.actions id="birth" name="Birth Record" doctors={{$doctors}} />
                                     <!-- Table start -->
                                     <div class="table-responsive table-nowrap">
                                         <table class="table" id="birth">
@@ -314,7 +289,7 @@
                                                                                                                                         </div>
                                                                                                                                         <div class="col">
                                                                                                                                             <label>Age</label>
-                                                                                                                                            <div class="line-data">--</div>
+                                                                                                                                            <div class="line-data">{{ $report->father_age }}</div>
                                                                                                                                         </div>
                                                                                                                                     </div>
                                                                                                                                     <label>Address</label>
@@ -326,7 +301,7 @@
                                                                                                                                         </div>
                                                                                                                                         <div class="col">
                                                                                                                                             <label>Blood Group</label>
-                                                                                                                                            <div class="line-data">O+</div>
+                                                                                                                                            <div class="line-data">{{ $report->father_blood_group }}</div>
                                                                                                                                         </div>
                                                                                                                                     </div>
                                                                                                                                     <h2>Informant Details</h2>
@@ -344,8 +319,8 @@
                                                                                                                                     <div class="line-data">{{ isset($report->created_at) ? \Carbon\Carbon::parse($report->created_at)->format('d F Y') : '--' }}</div>
                                                                                                                                     <h2>Authentication</h2>
                                                                                                                                     <div class="seal-section">
-                                                                                                                                        <div class="sign-box">Dr. Ananya Gupta<br><br>MBBS, MD (Pediatrics)</div>
-                                                                                                                                        <div class="seal-box">Sunrise Multispeciality Hospital Seal</div>
+                                                                                                                                        <div class="sign-box">{{ $report->doctor->name ?? 'N/A' }}<br></div>
+                                                                                                                                        <div class="seal-box"> {{ $report->hospital->name ?? ($hospital->name ?? 'N/A') }}</div>
                                                                                                                                     </div>
                                                                                                                                 </div>
                                                                                                                                 </div>
@@ -463,7 +438,7 @@ function loadBirthCertDesign(birthId) {
                 'label' => 'Child Name',
                 'type' => 'text',
                 'required' => true,
-                'size' => '5',
+                'size' => '8',
             ],
             [ 'name' => 'gender', 'label' => 'Gender', 'type' => 'select', 'required' => true, 'options' => [     'Male' => 'Male',   'Female' => 'Female' ], 'size' => '3'],
 
@@ -474,6 +449,7 @@ function loadBirthCertDesign(birthId) {
             ['name' => 'contact_person_phone', 'label' => 'Phone','required' => true, 'type' => 'text',  'size' => '6'],
             ['name' => 'address', 'label' => 'Address', 'type' => 'text',  'size' => '12'],
             ['name' => 'caseId', 'label' => 'Case Id', 'type' => 'text',  'size' => '6'],
+            ['name' => 'patient_id', 'label' => 'Patient Id', 'type' => 'text',  'size' => '6'],
            [
                 'name' => 'mother_name',
                 'label' => 'Mother Name ',
@@ -481,6 +457,13 @@ function loadBirthCertDesign(birthId) {
                 'required' => true,
                 'size' => '5',
             ],
+            {{-- [
+                'name' => 'mother_address',
+                'label' => 'Mother Address',
+                'type' => 'text',
+                'required' => false,
+                'size' => '5',
+            ], --}}
             ['name' => 'mother_image', 'label' => 'Mother Photo', 'type' => 'file', 'required' => false, 'size' => '6',],
             
             [
@@ -490,6 +473,30 @@ function loadBirthCertDesign(birthId) {
                 'required' => true,
                 'size' => '5',
             ],
+            [
+                'name' => 'father_address',
+                'label' => 'Father Address',
+                'type' => 'text',
+                'required' => true,
+                'size' => '5',
+            ],
+
+            [
+                'name' => 'father_blood_group',
+                'label' => 'Father Blood Group',
+                'type' => 'text',
+                'required' => false,
+                'size' => '5',
+            ],
+             
+            [
+                'name' => 'father_age',
+                'label' => 'Father Age',
+                'type' => 'text',
+                'required' => true,
+                'size' => '5',
+            ],
+
             ['name' => 'father_image', 'label' => 'Father Photo', 'type' => 'file', 'required' => false, 'size' => '6',],
             
             [
@@ -508,7 +515,16 @@ function loadBirthCertDesign(birthId) {
                 'type' => 'text',
                 'size' => '5',
             ],
-            [ 'name' => 'doctor', 'label' => 'Doctors', 'type' => 'select', 'required' => true, 'options' => $doctors->pluck('name','id')->toArray(),  'size' => '5'],
+
+         [ 'name' => 'doctor', 'label' => 'Doctors', 'type' => 'select', 'required' => true, 'options' => $doctors->pluck('name','id')->toArray(),  'size' => '5'],
+     
+       
+
+
+
+
+
+
            
         ]" :columns="4" />
     <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Birth"

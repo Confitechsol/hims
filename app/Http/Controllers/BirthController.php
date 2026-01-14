@@ -8,6 +8,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 use App\Models\Doctor;
+use App\Models\Hospital;
 
 class BirthController extends Controller
 {
@@ -34,7 +35,9 @@ class BirthController extends Controller
         if ($perPage <= 0) {
             $perPage = 5;
         }
-        $query = BirthReport::with(['patient']);
+       // $query = BirthReport::with(['patient']);
+       $query = BirthReport::with(['patient', 'doctor','hospital']);
+
         if ($request->has('search')) {
             $search_term = $request->search;
             $query->where(function ($q) use ($search_term) {
@@ -47,8 +50,16 @@ class BirthController extends Controller
         }
         $birthReports = $query->paginate($perPage);
         $doctors = Doctor::where('is_active',1)->select('id','name')->get();
-        //return response()->json($birthReports, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);~
-        return view('admin.birthordeath.index', compact('birthReports','doctors'));
+        $hospital = Hospital::where('is_active',1)->select('hospital_id','name')->first();
+    // return response()->json($birthReports, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
+     return view('admin.birthordeath.index', compact('birthReports','doctors','hospital'));
+
+//     return response()->json([
+//     'birthReports' => $birthReports,
+//     'doctors' => $doctors,
+//     'hospitals' => $hospitals
+// ], 200);
+
     }
 
     public function create(Request $request)
@@ -69,7 +80,16 @@ class BirthController extends Controller
             'father_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'report_image' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:4096',
             'icd_code' => 'required|string|max:255',
+            'doctor' => 'required|exists:doctor,id',
+            'father_address' => 'required|string|max:255',
+            'father_blood_group' => 'nullable|string|max:10',
+            'father_age' => 'required|string|max:255',
+            
+
+
         ]);
+
+        $hospitals = Hospital::where('is_active',1)->select('hospital_id','name')->firstOrFail();
 
     
         if ($request->hasFile('baby_image')) {
@@ -117,6 +137,12 @@ class BirthController extends Controller
             'document' => $report_image,
             'is_active' => 1,
             'icd_code' => $validated['icd_code'] ?? null,
+            'father_address' => $validated['father_address'],
+            'father_blood_group' => $validated['father_blood_group'],
+            'doctor_id' => $validated['doctor'],
+            'father_age' => $validated['father_age'],
+            'hospital_id' => $hospitals->hospital_id,
+
         ]);
 
         return redirect()->back()->with('success', 'Birth Record added successfully!');
