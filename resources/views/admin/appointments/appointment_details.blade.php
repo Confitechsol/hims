@@ -75,7 +75,7 @@
                                                         <div class="row align-items-center gy-3">
                                                             <div class="col-md-3">
                                                                 <label for="doctor" class="form-label">Doctor <span class="text-danger">*</span></label>
-                                                                <select class="form-select" id="inputGroupSelect01" name="doctor" required>
+                                                                <select class="form-select" id="doctor" name="doctor" required>
                                                                     <option value="">Select Doctor</option>
                                                                     @foreach($doctors as $doctor)
                                                                         <option value="{{ $doctor->id }}" >
@@ -589,7 +589,7 @@
 $(document).ready(function() {
 
      $('#doctor').change(function () {
-        alert('hi');
+        //alert('hi');
         // When doctor is selected, get default charge_category_id = 1
         $.ajax({
             url: '{{ route("appointments.getDoctorFees") }}',
