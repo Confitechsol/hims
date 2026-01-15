@@ -25,6 +25,8 @@ return new class extends Migration
             $table->string('e_card_no', 200)->index();
             $table->string('e_card_upload', 200)->index();
             $table->timestamps();
+            $table->softDeletes();
+            
         });
     }
 

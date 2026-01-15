@@ -399,7 +399,7 @@ class OpdController extends Controller
     public function getCharges(Request $request, $id)
     {
         // dd($id);
-        $charges = Charge::with('taxCategory')->where('charge_category_id', $id)->get();
+        $charges = Charge::with('taxCategory')->where('charge_category_id', $id)->whereNull('deleted_at')->get();
         // dd($charges);
         return response()->json($charges, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
     }
@@ -597,7 +597,7 @@ class OpdController extends Controller
 
     public function getChargeTypes(Request $request)
     {
-        $chargeTypes = ChargeTypeMaster::all();
+        $chargeTypes = ChargeTypeMaster::whereNotIn('charge_type', ['IPD', 'OPD'])->get();
         return response()->json($chargeTypes, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
     }
     public function getChargeCategoriesByTypeId(Request $request, $id)

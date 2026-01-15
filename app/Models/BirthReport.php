@@ -33,6 +33,10 @@ class BirthReport extends Model
         'is_active',
         'mother_name',
         'icd_code',
+        'doctor_id',
+        'father_address',
+        'father_blood_group',
+        'father_age',
     ];
 
     protected $casts = [
@@ -49,4 +53,15 @@ class BirthReport extends Model
     {
         return $this->belongsTo(CaseModel::class, 'case_reference_id'); // Assuming CaseModel is the model
     }
+
+      public function doctor()
+    {
+        return $this->belongsTo(Doctor::class, 'doctor_id'); // 'doctor_id' is your column in birth_reports
+    }
+
+    public function hospital()
+{
+    return $this->belongsTo(Hospital::class, 'hospital_id', 'hospital_id');
+}
+
 }
