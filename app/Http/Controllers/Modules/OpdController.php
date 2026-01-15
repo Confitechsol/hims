@@ -32,6 +32,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Pathology;
+use App\Models\Radio;
 
 class OpdController extends Controller
 {
@@ -451,6 +453,7 @@ class OpdController extends Controller
         $labInvestigations = PathologyReport::with('pathology')->where('patient_id', $opd->patient->id)->get();
         // $opdVisits         = OpdVisits::with('patient', 'opd.doctor')->where('opd_id', $id)->get();
         $opdVisits   = VisitDetail::with('opdDetail', 'doctor')->where('opd_details_id', $id)->get();
+        $opdPrescriptions  = OpdPrescription::where('opd_id', $id)->get();
         $opdSymptoms = [];
         foreach ($opdVisits as $opdDetail) {
             // Split comma-separated symptom IDs and clean up
@@ -467,14 +470,17 @@ class OpdController extends Controller
             // Store in array using OPD number as key
             $opdSymptoms[$opdDetail->opd_no] = $symptoms;
         }
+        $pathologies = Pathology::all();
+        $radiologies = Radio::all();
         // Store in array using OPD number as key
-        return view('admin.opd.opd_view', compact('opd', 'symptoms', 'vitals', 'vitalDetails', 'pharmacyDetails', 'medDosages', 'dosages', 'PatientTimelines', 'medicineCategories', 'medicationReport', 'operationDetail', 'opdCharges', 'labInvestigations', 'opdVisits', 'opdSymptoms'));
+        return view('admin.opd.opd_view', compact('opd', 'symptoms', 'vitals', 'vitalDetails', 'pharmacyDetails', 'medDosages', 'dosages', 'PatientTimelines', 'medicineCategories', 'medicationReport', 'operationDetail', 'opdCharges', 'labInvestigations', 'opdVisits', 'opdSymptoms','opdPrescriptions','pathologies','radiologies'));
     }
 
     public function storePrescription(Request $request)
     {
         // dd($request->all());
-        try { $request->validate([
+        // try {
+            $request->validate([
             'opd_id'              => 'nullable|string',
             'header_note'         => 'nullable|string',
             'footer_note'         => 'nullable|string',
@@ -490,6 +496,8 @@ class OpdController extends Controller
             'radiology.*'         => 'string',
             'visible'             => 'nullable|array',
             'visible.*'           => 'string',
+            'medicine_categories' =>'nullable|array',
+            'medicine_categories.*' =>'string',
             'medicines'           => 'nullable|array',
             'medicines.*'         => 'string',
             'dosages'             => 'nullable|array',
@@ -524,22 +532,24 @@ class OpdController extends Controller
                 'radiology_id'        => $implodedRadiologies,
                 'notification_to'     => $implodedVisibles,
             ]);
-
+            if ($request->filled('medicines')) {
             foreach ($request->medicines as $i => $med) {
 
                 OpdMedicine::create([
                     "prescription_id"    => $prescription->id,
                     "pharmacy_id"        => intval($med),
-                    "medicine_dosage_id" => intval($request->dosages[$i]), //$input['hsn_code'][$i],
-                    "dose_interval_id"   => intval($request->interval_dosages[$i]),
-                    "dose_duration_id"   => intval($request->duration_dosages[$i]),
-                    "instruction"        => $request->instructions[$i],
+                    "medicine_dosage_id" => intval($request->dosages[$i] ?? 0),
+                    "dose_interval_id"   => intval($request->interval_dosages[$i] ?? 0),
+                    "dose_duration_id"   => intval($request->duration_dosages[$i] ?? 0),
+                    "instruction"        => $request->instructions[$i] ?? null,
                 ]);
             }
-            return redirect()->back()->with('success', 'Prescription created successfully.');} catch (Exception $e) {
-            // dd($e);
-            return back()->with('error', 'Something went wrong: ' . $e->getMessage());
         }
+            return redirect()->back()->with('success', 'Prescription created successfully.');
+        // } catch (Exception $e) {
+            // dd($e);
+            // return back()->with('error', 'Something went wrong: ' . $e->getMessage());
+        // }
     }
 
     public function createOpdMedication(Request $request)

@@ -39,7 +39,7 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center">
                                 <span class="avatar rounded-circle flex-shrink-0 p-2"><img
-                                        src="assets/img/icons/trustcare.svg" alt="img"></span>
+                                        src="{{asset('assets/img/icons/trustcare.svg')}}" alt="img"></span>
                                 <div class="ms-2">
                                     <h6 class="fs-14 fw-semibold mb-0">Trustcare
                                         Clinic</h6>
@@ -53,7 +53,7 @@
                         <div class="p-2">
                             <label class="dropdown-item d-flex align-items-center justify-content-between p-1">
                                 <span class="d-flex align-items-center">
-                                    <span class="me-2"><img src="assets/img/icons/clinic-01.svg" alt></span>
+                                    <span class="me-2"><img src="{{asset('assets/img/icons/clinic-01.svg')}}" alt></span>
                                     <span class="fw-semibold text-dark">CureWell
                                         Medical Hub<small class="d-block text-muted fw-normal fs-13">Ohio</small></span>
                                 </span>
@@ -61,7 +61,7 @@
                             </label>
                             <label class="dropdown-item d-flex align-items-center justify-content-between p-1">
                                 <span class="d-flex align-items-center">
-                                    <span class="me-2"><img src="assets/img/icons/clinic-02.svg" alt></span>
+                                    <span class="me-2"><img src="{{asset('assets/img/icons/clinic-02.svg')}}" alt></span>
                                     <span class="fw-semibold text-dark">Trustcare
                                         Clinic<small class="d-block text-muted fw-normal fs-13">Lasvegas</small></span>
                                 </span>
@@ -69,7 +69,7 @@
                             </label>
                             <label class="dropdown-item d-flex align-items-center justify-content-between p-1">
                                 <span class="d-flex align-items-center">
-                                    <span class="me-2"><img src="assets/img/icons/clinic-03.svg" alt></span>
+                                    <span class="me-2"><img src="{{asset('assets/img/icons/clinic-03.svg')}}" alt></span>
                                     <span class="fw-semibold text-dark">NovaCare
                                         Medical<small
                                             class="d-block text-muted fw-normal fs-13">Washington</small></span>
@@ -78,7 +78,7 @@
                             </label>
                             <label class="dropdown-item d-flex align-items-center justify-content-between p-1">
                                 <span class="d-flex align-items-center">
-                                    <span class="me-2"><img src="assets/img/icons/clinic-04.svg" alt></span>
+                                    <span class="me-2"><img src="{{asset('assets/img/icons/clinic-04.svg')}}" alt></span>
                                     <span class="fw-semibold text-dark">Greeny
                                         Medical Clinic<small
                                             class="d-block text-muted fw-normal fs-13">Illinios</small></span>

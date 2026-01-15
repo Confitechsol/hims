@@ -1026,3 +1026,11 @@ Route::get('/ipdDischargePatient', function () {
 
 Route::get('/discharge/pdf/{id}', [DischargePdfController::class, 'generate'])
     ->name('discharge.pdf');
+
+//OPD View
+// Route::post('/opd/add_prescription', [OpdController::class, 'storePrescription'])->name('opd.addPrescription');
+Route::get('/opd/prescription/{id}', [OpdController::class, 'showPrescription'])->name('opd.prescription.show');
+Route::get('/opd/prescription/{id}/edit', [OpdController::class, 'editPrescription'])->name('opd.prescription.edit');
+Route::get('/opd/prescription/{id}/print', [OpdController::class, 'printPrescription'])->name('opd.prescription.print');
+Route::put('/opd/prescription/{id}', [OpdController::class, 'updatePrescription'])->name('opd.prescription.update');
+Route::delete('/opd/prescription/{id}', [OpdController::class, 'deletePrescription'])->name('opd.prescription.delete');
