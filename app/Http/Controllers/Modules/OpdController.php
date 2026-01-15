@@ -36,6 +36,7 @@ use App\Models\Pathology;
 use App\Models\Radio;
 use App\Models\DoseInterval;
 use App\Models\DoseDuration;
+use Illuminate\Support\Facades\Log;
 
 class OpdController extends Controller
 {
@@ -482,8 +483,7 @@ class OpdController extends Controller
 
     public function storePrescription(Request $request)
     {
-        // dd($request->all());
-        // try {
+        Log::info('Prescription request data (before validation):', $request->all());
             $request->validate([
             'opd_id'              => 'nullable|string',
             'header_note'         => 'nullable|string',
@@ -500,31 +500,58 @@ class OpdController extends Controller
             'radiology.*'         => 'string',
             'visible'             => 'nullable|array',
             'visible.*'           => 'string',
-            'medicine_categories' =>'nullable|array',
-            'medicine_categories.*' =>'string',
-            'medicines'           => 'nullable|array',
-            'medicines.*'         => 'string',
-            'dosages'             => 'nullable|array',
-            'dosages.*'           => 'string',
-            'interval_dosages'    => 'nullable|array',
-            'interval_dosages.*'  => 'string',
-            'duration_dosages'    => 'nullable|array',
-            'duration_dosages.*'  => 'string',
-            'instructions'        => 'nullable|array',
-            'instructions.*'      => 'string',
+            'medicine_categories'     => 'nullable|array',
+            'medicine_categories.*'   => 'nullable|string',
+            'medicines'               => 'nullable|array',
+            'medicines.*'             => 'nullable|string',
+            'dosages'                 => 'nullable|array',
+            'dosages.*'               => 'nullable|string',            
+            'interval_dosages'        => 'nullable|array',
+            'interval_dosages.*'      => 'nullable|string',
+            'duration_dosages'        => 'nullable|array',
+            'duration_dosages.*'      => 'nullable|string',
+            'instructions'            => 'nullable|array',
+            'instructions.*'          => 'nullable|string',
         ]);
-            $findingTypes         = array_filter($request->finding_type, fn($type) => $type !== null && $type !== '');
-            $findings             = array_filter($request->findings, fn($title) => $title !== null && $title !== '');
-            $pathology_ids        = array_filter($request->pathology, fn($pathology) => $pathology !== null && $pathology !== '');
-            $radiology_ids        = array_filter($request->radiology, fn($radio) => $radio !== null && $radio !== '');
-            $notification_to      = array_filter($request->visible, fn($notify) => $notify !== null && $notify !== '');
+        // dd($request->all());
+            $findingTypes = array_filter($request->input('finding_type', []));
+            $findings     = array_filter($request->input('findings', []));
+            $pathology_ids = array_filter($request->input('pathology', []));
+            $radiology_ids = array_filter($request->input('radiology', []));
+            $notification_to = array_filter($request->input('visible', []));
             $implodedFindingTypes = implode(", ", $findingTypes);
             $implodedFindings     = implode(", ", $findings);
             $implodedPathologies  = implode(", ", $pathology_ids);
             $implodedRadiologies  = implode(", ", $radiology_ids);
             $implodedVisibles     = implode(", ", $notification_to);
+
+            // Handle file upload
+            $attachment     = null;
+            $attachmentName = null;
+            if ($request->hasFile('document')) {
+                $file           = $request->file('document');
+                $attachmentName = $file->getClientOriginalName();
+                $attachment     = $file->store('prescription_documents', 'public');
+            }
+
+            // Generate prescription number
+            $lastPrescription = OpdPrescription::orderBy('id', 'desc')->first();
+            if ($lastPrescription && preg_match('/OPDP(\d+)/', $lastPrescription->prescription_number, $matches)) {
+                $lastNumber = intval($matches[1]);
+            } else {
+                $lastNumber = 0;
+            }
+            $prescriptionPrefix = Prefix::where("type", 'opd_pre')->firstOrFail();
+            $nextNumber         = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+            $prescriptionNo     = $prescriptionPrefix->prefix . $nextNumber;
+
+            // Get user info for hospital_id and branch_id
+            $user = Auth::user();
+            
             $prescription         = OpdPrescription::create([
-                'opd_id'              => $request->opd_id,
+                'prescription_number' => "ipd",
+                'opd_id'              => $request->opd_id,                
+                'prescribed_by'       => $request->prescribe_by,
                 'header_note'         => $request->header_note ?? null,
                 'footer_note'         => $request->footer_note ?? null,
                 'finding_description' => $request->finding_description ?? null,
@@ -535,6 +562,8 @@ class OpdController extends Controller
                 'pathology_id'        => $implodedPathologies,
                 'radiology_id'        => $implodedRadiologies,
                 'notification_to'     => $implodedVisibles,
+                'attachment'          => $attachment,     // NEW
+                'attachment_name'     => $attachmentName, // NEW
             ]);
             if ($request->filled('medicines')) {
             foreach ($request->medicines as $i => $med) {
@@ -550,10 +579,6 @@ class OpdController extends Controller
             }
         }
             return redirect()->back()->with('success', 'Prescription created successfully.');
-        // } catch (Exception $e) {
-            // dd($e);
-            // return back()->with('error', 'Something went wrong: ' . $e->getMessage());
-        // }
     }
 
     public function createOpdMedication(Request $request)
