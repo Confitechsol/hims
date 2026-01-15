@@ -1001,13 +1001,23 @@
                                         </thead>
                                         <tbody>
                                             @foreach ($opdCharges as $charge)
-                                                @php
-                                                    $taxAmount =
-                                                        ($charge->charge->standard_charge *
-                                                            $charge->charge->taxCategory->percentage) /
-                                                        100;
-                                                    $amount = $charge->charge->standard_charge + $taxAmount;
-                                                @endphp
+                                            @php
+                                            $taxAmount = 'N/A';
+                                            $amount = 'N/A';
+                                    
+                                            if (
+                                                $charge->charge &&
+                                                $charge->chargeCategory &&
+                                                $charge->chargeCategory->chargeType &&
+                                                $charge->charge->taxCategory
+                                            ) {
+                                                $taxAmount =
+                                                    ($charge->charge->standard_charge *
+                                                        $charge->charge->taxCategory->percentage) / 100;
+                                    
+                                                $amount = $charge->charge->standard_charge + $taxAmount;
+                                            }
+                                        @endphp
                                                 <tr>
                                                     <td>
                                                         {{ $charge->charge->name ?? 'N/A' }}
@@ -1017,7 +1027,7 @@
                                                     </td>
                                                     <td class="text-right">{{ $charge->charge->standard_charge ?? 'N/A' }}</td>
                                                     <td class="text-right">
-                                                        ({{ $charge->charge->taxCategory->percentage }}%)
+                                                        ({{ $charge->charge->taxCategory ? $charge->charge->taxCategory->percentage . "%" : 'N/A'  }})
                                                         {{ $taxAmount }}
                                                     </td>
                                                     <td class="text-right">{{ $charge->charge->standard_charge  ?? 'N/A'}}</td>
@@ -2081,20 +2091,16 @@
                                                                 <td class="text-right">{{ $amount }}</td>
                                                             </tr> --}}
                                                             @foreach ($opdCharges as $charge)
-                                                                @php
-                                                                    $taxAmount =
-                                                                        ($charge->charge->standard_charge *
-                                                                            $charge->charge->taxCategory->percentage) /
-                                                                        100;
-                                                                    $discountAmount =
-                                                                        ($charge->charge->standard_charge *
-                                                                            $charge->discount) /
-                                                                        100;
-                                                                    $amount =
-                                                                        $charge->charge->standard_charge -
-                                                                        $discountAmount +
-                                                                        $taxAmount;
-                                                                @endphp
+                                                            @php
+                                                                $standardCharge = $charge->charge->standard_charge ?? 0;
+                                                                $taxPercentage = $charge->charge->taxCategory->percentage ?? 0;
+                                                                $discountPercentage = $charge->discount ?? 0;
+                                                        
+                                                                $taxAmount = ($standardCharge * $taxPercentage) / 100;
+                                                                $discountAmount = ($standardCharge * $discountPercentage) / 100;
+                                                        
+                                                                $amount = $standardCharge - $discountAmount + $taxAmount;
+                                                            @endphp
                                                                 <tr>
                                                                     <td>
                                                                         {{ \Carbon\Carbon::parse($charge->created_at)->format('d-M-Y') }}
@@ -2108,9 +2114,9 @@
                                                                     <td>{{ $charge->charge->standard_charge ?? 'N/A' }}</td>
                                                                     <td>{{ $charge->charge->standard_charge ?? 'N/A' }}</td>
                                                                     <td>0.00</td>
-                                                                    <td>{{ $discountAmount }}&nbsp;({{ $charge->discount }}%)
+                                                                    <td>{{ $discountAmount }}&nbsp;({{ $discountPercentage }}%)
                                                                     </td>
-                                                                    <td>{{ $taxAmount }}&nbsp;({{ $charge->charge->taxCategory->percentage }}%)
+                                                                    <td>{{ $taxAmount }}&nbsp;({{ $taxPercentage }}%)
                                                                     </td>
                                                                     <td>{{ $amount }}</td>
                                                                     <td>

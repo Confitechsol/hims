@@ -34,6 +34,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Pathology;
 use App\Models\Radio;
+use App\Models\DoseInterval;
+use App\Models\DoseDuration;
 
 class OpdController extends Controller
 {
@@ -472,8 +474,10 @@ class OpdController extends Controller
         }
         $pathologies = Pathology::all();
         $radiologies = Radio::all();
+        $doseIntervals = DoseInterval::select('id', 'name')->get();
+        $doseDurations  = DoseDuration::select('id', 'name')->get();
         // Store in array using OPD number as key
-        return view('admin.opd.opd_view', compact('opd', 'symptoms', 'vitals', 'vitalDetails', 'pharmacyDetails', 'medDosages', 'dosages', 'PatientTimelines', 'medicineCategories', 'medicationReport', 'operationDetail', 'opdCharges', 'labInvestigations', 'opdVisits', 'opdSymptoms','opdPrescriptions','pathologies','radiologies'));
+        return view('admin.opd.opd_view', compact('opd', 'symptoms', 'vitals', 'vitalDetails', 'pharmacyDetails', 'medDosages', 'dosages', 'PatientTimelines', 'medicineCategories', 'medicationReport', 'operationDetail', 'opdCharges', 'labInvestigations', 'opdVisits', 'opdSymptoms','opdPrescriptions','pathologies','radiologies','doseIntervals','doseDurations'));
     }
 
     public function storePrescription(Request $request)

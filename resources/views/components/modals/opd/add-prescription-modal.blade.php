@@ -361,15 +361,18 @@
             </div>
 
             <!-- Modal Body (scrollable area provided by modal-dialog-scrollable) -->
-            <form action="{{ route('opd.addPrescription') }}" id="prescriptionForm" method="post" enctype="multipart/form-data">@csrf
+            <form action="{{ route('opd.addPrescription') }}" id="prescriptionForm" method="post"
+                enctype="multipart/form-data">@csrf
                 <div class="modal-body" style="max-height: calc(100vh - 160px); overflow-x:hiden;">
                     <div class="row p-4 mx-1">
                         <div class="col-sm-9">
                             <div class="ptt10">
                                 <div class="row">
                                     <div class="col-sm-12">
-                                        <input type="hidden" id="opd_id" name="opd_id" value="{{ isset($opd) ? $opd->id : '' }}">
-                                        <input type="hidden" id="ipd_id" name="ipd_id" value="{{ isset($ipd) ? $ipd->id : '' }}">
+                                        <input type="hidden" id="opd_id" name="opd_id"
+                                            value="{{ isset($opd) ? $opd->id : '' }}">
+                                        <input type="hidden" id="ipd_id" name="ipd_id"
+                                            value="{{ isset($ipd) ? $ipd->id : '' }}">
                                         <div class="form-group">
                                             <label class="form-label">Header Note</label>
                                             <div class="toolbar" id="toolbar">
@@ -404,8 +407,8 @@
                                                 <div class="col-md-3">
                                                     <label for="finding_type" class="form-label">Finding
                                                         Category</label>
-                                                    <select class="form-select select2-input"
-                                                        name="finding_type[]" id="finding_type" multiple>
+                                                    <select class="form-select select2-input" name="finding_type[]"
+                                                        id="finding_type" multiple>
                                                         <option value="1">General Examination</option>
                                                         <option value="2">Vitals</option>
                                                         <option value="3">Cardiovascular System</option>
@@ -416,8 +419,8 @@
                                                 <div class="col-md-3">
                                                     <label for="filterinput" class="form-label">
                                                         Finding List</label>
-                                                    <select class="form-control select2-input"
-                                                        name="findings[]" id="finding" multiple>
+                                                    <select class="form-control select2-input" name="findings[]"
+                                                        id="finding" multiple>
                                                         <option value="1">General Examination</option>
                                                         <option value="2">Vitals</option>
                                                         <option value="3">Cardiovascular System</option>
@@ -433,7 +436,8 @@
                                                 <div class="col-md-3">
                                                     <label for="finding_print" class="form-label">Finding Print
                                                     </label><br><input type="checkbox" name="finding_print"
-                                                        id="finding_print" rows="15" value="yes" checked="">
+                                                        id="finding_print" rows="15" value="yes"
+                                                        checked="">
                                                 </div>
                                             </div>
 
@@ -445,8 +449,13 @@
                                                     <div>
                                                         <label class="form-label">Medicine Category</label>
                                                         <select class="form-control medicine_category"
-                                                            style="width:100%" name="medicine_categories[]" data-select2-initialized="false">
+                                                            style="width:100%" name="medicine_categories[]"
+                                                            data-select2-initialized="false">
                                                             <option value="">Select</option>
+                                                            @foreach ($medicineCategories as $category)
+                                                                <option value="{{ $category->id }}">
+                                                                    {{ $category->medicine_category }}</option>
+                                                            @endforeach
                                                         </select>
                                                     </div>
                                                 </div>
@@ -480,7 +489,10 @@
                                                             id="interval_dosage_1" name="interval_dosages[]"
                                                             style="width:100%">
                                                             <option value="">Select</option>
-
+                                                            @foreach ($doseIntervals as $interval)
+                                                                <option value="{{ $interval->id }}">
+                                                                    {{ $interval->name }}</option>
+                                                            @endforeach
                                                         </select>
                                                     </div>
                                                 </div>
@@ -492,7 +504,10 @@
                                                             id="duration_dosage_1" name="duration_dosages[]"
                                                             style="width:100%">
                                                             <option value="">Select</option>
-
+                                                            @foreach ($doseDurations as $duration)
+                                                                <option value="{{ $duration->id }}">
+                                                                    {{ $duration->name }}</option>
+                                                            @endforeach
                                                         </select>
                                                     </div>
                                                 </div>
@@ -523,7 +538,7 @@
                                         <hr>
                                         <div class="form-group mt-2">
                                             <label class="form-label">Advice</label>
-                                            
+
 
                                             <textarea id="advice" name="advice" contenteditable="true" class="editor-area w-100" name="header_note"></textarea>
                                             <hr>
@@ -571,10 +586,11 @@
                                 <div class="col-sm-12">
                                     <div class="form-group">
                                         <label class="form-label">Pathology Tests</label>
-                                        <select class="form-control select2-input" name="pathology[]" id="pathologyOpt" multiple style="width: 100%;">
+                                        <select class="form-control select2-input" name="pathology[]"
+                                            id="pathologyOpt" multiple style="width: 100%;">
                                             <option value="">Select Tests</option>
-                                            @if(isset($pathologies) && count($pathologies) > 0)
-                                                @foreach($pathologies as $pathology)
+                                            @if (isset($pathologies) && count($pathologies) > 0)
+                                                @foreach ($pathologies as $pathology)
                                                     <option value="{{ $pathology->id }}">
                                                         {{ $pathology->test_name }}{{ $pathology->short_name ? ' (' . $pathology->short_name . ')' : '' }}
                                                     </option>
@@ -586,10 +602,11 @@
                                 <div class="col-sm-12">
                                     <div class="form-group">
                                         <label class="form-label">Radiology Tests</label>
-                                        <select class="form-control select2-input" name="radiology[]" id="radiologyOpt" multiple style="width: 100%;">
+                                        <select class="form-control select2-input" name="radiology[]"
+                                            id="radiologyOpt" multiple style="width: 100%;">
                                             <option value="">Select Tests</option>
-                                            @if(isset($radiologies) && count($radiologies) > 0)
-                                                @foreach($radiologies as $radiology)
+                                            @if (isset($radiologies) && count($radiologies) > 0)
+                                                @foreach ($radiologies as $radiology)
                                                     <option value="{{ $radiology->id }}">
                                                         {{ $radiology->test_name }}{{ $radiology->short_name ? ' (' . $radiology->short_name . ')' : '' }}
                                                     </option>
@@ -600,14 +617,18 @@
                                 </div>
                                 <div class="col-sm-12">
                                     <div class="form-group">
-                                        <label class="form-label">Prescribe By <span class="text-danger">*</span></label>
-                                        <select class="form-control select2-input" style="width: 100%" name="prescribe_by" id="prescribe_by" required>
+                                        <label class="form-label">Prescribe By <span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-control select2-input" style="width: 100%"
+                                            name="prescribe_by" id="prescribe_by" required>
                                             <option value="">Select Doctor</option>
                                             @php
                                                 $doctors = \App\Models\Doctor::all();
                                             @endphp
-                                            @foreach($doctors as $doctor)
-                                                <option value="{{ $doctor->id }}">{{ $doctor->name }} ({{ $doctor->doctor_id ?? 'N/A' }})</option>
+                                            @foreach ($doctors as $doctor)
+                                                <option value="{{ $doctor->id }}">{{ $doctor->name }}
+                                                    ({{ $doctor->doctor_id ?? 'N/A' }})
+                                                </option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -695,3 +716,135 @@
         </div>
     </div>
 </div>
+<script>
+    function initSelect2InModal(context) {
+        $(context).find('.select2').select2({
+            placeholder: 'Select',
+            allowClear: true,
+            width: '100%',
+            dropdownParent: $('#addPrescriptionModal')
+        });
+    }
+    $('#addPrescriptionModal').on('shown.bs.modal', function() {
+        initSelect2InModal(this);
+    });
+    const getMedicines = "{{ route('getMedicines', ':id') }}";
+    const getDoses = "{{ route('getDoses', ':id') }}";
+    $(document).on('change', '.medicine_category', function() {
+        let row = $(this).closest('.medicine-row');
+        let categoryId = $(this).val();
+        let medicineSelect = row.find('.medicine_name');
+        let dosageSelect = row.find('.medicine_dosage');
+
+        medicineSelect.empty().append('<option value="">Select</option>');
+        dosageSelect.empty().append('<option value="">Select</option>');
+
+        if (!categoryId) return;
+        let url = getMedicines.replace(':id', categoryId);
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function(response) {
+                $.each(response, function(i, item) {
+                    medicineSelect.append(
+                        `<option value="${item.medicine_category_id}">${item.medicine_name}</option>`
+                    );
+                });
+                medicineSelect.trigger('change.select2');
+            }
+        });
+    });
+    $(document).on('change', '.medicine_name', function() {
+        let row = $(this).closest('.medicine-row');
+        let medicineId = $(this).val();
+        let dosageSelect = row.find('.medicine_dosage');
+
+        dosageSelect.empty().append('<option value="">Select</option>');
+
+        if (!medicineId) return;
+        let url = getDoses.replace(':id', medicineId);
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function(response) {
+                $.each(response, function(i, item) {
+                    dosageSelect.append(
+                        `<option value="${item.id}">${item.dosage}</option>`);
+                });
+                dosageSelect.trigger('change.select2');
+            }
+        });
+    });
+    $(document).ready(function() {
+
+        let rowCount = 1;
+
+        $('#addMedicineBtn').on('click', function() {
+            rowCount++;
+
+            let newRow = `
+    <div class="medicine-row row mt-3" data-row="${rowCount}" id="row${rowCount}">
+        <div class="col-lg-3">
+            <label class="form-label">Medicine Category</label>
+            <select class="form-control select2 medicine_category" name="medicine_categories[]">
+                <option value="">Select</option>
+                @foreach ($medicineCategories as $category)
+                <option value="{{ $category->id }}">{{ $category->medicine_category }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="col-lg-3">
+            <label class="form-label">Medicine</label>
+            <select class="form-control select2 medicine_name" name="medicines[]">
+                <option value="">Select</option>
+            </select>
+        </div>
+
+        <div class="col-lg-3">
+            <label class="form-label">Dose</label>
+            <select class="form-control select2 medicine_dosage" name="dosages[]">
+                <option value="">Select</option>
+            </select>
+        </div>
+
+        <div class="col-lg-3">
+            <label class="form-label">Dose Interval</label>
+            <select class="form-control select2" name="interval_dosages[]">
+                <option value="">Select</option>
+                @foreach ($doseIntervals as $interval)
+                <option value="{{ $interval->id }}">
+                {{ $interval->name }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="col-lg-3">
+            <label class="form-label">Dose Duration</label>
+            <select class="form-control select2" name="duration_dosages[]">
+                <option value="">Select</option>
+                @foreach ($doseDurations as $duration)
+                <option value="{{ $duration->id }}">
+                {{ $duration->name }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="col-lg-3">
+            <label class="form-label">Instruction</label>
+            <textarea name="instructions[]" class="form-control" style="height:28px;"></textarea>
+        </div>
+
+        <div class="col-lg-1 d-flex align-items-center">
+            <button type="button" class="btn btn-sm btn-danger delete_row">
+                <i class="fa fa-remove"></i>
+            </button>
+        </div>
+    </div>`;
+
+            $('#addMedicineContainer').before(newRow);
+
+            initSelect2InModal(`#row${rowCount}`);
+        });
+    });
+</script>
