@@ -32,7 +32,7 @@
                     <tbody>
                         @forelse($dosages as $dosage)
                         <tr>
-                            <td>{{ $dosage->category->category_name ?? 'N/A' }}</td>
+                            <td>{{ $dosage->category->medicine_category ?? 'N/A' }}</td>
                             <td>{{ $dosage->dosage }}</td>
                             <td>{{ $dosage->unit->unit_name ?? 'N/A' }}</td>
                             <td>
@@ -61,7 +61,7 @@
 </div>
 
 <!-- Add Dosage Modal -->
-<div class="modal fade" id="addDosageModal" tabindex="-1">
+<div class="modal fade use-select2" id="addDosageModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header" style="background: #CB6CE6; color: white;">
@@ -73,10 +73,10 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Medicine Category <span class="text-danger">*</span></label>
-                        <select name="medicine_category_id" class="form-select" required>
+                        <select name="medicine_category_id" class="form-select select2-input" required>
                             <option value="">Select</option>
                             @foreach($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->category_name }}</option>
+                                <option value="{{ $category->id }}">{{ $category->medicine_category }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -86,7 +86,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Unit <span class="text-danger">*</span></label>
-                        <select name="units_id" class="form-select" required>
+                        <select name="units_id" class="form-select select2-input" required>
                             <option value="">Select</option>
                             @foreach($units as $unit)
                                 <option value="{{ $unit->id }}">{{ $unit->unit_name }}</option>

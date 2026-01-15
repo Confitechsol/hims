@@ -1,10 +1,16 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
-
 <style>
     body {
         background-color: #f0f2f5;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
+
+    /* span.select2-selection.select2-selection--multiple {
+        display: none !important;
+    } */
+    /* span.select2 {
+        display: none !important;
+    } */
 
     .modal-backdrop.show {
         opacity: 0.6;
@@ -39,7 +45,7 @@
     }
 
     .patient-search {
-        background: rgba(255, 255, 255, 0.15);
+        /* background: rgba(255, 255, 255, 0.15); */
         border: 1px solid rgba(255, 255, 255, 0.3);
         /* color: white; */
         border-radius: 8px;
@@ -632,7 +638,8 @@
 </style>
 
 <!-- Modal -->
-<div class="modal fade" id="createIpdModal" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
+<div class="modal fade use-select2" id="createIpdModal" tabindex="-1" aria-labelledby="addSpecializationLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <form action="{{ route('ipd.store') }}" id="ipdForm" method="POST">
@@ -642,7 +649,7 @@
                     <div class="flex-grow-1">
                         <h5 class="modal-title mb-3">Patient Admission</h5>
                         <div class="d-flex gap-3 align-items-center">
-                            <select type="text" class="form-select patient-search flex-grow-1"
+                            <select type="text" class="form-select select2-input patient-search flex-grow-1"
                                 placeholder="Search patient by name or ID..." id="patient_select" name="patient_id">
                                 <option value="">Loading...</option>
                             </select>
@@ -674,7 +681,7 @@
                                         <i class="bi bi-person-circle"></i> Patient Name
                                     </div>
                                     <div class="info-value" id="patient_name_value">-</div>
-                                        
+
                                     <div class="info-label">
                                         <i class="bi bi-gender-ambiguous"></i> Gender
                                     </div>
@@ -730,7 +737,7 @@
                                         </div>
                                     </div>
                                     <div class="patient-info-grid-tpa">
-                                        
+
 
                                         <div class="info-label">TPA Code</div>
                                         <div class="info-value" id="patient_tpaCode_value">-</div>
@@ -823,16 +830,39 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Reference</label>
-                                <input type="text" class="form-control" name="reference"
-                                    placeholder="Enter reference">
+                                {{-- <input type="text" class="form-control" name="reference"
+                                    placeholder="Enter reference"> --}}
+                                <select name="reference" id="" class="form-select">
+                                    <option value="">Select Reference</option>
+                                    @foreach ($references as $reference)
+                                        <option value="{{ $reference }}">{{ $reference }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Consultant Doctor <span class="required">*</span></label>
-                                <select class="form-select" name="doctor_id" id="doctor_select">
+                                <label class="form-label">Consultant Doctor 1 <span class="required">*</span></label>
+                                <select class="form-select select2-input" name="doctor_id" id="doctor_select">
                                     <option value="">Loading...</option>
                                 </select>
                             </div>
-
+                            <div class="col-md-4">
+                                <label class="form-label">Consultant Doctor 2 <span class="required">*</span></label>
+                                <select class="form-select select2-input" name="doctor2_id" id="doctor2_select">
+                                    <option value="">Loading...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Consultant Doctor 3 <span class="required">*</span></label>
+                                <select class="form-select select2-input" name="doctor3_id" id="doctor3_select">
+                                    <option value="">Loading...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Consultant Doctor 4 <span class="required">*</span></label>
+                                <select class="form-select select2-input" name="doctor4_id" id="doctor4_select">
+                                    <option value="">Loading...</option>
+                                </select>
+                            </div>
 
                         </div>
                     </div>
@@ -1067,7 +1097,7 @@
 
 @include('components.modals.add-patients-modal')
 
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+{{-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> --}}
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -1114,125 +1144,134 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
 
-    const patientSection = document.querySelector(".patient-card");
-    patientSection.style.display = "none";
+        const patientSection = document.querySelector(".patient-card");
+        patientSection.style.display = "none";
 
-    const patientSelect = document.getElementById('patient_select');
-    const photo = document.getElementById('patient_photo');
-    const noImagePlaceholder = document.getElementById('no_image_placeholder');
+        const patientSelect = document.getElementById('patient_select');
+        const photo = document.getElementById('patient_photo');
+        const noImagePlaceholder = document.getElementById('no_image_placeholder');
 
-    patientSelect.innerHTML = '<option value="">Loading...</option>';
+        patientSelect.innerHTML = '<option value="">Loading...</option>';
 
-    fetch("{{ route('getPatients') }}")
-        .then(res => res.json())
-        .then(data => {
-            console.log("Patients Loaded:", data);
-            window.patientsData = data;
+        fetch("{{ route('getPatients') }}")
+            .then(res => res.json())
+            .then(data => {
+                console.log("Patients Loaded:", data);
+                window.patientsData = data;
 
-            patientSelect.innerHTML = '<option value="">Select</option>';
-            data.forEach(patient => {
-                const option = document.createElement('option');
-                option.value = patient.id;
-                option.textContent = patient.patient_name;
-                patientSelect.appendChild(option);
+                patientSelect.innerHTML = '<option value="">Select</option>';
+                data.forEach(patient => {
+                    const option = document.createElement('option');
+                    option.value = patient.id;
+                    option.textContent = patient.patient_name;
+                    patientSelect.appendChild(option);
+                });
+            })
+            .catch(err => {
+                console.error("Error fetching patients:", err);
+                patientSelect.innerHTML = '<option value="">Error loading options</option>';
             });
-        })
-        .catch(err => {
-            console.error("Error fetching patients:", err);
-            patientSelect.innerHTML = '<option value="">Error loading options</option>';
-        });
 
-    // When a patient is selected
-    patientSelect.addEventListener('change', function() {
+        // When a patient is selected
+        patientSelect.addEventListener('change', function() {
 
-        const selected = window.patientsData.find(p => p.id == this.value);
+            const selected = window.patientsData.find(p => p.id == this.value);
 
-        if (selected) {
-            console.log("Selected patient:", selected);
+            if (selected) {
+                console.log("Selected patient:", selected);
 
-            patientSection.style.display = 'block';
+                patientSection.style.display = 'block';
 
-            document.getElementById('patient_name_value').textContent =
-                `${selected.patient_name} (${selected.id})`;
+                document.getElementById('patient_name_value').textContent =
+                    `${selected.patient_name} (${selected.id})`;
 
-            document.getElementById('patient_gender_value').textContent = selected.gender ?? 'N/A';
+                document.getElementById('patient_gender_value').textContent = selected.gender ?? 'N/A';
 
-            document.getElementById('patient_age_value').textContent =
-                `${selected.age} Year ${selected.month} Month ${selected.day} Days`;
+                document.getElementById('patient_age_value').textContent =
+                    `${selected.age} Year ${selected.month} Month ${selected.day} Days`;
 
-            document.getElementById('patient_marital_status_value').textContent =
-                selected.marital_status ?? 'N/A';
+                document.getElementById('patient_marital_status_value').textContent =
+                    selected.marital_status ?? 'N/A';
 
-            document.getElementById('patient_blood_value').textContent =
-                selected.blood_group ?? 'N/A';
+                document.getElementById('patient_blood_value').textContent =
+                    selected?.blood_group?.name ?? 'N/A';
 
-            document.getElementById('patient_phone_value').textContent =
-                selected.mobileno ?? 'N/A';
+                document.getElementById('patient_phone_value').textContent =
+                    selected.mobileno ?? 'N/A';
 
-            document.getElementById('patient_location_value').textContent =
-                selected.address ?? 'N/A';
+                document.getElementById('patient_location_value').textContent =
+                    selected.address ?? 'N/A';
 
-            document.getElementById('patient_height_value').textContent =
-                selected.height ?? 'N/A';
+                document.getElementById('patient_height_value').textContent =
+                    selected.height ?? 'N/A';
 
-            document.getElementById('patient_weight_value').textContent =
-                selected.weight ?? 'N/A';
+                document.getElementById('patient_weight_value').textContent =
+                    selected.weight ?? 'N/A';
 
-            document.getElementById('patient_languages_value').textContent =
-                selected.languages_speak ?? 'N/A';
+                document.getElementById('patient_languages_value').textContent =
+                    selected.languages_speak ?? 'N/A';
 
-            document.getElementById('patient_newspaper_value').textContent =
-                selected.newspaper_preference ?? 'N/A';
+                document.getElementById('patient_newspaper_value').textContent =
+                    selected.newspaper_preference ?? 'N/A';
 
-            // Organisation (use optional chaining)
-            document.getElementById('patient_tpa_value').textContent =
-                selected.organisation?.organisation_name ?? 'N/A';
+                // Organisation (use optional chaining)
+                document.getElementById('patient_tpa_value').textContent =
+                    selected.organisation?.organisation_name ?? 'N/A';
 
-            document.getElementById('patient_tpaCode_value').textContent =
-                selected.organisation?.code ?? 'N/A';
+                document.getElementById('patient_tpaCode_value').textContent =
+                    selected.organisation?.code ?? 'N/A';
 
-            document.getElementById('patient_tpa_validity_value').textContent =
-                selected.tpa_validity ?? 'N/A';
+                document.getElementById('patient_tpa_validity_value').textContent =
+                    selected.tpa_validity ?? 'N/A';
 
-            document.getElementById('patient_identification_value').textContent =
-                selected.identification_number ?? 'N/A';
+                document.getElementById('patient_identification_value').textContent =
+                    selected.identification_number ?? 'N/A';
 
-            // ---- PHOTO HANDLING ----
-            if (selected.photo_path) {
-                photo.src = selected.photo_path;
-                photo.style.display = 'block';
-                noImagePlaceholder.style.display = 'none';
+                // ---- PHOTO HANDLING ----
+                if (selected.photo_path) {
+                    photo.src = selected.photo_path;
+                    photo.style.display = 'block';
+                    noImagePlaceholder.style.display = 'none';
+                } else {
+                    photo.style.display = 'none';
+                    noImagePlaceholder.style.display = 'block';
+                }
+
             } else {
+                // RESET ALL FIELDS
+                [
+                    'patient_name_value', 'patient_gender_value', 'patient_age_value',
+                    'patient_marital_status_value', 'patient_blood_value', 'patient_height_value',
+                    'patient_weight_value', 'patient_languages_value', 'patient_newspaper_value',
+                    'patient_phone_value', 'patient_location_value', 'patient_tpa_value',
+                    'patient_tpaCode_value', 'patient_tpa_validity_value',
+                    'patient_identification_value'
+                ].forEach(id => document.getElementById(id).textContent = '—');
+
+                patientSection.style.display = 'none';
                 photo.style.display = 'none';
                 noImagePlaceholder.style.display = 'block';
             }
+        });
 
-        } else {
-            // RESET ALL FIELDS
-            [
-                'patient_name_value','patient_gender_value','patient_age_value',
-                'patient_marital_status_value','patient_blood_value','patient_height_value',
-                'patient_weight_value','patient_languages_value','patient_newspaper_value',
-                'patient_phone_value','patient_location_value','patient_tpa_value',
-                'patient_tpaCode_value','patient_tpa_validity_value','patient_identification_value'
-            ].forEach(id => document.getElementById(id).textContent = '—');
-
-            patientSection.style.display = 'none';
-            photo.style.display = 'none';
-            noImagePlaceholder.style.display = 'block';
-        }
     });
-
-});
-
 </script>
 
 {{-- get doctors --}}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const doctorSelect = document.getElementById('doctor_select');
-        const bedGroupSelect = document.getElementById('bed_group_select');
-        const bedNumberSelect = document.getElementById('bed_number_select');
+        const doctor2Select = document.getElementById('doctor2_select');
+        const doctor3Select = document.getElementById('doctor3_select');
+        const doctor4Select = document.getElementById('doctor4_select');
+        const selects = [
+    doctorSelect,
+    doctor2Select,
+    doctor3Select,
+    doctor4Select
+];
+        // const bedGroupSelect = document.getElementById('bed_group_select');
+        // const bedNumberSelect = document.getElementById('bed_number_select');
 
         // const standardCharge = document.getElementById('standard_charge');
         // const appliedCharge = document.getElementById('applied_charge');
@@ -1243,24 +1282,32 @@
         const symptomTypesSelect = document.getElementById('symptoms_type');
 
         doctorSelect.innerHTML = '<option value="">Loading...</option>';
-        bedGroupSelect.innerHTML = '<option value="">Loading...</option>';
-        bedNumberSelect.innerHTML = '<option value="">Loading...</option>';
+        // bedGroupSelect.innerHTML = '<option value="">Loading...</option>';
+        // bedNumberSelect.innerHTML = '<option value="">Loading...</option>';
         symptomTypesSelect.innerHTML = '<option value="">Loading...</option>';
 
         //doctor
         fetch("{{ route('getDoctors') }}")
             .then(response => response.json())
-            .then(data => {
-                window.doctorsData = data;
-                doctorSelect.innerHTML = '<option value="">Select</option>';
+                .then(data => {
+                    window.doctorsData = data;
+                    selects.forEach(select => {
+                    select.innerHTML = '<option value="">Select</option>';
+                });
+                const oldDoctorId = "{{ old('doctor_id') }}";
+
                 data.forEach(doc => {
-                    const option = document.createElement('option');
-                    option.value = doc.id;
-                    option.textContent = doc.name;
-                    if ("{{ old('doctor_id') }}" == doc.id) {
-                        option.selected = true;
-                    }
-                    doctorSelect.appendChild(option);
+                    selects.forEach(select => {
+                        const option = document.createElement('option');
+                        option.value = doc.id;
+                        option.textContent = `${doc.name} ${doc.surname ?? ''}`.trim();
+
+                        if (oldDoctorId && parseInt(oldDoctorId) === doc.id) {
+                            option.selected = true;
+                        }
+
+                        select.appendChild(option);
+                    });
                 });
             })
             .catch(error => {
@@ -1269,57 +1316,57 @@
             });
 
         //charge category
-        fetch("{{ route('getBedGroups') }}")
-            .then(response => response.json())
-            .then(data => {
-                window.bedGroupData = data;
-                bedGroupSelect.innerHTML = '<option value="">Select</option>';
-                data.forEach(bedGroup => {
-                    const option = document.createElement('option');
-                    option.value = bedGroup.id;
-                    console.log();
-                    option.textContent = bedGroup.name + ' - ' + bedGroup.floor_detail.name;
-                    if ("{{ old('bed_group') }}" == bedGroup.id) {
-                        option.selected = true;
-                    }
-                    bedGroupSelect.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching bed groups:', error);
-                bedGroupSelect.innerHTML = '<option value="">Error loading options</option>';
-            });
+        // fetch("{{ route('getBedGroups') }}")
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         window.bedGroupData = data;
+        //         bedGroupSelect.innerHTML = '<option value="">Select</option>';
+        //         data.forEach(bedGroup => {
+        //             const option = document.createElement('option');
+        //             option.value = bedGroup.id;
+        //             console.log();
+        //             option.textContent = bedGroup.name + ' - ' + bedGroup.floor_detail.name;
+        //             if ("{{ old('bed_group') }}" == bedGroup.id) {
+        //                 option.selected = true;
+        //             }
+        //             bedGroupSelect.appendChild(option);
+        //         });
+        //     })
+        //     .catch(error => {
+        //         console.error('Error fetching bed groups:', error);
+        //         bedGroupSelect.innerHTML = '<option value="">Error loading options</option>';
+        //     });
 
         // Listen for Charge Category dropdown change
-        bedGroupSelect.addEventListener('change', function() {
-            const selectedId = this.value;
-            const baseUrl = "{{ route('getBedNumbers', ['id' => 'ID']) }}";
-            const finalUrl = baseUrl.replace('ID', selectedId);
-            fetch(finalUrl)
-                .then(response => response.json())
-                .then(data => {
-                    window.bedNumberData = data;
-                    bedNumberSelect.innerHTML = '<option value="">Select</option>';
-                    bedNumberSelect.disabled = false
-                    if (data.length <= 0) {
-                        bedNumberSelect.innerHTML = '<option value="">No Bed Available</option>';
-                        bedNumberSelect.disabled = true
-                    } else {
-                        data.forEach(bedNumber => {
-                            const option = document.createElement('option');
-                            option.value = bedNumber.id;
-                            option.textContent = bedNumber.name;
-                            if ("{{ old('bed_number') }}" == bedNumber.id) {
-                                option.selected = true;
-                            }
-                            bedNumberSelect.appendChild(option);
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching Bed Numbers:', error);
-                    bedNumberSelect.innerHTML = '<option value="">Error loading options</option>';
-                });
+        // bedGroupSelect.addEventListener('change', function() {
+        //     const selectedId = this.value;
+        //     const baseUrl = "{{ route('getBedNumbers', ['id' => 'ID']) }}";
+        //     const finalUrl = baseUrl.replace('ID', selectedId);
+        //     fetch(finalUrl)
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             window.bedNumberData = data;
+        //             bedNumberSelect.innerHTML = '<option value="">Select</option>';
+        //             bedNumberSelect.disabled = false
+        //             if (data.length <= 0) {
+        //                 bedNumberSelect.innerHTML = '<option value="">No Bed Available</option>';
+        //                 bedNumberSelect.disabled = true
+        //             } else {
+        //                 data.forEach(bedNumber => {
+        //                     const option = document.createElement('option');
+        //                     option.value = bedNumber.id;
+        //                     option.textContent = bedNumber.name;
+        //                     if ("{{ old('bed_number') }}" == bedNumber.id) {
+        //                         option.selected = true;
+        //                     }
+        //                     bedNumberSelect.appendChild(option);
+        //                 });
+        //             }
+        //         })
+        //         .catch(error => {
+        //             console.error('Error fetching Bed Numbers:', error);
+        //             bedNumberSelect.innerHTML = '<option value="">Error loading options</option>';
+        //         });
 
             // bedNumberSelect.addEventListener('change', function() {
             //     const selectedCharge = window.bedNumberData[0];
@@ -1349,7 +1396,7 @@
             //     amount.value = totalAmount.toFixed(2);
             //     paidAmount.value = totalAmount.toFixed(2);
             // }
-        });
+        // });
 
 
         fetch("{{ route('getSymptomsTypes') }}")
@@ -1374,7 +1421,109 @@
 
     });
 </script>
+@section('script')
+    <script>
+        $(document).on('shown.bs.modal', '.use-select2', function() {
+            const $modal = $(this);
+            const bedGroupSelect = $modal.find('#bed_group_select');
+            const bedNumberSelect = $modal.find('#bed_number_select');
+            if (!bedGroupSelect.length) return;
+            // Init Select2 safely inside modal
+            function initSelect2($el) {
+                if (!$el.hasClass('select2-hidden-accessible')) {
+                    $el.select2({
+                        placeholder: 'Select',
+                        allowClear: true,
+                        width: '100%',
+                        dropdownParent: $modal
+                    });
+                }
+            }
 
+            initSelect2(bedGroupSelect);
+            initSelect2(bedNumberSelect);
+
+            // Fetch Bed Groups
+            fetch("{{ route('getBedGroups') }}")
+                .then(response => response.json())
+                .then(data => {
+                    window.bedGroupData = data;
+
+                    bedGroupSelect.empty().append('<option value=""></option>');
+
+                    data.forEach(bedGroup => {
+                        const option = new Option(
+                            bedGroup.name + ' - ' + bedGroup.floor_detail.name,
+                            bedGroup.id,
+                            false,
+                            "{{ old('bed_group') }}" == bedGroup.id
+                        );
+                        bedGroupSelect.append(option);
+                    });
+
+                    bedGroupSelect.trigger('change.select2');
+                })
+                .catch(error => {
+                    console.error('Error fetching bed groups:', error);
+                    bedGroupSelect
+                        .empty()
+                        .append('<option value="">Error loading options</option>')
+                        .trigger('change.select2');
+                });
+
+            // Bed Group Change → Load Bed Numbers
+            bedGroupSelect.off('change.select2load').on('change.select2load', function() {
+                const selectedId = $(this).val();
+
+                bedNumberSelect
+                    .prop('disabled', true)
+                    .empty()
+                    .append('<option value=""></option>')
+                    .trigger('change.select2');
+
+                if (!selectedId) return;
+
+                const baseUrl = "{{ route('getBedNumbers', ['id' => 'ID']) }}";
+                const finalUrl = baseUrl.replace('ID', selectedId);
+
+                fetch(finalUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        window.bedNumberData = data;
+
+                        bedNumberSelect.empty().append('<option value=""></option>');
+
+                        if (data.length <= 0) {
+                            bedNumberSelect
+                                .append('<option value="">No Bed Available</option>')
+                                .prop('disabled', true);
+                        } else {
+                            bedNumberSelect.prop('disabled', false);
+
+                            data.forEach(bedNumber => {
+                                const option = new Option(
+                                    bedNumber.name,
+                                    bedNumber.id,
+                                    false,
+                                    "{{ old('bed_number') }}" == bedNumber.id
+                                );
+                                bedNumberSelect.append(option);
+                            });
+                        }
+
+                        bedNumberSelect.trigger('change.select2');
+                    })
+                    .catch(error => {
+                        console.error('Error fetching Bed Numbers:', error);
+                        bedNumberSelect
+                            .empty()
+                            .append('<option value="">Error loading options</option>')
+                            .trigger('change.select2');
+                    });
+            });
+        })
+    </script>
+@endsection
 
 
 {{-- symptoms type multiselect --}}

@@ -39,6 +39,7 @@
                                     <th>Reporting Date</th>
                                     <th>Patient Name</th>
                                     <th>Reference Doctor</th>
+                                    <th>TPA</th>
                                     <th>Discount (INR)</th>
                                     <th>Amount (INR)</th>
                                     <th>Paid Amount (INR)</th>
@@ -54,6 +55,16 @@
                                         <td>{{ $bill->date ? date('m/d/Y h:i A', strtotime($bill->date)) : '-' }}</td>
                                         <td>{{ $bill->patient->patient_name ?? '-' }} ({{ $bill->patient_id ?? '-' }})</td>
                                         <td>{{ $bill->doctor_name ?? '-' }}</td>
+                                        <td>
+                                            @if($bill->organisation_id && $bill->organisation)
+                                                <span class="badge bg-info">{{ $bill->organisation->organisation_name }}</span>
+                                                @if($bill->organisation->code)
+                                                    <small class="text-muted">({{ $bill->organisation->code }})</small>
+                                                @endif
+                                            @else
+                                                <span class="text-muted">-</span>
+                                            @endif
+                                        </td>
                                         <td>{{ number_format($bill->discount ?? 0, 2) }} ({{ number_format($bill->discount_percentage ?? 0, 2) }}%)</td>
                                         <td>₹{{ number_format($bill->total ?? 0, 2) }}</td>
                                         <td>₹0.00</td>
@@ -78,7 +89,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="10" class="text-center py-4">
+                                        <td colspan="11" class="text-center py-4">
                                             <div class="text-muted">
                                                 <i class="ti ti-inbox fs-48 mb-2"></i>
                                                 <p>No pathology bills found. Generate your first bill!</p>

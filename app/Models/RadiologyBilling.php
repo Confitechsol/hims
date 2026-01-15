@@ -59,4 +59,12 @@ class RadiologyBilling extends Model
     {
         return $this->hasMany(RadiologyReport::class, 'radiology_bill_id');
     }
+
+    /**
+     * Relationship with IpdPrescription (case reference)
+     */
+    public function prescription()
+    {
+        return $this->belongsTo(IpdPrescription::class, 'case_reference_id');
+    }
 }

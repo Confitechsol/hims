@@ -32,6 +32,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Pathology;
+use App\Models\Radio;
+use App\Models\DoseInterval;
+use App\Models\DoseDuration;
+use Illuminate\Support\Facades\Log;
 
 class OpdController extends Controller
 {
@@ -397,7 +402,7 @@ class OpdController extends Controller
     public function getCharges(Request $request, $id)
     {
         // dd($id);
-        $charges = Charge::with('taxCategory')->where('charge_category_id', $id)->get();
+        $charges = Charge::with('taxCategory')->where('charge_category_id', $id)->whereNull('deleted_at')->get();
         // dd($charges);
         return response()->json($charges, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
     }
@@ -451,6 +456,7 @@ class OpdController extends Controller
         $labInvestigations = PathologyReport::with('pathology')->where('patient_id', $opd->patient->id)->get();
         // $opdVisits         = OpdVisits::with('patient', 'opd.doctor')->where('opd_id', $id)->get();
         $opdVisits   = VisitDetail::with('opdDetail', 'doctor')->where('opd_details_id', $id)->get();
+        $opdPrescriptions  = OpdPrescription::where('opd_id', $id)->get();
         $opdSymptoms = [];
         foreach ($opdVisits as $opdDetail) {
             // Split comma-separated symptom IDs and clean up
@@ -467,14 +473,18 @@ class OpdController extends Controller
             // Store in array using OPD number as key
             $opdSymptoms[$opdDetail->opd_no] = $symptoms;
         }
+        $pathologies = Pathology::all();
+        $radiologies = Radio::all();
+        $doseIntervals = DoseInterval::select('id', 'name')->get();
+        $doseDurations  = DoseDuration::select('id', 'name')->get();
         // Store in array using OPD number as key
-        return view('admin.opd.opd_view', compact('opd', 'symptoms', 'vitals', 'vitalDetails', 'pharmacyDetails', 'medDosages', 'dosages', 'PatientTimelines', 'medicineCategories', 'medicationReport', 'operationDetail', 'opdCharges', 'labInvestigations', 'opdVisits', 'opdSymptoms'));
+        return view('admin.opd.opd_view', compact('opd', 'symptoms', 'vitals', 'vitalDetails', 'pharmacyDetails', 'medDosages', 'dosages', 'PatientTimelines', 'medicineCategories', 'medicationReport', 'operationDetail', 'opdCharges', 'labInvestigations', 'opdVisits', 'opdSymptoms','opdPrescriptions','pathologies','radiologies','doseIntervals','doseDurations'));
     }
 
     public function storePrescription(Request $request)
     {
-        // dd($request->all());
-        try { $request->validate([
+        Log::info('Prescription request data (before validation):', $request->all());
+            $request->validate([
             'opd_id'              => 'nullable|string',
             'header_note'         => 'nullable|string',
             'footer_note'         => 'nullable|string',
@@ -490,29 +500,58 @@ class OpdController extends Controller
             'radiology.*'         => 'string',
             'visible'             => 'nullable|array',
             'visible.*'           => 'string',
-            'medicines'           => 'nullable|array',
-            'medicines.*'         => 'string',
-            'dosages'             => 'nullable|array',
-            'dosages.*'           => 'string',
-            'interval_dosages'    => 'nullable|array',
-            'interval_dosages.*'  => 'string',
-            'duration_dosages'    => 'nullable|array',
-            'duration_dosages.*'  => 'string',
-            'instructions'        => 'nullable|array',
-            'instructions.*'      => 'string',
+            'medicine_categories'     => 'nullable|array',
+            'medicine_categories.*'   => 'nullable|string',
+            'medicines'               => 'nullable|array',
+            'medicines.*'             => 'nullable|string',
+            'dosages'                 => 'nullable|array',
+            'dosages.*'               => 'nullable|string',            
+            'interval_dosages'        => 'nullable|array',
+            'interval_dosages.*'      => 'nullable|string',
+            'duration_dosages'        => 'nullable|array',
+            'duration_dosages.*'      => 'nullable|string',
+            'instructions'            => 'nullable|array',
+            'instructions.*'          => 'nullable|string',
         ]);
-            $findingTypes         = array_filter($request->finding_type, fn($type) => $type !== null && $type !== '');
-            $findings             = array_filter($request->findings, fn($title) => $title !== null && $title !== '');
-            $pathology_ids        = array_filter($request->pathology, fn($pathology) => $pathology !== null && $pathology !== '');
-            $radiology_ids        = array_filter($request->radiology, fn($radio) => $radio !== null && $radio !== '');
-            $notification_to      = array_filter($request->visible, fn($notify) => $notify !== null && $notify !== '');
+        // dd($request->all());
+            $findingTypes = array_filter($request->input('finding_type', []));
+            $findings     = array_filter($request->input('findings', []));
+            $pathology_ids = array_filter($request->input('pathology', []));
+            $radiology_ids = array_filter($request->input('radiology', []));
+            $notification_to = array_filter($request->input('visible', []));
             $implodedFindingTypes = implode(", ", $findingTypes);
             $implodedFindings     = implode(", ", $findings);
             $implodedPathologies  = implode(", ", $pathology_ids);
             $implodedRadiologies  = implode(", ", $radiology_ids);
             $implodedVisibles     = implode(", ", $notification_to);
+
+            // Handle file upload
+            $attachment     = null;
+            $attachmentName = null;
+            if ($request->hasFile('document')) {
+                $file           = $request->file('document');
+                $attachmentName = $file->getClientOriginalName();
+                $attachment     = $file->store('prescription_documents', 'public');
+            }
+
+            // Generate prescription number
+            $lastPrescription = OpdPrescription::orderBy('id', 'desc')->first();
+            if ($lastPrescription && preg_match('/OPDP(\d+)/', $lastPrescription->prescription_number, $matches)) {
+                $lastNumber = intval($matches[1]);
+            } else {
+                $lastNumber = 0;
+            }
+            $prescriptionPrefix = Prefix::where("type", 'opd_pre')->firstOrFail();
+            $nextNumber         = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+            $prescriptionNo     = $prescriptionPrefix->prefix . $nextNumber;
+
+            // Get user info for hospital_id and branch_id
+            $user = Auth::user();
+            
             $prescription         = OpdPrescription::create([
-                'opd_id'              => $request->opd_id,
+                'prescription_number' => $prescriptionNo,
+                'opd_id'              => $request->opd_id,                
+                'prescribed_by'       => $request->prescribe_by,
                 'header_note'         => $request->header_note ?? null,
                 'footer_note'         => $request->footer_note ?? null,
                 'finding_description' => $request->finding_description ?? null,
@@ -523,23 +562,23 @@ class OpdController extends Controller
                 'pathology_id'        => $implodedPathologies,
                 'radiology_id'        => $implodedRadiologies,
                 'notification_to'     => $implodedVisibles,
+                'attachment'          => $attachment,     // NEW
+                'attachment_name'     => $attachmentName, // NEW
             ]);
-
+            if ($request->filled('medicines')) {
             foreach ($request->medicines as $i => $med) {
 
                 OpdMedicine::create([
                     "prescription_id"    => $prescription->id,
                     "pharmacy_id"        => intval($med),
-                    "medicine_dosage_id" => intval($request->dosages[$i]), //$input['hsn_code'][$i],
-                    "dose_interval_id"   => intval($request->interval_dosages[$i]),
-                    "dose_duration_id"   => intval($request->duration_dosages[$i]),
-                    "instruction"        => $request->instructions[$i],
+                    "medicine_dosage_id" => intval($request->dosages[$i] ?? 0),
+                    "dose_interval_id"   => intval($request->interval_dosages[$i] ?? 0),
+                    "dose_duration_id"   => intval($request->duration_dosages[$i] ?? 0),
+                    "instruction"        => $request->instructions[$i] ?? null,
                 ]);
             }
-            return redirect()->back()->with('success', 'Prescription created successfully.');} catch (Exception $e) {
-            // dd($e);
-            return back()->with('error', 'Something went wrong: ' . $e->getMessage());
         }
+            return redirect()->back()->with('success', 'Prescription created successfully.');
     }
 
     public function createOpdMedication(Request $request)
@@ -587,7 +626,7 @@ class OpdController extends Controller
 
     public function getChargeTypes(Request $request)
     {
-        $chargeTypes = ChargeTypeMaster::all();
+        $chargeTypes = ChargeTypeMaster::whereNotIn('charge_type', ['IPD', 'OPD'])->get();
         return response()->json($chargeTypes, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
     }
     public function getChargeCategoriesByTypeId(Request $request, $id)

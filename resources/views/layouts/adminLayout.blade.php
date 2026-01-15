@@ -26,7 +26,7 @@
     <!-- Styles -->
 
     <!-- style css -->
-    <link rel="stylesheet" href="assets/css/custom.css">
+    <link rel="stylesheet" href="{{asset('assets/css/custom.css')}}">
 
     <!-- Page Title -->
     <title>{{ config('app.name', 'HIMS') }}</title>
@@ -207,7 +207,26 @@
         .select2-container .select2-search__field {
             display: block !important;
         }
+
+        .select2-container .select2-selection--single {
+            height: auto;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            padding-top: 4px;
+            padding-bottom: 3px;
+        }
+        /* CSS for validation error */
+        .input-group{
+            position: relative;
+        }
+        .input-group .invalid-feedback{
+            position: absolute;
+            left: 0;
+            bottom: -17px;
+        }
     </style>
+    @yield('select2cdn')
 </head>
 
 <body>
@@ -235,13 +254,13 @@
 
                         <!-- Logo Normal -->
                         <span class="logo-light">
-                            <span class="logo-lg"><img src="assets/img/logo.png" alt="logo"></span>
-                            <span class="logo-sm"><img src="assets/img/logo-small.svg" alt="small logo"></span>
+                            <span class="logo-lg"><img src="{{asset('assets/img/logo.png')}}" alt="logo"></span>
+                            <span class="logo-sm"><img src="{{asset('assets/img/logo-small.svg')}}" alt="small logo"></span>
                         </span>
 
                         <!-- Logo Dark -->
                         <span class="logo-dark">
-                            <span class="logo-lg"><img src="assets/img/logo-white.svg" alt="dark logo"></span>
+                            <span class="logo-lg"><img src="{{asset('assets/img/logo-white.svg')}}" alt="dark logo"></span>
                         </span>
                     </a>
 
@@ -551,8 +570,8 @@
 
                             <!-- Item-->
                             <div class="pt-2 mt-2 border-top">
-                                <form action="{{ route('logout') }}" method="POST" class="dropdown-item text-danger"
-                                    style="cursor: pointer">
+                                <form action="{{ route('logout') }}" method="POST"
+                                    class="dropdown-item text-danger" style="cursor: pointer">
                                     @csrf
                                     <button type="submit" class="btn w-100 justify-content-start p-0">
                                         <i class="ti ti-logout me-1 fs-17 align-middle text-danger fw-bold"></i>
@@ -682,61 +701,131 @@
     </script>
     <!-- Resilient global Select2 initializer: waits for Select2 then initializes all selects -->
     <script>
-        (function() {
-            function tryInitSelect2() {
-                if (typeof window.jQuery === 'undefined') return false;
-                var $ = window.jQuery;
-                if (typeof $.fn.select2 === 'undefined') return false;
+        // (function() {
+        //     function tryInitSelect2() {
+        //         if (typeof window.jQuery === 'undefined') return false;
+        //         var $ = window.jQuery;
+        //         if (typeof $.fn.select2 === 'undefined') return false;
 
-                function initSelect($el) {
-                    if ($el.data('select2-inited')) return;
+        //         function initSelect($el) {
+        //             if ($el.data('select2-inited')) return;
 
-                    // skip selects that are hidden (like inside a hidden modal)
-                    if (!$el.is(':visible')) return;
+        //             // skip selects that are hidden (like inside a hidden modal)
+        //             if (!$el.is(':visible')) return;
 
-                    //skip which are inside edit modal
-                    if ($el.closest('#edit_modal').length > 0) return;
+        //             //skip which are inside edit modal
+        //             if ($el.closest('#edit_modal').length > 0) return;
 
-                    var dp = $el.closest('.modal').find('.modal-content').first();
-                    if (!dp || dp.length === 0) dp = $(document.body);
-                    try {
-                        $el.select2({
-                            width: '100%',
-                            dropdownParent: dp,
-                            minimumResultsForSearch: 0
-                        });
-                        $el.data('select2-inited', true);
-                    } catch (e) {
-                        // ignore init errors
-                    }
+        //             var dp = $el.closest('.modal').find('.modal-content').first();
+        //             if (!dp || dp.length === 0) dp = $(document.body);
+        //             try {
+        //                 $el.select2({
+        //                     width: '100%',
+        //                     dropdownParent: dp,
+        //                     minimumResultsForSearch: 0
+        //                 });
+        //                 $el.data('select2-inited', true);
+        //             } catch (e) {
+        //                 // ignore init errors
+        //             }
+        //         }
+
+        //         $('select.form-select').each(function() {
+        //             initSelect($(this));
+        //         });
+
+
+
+        //         // Initialize selects that appear inside modals when they open
+        //         $('.modal').off('shown.bs.modal.select2init').on('shown.bs.modal.select2init', function() {
+        //             var $modal = $(this);
+        //             if ($modal.attr('id') === 'edit_modal') return;
+        //             $modal.find('select.form-select').each(function() {
+        //                 initSelect($(this));
+        //             });
+        //         });
+
+        //         return true;
+        //     }
+
+        //     var attempts = 0;
+        //     var interval = setInterval(function() {
+        //         if (tryInitSelect2() || attempts++ > 50) {
+        //             clearInterval(interval);
+        //         }
+        //     }, 150);
+        // })();
+
+        // Note: tryInitSelect2 function should be defined elsewhere or this code should be removed
+        // var attempts = 0;
+        // var interval = setInterval(function() {
+        //     if (tryInitSelect2() || attempts++ > 50) {
+        //         clearInterval(interval);
+        //     }
+        // }, 150);
+
+        // Hide loader when page is ready
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const loader = document.querySelector('.loader');
+                if (loader) {
+                    loader.style.display = 'none';
                 }
+            }, 100);
+        });
 
-                $('select.form-select').each(function() {
-                    initSelect($(this));
-                });
-
-               
-
-                // Initialize selects that appear inside modals when they open
-                $('.modal').off('shown.bs.modal.select2init').on('shown.bs.modal.select2init', function() {
-                    var $modal = $(this);
-                    if ($modal.attr('id') === 'edit_modal') return;
-                    $modal.find('select.form-select').each(function() {
-                        initSelect($(this));
-                    });
-                });
-
-                return true;
-            }
-
-            var attempts = 0;
-            var interval = setInterval(function() {
-                if (tryInitSelect2() || attempts++ > 50) {
-                    clearInterval(interval);
+        // Also hide loader on DOMContentLoaded as fallback
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const loader = document.querySelector('.loader');
+                if (loader) {
+                    loader.style.display = 'none';
                 }
-            }, 150);
-        })();
+            }, 500);
+        });
+
+        $(document).on('shown.bs.modal', '.use-select2', function() {
+            const $modal = $(this);
+
+            $modal.find('.select2-input').each(function() {
+                const $select = $(this);
+
+                // Prevent double initialization
+                if ($select.hasClass('select2-hidden-accessible')) {
+                    return;
+                }
+                const oldValue = $select.val();
+
+                $select.select2({
+                    dropdownParent: $modal,
+                    width: '100%'
+                });
+                if (oldValue) {
+                    $select.val(oldValue).trigger('change');
+                }
+            });
+        });
+
+        $(document).on('hidden.bs.modal', '.use-select2', function() {
+            const $modal = $(this);
+
+            $modal.find('.select2-input').each(function() {
+                const $select = $(this);
+
+                if ($select.hasClass('select2-hidden-accessible')) {
+                    $select.select2('destroy');
+                }
+            });
+        });
+        $(document).ready(function() {
+            $('.add-select2').each(function() {
+                if (!$(this).hasClass('select2-hidden-accessible')) {
+                    $(this).select2();
+                }
+            });
+        });
     </script>
+    @yield('script')
 </body>
 
 </html>

@@ -25,7 +25,7 @@ class ExcelImportController extends Controller
 {
     public function importPathology()
     {
-        $pathology     = Pathology::with(['category', 'charge', 'chargeCategory'])->get();
+        $pathology     = Pathology::with(['category'])->get();
         $categories    = PathologyCategory::all();
         $charges       = Charge::all();
         $chargeUnits   = ChargeUnit::all();
@@ -63,27 +63,24 @@ class ExcelImportController extends Controller
                 if (empty($row['A'])) continue;
 
                 // Excel → Variables
-                $testName       = trim($row['A']);
-                $shortName      = trim($row['B']);
-                $testType       = trim($row['C']);
-                $categoryName   = trim($row['D']);
-                $subCategory    = trim($row['E']);
-                $method         = trim($row['F']);
-                $reportDays     = trim($row['G']);
-                $chargeCategory = trim($row['H']);
-                $chargeName     = trim($row['I']);
-                $standardCharge = trim($row['J']);
-                $amount         = trim($row['K']);
-                $description    = trim($row['L']); // optional field
-                $unitName       = trim($row['M']); // if required
+                $testName           = trim($row['A']);
+                $shortName          = trim($row['B']);
+                $testType           = trim($row['C']);
+                $categoryName       = trim($row['D']);
+                $subCategory        = trim($row['E']);
+                $method             = trim($row['F']);
+                $reportDays         = trim($row['G']);
+                $chargeIpd          = trim($row['H']); // Changed from charge category
+                $chargeOpd          = trim($row['I']); // Changed from charge name
+                $description        = trim($row['J']); // optional field (shifted columns)
+                $unitName           = trim($row['K']); // if required (shifted columns)
+
+                $standardChargeIpd = str_replace([',', '₹', ' '], '', $chargeIpd);
+                $standardChargeOpd = str_replace([',', '₹', ' '], '', $chargeOpd);
 
                 // Convert Names → IDs
-                //dd($categoryName, $chargeName );
                 $categoryId = PathologyCategory::where('category_name', $categoryName)->value('id');
-                $chargeId   = Charge::where('name', $chargeName)->value('id');
-                $chargeCategoryId = ChargeCategory::where('name', $chargeCategory)->value('id');
                 $unitId = ChargeUnit::where('unit', $unitName)->value('id');
-               // dd($categoryId, $chargeId );
 
                 // Skip duplicate test names
                 if (Pathology::where('test_name', $testName)->exists()) {
@@ -100,21 +97,9 @@ class ExcelImportController extends Controller
                     'sub_category'          => $subCategory ?? '',
                     'method'                => $method ?? '',
                     'report_days'           => is_numeric($reportDays) ? $reportDays : 0,
-                    'charge_id'             => $chargeId,
+                    'standard_charge_ipd'   => is_numeric($standardChargeIpd) ? (float)$standardChargeIpd : 0,
+                    'standard_charge_opd'   => is_numeric($standardChargeOpd) ? (float)$standardChargeOpd : 0,
                 ];
-
-                // Only add optional fields if exist in DB
-                if (Schema::hasColumn('pathology', 'standard_charge')) {
-                    $createData['standard_charge'] = $standardCharge ?: 0;
-                }
-
-                if (Schema::hasColumn('pathology', 'amount')) {
-                    $createData['amount'] = $amount ?: 0;
-                }
-
-                if (Schema::hasColumn('pathology', 'charge_category_id')) {
-                    $createData['charge_category_id'] = $chargeCategoryId;
-                }
 
                 if (Schema::hasColumn('pathology', 'unit')) {
                     $createData['unit'] = $unitId;
@@ -134,41 +119,54 @@ class ExcelImportController extends Controller
                 $hospitalId = $user->hospital_id ?? null;
                 $branchId   = $user->branch_id ?? null;
 
+                // TPA charges are now optional and can be set manually after import
+                // If needed, TPA charges can be created using standard charges as default
+                // This section is commented out as TPA charges should be set individually per organization
+                /*
                 if ($hospitalId) {
                     $organisations = Organisation::all();
+                    $standardChargeIpd = is_numeric($standardChargeIpd) ? floatval($standardChargeIpd) : 0;
+                    $standardChargeOpd = is_numeric($standardChargeOpd) ? floatval($standardChargeOpd) : 0;
 
                     foreach ($organisations as $organisation) {
-
-                        // Excel does not include TPA charges → set amount = standard charge
-                        $orgCharge = floatval($standardCharge ?? $amount ?? 0);
-
-                        // If TPA charge is empty skip
-                        if ($orgCharge <= 0) continue;
-
-                        $existing = OrganisationsCharge::where('charge_id', $chargeId)
-                            ->where('org_id', $organisation->id)
-                            ->first();
-
-                        if ($existing) {
-                            $existing->org_charge = $orgCharge;
-                            $existing->save();
-                        } else {
-                            $tpaChargeData = [
-                                'charge_id'  => $chargeId,
-                                'org_id'     => $organisation->id,
-                                'org_charge' => $orgCharge,
+                        // Create IPD TPA charge if standard charge IPD > 0
+                        if ($standardChargeIpd > 0) {
+                            $tpaChargeDataIpd = [
+                                'pathology_id' => $pathology->id,
+                                'org_id' => $organisation->id,
+                                'charge_type' => 'IPD',
+                                'org_charge' => $standardChargeIpd,
                             ];
 
                             if (Schema::hasColumn('organisations_charges', 'hospital_id'))
-                                $tpaChargeData['hospital_id'] = $hospitalId;
+                                $tpaChargeDataIpd['hospital_id'] = $hospitalId;
 
                             if (Schema::hasColumn('organisations_charges', 'branch_id'))
-                                $tpaChargeData['branch_id'] = $branchId;
+                                $tpaChargeDataIpd['branch_id'] = $branchId;
 
-                            OrganisationsCharge::create($tpaChargeData);
+                            OrganisationsCharge::create($tpaChargeDataIpd);
+                        }
+
+                        // Create OPD TPA charge if standard charge OPD > 0
+                        if ($standardChargeOpd > 0) {
+                            $tpaChargeDataOpd = [
+                                'pathology_id' => $pathology->id,
+                                'org_id' => $organisation->id,
+                                'charge_type' => 'OPD',
+                                'org_charge' => $standardChargeOpd,
+                            ];
+
+                            if (Schema::hasColumn('organisations_charges', 'hospital_id'))
+                                $tpaChargeDataOpd['hospital_id'] = $hospitalId;
+
+                            if (Schema::hasColumn('organisations_charges', 'branch_id'))
+                                $tpaChargeDataOpd['branch_id'] = $branchId;
+
+                            OrganisationsCharge::create($tpaChargeDataOpd);
                         }
                     }
                 }
+                */
             }
 
             DB::commit();
@@ -202,8 +200,8 @@ class ExcelImportController extends Controller
         $headers = [
             'Test Name', 'Short Name', 'Test Type', 'Category Name',
             'Sub Category', 'Method', 'Report Days',
-            'Charge Category', 'Charge Name', 'Tax (%)',
-            'Standard Charge', 'Amount'
+            'Tax (%)',
+            'IPD Standard Charge', 'OPD Standard Charge'
         ];
 
         // Add TPA Columns
@@ -240,19 +238,19 @@ class ExcelImportController extends Controller
             $row++;
         }
 
-        // Charge Category List
-        $row = 1;
-        foreach ($chargeCats as $cc) {
-            $dropdown->setCellValue("B$row", $cc->name);
-            $row++;
-        }
+        // // Charge Category List
+        // $row = 1;
+        // foreach ($chargeCats as $cc) {
+        //     $dropdown->setCellValue("B$row", $cc->name);
+        //     $row++;
+        // }
 
-        // Charge Names
-        $row = 1;
-        foreach ($charges as $charge) {
-            $dropdown->setCellValue("C$row", $charge->name);
-            $row++;
-        }
+        // // Charge Names
+        // $row = 1;
+        // foreach ($charges as $charge) {
+        //     $dropdown->setCellValue("C$row", $charge->name);
+        //     $row++;
+        // }
 
         // Parameters
         $row = 1;
@@ -268,11 +266,11 @@ class ExcelImportController extends Controller
         // Category Name dropdown
         $this->setDropdown($sheet, 'D2:D500', 'DropdownData', 'A', count($categories));
 
-        // Charge Category dropdown
-        $this->setDropdown($sheet, 'H2:H500', 'DropdownData', 'B', count($chargeCats));
+        // // Charge Category dropdown
+        // $this->setDropdown($sheet, 'H2:H500', 'DropdownData', 'B', count($chargeCats));
 
-        // Charge Name dropdown
-        $this->setDropdown($sheet, 'I2:I500', 'DropdownData', 'C', count($charges));
+        // // Charge Name dropdown
+        // $this->setDropdown($sheet, 'I2:I500', 'DropdownData', 'C', count($charges));
 
         // Parameter dropdown
         $this->setDropdown($sheet, 'A2:A500', 'DropdownData', 'D', count($parameters));
@@ -293,7 +291,7 @@ class ExcelImportController extends Controller
 
     public function importRadiology()
     {
-        $radiology     = Radio::with(['radiologyCategory', 'charge', 'chargeCategory'])->get();
+        $radiology     = Radio::with(['radiologyCategory'])->get();
         $categories    = RadiologyCategory::all();
         $charges       = Charge::all();
         $chargeUnits   = ChargeUnit::all();
@@ -323,8 +321,8 @@ class ExcelImportController extends Controller
         $headers = [
             'Test Name', 'Short Name', 'Test Type', 'Category Name',
             'Sub Category', 'Method', 'Report Days',
-            'Charge Category', 'Charge Name', 'Tax (%)',
-            'Standard Charge', 'Amount', 'Unit (optional)'
+            'Tax (%)',
+            'IPD Standard Charge', 'OPD Standard Charge', 'Unit (optional)'
         ];
 
         foreach ($organisations as $org) {
@@ -348,22 +346,22 @@ class ExcelImportController extends Controller
             $row++;
         }
 
-        $row = 1;
-        foreach ($chargeCats as $cc) {
-            $dropdown->setCellValue("B$row", $cc->name);
-            $row++;
-        }
+        // $row = 1;
+        // foreach ($chargeCats as $cc) {
+        //     $dropdown->setCellValue("B$row", $cc->name);
+        //     $row++;
+        // }
 
-        $row = 1;
-        foreach ($charges as $charge) {
-            $dropdown->setCellValue("C$row", $charge->name);
-            $row++;
-        }
+        // $row = 1;
+        // foreach ($charges as $charge) {
+        //     $dropdown->setCellValue("C$row", $charge->name);
+        //     $row++;
+        // }
 
         // Apply dropdowns
         $this->setDropdown($sheet, 'D2:D500', 'DropdownData', 'A', count($categories));
-        $this->setDropdown($sheet, 'H2:H500', 'DropdownData', 'B', count($chargeCats));
-        $this->setDropdown($sheet, 'I2:I500', 'DropdownData', 'C', count($charges));
+        // $this->setDropdown($sheet, 'H2:H500', 'DropdownData', 'B', count($chargeCats));
+        // $this->setDropdown($sheet, 'I2:I500', 'DropdownData', 'C', count($charges));
 
         $writer = new Xlsx($spreadsheet);
 
@@ -395,23 +393,25 @@ class ExcelImportController extends Controller
                 if (empty($row['A'])) continue; // skip blank
 
                 // Excel columns
-                $testName       = trim($row['A']);
-                $shortName      = trim($row['B']);
-                $testType       = trim($row['C']);
-                $categoryName   = trim($row['D']);
-                $subCategory    = trim($row['E']);
-                $method         = trim($row['F']);
-                $reportDays     = trim($row['G']);
-                $chargeCategory = trim($row['H']);
-                $chargeName     = trim($row['I']);
-                $standardCharge = trim($row['J']);
-                $amount         = trim($row['K']);
-                $unitName       = trim($row['L']);
+                $testName           = trim($row['A']);
+                $shortName          = trim($row['B']);
+                $testType           = trim($row['C']);
+                $categoryName       = trim($row['D']);
+                $subCategory        = trim($row['E']);
+                $method             = trim($row['F']);
+                $reportDays         = trim($row['G']);
+                $chargeIpd  = trim($row['H']);
+                $chargeOpd  = trim($row['I']);
+                $amount             = trim($row['K']);
+                $unitName           = trim($row['L']);
+
+                $standardChargeIpd = str_replace([',', '₹', ' '], '', $chargeIpd);
+                $standardChargeOpd = str_replace([',', '₹', ' '], '', $chargeOpd);
 
                 // Convert names → IDs
                 $categoryId        = RadiologyCategory::where('name', $categoryName)->value('id');
-                $chargeId          = Charge::where('name', $chargeName)->value('id');
-                $chargeCategoryId  = ChargeCategory::where('name', $chargeCategory)->value('id');
+                // $chargeId          = Charge::where('name', $chargeName)->value('id');
+                // $chargeCategoryId  = ChargeCategory::where('name', $chargeCategory)->value('id');
                 $unitId            = ChargeUnit::where('unit', $unitName)->value('id');
 
                 // Skip duplicates
@@ -428,7 +428,9 @@ class ExcelImportController extends Controller
                     'sub_category'          => $subCategory ?? '',
                     'method'                => $method ?? '',
                     'report_days'           => is_numeric($reportDays) ? $reportDays : 0,
-                    'charge_id'             => $chargeId,
+                    'standard_charge_ipd'   => is_numeric($standardChargeIpd) ? (float)$standardChargeIpd : 0,
+                    'standard_charge_opd'   => is_numeric($standardChargeOpd) ? (float)$standardChargeOpd : 0,
+                    // 'charge_id'             => $chargeId,
                 ];
 
                 if (Schema::hasColumn('radiology', 'standard_charge')) {
@@ -498,9 +500,6 @@ class ExcelImportController extends Controller
             return back()->with('error', 'Error importing file: ' . $e->getMessage());
         }
     }
-
-
-
 
     // =========================
     // Helper: Apply dropdown

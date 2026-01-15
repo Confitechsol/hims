@@ -335,6 +335,19 @@
         .info-item:nth-child(6) {
             animation-delay: 0.3s;
         }
+        .tabs-scroll-wrapper {
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .tabs-scroll-wrapper::-webkit-scrollbar {
+            height: 6px;
+        }
+        .tabs-scroll-wrapper::-webkit-scrollbar-thumb {
+            background: #cfcfcf;
+            border-radius: 3px;
+        }
     </style>
 
     <div class="p-4">
@@ -356,8 +369,23 @@
                 });
             </script>
         @endif
-
+        @if ($errors->any())
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                html: `
+                    <ul style="text-align:left;">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                `,
+            });
+        </script>
+        @endif
         <!-- tab start -->
+        <div class="tabs-scroll-wrapper">
         <ul class="nav nav-tabs nav-bordered mb-3 flex-nowrap">
             <li class="nav-item">
                 <a href="#overview" data-bs-toggle="tab" aria-expanded="false"
@@ -436,7 +464,15 @@
                     <span>Vitals</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a href="#prescription" data-bs-toggle="tab" aria-expanded="true"
+                    class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                        class="fa-solid fa-file-prescription text-primary pe-1"></i>
+                    <span>Prescription</span>
+                </a>
+            </li>
         </ul>
+        </div>
         <!-- tab end -->
 
         <!-- tab content start -->
@@ -965,13 +1001,23 @@
                                         </thead>
                                         <tbody>
                                             @foreach ($opdCharges as $charge)
-                                                @php
-                                                    $taxAmount =
-                                                        ($charge->charge->standard_charge *
-                                                            $charge->charge->taxCategory->percentage) /
-                                                        100;
-                                                    $amount = $charge->charge->standard_charge + $taxAmount;
-                                                @endphp
+                                            @php
+                                            $taxAmount = 'N/A';
+                                            $amount = 'N/A';
+                                    
+                                            if (
+                                                $charge->charge &&
+                                                $charge->chargeCategory &&
+                                                $charge->chargeCategory->chargeType &&
+                                                $charge->charge->taxCategory
+                                            ) {
+                                                $taxAmount =
+                                                    ($charge->charge->standard_charge *
+                                                        $charge->charge->taxCategory->percentage) / 100;
+                                    
+                                                $amount = $charge->charge->standard_charge + $taxAmount;
+                                            }
+                                        @endphp
                                                 <tr>
                                                     <td>
                                                         {{ $charge->charge->name ?? 'N/A' }}
@@ -981,7 +1027,7 @@
                                                     </td>
                                                     <td class="text-right">{{ $charge->charge->standard_charge ?? 'N/A' }}</td>
                                                     <td class="text-right">
-                                                        ({{ $charge->charge->taxCategory->percentage }}%)
+                                                        ({{ $charge->charge->taxCategory ? $charge->charge->taxCategory->percentage . "%" : 'N/A'  }})
                                                         {{ $taxAmount }}
                                                     </td>
                                                     <td class="text-right">{{ $charge->charge->standard_charge  ?? 'N/A'}}</td>
@@ -2045,20 +2091,16 @@
                                                                 <td class="text-right">{{ $amount }}</td>
                                                             </tr> --}}
                                                             @foreach ($opdCharges as $charge)
-                                                                @php
-                                                                    $taxAmount =
-                                                                        ($charge->charge->standard_charge *
-                                                                            $charge->charge->taxCategory->percentage) /
-                                                                        100;
-                                                                    $discountAmount =
-                                                                        ($charge->charge->standard_charge *
-                                                                            $charge->discount) /
-                                                                        100;
-                                                                    $amount =
-                                                                        $charge->charge->standard_charge -
-                                                                        $discountAmount +
-                                                                        $taxAmount;
-                                                                @endphp
+                                                            @php
+                                                                $standardCharge = $charge->charge->standard_charge ?? 0;
+                                                                $taxPercentage = $charge->charge->taxCategory->percentage ?? 0;
+                                                                $discountPercentage = $charge->discount ?? 0;
+                                                        
+                                                                $taxAmount = ($standardCharge * $taxPercentage) / 100;
+                                                                $discountAmount = ($standardCharge * $discountPercentage) / 100;
+                                                        
+                                                                $amount = $standardCharge - $discountAmount + $taxAmount;
+                                                            @endphp
                                                                 <tr>
                                                                     <td>
                                                                         {{ \Carbon\Carbon::parse($charge->created_at)->format('d-M-Y') }}
@@ -2072,9 +2114,9 @@
                                                                     <td>{{ $charge->charge->standard_charge ?? 'N/A' }}</td>
                                                                     <td>{{ $charge->charge->standard_charge ?? 'N/A' }}</td>
                                                                     <td>0.00</td>
-                                                                    <td>{{ $discountAmount }}&nbsp;({{ $charge->discount }}%)
+                                                                    <td>{{ $discountAmount }}&nbsp;({{ $discountPercentage }}%)
                                                                     </td>
-                                                                    <td>{{ $taxAmount }}&nbsp;({{ $charge->charge->taxCategory->percentage }}%)
+                                                                    <td>{{ $taxAmount }}&nbsp;({{ $taxPercentage }}%)
                                                                     </td>
                                                                     <td>{{ $amount }}</td>
                                                                     <td>
@@ -2777,13 +2819,102 @@
                     </div>
                 </div>
             </div>
+            <div class="tab-pane" id="prescription">
+                <!-- row start -->
+                <div class="row">
+                    <div class="col-12 d-flex">
+                        <div class="card shadow-sm flex-fill w-100">
+                            <div class="card-header"
+                                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Prescription
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div
+                                                    class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
+                                                    <div class="input-icon-start position-relative me-2">
+                                                        <span class="input-icon-addon">
+                                                            <i class="ti ti-search"></i>
+                                                        </span>
+                                                        <input type="text" class="form-control shadow-sm"
+                                                            placeholder="Search">
+
+                                                    </div>
+                                                    <div class="d-flex align-items-center flex-wrap gap-2">
+                                                        <div class="text-end d-flex">
+                                                            <a href="javascript:void(0);"
+                                                                class="btn btn-primary text-white ms-2 btn-md"
+                                                                data-bs-toggle="modal" data-bs-target="#addPrescriptionModal"><i
+                                                                    class="ti ti-plus me-1"></i>Add Prescription</a>
+                                                        </div>
+                                                        {{-- @include('components.modals.opd.add-prescription-modal') --}}
+                                                    </div>
+                                                </div>
+                                                <!-- Table start -->
+                                                <div class="table-responsive table-nowrap">
+                                                    <table class="table border">
+                                                        <thead class="thead-light">
+                                                            <tr>
+                                                                <th>Prescription No.</th>
+                                                                <th>Date</th>
+                                                                <th>Finding</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach ($opdPrescriptions as $prescription)
+                                                                <tr>
+                                                                    <td>
+                                                                        <h6 class="fs-14 mb-1">
+                                                                            {{ $prescription->prescription_number }}</h6>
+                                                                    </td>
+                                                                    <td>{{ \Carbon\Carbon::parse($prescription->date)->format('d/m/Y') }}
+                                                                    </td>
+                                                                    <td>--</td>
+                                                                    <td>
+                                                                        <div class="d-flex gap-2">
+                                                                            <a href="{{ route('opd.prescription.edit', $prescription->id) }}"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-warning rounded-pill"
+                                                                                data-bs-toggle="tooltip"
+                                                                                title="Edit">
+                                                                                <i class="fa-solid fa-pencil"></i>
+                                                                            </a>
+                                                                            <a href="{{ route('opd.prescription.print', $prescription->id) }}"
+                                                                                target="_blank"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                                                data-bs-toggle="tooltip"
+                                                                                title="Print">
+                                                                                <i class="fa-solid fa-print"></i>
+                                                                            </a>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <!-- Table end -->
+                                                <!-- Table end -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!-- row end -->
 
         </div>
     </div>
     <!-- tab content end -->
     </div>
-    @include('components.modals.add-prescription-modal')
+    @include('components.modals.opd.add-prescription-modal')
     @include('components.modals.show-prescription-modal')
 
     <!-- Chart JS -->

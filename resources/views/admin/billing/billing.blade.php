@@ -28,7 +28,7 @@
                 <div class="card-body">
                     <div class="row align-items-center gy-4">
                         <div class="col-md-4">
-                            <a href="appointment-billing">
+                            <a href="{{ route('appointment-details') }}">
                                 <div class="module_billing">
                                     <i class="fa-solid fa-calendar-check"></i>
                                     <p>Appointment</p>
@@ -36,7 +36,7 @@
                             </a>
                         </div>
                         <div class="col-md-4">
-                            <a href="opd">
+                            <a href="{{ route('opd') }}">
                                 <div class="module_billing">
                                     <i class="fa-solid fa-stethoscope"></i>
                                     <p>OPD</p>

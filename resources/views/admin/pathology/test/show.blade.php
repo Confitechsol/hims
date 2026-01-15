@@ -60,24 +60,12 @@
                         <div class="col-md-6">
                             <table class="table table-bordered">
                                 <tr>
-                                    <th width="40%">Charge Category:</th>
-                                    <td>{{ $test->chargeCategory->name ?? ($test->charge && $test->charge->category ? $test->charge->category->name : '-') }}</td>
+                                    <th width="40%">Standard Charge IPD:</th>
+                                    <td class="fw-bold">₹{{ number_format($test->standard_charge_ipd ?? 0, 2) }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Charge Name:</th>
-                                    <td>{{ $test->charge->name ?? '-' }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Standard Charge:</th>
-                                    <td>₹{{ number_format($test->standard_charge ?? ($test->charge ? $test->charge->standard_charge : 0), 2) }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Tax (%):</th>
-                                    <td>{{ $test->charge && $test->charge->taxCategory ? number_format($test->charge->taxCategory->percentage, 2) : '0.00' }}%</td>
-                                </tr>
-                                <tr>
-                                    <th>Amount:</th>
-                                    <td class="fw-bold">₹{{ number_format($test->amount ?? ($test->charge ? ($test->charge->standard_charge + ($test->charge->standard_charge * ($test->charge->taxCategory ? $test->charge->taxCategory->percentage : 0) / 100)) : 0), 2) }}</td>
+                                    <th>Standard Charge OPD:</th>
+                                    <td class="fw-bold">₹{{ number_format($test->standard_charge_opd ?? 0, 2) }}</td>
                                 </tr>
                             </table>
                         </div>
@@ -141,38 +129,78 @@
                                         </div>
                                     @endif
 
-                                    @if($tpaCharges && count($tpaCharges) > 0)
+                                    @if($groupedTpaCharges && $groupedTpaCharges->count() > 0)
                                         <div class="table-responsive">
                                             <table class="table table-bordered">
                                                 <thead class="thead-light">
                                                     <tr>
                                                         <th>TPA Organization</th>
-                                                        <th>Standard Charge (INR)</th>
-                                                        <th>TPA Charge (INR)</th>
-                                                        <th>Action</th>
+                                                        <th>Standard Charge IPD (INR)</th>
+                                                        <th>TPA Charge IPD (INR)</th>
+                                                        <th>Standard Charge OPD (INR)</th>
+                                                        <th>TPA Charge OPD (INR)</th>
+                                                        <th>Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    @foreach($tpaCharges as $tpaCharge)
+                                                    @foreach($groupedTpaCharges as $orgId => $charges)
+                                                        @php
+                                                            $organisation = $charges['organisation'];
+                                                            $ipdCharge = $charges['ipd_charge'];
+                                                            $opdCharge = $charges['opd_charge'];
+                                                        @endphp
                                                         <tr>
                                                             <td>
-                                                                <strong>{{ $tpaCharge->organisation->organisation_name ?? '-' }}</strong>
-                                                                @if($tpaCharge->organisation && $tpaCharge->organisation->code)
-                                                                    <br><small class="text-muted">Code: {{ $tpaCharge->organisation->code }}</small>
+                                                                <strong>{{ $organisation->organisation_name ?? '-' }}</strong>
+                                                                @if($organisation && $organisation->code)
+                                                                    <br><small class="text-muted">Code: {{ $organisation->code }}</small>
                                                                 @endif
                                                             </td>
-                                                            <td>₹{{ number_format($test->standard_charge ?? 0, 2) }}</td>
-                                                            <td>₹{{ number_format($tpaCharge->org_charge ?? 0, 2) }}</td>
+                                                            <td>₹{{ number_format($test->standard_charge_ipd ?? 0, 2) }}</td>
                                                             <td>
-                                                                <button
-                                                                    class="btn btn-sm btn-soft-success rounded-pill edit-tpa-charge-btn"
-                                                                    data-id="{{ $tpaCharge->id }}"
-                                                                    data-org_charge="{{ $tpaCharge->org_charge }}"
-                                                                    data-org_name="{{ $tpaCharge->organisation->organisation_name ?? 'TPA' }}"
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#editTpaChargeModal">
-                                                                    <i class="ti ti-pencil"></i> Edit
-                                                                </button>
+                                                                @if($ipdCharge)
+                                                                    ₹{{ number_format($ipdCharge->org_charge ?? 0, 2) }}
+                                                                @else
+                                                                    <span class="text-muted">-</span>
+                                                                @endif
+                                                            </td>
+                                                            <td>₹{{ number_format($test->standard_charge_opd ?? 0, 2) }}</td>
+                                                            <td>
+                                                                @if($opdCharge)
+                                                                    ₹{{ number_format($opdCharge->org_charge ?? 0, 2) }}
+                                                                @else
+                                                                    <span class="text-muted">-</span>
+                                                                @endif
+                                                            </td>
+                                                            <td>
+                                                                <div class="d-flex gap-1">
+                                                                    @if($ipdCharge)
+                                                                        <button
+                                                                            class="btn btn-sm btn-soft-success rounded-pill edit-tpa-charge-btn"
+                                                                            data-id="{{ $ipdCharge->id }}"
+                                                                            data-org_charge="{{ $ipdCharge->org_charge }}"
+                                                                            data-org_name="{{ $organisation->organisation_name ?? 'TPA' }}"
+                                                                            data-charge-type="IPD"
+                                                                            data-bs-toggle="modal"
+                                                                            data-bs-target="#editTpaChargeModal"
+                                                                            title="Edit IPD Charge">
+                                                                            <i class="ti ti-pencil"></i> IPD
+                                                                        </button>
+                                                                    @endif
+                                                                    @if($opdCharge)
+                                                                        <button
+                                                                            class="btn btn-sm btn-soft-info rounded-pill edit-tpa-charge-btn"
+                                                                            data-id="{{ $opdCharge->id }}"
+                                                                            data-org_charge="{{ $opdCharge->org_charge }}"
+                                                                            data-org_name="{{ $organisation->organisation_name ?? 'TPA' }}"
+                                                                            data-charge-type="OPD"
+                                                                            data-bs-toggle="modal"
+                                                                            data-bs-target="#editTpaChargeModal"
+                                                                            title="Edit OPD Charge">
+                                                                            <i class="ti ti-pencil"></i> OPD
+                                                                        </button>
+                                                                    @endif
+                                                                </div>
                                                             </td>
                                                         </tr>
                                                     @endforeach
@@ -211,8 +239,13 @@
                             <input type="text" class="form-control" id="tpa_org_name" readonly>
                         </div>
                         <div class="mb-3">
+                            <label class="form-label">Charge Type</label>
+                            <input type="text" class="form-control" id="tpa_charge_type_display" readonly>
+                            <input type="hidden" name="charge_type" id="tpa_charge_type">
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label">Standard Charge (INR)</label>
-                            <input type="text" class="form-control" value="₹{{ number_format($test->standard_charge ?? 0, 2) }}" readonly>
+                            <input type="text" class="form-control" id="tpa_standard_charge" readonly>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">TPA Charge (INR) <span class="text-danger">*</span></label>
@@ -236,10 +269,19 @@
                     const id = this.getAttribute('data-id');
                     const orgCharge = this.getAttribute('data-org_charge');
                     const orgName = this.getAttribute('data-org_name');
+                    const chargeType = this.getAttribute('data-charge-type');
                     
                     document.getElementById('tpa_charge_id').value = id;
                     document.getElementById('tpa_org_charge').value = orgCharge;
                     document.getElementById('tpa_org_name').value = orgName;
+                    document.getElementById('tpa_charge_type').value = chargeType;
+                    document.getElementById('tpa_charge_type_display').value = chargeType;
+                    
+                    // Set standard charge based on type
+                    const standardCharge = chargeType === 'IPD' 
+                        ? {{ $test->standard_charge_ipd ?? 0 }}
+                        : {{ $test->standard_charge_opd ?? 0 }};
+                    document.getElementById('tpa_standard_charge').value = '₹' + standardCharge.toFixed(2);
                 });
             });
         });

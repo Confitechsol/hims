@@ -9,8 +9,12 @@ use App\Models\Radio;
 use App\Models\Patient;
 use App\Models\Doctor;
 use App\Models\CaseReference;
+use App\Models\OpdDetail;
 use App\Models\Organisation;
 use App\Models\OrganisationsCharge;
+use App\Models\IpdPrescription;
+use App\Models\IpdDetail;
+use App\Models\IpdPrescriptionTest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
@@ -41,7 +45,7 @@ class RadiologyBillingController extends Controller
                       ->orWhere('is_active', 'yes');
             })
             ->get();
-        $tests = Radio::with(['radiologyCategory', 'charge.taxCategory'])->get();
+        $tests = Radio::with(['radiologyCategory'])->get();
         
         return view('admin.radiology.billing.create', compact('patients', 'doctors', 'tests'));
     }
@@ -53,8 +57,8 @@ class RadiologyBillingController extends Controller
     {
         $validated = $request->validate([
             'patient_id' => 'required|exists:patients,id',
-            'case_reference_id' => 'nullable|exists:case_references,id',
-            'doctor_id' => 'nullable|exists:doctors,id',
+            'case_reference_id' => 'nullable',
+            'doctor_id' => 'nullable|exists:doctor,id',
             'doctor_name' => 'nullable|string|max:100',
             'date' => 'required|date',
             'total' => 'required|numeric|min:0',
@@ -65,7 +69,7 @@ class RadiologyBillingController extends Controller
             'net_amount' => 'required|numeric|min:0',
             'note' => 'nullable|string',
             'organisation_id' => 'nullable|exists:organisation,id',
-            'activate_tpa' => 'nullable|boolean',
+            'activate_tpa' => 'nullable',
             'tests' => 'required|array|min:1',
             'tests.*.radiology_id' => 'required|exists:radio,id',
             'tests.*.report_days' => 'required|integer|min:0',
@@ -79,13 +83,28 @@ class RadiologyBillingController extends Controller
         try {
             $user = Auth::user();
             
+            // Get doctor name if doctor_id is provided
+            $doctorName = $validated['doctor_name'] ?? null;
+            if (!$doctorName && $validated['doctor_id']) {
+                $doctor = Doctor::find($validated['doctor_id']);
+                if ($doctor) {
+                    $name = trim($doctor->name . ' ' . ($doctor->surname ?? ''));
+                    // Only add "Dr." prefix if it's not already there
+                    $doctorName = (stripos($name, 'Dr.') === 0) ? $name : 'Dr. ' . $name;
+                }
+            }
+            
+            // Truncate doctor name to fit database column (limit to 8 chars - column appears to be very short)
+            // Store truncated version for reports
+            $truncatedDoctorName = $doctorName ? mb_substr(trim($doctorName), 0, 8) : '';
+            
             // Create radiology bill
             $bill = RadiologyBilling::create([
                 'date' => $validated['date'],
                 'patient_id' => $validated['patient_id'],
                 'case_reference_id' => $validated['case_reference_id'] ?? null,
                 'doctor_id' => $validated['doctor_id'] ?? null,
-                'doctor_name' => $validated['doctor_name'] ?? null,
+                'doctor_name' => $doctorName ?? '',
                 'total' => $validated['total'],
                 'discount_percentage' => $validated['discount_percentage'] ?? 0,
                 'discount' => $validated['discount'] ?? 0,
@@ -95,8 +114,6 @@ class RadiologyBillingController extends Controller
                 'note' => $validated['note'] ?? null,
                 'organisation_id' => ($request->has('activate_tpa') && $request->activate_tpa) ? ($validated['organisation_id'] ?? null) : null,
                 'generated_by' => Auth::id(),
-                'hospital_id' => $user->hospital_id ?? '',
-                'branch_id' => $user->branch_id ?? '',
             ]);
 
             // Create radiology reports
@@ -109,8 +126,8 @@ class RadiologyBillingController extends Controller
                     'tax_percentage' => $test['tax_percentage'] ?? 0,
                     'apply_charge' => $test['amount'],
                     'customer_type' => 'OPD',
-                    'hospital_id' => $user->hospital_id ?? '',
-                    'branch_id' => $user->branch_id ?? '',
+                    'consultant_doctor' => $truncatedDoctorName,
+                    'radiology_center' => '', // Required field, set to empty string
                 ]);
             }
 
@@ -119,8 +136,18 @@ class RadiologyBillingController extends Controller
             return redirect()->route('radiology.billing.index')
                 ->with('success', 'Radiology bill created successfully!');
                 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            \Log::error('Validation error creating radiology bill: ' . json_encode($e->errors()));
+            return redirect()->back()
+                ->withInput()
+                ->withErrors($e->errors())
+                ->with('error', 'Please check the form for errors.');
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('Error creating radiology bill: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            \Log::error('Request data: ' . json_encode($request->all()));
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Error creating radiology bill: ' . $e->getMessage());
@@ -132,7 +159,7 @@ class RadiologyBillingController extends Controller
      */
     public function show($id)
     {
-        $bill = RadiologyBilling::with(['patient', 'doctor', 'reports.radiology'])
+        $bill = RadiologyBilling::with(['patient', 'doctor', 'reports.radiology', 'organisation'])
             ->findOrFail($id);
         
         return view('admin.radiology.billing.show', compact('bill'));
@@ -143,7 +170,7 @@ class RadiologyBillingController extends Controller
      */
     public function edit($id)
     {
-        $bill = RadiologyBilling::with(['patient', 'doctor', 'reports.radiology'])->findOrFail($id);
+        $bill = RadiologyBilling::with(['patient.organisation', 'doctor', 'reports.radiology', 'organisation', 'prescription'])->findOrFail($id);
         $patients = Patient::select('id', 'patient_name', 'mobileno')->get();
         $doctors = Doctor::select('id', 'name', 'surname', 'doctor_id')
             ->where(function($query) {
@@ -152,9 +179,15 @@ class RadiologyBillingController extends Controller
                       ->orWhere('is_active', 'yes');
             })
             ->get();
-        $tests = Radio::with(['radiologyCategory', 'charge.taxCategory'])->get();
+        $tests = Radio::with(['radiologyCategory'])->get();
         
-        return view('admin.radiology.billing.edit', compact('bill', 'patients', 'doctors', 'tests'));
+        // Get prescription number for display
+        $prescriptionNumber = '';
+        if ($bill->prescription) {
+            $prescriptionNumber = $bill->prescription->prescription_number ?? 'IPDP' . str_pad($bill->prescription->id, 4, '0', STR_PAD_LEFT);
+        }
+        
+        return view('admin.radiology.billing.edit', compact('bill', 'patients', 'doctors', 'tests', 'prescriptionNumber'));
     }
 
     /**
@@ -164,8 +197,8 @@ class RadiologyBillingController extends Controller
     {
         $validated = $request->validate([
             'patient_id' => 'required|exists:patients,id',
-            'case_reference_id' => 'nullable|exists:case_references,id',
-            'doctor_id' => 'nullable|exists:doctors,id',
+            'case_reference_id' => 'nullable',
+            'doctor_id' => 'nullable|exists:doctor,id',
             'doctor_name' => 'nullable|string|max:100',
             'date' => 'required|date',
             'total' => 'required|numeric|min:0',
@@ -176,7 +209,7 @@ class RadiologyBillingController extends Controller
             'net_amount' => 'required|numeric|min:0',
             'note' => 'nullable|string',
             'organisation_id' => 'nullable|exists:organisation,id',
-            'activate_tpa' => 'nullable|boolean',
+            'activate_tpa' => 'nullable',
             'tests' => 'required|array|min:1',
             'tests.*.radiology_id' => 'required|exists:radio,id',
             'tests.*.report_days' => 'required|integer|min:0',
@@ -190,13 +223,28 @@ class RadiologyBillingController extends Controller
         try {
             $bill = RadiologyBilling::findOrFail($id);
             
+            // Get doctor name if doctor_id is provided
+            $doctorName = $validated['doctor_name'] ?? null;
+            if (!$doctorName && $validated['doctor_id']) {
+                $doctor = Doctor::find($validated['doctor_id']);
+                if ($doctor) {
+                    $name = trim($doctor->name . ' ' . ($doctor->surname ?? ''));
+                    // Only add "Dr." prefix if it's not already there
+                    $doctorName = (stripos($name, 'Dr.') === 0) ? $name : 'Dr. ' . $name;
+                }
+            }
+            
+            // Truncate doctor name to fit database column (limit to 8 chars - column appears to be very short)
+            // Store truncated version for reports
+            $truncatedDoctorName = $doctorName ? mb_substr(trim($doctorName), 0, 8) : '';
+            
             // Update radiology bill
             $bill->update([
                 'date' => $validated['date'],
                 'patient_id' => $validated['patient_id'],
                 'case_reference_id' => $validated['case_reference_id'] ?? null,
                 'doctor_id' => $validated['doctor_id'] ?? null,
-                'doctor_name' => $validated['doctor_name'] ?? null,
+                'doctor_name' => $doctorName ?? '',
                 'total' => $validated['total'],
                 'discount_percentage' => $validated['discount_percentage'] ?? 0,
                 'discount' => $validated['discount'] ?? 0,
@@ -211,7 +259,6 @@ class RadiologyBillingController extends Controller
             RadiologyReport::where('radiology_bill_id', $bill->id)->delete();
 
             // Create new radiology reports
-            $user = Auth::user();
             foreach ($validated['tests'] as $test) {
                 RadiologyReport::create([
                     'radiology_bill_id' => $bill->id,
@@ -221,8 +268,8 @@ class RadiologyBillingController extends Controller
                     'tax_percentage' => $test['tax_percentage'] ?? 0,
                     'apply_charge' => $test['amount'],
                     'customer_type' => 'OPD',
-                    'hospital_id' => $user->hospital_id ?? '',
-                    'branch_id' => $user->branch_id ?? '',
+                    'consultant_doctor' => $truncatedDoctorName,
+                    'radiology_center' => '', // Required field, set to empty string
                 ]);
             }
 
@@ -231,8 +278,18 @@ class RadiologyBillingController extends Controller
             return redirect()->route('radiology.billing.index')
                 ->with('success', 'Radiology bill updated successfully!');
                 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            \Log::error('Validation error updating radiology bill: ' . json_encode($e->errors()));
+            return redirect()->back()
+                ->withInput()
+                ->withErrors($e->errors())
+                ->with('error', 'Please check the form for errors.');
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('Error updating radiology bill: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            \Log::error('Request data: ' . json_encode($request->all()));
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Error updating radiology bill: ' . $e->getMessage());
@@ -268,25 +325,62 @@ class RadiologyBillingController extends Controller
     }
 
     /**
-     * API: Get patient prescriptions
+     * API: Get patient prescriptions (OPD Visits and IPD Prescriptions)
      */
     public function getPatientPrescriptions($patientId)
     {
-        $caseReferences = CaseReference::where('patient_id', $patientId)
-            ->orderBy('created_at', 'desc')
-            ->select('id', 'case_id', 'appointment_date as date', 'symptoms', 'reference_doctor')
-            ->get()
-            ->map(function($case) {
-                return [
-                    'id' => $case->id,
-                    'case_id' => $case->case_id ?? 'Case #' . $case->id,
-                    'date' => $case->date ? date('Y-m-d', strtotime($case->date)) : null,
-                    'symptoms' => $case->symptoms,
-                    'doctor' => $case->reference_doctor,
-                ];
-            });
-        
-        return response()->json($caseReferences);
+        try {
+            \Log::info('Getting prescriptions for patient ID: ' . $patientId);
+            
+            $prescriptions = collect();
+            
+            // Get OPD Visits
+            $opdVisits = OpdDetail::where('patient_id', $patientId)
+                ->with('doctor')
+                ->orderBy('appointment_date', 'desc')
+                ->get()
+                ->map(function($opd) {
+                    return [
+                        'id' => $opd->id,
+                        'case_id' => $opd->opd_no ?? 'OPD' . str_pad($opd->id, 4, '0', STR_PAD_LEFT),
+                        'date' => $opd->appointment_date ? date('Y-m-d', strtotime($opd->appointment_date)) : null,
+                        'symptoms' => $opd->symptoms_description ?? $opd->symptoms_title ?? '',
+                        'doctor' => $opd->doctor ? $opd->doctor->name : null,
+                        'type' => 'opd',
+                    ];
+                });
+            
+            $prescriptions = $prescriptions->merge($opdVisits);
+            \Log::info('OPD Visits found: ' . $opdVisits->count());
+            
+            // Get IPD Prescriptions
+            $ipdPrescriptions = IpdPrescription::join('ipd_details', 'ipd_prescription.ipd_id', '=', 'ipd_details.id')
+                ->where('ipd_details.patient_id', $patientId)
+                ->select('ipd_prescription.*')
+                ->with(['ipd', 'prescribedBy'])
+                ->orderBy('ipd_prescription.date', 'desc')
+                ->get()
+                ->map(function($prescription) {
+                    return [
+                        'id' => $prescription->id,
+                        'case_id' => $prescription->prescription_number ?? 'IPDP' . str_pad($prescription->id, 4, '0', STR_PAD_LEFT),
+                        'date' => $prescription->date ? $prescription->date->format('Y-m-d') : null,
+                        'symptoms' => $prescription->finding_description ?? '',
+                        'doctor' => $prescription->prescribedBy ? $prescription->prescribedBy->name : null,
+                        'type' => 'ipd',
+                        'prescription_id' => $prescription->id,
+                    ];
+                });
+            
+            $prescriptions = $prescriptions->merge($ipdPrescriptions);
+            \Log::info('IPD Prescriptions found: ' . $ipdPrescriptions->count());
+            \Log::info('Total prescriptions: ' . $prescriptions->count());
+            
+            return response()->json($prescriptions->values());
+        } catch (\Exception $e) {
+            \Log::error('Error getting patient prescriptions: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -295,42 +389,122 @@ class RadiologyBillingController extends Controller
     public function getTestDetails(Request $request)
     {
         $testId = $request->input('test_id');
+        $customerType = $request->input('customer_type', 'OPD'); // Default to OPD if not provided
         
-        $test = Radio::with(['charge.taxCategory'])->find($testId);
+        $test = Radio::find($testId);
         
         if (!$test) {
             return response()->json(['error' => 'Test not found'], 404);
         }
         
+        // Select the appropriate charge based on customer type
+        $amount = ($customerType === 'IPD') ? ($test->standard_charge_ipd ?? 0) : ($test->standard_charge_opd ?? 0);
+        
         return response()->json([
             'id' => $test->id,
             'test_name' => $test->test_name,
             'report_days' => $test->report_days,
-            'tax_percentage' => $test->charge && $test->charge->taxCategory ? $test->charge->taxCategory->percentage : 0,
-            'amount' => $test->charge ? $test->charge->standard_charge : 0,
+            'tax_percentage' => 0, // Tax is now handled separately in billing
+            'amount' => $amount,
+            'standard_charge_ipd' => $test->standard_charge_ipd ?? 0,
+            'standard_charge_opd' => $test->standard_charge_opd ?? 0,
         ]);
     }
 
     /**
-     * API: Get TPA names for a patient from previous radiology bills
+     * API: Get TPA names for a patient from previous radiology bills, IPD records, and Patient record
      */
     public function getPatientTpas($patientId)
     {
-        $tpas = RadiologyBilling::where('patient_id', $patientId)
-            ->whereNotNull('organisation_id')
-            ->with('organisation')
-            ->select('organisation_id')
-            ->distinct()
-            ->get()
-            ->map(function($billing) {
-                return [
-                    'id' => $billing->organisation_id,
-                    'name' => $billing->organisation ? $billing->organisation->organisation_name : 'Unknown TPA',
-                    'code' => $billing->organisation ? $billing->organisation->code : null,
-                ];
-            });
-        
-        return response()->json($tpas);
+        try {
+            \Log::info('Getting TPAs for patient ID: ' . $patientId);
+            
+            $tpas = collect();
+            
+            // FIRST: Get TPA directly from Patient record (this is the primary source)
+            $patient = Patient::with('organisation')->find($patientId);
+            if ($patient && $patient->organisation_id && $patient->organisation) {
+                $tpas->push([
+                    'id' => $patient->organisation_id,
+                    'name' => $patient->organisation->organisation_name ?? 'Unknown TPA',
+                    'code' => $patient->organisation->code ?? null,
+                ]);
+                \Log::info('TPA from Patient record: ' . ($patient->organisation->organisation_name ?? 'N/A'));
+            }
+            
+            // Get TPAs from previous radiology bills
+            $radiologyTpas = RadiologyBilling::where('patient_id', $patientId)
+                ->whereNotNull('organisation_id')
+                ->with('organisation')
+                ->select('organisation_id')
+                ->distinct()
+                ->get()
+                ->filter(function($billing) {
+                    return $billing->organisation !== null;
+                })
+                ->map(function($billing) {
+                    return [
+                        'id' => $billing->organisation_id,
+                        'name' => $billing->organisation->organisation_name ?? 'Unknown TPA',
+                        'code' => $billing->organisation->code ?? null,
+                    ];
+                });
+            
+            $tpas = $tpas->merge($radiologyTpas);
+            \Log::info('TPAs from radiology bills: ' . $radiologyTpas->count());
+            
+            // Get TPAs from IPD records
+            $ipdTpas = IpdDetail::where('patient_id', $patientId)
+                ->whereNotNull('organisation_id')
+                ->with('organisation')
+                ->select('organisation_id')
+                ->distinct()
+                ->get()
+                ->filter(function($ipd) {
+                    return $ipd->organisation !== null;
+                })
+                ->map(function($ipd) {
+                    return [
+                        'id' => $ipd->organisation_id,
+                        'name' => $ipd->organisation->organisation_name ?? 'Unknown TPA',
+                        'code' => $ipd->organisation->code ?? null,
+                    ];
+                });
+            
+            $tpas = $tpas->merge($ipdTpas);
+            \Log::info('TPAs from IPD records: ' . $ipdTpas->count());
+            
+            // Also get TPAs from IPD Prescriptions
+            $ipdPrescriptionTpas = IpdPrescription::whereHas('ipd', function($query) use ($patientId) {
+                    $query->where('patient_id', $patientId)
+                          ->whereNotNull('organisation_id');
+                })
+                ->with('ipd.organisation')
+                ->get()
+                ->map(function($prescription) {
+                    if ($prescription->ipd && $prescription->ipd->organisation) {
+                        return [
+                            'id' => $prescription->ipd->organisation_id,
+                            'name' => $prescription->ipd->organisation->organisation_name ?? 'Unknown TPA',
+                            'code' => $prescription->ipd->organisation->code ?? null,
+                        ];
+                    }
+                    return null;
+                })
+                ->filter();
+            
+            $tpas = $tpas->merge($ipdPrescriptionTpas);
+            \Log::info('TPAs from IPD Prescriptions: ' . $ipdPrescriptionTpas->count());
+            
+            // Remove duplicates based on ID
+            $uniqueTpas = $tpas->unique('id')->values();
+            \Log::info('Total unique TPAs: ' . $uniqueTpas->count());
+            
+            return response()->json($uniqueTpas);
+        } catch (\Exception $e) {
+            \Log::error('Error getting patient TPAs: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -340,6 +514,7 @@ class RadiologyBillingController extends Controller
     {
         $testId = $request->input('test_id');
         $organisationId = $request->input('organisation_id');
+        $customerType = $request->input('customer_type', 'OPD'); // Default to OPD if not provided
         
         if (!$testId || !$organisationId) {
             return response()->json(['error' => 'Test ID and Organisation ID are required'], 400);
@@ -347,19 +522,117 @@ class RadiologyBillingController extends Controller
         
         $test = Radio::find($testId);
         
-        if (!$test || !$test->charge_id) {
-            return response()->json(['tpa_charge' => null, 'standard_charge' => $test->charge ? $test->charge->standard_charge : 0]);
+        if (!$test) {
+            return response()->json(['error' => 'Test not found'], 404);
         }
         
-        $tpaCharge = OrganisationsCharge::where('charge_id', $test->charge_id)
+        // Get standard charge based on customer type
+        $standardCharge = ($customerType === 'IPD') ? ($test->standard_charge_ipd ?? 0) : ($test->standard_charge_opd ?? 0);
+        
+        // Look for TPA charge using radiology_id and charge_type
+        $tpaCharge = OrganisationsCharge::where('radiology_id', $testId)
             ->where('org_id', $organisationId)
+            ->where('charge_type', $customerType)
             ->first();
         
-        $standardCharge = $test->charge ? $test->charge->standard_charge : 0;
+        \Log::info("TPA charge lookup - Test: {$testId}, Org: {$organisationId}, Customer Type: {$customerType}, Found: " . ($tpaCharge ? 'Yes' : 'No'));
+        
+        if ($tpaCharge && $tpaCharge->org_charge !== null) {
+            \Log::info("TPA charge found: {$tpaCharge->org_charge}");
+            return response()->json([
+                'tpa_charge_ipd' => ($customerType === 'IPD') ? (float)$tpaCharge->org_charge : null,
+                'tpa_charge_opd' => ($customerType === 'OPD') ? (float)$tpaCharge->org_charge : null,
+                'standard_charge' => $standardCharge,
+            ]);
+        }
+        
+        \Log::info("No TPA charge found, returning standard charge: {$standardCharge}");
+        return response()->json([
+            'tpa_charge_ipd' => null,
+            'tpa_charge_opd' => null,
+            'standard_charge' => $standardCharge,
+        ]);
+    }
+
+    /**
+     * API: Get prescription tests (radiology tests from IPD prescription)
+     */
+    public function getPrescriptionTests($prescriptionId)
+    {
+        $prescription = IpdPrescription::with(['tests.radiology', 'ipd.patient.organisation', 'ipd.organisation'])
+            ->find($prescriptionId);
+        
+        if (!$prescription) {
+            return response()->json(['error' => 'Prescription not found'], 404);
+        }
+        
+        // Get radiology tests from the prescription
+        // Determine if this is IPD or OPD based on prescription type
+        $isIpd = $prescription->ipd !== null;
+        $customerType = $isIpd ? 'IPD' : 'OPD';
+        
+        $radiologyTests = $prescription->tests()
+            ->whereNotNull('radiology_id')
+            ->with('radiology')
+            ->get()
+            ->filter(function($test) {
+                return $test->radiology !== null;
+            })
+            ->map(function($test) use ($isIpd) {
+                $radiology = $test->radiology;
+                // Use IPD charge for IPD prescriptions, OPD charge for OPD
+                $standardCharge = $isIpd ? ($radiology->standard_charge_ipd ?? 0) : ($radiology->standard_charge_opd ?? 0);
+                $amount = $test->amount ?? $standardCharge;
+                
+                return [
+                    'id' => $radiology->id,
+                    'test_name' => $radiology->test_name,
+                    'report_days' => $radiology->report_days ?? 0,
+                    'tax_percentage' => 0, // Tax is handled separately in billing
+                    'amount' => $amount,
+                    'standard_charge_ipd' => $radiology->standard_charge_ipd ?? 0,
+                    'standard_charge_opd' => $radiology->standard_charge_opd ?? 0,
+                ];
+            });
+        
+        // Get TPA - Priority: Patient's TPA > IPD's TPA
+        $tpa = null;
+        if ($prescription->ipd && $prescription->ipd->patient) {
+            if ($prescription->ipd->patient->organisation_id && $prescription->ipd->patient->organisation) {
+                $tpa = [
+                    'id' => $prescription->ipd->patient->organisation_id,
+                    'name' => $prescription->ipd->patient->organisation->organisation_name,
+                    'code' => $prescription->ipd->patient->organisation->code,
+                ];
+            }
+            elseif ($prescription->ipd->organisation_id && $prescription->ipd->organisation) {
+                $tpa = [
+                    'id' => $prescription->ipd->organisation_id,
+                    'name' => $prescription->ipd->organisation->organisation_name,
+                    'code' => $prescription->ipd->organisation->code,
+                ];
+            }
+        }
+        
+        // Get full doctor name with surname
+        $doctorName = null;
+        $doctorId = null;
+        if ($prescription->prescribedBy) {
+            $name = trim($prescription->prescribedBy->name . ' ' . ($prescription->prescribedBy->surname ?? ''));
+            $doctorName = $name;
+            $doctorId = $prescription->prescribedBy->id;
+        }
         
         return response()->json([
-            'tpa_charge' => $tpaCharge ? $tpaCharge->org_charge : null,
-            'standard_charge' => $standardCharge,
+            'prescription' => [
+                'id' => $prescription->id,
+                'prescription_number' => $prescription->prescription_number,
+                'date' => $prescription->date ? $prescription->date->format('Y-m-d') : null,
+                'doctor' => $doctorName,
+                'doctor_id' => $doctorId,
+            ],
+            'tests' => $radiologyTests,
+            'tpa' => $tpa,
         ]);
     }
 }

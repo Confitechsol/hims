@@ -13,10 +13,13 @@ class OpdPrescription extends Model
 
     // Mass assignable attributes
     protected $fillable = [
+        'prescription_number',
+        'prescribed_by',
         'opd_id',
         'visit_id',
         'header_note',
         'footer_note',
+        'advice',
         'finding_description',
         'finding_categories',
         'findings',
@@ -25,6 +28,8 @@ class OpdPrescription extends Model
         'radiology_id',
         'date',
         'notification_to',
+        'attachment',
+        'attachment_name'
     ];
 
     // Casts for automatic data conversion

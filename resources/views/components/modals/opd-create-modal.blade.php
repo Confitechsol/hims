@@ -632,7 +632,8 @@
 </style>
 
 <!-- Modal -->
-<div class="modal fade" id="createOpdModal" tabindex="-1" aria-labelledby="addSpecializationLabel" aria-hidden="true">
+<div class="modal fade use-select2" id="createOpdModal" tabindex="-1" aria-labelledby="addSpecializationLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
             <form action="{{ route('opd.store') }}" id="opdForm" method="POST">
@@ -641,12 +642,15 @@
                 <div class="modal-header align-items-start">
                     <div class="flex-grow-1">
                         <h5 class="modal-title mb-3" id="patient-header">Patient Appointment</h5>
-                        
+
                         <div class="d-flex gap-3 align-items-center" id="patient-loader">
-                            <select type="text" class="form-select patient-search flex-grow-1"
-                                placeholder="Search patient by name or ID..." id="patient_select" name="patient_id">
-                                <option value="">Loading...</option>
+                            <select
+                                class="form-select select2-input patient-search @error('patient_id') is-invalid @enderror"
+                                id="patient_select" name="patient_id" value="{{old('patient_id')}}">
                             </select>
+                            @error('patient_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                             <div class="flex-nowrap text-nowrap">
                                 <button type="button" class="btn btn-primary" id="openAddPatientBtn">
                                     <i class="bi bi-person-plus me-2"></i>New Patient
@@ -782,30 +786,50 @@
 
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label">Appointment Date & Time <span class="required">*</span></label>
-                                <input type="datetime-local" class="form-control" name="appointment_date">
+                                <label class="form-label">Appointment Date & Time <span
+                                        class="required">*</span></label>
+                                <input type="datetime-local"
+                                    class="form-control @error('appointment_date') is-invalid @enderror"
+                                    name="appointment_date">
+
+                                @error('appointment_date')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Patient Type</label>
-                                <select class="form-select" name="case_type">
+                                <select class="form-select @error('case_type') is-invalid @enderror" name="case_type">
                                     <option value="">Select Case Type</option>
-                                    <option value="Old Patient">Old Patient</option>
-                                    <option value="New Patient">New Patient</option>
+                                    <option value="Old Patient" {{ old('case_type') == 'Old Patient' ? 'selected' : '' }}>
+                                        Old Patient
+                                    </option>
+                                    <option value="New Patient" {{ old('case_type') == 'New Patient' ? 'selected' : '' }}>
+                                        New Patient
+                                    </option>
                                 </select>
+                                @error('case_type')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-2 align-items-center d-flex">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="applyTPA" name="apply_tpa"
-                                        value="1">
+                                    <input class="form-check-input @error('apply_tpa') is-invalid @enderror"
+                                        type="checkbox" id="applyTPA" name="apply_tpa" value="1">
                                     <label class="form-check-label" for="applyTPA">Apply TPA</label>
+                                    @error('apply_tpa')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Emergency</label>
-                                <select class="form-select" name="casualty">
+                                <select class="form-select  @error('casualty') is-invalid @enderror" name="casualty">
                                     <option value="No">No</option>
                                     <option value="Yes">Yes</option>
                                 </select>
+                                @error('casualty')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Reference</label>
@@ -814,11 +838,15 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Consultant Doctor <span class="required">*</span></label>
-                                <select class="form-select" name="doctor_id" id="doctor_select">
+                                <select class="form-select select2-input @error('doctor_id') is-invalid @enderror"
+                                    name="doctor_id" id="doctor_select" value="{{old('doctor_id')}}">
                                     <option value="">Loading...</option>
                                 </select>
+                                @error('doctor_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
-
+                            
 
                         </div>
                     </div>
@@ -835,74 +863,114 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">Charge Category</label>
-                                <select class="form-select" name="charge_category" id="charge_category_select">
+                                <select class="form-select @error('charge_category') is-invalid @enderror"
+                                    name="charge_category" id="charge_category_select">
                                     <option value="">Loading...</option>
                                 </select>
+                                @error('charge_category')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Charge <span class="required">*</span></label>
-                                <select class="form-select" name="charge" id="charge_select">
+                                <select class="form-select @error('charge') is-invalid @enderror" name="charge"
+                                    id="charge_select">
                                     <option value="">Loading...</option>
                                 </select>
+                                @error('charge')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Standard Charge (INR)</label>
-                                <input type="number" class="form-control" name="standard_charge"
-                                    id="standard_charge" placeholder="0.00" readonly>
+                                <input type="number"
+                                    class="form-control @error('standard_charge') is-invalid @enderror"
+                                    name="standard_charge" id="standard_charge" placeholder="0.00" value="{{old('standard_charge')}}">
+                                @error('standard_charge')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Applied Charge (INR) <span class="required">*</span></label>
-                                <input type="number" class="form-control" name="applied_charge" id="applied_charge"
-                                    placeholder="0.00">
+                                <input type="number"
+                                    class="form-control @error('applied_charge') is-invalid @enderror"
+                                    name="applied_charge" id="applied_charge" placeholder="0.00" value="{{old('applied_charge')}}">
+                                @error('applied_charge')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Discount</label>
                                 <div class="input-group">
-                                    <input type="number" class="form-control" name="discount" id="discount"
-                                        placeholder="0">
+                                    <input type="number"
+                                        class="form-control @error('discount') is-invalid @enderror" name="discount"
+                                        id="discount" placeholder="0" value="{{old('discount')}}">
+                                        @error('discount')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     <span class="input-group-text">%</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Tax</label>
                                 <div class="input-group">
-                                    <input type="number" class="form-control" id="tax" name="tax"
-                                        placeholder="0">
+                                    <input type="number" class="form-control @error('tax') is-invalid @enderror"
+                                        id="tax" name="tax" placeholder="0" value="{{old('tax')}}">
+                                    @error('tax')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                     <span class="input-group-text">%</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Amount (INR) <span class="required">*</span></label>
-                                <input type="number" class="form-control" name="amount" id="amount"
-                                    placeholder="0.00" readonly>
+                                <input type="number" class="form-control @error('amount') is-invalid @enderror"
+                                    name="amount" id="amount" placeholder="0.00" value="{{old('amount')}}">
+                                @error('amount')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Payment Mode</label>
-                                <select class="form-select" name="payment_mode">
-                                    <option value="Cash" selected>Cash</option>
-                                    <option value="Card">Card</option>
-                                    <option value="UPI">UPI</option>
-                                    <option value="Online Transfer">Online Transfer</option>
+                                <select class="form-select @error('payment_mode') is-invalid @enderror"
+                                    name="payment_mode">
+                                    <option value="Cash" {{ old('payment_mode') == 'Cash' ? 'selected' : '' }}>Cash</option>
+                                    <option value="Card" {{ old('payment_mode') == 'Card' ? 'selected' : '' }}>Card</option>
+                                    <option value="UPI" {{ old('payment_mode') == 'UPI' ? 'selected' : '' }}>UPI</option>
+                                    <option value="Online Transfer" {{ old('payment_mode') == 'Online Transfer' ? 'selected' : '' }}>Online Transfer</option>
                                 </select>
+                                @error('payment_mode')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Paid Amount (INR) <span class="required">*</span></label>
-                                <input type="number" class="form-control" name="paid_amount" id="paid_amount"
-                                    placeholder="0.00">
+                                <input type="number" class="form-control @error('paid_amount') is-invalid @enderror"
+                                    name="paid_amount" id="paid_amount" placeholder="0.00">
+                                @error('paid_amount')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-6">
                                 <label for="payment_date" class="form-label">
                                     Payment Date <span class="required">*</span>
                                 </label>
-                                <input type="date" name="payment_date" id="payment_date" class="form-control"
-                                    required>
+                                <input type="date" name="payment_date" id="payment_date"
+                                    class="form-control @error('payment_date') is-invalid @enderror" value="{{old('payment_date')}}" required>
+                                @error('payment_date')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Live Consultation</label>
-                                <select class="form-select" name="live_consultation">
-                                    <option value="No" selected>No</option>
-                                    <option value="Yes">Yes</option>
+                                <select class="form-select @error('live_consultation') is-invalid @enderror"
+                                    name="live_consultation">
+                                    <option value="No" {{ old('live_consultation', 'No') == 'No' ? 'selected' : '' }}>No</option>
+                                    <option value="Yes" {{ old('live_consultation') == 'Yes' ? 'selected' : '' }}>Yes</option>
                                 </select>
+                                @error('live_consultation')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
                     </div>
@@ -921,10 +989,13 @@
                                 <label class="form-label">Symptoms Type</label>
                                 <div class="custom-multiselect-wrapper">
                                     <!-- Hidden native select (for form submission) -->
-                                    <select name="symptoms_type[]" id="symptoms_type" class="form-select" multiple>
+                                    <select name="symptoms_type[]" id="symptoms_type"
+                                        class="form-select @error('symptoms_type') is-invalid @enderror" multiple>
                                         <option value="">Loading...</option>
                                     </select>
-
+                                    @error('symptoms_type')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
                                     <!-- Custom Multi-Select UI -->
                                     <div class="custom-multiselect">
                                         <div class="multiselect-selected" tabindex="0">
@@ -958,7 +1029,9 @@
                                     <select name="symptoms_title[]" id="symptoms_title" class="form-select" multiple>
                                         <option value="">Loading...</option>
                                     </select>
-
+                                    @error('symptoms_title')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
                                     <!-- Custom Multi-Select UI -->
                                     <div class="custom-multiselect-wrapper">
                                         <select name="symptoms_title[]" id="symptoms_title" class="form-select"
@@ -998,16 +1071,27 @@
 
                             <div class="col-md-4">
                                 <label class="form-label">Any Known Allergies</label>
-                                <textarea class="form-control" name="allergies" rows="1" placeholder="Enter allergies"></textarea>
+                                <textarea class="form-control @error('allergies') is-invalid @enderror" name="allergies" rows="1"
+                                    placeholder="Enter allergies"></textarea>
+                                @error('allergies')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-12">
                                 <label class="form-label">Symptoms Description</label>
-                                <textarea class="form-control" name="symptoms_description" rows="3"
-                                    placeholder="Enter detailed symptoms description"></textarea>
+                                <textarea class="form-control @error('symptoms_description') is-invalid @enderror" name="symptoms_description"
+                                    rows="3" placeholder="Enter detailed symptoms description"></textarea>
+                                @error('symptoms_description')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-12">
                                 <label class="form-label">Note</label>
-                                <textarea class="form-control" name="note" rows="3" placeholder="Enter additional notes"></textarea>
+                                <textarea class="form-control @error('note') is-invalid @enderror" name="note" rows="3"
+                                    placeholder="Enter additional notes"></textarea>
+                                @error('note')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
                     </div>
@@ -1037,7 +1121,7 @@
 {{-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> --}}
 <script>
     function populatePatientDetails(selected) {
-        
+
         document.getElementById('patient_name_value').textContent =
             `${selected.patient_name} (${selected.id})`;
         document.getElementById('patient_gender_value').textContent = selected
@@ -1080,8 +1164,8 @@
 
         createOpdModal.addEventListener('show.bs.modal', function(event) {
             var button = event.relatedTarget; // Button that triggered the modal
-            var isHidden = button.getAttribute('data-is-hidden');
-            const patient = JSON.parse(button.getAttribute('data-patient'));
+            var isHidden = button?.getAttribute('data-is-hidden');
+            const patient = button && JSON.parse(button?.getAttribute('data-patient'));
 
 
 
@@ -1156,7 +1240,7 @@
                         const option = document.createElement('option');
                         option.value = patient.id;
                         option.textContent = patient.patient_name;
-                        if ("{{ old('patient_select') }}" == patient.id) {
+                        if ("{{ old('patient_id') }}" == patient.id) {
                             option.selected = true;
                         }
                         patientSelect.appendChild(option);
@@ -1205,146 +1289,370 @@
 </script>
 
 {{-- get doctors --}}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const doctorSelect = document.getElementById('doctor_select');
-        const chargeCategorySelect = document.getElementById('charge_category_select');
-        const chargeSelect = document.getElementById('charge_select');
+@section('script')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const doctorSelect = document.getElementById('doctor_select');
+            // const chargeCategorySelect = document.getElementById('charge_category_select');
+            // const chargeSelect = document.getElementById('charge_select');
 
-        const standardCharge = document.getElementById('standard_charge');
-        const appliedCharge = document.getElementById('applied_charge');
-        const discount = document.getElementById('discount');
-        const tax = document.getElementById('tax');
-        const amount = document.getElementById('amount');
-        const paidAmount = document.getElementById('paid_amount');
-        const symptomTypesSelect = document.getElementById('symptoms_type');
+            const standardCharge = document.getElementById('standard_charge');
+            const appliedCharge = document.getElementById('applied_charge');
+            const discount = document.getElementById('discount');
+            const tax = document.getElementById('tax');
+            const amount = document.getElementById('amount');
+            const paidAmount = document.getElementById('paid_amount');
+            const symptomTypesSelect = document.getElementById('symptoms_type');
 
-        doctorSelect.innerHTML = '<option value="">Loading...</option>';
-        chargeCategorySelect.innerHTML = '<option value="">Loading...</option>';
-        chargeSelect.innerHTML = '<option value="">Loading...</option>';
-        symptomTypesSelect.innerHTML = '<option value="">Loading...</option>';
+            doctorSelect.innerHTML = '<option value="">Loading...</option>';
+            // chargeCategorySelect.innerHTML = '<option value="">Loading...</option>';
+            // chargeSelect.innerHTML = '<option value="">Loading...</option>';
+            symptomTypesSelect.innerHTML = '<option value="">Loading...</option>';
 
-        //doctor
-        fetch("{{ route('getDoctors') }}")
-            .then(response => response.json())
-            .then(data => {
-                window.doctorsData = data;
-                doctorSelect.innerHTML = '<option value="">Select</option>';
-                data.forEach(doc => {
-                    const option = document.createElement('option');
-                    option.value = doc.id;
-                    option.textContent = doc.name;
-                    if ("{{ old('doctor_id') }}" == doc.id) {
-                        option.selected = true;
-                    }
-                    doctorSelect.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching doctors:', error);
-                doctorSelect.innerHTML = '<option value="">Error loading options</option>';
-            });
-
-        //charge category
-        fetch("{{ route('getChargeCategories') }}")
-            .then(response => response.json())
-            .then(data => {
-                window.chargeCategoryData = data;
-                chargeCategorySelect.innerHTML = '<option value="">Select</option>';
-                data.forEach(category => {
-                    const option = document.createElement('option');
-                    option.value = category.id;
-                    option.textContent = category.name;
-                    if ("{{ old('charge_category') }}" == category.id) {
-                        option.selected = true;
-                    }
-                    chargeCategorySelect.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching charge categories:', error);
-                chargeCategorySelect.innerHTML = '<option value="">Error loading options</option>';
-            });
-
-        // Listen for Charge Category dropdown change
-        chargeCategorySelect.addEventListener('change', function() {
-            const selectedId = this.value;
-            const baseUrl = "{{ route('getCharges', ['id' => 'ID']) }}";
-            const finalUrl = baseUrl.replace('ID', selectedId);
-            fetch(finalUrl)
+            //doctor
+            fetch("{{ route('getDoctors') }}")
                 .then(response => response.json())
                 .then(data => {
-                    window.chargeData = data;
-                    chargeSelect.innerHTML = '<option value="">Select</option>';
-                    data.forEach(charge => {
+                    window.doctorsData = data;
+                    doctorSelect.innerHTML = '<option value="">Select</option>';
+                    data.forEach(doc => {
                         const option = document.createElement('option');
-                        option.value = charge.id;
-                        option.textContent = charge.name;
-                        if ("{{ old('charge') }}" == charge.id) {
+                        option.value = doc.id;
+                        option.textContent = doc.name;
+                        if ("{{ old('doctor_id') }}" == doc.id) {
                             option.selected = true;
                         }
-                        chargeSelect.appendChild(option);
+                        doctorSelect.appendChild(option);
                     });
                 })
                 .catch(error => {
-                    console.error('Error fetching Charges:', error);
-                    chargeSelect.innerHTML = '<option value="">Error loading options</option>';
+                    console.error('Error fetching doctors:', error);
+                    doctorSelect.innerHTML = '<option value="">Error loading options</option>';
                 });
 
-            chargeSelect.addEventListener('change', function() {
-                const selectedCharge = window.chargeData[0];
-                standardCharge.value = selectedCharge.standard_charge
-                appliedCharge.value = selectedCharge.standard_charge
-                tax.value = selectedCharge.tax_category.percentage
-                calculateAmount();
-            })
-            if (!appliedCharge || !tax || !discount || !amount) {
-                console.error("❌ One or more required input fields are missing in the DOM.");
-                return;
-            }
-            [appliedCharge, tax, discount].forEach(field => {
-                field.addEventListener('input', calculateAmount);
-            });
+            // //charge category
+            // fetch("{{ route('getChargeCategories') }}")
+            //     .then(response => response.json())
+            //     .then(data => {
+            //         window.chargeCategoryData = data;
+            //         chargeCategorySelect.innerHTML = '<option value="">Select</option>';
+            //         data.forEach(category => {
+            //             const option = document.createElement('option');
+            //             option.value = category.id;
+            //             option.textContent = category.name;
+            //             if ("{{ old('charge_category') }}" == category.id) {
+            //                 option.selected = true;
+            //             }
+            //             chargeCategorySelect.appendChild(option);
+            //         });
+            //     })
+            //     .catch(error => {
+            //         console.error('Error fetching charge categories:', error);
+            //         chargeCategorySelect.innerHTML = '<option value="">Error loading options</option>';
+            //     });
 
-            function calculateAmount() {
-                const appliedChargeValue = parseFloat(appliedCharge.value) || 0;
-                const taxValue = parseFloat(tax.value) || 0;
-                const discountValue = parseFloat(discount.value) || 0;
+            // // Listen for Charge Category dropdown change
+            // chargeCategorySelect.addEventListener('change', function() {
+            //     const selectedId = this.value;
+            //     const baseUrl = "{{ route('getCharges', ['id' => 'ID']) }}";
+            //     const finalUrl = baseUrl.replace('ID', selectedId);
+            //     fetch(finalUrl)
+            //         .then(response => response.json())
+            //         .then(data => {
+            //             window.chargeData = data;
+            //             chargeSelect.innerHTML = '<option value="">Select</option>';
+            //             data.forEach(charge => {
+            //                 const option = document.createElement('option');
+            //                 option.value = charge.id;
+            //                 option.textContent = charge.name;
+            //                 if ("{{ old('charge') }}" == charge.id) {
+            //                     option.selected = true;
+            //                 }
+            //                 chargeSelect.appendChild(option);
+            //             });
+            //         })
+            //         .catch(error => {
+            //             console.error('Error fetching Charges:', error);
+            //             chargeSelect.innerHTML = '<option value="">Error loading options</option>';
+            //         });
 
-                // Formula: Amount = (AppliedCharge + Tax%) - Discount%
-                const taxAmount = appliedChargeValue * (taxValue / 100);
-                const discountAmount = appliedChargeValue * (discountValue / 100);
-                const totalAmount = appliedChargeValue + taxAmount - discountAmount;
+            //     chargeSelect.addEventListener('change', function() {
+            //         const selectedCharge = window.chargeData[0];
+            //         standardCharge.value = selectedCharge.standard_charge
+            //         appliedCharge.value = selectedCharge.standard_charge
+            //         tax.value = selectedCharge.tax_category.percentage
+            //         calculateAmount();
+            //     })
+            //     if (!appliedCharge || !tax || !discount || !amount) {
+            //         console.error("❌ One or more required input fields are missing in the DOM.");
+            //         return;
+            //     }
+            //     [appliedCharge, tax, discount].forEach(field => {
+            //         field.addEventListener('input', calculateAmount);
+            //     });
 
-                amount.value = totalAmount.toFixed(2);
-                paidAmount.value = totalAmount.toFixed(2);
-            }
+            //     function calculateAmount() {
+            //         const appliedChargeValue = parseFloat(appliedCharge.value) || 0;
+            //         const taxValue = parseFloat(tax.value) || 0;
+            //         const discountValue = parseFloat(discount.value) || 0;
+
+            //         // Formula: Amount = (AppliedCharge + Tax%) - Discount%
+            //         const taxAmount = appliedChargeValue * (taxValue / 100);
+            //         const discountAmount = appliedChargeValue * (discountValue / 100);
+            //         const totalAmount = appliedChargeValue + taxAmount - discountAmount;
+
+            //         amount.value = totalAmount.toFixed(2);
+            //         paidAmount.value = totalAmount.toFixed(2);
+            //     }
+            // });
+
+
+            fetch("{{ route('getSymptomsTypes') }}")
+                .then(response => response.json())
+                .then(data => {
+                    window.symptomTypesData = data;
+                    symptomTypesSelect.innerHTML = '<option value="">Select</option>';
+                    data.forEach(type => {
+                        const option = document.createElement('option');
+                        option.value = type.id;
+                        option.textContent = type.symptoms_type;
+                        if ("{{ old('symptoms_type[]') }}" == type.id) {
+                            option.selected = true;
+                        }
+                        symptomTypesSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching Symptoms Types:', error);
+                    symptomTypesSelect.innerHTML = '<option value="">Error loading options</option>';
+                });
+
         });
 
+        $(document).on('shown.bs.modal', '.use-select2', function() {
 
-        fetch("{{ route('getSymptomsTypes') }}")
-            .then(response => response.json())
-            .then(data => {
-                window.symptomTypesData = data;
-                symptomTypesSelect.innerHTML = '<option value="">Select</option>';
-                data.forEach(type => {
-                    const option = document.createElement('option');
-                    option.value = type.id;
-                    option.textContent = type.symptoms_type;
-                    if ("{{ old('symptoms_type[]') }}" == type.id) {
-                        option.selected = true;
+            const $modal = $(this);
+
+            const chargeCategorySelect = $modal.find('#charge_category_select');
+            const chargeSelect = $modal.find('#charge_select');
+
+            if (!chargeCategorySelect.length) return;
+            const oldChargeCategory = "{{ old('charge_category') }}";
+            const oldCharge = "{{ old('charge') }}";
+            // ----------------------
+            // Init Select2 safely
+            // ----------------------
+            function initSelect2($el) {
+                if (!$el.hasClass('select2-hidden-accessible')) {
+                    $el.select2({
+                        placeholder: 'Select',
+                        allowClear: true,
+                        width: '100%',
+                        dropdownParent: $modal
+                    });
+                }
+            }
+
+            initSelect2(chargeCategorySelect);
+            initSelect2(chargeSelect);
+
+            // ----------------------
+            // Fetch Charge Categories
+            // ----------------------
+            fetch("{{ route('getChargeCategories') }}")
+                .then(response => response.json())
+                .then(data => {
+
+                    window.chargeCategoryData = data;
+
+                    chargeCategorySelect.empty().append('<option value=""></option>');
+
+                    data.forEach(category => {
+                        chargeCategorySelect.append(
+                            new Option(category.name, category.id, false, false)
+                        );
+                    });
+
+                    // ✅ Set selected value AFTER options exist
+                    if (oldChargeCategory) {
+                        chargeCategorySelect
+                            .val(oldChargeCategory)
+                            .trigger('change.select2');
+                    //Now set Charge..........................
+                    const baseUrl = "{{ route('getCharges', ['id' => 'ID']) }}";
+                    fetch(baseUrl.replace('ID', oldChargeCategory))
+                        .then(response => response.json())
+                        .then(data => {
+
+                            window.chargeData = data;
+
+                            chargeSelect.empty().append('<option value=""></option>');
+
+                            if (data.length === 0) {
+                                chargeSelect
+                                    .append('<option value="">No Charges Available</option>')
+                                    .prop('disabled', true);
+                            } else {
+                                chargeSelect.prop('disabled', false);
+
+                                data.forEach(charge => {
+                                    chargeSelect.append(
+                                        new Option(charge.name, charge.id, false, false)
+                                    );
+                                });
+                            }
+
+                            // ✅ Set selected value AFTER options exist
+                            if (oldCharge) {
+                                chargeSelect
+                                    .val(oldCharge)
+                                    .trigger('change.select2');
+                            }
+                        })
+                        .catch(() => {
+                            chargeSelect
+                                .empty()
+                                .append('<option value="">Error loading options</option>')
+                                .trigger('change.select2');
+                        });
+                    //Set Charge Ends..........................        
                     }
-                    symptomTypesSelect.appendChild(option);
+                })
+                .catch(() => {
+                    chargeCategorySelect
+                        .empty()
+                        .append('<option value="">Error loading options</option>')
+                        .trigger('change.select2');
                 });
-            })
-            .catch(error => {
-                console.error('Error fetching Symptoms Types:', error);
-                symptomTypesSelect.innerHTML = '<option value="">Error loading options</option>';
+
+            // ----------------------
+            // Charge Category Change → Load Charges
+            // ----------------------
+            chargeCategorySelect
+                .off('change.select2load')
+                .on('change.select2load', function() {
+
+                    const selectedId = $(this).val();
+
+                    chargeSelect
+                        .prop('disabled', true)
+                        .empty()
+                        .append('<option value=""></option>')
+                        .trigger('change.select2');
+
+                    if (!selectedId) return;
+
+                    const baseUrl = "{{ route('getCharges', ['id' => 'ID']) }}";
+
+                    fetch(baseUrl.replace('ID', selectedId))
+                        .then(response => response.json())
+                        .then(data => {
+
+                            window.chargeData = data;
+
+                            chargeSelect.empty().append('<option value=""></option>');
+
+                            if (data.length === 0) {
+                                chargeSelect
+                                    .append('<option value="">No Charges Available</option>')
+                                    .prop('disabled', true);
+                            } else {
+                                chargeSelect.prop('disabled', false);
+
+                                data.forEach(charge => {
+                                    chargeSelect.append(
+                                        new Option(charge.name, charge.id, false, false)
+                                    );
+                                });
+                            }
+
+                            // ✅ Set selected value AFTER options exist
+                            if (oldCharge) {
+                                chargeSelect
+                                    .val(oldCharge)
+                                    .trigger('change.select2');
+                            }
+                        })
+                        .catch(() => {
+                            chargeSelect
+                                .empty()
+                                .append('<option value="">Error loading options</option>')
+                                .trigger('change.select2');
+                        });
+                });
+
+            // ----------------------
+            // Charge Change → Set Amounts
+            // ----------------------
+            chargeSelect
+                .off('change.setAmounts')
+                .on('change.setAmounts', function() {
+
+                    const selectedId = $(this).val();
+                    const selectedCharge = window.chargeData?.find(c => c.id == selectedId);
+
+                    if (!selectedCharge) return;
+
+                    $('#standard_charge').val(selectedCharge?.standard_charge);
+                    $('#applied_charge').val(selectedCharge?.standard_charge);
+                    $('#tax').val(selectedCharge?.tax_category?.percentage);
+
+                    calculateAmount();
+                });
+
+        });
+
+        function calculateAmount() {
+            const appliedCharge = parseFloat($('#applied_charge').val()) || 0;
+            const tax = parseFloat($('#tax').val()) || 0;
+            const discount = parseFloat($('#discount').val()) || 0;
+
+            const taxAmount = appliedCharge * (tax / 100);
+            const discountAmount = appliedCharge * (discount / 100);
+            const totalAmount = appliedCharge + taxAmount - discountAmount;
+
+            $('#amount').val(totalAmount.toFixed(2));
+            $('#paid_amount').val(totalAmount.toFixed(2));
+        }
+
+        // Live recalculation
+        $(document).on('input', '#applied_charge, #tax, #discount', calculateAmount);
+    </script>
+    @if (session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: '{{ session('success') }}',
+                confirmButtonColor: '#3085d6'
             });
+        </script>
+    @endif
+    @if ($errors->any())
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                html: `{!! implode('<br>', $errors->all()) !!}`,
+                confirmButtonColor: '#d33'
+            }).then(() => {
+                const modal = new bootstrap.Modal(document.getElementById('createOpdModal'));
+                modal.show();
 
-    });
-</script>
-
+                setTimeout(() => {
+                    const firstError = document.querySelector('.is-invalid');
+                    if (firstError) {
+                        firstError.focus();
+                        firstError.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                    }
+                }, 300);
+            });;
+        </script>
+    @endif
+@endsection
 
 
 {{-- symptoms type multiselect --}}

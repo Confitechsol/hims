@@ -43,9 +43,10 @@ class HospitalChargesController extends Controller
         'schedule_charge_id'=>'required|array',
         'schedule_charge_id.*'=>'required|exists:organisations_charges,id',
     ]);
+    // dd(request->all());
     $organisation_ids = $request->schedule_charge_id;
     $charge =  Charge::create([
-            'charge_category_id'=>$request->charge_type,
+            'charge_category_id'=>$request->charge_category,
             'tax_category_id'=>$request->tax_category,
             'charge_unit_id'=>$request->unit_type,
             'name'=>$request->charge_name,
@@ -116,17 +117,23 @@ class HospitalChargesController extends Controller
         }
         return redirect()->back()->with("success",$charge->name." Charge Updated Sucessfully!");
     }
-    public function destroy(Request $request){
+    public function destroy(Request $request)
+    {
         $request->validate([
-            'id'=>'required|exists:charges,id',
+            'id' => 'required|exists:charges,id',
         ]);
-        $id = $request->id;
-        $charge = Charge::find($id);
+
+        $charge = Charge::findOrFail($request->id);
+
+        // Soft delete related organisation charges
+        OrganisationsCharge::where('charge_id', $charge->id)->delete();
+
+        // Soft delete main charge
         $charge->delete();
-        $organisations_charge = OrganisationsCharge::where('charge_id',$id)->get();
-        foreach($organisations_charge as $org_charge){
-            $org_charge->delete();
-        }
-        return redirect()->back()->with("success",$charge->name." Charge Deleted Sucessfully!");
+
+        return redirect()->back()->with(
+            'success',
+            $charge->name . ' Charge Deleted Successfully!'
+        );
     }
 }

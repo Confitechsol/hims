@@ -33,6 +33,9 @@ class IpdDetail extends Model
         'note',
         'refference',
         'cons_doctor',
+        'cons_doctor2',
+        'cons_doctor3',
+        'cons_doctor4',
         'organisation_id',
         'credit_limit',
         'payment_mode',
@@ -95,5 +98,9 @@ class IpdDetail extends Model
      public function treatmentHistory()
     {
         return $this->hasMany(ConsultantRegister::class, 'ipd_id', 'id');
+    }
+    public function ipdPatients()
+    {
+        return $this->hasOne(IpdPatient::class, 'ipd_id', 'id');
     }
 }

@@ -22,11 +22,11 @@ class IpdMedicine extends Model
     ];
 
     /**
-     * 🔗 Relation: Each medicine belongs to one OPD Prescription.
+     * 🔗 Relation: Each medicine belongs to one IPD Prescription.
      */
     public function prescription()
     {
-        return $this->belongsTo(OpdPrescription::class, 'prescription_id');
+        return $this->belongsTo(IpdPrescription::class, 'prescription_id');
     }
 
     /**

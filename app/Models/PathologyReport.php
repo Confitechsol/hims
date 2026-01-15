@@ -10,6 +10,8 @@ class PathologyReport extends Model
     use HasFactory;
 
     protected $table = 'pathology_report';
+    
+    public $timestamps = false; // Disable timestamps if table doesn't have created_at/updated_at
 
     protected $fillable = [
         'hospital_id',
@@ -23,6 +25,7 @@ class PathologyReport extends Model
         'tax_percentage',
         'apply_charge',
         'collection_date',
+        'collection_by',
         'collection_specialist',
         'pathology_center',
         'approved_by',
@@ -30,6 +33,7 @@ class PathologyReport extends Model
         'description',
         'pathology_report',
         'report_name',
+        'path_doc_path',
         'pathology_result',
     ];
 

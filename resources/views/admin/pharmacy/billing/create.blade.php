@@ -247,6 +247,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Medicine category change
     document.addEventListener('change', '.medicine_category', function() {
+        // Skip if this change was triggered programmatically
+        if (this.dataset.programmaticChange === 'true') {
+            this.dataset.programmaticChange = 'false';
+            return;
+        }
+        
         const categoryId = this.value;
         const medicineSelect = this.closest('tr').querySelector('.medicine_name');
         
@@ -471,6 +477,24 @@ function initPrescriptionAutocomplete() {
         searchInput.value = `${prescription.case_id} - ${prescription.date || 'N/A'}`;
         hiddenInput.value = prescription.id;
         hideSuggestions();
+        
+        // Load medicines if this is an IPD prescription
+        if (prescription.type === 'ipd' && prescription.prescription_id) {
+            loadPrescriptionMedicines(prescription.prescription_id);
+            
+            // Update doctor name if available
+            if (prescription.doctor) {
+                document.getElementById('doctor_name').value = prescription.doctor;
+            }
+        } else if (prescription.type === 'ipd' && prescription.id) {
+            // Fallback: use id if prescription_id is not available
+            loadPrescriptionMedicines(prescription.id);
+            
+            // Update doctor name if available
+            if (prescription.doctor) {
+                document.getElementById('doctor_name').value = prescription.doctor;
+            }
+        }
     }
     
     function hideSuggestions() {
@@ -535,8 +559,14 @@ function updateHighlight(suggestionsList) {
 
 function loadPatientPrescriptions(patientId) {
     // Fetch case references for the selected patient
-    fetch(`/hims/pharmacy/api/patient-prescriptions/${patientId}`)
-        .then(response => response.json())
+    const url = `{{ url('/pharmacy/api/patient-prescriptions') }}/${patientId}`;
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             // Store prescription data globally for autocomplete
             window.prescriptionData = data;
@@ -555,7 +585,7 @@ function loadPatientPrescriptions(patientId) {
 }
 
 function fetchMedicines(categoryId, medicineSelect) {
-    fetch(`{{ route('pharmacy.api.medicines') }}?category_id=${categoryId}`)
+    return fetch(`{{ route('pharmacy.api.medicines') }}?category_id=${categoryId}`)
         .then(response => response.json())
         .then(data => {
             let options = '<option value="">Select Medicine</option>';
@@ -563,8 +593,12 @@ function fetchMedicines(categoryId, medicineSelect) {
                 options += `<option value="${medicine.id}">${medicine.medicine_name}</option>`;
             });
             medicineSelect.innerHTML = options;
+            return data; // Return data for chaining
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
 }
 
 function fetchMedicineBatches(medicineId, batchSelect) {
@@ -594,6 +628,213 @@ function fetchBatchDetails(batchId, row) {
             calculateTotals();
         })
         .catch(error => console.error('Error:', error));
+}
+
+function loadPrescriptionMedicines(prescriptionId) {
+    console.log('Loading prescription medicines for ID:', prescriptionId);
+    const url = `{{ url('/pharmacy/api/prescription-medicines') }}/${prescriptionId}`;
+    
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Prescription medicines loaded:', data);
+            if (data.error) {
+                console.error('Error:', data.error);
+                alert('Error loading prescription medicines: ' + data.error);
+                return;
+            }
+            
+            // Clear existing medicine rows (except the first one)
+            const tbody = document.getElementById('medicineTableBody');
+            const existingRows = tbody.querySelectorAll('tr');
+            existingRows.forEach((row, index) => {
+                if (index > 0) {
+                    row.remove();
+                }
+            });
+            
+            // Reset totalRows counter
+            totalRows = 1;
+            
+            // Clear the first row
+            const firstRow = tbody.querySelector('tr');
+            if (firstRow) {
+                const categorySelect = firstRow.querySelector('.medicine_category');
+                const medicineSelect = firstRow.querySelector('.medicine_name');
+                const batchSelect = firstRow.querySelector('.batch_no');
+                categorySelect.value = '';
+                medicineSelect.innerHTML = '<option value="">Select Medicine</option>';
+                batchSelect.innerHTML = '<option value="">Select Batch</option>';
+                firstRow.querySelector('.exp_date').value = '';
+                firstRow.querySelector('.qty').value = '';
+                firstRow.querySelector('.available_qty').textContent = '';
+                firstRow.querySelector('.available_quantity').value = '';
+                firstRow.querySelector('.price').value = '';
+                firstRow.querySelector('.medicine_tax').value = '';
+                firstRow.querySelector('.subtot').value = '';
+            }
+            
+            // Add medicines from prescription
+            if (data.medicines && data.medicines.length > 0) {
+                // Process medicines sequentially to avoid race conditions
+                const processMedicines = async () => {
+                    const firstRowRef = firstRow; // Store reference to avoid closure issues
+                    
+                    for (let index = 0; index < data.medicines.length; index++) {
+                        const medicine = data.medicines[index];
+                        console.log(`Processing medicine ${index + 1}:`, medicine);
+                        
+                        let row;
+                        if (index === 0 && firstRowRef) {
+                            row = firstRowRef;
+                            console.log('Using first row');
+                        } else {
+                            // Create new row
+                            totalRows++;
+                            addMedicineRow();
+                            row = document.getElementById(`row${totalRows}`);
+                            console.log(`Created new row: row${totalRows}`);
+                        }
+                        
+                        if (!row) {
+                            console.error('Row not found!');
+                            continue;
+                        }
+                        
+                        // Set category
+                        const categorySelect = row.querySelector('.medicine_category');
+                        const medicineSelect = row.querySelector('.medicine_name');
+                        
+                        if (!categorySelect) {
+                            console.error('Category select not found in row!');
+                            continue;
+                        }
+                        
+                        if (!medicineSelect) {
+                            console.error('Medicine select not found in row!');
+                            continue;
+                        }
+                        
+                        if (medicine.medicine_category_id) {
+                            console.log(`Setting category to ${medicine.medicine_category_id}`);
+                            // Set category value (convert to string to match select option values)
+                            const categoryIdStr = String(medicine.medicine_category_id);
+                            
+                            // Find and select the option explicitly
+                            const categoryOption = Array.from(categorySelect.options).find(opt => opt.value === categoryIdStr);
+                            if (categoryOption) {
+                                // First deselect all options
+                                Array.from(categorySelect.options).forEach(opt => {
+                                    opt.selected = false;
+                                });
+                                // Then select the target option
+                                categoryOption.selected = true;
+                                categorySelect.value = categoryIdStr;
+                                console.log('Category option found and selected:', categoryOption.text);
+                            } else {
+                                // Fallback: just set the value
+                                categorySelect.value = categoryIdStr;
+                                console.warn('Category option not found, setting value directly');
+                                console.log('Available category options:', Array.from(categorySelect.options).map(opt => ({value: opt.value, text: opt.text})));
+                            }
+                            
+                            // Verify the value was set
+                            if (categorySelect.value !== categoryIdStr) {
+                                console.warn(`Category value mismatch. Expected: ${categoryIdStr}, Got: ${categorySelect.value}`);
+                            } else {
+                                console.log('Category value set successfully:', categorySelect.value);
+                            }
+                            
+                            // Force a visual update by triggering change event (but mark it as programmatic)
+                            categorySelect.dataset.programmaticChange = 'true';
+                            const changeEvent = new Event('change', { bubbles: true });
+                            categorySelect.dispatchEvent(changeEvent);
+                            
+                            // Force a visual update with a small delay to ensure DOM updates
+                            setTimeout(() => {
+                                // Double-check the value is still set
+                                if (categorySelect.value !== categoryIdStr) {
+                                    categorySelect.value = categoryIdStr;
+                                    console.log('Re-setting category value after delay');
+                                }
+                            }, 50);
+                            
+                            // Load medicines for this category and wait for completion
+                            try {
+                                await fetchMedicines(medicine.medicine_category_id, medicineSelect);
+                                console.log('Medicines loaded for category');
+                                
+                                // Now set the medicine value (convert to string to match select option values)
+                                if (medicine.id) {
+                                    console.log(`Setting medicine to ${medicine.id}`);
+                                    const medicineIdStr = String(medicine.id);
+                                    
+                                    // Find and select the option explicitly
+                                    const medicineOption = Array.from(medicineSelect.options).find(opt => opt.value === medicineIdStr);
+                                    if (medicineOption) {
+                                        // First deselect all options
+                                        Array.from(medicineSelect.options).forEach(opt => {
+                                            opt.selected = false;
+                                        });
+                                        // Then select the target option
+                                        medicineOption.selected = true;
+                                        medicineSelect.value = medicineIdStr;
+                                        console.log('Medicine option found and selected:', medicineOption.text);
+                                    } else {
+                                        medicineSelect.value = medicineIdStr;
+                                        console.warn('Medicine option not found, setting value directly');
+                                    }
+                                    
+                                    // Verify the value was set
+                                    if (medicineSelect.value != medicineIdStr) {
+                                        console.warn(`Medicine value mismatch. Expected: ${medicine.id}, Got: ${medicineSelect.value}`);
+                                    } else {
+                                        console.log('Medicine value set successfully:', medicineSelect.value);
+                                    }
+                                    
+                                    // Force a visual update with a small delay to ensure DOM updates
+                                    setTimeout(() => {
+                                        // Double-check the value is still set
+                                        if (medicineSelect.value != medicineIdStr) {
+                                            medicineSelect.value = medicineIdStr;
+                                            console.log('Re-setting medicine value after delay');
+                                        }
+                                    }, 50);
+                                    
+                                    // Trigger change event to load batches
+                                    const medicineChangeEvent = new Event('change', { bubbles: true });
+                                    medicineSelect.dispatchEvent(medicineChangeEvent);
+                                }
+                            } catch (error) {
+                                console.error('Error loading medicines for category:', error);
+                            }
+                        } else {
+                            console.warn('Medicine category_id is missing:', medicine);
+                        }
+                    }
+                    
+                    // Update doctor name if available
+                    if (data.prescription && data.prescription.doctor) {
+                        document.getElementById('doctor_name').value = data.prescription.doctor;
+                    }
+                    
+                    console.log(`Loaded ${data.medicines.length} medicines from prescription`);
+                };
+                
+                processMedicines();
+            } else {
+                console.log('No medicines found in prescription');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading prescription medicines:', error);
+            alert('Error loading prescription medicines: ' + error.message);
+        });
 }
 
 function updateAmount(row) {

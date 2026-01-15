@@ -85,6 +85,7 @@ class PatientController extends Controller
             'name'                  => 'required|string|max:255',
             'guardian_name'         => 'nullable|string|max:255',
             'guardian_phone'        => 'nullable|string|max:20',
+            'guardian_relation'     => 'nullable|string|max:255',
             'gender'                => 'required',
             'birth_date'            => 'nullable|date',
             'age.year'              => 'nullable|integer|min:0',
@@ -97,11 +98,16 @@ class PatientController extends Controller
             'email'                 => 'nullable|email|max:255',
             'height'                => 'nullable|string|max:255',
             'weight'                => 'nullable|string|max:255',
+            'nationality'           => 'nullable|string|max:255',
             'temperature'           => 'nullable|string|max:255',
             'emergency_contact_no'  => 'nullable|string|max:20',
-            'languages_speak'       => 'nullable|string|max:255',
+            // 'languages_speak'       => 'nullable|string|max:255',
+            'languages_known' => 'nullable|array',
+            'languages_known.*' => 'in:Bengali,Hindi,English,Urdu',
             'newspaper_preference'  => 'nullable|string|max:255',
             'address'               => 'nullable|string|max:500',
+            'area'                  => 'nullable|string|max:500',
+            'religion'               => 'nullable|string|max:500',
             'remarks'               => 'nullable|string|max:500',
             'allergies'             => 'nullable|string|max:255',
             'tpa'                   => 'nullable|in:1,2,3,4,5',
@@ -120,7 +126,6 @@ class PatientController extends Controller
         // Convert validator result to array
         $data = $validated->validated();
 
-    
 
         // Handle file upload
         $photoPath = null;
@@ -133,6 +138,7 @@ class PatientController extends Controller
             'patient_name'          => $data['name'],
             'guardian_name'         => $data['guardian_name'] ?? null,
             'guardian_phone'        => $data['guardian_phone'] ?? null,
+            'guardian_relation'     => $data['guardian_relation'] ?? null,
             'gender'                => $data['gender'],
             'dob'                   => $data['birth_date'] ?? null,
 
@@ -148,11 +154,15 @@ class PatientController extends Controller
             'email'                 => $data['email'] ?? null,
             'height'                => $data['height'] ?? null,
             'weight'                => $data['weight'] ?? null,
+            'nationality'           => $data['nationality'] ?? null,
             'temperature'           => $data['temperature'] ?? null,
             'emergency_contact_no'  => $data['emergency_contact_no'] ?? null,
-            'languages_speak'       => $data['languages_speak'] ?? null,
+            // 'languages_speak'       => $data['languages_speak'] ?? null,
+            'languages_speak' => $data['languages_known'] ?? null,
             'newspaper_preference'  => $data['newspaper_preference'] ?? null,
             'address'               => $data['address'] ?? null,
+            'area'                  => $data['area'] ?? null,
+            'religion'               => $data['religion'] ?? null,
             'note'                  => $data['remarks'] ?? null,
             'known_allergies'       => $data['allergies'] ?? null,
 
@@ -184,6 +194,7 @@ class PatientController extends Controller
             'name'                  => 'required|string|max:255',
             'guardian_name'         => 'nullable|string|max:255',
             'guardian_phone'        => 'nullable|string|max:20',
+            'guardian_relation'     => 'nullable|string|max:255',
             'gender'                => 'required|in:Male,Female',
             'birth_date'            => 'nullable|date',
             'age.year'              => 'nullable|integer|min:0',
@@ -234,6 +245,7 @@ class PatientController extends Controller
            'patient_name'          => $data['name'],
         'guardian_name'         => $data['guardian_name'] ?? null,
         'guardian_phone'        => $data['guardian_phone'] ?? null,
+        'guardian_relation'     => $data['guardian_relation'] ?? null,
         'gender'                => $data['gender'],
         'dob'                   => $data['birth_date'] ?? null,
 
@@ -390,7 +402,7 @@ class PatientController extends Controller
             "Patient", "Gender", "Blood Group", "Age(Year)", "Age(Month)", "Age(Day)",
             "Marital Status", "Phone", "Email", "Address", "Remarks", "Known Allergies",
             "Height","Weight","Temperature","Identification Number", "TPA", "TPA ID", "TPA Validity",
-            "Gaurdian Name", "Gaurdian Phone No.", "Emergency Phone No.", "Languages Speak", "Newspaper Preference"
+            "Gaurdian Name", "Gaurdian Phone No.", "Gaurdian Phone No.", "Emergency Phone No.", "Languages Speak", "Newspaper Preference"
         ];
 
         // Add header row

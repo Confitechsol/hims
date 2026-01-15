@@ -1097,7 +1097,7 @@
 
 
         })
-        addPatientBtn.addEventListener("click", function() {
+        addPatientBtn?.addEventListener("click", function() {
             // Keep the first modal open
             const opdModalInstance = bootstrap.Modal.getInstance(visitDetailsModal);
             opdModalInstance._element.classList.add('modal-stacked');
@@ -1120,7 +1120,7 @@
         });
 
         // Cleanup when second modal closes
-        addPatientModal.addEventListener('hidden.bs.modal', () => {
+        addPatientModal?.addEventListener('hidden.bs.modal', () => {
             // Remove only the custom backdrop
             const stackedBackdrop = document.querySelector('.modal-backdrop[data-stacked="true"]');
             if (stackedBackdrop) stackedBackdrop.remove();

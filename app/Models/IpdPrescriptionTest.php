@@ -14,6 +14,7 @@ class IpdPrescriptionTest extends Model
         'hospital_id',
         'branch_id',
         'ipd_prescription_basic_id',
+        'ipd_prescription_id',  // NEW
         'pathology_id',
         'radiology_id',
     ];
@@ -26,13 +27,18 @@ class IpdPrescriptionTest extends Model
         return $this->belongsTo(IpdPrescriptionBasic::class, 'ipd_prescription_basic_id');
     }
 
+    public function prescription()
+    {
+        return $this->belongsTo(IpdPrescription::class, 'ipd_prescription_id');
+    }
+
     public function pathology()
     {
         return $this->belongsTo(Pathology::class, 'pathology_id');
     }
 
-    // public function radiology()
-    // {
-    //     return $this->belongsTo(Radiology::class, 'radiology_id');
-    // }
+    public function radiology()
+    {
+        return $this->belongsTo(Radio::class, 'radiology_id');
+    }
 }
