@@ -68,7 +68,23 @@ class ProcessDaywiseBedChargeJob implements ShouldQueue
             $result = $service->calculateDaywiseCharges($this->ipdId, $this->chargeDate);
 
             if (!$result['success']) {
-                throw new Exception($result['message']);
+                // Handle expected failures gracefully (no bed assignment, invalid charge, etc.)
+                $message = $result['message'] ?? 'Unknown error';
+                
+                // Only throw exception for unexpected errors, not for "no bed assignment" scenarios
+                if (str_contains(strtolower($message), 'no bed assignment') || 
+                    str_contains(strtolower($message), 'invalid bed charge')) {
+                    // These are expected scenarios - log and mark as successful (no retry needed)
+                    Log::info("Skipping bed charge calculation (expected scenario)", [
+                        'ipd_id' => $this->ipdId,
+                        'charge_date' => $this->chargeDate ?? 'previous day',
+                        'reason' => $message,
+                    ]);
+                    return; // Exit successfully without throwing exception
+                }
+                
+                // For other errors, throw exception to trigger retry
+                throw new Exception($message);
             }
 
             Log::info("Successfully processed daywise bed charge job", [
