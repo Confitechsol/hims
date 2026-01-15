@@ -24,7 +24,7 @@ class DeathController extends Controller
         });
     }
     $deathReports = $query->paginate($perPage);
-    //    return response()->json($deathReports , 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
+      //  return response()->json($deathReports , 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
       return view('admin.birthordeath.indexdeath', compact('deathReports'));
     }
 

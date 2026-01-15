@@ -176,7 +176,7 @@ class PathologyBillingController extends Controller
      */
     public function edit($id)
     {
-        $bill = PathologyBilling::with(['patient.organisation', 'doctor', 'reports.pathology', 'organisation'])->findOrFail($id);
+        $bill = PathologyBilling::with(['patient.organisation', 'doctor', 'reports.pathology', 'organisation', 'prescription'])->findOrFail($id);
         $patients = Patient::select('id', 'patient_name', 'mobileno')->get();
         $doctors = Doctor::select('id', 'name', 'surname', 'doctor_id')
             ->where(function($query) {
@@ -187,7 +187,13 @@ class PathologyBillingController extends Controller
             ->get();
         $tests = Pathology::with(['category'])->get();
         
-        return view('admin.pathology.billing.edit', compact('bill', 'patients', 'doctors', 'tests'));
+        // Get prescription number for display
+        $prescriptionNumber = '';
+        if ($bill->prescription) {
+            $prescriptionNumber = $bill->prescription->prescription_number ?? 'IPDP' . str_pad($bill->prescription->id, 4, '0', STR_PAD_LEFT);
+        }
+        
+        return view('admin.pathology.billing.edit', compact('bill', 'patients', 'doctors', 'tests', 'prescriptionNumber'));
     }
 
     /**

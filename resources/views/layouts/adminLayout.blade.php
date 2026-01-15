@@ -26,7 +26,7 @@
     <!-- Styles -->
 
     <!-- style css -->
-    <link rel="stylesheet" href="assets/css/custom.css">
+    <link rel="stylesheet" href="{{asset('assets/css/custom.css')}}">
 
     <!-- Page Title -->
     <title>{{ config('app.name', 'HIMS') }}</title>
@@ -254,13 +254,13 @@
 
                         <!-- Logo Normal -->
                         <span class="logo-light">
-                            <span class="logo-lg"><img src="assets/img/logo.png" alt="logo"></span>
-                            <span class="logo-sm"><img src="assets/img/logo-small.svg" alt="small logo"></span>
+                            <span class="logo-lg"><img src="{{asset('assets/img/logo.png')}}" alt="logo"></span>
+                            <span class="logo-sm"><img src="{{asset('assets/img/logo-small.svg')}}" alt="small logo"></span>
                         </span>
 
                         <!-- Logo Dark -->
                         <span class="logo-dark">
-                            <span class="logo-lg"><img src="assets/img/logo-white.svg" alt="dark logo"></span>
+                            <span class="logo-lg"><img src="{{asset('assets/img/logo-white.svg')}}" alt="dark logo"></span>
                         </span>
                     </a>
 

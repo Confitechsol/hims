@@ -117,7 +117,7 @@
 </td>
 
 
-                                                                                                        <td>
+                                                                                                           <td>
                                                                                                                 <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#birthCertModal{{ $report->id }}">
                                                                                                                         Generated Birth Certificate
                                                                                                                 </button>

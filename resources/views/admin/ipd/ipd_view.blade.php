@@ -3925,7 +3925,7 @@
                                                                 data-ipd-id="{{ $ipd->id }}"><i
                                                                     class="ti ti-plus me-1"></i>Add Prescription</a>
                                                         </div>
-                                                        @include('components.modals.add-prescription-modal')
+                                                       @include('components.modals.add-prescription-modal') 
                                                         <!-- First Modal -->
                                                         <div class="modal fade" id="add_timeline" tabindex="-1"
                                                             aria-hidden="true">
