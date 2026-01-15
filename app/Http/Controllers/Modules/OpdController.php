@@ -549,7 +549,7 @@ class OpdController extends Controller
             $user = Auth::user();
             
             $prescription         = OpdPrescription::create([
-                'prescription_number' => "ipd",
+                'prescription_number' => $prescriptionNo,
                 'opd_id'              => $request->opd_id,                
                 'prescribed_by'       => $request->prescribe_by,
                 'header_note'         => $request->header_note ?? null,
