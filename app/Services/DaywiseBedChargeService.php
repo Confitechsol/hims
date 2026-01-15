@@ -49,9 +49,25 @@ class DaywiseBedChargeService
             $lastBed = $this->getLastBedForPeriod($ipdId, $startTime, $endTime);
 
             if (!$lastBed) {
+                // Log all bed history for debugging
+                $allBeds = PatientBedHistory::where('ipd_id', $ipdId)
+                    ->where('is_active', 'yes')
+                    ->orderBy('from_date', 'desc')
+                    ->get(['id', 'from_date', 'to_date', 'bed_group_id', 'bed_id']);
+                
                 Log::info("No bed assignment found for IPD ID: {$ipdId} in period", [
                     'charge_date' => $chargeDate,
+                    'period_start' => $startTime->format('Y-m-d H:i:s'),
+                    'period_end' => $endTime->format('Y-m-d H:i:s'),
+                    'available_beds' => $allBeds->map(function($bed) {
+                        return [
+                            'from_date' => $bed->from_date,
+                            'to_date' => $bed->to_date,
+                            'bed_group_id' => $bed->bed_group_id,
+                        ];
+                    })->toArray(),
                 ]);
+                
                 DB::rollBack();
                 return [
                     'success' => false,
@@ -149,23 +165,23 @@ class DaywiseBedChargeService
      */
     public function getLastBedForPeriod($ipdId, $startTime, $endTime)
     {
+        // Find beds that were active during the period
+        // A bed is active during the period if:
+        // 1. It started before or during the period AND
+        // 2. It ended after the period started (or is still active - to_date is NULL)
         return PatientBedHistory::where('ipd_id', $ipdId)
+            ->where('is_active', 'yes')
             ->where(function ($query) use ($startTime, $endTime) {
-                // Bed assignment started within the period
                 $query->where(function ($q) use ($startTime, $endTime) {
-                    $q->where('from_date', '>=', $startTime)
-                      ->where('from_date', '<', $endTime);
-                })
-                // OR bed assignment was active during the period (to_date is null or after start)
-                ->orWhere(function ($q) use ($startTime, $endTime) {
-                    $q->where('from_date', '<=', $startTime)
-                      ->where(function ($subQ) use ($endTime) {
+                    // Bed assignment started before or during the period
+                    $q->where('from_date', '<=', $endTime)
+                      // AND either still active (to_date is NULL) or ended after period started
+                      ->where(function ($subQ) use ($startTime) {
                           $subQ->whereNull('to_date')
-                               ->orWhere('to_date', '>=', $endTime);
+                               ->orWhere('to_date', '>=', $startTime);
                       });
                 });
             })
-            ->where('is_active', 'yes')
             ->orderBy('from_date', 'desc')
             ->first();
     }

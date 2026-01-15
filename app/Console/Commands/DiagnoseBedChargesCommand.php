@@ -84,7 +84,11 @@ class DiagnoseBedChargesCommand extends Command
             $this->info("4. Testing with IPD ID: {$ipdId}");
         }
 
-        $testDate = $this->option('date') ?: '2024-01-15';
+        $testDate = $this->option('date');
+        if (!$testDate) {
+            // Use yesterday's date by default, or bed assignment date if available
+            $testDate = date('Y-m-d', strtotime('-1 day'));
+        }
         $this->line("   Test Date: {$testDate}");
         $this->newLine();
 
