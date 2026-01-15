@@ -240,327 +240,268 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const form = document.getElementById('itemStockForm');
-    const itemCategory = document.getElementById('item_category');
-    const itemSelect = document.getElementById('item');
-    const capitalTableDiv = document.getElementById('capital_table_div');
-    const consumableTableDiv = document.getElementById('consumable_table_div');
-    const modalTitle = document.getElementById('modalTitle');
-    const saveBtn = document.getElementById('saveBtn');
+document.addEventListener('DOMContentLoaded', () => {
 
-    // Helper: empty both batch table bodies
-    function clearBatchTables() {
-        document.querySelector('#capitalTable tbody').innerHTML = '';
-        document.querySelector('#consumableTable tbody').innerHTML = '';
+    /* ===============================
+       DOM REFERENCES
+    =============================== */
+    const form                = document.getElementById('itemStockForm');
+    const categorySelect      = document.getElementById('item_category');
+    const itemSelect          = document.getElementById('item');
+    const capitalDiv          = document.getElementById('capital_table_div');
+    const consumableDiv       = document.getElementById('consumable_table_div');
+    const modalEl             = document.getElementById('add_item_stock');
+    const modalTitle          = document.getElementById('modalTitle');
+    const saveBtn             = document.getElementById('saveBtn');
+
+    const capitalTbody        = document.querySelector('#capitalTable tbody');
+    const consumableTbody     = document.querySelector('#consumableTable tbody');
+
+    /* ===============================
+       HELPERS
+    =============================== */
+
+    const clearBatches = () => {
+        capitalTbody.innerHTML = '';
+        consumableTbody.innerHTML = '';
+    };
+
+    const hideBatchTables = () => {
+        capitalDiv.classList.add('d-none');
+        consumableDiv.classList.add('d-none');
+    };
+
+    const showBatchTable = (type) => {
+        hideBatchTables();
+        if (type === 'capital') capitalDiv.classList.remove('d-none');
+        if (type === 'consumable') consumableDiv.classList.remove('d-none');
+    };
+
+    const escapeHtml = (str = '') =>
+        String(str).replace(/[&<>"'`=\/]/g, s =>
+            ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','/':'&#x2F;','`':'&#x60;','=':'&#x3D;'})[s]
+        );
+
+    /* ===============================
+       FETCH ITEMS BY CATEGORY
+    =============================== */
+    const loadItems = (categoryId, selectedItemId = null) => {
+        itemSelect.innerHTML = '<option value="">Loading...</option>';
+
+        return fetch(`{{ route('get.items', ':id') }}`.replace(':id', categoryId))
+            .then(r => r.json())
+            .then(items => {
+                itemSelect.innerHTML = '<option value="">Select Item</option>';
+                items.forEach(i => {
+                    const opt = document.createElement('option');
+                    opt.value = i.id;
+                    opt.textContent = i.name;
+                    if (selectedItemId && i.id == selectedItemId) {
+                        opt.selected = true;
+                    }
+                    itemSelect.appendChild(opt);
+                });
+            });
+    };
+
+    /* ===============================
+       CATEGORY CHANGE
+    =============================== */
+    $(document).on('change', '#item_category', function () {
+
+    const selected = this.options[this.selectedIndex];
+    const head = selected ? selected.getAttribute('data-item-head') : null;
+
+    console.log('ITEM HEAD:', head); // ✅ WILL SHOW NOW
+
+    clearBatches();
+    hideBatchTables();
+
+    if (head === 'Capital Equipment') {
+        showBatchTable('capital');
     }
 
-    // Category change -> toggle tables and load items for that category
-    itemCategory.addEventListener('change', function () {
-        const selected = this.options[this.selectedIndex];
-        const itemHead = selected?.getAttribute('data-item-head') || '';
-        const categoryId = this.value;
+    if (head === 'Consumables') {
+        showBatchTable('consumable');
+    }
 
-        capitalTableDiv.classList.add('d-none');
-        consumableTableDiv.classList.add('d-none');
-        clearBatchTables();
+    if (this.value) {
+        loadItems(this.value);
+    } else {
+        itemSelect.innerHTML = '<option value="">Select Item</option>';
+    }
+});
 
-        if (itemHead === 'Capital Equipment') capitalTableDiv.classList.remove('d-none');
-        else if (itemHead === 'Consumables') consumableTableDiv.classList.remove('d-none');
 
-        if (categoryId) {
-            fetch(`{{ route('get.items', ':id') }}`.replace(':id', categoryId))
-                .then(res => res.json())
-                .then(data => {
-                    itemSelect.innerHTML = '<option value="">Select Item</option>';
-                    data.forEach(i => itemSelect.innerHTML += `<option value="${i.id}">${i.name}</option>`);
-                })
-                .catch(() => {
-                    itemSelect.innerHTML = '<option value="">Error loading items</option>';
-                });
-        } else {
-            itemSelect.innerHTML = '<option value="">Select Item</option>';
-        }
-    });
+    /* ===============================
+       ADD MODE
+    =============================== */
+    $(document).on('click', '#addNewStockBtn', () => {
 
-    // Add new stock -> reset and open modal (create mode)
-    $(document).on('click', '#addNewStockBtn', function () {
-        // reset form
         form.reset();
-        clearBatchTables();
+        clearBatches();
+        hideBatchTables();
+
         modalTitle.textContent = 'Add Item Stock';
         saveBtn.textContent = 'Save Item Stock';
-        // remove _method if any
-        const methodInput = form.querySelector('input[name="_method"]');
-        if (methodInput) methodInput.remove();
+
         form.action = "{{ route('itemstock.store') }}";
 
-        // hide batch tables
-        capitalTableDiv.classList.add('d-none');
-        consumableTableDiv.classList.add('d-none');
+        const method = form.querySelector('input[name="_method"]');
+        if (method) method.remove();
 
-        // show modal
-        const modal = new bootstrap.Modal(document.getElementById('add_item_stock'));
-        modal.show();
+        new bootstrap.Modal(modalEl).show();
     });
 
-    // Dynamic add/remove rows
-    document.addEventListener('click', function (e) {
-        const addBtn = e.target.closest('button.addRow');
-        const removeBtn = e.target.closest('button.removeRow');
+    /* ===============================
+       EDIT MODE
+    =============================== */
+    $(document).on('click', '.editStockBtn', function () {
+
+        const id = $(this).data('id');
+
+        $.get(`{{ route('itemstock.edit', ':id') }}`.replace(':id', id), data => {
+
+            const stock = data.stock;
+            if (!stock) return alert('Stock not found');
+
+            modalTitle.textContent = 'Edit Item Stock';
+            saveBtn.textContent = 'Update Item Stock';
+            form.action = `{{ route('itemstock.update', ':id') }}`.replace(':id', id);
+
+            if (!form.querySelector('input[name="_method"]')) {
+                form.insertAdjacentHTML('beforeend',
+                    `<input type="hidden" name="_method" value="PUT">`
+                );
+            }
+
+            /* ---- SIMPLE FIELDS ---- */
+            $('#supplier').val(stock.supplier_id);
+            $('#store').val(stock.store_id);
+            $('#quantity').val(stock.quantity);
+            $('#date').val(stock.date ?? '');
+            $('#message').val(stock.description ?? '');
+            $('select[name="symbol"]').val(stock.symbol ?? '+');
+
+            clearBatches();
+            hideBatchTables();
+
+            /* ---- CATEGORY & ITEMS ---- */
+            $('#item_category').val(stock.item_category_id);
+
+            loadItems(stock.item_category_id, stock.item_id).then(() => {
+
+                const head = stock.item_category?.item_head;
+                const batches = stock.batches || [];
+
+                if (head === 'Capital Equipment') {
+                    showBatchTable('capital');
+                    populateCapital(batches);
+                }
+
+                if (head === 'Consumables') {
+                    showBatchTable('consumable');
+                    populateConsumable(batches);
+                }
+            });
+
+            new bootstrap.Modal(modalEl).show();
+        });
+    });
+
+    /* ===============================
+       ROW ADD / REMOVE
+    =============================== */
+    document.addEventListener('click', e => {
+
+        const addBtn = e.target.closest('.addRow');
+        const removeBtn = e.target.closest('.removeRow');
 
         if (addBtn) {
-            const type = addBtn.getAttribute('data-type');
-            const tableBody = (type === 'capital') ? document.querySelector('#capitalTable tbody') : document.querySelector('#consumableTable tbody');
-            if (!tableBody) return;
-            const rowCount = tableBody.querySelectorAll('tr').length;
-
-            if (type === 'capital') {
-                tableBody.insertAdjacentHTML('beforeend', `
-                    <tr>
-                        <td><input type="text" name="capital_batches[${rowCount}][batch_no]" class="form-control"></td>
-                        <td><input type="text" name="capital_batches[${rowCount}][serial_no]" class="form-control"></td>
-                        <td><input type="number" name="capital_batches[${rowCount}][purchase_price]" class="form-control cap-price"></td>
-                        <td><input type="number" name="capital_batches[${rowCount}][salvage_value]" class="form-control cap-salvage"></td>
-                        <td><input type="number" name="capital_batches[${rowCount}][useful_life]" class="form-control cap-life"></td>
-                        <td><input type="number" name="capital_batches[${rowCount}][annual_depreciation]" class="form-control cap-depreciation" readonly></td>
-                        <td><button type="button" class="btn btn-sm btn-danger removeRow">×</button></td>
-                    </tr>
-                `);
-            } else {
-                tableBody.insertAdjacentHTML('beforeend', `
-                    <tr>
-                        <td><input type="text" name="consumable_batches[${rowCount}][batch_no]" class="form-control"></td>
-                        <td><input type="text" name="consumable_batches[${rowCount}][serial_no]" class="form-control"></td>
-                        <td><input type="number" name="consumable_batches[${rowCount}][purchase_price]" class="form-control"></td>
-                        <td><input type="date" name="consumable_batches[${rowCount}][expiry_date]" class="form-control"></td>
-                        <td><button type="button" class="btn btn-sm btn-danger removeRow">×</button></td>
-                    </tr>
-                `);
-            }
-            reindexRows(type);
+            const type = addBtn.dataset.type;
+            type === 'capital' ? addCapitalRow() : addConsumableRow();
         }
 
         if (removeBtn) {
-            const row = removeBtn.closest('tr');
-            if (!row) return;
-            const tbody = row.closest('tbody');
-            row.remove();
-            const parentTable = tbody.closest('table');
-            if (!parentTable) return;
-            const id = parentTable.id;
-            if (id === 'capitalTable') reindexRows('capital');
-            else if (id === 'consumableTable') reindexRows('consumable');
+            removeBtn.closest('tr').remove();
+            reindex(typeFromRow(removeBtn));
         }
     });
 
-    function reindexRows(type) {
-        if (type === 'capital') {
-            document.querySelectorAll('#capitalTable tbody tr').forEach((tr, idx) => {
-                tr.querySelectorAll('input').forEach((input) => {
-                    const name = input.getAttribute('name') || '';
-                    input.setAttribute('name', name.replace(/capital_batches\[\d+\]/, `capital_batches[${idx}]`));
-                });
+    const typeFromRow = btn =>
+        btn.closest('#capitalTable') ? 'capital' : 'consumable';
+
+    /* ===============================
+       CAPITAL
+    =============================== */
+    const addCapitalRow = (b = {}, i = capitalTbody.children.length) => {
+        capitalTbody.insertAdjacentHTML('beforeend', `
+            <tr>
+                <td><input name="capital_batches[${i}][batch_no]" value="${escapeHtml(b.batch_no)}" class="form-control"></td>
+                <td><input name="capital_batches[${i}][serial_no]" value="${escapeHtml(b.serial_no)}" class="form-control"></td>
+                <td><input name="capital_batches[${i}][purchase_price]" value="${b.purchase_price ?? ''}" class="form-control cap-price"></td>
+                <td><input name="capital_batches[${i}][salvage_value]" value="${b.salvage_value ?? ''}" class="form-control cap-salvage"></td>
+                <td><input name="capital_batches[${i}][useful_life]" value="${b.useful_life ?? ''}" class="form-control cap-life"></td>
+                <td><input name="capital_batches[${i}][annual_depreciation]" value="${b.annual_depreciation ?? ''}" class="form-control cap-dep" readonly></td>
+                <td><button type="button" class="btn btn-sm btn-danger removeRow">×</button></td>
+            </tr>
+        `);
+    };
+
+    const populateCapital = batches => {
+        capitalTbody.innerHTML = '';
+        batches.forEach(addCapitalRow);
+    };
+
+    /* ===============================
+       CONSUMABLE
+    =============================== */
+    const addConsumableRow = (b = {}, i = consumableTbody.children.length) => {
+        consumableTbody.insertAdjacentHTML('beforeend', `
+            <tr>
+                <td><input name="consumable_batches[${i}][batch_no]" value="${escapeHtml(b.batch_no)}" class="form-control"></td>
+                <td><input name="consumable_batches[${i}][serial_no]" value="${escapeHtml(b.serial_no)}" class="form-control"></td>
+                <td><input name="consumable_batches[${i}][purchase_price]" value="${b.purchase_price ?? ''}" class="form-control"></td>
+                <td><input type="date" name="consumable_batches[${i}][expiry_date]" value="${b.expiry_date ?? ''}" class="form-control"></td>
+                <td><button type="button" class="btn btn-sm btn-danger removeRow">×</button></td>
+            </tr>
+        `);
+    };
+
+    const populateConsumable = batches => {
+        consumableTbody.innerHTML = '';
+        batches.forEach(addConsumableRow);
+    };
+
+    /* ===============================
+       REINDEX
+    =============================== */
+    const reindex = type => {
+        document.querySelectorAll(`#${type}Table tbody tr`).forEach((tr, i) => {
+            tr.querySelectorAll('input').forEach(inp => {
+                inp.name = inp.name.replace(/\[\d+\]/, `[${i}]`);
             });
-        } else {
-            document.querySelectorAll('#consumableTable tbody tr').forEach((tr, idx) => {
-                tr.querySelectorAll('input').forEach((input) => {
-                    const name = input.getAttribute('name') || '';
-                    input.setAttribute('name', name.replace(/consumable_batches\[\d+\]/, `consumable_batches[${idx}]`));
-                });
-            });
-        }
-    }
+        });
+    };
 
-    // Auto-calc depreciation on capital rows
-    document.addEventListener('input', function (e) {
-        if (e.target.classList.contains('cap-price') || e.target.classList.contains('cap-salvage') || e.target.classList.contains('cap-life')) {
-            const row = e.target.closest('tr');
-            const purchase = parseFloat(row.querySelector('.cap-price').value) || 0;
-            const salvage = parseFloat(row.querySelector('.cap-salvage').value) || 0;
-            const life = parseFloat(row.querySelector('.cap-life').value) || 0;
-            const depField = row.querySelector('.cap-depreciation');
-            depField.value = (purchase > 0 && life > 0) ? ((purchase - salvage) / life).toFixed(2) : '';
-        }
+    /* ===============================
+       DEPRECIATION
+    =============================== */
+    document.addEventListener('input', e => {
+        if (!e.target.closest('.cap-price,.cap-salvage,.cap-life')) return;
+
+        const row = e.target.closest('tr');
+        const p = +row.querySelector('.cap-price')?.value || 0;
+        const s = +row.querySelector('.cap-salvage')?.value || 0;
+        const l = +row.querySelector('.cap-life')?.value || 0;
+
+        row.querySelector('.cap-dep').value =
+            (p && l) ? ((p - s) / l).toFixed(2) : '';
     });
 
-    // EDIT handler: fetch stock & populate modal
-    $(document).on('click', '.editStockBtn', function () {
-        const id = $(this).data('id');
-
-        $.ajax({
-            url: "{{ route('itemstock.edit', ':id') }}".replace(':id', id),
-            method: 'GET',
-            success: function (data) {
-                // `data` contains: stock, categories, items, suppliers, stores (per your earlier JSON)
-                if (!data || !data.stock) {
-                    return alert('Stock not found.');
-                }
-
-                const stock = data.stock;
-
-                // show modal
-                const modal = new bootstrap.Modal(document.getElementById('add_item_stock'));
-                modal.show();
-
-                modalTitle.textContent = 'Edit Item Stock';
-                saveBtn.textContent = 'Update Item Stock';
-
-                // set form action to update route
-                form.action = "{{ route('itemstock.update', ':id') }}".replace(':id', id);
-
-                // add PUT method input if not present
-                if (!form.querySelector('input[name="_method"]')) {
-                    const methodInput = document.createElement('input');
-                    methodInput.type = 'hidden';
-                    methodInput.name = '_method';
-                    methodInput.value = 'PUT';
-                    form.appendChild(methodInput);
-                }
-
-                // populate categories select (use data.categories if present)
-                if (Array.isArray(data.categories)) {
-                    const catSel = document.getElementById('item_category');
-                    catSel.innerHTML = '<option value="">Select Item Category</option>';
-                    data.categories.forEach(c => {
-                        const opt = document.createElement('option');
-                        opt.value = c.id;
-                        opt.text = c.item_category;
-                        // if server returned item_head with categories then keep data-item-head attribute - but fallback keep existing
-                        // We can't get item_head from this array here, but the selected option already exists in your view.
-                        catSel.appendChild(opt);
-                    });
-                }
-
-                // populate items select (data.items) and select the stock.item
-                if (Array.isArray(data.items)) {
-                    itemSelect.innerHTML = '<option value="">Select Item</option>';
-                    data.items.forEach(i => {
-                        const selected = (i.id == stock.item_id) ? 'selected' : '';
-                        itemSelect.innerHTML += `<option value="${i.id}" ${selected}>${i.name}</option>`;
-                    });
-                } else {
-                    // fallback: set the single item
-                    itemSelect.innerHTML = `<option value="${stock.item.id}" selected>${stock.item.name}</option>`;
-                }
-
-                // populate suppliers & stores selects using server arrays (if exist)
-                if (Array.isArray(data.suppliers)) {
-                    const sSel = document.getElementById('supplier');
-                    sSel.innerHTML = '<option value="">Select Supplier</option>';
-                    data.suppliers.forEach(s => sSel.innerHTML += `<option value="${s.id}" ${s.id == stock.supplier_id ? 'selected' : ''}>${s.item_supplier}</option>`);
-                } else {
-                    $('#supplier').val(stock.supplier_id);
-                }
-
-                if (Array.isArray(data.stores)) {
-                    const stSel = document.getElementById('store');
-                    stSel.innerHTML = '<option value="">Select Store</option>';
-                    data.stores.forEach(s => stSel.innerHTML += `<option value="${s.id}" ${s.id == stock.store_id ? 'selected' : ''}>${s.item_store}</option>`);
-                } else {
-                    $('#store').val(stock.store_id);
-                }
-
-                // set simple fields
-                $('#item_category').val(stock.item_category_id).trigger('change');
-                $('#supplier').val(stock.supplier_id);
-                $('#store').val(stock.store_id);
-                $('#quantity').val(stock.quantity);
-                $('#date').val(stock.date ?? '');
-                $('#message').val(stock.description ?? '');
-
-                $('#stock_id').val(stock.id);
-
-                // clear previous batch rows
-                clearBatchTables();
-
-                // determine which batch table to show:
-                // Use stock.item_category.item_head (note server returns item_category not itemCategory)
-                const itemCategoryObj = stock.item_category || stock.itemCategory || null;
-                const head = itemCategoryObj ? itemCategoryObj.item_head : null;
-
-                // If categories array or stock.batches can indicate per-batch fields:
-                // decide by head OR by presence of salvage_value / expiry_date on batches
-                const batches = Array.isArray(stock.batches) ? stock.batches : [];
-
-                let decided = null;
-                if (head === 'Capital Equipment') decided = 'capital';
-                else if (head === 'Consumables') decided = 'consumable';
-                else if (batches.length > 0) {
-                    // fallback: inspect first batch row fields
-                    const first = batches[0];
-                    if (first && (first.salvage_value !== null || first.useful_life !== null)) decided = 'capital';
-                    else if (first && first.expiry_date) decided = 'consumable';
-                }
-
-                if (decided === 'capital') {
-                    populateCapitalBatches(batches);
-                    capitalTableDiv.classList.remove('d-none');
-                    consumableTableDiv.classList.add('d-none');
-                } else if (decided === 'consumable') {
-                    populateConsumableBatches(batches);
-                    consumableTableDiv.classList.remove('d-none');
-                    capitalTableDiv.classList.add('d-none');
-                } else {
-                    // if no batches, show nothing (user can add)
-                    capitalTableDiv.classList.add('d-none');
-                    consumableTableDiv.classList.add('d-none');
-                }
-            },
-            error: function (xhr) {
-                console.error(xhr.responseText);
-                alert('Error fetching stock data.');
-            }
-        });
-    });
-
-    // Populate helpers
-    function populateCapitalBatches(batches) {
-        const tbody = document.querySelector('#capitalTable tbody');
-        tbody.innerHTML = '';
-        batches.forEach((b, i) => {
-            tbody.insertAdjacentHTML('beforeend', `
-                <tr>
-                    <td><input type="text" name="capital_batches[${i}][batch_no]" value="${escapeHtml(b.batch_no ?? '')}" class="form-control"></td>
-                    <td><input type="text" name="capital_batches[${i}][serial_no]" value="${escapeHtml(b.serial_no ?? '')}" class="form-control"></td>
-                    <td><input type="number" name="capital_batches[${i}][purchase_price]" value="${b.purchase_price ?? ''}" class="form-control cap-price"></td>
-                    <td><input type="number" name="capital_batches[${i}][salvage_value]" value="${b.salvage_value ?? ''}" class="form-control cap-salvage"></td>
-                    <td><input type="number" name="capital_batches[${i}][useful_life]" value="${b.useful_life ?? ''}" class="form-control cap-life"></td>
-                    <td><input type="number" name="capital_batches[${i}][annual_depreciation]" value="${b.annual_depreciation ?? ''}" class="form-control cap-depreciation" readonly></td>
-                    <td><button type="button" class="btn btn-sm btn-danger removeRow">×</button></td>
-                </tr>
-            `);
-        });
-        reindexRows('capital');
-    }
-
-    function populateConsumableBatches(batches) {
-        const tbody = document.querySelector('#consumableTable tbody');
-        tbody.innerHTML = '';
-        batches.forEach((b, i) => {
-            tbody.insertAdjacentHTML('beforeend', `
-                <tr>
-                    <td><input type="text" name="consumable_batches[${i}][batch_no]" value="${escapeHtml(b.batch_no ?? '')}" class="form-control"></td>
-                    <td><input type="text" name="consumable_batches[${i}][serial_no]" value="${escapeHtml(b.serial_no ?? '')}" class="form-control"></td>
-                    <td><input type="number" name="consumable_batches[${i}][purchase_price]" value="${b.purchase_price ?? ''}" class="form-control"></td>
-                    <td><input type="date" name="consumable_batches[${i}][expiry_date]" value="${b.expiry_date ?? ''}" class="form-control"></td>
-                    <td><button type="button" class="btn btn-sm btn-danger removeRow">×</button></td>
-                </tr>
-            `);
-        });
-        reindexRows('consumable');
-    }
-
-    // small helper to avoid breaking HTML injection
-    function escapeHtml(str) {
-        if (!str) return '';
-        return String(str).replace(/[&<>"'`=\/]/g, function (s) {
-            return ({
-                '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','/':'&#x2F;','`':'&#x60;','=':'&#x3D;'
-            })[s];
-        });
-    }
 });
 </script>
+
+
 
 @endsection
