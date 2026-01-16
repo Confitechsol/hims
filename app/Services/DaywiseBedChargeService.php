@@ -49,9 +49,25 @@ class DaywiseBedChargeService
             $lastBed = $this->getLastBedForPeriod($ipdId, $startTime, $endTime);
 
             if (!$lastBed) {
+                // Log all bed history for debugging
+                $allBeds = PatientBedHistory::where('ipd_id', $ipdId)
+                    ->where('is_active', 'yes')
+                    ->orderBy('from_date', 'desc')
+                    ->get(['id', 'from_date', 'to_date', 'bed_group_id', 'bed_id']);
+                
                 Log::info("No bed assignment found for IPD ID: {$ipdId} in period", [
                     'charge_date' => $chargeDate,
+                    'period_start' => $startTime->format('Y-m-d H:i:s'),
+                    'period_end' => $endTime->format('Y-m-d H:i:s'),
+                    'available_beds' => $allBeds->map(function($bed) {
+                        return [
+                            'from_date' => $bed->from_date,
+                            'to_date' => $bed->to_date,
+                            'bed_group_id' => $bed->bed_group_id,
+                        ];
+                    })->toArray(),
                 ]);
+                
                 DB::rollBack();
                 return [
                     'success' => false,
@@ -59,21 +75,44 @@ class DaywiseBedChargeService
                 ];
             }
 
-            // Get bed charge
-            $bedCharge = $this->getBedCharge($lastBed->bed_group_id);
-
-            if ($bedCharge === null || $bedCharge <= 0) {
-                Log::warning("Invalid bed charge for bed group ID: {$lastBed->bed_group_id}", [
+            // Get bed group to retrieve bed_cost (bed_charge_rate)
+            $bedGroup = BedGroup::find($lastBed->bed_group_id);
+            if (!$bedGroup) {
+                Log::warning("Bed group not found for bed group ID: {$lastBed->bed_group_id}", [
                     'ipd_id' => $ipdId,
                     'charge_date' => $chargeDate,
                 ]);
                 DB::rollBack();
                 return [
                     'success' => false,
-                    'message' => 'Invalid bed charge amount',
+                    'message' => 'Bed group not found',
                 ];
             }
 
+            // Get bed charge rate from bed_group.bed_cost
+            $bedChargeRate = $bedGroup->bed_cost ?? 0.00;
+            
+            if ($bedChargeRate <= 0) {
+                Log::warning("Invalid bed charge rate for bed group ID: {$lastBed->bed_group_id}", [
+                    'ipd_id' => $ipdId,
+                    'charge_date' => $chargeDate,
+                    'bed_charge_rate' => $bedChargeRate,
+                ]);
+                DB::rollBack();
+                return [
+                    'success' => false,
+                    'message' => 'Invalid bed charge rate',
+                ];
+            }
+
+            // Calculate period dates (date portion only, not datetime)
+            $periodStartDate = $startTime->format('Y-m-d');
+            $periodEndDate = $endTime->format('Y-m-d');
+            
+            // Calculate total bed charge (rate × number of days)
+            // For 1 day period, bed_charge = bed_charge_rate × 1
+            $bedCharge = $bedChargeRate * 1; // Always 1 day for this period
+            
             // Store or update daywise charge
             $result = $this->storeDaywiseCharge([
                 'hospital_id' => $ipd->hospital_id,
@@ -82,9 +121,13 @@ class DaywiseBedChargeService
                 'case_reference_id' => $ipd->case_reference_id,
                 'patient_id' => $ipd->patient_id,
                 'charge_date' => $chargeDate,
+                'period_start_date' => $periodStartDate,
+                'period_end_date' => $periodEndDate,
                 'bed_group_id' => $lastBed->bed_group_id,
                 'bed_id' => $lastBed->bed_id,
-                'bed_charge' => $bedCharge,
+                'bed_charge' => $bedCharge, // Total charge for the period
+                'bed_charge_rate' => $bedChargeRate, // Per-day rate from bed_group.bed_cost
+                'no_of_days' => 1, // Always 1 for each day period (10 AM to next 10 AM)
                 'is_active' => 'yes',
             ]);
 
@@ -92,8 +135,13 @@ class DaywiseBedChargeService
 
             Log::info("Successfully calculated bed charge for IPD ID: {$ipdId}", [
                 'charge_date' => $chargeDate,
+                'period_start_date' => $periodStartDate,
+                'period_end_date' => $periodEndDate,
                 'bed_charge' => $bedCharge,
+                'bed_charge_rate' => $bedChargeRate,
+                'no_of_days' => 1,
                 'bed_group_id' => $lastBed->bed_group_id,
+                'bed_group_name' => $bedGroup->name ?? 'N/A',
             ]);
 
             return [
@@ -149,23 +197,23 @@ class DaywiseBedChargeService
      */
     public function getLastBedForPeriod($ipdId, $startTime, $endTime)
     {
+        // Find beds that were active during the period
+        // A bed is active during the period if:
+        // 1. It started before or during the period AND
+        // 2. It ended after the period started (or is still active - to_date is NULL)
         return PatientBedHistory::where('ipd_id', $ipdId)
+            ->where('is_active', 'yes')
             ->where(function ($query) use ($startTime, $endTime) {
-                // Bed assignment started within the period
                 $query->where(function ($q) use ($startTime, $endTime) {
-                    $q->where('from_date', '>=', $startTime)
-                      ->where('from_date', '<', $endTime);
-                })
-                // OR bed assignment was active during the period (to_date is null or after start)
-                ->orWhere(function ($q) use ($startTime, $endTime) {
-                    $q->where('from_date', '<=', $startTime)
-                      ->where(function ($subQ) use ($endTime) {
+                    // Bed assignment started before or during the period
+                    $q->where('from_date', '<=', $endTime)
+                      // AND either still active (to_date is NULL) or ended after period started
+                      ->where(function ($subQ) use ($startTime) {
                           $subQ->whereNull('to_date')
-                               ->orWhere('to_date', '>=', $endTime);
+                               ->orWhere('to_date', '>=', $startTime);
                       });
                 });
             })
-            ->where('is_active', 'yes')
             ->orderBy('from_date', 'desc')
             ->first();
     }

@@ -47,7 +47,9 @@ class IpdViewController extends Controller
     }
     public function showIpd(Request $request, $id)
     {
+       
         $ipd             = IpdDetail::with('patient.bloodGroup', 'patient.organisation', 'doctor', 'bedDetail', 'bedGroup', 'treatmentHistory')->where('id', $id)->firstOrFail();
+        // dd($request->all(),$id, $ipd);
         $bedShiftHistory = PatientBedHistory::with('ipd', 'bedGroup', 'bed')->where('is_active', 'yes')->where('ipd_id', $id)->first();
         $symptomIds      = array_filter(
             explode(',', $ipd->symptoms_title),
@@ -118,7 +120,12 @@ class IpdViewController extends Controller
             }
         }
         $currentUser = User::with('userRole')->where('id', Auth::id())->firstOrFail();
-        // dd($currentUser->username);
+//         dd(
+//     $ipd->id,
+//     $ipd->patient,
+//     optional($ipd->patient)->patient_name
+// );
+        //dd($currentUser->username);
         return view('admin.ipd.ipd_view', compact(
             'ipd',
             'doctors',
