@@ -36,7 +36,7 @@ class DoctorController extends Controller
         return response()->json($specialists);
     }
     public function edit($id) {
-        return view('admin.Doctor.addDoctor', [
+        return view('admin.doctor.addDoctor', [
             'doctor' => Doctor::findOrFail($id),
             'roles' => Role::all(),
             'designations' => StaffDesignation::all(),

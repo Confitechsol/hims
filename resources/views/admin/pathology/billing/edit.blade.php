@@ -26,7 +26,7 @@
                         <div class="col-md-3">
                             <label class="form-label">Case Reference</label>
                             <div class="autocomplete-container">
-                                <input type="text" id="prescription_search" class="form-control" placeholder="Search prescriptions" autocomplete="off" value="{{ $bill->case_reference_id ?? '' }}">
+                                <input type="text" id="prescription_search" class="form-control" placeholder="Search prescriptions" autocomplete="off" value="{{ $prescriptionNumber ?? '' }}">
                                 <input type="hidden" name="case_reference_id" id="case_reference_id" value="{{ $bill->case_reference_id ?? '' }}">
                                 <div id="prescription_suggestions" class="autocomplete-suggestions"></div>
                             </div>

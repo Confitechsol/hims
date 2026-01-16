@@ -1197,7 +1197,7 @@
                                                 <th>Name</th>
                                                 <th>Charge Type</th>
                                                 <th>Standard Charge (INR)</th>
-                                                <th>Tax</th>
+                                                <!-- <th>Tax</th> -->
                                                 <th>Applied Charge (INR)</th>
                                                 <th>Amount (INR)</th>
                                             </tr>
@@ -1209,21 +1209,21 @@
                                                         ($charge->charge->standard_charge *
                                                             $charge->charge->taxCategory->percentage) /
                                                         100;
-                                                    $amount = $charge->charge->standard_charge + $taxAmount;
+                                                    $amount = $charge->standard_charge + $taxAmount;
                                                 @endphp
                                                 <tr>
                                                     <td>
-                                                        {{ $charge->charge->name }}
+                                                        {{ $charge->charge->name ?? '-'}}
                                                     </td>
                                                     <td style="text-transform: capitalize;">
-                                                        {{ $charge->chargeCategory->chargeType->charge_type }}
+                                                        {{ $charge->chargeCategory?->chargeType?->charge_type ?? '-' }}
                                                     </td>
-                                                    <td class="text-right">{{ $charge->charge->standard_charge }}</td>
-                                                    <td class="text-right">
-                                                        ({{ $charge->charge->taxCategory->percentage }}%)
+                                                    <td class="text-right">{{ $charge->standard_charge ?? '-'}}</td>
+                                                    <!-- <td class="text-right">
+                                                        ({{ $charge->charge->taxCategory->percentage ?? '-' }}%)
                                                         {{ $taxAmount }}
-                                                    </td>
-                                                    <td class="text-right">{{ $charge->charge->standard_charge }}</td>
+                                                    </td> -->
+                                                    <td class="text-right">{{ $charge->standard_charge ?? '-' }}</td>
                                                     <td class="text-right">{{ $amount }}</td>
                                                 </tr>
                                             @endforeach
@@ -3268,7 +3268,7 @@
                                                                 <th>Applied Charge (INR)</th>
                                                                 <th>TPA Charge (INR)</th>
                                                                 <th>Discount</th>
-                                                                <th>Tax</th>
+                                                                <!-- <th>Tax</th> -->
                                                                 <th>Amount (INR)</th>
                                                                 <!-- <th>Action</th> -->
                                                             </tr>
@@ -3294,24 +3294,24 @@
                                                                         {{ \Carbon\Carbon::parse($charge->date)->format('d-m-Y') }}
                                                                     </td>
                                                                     <td>
-                                                                        {{ $charge->charge->name }}
+                                                                        {{ $charge->charge->name ?? '-' }}
                                                                     </td>
                                                                     <td style="text-transform: capitalize;">
-                                                                        {{ $charge->chargeCategory->chargeType->charge_type }}
+                                                                        {{ $charge->chargeCategory?->chargeType?->charge_type ?? '-' }}
                                                                     </td>
                                                                     <td class="text-right">
-                                                                        {{ $charge->chargeCategory->name }}
+                                                                        {{ $charge->chargeCategory->name ?? '-' }}
                                                                     </td>
 
                                                                     <td class="text-right">
-                                                                        {{ $charge->qty }}</td>
+                                                                        {{ $charge->qty ?? '-' }}</td>
                                                                     <td class="text-right">
-                                                                        {{ $charge->standard_charge }}</td>
+                                                                        {{ $charge->standard_charge ?? '-' }}</td>
                                                                     <td class="text-right">0.00</td>
                                                                     <td>{{ $discountAmount }}&nbsp;({{ $charge->discount }}%)
                                                                     </td>
-                                                                    <td>{{ $taxAmount }}&nbsp;({{ $charge->charge->taxCategory->percentage }}%)
-                                                                    </td>
+                                                                    <!-- <td>{{ $taxAmount }}&nbsp;({{ $charge->charge->taxCategory->percentage }}%)
+                                                                    </td> -->
                                                                     <td>{{ $amount }}</td>
                                                                     <!-- <td>
                                                                                 <div class="d-flex gap-2">
@@ -3925,7 +3925,7 @@
                                                                 data-ipd-id="{{ $ipd->id }}"><i
                                                                     class="ti ti-plus me-1"></i>Add Prescription</a>
                                                         </div>
-                                                        @include('components.modals.add-prescription-modal')
+                                                       @include('components.modals.add-prescription-modal') 
                                                         <!-- First Modal -->
                                                         <div class="modal fade" id="add_timeline" tabindex="-1"
                                                             aria-hidden="true">

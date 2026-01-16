@@ -39,7 +39,7 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center">
                                 <span class="avatar rounded-circle flex-shrink-0 p-2"><img
-                                        src="assets/img/icons/trustcare.svg" alt="img"></span>
+                                        src="{{asset('assets/img/icons/trustcare.svg')}}" alt="img"></span>
                                 <div class="ms-2">
                                     <h6 class="fs-14 fw-semibold mb-0">Trustcare
                                         Clinic</h6>
@@ -53,7 +53,7 @@
                         <div class="p-2">
                             <label class="dropdown-item d-flex align-items-center justify-content-between p-1">
                                 <span class="d-flex align-items-center">
-                                    <span class="me-2"><img src="assets/img/icons/clinic-01.svg" alt></span>
+                                    <span class="me-2"><img src="{{asset('assets/img/icons/clinic-01.svg')}}" alt></span>
                                     <span class="fw-semibold text-dark">CureWell
                                         Medical Hub<small class="d-block text-muted fw-normal fs-13">Ohio</small></span>
                                 </span>
@@ -61,7 +61,7 @@
                             </label>
                             <label class="dropdown-item d-flex align-items-center justify-content-between p-1">
                                 <span class="d-flex align-items-center">
-                                    <span class="me-2"><img src="assets/img/icons/clinic-02.svg" alt></span>
+                                    <span class="me-2"><img src="{{asset('assets/img/icons/clinic-02.svg')}}" alt></span>
                                     <span class="fw-semibold text-dark">Trustcare
                                         Clinic<small class="d-block text-muted fw-normal fs-13">Lasvegas</small></span>
                                 </span>
@@ -69,7 +69,7 @@
                             </label>
                             <label class="dropdown-item d-flex align-items-center justify-content-between p-1">
                                 <span class="d-flex align-items-center">
-                                    <span class="me-2"><img src="assets/img/icons/clinic-03.svg" alt></span>
+                                    <span class="me-2"><img src="{{asset('assets/img/icons/clinic-03.svg')}}" alt></span>
                                     <span class="fw-semibold text-dark">NovaCare
                                         Medical<small
                                             class="d-block text-muted fw-normal fs-13">Washington</small></span>
@@ -78,7 +78,7 @@
                             </label>
                             <label class="dropdown-item d-flex align-items-center justify-content-between p-1">
                                 <span class="d-flex align-items-center">
-                                    <span class="me-2"><img src="assets/img/icons/clinic-04.svg" alt></span>
+                                    <span class="me-2"><img src="{{asset('assets/img/icons/clinic-04.svg')}}" alt></span>
                                     <span class="fw-semibold text-dark">Greeny
                                         Medical Clinic<small
                                             class="d-block text-muted fw-normal fs-13">Illinios</small></span>
@@ -98,7 +98,7 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('dashboard') }}" class="active">Admin
+                                    <li><a href="{{ route('dashboard') }}" class=" {{ request()->routeIs('dashboard') ? 'active' : '' }}">Admin
                                             Dashboard</a></li>
                                     <!--<li><a href="doctor-dashboard.html">Doctor
                                             Dashboard</a></li>
@@ -107,7 +107,7 @@
                                 </ul>
                             </li>
                             <li>
-                                   <a href="{{ route('billing') }}">
+                                   <a href="{{ route('billing') }}" class="{{ request()->routeIs('billing') ? 'active' : '' }}">
                                       <!--<i class="fa fa-file-invoice"></i>  optional icon -->
                                           <span>Billing Section</span>
                                               <!--<span class="menu-arrow"></span>-->
@@ -135,9 +135,9 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('birth') }}" class="active">Birth Record
+                                    <li><a href="{{ route('birth') }}" class="{{ request()->routeIs('birth') ? 'active' : '' }}">Birth Record
                                             </a></li>
-                                    <li><a href="{{ route('death') }}">Death Record
+                                    <li><a href="{{ route('death') }} " class="{{ request()->routeIs('death') ? 'active' : '' }}">Death Record
                                             </a></li>
                                     
                                 </ul>
@@ -148,11 +148,11 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{route('certificate')}}" class="active">Certificate
+                                    <li><a href="{{route('certificate')}}" class="{{ request()->routeIs('certificate') ? 'active' : '' }}">Certificate
                                             </a></li>
-                                    <li><a href="{{route('generate_patient_id')}}">Patient ID Card
+                                    <li><a href="{{route('generate_patient_id')}}" class="{{ request()->routeIs('generate_patient_id') ? 'active' : '' }}">Patient ID Card
                                             </a></li>
-                                    <li><a href="{{route('generate_patient_id')}}">Staff ID Card
+                                    <li><a href="{{route('generate_patient_id')}}" class="{{ request()->routeIs('generate_patient_id') ? 'active' : '' }}">Staff ID Card
                                             </a></li>
                                 </ul>
                             </li>
@@ -185,9 +185,9 @@
                                 </a>
                                 <ul>
                                     
-                                    <li><a href="{{ route('opd') }}">OPD Patient
+                                    <li><a href="{{ route('opd') }}"  class="{{ request()->routeIs('opd') ? 'active' : '' }}">OPD Patient
                                             Details</a></li>
-                                    <li><a href="{{ route('ipd') }}">IPD Patient
+                                    <li><a href="{{ route('ipd') }}"  class="{{ request()->routeIs('ipd') ? 'active' : '' }}">IPD Patient
                                             Details</a></li>
 
 
@@ -199,7 +199,7 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('appointment-details') }}">Appointment Details</a></li>
+                                    <li><a href="{{ route('appointment-details') }}" class="{{ request()->routeIs('appointment-details') ? 'active' : '' }}">Appointment Details</a></li>
                                     <!--<li><a href="new-appointment.html">New
                                             Appointment</a></li>
                                     <li><a href="appointment-calendar.html">Calendar</a></li> -->
@@ -212,15 +212,15 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul style="display: none;">
-                                    <li><a href="{{ route('setup.medicine-category') }}">Medicine Category</a></li>
-                                    <li><a href="{{ route('setup.medicine-supplier') }}">Medicine Supplier</a></li>
-                                    <li><a href="{{ route('setup.medicine-dosage') }}">Medicine Dosage</a></li>
-                                    <li><a href="{{ route('setup.medicine-group') }}">Medicine Group</a></li>
-                                    <li><a href="{{ route('setup.medicine-unit') }}">Medicine Unit</a></li>
-                                    <li><a href="{{ route('setup.dose-duration') }}">Dose Duration</a></li>
-                                    <li><a href="{{ route('setup.dose-interval') }}">Dose Interval</a></li>
-                                    <li><a href="{{ route('setup.medicine-company') }}">Medicine Company</a></li>
-                                    <li><a href="{{ route('pharmacy.billing.index') }}">Pharmacy Billing</a></li>                                    
+                                    <li><a href="{{ route('setup.medicine-category') }}" class="{{ request()->routeIs('setup.medicine-category') ? 'active' : '' }}">Medicine Category</a></li>
+                                    <li><a href="{{ route('setup.medicine-supplier') }}" class="{{ request()->routeIs('setup.medicine-supplier') ? 'active' : '' }}">Medicine Supplier</a></li>
+                                    <li><a href="{{ route('setup.medicine-dosage') }}" class="{{ request()->routeIs('setup.medicine-dosage') ? 'active' : '' }}">Medicine Dosage</a></li>
+                                    <li><a href="{{ route('setup.medicine-group') }}" class="{{ request()->routeIs('setup.medicine-group') ? 'active' : '' }}">Medicine Group</a></li>
+                                    <li><a href="{{ route('setup.medicine-unit') }}" class="{{ request()->routeIs('setup.medicine-unit') ? 'active' : '' }}">Medicine Unit</a></li>
+                                    <li><a href="{{ route('setup.dose-duration') }}" class="{{ request()->routeIs('setup.dose-duration') ? 'active' : '' }}">Dose Duration</a></li>
+                                    <li><a href="{{ route('setup.dose-interval') }}" class="{{ request()->routeIs('setup.dose-interval') ? 'active' : '' }}">Dose Interval</a></li>
+                                    <li><a href="{{ route('setup.medicine-company') }}" class="{{ request()->routeIs('setup.medicine-company') ? 'active' : '' }}">Medicine Company</a></li>
+                                    <li><a href="{{ route('pharmacy.billing.index') }}" class="{{ request()->routeIs('pharmacy.billing.index') ? 'active' : '' }}">Pharmacy Billing</a></li>                                    
                                 </ul>
                             </li>
                             <li class="submenu">
@@ -229,11 +229,11 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('pathology-category') }}">Pathology Category</a></li>
-                                    <li><a href="{{ route('pathology-unit') }}">Pathology Unit</a></li>
-                                    <li><a href="{{ route('pathology-parameter') }}">Pathology Parameter</a></li>
-                                    <li><a href="{{ route('pathology.test.index') }}">Pathology Test</a></li>
-                                    <li><a href="{{ route('pathology.billing.index') }}">Pathology Billing</a></li>
+                                    <li><a href="{{ route('pathology-category') }}" class="{{ request()->routeIs('pathology-category') ? 'active' : '' }}">Pathology Category</a></li>
+                                    <li><a href="{{ route('pathology-unit') }}" class="{{ request()->routeIs('pathology-unit') ? 'active' : '' }}">Pathology Unit</a></li>
+                                    <li><a href="{{ route('pathology-parameter') }}" class="{{ request()->routeIs('pathology-parameter') ? 'active' : '' }}">Pathology Parameter</a></li>
+                                    <li><a href="{{ route('pathology.test.index') }}" class="{{ request()->routeIs('pathology.test.index') ? 'active' : '' }}">Pathology Test</a></li>
+                                    <li><a href="{{ route('pathology.billing.index') }}" class="{{ request()->routeIs('pathology.billing.index') ? 'active' : '' }}">Pathology Billing</a></li>
                                 </ul>
                             </li>
                             <li class="submenu">
@@ -242,25 +242,25 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('radiology-category') }}">Radiology Category</a></li>
-                                    <li><a href="{{ route('radiology-unit') }}">Radiology Unit</a></li>
-                                    <li><a href="{{ route('radiology-parameter') }}">Radiology Parameter</a></li>
-                                    <li><a href="{{ route('radiology.test.index') }}">Radiology Test</a></li>
-                                    <li><a href="{{ route('radiology.billing.index') }}">Radiology Billing</a></li>
+                                    <li><a href="{{ route('radiology-category') }}" class="{{ request()->routeIs('radiology-category') ? 'active' : '' }}">Radiology Category</a></li>
+                                    <li><a href="{{ route('radiology-unit') }}" class="{{ request()->routeIs('radiology-unit') ? 'active' : '' }}">Radiology Unit</a></li>
+                                    <li><a href="{{ route('radiology-parameter') }}" class="{{ request()->routeIs('radiology-parameter') ? 'active' : '' }}">Radiology Parameter</a></li>
+                                    <li><a href="{{ route('radiology.test.index') }}" class="{{ request()->routeIs('radiology.test.index') ? 'active' : '' }}">Radiology Test</a></li>
+                                    <li><a href="{{ route('radiology.billing.index') }}" class="{{ request()->routeIs('radiology.billing.index') ? 'active' : '' }}">Radiology Billing</a></li>
                                 </ul>
                             </li>
-                            <li>
+                            <!-- <li>
                                 <a href="#">
                                     <i class="ti ti-map-pin"></i><span>Blood Bank</span>
                                 </a>
-                            </li>
+                            </li> -->
                             <!-- <li>
                                 <a href="#">
                                     <i class="ti ti-map-pin"></i><span>Ambulance Call</span>
                                 </a>
                             </li> -->
                             <li>
-                                <a href="{{ route('doctor-visit.create') }}">
+                                <a href="{{ route('doctor-visit.create') }}" class="{{ request()->routeIs('doctor-visit.create') ? 'active' : '' }}">
                                     <i class="ti ti-map-pin"></i><span>Doctor Visit</span>
                                 </a>
                             </li>
@@ -277,11 +277,11 @@
                                 <ul>
                                     <li><a href="{{ route('dutyroster') }}" >Duty Roster List
                                             </a></li>
-                                    <li><a href="{{ route('dutyroster.Shift') }}" >Duty Shift List
+                                    <li><a href="{{ route('dutyroster.Shift') }}" class="{{ request()->routeIs('dutyroster.Shift') ? 'active' : '' }}">Duty Shift List
                                             </a></li>
-                                    <li><a href="{{ route('dutyroster.staff') }}" >Staff Roster Details
+                                    <li><a href="{{ route('dutyroster.staff') }}" class="{{ request()->routeIs('dutyroster.staff') ? 'active' : '' }}">Staff Roster Details
                                             </a></li>
-                                    <li><a href="{{ route('dutyroster.doctor') }}">Doctors Roster Details
+                                    <li><a href="{{ route('dutyroster.doctor') }}" class="{{ request()->routeIs('dutyroster.doctor') ? 'active' : '' }}">Doctors Roster Details
                                             </a></li>
                                     
                                 </ul>
@@ -292,12 +292,12 @@
                                 </a>
                             </li> -->
                             <li>
-                                <a href="{{ route('tpamanagement') }}">
+                                <a href="{{ route('tpamanagement') }}" class="{{ request()->routeIs('tpamanagement') ? 'active' : '' }}">
                                     <i class="ti ti-map-pin"></i><span>TPA Management</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ route('inventory-details') }}">
+                                <a href="{{ route('inventory-details') }}" class="{{ request()->routeIs('inventory-details') ? 'active' : '' }}">
                                     <i class="ti ti-map-pin"></i><span>Inventory</span>
                                 </a>
                             </li>
@@ -396,12 +396,12 @@
                             <li>
                         <ul>
                             <li>
-                                <a href="{{ route('staffs.index') }}">
+                                <a href="{{ route('staffs.index') }}" class="{{ request()->routeIs('staffs.index') ? 'active' : '' }}">
                                     <i class="ti ti-users-group"></i><span>Staffs</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ route('doctors.index') }}">
+                                <a href="{{ route('doctors.index') }}" class="{{ request()->routeIs('doctors.index') ? 'active' : '' }}">
                                     <i class="ti ti-users-group"></i><span>Doctors</span>
                                 </a>
                             </li>
@@ -449,16 +449,16 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('finance') }}" class="active">Finance Report
+                                    <li><a href="{{ route('finance') }}" class="{{ request()->routeIs('finance') ? 'active' : '' }}">Finance Report
                                             </a></li>
                                     
-                                    <li><a href="{{ route('finance') }}">OPD
+                                    <li><a href="{{ route('finance') }}" class="{{ request()->routeIs('finance') ? 'active' : '' }}">OPD
                                             Report</a></li>
                                     <li><a href="{{ route('finance') }}">IPD
                                             Report</a></li>
                                     <li><a href="{{ route('finance') }}">Appointment
                                             Report</a></li>
-                                    <li><a href="patient-report.html">Patient
+                                    <!-- <li><a href="patient-report.html">Patient
                                             Report</a></li>
                                             <li><a href="patient-report.html">Finance
                                             Report</a></li>
@@ -481,8 +481,8 @@
                                             <li><a href="patient-report.html">Birth & Death
                                             Report</a></li>
                                             <li><a href="patient-report.html">Human Resource
-                                            Report</a></li>
-                                            <li><a href="patient-report.html">TPA
+                                            Report</a></li> -->
+                                            <!-- <li><a href="patient-report.html">TPA
                                             Report</a></li>
                                             <li><a href="patient-report.html">Inventory
                                             Report</a></li>
@@ -491,17 +491,17 @@
                                             <li><a href="patient-report.html">Log
                                             Report</a></li>
                                             <li><a href="patient-report.html">OT
-                                            Report</a></li>
+                                            Report</a></li> -->
                                             
-                                </ul>
-                            </li>
+                                    </ul>
+                                </li>
                         </ul>
                     </li>
                     <li class="menu-title"><span>Settings</span></li>
                     <li>
                         <ul>
                             <li class="submenu">
-                                <a href="javascript:void(0);">
+                                <a href="javascript:void(0);" >
                                     <i class="ti ti-user-cog"></i><span>Account
                                         Settings</span>
                                     <span class="menu-arrow"></span>
@@ -511,14 +511,14 @@
                                     <!--<li><a href="security-settings.html">Security</a></li>
                                     //<li><a href="notifications-settings.html">Notifications</a></li>
                                     <li><a href="integrations-settings.html">Integrations</a></li>-->
-                                    <li><a href="{{ route('profile') }}">General Settings</a></li>
-                                    <li><a href="{{ route('email-setting') }}">Email Settings</a></li>
-                                    <li><a href="{{ route('prefix') }}">Prefix Settings</a></li>
-                                    <li><a href="{{ route('roles') }}">Roles Permissions</a></li>
-                                    <li><a href="{{ route('database.backups') }}">Backup/Restore</a></li>
-                                    <li><a href="{{ route('languages') }}">Languages</a></li>
-                                    <li><a href="{{ route('users') }}">Users</a></li>
-                                    <li><a href="{{ route('permissions.modules') }}">Modules</a></li>
+                                    <li><a href="{{ route('profile') }}" class="{{ request()->routeIs('doctors.index') ? 'active' : '' }}">General Settings</a></li>
+                                    <li><a href="{{ route('email-setting') }}" class="{{ request()->routeIs('email-setting') ? 'active' : '' }}">Email Settings</a></li>
+                                    <li><a href="{{ route('prefix') }}" class="{{ request()->routeIs('prefix') ? 'active' : '' }}">Prefix Settings</a></li>
+                                    <li><a href="{{ route('roles') }}" class="{{ request()->routeIs('roles') ? 'active' : '' }}">Roles Permissions</a></li>
+                                    <li><a href="{{ route('database.backups') }}" class="{{ request()->routeIs('database.backups') ? 'active' : '' }}">Backup/Restore</a></li>
+                                    <li><a href="{{ route('languages') }}" class="{{ request()->routeIs('languages') ? 'active' : '' }}">Languages</a></li>
+                                    <li><a href="{{ route('users') }}" class="{{ request()->routeIs('users') ? 'active' : '' }}">Users</a></li>
+                                    <li><a href="{{ route('permissions.modules') }}" class="{{ request()->routeIs('permissions.modules') ? 'active' : '' }}">Modules</a></li>
                                 </ul>
                             </li>
                             <li><a href="{{ route('patients') }}"><i class="ti ti-user-cog"></i><span> Patient </span></a></li>

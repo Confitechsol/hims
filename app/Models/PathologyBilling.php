@@ -81,4 +81,12 @@ class PathologyBilling extends Model
     {
         return $this->belongsTo(CaseReference::class, 'case_reference_id');
     }
+
+    /**
+     * Relationship with IpdPrescription (case reference)
+     */
+    public function prescription()
+    {
+        return $this->belongsTo(IpdPrescription::class, 'case_reference_id');
+    }
 }

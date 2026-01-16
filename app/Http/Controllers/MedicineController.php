@@ -16,7 +16,7 @@ class MedicineController extends Controller
 
     public function getMedicines($categoryId)
     {
-        return response()->json(Pharmacy::where('medicine_category_id', $categoryId)->select('id', 'medicine_name')->get());
+        return response()->json(Pharmacy::where('medicine_category_id', $categoryId)->with('medicineCategory.dosages')->get());
     }
 
     public function getDoses($categoryId)
