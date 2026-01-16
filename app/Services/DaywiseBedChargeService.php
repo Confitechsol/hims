@@ -75,21 +75,44 @@ class DaywiseBedChargeService
                 ];
             }
 
-            // Get bed charge
-            $bedCharge = $this->getBedCharge($lastBed->bed_group_id);
-
-            if ($bedCharge === null || $bedCharge <= 0) {
-                Log::warning("Invalid bed charge for bed group ID: {$lastBed->bed_group_id}", [
+            // Get bed group to retrieve bed_cost (bed_charge_rate)
+            $bedGroup = BedGroup::find($lastBed->bed_group_id);
+            if (!$bedGroup) {
+                Log::warning("Bed group not found for bed group ID: {$lastBed->bed_group_id}", [
                     'ipd_id' => $ipdId,
                     'charge_date' => $chargeDate,
                 ]);
                 DB::rollBack();
                 return [
                     'success' => false,
-                    'message' => 'Invalid bed charge amount',
+                    'message' => 'Bed group not found',
                 ];
             }
 
+            // Get bed charge rate from bed_group.bed_cost
+            $bedChargeRate = $bedGroup->bed_cost ?? 0.00;
+            
+            if ($bedChargeRate <= 0) {
+                Log::warning("Invalid bed charge rate for bed group ID: {$lastBed->bed_group_id}", [
+                    'ipd_id' => $ipdId,
+                    'charge_date' => $chargeDate,
+                    'bed_charge_rate' => $bedChargeRate,
+                ]);
+                DB::rollBack();
+                return [
+                    'success' => false,
+                    'message' => 'Invalid bed charge rate',
+                ];
+            }
+
+            // Calculate period dates (date portion only, not datetime)
+            $periodStartDate = $startTime->format('Y-m-d');
+            $periodEndDate = $endTime->format('Y-m-d');
+            
+            // Calculate total bed charge (rate × number of days)
+            // For 1 day period, bed_charge = bed_charge_rate × 1
+            $bedCharge = $bedChargeRate * 1; // Always 1 day for this period
+            
             // Store or update daywise charge
             $result = $this->storeDaywiseCharge([
                 'hospital_id' => $ipd->hospital_id,
@@ -98,9 +121,13 @@ class DaywiseBedChargeService
                 'case_reference_id' => $ipd->case_reference_id,
                 'patient_id' => $ipd->patient_id,
                 'charge_date' => $chargeDate,
+                'period_start_date' => $periodStartDate,
+                'period_end_date' => $periodEndDate,
                 'bed_group_id' => $lastBed->bed_group_id,
                 'bed_id' => $lastBed->bed_id,
-                'bed_charge' => $bedCharge,
+                'bed_charge' => $bedCharge, // Total charge for the period
+                'bed_charge_rate' => $bedChargeRate, // Per-day rate from bed_group.bed_cost
+                'no_of_days' => 1, // Always 1 for each day period (10 AM to next 10 AM)
                 'is_active' => 'yes',
             ]);
 
@@ -108,8 +135,13 @@ class DaywiseBedChargeService
 
             Log::info("Successfully calculated bed charge for IPD ID: {$ipdId}", [
                 'charge_date' => $chargeDate,
+                'period_start_date' => $periodStartDate,
+                'period_end_date' => $periodEndDate,
                 'bed_charge' => $bedCharge,
+                'bed_charge_rate' => $bedChargeRate,
+                'no_of_days' => 1,
                 'bed_group_id' => $lastBed->bed_group_id,
+                'bed_group_name' => $bedGroup->name ?? 'N/A',
             ]);
 
             return [
