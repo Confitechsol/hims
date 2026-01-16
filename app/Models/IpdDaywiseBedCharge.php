@@ -18,9 +18,13 @@ class IpdDaywiseBedCharge extends Model
         'case_reference_id',
         'patient_id',
         'charge_date',
+        'period_start_date',
+        'period_end_date',
         'bed_group_id',
         'bed_id',
         'bed_charge',
+        'bed_charge_rate',
+        'no_of_days',
         'is_active',
     ];
 
@@ -29,9 +33,13 @@ class IpdDaywiseBedCharge extends Model
         'case_reference_id' => 'integer',
         'patient_id' => 'integer',
         'charge_date' => 'date',
+        'period_start_date' => 'date',
+        'period_end_date' => 'date',
         'bed_group_id' => 'integer',
         'bed_id' => 'integer',
         'bed_charge' => 'decimal:2',
+        'bed_charge_rate' => 'decimal:2',
+        'no_of_days' => 'integer',
     ];
 
     /**
