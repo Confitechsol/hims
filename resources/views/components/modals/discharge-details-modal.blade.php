@@ -33,10 +33,10 @@
 
       .body_area {
           padding: 0 20px 20px;
-          background-image: url("{{ asset('/assets/images/body.webp') }}");
+          /* background-image: url("{{ asset('/assets/images/body.webp') }}");
           background-position: center;
           background-repeat: no-repeat;
-          background-size: 100% 100%;
+          background-size: 100% 100%; */
           height: 100%;
       }
 
@@ -200,6 +200,10 @@
           font-size: 10px;
           border: 2px solid #9c9c9c;
           padding: 10px;
+      }
+
+      .text h4 {
+        font-size: 10px;
       }
 
       .admission_item {
