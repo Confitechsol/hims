@@ -593,7 +593,7 @@
                             </li>
                             
                             
-                            <li class="submenu">
+                            <!-- <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-world-cog"></i><span>Pathology
                                         </span>
@@ -605,9 +605,9 @@
                                     <li><a href="{{ route('pathology-parameter') }}">Pathology Parameter</a></li>
                                     
                                 </ul>
-                            </li>
+                            </li> -->
 
-                            <li class="submenu">
+                            <!-- <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-world-cog"></i><span>Radiology
                                         </span>
@@ -619,9 +619,9 @@
                                     <li><a href="{{ route('radiology-parameter') }}">Radiology Parameter</a></li>
                                     
                                 </ul>
-                            </li>
+                            </li> -->
                           
-                            <li class="submenu">
+                            <!-- <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-world-cog"></i><span>Blood
                                         Bank</span>
@@ -631,7 +631,7 @@
                                     <li><a href="{{ route('blood-bank-products') }}">Products</a></li>
                                     
                                 </ul>
-                            </li>
+                            </li> -->
                           
                             <li class="submenu">
                                 <a href="javascript:void(0);">
