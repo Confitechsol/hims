@@ -16,6 +16,11 @@
         font-size: 12px;
     }
 
+    .first_logo,
+    .second_logo,.about_info {
+        width: 22%;
+    }
+
     .about_info {
         font-size: 12px;
     }
@@ -188,7 +193,7 @@
             </div>
             <div class="second_logo">
                 @if (file_exists(public_path('assets/images/nabh-logo.png')))
-                    <img src="{{ asset('assets/images/nabh-logo.png') }}" alt="LOGO2" style="height: 70px; width:auto;">
+                    <img src="{{ asset('assets/images/nabh-logo.png') }}" alt="LOGO2" style="height: auto; width:100%;">
                 @endif
             </div>
             <div class="about_info">
