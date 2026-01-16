@@ -37,6 +37,7 @@ use App\Models\Radio;
 use App\Models\DoseInterval;
 use App\Models\DoseDuration;
 use Illuminate\Support\Facades\Log;
+use App\Models\Finding;
 
 class OpdController extends Controller
 {
@@ -473,6 +474,8 @@ class OpdController extends Controller
             // Store in array using OPD number as key
             $opdSymptoms[$opdDetail->opd_no] = $symptoms;
         }
+        $doctors     = Doctor::all();
+        $findings    = Finding::all();
         $pathologies = Pathology::all();
         $radiologies = Radio::all();
         $doseIntervals = DoseInterval::select('id', 'name')->get();
@@ -772,5 +775,14 @@ class OpdController extends Controller
             return redirect()->back()->with('error', "Something went wrong: " . $e->getMessage());
         }
     }
-
+    public function editPrescription($id){
+       $prescription = OpdPrescription::findOrFail($id);
+       $doctors     = Doctor::all();
+       $findings    = Finding::all();
+       $pathologies = Pathology::all();
+       $radiologies = Radio::all();
+       $doseIntervals = DoseInterval::select('id', 'name')->get();
+       $doseDurations  = DoseDuration::select('id', 'name')->get();
+       return view('admin.opd.prescription.edit',compact('prescription','doctors','findings','pathologies','radiologies','doseIntervals','doseDurations'));
+    }
 }
