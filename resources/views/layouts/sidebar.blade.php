@@ -142,7 +142,7 @@
                                     
                                 </ul>
                             </li>
-                            <li class="submenu">
+                            <!-- <li class="submenu">
                                 <a href="{{route('certificate')}}" class="active subdrop">
                                     <i class="ti ti-layout-dashboard"></i><span>Certificate</span>
                                     <span class="menu-arrow"></span>
@@ -155,7 +155,7 @@
                                     <li><a href="{{route('generate_patient_id')}}" class="{{ request()->routeIs('generate_patient_id') ? 'active' : '' }}">Staff ID Card
                                             </a></li>
                                 </ul>
-                            </li>
+                            </li> -->
                             
                         </ul>
                     </li>
