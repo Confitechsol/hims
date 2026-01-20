@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Estimate Bill - {{ $ipd->ipd_no }}</title>
-    <style>
-         @page {
-            size: A4;
-            /* margin: 330px 50px 80px 50px; */
-        } 
-
+    <style>        
+        @page {
+                size: A4;
+                margin-top: 420px;   /* ✅ bigger than actual header */
+                margin-bottom: 80px;
+                margin-left: 20px;
+                margin-right: 20px;
+            }
 
 
         body {
@@ -23,23 +25,21 @@
 
         /* Fixed header - repeats on all pages */
         header {
-            /* position: fixed; */
-            /* top: -320px;
-            left: 50px;
-            right: 50px; */
-            /* height: 320px; */
-            /* background-color: white; */
-            /* z-index: 1000; */
-            /* overflow: visible; */
-            padding: 8px 0;
-            width: 100%;
-        }
+                position: fixed;
+                top: -400px;         /* margin-top - 20px safety */
+                left: 20px;
+                right: 20px;
+                height: auto;        /* 🔥 IMPORTANT */                
+                padding: 8px 0;
+            }
+
+
 
         header .header-content {
             width: 100%;
             max-width: 100%;
-            margin: 0;
-            padding: 0;
+            /* margin: 0;
+            padding: 0; */
             box-sizing: border-box;
         }
 
@@ -55,10 +55,11 @@
         }
 
         main {
-            margin-top: 0;
-            padding-top: 25px;
+            margin: 0;
+            padding: 0;
+            margin-left: 20px;
+            margin-right: 20px;
             position: relative;
-            height: 297mm;
         }
         
         /* Ensure content on subsequent pages respects header */
@@ -668,35 +669,16 @@
     <script type="text/php">
         if (isset($pdf)) {
             $font = $fontMetrics->getFont("DejaVu Sans", "normal");
-            $fontSize = 8;
-            
-            // Get current page number (this is accurate)
-            $pageNum = $pdf->get_page_number();
-            
-            // Get total pages - use passed value if available, otherwise try DOMPDF's count
-            if (isset($totalPages) && $totalPages > 0) {
-                // Use the pre-calculated total pages from controller
-                $totalPagesCount = $totalPages;
-            } else {
-                // Fallback to DOMPDF's count
-                $totalPagesCount = $pdf->get_page_count();
-            }
-            
-            // Ensure valid numbers
-            if ($pageNum <= 0) $pageNum = 1;
-            if ($totalPagesCount <= 0) $totalPagesCount = $pageNum;
-            
-            // Page number text
-            $pageText = "Page " . $pageNum . " of " . $totalPagesCount;
-            
-            // Calculate position (bottom right, aligned with footer)
-            $pageWidth = $fontMetrics->get_text_width($pageText, $font, $fontSize);
-            $pageX = $pdf->get_width() - $pageWidth - 50; // 50px from right edge
-            $pageY = $pdf->get_height() - 25; // 25px from bottom
-            
-            // Draw page number
-            $pdf->page_text($pageX, $pageY, $pageText, $font, $fontSize);
+            $size = 8;
+    
+            $text = "Page {PAGE_NUM} of {PAGE_COUNT}";
+    
+            $x = $pdf->get_width() - 120; // right aligned
+            $y = $pdf->get_height() - 25; // footer area
+    
+            $pdf->page_text($x, $y, $text, $font, $size);
         }
     </script>
+    
 </body>
 </html>

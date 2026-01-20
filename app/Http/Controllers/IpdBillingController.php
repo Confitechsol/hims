@@ -614,56 +614,187 @@ class IpdBillingController extends Controller
      */
     public function exportFinal($ipdId)
     {
-        $ipd = IpdDetail::with(['patient', 'doctor', 'bedGroup', 'bedDetail'])
-            ->findOrFail($ipdId);
+        try {
+            $ipd = IpdDetail::with(['patient.organisation', 'doctor', 'bedGroup', 'bedDetail'])
+                ->findOrFail($ipdId);
 
-        $breakup = $this->calculateBreakup($ipdId);
+            $breakup = $this->calculateBreakup($ipdId);
 
-        // Get payment details
-        $payments = Transaction::where('ipd_id', $ipdId)
-            ->where('type', 'payment')
-            ->where('section', 'ipd')
-            ->orderBy('payment_date', 'asc')
-            ->get();
+            // Get payment details
+            $payments = Transaction::where('ipd_id', $ipdId)
+                ->where('type', 'payment')
+                ->where('section', 'ipd')
+                ->orderBy('payment_date', 'asc')
+                ->get();
 
-        // Get detailed breakdown
-        $bedChargesDetails = IpdDaywiseBedCharge::where('ipd_id', $ipdId)
-            ->where('is_active', 'yes')
-            ->orderBy('charge_date', 'asc')
-            ->get();
+            // Get detailed breakdown
+            $bedChargesDetails = IpdDaywiseBedCharge::where('ipd_id', $ipdId)
+                ->where('is_active', 'yes')
+                ->with(['bedGroup', 'bed'])
+                ->orderBy('charge_date', 'asc')
+                ->get();
 
-        $ipdChargesDetails = IpdCharges::where('ipd_id', $ipdId)
-            ->with(['charge', 'chargeCategory'])
-            ->orderBy('date', 'asc')
-            ->get();
-
-        $pathologyDetails = collect();
-        if ($ipd->case_reference_id) {
-            $pathologyDetails = PathologyBilling::where('case_reference_id', $ipd->case_reference_id)
-                ->with(['pathology'])
+            $ipdChargesDetails = IpdCharges::where('ipd_id', $ipdId)
+                ->with(['charge', 'chargeCategory'])
                 ->orderBy('date', 'asc')
                 ->get();
-        }
 
-        $radiologyDetails = collect();
-        if ($ipd->case_reference_id) {
-            $radiologyDetails = RadiologyBilling::where('case_reference_id', $ipd->case_reference_id)
-                ->with(['radiology'])
-                ->orderBy('date', 'asc')
+            $pathologyDetails = collect();
+            if ($ipd->case_reference_id) {
+                $pathologyDetails = PathologyBilling::where('case_reference_id', $ipd->case_reference_id)
+                    ->with(['pathology'])
+                    ->orderBy('date', 'asc')
+                    ->get();
+            }
+
+            $radiologyDetails = collect();
+            if ($ipd->case_reference_id) {
+                $radiologyDetails = RadiologyBilling::where('case_reference_id', $ipd->case_reference_id)
+                    ->with(['radiology'])
+                    ->orderBy('date', 'asc')
+                    ->get();
+            }
+
+            $doctorVisitDetails = DoctorVisit::where('patient_id', $ipd->patient_id)
+                ->where('visit_date', '>=', $ipd->date)
+                ->with(['doctor', 'charge'])
+                ->orderBy('visit_date', 'asc')
                 ->get();
+
+            // Get hospital information
+            $hospital = Hospital::first();
+
+            // Generate final bill number (format: F-XXXXXX/YY-YY)
+            $currentYear = date('y');
+            $nextYear = $currentYear + 1;
+            $yearRange = $currentYear . '-' . $nextYear;
+            
+            // Generate bill number based on IPD ID or use a sequential number
+            // You can modify this logic based on your business requirements
+            $billNumber = 'F-' . str_pad($ipd->id, 6, '0', STR_PAD_LEFT) . '/' . $yearRange;
+
+            // Get discharge date
+            $dischargeDate = $ipd->discharged_date ?? ($ipd->discharged == 'yes' ? now() : null);
+            $billDate = $dischargeDate ?? now();
+
+            // Calculate discount (if any)
+            $discount = 0; // You may need to add discount logic based on your system
+
+            // Calculate balance
+            $grandTotal = $breakup['total_charges'];
+            $totalAdvance = $breakup['total_payments'];
+            $balance = $grandTotal - $totalAdvance - $discount;
+
+            // Convert amounts to words
+            $grandTotalInWords = 'Zero Rupees Only';
+            $totalAdvanceInWords = 'Zero Rupees Only';
+            $balanceInWords = 'Zero Rupees Only';
+            
+            try {
+                if (class_exists(\App\Helpers\NumberToWords::class)) {
+                    $grandTotalInWords = \App\Helpers\NumberToWords::convert($grandTotal);
+                    $totalAdvanceInWords = \App\Helpers\NumberToWords::convert($totalAdvance);
+                    $balanceInWords = \App\Helpers\NumberToWords::convert($balance);
+                }
+            } catch (\Exception $e) {
+                \Log::error('Error converting amounts to words: ' . $e->getMessage());
+            }
+
+            // Group bed charges by bed type for display
+            $bedChargesGrouped = $bedChargesDetails->groupBy(function($item) {
+                return ($item->bedGroup && $item->bedGroup->name) ? $item->bedGroup->name : 'Unknown';
+            });
+
+            // Get OT charges (from IPD charges where category is OT)
+            $otCharges = $ipdChargesDetails->filter(function($charge) {
+                $categoryName = ($charge->chargeCategory && $charge->chargeCategory->name) ? $charge->chargeCategory->name : '';
+                $chargeName = ($charge->charge && $charge->charge->name) ? $charge->charge->name : '';
+                return stripos($categoryName, 'OT') !== false || 
+                       stripos($categoryName, 'Operation') !== false ||
+                       stripos($chargeName, 'OT') !== false;
+            });
+
+            // Get medicine charges (from IPD charges)
+            $medicineCharges = $ipdChargesDetails->filter(function($charge) {
+                $categoryName = ($charge->chargeCategory && $charge->chargeCategory->name) ? $charge->chargeCategory->name : '';
+                $chargeName = ($charge->charge && $charge->charge->name) ? $charge->charge->name : '';
+                return stripos($categoryName, 'Medicine') !== false ||
+                       stripos($categoryName, 'Pharmacy') !== false ||
+                       stripos($chargeName, 'Medicine') !== false;
+            });
+
+            // Get surgeon and anesthesia charges
+            $surgeonCharges = $ipdChargesDetails->filter(function($charge) {
+                $categoryName = ($charge->chargeCategory && $charge->chargeCategory->name) ? $charge->chargeCategory->name : '';
+                $chargeName = ($charge->charge && $charge->charge->name) ? $charge->charge->name : '';
+                return stripos($chargeName, 'Surgeon') !== false ||
+                       stripos($categoryName, 'Surgeon') !== false;
+            });
+
+            $anesthesiaCharges = $ipdChargesDetails->filter(function($charge) {
+                $categoryName = ($charge->chargeCategory && $charge->chargeCategory->name) ? $charge->chargeCategory->name : '';
+                $chargeName = ($charge->charge && $charge->charge->name) ? $charge->charge->name : '';
+                return stripos($chargeName, 'Anesthesia') !== false ||
+                       stripos($categoryName, 'Anesthesia') !== false;
+            });
+
+            // Combine pathology and radiology as investigation charges
+            $investigationCharges = $pathologyDetails->sum('total') + $radiologyDetails->sum('total');
+
+            // First pass: Render to get accurate page count
+            $tempPdf = Pdf::loadView('admin.billing.ipd_final_pdf', compact(
+                'ipd', 'breakup', 'bedChargesDetails', 'bedChargesGrouped', 'ipdChargesDetails',
+                'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'payments',
+                'hospital', 'billNumber', 'billDate', 'dischargeDate', 'discount',
+                'grandTotal', 'totalAdvance', 'balance', 'grandTotalInWords', 
+                'totalAdvanceInWords', 'balanceInWords', 'otCharges', 'medicineCharges',
+                'surgeonCharges', 'anesthesiaCharges', 'investigationCharges'
+            ));
+            
+            $tempPdf->setOption('enable-php', false);
+            $tempPdf->setOption('enable-local-file-access', true);
+            $tempPdf->setPaper('a4', 'portrait');
+            
+            // Render to get page count
+            $dompdf = $tempPdf->getDomPDF();
+            $dompdf->render();
+            
+            // Get total pages
+            try {
+                $canvas = $dompdf->getCanvas();
+                $totalPages = method_exists($canvas, 'get_page_count') ? $canvas->get_page_count() : $dompdf->get_page_count();
+            } catch (\Exception $e) {
+                $totalPages = $dompdf->get_page_count();
+            }
+            
+            if (!$totalPages || $totalPages <= 0) {
+                $totalPages = 1;
+            }
+
+            // Second pass: Render with accurate page count
+            $pdf = Pdf::loadView('admin.billing.ipd_final_pdf', compact(
+                'ipd', 'breakup', 'bedChargesDetails', 'bedChargesGrouped', 'ipdChargesDetails',
+                'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'payments',
+                'hospital', 'billNumber', 'billDate', 'dischargeDate', 'discount',
+                'grandTotal', 'totalAdvance', 'balance', 'grandTotalInWords', 
+                'totalAdvanceInWords', 'balanceInWords', 'otCharges', 'medicineCharges',
+                'surgeonCharges', 'anesthesiaCharges', 'investigationCharges', 'totalPages'
+            ));
+            
+            $pdf->setOption('enable-php', true);
+            $pdf->setOption('isPhpEnabled', true);
+            $pdf->setOption('enable-local-file-access', true);
+            $pdf->setPaper('a4', 'portrait');
+
+            return $pdf->download('IPD_Final_Bill_' . $ipd->ipd_no . '.pdf');
+        } catch (\Exception $e) {
+            \Log::error('Error in exportFinal: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'ipd_id' => $ipdId
+            ]);
+            abort(500, 'Error generating PDF: ' . $e->getMessage() . ' (Check logs for details)');
         }
-
-        $doctorVisitDetails = DoctorVisit::where('patient_id', $ipd->patient_id)
-            ->where('visit_date', '>=', $ipd->date)
-            ->with(['doctor', 'charge'])
-            ->orderBy('visit_date', 'asc')
-            ->get();
-
-        $pdf = Pdf::loadView('admin.billing.ipd_final_pdf', compact(
-            'ipd', 'breakup', 'bedChargesDetails', 'ipdChargesDetails',
-            'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'payments'
-        ));
-
-        return $pdf->download('IPD_Final_Bill_' . $ipd->ipd_no . '.pdf');
     }
 }
