@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Estimate Bill - {{ $ipd->ipd_no }}</title>
     <style>
-        @page {
+         @page {
             size: A4;
-            margin: 330px 50px 80px 50px;
-        }
+            /* margin: 330px 50px 80px 50px; */
+        } 
+
+
 
         body {
             font-family: DejaVu Sans, sans-serif;
@@ -21,16 +23,16 @@
 
         /* Fixed header - repeats on all pages */
         header {
-            position: fixed;
-            top: -320px;
+            /* position: fixed; */
+            /* top: -320px;
             left: 50px;
-            right: 50px;
-            height: 320px;
-            background-color: white;
-            z-index: 1000;
-            overflow: visible;
+            right: 50px; */
+            /* height: 320px; */
+            /* background-color: white; */
+            /* z-index: 1000; */
+            /* overflow: visible; */
             padding: 8px 0;
-            width: auto;
+            width: 100%;
         }
 
         header .header-content {
@@ -56,6 +58,7 @@
             margin-top: 0;
             padding-top: 25px;
             position: relative;
+            height: 297mm;
         }
         
         /* Ensure content on subsequent pages respects header */
@@ -309,7 +312,6 @@
                         @if (file_exists(public_path('assets/images/logo.webp')))
                             <img src="{{ public_path('assets/images/logo.webp') }}" alt="LOGO" style="height: 50px; display: block; margin-bottom: 3px;">
                         @endif
-                        <p style="margin: 0; font-size: 8px;">NABH/PESHCO-2018-3150/L-03</p>
                     </td>
                     <td class="second_logo" style="width: 30%; padding: 0 5px; margin: 0; vertical-align: middle; text-align: center;">
                         @if (file_exists(public_path('assets/images/nabh-logo.png')))
@@ -317,6 +319,7 @@
                                 <img src="{{ public_path('assets/images/nabh-logo.png') }}" alt="NABH" style="height: 70px; width:auto; display: inline-block;">
                             </div>
                         @endif
+                        <p style="margin: 0; font-size: 10px;">NABH/PESHCO-2018-3150/L-03</p>
                     </td>
                     <td class="about_info" style="width: 35%; padding: 0 5px; margin: 0; vertical-align: top; text-align: right;">
                         <p style="margin: 1px 0;"><strong>{{ $hospital->name ?? 'Hospital Name' }}</strong></p>

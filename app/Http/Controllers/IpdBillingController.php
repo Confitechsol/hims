@@ -571,21 +571,21 @@ class IpdBillingController extends Controller
             \Log::info('Total pages calculated', ['total_pages' => $totalPages]);
 
 
-            /* return view('admin.billing.ipd_estimate_pdf', compact(
-                'ipd', 'breakup', 'bedChargesDetails', 'ipdChargesDetails',
-                'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails',
-                'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
-                'totalChargesInWords', 'totalPaymentsInWords', 'outstandingInWords', 'netBalanceInWords',
-                'hospital', 'totalPages'
-            )); */
+            // return view('admin.billing.ipd_estimate_pdf', compact(
+            //     'ipd', 'breakup', 'bedChargesDetails', 'ipdChargesDetails',
+            //     'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails',
+            //     'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
+            //     'totalChargesInWords', 'totalPaymentsInWords', 'outstandingInWords', 'netBalanceInWords',
+            //     'hospital', 'totalPages'
+            // ));
             // Second pass: Render with accurate page count stored in view
-             $pdf = Pdf::loadView('admin.billing.ipd_estimate_pdf', compact(
+            $pdf = Pdf::loadView('admin.billing.ipd_estimate_pdf', compact(
                 'ipd', 'breakup', 'bedChargesDetails', 'ipdChargesDetails',
                 'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
                 'totalChargesInWords', 'totalPaymentsInWords', 'outstandingInWords', 'netBalanceInWords',
                 'hospital', 'totalPages'
-            )); 
+            ));
             
             // Enable PHP scripts for page numbering
              $pdf->setOption('enable-php', true);
@@ -595,7 +595,7 @@ class IpdBillingController extends Controller
             
             \Log::info('PDF generated, returning download');
             
-            return $pdf->download('IPD_Estimate_Bill_' . $ipd->ipd_no . '.pdf'); 
+            return $pdf->download('IPD_Estimate_Bill_' . $ipd->ipd_no . '.pdf');
         } catch (\Exception $e) {
             \Log::error('Error in exportEstimate: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
