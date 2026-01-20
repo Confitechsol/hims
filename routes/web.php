@@ -136,6 +136,7 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/roles/store', [RolesController::class, 'store'])->name('roles.store');
     Route::put('/roles/update/{id}', [RolesController::class, 'update'])->name('roles.update');
     Route::delete('/roles/destroy/{id}', [RolesController::class, 'destroy'])->name('roles.destroy');
+    Route::post('/roles/updateStatus/{id}', [RolesController::class, 'updateStatus'])->name('roles.status');
     Route::get('/languages', function () {
         return view('admin.setup.languages');
     })->name('languages');
