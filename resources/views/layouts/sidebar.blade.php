@@ -337,9 +337,9 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('income') }}" class="active">Income
+                                    <li><a href="{{ route('income') }}" class="{{ request()->routeIs('income') ? 'active' : '' }}">Income
                                             </a></li>
-                                    <li><a href="{{ route('expense') }}">Expenses
+                                    <li><a href="{{ route('expense') }}" class="{{ request()->routeIs('expense') ? 'active' : '' }}">Expenses
                                             </a></li>
                                     
                                 </ul>
@@ -454,9 +454,9 @@
                                     
                                     <li><a href="{{ route('finance') }}" class="{{ request()->routeIs('finance') ? 'active' : '' }}">OPD
                                             Report</a></li>
-                                    <li><a href="{{ route('finance') }}">IPD
+                                    <li><a href="{{ route('finance') }}"  class="{{ request()->routeIs('death') ? 'active' : '' }}">IPD
                                             Report</a></li>
-                                    <li><a href="{{ route('finance') }}">Appointment
+                                    <li><a href="{{ route('finance') }}"  class="{{ request()->routeIs('death') ? 'active' : '' }}">Appointment
                                             Report</a></li>
                                     <!-- <li><a href="patient-report.html">Patient
                                             Report</a></li>
@@ -529,17 +529,17 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('charges') }}">Charges</a></li>
-                                    <li><a href="{{ route('charge_categories') }}">Charge Category</a></li>
-                                    <li><a href="{{ route('charge_type_module') }}">Charge Type</a></li>
-                                    <li><a href="{{ route('tax_category') }}">Tax
+                                    <li><a href="{{ route('charges') }}"  class="{{ request()->routeIs('charges') ? 'active' : '' }}">Charges</a></li>
+                                    <li><a href="{{ route('charge_categories') }}" class="{{ request()->routeIs('charge_categories') ? 'active' : '' }}">Charge Category</a></li>
+                                    <li><a href="{{ route('charge_type_module') }}" class="{{ request()->routeIs('charge_type_module') ? 'active' : '' }}">Charge Type</a></li>
+                                    <li><a href="{{ route('tax_category') }}" class="{{ request()->routeIs('tax_category') ? 'active' : '' }}">Tax
                                             Category</a></li>
-                                    <li><a href="{{ route('charge_units') }}">Unit Type</a></li>
+                                    <li><a href="{{ route('charge_units') }}" class="{{ request()->routeIs('charge_units') ? 'active' : '' }}">Unit Type</a></li>
                                     
                                 </ul>
                             </li>
                             <li>
-                                <a href="{{ route('packages.index') }}">
+                                <a href="{{ route('packages.index') }}" class="{{ request()->routeIs('packages.index') ? 'active' : '' }}">
                                     <i class="ti ti-package"></i><span>Package Master</span>
                                 </a>
                             </li>
@@ -551,43 +551,43 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('bed-status') }}">Bed Status</a></li>
-                                    <li><a href="{{ route('bed') }}">Bed</a></li>
-                                    <li><a href="{{ route('bed-types.index') }}">Bed Type</a></li>
-                                    <li><a href="{{ route('bed-groups.index') }}">Bed
+                                    <li><a href="{{ route('bed-status') }}" class="{{ request()->routeIs('bed-status') ? 'active' : '' }}">Bed Status</a></li>
+                                    <li><a href="{{ route('bed') }}" class="{{ request()->routeIs('bed') ? 'active' : '' }}">Bed</a></li>
+                                    <li><a href="{{ route('bed-types.index') }}" class="{{ request()->routeIs('bed-types.index') ? 'active' : '' }}">Bed Type</a></li>
+                                    <li><a href="{{ route('bed-groups.index') }}" class="{{ request()->routeIs('bed-groups.index') ? 'active' : '' }}">Bed
                                             Group</a></li>
-                                    <li><a href="{{ route('floors.index') }}">Floor</a></li>
+                                    <li><a href="{{ route('floors.index') }}" class="{{ request()->routeIs('floors.index') ? 'active' : '' }}">Floor</a></li>
                                     
                                 </ul>
                             </li>
-                            <li><a href="{{ route('letterHead') }}">
+                            <li><a href="{{ route('letterHead') }}" class="{{ request()->routeIs('letterHead') ? 'active' : '' }}">
                                     <i class="ti ti-world-cog"></i>
                                     <span>Print Header Footer</span>
                                 </a>
                             </li>
                             <li class="submenu">
-                                <a href="javascript:void(0);">
+                                <a href="javascript:void(0);" >
                                     <i class="ti ti-world-cog"></i><span>Front
                                         Office</span>
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('purpose') }}">Purpose</a></li>
-                                    <li><a href="{{ route('complaint') }}">Complain Type</a></li>
-                                    <li><a href="{{ route('sources') }}">Source</a></li>
+                                    <li><a href="{{ route('purpose') }}" class="{{ request()->routeIs('purpose') ? 'active' : '' }}">Purpose</a></li>
+                                    <li><a href="{{ route('complaint') }}" class="{{ request()->routeIs('complaint') ? 'active' : '' }}">Complain Type</a></li>
+                                    <li><a href="{{ route('sources') }}" class="{{ request()->routeIs('sources') ? 'active' : '' }}">Source</a></li>
                                     
                                 </ul>
                             </li>
                             
                             <li class="submenu">
-                                <a href="javascript:void(0);">
+                                <a href="javascript:void(0);" >
                                     <i class="ti ti-world-cog"></i><span>Operations
                                         </span>
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('operations') }}">Operation</a></li>
-                                    <li><a href="{{ route('operation-category') }}">Operation Category</a></li>
+                                    <li><a href="{{ route('operations') }}" class="{{ request()->routeIs('operations') ? 'active' : '' }}">Operation</a></li>
+                                    <li><a href="{{ route('operation-category') }}" class="{{ request()->routeIs('operation-category') ? 'active' : '' }}">Operation Category</a></li>
                                     
                                 </ul>
                             </li>
@@ -640,8 +640,8 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('symptoms-head') }}">Symptoms Head</a></li>
-                                    <li><a href="{{ route('symptoms-type') }}">Symptoms Type</a></li>
+                                    <li><a href="{{ route('symptoms-head') }}" class="{{ request()->routeIs('symptoms-head') ? 'active' : '' }}">Symptoms Head</a></li>
+                                    <li><a href="{{ route('symptoms-type') }}" class="{{ request()->routeIs('symptoms-type') ? 'active' : '' }}">Symptoms Type</a></li>
                                     
                                 </ul>
                             </li>
@@ -653,12 +653,12 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('finding') }}">Finding</a></li>
-                                    <li><a href="{{ route('finding-category') }}">Category</a></li>
+                                    <li><a href="{{ route('finding') }}" class="{{ request()->routeIs('finding') ? 'active' : '' }}">Finding</a></li>
+                                    <li><a href="{{ route('finding-category') }}" class="{{ request()->routeIs('finding-category') ? 'active' : '' }}">Category</a></li>
                                     
                                 </ul>
                             </li>
-                            <li><a href="{{ route('vitals') }}">Vitals</a></li>
+                            <li><a href="{{ route('vitals') }}" class="{{ request()->routeIs('vitals') ? 'active' : '' }}">Vitals</a></li>
                             <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-world-cog"></i><span>Finance
@@ -666,8 +666,8 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('income-head') }}">Income </a></li>
-                                    <li><a href="{{ route('expense-head') }}">Expenses </a></li>
+                                    <li><a href="{{ route('income-head') }}" class="{{ request()->routeIs('income-head') ? 'active' : '' }}">Income </a></li>
+                                    <li><a href="{{ route('expense-head') }}" class="{{ request()->routeIs('expense-head') ? 'active' : '' }}">Expenses </a></li>
                                     
                                 </ul>
                             </li>
@@ -679,10 +679,10 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('leave-type') }}">Leave Type</a></li>
-                                    <li><a href="{{ route('department') }}">Department</a></li>
-                                    <li><a href="{{ route('designation') }}">Designation</a></li>
-                                    <li><a href="{{ route('specialist') }}">Specialist
+                                    <li><a href="{{ route('leave-type') }}" class="{{ request()->routeIs('leave-type') ? 'active' : '' }}">Leave Type</a></li>
+                                    <li><a href="{{ route('department') }}" class="{{ request()->routeIs('department') ? 'active' : '' }}">Department</a></li>
+                                    <li><a href="{{ route('designation') }}" class="{{ request()->routeIs('designation') ? 'active' : '' }}">Designation</a></li>
+                                    <li><a href="{{ route('specialist') }}" class="{{ request()->routeIs('specialist') ? 'active' : '' }}">Specialist
                                             </a></li>
                                     
                                 </ul>
@@ -695,10 +695,10 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    <li><a href="{{ route('slots') }}">Slots</a></li>
-                                    <li><a href="{{ route('doctor-shift') }}">Doctor Shift</a></li>
-                                    <li><a href="{{ route('shift') }}">Shift</a></li>
-                                    <li><a href="{{ route('appointment-priority') }}">Appointment
+                                    <li><a href="{{ route('slots') }}"  class="{{ request()->routeIs('slots') ? 'active' : '' }}">Slots</a></li>
+                                    <li><a href="{{ route('doctor-shift') }}" class="{{ request()->routeIs('doctor-shift') ? 'active' : '' }}">Doctor Shift</a></li>
+                                    <li><a href="{{ route('shift') }}" class="{{ request()->routeIs('shift') ? 'active' : '' }}">Shift</a></li>
+                                    <li><a href="{{ route('appointment-priority') }}" class="{{ request()->routeIs('appointment-priority') ? 'active' : '' }}">Appointment
                                             Priority</a></li>
                                     
                                 </ul>
