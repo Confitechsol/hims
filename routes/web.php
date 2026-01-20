@@ -354,8 +354,8 @@ Route::prefix('doctor-visit')->group(function () {
     Route::get('/create', [DoctorVisitController::class, 'create'])->name('doctor-visit.create');
     Route::post('/store', [DoctorVisitController::class, 'store'])->name('doctor-visit.store');
     Route::get('/api/patient-visits/{patientId}', [DoctorVisitController::class, 'getPatientVisits'])->name('doctor-visit.api.patient-visits');
-
-
+    Route::get('/api/visit/{id}', [DoctorVisitController::class, 'getVisit'])->name('doctor-visit.api.visit');
+    Route::delete('/api/visit/{id}', [DoctorVisitController::class, 'destroy'])->name('doctor-visit.api.destroy');
 });
 
 Route::prefix('pathology-category')->group(function () {

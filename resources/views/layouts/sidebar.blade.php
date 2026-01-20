@@ -142,7 +142,7 @@
                                     
                                 </ul>
                             </li>
-                            <li class="submenu">
+                            <!-- <li class="submenu">
                                 <a href="{{route('certificate')}}" class="active subdrop">
                                     <i class="ti ti-layout-dashboard"></i><span>Certificate</span>
                                     <span class="menu-arrow"></span>
@@ -155,7 +155,7 @@
                                     <li><a href="{{route('generate_patient_id')}}" class="{{ request()->routeIs('generate_patient_id') ? 'active' : '' }}">Staff ID Card
                                             </a></li>
                                 </ul>
-                            </li>
+                            </li> -->
                             
                         </ul>
                     </li>
@@ -593,7 +593,7 @@
                             </li>
                             
                             
-                            <li class="submenu">
+                            <!-- <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-world-cog"></i><span>Pathology
                                         </span>
@@ -605,9 +605,9 @@
                                     <li><a href="{{ route('pathology-parameter') }}">Pathology Parameter</a></li>
                                     
                                 </ul>
-                            </li>
+                            </li> -->
 
-                            <li class="submenu">
+                            <!-- <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-world-cog"></i><span>Radiology
                                         </span>
@@ -619,9 +619,9 @@
                                     <li><a href="{{ route('radiology-parameter') }}">Radiology Parameter</a></li>
                                     
                                 </ul>
-                            </li>
+                            </li> -->
                           
-                            <li class="submenu">
+                            <!-- <li class="submenu">
                                 <a href="javascript:void(0);">
                                     <i class="ti ti-world-cog"></i><span>Blood
                                         Bank</span>
@@ -631,7 +631,7 @@
                                     <li><a href="{{ route('blood-bank-products') }}">Products</a></li>
                                     
                                 </ul>
-                            </li>
+                            </li> -->
                           
                             <li class="submenu">
                                 <a href="javascript:void(0);">

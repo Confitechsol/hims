@@ -115,6 +115,54 @@
                                                 </tbody>
                                             </table>
                                         </div>
+                                         {{-- Pagination Links --}}
+                                         
+                                    <div class="mt-3" id="pagination-wrapper">
+                                        @php
+                                            $currentPage = $doctors->currentPage();
+                                            $lastPage = $doctors->lastPage();
+                                            $window = 2; // how many pages to show on each side
+                                            $start = max(1, $currentPage - $window);
+                                            $end = min($lastPage, $currentPage + $window);
+                                        @endphp
+
+                                        @if ($doctors->onFirstPage())
+                                            <button class="btn btn-outline-secondary btn-sm me-1" disabled>« Prev</button>
+                                        @else
+                                            <a href="{{ $doctors->previousPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm me-1">« Prev</a>
+                                        @endif
+
+                                        @if ($start > 1)
+                                            <a href="{{ $doctors->url(1) }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm me-1">1</a>
+                                            @if ($start > 2)
+                                                <span class="btn btn-outline-secondary btn-sm me-1 disabled">...</span>
+                                            @endif
+                                        @endif
+
+                                        @for ($page = $start; $page <= $end; $page++)
+                                            @if ($page == $currentPage)
+                                                <button class="btn btn-primary btn-sm me-1">{{ $page }}</button>
+                                            @else
+                                                <a href="{{ $doctors->url($page) }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm me-1">{{ $page }}</a>
+                                            @endif
+                                        @endfor
+
+                                        @if ($end < $lastPage)
+                                            @if ($end < $lastPage - 1)
+                                                <span class="btn btn-outline-secondary btn-sm me-1 disabled">...</span>
+                                            @endif
+                                            <a href="{{ $doctors->url($lastPage) }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm me-1">{{ $lastPage }}</a>
+                                        @endif
+
+                                        @if ($doctors->hasMorePages())
+                                            <a href="{{ $doctors->nextPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm">Next »</a>
+                                        @else
+                                            <button class="btn btn-outline-secondary btn-sm" disabled>Next »</button>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                                     </form>
                                 </div> <!-- end card-body -->
                             </div> <!-- end card -->

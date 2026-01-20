@@ -1,6 +1,4 @@
-{{-- resources/views/settings.blade.php --}}
-@extends('layouts.adminLayout')
-@section('content')
+<?php $__env->startSection('content'); ?>
 
     <style>
         .module_billing {
@@ -213,11 +211,11 @@
         }
 
 
-        /* Modal Styling */
+         /* Modal Styling */
         .modal-content {
             border: none;
             border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
             overflow: hidden;
         }
 
@@ -263,7 +261,7 @@
             margin: 1rem;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
         .section-header {
@@ -503,24 +501,24 @@
     </style>
 
     <div class="p-4">
-        @if (session('success'))
+        <?php if(session('success')): ?>
             <script>
                 Swal.fire({
                     icon: 'success',
-                    title: "{{ session('alertTitle') ?? 'Success' }}",
-                    text: "{{ session('success') }}",
+                    title: "<?php echo e(session('alertTitle') ?? 'Success'); ?>",
+                    text: "<?php echo e(session('success')); ?>",
                 });
             </script>
-        @endif
-        @if (session('error'))
+        <?php endif; ?>
+        <?php if(session('error')): ?>
             <script>
                 Swal.fire({
                     icon: 'error',
-                    title: "{{ session('alertTitle') ?? 'Error' }}",
-                    text: "{{ session('error') }}",
+                    title: "<?php echo e(session('alertTitle') ?? 'Error'); ?>",
+                    text: "<?php echo e(session('error')); ?>",
                 });
             </script>
-        @endif
+        <?php endif; ?>
         <!-- tab start -->
         <div class="tabs-scroll-wrapper">
             <ul class="nav nav-tabs nav-bordered mb-3 flex-nowrap">
@@ -550,13 +548,6 @@
                         class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
                             class="fa-solid fa-flask text-primary pe-1"></i>
                         <span>Lab Investigation</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#radiology_reports" data-bs-toggle="tab" aria-expanded="true"
-                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
-                            class="fa-solid fa-flask text-primary pe-1"></i>
-                        <span>Radiology Details</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -619,7 +610,7 @@
                     <a href="#bed_issue" data-bs-toggle="tab" aria-expanded="true"
                         class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
                             class="fa-solid fa-bed text-primary pe-1"></i>
-                        <span>Bed Transfer</span>
+                        <span>Bed Issue</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -645,27 +636,28 @@
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                                 <div class= "d-flex justify-content-between align-items-center">
                                     <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>
-                                        {{ $ipd->patient->patient_name }}
+                                        <?php echo e($ipd->patient->patient_name); ?>
+
                                     </h5>
-                                    @if ($ipd->discharged == 'yes')
+                                    <?php if($ipd->discharged == 'yes'): ?>
                                         <button class="bg-transparent border-0" data-bs-toggle="modal"
-                                            data-bs-target="#dischargePreviewModal"
-                                            data-discharge='@json($ipd->dischargeCard)'><i
+                                            data-bs-target="#dischargeDetailsModal"
+                                            data-discharge='<?php echo json_encode($ipd->dischargeCard, 15, 512) ?>'><i
                                                 class="bi bi-clipboard-pulse text-white"></i></button>
-                                    @else
+                                    <?php else: ?>
                                         <button class="bg-transparent border-0" data-bs-toggle="modal"
-                                            data-bs-target="#patientDischargeModal" data-ipd="{{ $ipd }}" data-doctors="{{$doctors}}" data-user="{{$currentUser}}"><i
+                                            data-bs-target="#patientDischargeModal" data-id="<?php echo e($ipd->id); ?>"><i
                                                 class="bi bi-clipboard-pulse text-white"></i></button>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
                             </div>
                             <div class="card-body">
                                 <div class="d-sm-flex position-relative z-0 overflow-hidden p-2">
                                     <!-- <img src="assets/img/icons/shape-01.svg" alt="img"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
                                     <a href="javascript:void(0);"
                                         class="avatar avatar-xxxl patient-avatar me-2 flex-shrink-0">
-                                        <img src="{{ asset('assets/img/patient.png') }}" alt="product" class="rounded">
+                                        <img src="<?php echo e(asset('assets/img/patient.png')); ?>" alt="product" class="rounded">
                                     </a>
                                     <div>
                                         <div class="d-flex align-items-center mb-3">
@@ -673,7 +665,7 @@
                                                     class="fa-solid fa-phone text-primary"></i></span>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">Phone :</h6>
-                                                <p class="patient_data mb-0">{{ $ipd->patient->mobileno }}</p>
+                                                <p class="patient_data mb-0"><?php echo e($ipd->patient->mobileno); ?></p>
                                             </div>
                                         </div>
 
@@ -682,10 +674,10 @@
                                                     class="fa-solid fa-calendar-days text-primary"></i></span>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">Age :</h6>
-                                                <p class="patient_data mb-0">{{ $ipd->patient->age }} Year
-                                                    {{ $ipd->patient->month }} Month {{ $ipd->patient->day }} Days (As
+                                                <p class="patient_data mb-0"><?php echo e($ipd->patient->age); ?> Year
+                                                    <?php echo e($ipd->patient->month); ?> Month <?php echo e($ipd->patient->day); ?> Days (As
                                                     Of
-                                                    {{ \Carbon\Carbon::parse($ipd->patient->as_of_date)->format('d/m/Y') }})
+                                                    <?php echo e(\Carbon\Carbon::parse($ipd->patient->as_of_date)->format('d/m/Y')); ?>)
                                                 </p>
                                             </div>
                                         </div>
@@ -694,7 +686,8 @@
                                                     class="fa-solid fa-hands-holding-child text-primary"></i></span>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">Guardian Name :</h6>
-                                                <p class="patient_data mb-0">{{ $ipd->patient->guardian_name ?? '--' }}
+                                                <p class="patient_data mb-0"><?php echo e($ipd->patient->guardian_name ?? '--'); ?>
+
                                                 </p>
                                             </div>
                                         </div>
@@ -703,7 +696,7 @@
                                                     class="fa-solid fa-mars-and-venus text-primary"></i></span>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">Gender :</h6>
-                                                <p class="patient_data mb-0">{{ $ipd->patient->gender }}</p>
+                                                <p class="patient_data mb-0"><?php echo e($ipd->patient->gender); ?></p>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-3">
@@ -712,7 +705,7 @@
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">TPA :</h6>
                                                 <p class="patient_data mb-0">
-                                                    {{ $ipd->patient->organisation->organisation_name ?? '--' }}</p>
+                                                    <?php echo e($ipd->patient->organisation->organisation_name ?? '--'); ?></p>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-3">
@@ -721,7 +714,7 @@
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">TPA ID :</h6>
                                                 <p class="patient_data mb-0">
-                                                    {{ $ipd->patient->organisation->code ?? '--' }}</p>
+                                                    <?php echo e($ipd->patient->organisation->code ?? '--'); ?></p>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-3">
@@ -729,7 +722,7 @@
                                                     class="fa-solid fa-user-check text-primary"></i></span>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="about_patient fs-13 fw-bold mb-1">TPA Validity :</h6>
-                                                <p class="patient_data mb-0">{{ $ipd->patient->tpa_validity ?? '--' }}</p>
+                                                <p class="patient_data mb-0"><?php echo e($ipd->patient->tpa_validity ?? '--'); ?></p>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-3">
@@ -750,19 +743,19 @@
                                         </div>
                                     </div>
                                     <!-- <div class="row">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="col-sm-5">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-5">
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="col-sm-7">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-7">
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="col-sm-5">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-5">
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="col-sm-7">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <div class="col-sm-7">
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </div> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div> -->
                                 </div>
                                 <hr>
                                 <div class="d-flex align-items-center mb-3">
@@ -770,7 +763,7 @@
                                             class="fa-solid fa-tag text-primary"></i></span>
                                     <div class="d-flex align-items-center gap-2">
                                         <h6 class="about_patient fs-13 fw-bold mb-1"> Known Allergies :</h6>
-                                        <p class="patient_data mb-0">{{ $ipd->known_allergies ?? '--' }}</p>
+                                        <p class="patient_data mb-0"><?php echo e($ipd->known_allergies ?? '--'); ?></p>
                                     </div>
                                 </div>
                                 <div class="d-flex align-items-center mb-3">
@@ -788,10 +781,10 @@
                                         <h6 class=" fs-13 fw-bold mb-1"> Symptoms :</h6>
                                         <p class=" mb-0">
                                         <ul>
-                                            @foreach ($symptoms as $symptom)
+                                            <?php $__currentLoopData = $symptoms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $symptom): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <li><i class="fa-regular fa-circle-check text-primary"></i>
-                                                    {{ $symptom->symptoms_title }}</li>
-                                            @endforeach
+                                                    <?php echo e($symptom->symptoms_title); ?></li>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </ul>
                                         </p>
                                     </div>
@@ -812,104 +805,20 @@
                                     <a href="#">
                                         <div class="d-flex align-items-center gap-2">
                                             <div class="patient_img">
-                                                <img src="{{ asset('assets/img/patient.png') }}" alt="product"
+                                                <img src="<?php echo e(asset('assets/img/patient.png')); ?>" alt="product"
                                                     class="rounded">
                                             </div>
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="fs-13 fw-bold mb-1">
-                                                    {{ $ipd->doctor ? $ipd->doctor->name . '(' . $ipd->doctor->doctor_id . ')' : '--' }}
+                                                    <?php echo e($ipd->doctor->name . '(' . $ipd->doctor->doctor_id . ')' ?? '--'); ?>
+
                                                 </h6>
                                             </div>
                                         </div>
                                     </a>
 
                                 </div>
-                                {{-- <hr>
-                                <div>
-                                    <a href="#">
-                                        <div class="d-flex align-items-center mb-3 gap-2">
-                                            <div class="patient_img">
-                                                <img src="assets/img/patient.png" alt="product" class="rounded">
-                                            </div>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <h6 class="fs-13 fw-bold mb-1">Anjali Rao (D011)</h6>
-                                            </div>
-                                        </div>
-                                    </a>
-
-                                </div> --}}
-                            </div>
-                        </div>
-                        <div class="card shadow-sm border-0 mt-2">
-                            <div class="card-header"
-                                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Doctor Visit Details
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <!-- Table start -->
-                                <div class="table-responsive table-nowrap">
-                                    <table class="table border">
-                                        <thead class="thead-light">
-                                            <tr>
-                                                <th>Doctor Name</th>
-                                                <th>Rate</th>
-                                                <th>No. of Visit</th>
-                                                <th>Amount</th>
-                                                <th>Date</th>
-                                                <th>Time</th>
-                                                <th>Entry</th>
-                                                <th>Visit Type</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse($doctorvisits as $doctorvisit)
-                                                <tr>
-                                                    <td>
-                                                        {{ $doctorvisit->doctor->name ?? '-' }}
-                                                    </td>
-
-                                                    <td>
-                                                       {{ $doctorvisit->rate ?? '-' }}
-                                                    </td>
-
-                                                    <td>
-                                                        {{ $doctorvisit->no_of_visit ?? '-' }}
-                                                    </td>
-
-                                                    <td>
-                                                        {{ $doctorvisit->amount ?? '-' }}
-                                                    </td>
-
-                                                    <td>
-                                                        {{ $doctorvisit->date ?? '-' }}
-                                                    </td>
-
-                                                    <td>
-                                                        {{ $doctorvisit->time ?? '-' }}
-                                                    </td>
-
-                                                    <td>
-                                                        {{ $doctorvisit->entry ?? '-' }}
-                                                    </td>
-
-                                                    <td class="text-end">
-                                                        {{ $doctorvisit->visit_type ?? '-' }}
-                                                    </td>
-
-
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="6" class="text-center text-muted">
-                                                        No payments found
-                                                    </td>
-                                                </tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <!-- Table end -->
+                                
                             </div>
                         </div>
                         <div class="card shadow-sm border-0 mt-2">
@@ -922,11 +831,12 @@
                                 <div class="timeline-wrapper">
 
                                     <!-- Step 1 (Completed) -->
-                                    @foreach ($nurseNotes as $note)
+                                    <?php $__currentLoopData = $nurseNotes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $note): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <div class="timeline-item">
                                             <div class="timeline-date">
                                                 <div class="date-badge">
-                                                    {{ \Carbon\Carbon::parse($note->date)->format('d/m/Y') }}
+                                                    <?php echo e(\Carbon\Carbon::parse($note->date)->format('d/m/Y')); ?>
+
 
                                                     <span class="time"></span>
                                                 </div>
@@ -940,7 +850,8 @@
                                                 <div class="card-header p-0 pb-3">
                                                     <div>
                                                         <h5 class="title text-primary">
-                                                            {{ $note->staff->name }}
+                                                            <?php echo e($note->staff->name); ?>
+
                                                         </h5>
 
                                                     </div>
@@ -949,15 +860,16 @@
                                                 <div class="timeline-body">
 
                                                     <p class="lh-base"><strong>Note</strong> <br>
-                                                        {{ $note->note }}</p>
+                                                        <?php echo e($note->note); ?></p>
                                                     <p class="lh-base"><strong>Comment</strong> <br>
-                                                        {{ $note->comment }}
+                                                        <?php echo e($note->comment); ?>
+
                                                     </p>
 
                                                 </div>
                                             </div>
                                         </div>
-                                    @endforeach
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
                                     <!-- Final clock marker -->
                                     <div class="timeline-end">
@@ -1051,24 +963,26 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($medicationReport as $medication)
+                                            <?php $__currentLoopData = $medicationReport; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $medication): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <tr>
-                                                    <td>{{ $medication->date }}</td>
-                                                    <td>{{ $medication->pharmacy->medicine_name }}</td>
-                                                    <td>{{ $medication->medicineDosage->dosage }}
-                                                        {{ $medication->medicineDosage->unit->unit_name }}
+                                                    <td><?php echo e($medication->date); ?></td>
+                                                    <td><?php echo e($medication->pharmacy->medicine_name); ?></td>
+                                                    <td><?php echo e($medication->medicineDosage->dosage); ?>
+
+                                                        <?php echo e($medication->medicineDosage->unit->unit_name); ?>
+
                                                     </td>
-                                                    <td>{{ $medication->time }}</td>
-                                                    <td>{{ $medication->remark }}</td>
+                                                    <td><?php echo e($medication->time); ?></td>
+                                                    <td><?php echo e($medication->remark); ?></td>
                                                 </tr>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </tbody>
                                     </table>
                                 </div>
                                 <!-- Table end -->
                             </div>
                         </div>
-                        {{-- prescription --}}
+                        
                         <div class="card shadow-sm border-0 mt-2">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
@@ -1085,45 +999,29 @@
                                                 <th>Date</th>
                                                 <th>Prescribed By</th>
                                                 <th>Generated By</th>
-                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($ipdPrescriptions as $prescription)
+                                            <?php $__currentLoopData = $ipdPrescriptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $prescription): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <tr>
                                                     <td>
                                                         <h6 class="fs-14 mb-1">
-                                                            {{ $prescription->prescription_number }}</h6>
+                                                            <?php echo e($prescription->prescription_number); ?></h6>
                                                     </td>
-                                                    <td>{{ \Carbon\Carbon::parse($prescription->date)->format('d/m/Y') }}
+                                                    <td><?php echo e(\Carbon\Carbon::parse($prescription->date)->format('d/m/Y')); ?>
+
                                                     </td>
                                                     <td>--</td>
-                                                    <td>
-                                                        <div class="d-flex gap-2">
-                                                            <a href="{{ route('ipd.prescription.edit', $prescription->id) }}"
-                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-warning rounded-pill"
-                                                                data-bs-toggle="tooltip"
-                                                                title="Edit">
-                                                                <i class="fa-solid fa-pencil"></i>
-                                                            </a>
-                                                            <a href="{{ route('ipd.prescription.print', $prescription->id) }}"
-                                                                target="_blank"
-                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
-                                                                data-bs-toggle="tooltip"
-                                                                title="Print">
-                                                                <i class="fa-solid fa-print"></i>
-                                                            </a>
-                                                        </div>
-                                                    </td>
+                                                    <td>--</td>
                                                 </tr>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </tbody>
                                     </table>
                                 </div>
                                 <!-- Table end -->
                             </div>
                         </div>
-                        {{-- prescription End --}}
+                        
 
 
 
@@ -1148,64 +1046,24 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($labInvestigations as $lab)
+                                            <?php $__currentLoopData = $labInvestigations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $lab): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <tr>
                                                     <td>
-                                                        {{ $lab->pathology->test_name .
-                                                            "
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    (" .
-                                                            $lab->pathology->short_name .
-                                                            ')' }}
-                                                    </td>
-                                                    <td>Pathology</td>
-                                                    <td>{{ '--' }}</td>
-                                                    <td>{{ \Carbon\Carbon::today()->copy()->addDays(intval($lab->pathology->report_days))->format('d-M-Y') }}
-                                                    </td>
-                                                    <td>{{ $lab->approved_by ?? '--' }}</td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <!-- Table end -->
-                            </div>
-                        </div>
-                        <div class="card shadow-sm border-0 mt-2">
-                            <div class="card-header"
-                                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Radiology
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <!-- Table start -->
-                                <div class="table-responsive table-nowrap">
-                                    <table class="table border">
-                                        <thead class="thead-light">
-                                            <tr>
-                                                <th>Test Name</th>
-                                                <th>Radiology</th>
-                                                <th>Sample Collected</th>
-                                                <th>Expected Date</th>
-                                                <th>Approved By</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($radiologyReports as $lab)
-                                                <tr>
-                                                    <td>
-                                                        {{ $lab->radiology->test_name .
+                                                        <?php echo e($lab->pathology->test_name .
                                                             "
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     (" .
-                                                            $lab->radiology->short_name .
-                                                            ')' }}
+                                                            $lab->pathology->short_name .
+                                                            ')'); ?>
+
                                                     </td>
-                                                    <td>Radiology</td>
-                                                    <td>{{ '--' }}</td>
-                                                    <td>{{ \Carbon\Carbon::today()->copy()->addDays(intval($lab->radiology->report_days))->format('d-M-Y') }}
+                                                    <td>Pathology</td>
+                                                    <td><?php echo e('--'); ?></td>
+                                                    <td><?php echo e(\Carbon\Carbon::today()->copy()->addDays(intval($lab->pathology->report_days))->format('d-M-Y')); ?>
+
                                                     </td>
-                                                    <td>{{ $lab->approved_by ?? '--' }}</td>
+                                                    <td><?php echo e($lab->approved_by ?? '--'); ?></td>
                                                 </tr>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -1233,21 +1091,23 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($operationDetail as $operation)
+                                            <?php $__currentLoopData = $operationDetail; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $operation): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <tr>
                                                     <td>
                                                         <h6 class="fs-14 mb-1">
-                                                            {{ $operation->reference_no }}
+                                                            <?php echo e($operation->reference_no); ?>
+
                                                         </h6>
                                                     </td>
-                                                    <td>{{ $operation->date }}</td>
-                                                    <td>{{ $operation->operation->operation }}</td>
-                                                    <td>{{ $operation->operation->category->category }}
+                                                    <td><?php echo e($operation->date); ?></td>
+                                                    <td><?php echo e($operation->operation->operation); ?></td>
+                                                    <td><?php echo e($operation->operation->category->category); ?>
+
                                                     </td>
-                                                    <td>{{ $operation->ot_technician }}</td>
+                                                    <td><?php echo e($operation->ot_technician); ?></td>
 
                                                 </tr>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -1269,36 +1129,39 @@
                                                 <th>Name</th>
                                                 <th>Charge Type</th>
                                                 <th>Standard Charge (INR)</th>
-                                                <!-- <th>Tax</th> -->
+                                                <th>Tax</th>
                                                 <th>Applied Charge (INR)</th>
                                                 <th>Amount (INR)</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($ipdCharges as $charge)
-                                                @php
+                                            <?php $__currentLoopData = $ipdCharges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $charge): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <?php
                                                     $taxAmount =
                                                         ($charge->charge->standard_charge *
                                                             $charge->charge->taxCategory->percentage) /
                                                         100;
-                                                    $amount = $charge->standard_charge + $taxAmount;
-                                                @endphp
+                                                    $amount = $charge->charge->standard_charge + $taxAmount;
+                                                ?>
                                                 <tr>
                                                     <td>
-                                                        {{ $charge->charge->name ?? '-'}}
+                                                        <?php echo e($charge->charge->name); ?>
+
                                                     </td>
                                                     <td style="text-transform: capitalize;">
-                                                        {{ $charge->chargeCategory?->chargeType?->charge_type ?? '-' }}
+                                                        <?php echo e($charge->chargeCategory->chargeType->charge_type); ?>
+
                                                     </td>
-                                                    <td class="text-right">{{ $charge->standard_charge ?? '-'}}</td>
-                                                    <!-- <td class="text-right">
-                                                        ({{ $charge->charge->taxCategory->percentage ?? '-' }}%)
-                                                        {{ $taxAmount }}
-                                                    </td> -->
-                                                    <td class="text-right">{{ $charge->standard_charge ?? '-' }}</td>
-                                                    <td class="text-right">{{ $amount }}</td>
+                                                    <td class="text-right"><?php echo e($charge->charge->standard_charge); ?></td>
+                                                    <td class="text-right">
+                                                        (<?php echo e($charge->charge->taxCategory->percentage); ?>%)
+                                                        <?php echo e($taxAmount); ?>
+
+                                                    </td>
+                                                    <td class="text-right"><?php echo e($charge->charge->standard_charge); ?></td>
+                                                    <td class="text-right"><?php echo e($amount); ?></td>
                                                 </tr>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -1325,37 +1188,42 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse($transactions as $transaction)
-                                                <tr>
-                                                    <td>
-                                                        {{ $transaction->transaction_no ?? 'TRID' . $transaction->id }}
-                                                    </td>
+                                            <?php $__empty_1 = true; $__currentLoopData = $transactions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $transaction): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                                                <tr>
+                                                                    <td>
+                                                                        <?php echo e($transaction->transaction_no ?? 'TRID'.$transaction->id); ?>
 
-                                                    <td>
-                                                        {{ \Carbon\Carbon::parse($transaction->transaction_date)->format('d/m/Y h:i A') }}
-                                                    </td>
+                                                                    </td>
 
-                                                    <td>
-                                                        {{ $transaction->note ?? '-' }}
-                                                    </td>
+                                                                    <td>
+                                                                        <?php echo e(\Carbon\Carbon::parse($transaction->transaction_date)->format('d/m/Y h:i A')); ?>
 
-                                                    <td>
-                                                        {{ $transaction->payment_mode == 1 ? 'Cash' : '-' }}
-                                                    </td>
+                                                                    </td>
 
-                                                    <td class="text-end">
-                                                        {{ number_format($transaction->amount, 2) }}
-                                                    </td>
+                                                                    <td>
+                                                                        <?php echo e($transaction->note ?? '-'); ?>
+
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <?php echo e($transaction->payment_mode == 1 ? 'Cash' : '-'); ?>
+
+                                                                    </td>
+
+                                                                    <td class="text-end">
+                                                                        <?php echo e(number_format($transaction->amount, 2)); ?>
+
+                                                                    </td>
 
 
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="6" class="text-center text-muted">
-                                                        No payments found
-                                                    </td>
-                                                </tr>
-                                            @endforelse
+                                                                </tr>
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                                                <tr>
+                                                                    <td colspan="6" class="text-center text-muted">
+                                                                        No payments found
+                                                                    </td>
+                                                                </tr>
+                                                            <?php endif; ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -1446,15 +1314,15 @@
                                                                             data-bs-dismiss="modal"></button>
 
                                                                     </div>
-                                                                    <form action="{{ route('nurseNote.store') }}"
+                                                                    <form action="<?php echo e(route('nurseNote.store')); ?>"
                                                                         method="post">
-                                                                        @csrf
+                                                                        <?php echo csrf_field(); ?>
 
                                                                         <div class="modal-body">
 
                                                                             <div class="row gy-3 py-4 mx-1">
                                                                                 <input type="hidden" name="ipd_id"
-                                                                                    value="{{ $ipd->id }}">
+                                                                                    value="<?php echo e($ipd->id); ?>">
                                                                                 <div class="col-md-6">
                                                                                     <label for="appointment_date"
                                                                                         class="form-label">
@@ -1877,11 +1745,12 @@
                                                 <div class="timeline-wrapper">
 
                                                     <!-- Step 1 (Completed) -->
-                                                    @foreach ($nurseNotes as $note)
+                                                    <?php $__currentLoopData = $nurseNotes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $note): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                         <div class="timeline-item">
                                                             <div class="timeline-date">
                                                                 <div class="date-badge">
-                                                                    {{ \Carbon\Carbon::parse($note->date)->format('d/m/Y') }}
+                                                                    <?php echo e(\Carbon\Carbon::parse($note->date)->format('d/m/Y')); ?>
+
 
                                                                     <span class="time"></span>
                                                                 </div>
@@ -1895,7 +1764,8 @@
                                                                 <div class="card-header p-0 pb-3">
                                                                     <div>
                                                                         <h5 class="title text-primary">
-                                                                            {{ $note->staff->name }}
+                                                                            <?php echo e($note->staff->name); ?>
+
                                                                         </h5>
 
                                                                     </div>
@@ -1917,15 +1787,16 @@
                                                                 <div class="timeline-body">
 
                                                                     <p class="lh-base"><strong>Note</strong> <br>
-                                                                        {{ $note->note }}</p>
+                                                                        <?php echo e($note->note); ?></p>
                                                                     <p class="lh-base"><strong>Comment</strong> <br>
-                                                                        {{ $note->comment }}
+                                                                        <?php echo e($note->comment); ?>
+
                                                                     </p>
 
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    @endforeach
+                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
                                                     <!-- Final clock marker -->
                                                     <div class="timeline-end">
@@ -1996,106 +1867,177 @@
                                                                     </div>
 
                                                                     <form method="POST"
-                                                                        action="{{ route('medication.store') }}">
-                                                                        @csrf
+                                                                        action="<?php echo e(route('medication.store')); ?>">
+                                                                        <?php echo csrf_field(); ?>
                                                                         <input type="hidden" name="ipd_id"
-                                                                            value="{{ $ipd->id }}">
+                                                                            value="<?php echo e($ipd->id); ?>">
                                                                         <div class="modal-body">
                                                                             <div class="row gy-3 py-4 mx-1">
 
-                                                                                {{-- Date --}}
+                                                                                
                                                                                 <div class="col-md-6">
                                                                                     <label for="date"
                                                                                         class="form-label">Date <span
                                                                                             class="text-danger">*</span></label>
                                                                                     <input type="date" name="date"
                                                                                         id="date"
-                                                                                        value="{{ old('date') }}"
-                                                                                        class="form-control @error('date') is-invalid @enderror">
-                                                                                    @error('date')
+                                                                                        value="<?php echo e(old('date')); ?>"
+                                                                                        class="form-control <?php $__errorArgs = ['date'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>">
+                                                                                    <?php $__errorArgs = ['date'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
                                                                                         <div class="text-danger small">
-                                                                                            {{ $message }}</div>
-                                                                                    @enderror
+                                                                                            <?php echo e($message); ?></div>
+                                                                                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                                                                 </div>
 
-                                                                                {{-- Time --}}
+                                                                                
                                                                                 <div class="col-md-6">
                                                                                     <label for="time"
                                                                                         class="form-label">Time <span
                                                                                             class="text-danger">*</span></label>
                                                                                     <input type="time" name="time"
                                                                                         id="time"
-                                                                                        value="{{ old('time') }}"
-                                                                                        class="form-control @error('time') is-invalid @enderror">
-                                                                                    @error('time')
+                                                                                        value="<?php echo e(old('time')); ?>"
+                                                                                        class="form-control <?php $__errorArgs = ['time'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>">
+                                                                                    <?php $__errorArgs = ['time'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
                                                                                         <div class="text-danger small">
-                                                                                            {{ $message }}</div>
-                                                                                    @enderror
+                                                                                            <?php echo e($message); ?></div>
+                                                                                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                                                                 </div>
 
-                                                                                {{-- Medicine Category --}}
+                                                                                
                                                                                 <div class="col-md-6">
                                                                                     <label for="medi_cat"
                                                                                         class="form-label">Medicine
                                                                                         Category <span
                                                                                             class="text-danger">*</span></label>
                                                                                     <select name="medi_cat" id="medi_cat"
-                                                                                        class="form-select @error('medi_cat') is-invalid @enderror">
+                                                                                        class="form-select <?php $__errorArgs = ['medi_cat'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>">
                                                                                         <option value="">Select
                                                                                         </option>
-                                                                                        @foreach ($medicineCategories as $cat)
+                                                                                        <?php $__currentLoopData = $medicineCategories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                                             <option
-                                                                                                value="{{ $cat->id }}"
-                                                                                                {{ old('medi_cat') == $cat->id ? 'selected' : '' }}>
-                                                                                                {{ $cat->medicine_category }}
+                                                                                                value="<?php echo e($cat->id); ?>"
+                                                                                                <?php echo e(old('medi_cat') == $cat->id ? 'selected' : ''); ?>>
+                                                                                                <?php echo e($cat->medicine_category); ?>
+
                                                                                             </option>
-                                                                                        @endforeach
+                                                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                                     </select>
-                                                                                    @error('medi_cat')
+                                                                                    <?php $__errorArgs = ['medi_cat'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
                                                                                         <div class="text-danger small">
-                                                                                            {{ $message }}</div>
-                                                                                    @enderror
+                                                                                            <?php echo e($message); ?></div>
+                                                                                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                                                                 </div>
 
-                                                                                {{-- Medicine Name (filtered by category via JS if needed) --}}
+                                                                                
                                                                                 <div class="col-md-6">
                                                                                     <label for="med_name"
                                                                                         class="form-label">Medicine Name
                                                                                         <span
                                                                                             class="text-danger">*</span></label>
                                                                                     <select name="med_name" id="med_name"
-                                                                                        class="form-select @error('med_name') is-invalid @enderror">
+                                                                                        class="form-select <?php $__errorArgs = ['med_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>">
                                                                                         <option value="">Select
                                                                                         </option>
                                                                                     </select>
-                                                                                    @error('med_name')
+                                                                                    <?php $__errorArgs = ['med_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
                                                                                         <div class="text-danger small">
-                                                                                            {{ $message }}</div>
-                                                                                    @enderror
+                                                                                            <?php echo e($message); ?></div>
+                                                                                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                                                                 </div>
 
-                                                                                {{-- Dosage --}}
+                                                                                
                                                                                 <div class="col-md-6">
                                                                                     <label for="dosage"
                                                                                         class="form-label">Dosage <span
                                                                                             class="text-danger">*</span></label>
                                                                                     <select name="dosage" id="dosage"
-                                                                                        class="form-select @error('dosage') is-invalid @enderror">
+                                                                                        class="form-select <?php $__errorArgs = ['dosage'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>">
                                                                                         <option value="">Select
                                                                                         </option>
 
                                                                                     </select>
-                                                                                    @error('dosage')
+                                                                                    <?php $__errorArgs = ['dosage'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
                                                                                         <div class="text-danger small">
-                                                                                            {{ $message }}</div>
-                                                                                    @enderror
+                                                                                            <?php echo e($message); ?></div>
+                                                                                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                                                                 </div>
 
-                                                                                {{-- Remarks --}}
+                                                                                
                                                                                 <div class="col-md-6">
                                                                                     <label for="remark"
                                                                                         class="form-label">Remarks</label>
-                                                                                    <textarea name="remark" id="remark" class="form-control">{{ old('remark') }}</textarea>
+                                                                                    <textarea name="remark" id="remark" class="form-control"><?php echo e(old('remark')); ?></textarea>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -2123,33 +2065,35 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @foreach ($medicationReport as $medication)
+                                                            <?php $__currentLoopData = $medicationReport; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $medication): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                 <tr>
-                                                                    <td>{{ $medication->date }}</td>
-                                                                    <td>{{ $medication->pharmacy->medicine_name }}</td>
-                                                                    <td>{{ $medication->medicineDosage->dosage }}
-                                                                        {{ $medication->medicineDosage->unit->unit_name }}
+                                                                    <td><?php echo e($medication->date); ?></td>
+                                                                    <td><?php echo e($medication->pharmacy->medicine_name); ?></td>
+                                                                    <td><?php echo e($medication->medicineDosage->dosage); ?>
+
+                                                                        <?php echo e($medication->medicineDosage->unit->unit_name); ?>
+
                                                                     </td>
                                                                     <td>
                                                                         <div class="d-flex gap-2">
                                                                             <a href="javascript:void(0);"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill editMedicationBtn"
-                                                                                data-id="{{ $medication->id }}"
-                                                                                data-date="{{ $medication->date }}"
-                                                                                data-time="{{ $medication->time }}"
-                                                                                data-cat="{{ $medication->pharmacy->medicine_category_id }}"
-                                                                                data-med="{{ $medication->pharmacy_id }}"
-                                                                                data-dose="{{ $medication->medicine_dosage_id }}"
-                                                                                data-remark="{{ $medication->remark }}"
+                                                                                data-id="<?php echo e($medication->id); ?>"
+                                                                                data-date="<?php echo e($medication->date); ?>"
+                                                                                data-time="<?php echo e($medication->time); ?>"
+                                                                                data-cat="<?php echo e($medication->pharmacy->medicine_category_id); ?>"
+                                                                                data-med="<?php echo e($medication->pharmacy_id); ?>"
+                                                                                data-dose="<?php echo e($medication->medicine_dosage_id); ?>"
+                                                                                data-remark="<?php echo e($medication->remark); ?>"
                                                                                 data-bs-toggle="modal"
                                                                                 data-bs-target="#edit_medication">
                                                                                 <i class="ti ti-pencil"></i>
                                                                             </a>
                                                                             <!-- <a href="javascript:void(0);"
-                                                                                                            onclick="confirmDelete('{{ route('medication.delete', $medication->id) }}')"
-                                                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                                                                <i class="ti ti-trash" data-bs-toggle="tooltip" title="Delete"></i>
-                                                                                                        </a> -->
+                                                                                                    onclick="confirmDelete('<?php echo e(route('medication.delete', $medication->id)); ?>')"
+                                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                                                                        <i class="ti ti-trash" data-bs-toggle="tooltip" title="Delete"></i>
+                                                                                                </a> -->
 
                                                                         </div>
                                                                     </td>
@@ -2169,19 +2113,19 @@
                                                                             </div>
 
                                                                             <form method="POST"
-                                                                                action="{{ route('medication.update') }}">
-                                                                                @csrf
-                                                                                @method('PUT')
+                                                                                action="<?php echo e(route('medication.update')); ?>">
+                                                                                <?php echo csrf_field(); ?>
+                                                                                <?php echo method_field('PUT'); ?>
 
                                                                                 <input type="hidden" name="id"
                                                                                     id="edit_id">
                                                                                 <input type="hidden" name="ipd_id"
-                                                                                    value="{{ $ipd->id }}">
+                                                                                    value="<?php echo e($ipd->id); ?>">
 
                                                                                 <div class="modal-body">
                                                                                     <div class="row gy-3 py-4 mx-1">
 
-                                                                                        {{-- Date --}}
+                                                                                        
                                                                                         <div class="col-md-6">
                                                                                             <label
                                                                                                 class="form-label">Date</label>
@@ -2191,7 +2135,7 @@
                                                                                                 class="form-control">
                                                                                         </div>
 
-                                                                                        {{-- Time --}}
+                                                                                        
                                                                                         <div class="col-md-6">
                                                                                             <label
                                                                                                 class="form-label">Time</label>
@@ -2201,7 +2145,7 @@
                                                                                                 class="form-control">
                                                                                         </div>
 
-                                                                                        {{-- Category --}}
+                                                                                        
                                                                                         <div class="col-md-6">
                                                                                             <label
                                                                                                 class="form-label">Medicine
@@ -2211,16 +2155,17 @@
                                                                                                 class="form-select">
                                                                                                 <option value="">
                                                                                                     Select</option>
-                                                                                                @foreach ($medicineCategories as $cat)
+                                                                                                <?php $__currentLoopData = $medicineCategories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                                                     <option
-                                                                                                        value="{{ $cat->id }}">
-                                                                                                        {{ $cat->medicine_category }}
+                                                                                                        value="<?php echo e($cat->id); ?>">
+                                                                                                        <?php echo e($cat->medicine_category); ?>
+
                                                                                                     </option>
-                                                                                                @endforeach
+                                                                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                                             </select>
                                                                                         </div>
 
-                                                                                        {{-- Medicine --}}
+                                                                                        
                                                                                         <div class="col-md-6">
                                                                                             <label
                                                                                                 class="form-label">Medicine
@@ -2228,32 +2173,34 @@
                                                                                             <select name="med_name"
                                                                                                 id="edit_med_name"
                                                                                                 class="form-select">
-                                                                                                @foreach ($pharmacyDetails as $med)
+                                                                                                <?php $__currentLoopData = $pharmacyDetails; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $med): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                                                     <option
-                                                                                                        value="{{ $med->id }}">
-                                                                                                        {{ $med->medicine_name }}
+                                                                                                        value="<?php echo e($med->id); ?>">
+                                                                                                        <?php echo e($med->medicine_name); ?>
+
                                                                                                     </option>
-                                                                                                @endforeach
+                                                                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                                             </select>
                                                                                         </div>
 
-                                                                                        {{-- Dosage --}}
+                                                                                        
                                                                                         <div class="col-md-6">
                                                                                             <label
                                                                                                 class="form-label">Dosage</label>
                                                                                             <select name="dosage"
                                                                                                 id="edit_dosage"
                                                                                                 class="form-select">
-                                                                                                @foreach ($medDosages as $dose)
+                                                                                                <?php $__currentLoopData = $medDosages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $dose): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                                                     <option
-                                                                                                        value="{{ $dose->id }}">
-                                                                                                        {{ $dose->dosage }}
+                                                                                                        value="<?php echo e($dose->id); ?>">
+                                                                                                        <?php echo e($dose->dosage); ?>
+
                                                                                                     </option>
-                                                                                                @endforeach
+                                                                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                                             </select>
                                                                                         </div>
 
-                                                                                        {{-- Remarks --}}
+                                                                                        
                                                                                         <div class="col-md-6">
                                                                                             <label
                                                                                                 class="form-label">Remarks</label>
@@ -2275,7 +2222,7 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            @endforeach
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -2313,15 +2260,6 @@
                                                         </span>
                                                         <input type="text" class="form-control shadow-sm"
                                                             placeholder="Search">
-                                                        @if ($errors->any())
-                                                            <div class="alert alert-danger">
-                                                                <ul class="mb-0">
-                                                                    @foreach ($errors->all() as $error)
-                                                                        <li>{{ $error }}</li>
-                                                                    @endforeach
-                                                                </ul>
-                                                            </div>
-                                                        @endif
 
                                                     </div>
                                                 </div>
@@ -2339,154 +2277,33 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @foreach ($labInvestigations as $lab)
+                                                            <?php $__currentLoopData = $labInvestigations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $lab): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                 <tr>
                                                                     <td>
-                                                                        {{ $lab->pathology->test_name .
-                                                                            "
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                (" .
-                                                                            $lab->pathology->short_name .
-                                                                            ')' }}
-                                                                    </td>
-                                                                    <td>Pathology</td>
-                                                                    <td>{{ '--' }}</td>
-                                                                    <td>{{ \Carbon\Carbon::today()->copy()->addDays(intval($lab->pathology->report_days))->format('d-M-Y') }}
-                                                                    </td>
-                                                                    <td>{{ $lab->approved_by ?? '--' }}</td>
-                                                                    <td>
-                                                                        <div class="d-flex gap-2">
-                                                                            <!-- Edit -->
-                                                                            <a href="javascript:void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-warning rounded-pill editLabBtn"
-                                                                                data-bs-toggle="modal"
-                                                                                data-bs-target="#addPathLabModal"
-                                                                                data-lab-id="{{ $lab->id }}"
-                                                                                title="Edit">
-                                                                                    <i class="ti ti-edit"></i>
-                                                                            </a>
-
-                                                                            <!-- Download -->
-                                                                            @if($lab->path_doc_path)
-                                                                                <a href="{{ route('path.report.download', $lab->id) }}"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
-                                                                                title="Download"
-                                                                                download>
-                                                                                    <i class="ti ti-download"></i>
-                                                                                </a>
-                                                                            @else
-                                                                                <a href="javascript:void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill disabled"
-                                                                                title="No file available"
-                                                                                >
-                                                                                    <i class="ti ti-download"></i>
-                                                                                </a>
-                                                                            @endif
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                                @include('components.modals.add-pathlab-report')
-                                                            @endforeach
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                                <!-- Table end -->
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="tab-pane" id="radiology_reports">
-                <!-- row start -->
-                <div class="row">
-                    <div class="col-12 d-flex">
-                        <div class="card shadow-sm flex-fill w-100">
-                            <div class="card-header"
-                                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Radiology
-                                    Reports
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-lg-12">
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <div
-                                                    class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
-                                                    <div class="input-icon-start position-relative me-2">
-                                                        <span class="input-icon-addon">
-                                                            <i class="ti ti-search"></i>
-                                                        </span>
-                                                        <input type="text" class="form-control shadow-sm"
-                                                            placeholder="Search">
-
-                                                    </div>
-                                                </div>
-                                                <!-- Table start -->
-                                                <div class="table-responsive table-nowrap">
-                                                    <table class="table border">
-                                                        <thead class="thead-light">
-                                                            <tr>
-                                                                <th>Test Name</th>
-                                                                <th>Radiology</th>
-                                                                <th>Sample Collected</th>
-                                                                <th>Expected Date</th>
-                                                                <th>Approved By</th>
-                                                                <th>Action</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @foreach ($radiologyReports as $lab)
-                                                                <tr>
-                                                                    <td>
-                                                                        {{ $lab->radiology->test_name .
+                                                                        <?php echo e($lab->pathology->test_name .
                                                                             "
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 (" .
-                                                                            $lab->radiology->short_name .
-                                                                            ')' }}
+                                                                            $lab->pathology->short_name .
+                                                                            ')'); ?>
+
                                                                     </td>
-                                                                    <td>Radiology</td>
-                                                                    <td>{{ '--' }}</td>
-                                                                    <td>{{ \Carbon\Carbon::today()->copy()->addDays(intval($lab->radiology->report_days))->format('d-M-Y') }}
+                                                                    <td>Pathology</td>
+                                                                    <td><?php echo e('--'); ?></td>
+                                                                    <td><?php echo e(\Carbon\Carbon::today()->copy()->addDays(intval($lab->pathology->report_days))->format('d-M-Y')); ?>
+
                                                                     </td>
-                                                                    <td>{{ $lab->approved_by ?? '--' }}</td>
+                                                                    <td><?php echo e($lab->approved_by ?? '--'); ?></td>
                                                                     <td>
                                                                         <div class="d-flex gap-2">
-                                                                            <!-- Edit -->
-                                                                            <a href="javascript:void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-warning rounded-pill editLabBtn"
-                                                                                data-bs-toggle="modal"
-                                                                                data-bs-target="#addRadioLabModal"
-                                                                                data-lab-id="{{ $lab->id }}"
-                                                                                title="Edit">
-                                                                                    <i class="ti ti-edit"></i>
-                                                                            </a>
-
-                                                                            <!-- Download -->
-                                                                            @if($lab->radio_doc_path)
-                                                                                <a href="{{ route('radio.report.download', $lab->id) }}"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
-                                                                                title="Download"
-                                                                                download>
-                                                                                    <i class="ti ti-download"></i>
-                                                                                </a>
-                                                                            @else
-                                                                                <a href="javascript:void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill disabled"
-                                                                                title="No file available"
-                                                                                >
-                                                                                    <i class="ti ti-download"></i>
-                                                                                </a>
-                                                                            @endif
+                                                                            <a href="javascript: void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
+                                                                                <i class="ti ti-menu"
+                                                                                    data-bs-toggle="tooltip"
+                                                                                    title="Show"></i></a>
                                                                         </div>
                                                                     </td>
                                                                 </tr>
-                                                                @include('components.modals.add-radlab-report')
-                                                            @endforeach
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
 
 
@@ -2553,11 +2370,11 @@
 
                                                             <div class="modal-body">
                                                                 <!-- Include the Operation Form -->
-                                                                <form action="{{ route('operation.store') }}"
+                                                                <form action="<?php echo e(route('operation.store')); ?>"
                                                                     method="POST">
-                                                                    @csrf
+                                                                    <?php echo csrf_field(); ?>
                                                                     <input type="text" name="ipd_details_id"
-                                                                        class="form-control" value="{{ $ipd->id }}"
+                                                                        class="form-control" value="<?php echo e($ipd->id); ?>"
                                                                         hidden>
                                                                     <div class="row gy-3 py-4 mx-1">
 
@@ -2583,10 +2400,10 @@
                                                                                 class="form-select">
                                                                                 <option value="">Select Category
                                                                                 </option>
-                                                                                @foreach ($operationCategories as $cat)
-                                                                                    <option value="{{ $cat->id }}">
-                                                                                        {{ $cat->category }}</option>
-                                                                                @endforeach
+                                                                                <?php $__currentLoopData = $operationCategories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                                    <option value="<?php echo e($cat->id); ?>">
+                                                                                        <?php echo e($cat->category); ?></option>
+                                                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                             </select>
                                                                         </div>
 
@@ -2597,7 +2414,7 @@
                                                                                 id="operation_type" class="form-select">
                                                                                 <option value="">Select Operation
                                                                                 </option>
-                                                                                {{-- Options will be populated via JS --}}
+                                                                                
                                                                             </select>
                                                                         </div>
 
@@ -2615,10 +2432,10 @@
                                                                                 class="form-select">
                                                                                 <option value="">Select Doctor
                                                                                 </option>
-                                                                                @foreach ($doctors as $doctor)
-                                                                                    <option value="{{ $doctor->id }}">
-                                                                                        {{ $doctor->name }}</option>
-                                                                                @endforeach
+                                                                                <?php $__currentLoopData = $doctors; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $doctor): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                                    <option value="<?php echo e($doctor->id); ?>">
+                                                                                        <?php echo e($doctor->name); ?></option>
+                                                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                             </select>
                                                                         </div>
 
@@ -2705,36 +2522,38 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @foreach ($operationDetail as $operation)
+                                                            <?php $__currentLoopData = $operationDetail; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $operation): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                 <tr>
                                                                     <td>
                                                                         <h6 class="fs-14 mb-1">
-                                                                            {{ $operation->reference_no }}
+                                                                            <?php echo e($operation->reference_no); ?>
+
                                                                         </h6>
                                                                     </td>
-                                                                    <td>{{ $operation->date }}</td>
-                                                                    <td>{{ $operation->operation->operation }}</td>
-                                                                    <td>{{ $operation->operation->category->category }}
+                                                                    <td><?php echo e($operation->date); ?></td>
+                                                                    <td><?php echo e($operation->operation->operation); ?></td>
+                                                                    <td><?php echo e($operation->operation->category->category); ?>
+
                                                                     </td>
-                                                                    <td>{{ $operation->ot_technician }}</td>
+                                                                    <td><?php echo e($operation->ot_technician); ?></td>
                                                                     <td>
                                                                         <div class="d-flex gap-2">
                                                                             <a href="#" data-bs-toggle="modal"
-                                                                                data-bs-target="#editOperationModal{{ $operation->id }}"
+                                                                                data-bs-target="#editOperationModal<?php echo e($operation->id); ?>"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
                                                                                 <i class="ti ti-pencil"></i>
                                                                             </a>
                                                                             <!-- <a href="javascript: void(0);"
-                                                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                                                            <i class="ti ti-trash"
-                                                                                                                data-bs-toggle="tooltip"
-                                                                                                                title="Show"></i></a> -->
+                                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                                                                    <i class="ti ti-trash"
+                                                                                                        data-bs-toggle="tooltip"
+                                                                                                        title="Show"></i></a> -->
                                                                         </div>
                                                                     </td>
                                                                 </tr>
                                                                 <!-- EDIT OPERATION MODAL -->
                                                                 <div class="modal fade"
-                                                                    id="editOperationModal{{ $operation->id }}"
+                                                                    id="editOperationModal<?php echo e($operation->id); ?>"
                                                                     tabindex="-1" aria-hidden="true">
                                                                     <div
                                                                         class="modal-dialog modal-lg modal-dialog-centered">
@@ -2752,14 +2571,14 @@
 
                                                                             <div class="modal-body">
                                                                                 <form
-                                                                                    action="{{ route('operation.update', $operation->id) }}"
+                                                                                    action="<?php echo e(route('operation.update', $operation->id)); ?>"
                                                                                     method="POST">
-                                                                                    @csrf
-                                                                                    @method('PUT')
+                                                                                    <?php echo csrf_field(); ?>
+                                                                                    <?php echo method_field('PUT'); ?>
                                                                                     <input type="text"
                                                                                         name="ipd_details_id"
                                                                                         class="form-control"
-                                                                                        value="{{ $ipd->id }}"
+                                                                                        value="<?php echo e($ipd->id); ?>"
                                                                                         hidden>
                                                                                     <div class="row gy-3 py-4 mx-1">
                                                                                         <div class="col-md-4 mb-3">
@@ -2772,13 +2591,13 @@
                                                                                                 <option value="">
                                                                                                     Select</option>
                                                                                                 <option value="General"
-                                                                                                    {{ $operation->customer_type == 'General' ? 'selected' : '' }}>
+                                                                                                    <?php echo e($operation->customer_type == 'General' ? 'selected' : ''); ?>>
                                                                                                     General</option>
                                                                                                 <option value="VIP"
-                                                                                                    {{ $operation->customer_type == 'VIP' ? 'selected' : '' }}>
+                                                                                                    <?php echo e($operation->customer_type == 'VIP' ? 'selected' : ''); ?>>
                                                                                                     VIP</option>
                                                                                                 <option value="Corporate"
-                                                                                                    {{ $operation->customer_type == 'Corporate' ? 'selected' : '' }}>
+                                                                                                    <?php echo e($operation->customer_type == 'Corporate' ? 'selected' : ''); ?>>
                                                                                                     Corporate</option>
                                                                                             </select>
                                                                                         </div>
@@ -2792,13 +2611,14 @@
                                                                                                 class="form-select">
                                                                                                 <option value="">
                                                                                                     Select Category</option>
-                                                                                                @foreach ($operationCategories as $cat)
+                                                                                                <?php $__currentLoopData = $operationCategories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                                                     <option
-                                                                                                        value="{{ $cat->id }}"
-                                                                                                        {{ $operation->operation->category_id == $cat->id ? 'selected' : '' }}>
-                                                                                                        {{ $cat->category }}
+                                                                                                        value="<?php echo e($cat->id); ?>"
+                                                                                                        <?php echo e($operation->operation->category_id == $cat->id ? 'selected' : ''); ?>>
+                                                                                                        <?php echo e($cat->category); ?>
+
                                                                                                     </option>
-                                                                                                @endforeach
+                                                                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                                             </select>
                                                                                         </div>
 
@@ -2810,13 +2630,14 @@
                                                                                                 <option value="">
                                                                                                     Select Operation
                                                                                                 </option>
-                                                                                                @foreach ($operations as $op)
+                                                                                                <?php $__currentLoopData = $operations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $op): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                                                     <option
-                                                                                                        value="{{ $op->id }}"
-                                                                                                        {{ $operation->operation_id == $op->id ? 'selected' : '' }}>
-                                                                                                        {{ $op->operation }}
+                                                                                                        value="<?php echo e($op->id); ?>"
+                                                                                                        <?php echo e($operation->operation_id == $op->id ? 'selected' : ''); ?>>
+                                                                                                        <?php echo e($op->operation); ?>
+
                                                                                                     </option>
-                                                                                                @endforeach
+                                                                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                                             </select>
                                                                                         </div>
 
@@ -2827,7 +2648,7 @@
                                                                                             <input type="datetime-local"
                                                                                                 name="date"
                                                                                                 class="form-control"
-                                                                                                value="{{ \Carbon\Carbon::parse($operation->date)->format('Y-m-d\TH:i') }}"
+                                                                                                value="<?php echo e(\Carbon\Carbon::parse($operation->date)->format('Y-m-d\TH:i')); ?>"
                                                                                                 required>
                                                                                         </div>
 
@@ -2840,13 +2661,14 @@
                                                                                                 class="form-select">
                                                                                                 <option value="">
                                                                                                     Select Doctor</option>
-                                                                                                @foreach ($doctors as $doctor)
+                                                                                                <?php $__currentLoopData = $doctors; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $doctor): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                                                     <option
-                                                                                                        value="{{ $doctor->id }}"
-                                                                                                        {{ $operation->consultant_doctor == $doctor->id ? 'selected' : '' }}>
-                                                                                                        {{ $doctor->name }}
+                                                                                                        value="<?php echo e($doctor->id); ?>"
+                                                                                                        <?php echo e($operation->consultant_doctor == $doctor->id ? 'selected' : ''); ?>>
+                                                                                                        <?php echo e($doctor->name); ?>
+
                                                                                                     </option>
-                                                                                                @endforeach
+                                                                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                                             </select>
                                                                                         </div>
 
@@ -2857,7 +2679,7 @@
                                                                                             <input type="text"
                                                                                                 name="ass_consultant_1"
                                                                                                 class="form-control"
-                                                                                                value="{{ $operation->ass_consultant_1 }}">
+                                                                                                value="<?php echo e($operation->ass_consultant_1); ?>">
                                                                                         </div>
 
                                                                                         <div class="col-md-4 mb-3">
@@ -2867,7 +2689,7 @@
                                                                                             <input type="text"
                                                                                                 name="ass_consultant_2"
                                                                                                 class="form-control"
-                                                                                                value="{{ $operation->ass_consultant_2 }}">
+                                                                                                value="<?php echo e($operation->ass_consultant_2); ?>">
                                                                                         </div>
 
                                                                                         <div class="col-md-4 mb-3">
@@ -2876,7 +2698,7 @@
                                                                                             <input type="text"
                                                                                                 name="anesthetist"
                                                                                                 class="form-control"
-                                                                                                value="{{ $operation->anesthetist }}">
+                                                                                                value="<?php echo e($operation->anesthetist); ?>">
                                                                                         </div>
 
                                                                                         <div class="col-md-4 mb-3">
@@ -2886,7 +2708,7 @@
                                                                                             <input type="text"
                                                                                                 name="anaethesia_type"
                                                                                                 class="form-control"
-                                                                                                value="{{ $operation->anaethesia_type }}">
+                                                                                                value="<?php echo e($operation->anaethesia_type); ?>">
                                                                                         </div>
 
                                                                                         <div class="col-md-4 mb-3">
@@ -2895,7 +2717,7 @@
                                                                                             <input type="text"
                                                                                                 name="ot_technician"
                                                                                                 class="form-control"
-                                                                                                value="{{ $operation->ot_technician }}">
+                                                                                                value="<?php echo e($operation->ot_technician); ?>">
                                                                                         </div>
 
                                                                                         <div class="col-md-4 mb-3">
@@ -2904,7 +2726,7 @@
                                                                                             <input type="text"
                                                                                                 name="ot_assistant"
                                                                                                 class="form-control"
-                                                                                                value="{{ $operation->ot_assistant }}">
+                                                                                                value="<?php echo e($operation->ot_assistant); ?>">
                                                                                         </div>
 
                                                                                         <div class="col-md-4 mb-3">
@@ -2913,13 +2735,13 @@
                                                                                             <input type="text"
                                                                                                 name="result"
                                                                                                 class="form-control"
-                                                                                                value="{{ $operation->result }}">
+                                                                                                value="<?php echo e($operation->result); ?>">
                                                                                         </div>
 
                                                                                         <div class="col-md-12 mb-3">
                                                                                             <label
                                                                                                 class="form-label">Remark</label>
-                                                                                            <textarea name="remark" rows="3" class="form-control">{{ $operation->remark }}</textarea>
+                                                                                            <textarea name="remark" rows="3" class="form-control"><?php echo e($operation->remark); ?></textarea>
                                                                                         </div>
 
                                                                                     </div>
@@ -2935,7 +2757,7 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            @endforeach
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -3015,9 +2837,9 @@
 
                                                                     </div>
 
-                                                                    <form action="{{ route('ipd.addIpdCharge') }}"
+                                                                    <form action="<?php echo e(route('ipd.addIpdCharge')); ?>"
                                                                         method="POST" id="addChargeForm">
-                                                                        @csrf
+                                                                        <?php echo csrf_field(); ?>
                                                                         <div class="modal-body">
                                                                             <div class="row gy-3 py-4 mx-1">
                                                                                 <div
@@ -3034,10 +2856,10 @@
                                                                                                 <input type="hidden"
                                                                                                     name="ipd_id"
                                                                                                     id="ipd_id"
-                                                                                                    value="{{ $ipd->id }}">
+                                                                                                    value="<?php echo e($ipd->id); ?>">
                                                                                                 <select name="charge_type"
                                                                                                     id="add_charge_type"
-                                                                                                    class="form-control charge_type reset_value"
+                                                                                                    class="form-control charge_type select2 reset_value select2-hidden-accessible"
                                                                                                     style="width: 100%"
                                                                                                     tabindex="-1"
                                                                                                     aria-hidden="true">
@@ -3054,14 +2876,14 @@
                                                                                             <div class="form-group">
                                                                                                 <label
                                                                                                     class="form-label">Charge
-                                                                                                    Category<small
-                                                                                                        class="req">
-                                                                                                        *</small></label>
+                                                                                                    Category</label><small
+                                                                                                    class="req">
+                                                                                                    *</small>
                                                                                                 <select
                                                                                                     name="charge_category2"
                                                                                                     id="charge_category2"
                                                                                                     style="width: 100%"
-                                                                                                    class="form-control select2 charge_category2 reset_value "
+                                                                                                    class="form-control select2 charge_category2 reset_value select2-hidden-accessible"
                                                                                                     tabindex="-1"
                                                                                                     aria-hidden="true">
                                                                                                     <option
@@ -3075,20 +2897,20 @@
                                                                                             <div class="form-group">
                                                                                                 <label
                                                                                                     class="form-label">Charge
-                                                                                                    Name<small
-                                                                                                        class="req">
-                                                                                                        *</small></label>
-                                                                                                        <select name="charge_id"
-                                                                                                            id="charge_id"
-                                                                                                            style="width: 100%"
-                                                                                                            class="form-control addcharge  select2 reset_value "
-                                                                                                            tabindex="-1"
-                                                                                                            aria-hidden="true">
-                                                                                                            <option
-                                                                                                                value="">
-                                                                                                                Select
-                                                                                                            </option>
-                                                                                                        </select>
+                                                                                                    Name</label><small
+                                                                                                    class="req">
+                                                                                                    *</small>
+                                                                                                <select name="charge_id"
+                                                                                                    id="charge_id"
+                                                                                                    style="width: 100%"
+                                                                                                    class="form-control addcharge  select2 reset_value select2-hidden-accessible"
+                                                                                                    tabindex="-1"
+                                                                                                    aria-hidden="true">
+                                                                                                    <option
+                                                                                                        value="">
+                                                                                                        Select
+                                                                                                    </option>
+                                                                                                </select>
                                                                                             </div>
                                                                                         </div>
                                                                                         <div class="col-md-2">
@@ -3097,12 +2919,14 @@
                                                                                                     class="form-label">Standard
                                                                                                     Charge
                                                                                                     (INR)</label>
-                                                                                                    <input type="text"
-                                                                                                        name="standard_charge"
-                                                                                                        id="addstandard_charge"
-                                                                                                        class="form-control reset_value standard_charge"
-                                                                                                        value="">
-                                                                                                        <span class="text-danger"></span>
+                                                                                                <input type="text"
+
+                                                                                                    name="standard_charge"
+                                                                                                    id="addstandard_charge"
+                                                                                                    class="form-control reset_value standard_charge"
+                                                                                                    value="">
+                                                                                                <span
+                                                                                                    class="text-danger"></span>
                                                                                             </div>
                                                                                         </div>
                                                                                         <div class="col-md-2">
@@ -3111,6 +2935,7 @@
                                                                                                     class="form-label">TPA
                                                                                                     Charge (INR)</label>
                                                                                                 <input type="text"
+
                                                                                                     name="schedule_charge"
                                                                                                     id="addscd_charge"
                                                                                                     placeholder=""
@@ -3123,9 +2948,9 @@
                                                                                         <div class="col-sm-2">
                                                                                             <div class="form-group">
                                                                                                 <label
-                                                                                                    class="form-label">Qty<small
-                                                                                                        class="req">
-                                                                                                        *</small></label>
+                                                                                                    class="form-label">Qty</label><small
+                                                                                                    class="req">
+                                                                                                    *</small>
                                                                                                 <input type="text"
                                                                                                     name="qty"
                                                                                                     id="qty"
@@ -3155,7 +2980,8 @@
                                                                                                                 name="apply_charge"
                                                                                                                 id="apply_charge"
                                                                                                                 style="width: 30%; float: right"
-                                                                                                                class="form-control total apply_charge_add_charge">
+                                                                                                                class="form-control total apply_charge_add_charge"
+                                                                                                                >
                                                                                                         </td>
                                                                                                     </tr>
                                                                                                     <tr>
@@ -3185,7 +3011,8 @@
                                                                                                                 value="0"
                                                                                                                 id="discount_percentage_amount"
                                                                                                                 style="width: 50%; float: right"
-                                                                                                                class="form-control discount_percentage_amount">
+                                                                                                                class="form-control discount_percentage_amount"
+                                                                                                                >
                                                                                                         </td>
                                                                                                     </tr>
                                                                                                     <tr>
@@ -3212,7 +3039,8 @@
                                                                                                                 value="0"
                                                                                                                 id="tax_amt"
                                                                                                                 style="width: 50%; float: right"
-                                                                                                                class="form-control tax">
+                                                                                                                class="form-control tax"
+                                                                                                                >
                                                                                                         </td>
                                                                                                     </tr>
                                                                                                     <tr>
@@ -3227,7 +3055,8 @@
                                                                                                                 name="amount"
                                                                                                                 id="final_amount"
                                                                                                                 style="width: 30%; float: right"
-                                                                                                                class="form-control net_amount">
+                                                                                                                class="form-control net_amount"
+                                                                                                                >
                                                                                                         </td>
                                                                                                     </tr>
                                                                                                 </tbody>
@@ -3250,9 +3079,9 @@
                                                                                         <div class="col-sm-3">
                                                                                             <div class="form-group mb-2">
                                                                                                 <label for=""
-                                                                                                    class="form-label">Date
-                                                                                                    <small class="req">
-                                                                                                        *</small></label>
+                                                                                                    class="form-label">Date</label>
+                                                                                                <small class="req">
+                                                                                                    *</small>
                                                                                                 <input id="charge_date"
                                                                                                     name="date"
                                                                                                     placeholder=""
@@ -3340,14 +3169,14 @@
                                                                 <th>Applied Charge (INR)</th>
                                                                 <th>TPA Charge (INR)</th>
                                                                 <th>Discount</th>
-                                                                <!-- <th>Tax</th> -->
+                                                                <th>Tax</th>
                                                                 <th>Amount (INR)</th>
                                                                 <!-- <th>Action</th> -->
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @foreach ($ipdCharges as $charge)
-                                                                @php
+                                                            <?php $__currentLoopData = $ipdCharges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $charge): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                <?php
                                                                     $taxAmount =
                                                                         ($charge->charge->standard_charge *
                                                                             $charge->charge->taxCategory->percentage) /
@@ -3360,53 +3189,57 @@
                                                                         $charge->charge->standard_charge -
                                                                         $discountAmount +
                                                                         $taxAmount;
-                                                                @endphp
+                                                                ?>
                                                                 <tr>
                                                                     <td>
-                                                                        {{ \Carbon\Carbon::parse($charge->date)->format('d-m-Y') }}
+                                                                         <?php echo e(\Carbon\Carbon::parse($charge->date)->format('d-m-Y')); ?>
+
                                                                     </td>
                                                                     <td>
-                                                                        {{ $charge->charge->name ?? '-' }}
+                                                                        <?php echo e($charge->charge->name); ?>
+
                                                                     </td>
                                                                     <td style="text-transform: capitalize;">
-                                                                        {{ $charge->chargeCategory?->chargeType?->charge_type ?? '-' }}
+                                                                        <?php echo e($charge->chargeCategory->chargeType->charge_type); ?>
+
                                                                     </td>
                                                                     <td class="text-right">
-                                                                        {{ $charge->chargeCategory->name ?? '-' }}
+                                                                        <?php echo e($charge->chargeCategory->name); ?>
+
                                                                     </td>
 
                                                                     <td class="text-right">
-                                                                        {{ $charge->qty ?? '-' }}</td>
+                                                                        <?php echo e($charge->qty); ?></td>
                                                                     <td class="text-right">
-                                                                        {{ $charge->standard_charge ?? '-' }}</td>
+                                                                        <?php echo e($charge->standard_charge); ?></td>
                                                                     <td class="text-right">0.00</td>
-                                                                    <td>{{ $discountAmount }}&nbsp;({{ $charge->discount }}%)
+                                                                    <td><?php echo e($discountAmount); ?>&nbsp;(<?php echo e($charge->discount); ?>%)
                                                                     </td>
-                                                                    <!-- <td>{{ $taxAmount }}&nbsp;({{ $charge->charge->taxCategory->percentage }}%)
-                                                                    </td> -->
-                                                                    <td>{{ $amount }}</td>
+                                                                    <td><?php echo e($taxAmount); ?>&nbsp;(<?php echo e($charge->charge->taxCategory->percentage); ?>%)
+                                                                    </td>
+                                                                    <td><?php echo e($amount); ?></td>
                                                                     <!-- <td>
-                                                                                <div class="d-flex gap-2">
-                                                                                    <a href="javascript: void(0);"
-                                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
-                                                                                        <i class="fa-solid fa-print"
-                                                                                            data-bs-toggle="tooltip"
-                                                                                            title="Print"></i></a>
-                                                                                    <a href="javascript: void(0);"
-                                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                                                        <i class="ti ti-pencil"
-                                                                                            data-bs-toggle="tooltip"
-                                                                                            title="Edit"></i></a>
+                                                                        <div class="d-flex gap-2">
+                                                                            <a href="javascript: void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
+                                                                                <i class="fa-solid fa-print"
+                                                                                    data-bs-toggle="tooltip"
+                                                                                    title="Print"></i></a>
+                                                                            <a href="javascript: void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
+                                                                                <i class="ti ti-pencil"
+                                                                                    data-bs-toggle="tooltip"
+                                                                                    title="Edit"></i></a>
 
-                                                                                    <a href="javascript: void(0);"
-                                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                                        <i class="ti ti-trash"
-                                                                                            data-bs-toggle="tooltip"
-                                                                                            title="Delete"></i></a>
-                                                                                </div>
-                                                                            </td> -->
+                                                                            <a href="javascript: void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
+                                                                                <i class="ti ti-trash"
+                                                                                    data-bs-toggle="tooltip"
+                                                                                    title="Delete"></i></a>
+                                                                        </div>
+                                                                    </td> -->
                                                                 </tr>
-                                                            @endforeach
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
                                                         </tbody>
                                                     </table>
@@ -3472,66 +3305,59 @@
                                                                     </div>
 
                                                                     <div class="modal-body">
-                                                                        <form action="{{ route('transactions.store') }}"
-                                                                            method="POST">
-                                                                            @csrf
-                                                                            <input type="hidden" name="ipd_id"
-                                                                                value="{{ $ipd->id }}">
-                                                                            <input type="hidden" name="patient_id"
-                                                                                value="{{ $ipd->patient_id }}">
-                                                                            <input type="hidden" name="type"
-                                                                                value="payment">
-                                                                            <input type="hidden" name="section"
-                                                                                value="ipd">
-                                                                            <div class="row gy-3 py-4 mx-1">
+                                                                        <form action="<?php echo e(route('transactions.store')); ?>" method="POST">
+                                                                            <?php echo csrf_field(); ?>
+                                                                            <input type="hidden" name="ipd_id" value="<?php echo e($ipd->id); ?>">
+                                                                            <input type="hidden" name="patient_id" value="<?php echo e($ipd->patient_id); ?>">
+                                                                            <input type="hidden" name="type" value="payment">
+                                                                            <input type="hidden" name="section" value="ipd">
+                                                                                <div class="row gy-3 py-4 mx-1">
 
-                                                                                <div class="col-md-6">
-                                                                                    <label for="date"
-                                                                                        class="form-label">Date
-                                                                                        <span class="text-danger">*</span>
-                                                                                    </label>
-                                                                                    <input type="date" name="date"
-                                                                                        id="date"
-                                                                                        class="form-control" required>
-                                                                                </div>
-                                                                                <div class="col-md-6">
-                                                                                    <label for="amount"
-                                                                                        class="form-label">Amount (INR)
-                                                                                        <span class="text-danger">*</span>
-                                                                                    </label>
-                                                                                    <input type="text" name="amount"
-                                                                                        id="amount"
-                                                                                        class="form-control" required>
-                                                                                </div>
-                                                                                <div class="col-md-6">
-                                                                                    <label for="payment_mode"
-                                                                                        class="form-label">Payment Mode
+                                                                                    <div class="col-md-6">
+                                                                                        <label for="date"
+                                                                                            class="form-label">Date
+                                                                                            <span class="text-danger">*</span>
+                                                                                        </label>
+                                                                                        <input type="date" name="date"
+                                                                                            id="date" class="form-control"
+                                                                                            required>
+                                                                                    </div>
+                                                                                    <div class="col-md-6">
+                                                                                        <label for="amount"
+                                                                                            class="form-label">Amount (INR)
+                                                                                            <span class="text-danger">*</span>
+                                                                                        </label>
+                                                                                        <input type="text" name="amount"
+                                                                                            id="amount" class="form-control"
+                                                                                            required>
+                                                                                    </div>
+                                                                                    <div class="col-md-6">
+                                                                                        <label for="payment_mode"
+                                                                                            class="form-label">Payment Mode
 
-                                                                                    </label>
-                                                                                    <select name="payment_mode"
-                                                                                        id="payment_mode"
-                                                                                        class="form-select"
-                                                                                        data-placeholder="Enter Patient Name or Id…">
-                                                                                        <option value="0">Select
-                                                                                        </option>
-                                                                                        <option value="1">Cash
-                                                                                        </option>
-                                                                                    </select>
+                                                                                        </label>
+                                                                                        <select name="payment_mode"
+                                                                                            id="payment_mode"
+                                                                                            class="form-select"
+                                                                                            data-placeholder="Enter Patient Name or Id…">
+                                                                                            <option value="0">Select</option>
+                                                                                            <option value="1">Cash</option>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                    <div class="col-md-6">
+                                                                                        <label for="note"
+                                                                                            class="form-label">Note
+                                                                                        </label>
+                                                                                        <textarea name="note" id="note" class="form-control"></textarea>
+                                                                                    </div>
                                                                                 </div>
-                                                                                <div class="col-md-6">
-                                                                                    <label for="note"
-                                                                                        class="form-label">Note
-                                                                                    </label>
-                                                                                    <textarea name="note" id="note" class="form-control"></textarea>
-                                                                                </div>
+
                                                                             </div>
-
-                                                                    </div>
-                                                                    <div class="modal-footer">
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary">Save</button>
-                                                                    </div>
-                                                                    </form>
+                                                                            <div class="modal-footer">
+                                                                                <button type="submit"
+                                                                                    class="btn btn-primary">Save</button>
+                                                                            </div>
+                                                                        </form>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -3551,66 +3377,71 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @forelse($transactions as $transaction)
+                                                            <?php $__empty_1 = true; $__currentLoopData = $transactions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $transaction): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                                                 <tr>
                                                                     <td>
-                                                                        {{ $transaction->transaction_no ?? 'TRID' . $transaction->id }}
+                                                                        <?php echo e($transaction->transaction_no ?? 'TRID'.$transaction->id); ?>
+
                                                                     </td>
 
                                                                     <td>
-                                                                        {{ \Carbon\Carbon::parse($transaction->transaction_date)->format('d/m/Y h:i A') }}
+                                                                        <?php echo e(\Carbon\Carbon::parse($transaction->transaction_date)->format('d/m/Y h:i A')); ?>
+
                                                                     </td>
 
                                                                     <td>
-                                                                        {{ $transaction->note ?? '-' }}
+                                                                        <?php echo e($transaction->note ?? '-'); ?>
+
                                                                     </td>
 
                                                                     <td>
-                                                                        {{ $transaction->payment_mode == 1 ? 'Cash' : '-' }}
+                                                                        <?php echo e($transaction->payment_mode == 1 ? 'Cash' : '-'); ?>
+
                                                                     </td>
 
                                                                     <td class="text-end">
-                                                                        {{ number_format($transaction->amount, 2) }}
+                                                                        <?php echo e(number_format($transaction->amount, 2)); ?>
+
                                                                     </td>
 
                                                                     <!-- <td>
-                                                                                <div class="d-flex gap-2">
-                                                                                    {{-- Print --}}
-                                                                                    <a href="{{ route('transactions.print', $transaction->id) }}"
-                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill"
-                                                                                    data-bs-toggle="tooltip" title="Print">
-                                                                                        <i class="fa-solid fa-print"></i>
-                                                                                    </a>
+                                                                        <div class="d-flex gap-2">
+                                                                            
+                                                                            <a href="<?php echo e(route('transactions.print', $transaction->id)); ?>"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill"
+                                                                            data-bs-toggle="tooltip" title="Print">
+                                                                                <i class="fa-solid fa-print"></i>
+                                                                            </a>
 
-                                                                                    {{-- View --}}
-                                                                                    <a href="{{ route('transactions.show', $transaction->id) }}"
-                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill"
-                                                                                    data-bs-toggle="tooltip" title="Show">
-                                                                                        <i class="ti ti-pencil"></i>
-                                                                                    </a>
+                                                                            
+                                                                            <a href="<?php echo e(route('transactions.show', $transaction->id)); ?>"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill"
+                                                                            data-bs-toggle="tooltip" title="Show">
+                                                                                <i class="ti ti-pencil"></i>
+                                                                            </a>
 
-                                                                                    {{-- Delete --}}
-                                                                                    <form action="{{ route('transactions.destroy', $transaction->id) }}"
-                                                                                        method="POST"
-                                                                                        onsubmit="return confirm('Delete this payment?')">
-                                                                                        @csrf
-                                                                                        @method('DELETE')
-                                                                                        <button type="submit"
-                                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
-                                                                                            data-bs-toggle="tooltip" title="Delete">
-                                                                                            <i class="ti ti-trash"></i>
-                                                                                        </button>
-                                                                                    </form>
-                                                                                </div>
-                                                                            </td> -->
+                                                                            
+                                                                            <form action="<?php echo e(route('transactions.destroy', $transaction->id)); ?>"
+                                                                                method="POST"
+                                                                                onsubmit="return confirm('Delete this payment?')">
+                                                                                <?php echo csrf_field(); ?>
+                                                                                <?php echo method_field('DELETE'); ?>
+                                                                                <button type="submit"
+                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
+                                                                                    data-bs-toggle="tooltip" title="Delete">
+                                                                                    <i class="ti ti-trash"></i>
+                                                                                </button>
+                                                                            </form>
+                                                                        </div>
+                                                                    </td> -->
                                                                 </tr>
-                                                            @empty
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                                                 <tr>
                                                                     <td colspan="6" class="text-center text-muted">
                                                                         No payments found
                                                                     </td>
                                                                 </tr>
-                                                            @endforelse
+                                                            <?php endif; ?>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -3745,15 +3576,15 @@
 
                                                                     </div>
                                                                     <form method="POST"
-                                                                        action="{{ isset($timeline) ? route('patient-timeline.update', $timeline->id) : route('patient-timeline.store') }}"
+                                                                        action="<?php echo e(isset($timeline) ? route('patient-timeline.update', $timeline->id) : route('patient-timeline.store')); ?>"
                                                                         enctype="multipart/form-data">
-                                                                        @csrf
-                                                                        @if (isset($timeline))
-                                                                            @method('PUT')
-                                                                        @endif
+                                                                        <?php echo csrf_field(); ?>
+                                                                        <?php if(isset($timeline)): ?>
+                                                                            <?php echo method_field('PUT'); ?>
+                                                                        <?php endif; ?>
 
                                                                         <input type="hidden" name="patient_id"
-                                                                            value="{{ $ipd->patient_id ?? '' }}">
+                                                                            value="<?php echo e($ipd->patient_id ?? ''); ?>">
 
                                                                         <div class="modal-body">
                                                                             <div class="row gy-3 py-4 mx-1">
@@ -3767,7 +3598,7 @@
                                                                                     <input type="text" name="title"
                                                                                         id="title"
                                                                                         class="form-control"
-                                                                                        value="{{ old('title', $timeline->title ?? '') }}"
+                                                                                        value="<?php echo e(old('title', $timeline->title ?? '')); ?>"
                                                                                         required>
                                                                                 </div>
 
@@ -3781,7 +3612,7 @@
                                                                                     <input type="date" name="date"
                                                                                         id="date"
                                                                                         class="form-control"
-                                                                                        value="{{ old('date', isset($timeline->date) ? \Carbon\Carbon::parse($timeline->date)->format('Y-m-d') : '') }}"
+                                                                                        value="<?php echo e(old('date', isset($timeline->date) ? \Carbon\Carbon::parse($timeline->date)->format('Y-m-d') : '')); ?>"
                                                                                         required>
                                                                                 </div>
 
@@ -3791,7 +3622,7 @@
                                                                                         class="form-label">
                                                                                         Description
                                                                                     </label>
-                                                                                    <textarea name="description" id="description" class="form-control" rows="3">{{ old('description', $timeline->description ?? '') }}</textarea>
+                                                                                    <textarea name="description" id="description" class="form-control" rows="3"><?php echo e(old('description', $timeline->description ?? '')); ?></textarea>
                                                                                 </div>
 
                                                                                 <!-- Attach Document -->
@@ -3803,16 +3634,16 @@
                                                                                     <input type="file"
                                                                                         name="attch_doc" id="attch_doc"
                                                                                         class="form-control">
-                                                                                    @if (isset($timeline) && $timeline->attch_doc)
+                                                                                    <?php if(isset($timeline) && $timeline->attch_doc): ?>
                                                                                         <small
                                                                                             class="text-muted d-block mt-1">
                                                                                             Current File:
-                                                                                            <a href="{{ asset('storage/timeline_docs/' . $timeline->attch_doc) }}"
+                                                                                            <a href="<?php echo e(asset('storage/timeline_docs/' . $timeline->attch_doc)); ?>"
                                                                                                 target="_blank">
                                                                                                 View Document
                                                                                             </a>
                                                                                         </small>
-                                                                                    @endif
+                                                                                    <?php endif; ?>
                                                                                 </div>
 
                                                                                 <!-- Visible to Person -->
@@ -3821,7 +3652,7 @@
                                                                                         name="visible_person"
                                                                                         id="visible_person"
                                                                                         class="form-check-input"
-                                                                                        {{ old('visible_person', $timeline->visible_person ?? false) ? 'checked' : '' }}>
+                                                                                        <?php echo e(old('visible_person', $timeline->visible_person ?? false) ? 'checked' : ''); ?>>
                                                                                     <label for="visible_person"
                                                                                         class="form-check-label">Visible
                                                                                         to this person</label>
@@ -3832,7 +3663,8 @@
                                                                         <div class="modal-footer">
                                                                             <button type="submit"
                                                                                 class="btn btn-primary">
-                                                                                {{ isset($timeline) ? 'Update' : 'Save' }}
+                                                                                <?php echo e(isset($timeline) ? 'Update' : 'Save'); ?>
+
                                                                             </button>
                                                                         </div>
                                                                     </form>
@@ -3856,24 +3688,25 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @forelse($PatientTimelines as $timeline)
+                                                            <?php $__empty_1 = true; $__currentLoopData = $PatientTimelines; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $timeline): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                                                 <tr>
                                                                     <td>
                                                                         <h6 class="fs-14 mb-1">
                                                                             <a href="#"
-                                                                                class="fw-semibold">{{ $timeline->patient->patient_name ?? '-' }}</a>
+                                                                                class="fw-semibold"><?php echo e($timeline->patient->patient_name ?? '-'); ?></a>
                                                                         </h6>
                                                                     </td>
 
 
-                                                                    <td>{{ $timeline->title ?? '-' }}</td>
-                                                                    <td>{{ $timeline->description ?? '-' }}</td>
+                                                                    <td><?php echo e($timeline->title ?? '-'); ?></td>
+                                                                    <td><?php echo e($timeline->description ?? '-'); ?></td>
                                                                     <td>
-                                                                        @if (!empty($timeline->timeline_date))
-                                                                            {{ \Carbon\Carbon::parse($timeline->timeline_date)->format('d/m/Y h:i A') }}
-                                                                        @else
+                                                                        <?php if(!empty($timeline->timeline_date)): ?>
+                                                                            <?php echo e(\Carbon\Carbon::parse($timeline->timeline_date)->format('d/m/Y h:i A')); ?>
+
+                                                                        <?php else: ?>
                                                                             -
-                                                                        @endif
+                                                                        <?php endif; ?>
                                                                     </td>
                                                                     <td>
                                                                         <div class="d-flex gap-2">
@@ -3885,12 +3718,12 @@
                                                                         </div>
                                                                     </td>
                                                                 </tr>
-                                                            @empty
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                                                 <tr>
                                                                     <td colspan="6" class="text-center text-muted">No
                                                                         timeline records found</td>
                                                                 </tr>
-                                                            @endforelse
+                                                            <?php endif; ?>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -3944,11 +3777,13 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <td>{{ $ipd->ipd_no }}</td>
-                                                            <td>{{ $ipd->patient_id }}</td>
-                                                            <td>{{ $ipd->doctor ? ($ipd->doctor->name . ' ' . $ipd->doctor->surname) : '--' }}
+                                                            <td><?php echo e($ipd->ipd_no); ?></td>
+                                                            <td><?php echo e($ipd->patient_id); ?></td>
+                                                            <td><?php echo e($ipd->doctor->name); ?> <?php echo e($ipd->doctor->surname); ?>
+
                                                             </td>
-                                                            <td>{{ ($ipd->bedGroup ? $ipd->bedGroup->name : '--') }}-{{ ($ipd->bedDetail ? $ipd->bedDetail->name : '--') }}
+                                                            <td><?php echo e($ipd->bedGroup->name); ?>-<?php echo e($ipd->bedDetail->name); ?>
+
                                                             </td>
                                                         </tbody>
                                                     </table>
@@ -3994,10 +3829,10 @@
                                                                 class="btn btn-primary text-white ms-2 btn-md"
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#addPrescriptionModal"
-                                                                data-ipd-id="{{ $ipd->id }}"><i
+                                                                data-ipd-id="<?php echo e($ipd->id); ?>"><i
                                                                     class="ti ti-plus me-1"></i>Add Prescription</a>
                                                         </div>
-                                                       @include('components.modals.add-prescription-modal') 
+                                                        <?php echo $__env->make('components.modals.add-prescription-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
                                                         <!-- First Modal -->
                                                         <div class="modal fade" id="add_timeline" tabindex="-1"
                                                             aria-hidden="true">
@@ -4083,19 +3918,20 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @foreach ($ipdPrescriptions as $prescription)
+                                                            <?php $__currentLoopData = $ipdPrescriptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $prescription): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                 <tr>
                                                                     <td>
                                                                         <h6 class="fs-14 mb-1">
-                                                                            {{ $prescription->prescription_number }}</h6>
+                                                                            <?php echo e($prescription->prescription_number); ?></h6>
                                                                     </td>
-                                                                    <td>{{ \Carbon\Carbon::parse($prescription->date)->format('d/m/Y') }}
+                                                                    <td><?php echo e(\Carbon\Carbon::parse($prescription->date)->format('d/m/Y')); ?>
+
                                                                     </td>
                                                                     <td>
-                                                                        @foreach ($ipdFindings[$prescription->ipd_id] as $finding)
+                                                                        <?php $__currentLoopData = $ipdFindings[$prescription->ipd_id]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $finding): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                             <span
-                                                                                class="badge bg-primary me-1">{{ $finding->name }}</span><br>
-                                                                        @endforeach
+                                                                                class="badge bg-primary me-1"><?php echo e($finding->name); ?></span><br>
+                                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                     </td>
                                                                     <td>
                                                                         <div class="d-flex gap-2">
@@ -4104,30 +3940,16 @@
                                                                                 data-bs-toggle="modal"
                                                                                 data-bs-target="#showPrescriptionModal"
                                                                                 data-is-ipd="true"
-                                                                                data-id="{{ $ipd->id }}"
-                                                                                data-pres-id = "{{ $prescription->id }}">
+                                                                                data-id="<?php echo e($ipd->id); ?>"
+                                                                                data-pres-id = "<?php echo e($prescription->id); ?>">
                                                                                 <i class="fa-solid fa-prescription"
                                                                                     data-bs-toggle="tooltip"
-                                                                                    title="Show"></i>
-                                                                            </a>
-                                                                            <a href="{{ route('ipd.prescription.edit', $prescription->id) }}"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-warning rounded-pill"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Edit">
-                                                                                <i class="fa-solid fa-pencil"></i>
-                                                                            </a>
-                                                                            <a href="{{ route('ipd.prescription.print', $prescription->id) }}"
-                                                                                target="_blank"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Print">
-                                                                                <i class="fa-solid fa-print"></i>
-                                                                            </a>
+                                                                                    title="Show"></i></a>
                                                                         </div>
-                                                                        @include('components.modals.show-prescription-modal')
+                                                                        <?php echo $__env->make('components.modals.show-prescription-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
                                                                     </td>
                                                                 </tr>
-                                                            @endforeach
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
                                                         </tbody>
                                                     </table>
@@ -4181,21 +4003,23 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @foreach ($bedHistories as $history)
+                                                            <?php $__currentLoopData = $bedHistories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $history): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                 <tr>
                                                                     <td>
                                                                         <h6 class="fs-14 mb-1">
-                                                                            {{ $history->bedGroup->name ?? '-' }}</h6>
+                                                                            <?php echo e($history->bedGroup->name ?? '-'); ?></h6>
                                                                     </td>
-                                                                    <td>{{ $history->bed->name }}</td>
-                                                                    <td>{{ \Carbon\Carbon::parse($history->from_date)->format('d/m/Y h:i A') }}
+                                                                    <td><?php echo e($history->bed->name); ?></td>
+                                                                    <td><?php echo e(\Carbon\Carbon::parse($history->from_date)->format('d/m/Y h:i A')); ?>
+
                                                                     </td>
-                                                                    <td>{{ $history->to_date ? \Carbon\Carbon::parse($history->to_date)->format('d/m/Y h:i A') : '--' }}
+                                                                    <td><?php echo e($history->to_date ? \Carbon\Carbon::parse($history->to_date)->format('d/m/Y h:i A') : '--'); ?>
+
                                                                     </td>
-                                                                    <td>{{ $history->bed->is_active }}</td>
+                                                                    <td><?php echo e($history->bed->is_active); ?></td>
 
                                                                 </tr>
-                                                            @endforeach
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
                                                         </tbody>
                                                     </table>
@@ -4217,12 +4041,12 @@
                         <div class="card shadow-sm flex-fill w-100">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>New Bed Assign
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Bed Assign
                                 </h5>
                             </div>
                             <div class="card-body">
-                                <form action = "{{ route('assignNewBed') }}" method = "POST">
-                                    @csrf
+                                <form action = "<?php echo e(route('assignNewBed')); ?>" method = "POST">
+                                    <?php echo csrf_field(); ?>
                                     <div class="row">
                                         <div class="col-lg-12">
                                             <div class="row gy-4">
@@ -4230,24 +4054,28 @@
                                                     <span class="text-primary"> <b>Old Assigned Bed : </b> </span>
 
                                                     <span>
-                                                        {{ $bedShiftHistory->bed->name ?? '-' }}
+                                                        <?php echo e($bedShiftHistory->bed->name ?? '-'); ?>
+
                                                         -
-                                                        {{ $bedShiftHistory->bedGroup->name ?? 'No Ward' }}
+                                                        <?php echo e($bedShiftHistory->bedGroup->name ?? 'No Ward'); ?>
+
                                                         -
-                                                        {{ $bedShiftHistory->bedGroup->floorDetail->name ?? '-' }}
+                                                        <?php echo e($bedShiftHistory->bedGroup->floorDetail->name ?? '-'); ?>
+
                                                     </span>
 
 
                                                 </div>
-                                                <input type="hidden" name="ipd_id" value="{{ $ipd->id }}">
+                                                <input type="hidden" name="ipd_id" value="<?php echo e($ipd->id); ?>">
                                                 <div class="col-md-6">
                                                     <span class="text-primary"><b>Assigned Date : </b></span>
                                                     <span>
-                                                        @if ($bedShiftHistory)
-                                                            {{ $bedShiftHistory->from_date ? \Carbon\Carbon::parse($bedShiftHistory->from_date)->format('jS F Y h:i:s a') : '-' }}
-                                                        @else
+                                                        <?php if($bedShiftHistory): ?>
+                                                            <?php echo e($bedShiftHistory->from_date ? \Carbon\Carbon::parse($bedShiftHistory->from_date)->format('jS F Y h:i:s a') : '-'); ?>
+
+                                                        <?php else: ?>
                                                             <span class="text-danger">No active bed history</span>
-                                                        @endif
+                                                        <?php endif; ?>
                                                     </span>
                                                 </div>
 
@@ -4336,10 +4164,10 @@
 
                                                                     </div>
                                                                     <form method="POST"
-                                                                        action="{{ route('patient-vitals.store') }}">
-                                                                        @csrf
+                                                                        action="<?php echo e(route('patient-vitals.store')); ?>">
+                                                                        <?php echo csrf_field(); ?>
                                                                         <input type="hidden" name="patient_id"
-                                                                            value="{{ $ipd->patient_id }}">
+                                                                            value="<?php echo e($ipd->patient_id); ?>">
                                                                         <div class="modal-body p-4 mx-1">
                                                                             <div id="vitalFields">
                                                                                 <div class="row gy-3 vital-row mb-2">
@@ -4354,12 +4182,13 @@
                                                                                             id="vital_name">
                                                                                             <option value="">Select
                                                                                             </option>
-                                                                                            @foreach ($vitals as $vital)
+                                                                                            <?php $__currentLoopData = $vitals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $vital): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                                                 <option
-                                                                                                    value="{{ $vital->id }}">
-                                                                                                    {{ $vital->name . ' (' . $vital->reference_range . ')' }}
+                                                                                                    value="<?php echo e($vital->id); ?>">
+                                                                                                    <?php echo e($vital->name . ' (' . $vital->reference_range . ')'); ?>
+
                                                                                                 </option>
-                                                                                            @endforeach
+                                                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                                         </select>
                                                                                     </div>
 
@@ -4423,58 +4252,60 @@
                                                             <tr>
 
                                                                 <th>Messure Date</th>
-                                                                {{-- Dynamically generate vital headers --}}
-                                                                @foreach ($vitals as $vital)
-                                                                    <th>{{ $vital->name }}</th>
-                                                                @endforeach
+                                                                
+                                                                <?php $__currentLoopData = $vitals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $vital): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                    <th><?php echo e($vital->name); ?></th>
+                                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                 <!-- <th>Action</th> -->
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @forelse($vitalDetails->groupBy('patient_id') as $caseId => $caseVitals)
-                                                                @php
+                                                            <?php $__empty_1 = true; $__currentLoopData = $vitalDetails->groupBy('patient_id'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $caseId => $caseVitals): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                                                <?php
                                                                     $firstRecord = $caseVitals->first();
-                                                                @endphp
+                                                                ?>
                                                                 <tr>
 
                                                                     <td>
-                                                                        @if (!empty($firstRecord->messure_date))
-                                                                            {{ \Carbon\Carbon::parse($firstRecord->messure_date)->format('d/m/Y h:i A') }}
-                                                                        @else
+                                                                        <?php if(!empty($firstRecord->messure_date)): ?>
+                                                                            <?php echo e(\Carbon\Carbon::parse($firstRecord->messure_date)->format('d/m/Y h:i A')); ?>
+
+                                                                        <?php else: ?>
                                                                             -
-                                                                        @endif
+                                                                        <?php endif; ?>
                                                                     </td>
 
-                                                                    {{-- Loop through all vitals dynamically --}}
-                                                                    @foreach ($vitals as $vital)
-                                                                        @php
+                                                                    
+                                                                    <?php $__currentLoopData = $vitals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $vital): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                        <?php
                                                                             $record = $caseVitals
                                                                                 ->where('vital_id', $vital->id)
                                                                                 ->first();
-                                                                        @endphp
+                                                                        ?>
                                                                         <td>
-                                                                            {{ $record->reference_range ?? '-' }}
+                                                                            <?php echo e($record->reference_range ?? '-'); ?>
+
                                                                         </td>
-                                                                    @endforeach
+                                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
                                                                     <!-- <td>
-                                                                                                    <div class="d-flex gap-2">
-                                                                                                        <a href="#"
-                                                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
-                                                                                                            data-bs-toggle="tooltip" title="Show">
-                                                                                                            <i class="ti ti-menu"></i>
-                                                                                                        </a>
-                                                                                                    </div>
-                                                                                                </td> -->
+                                                                                            <div class="d-flex gap-2">
+                                                                                                <a href="#"
+                                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
+                                                                                                    data-bs-toggle="tooltip" title="Show">
+                                                                                                    <i class="ti ti-menu"></i>
+                                                                                                </a>
+                                                                                            </div>
+                                                                                        </td> -->
                                                                 </tr>
-                                                            @empty
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                                                 <tr>
-                                                                    <td colspan="{{ 4 + $vitals->count() }}"
+                                                                    <td colspan="<?php echo e(4 + $vitals->count()); ?>"
                                                                         class="text-center text-muted">
                                                                         No vital records found
                                                                     </td>
                                                                 </tr>
-                                                            @endforelse
+                                                            <?php endif; ?>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -4495,14 +4326,206 @@
     <!-- tab content end -->
     </div>
 
-    {{-- modal ends --}}
-    @include('components.modals.discharge-modal')
-    @include('components.modals.discharge-details-modal')
+    
+    <div class="modal fade" id="dischargeDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-clipboard-check"></i>
+                        Discharge Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body">
+
+                    <!-- Common Details Section -->
+                    <div class="section-card">
+                        <div class="section-header primary">
+                            <div class="section-icon primary">
+                                <i class="bi bi-file-medical"></i>
+                            </div>
+                            <h6 class="section-title pb-0 mb-0">General Information</h6>
+                        </div>
+                        <div class="section-body">
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-calendar-event"></i>
+                                        Discharge Date
+                                    </div>
+                                    <div class="info-value" id="dc_discharge_date">January 15, 2025</div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-check-circle"></i>
+                                        Status
+                                    </div>
+                                    <div class="info-value">
+                                        <span class="status-badge discharged" id="dc_status">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                            Discharged
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-bandaid"></i>
+                                        Operation
+                                    </div>
+                                    <div class="info-value" id="dc_operation">Appendectomy</div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-heart-pulse"></i>
+                                        Diagnosis
+                                    </div>
+                                    <div class="info-value" id="dc_diagnosis">Acute Appendicitis</div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-clipboard2-pulse"></i>
+                                        Investigations
+                                    </div>
+                                    <div class="info-value" id="dc_investigations">CT Scan, Blood Tests, Ultrasound
+                                    </div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-house-heart"></i>
+                                        Treatment Home
+                                    </div>
+                                    <div class="info-value" id="dc_treatment_home">Rest, prescribed medications,
+                                        follow-up in 2 weeks</div>
+                                </div>
+                            </div>
+
+                            <div class="info-grid full mt-3">
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-journal-text"></i>
+                                        Note
+                                    </div>
+                                    <div class="info-value long-text" id="dc_note">Patient recovered well
+                                        post-surgery. No complications observed. Advised to continue medication and maintain
+                                        proper diet. Follow-up required after 2 weeks.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Death Details Section -->
+                    <div id="deathSection" class="section-card d-none">
+                        <div class="section-header danger">
+                            <div class="section-icon danger">
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                            </div>
+                            <h6 class="section-title pb-0 mb-0">Death Details</h6>
+                        </div>
+                        <div class="section-body">
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-calendar-x"></i>
+                                        Death Date
+                                    </div>
+                                    <div class="info-value" id="dc_death_date">--</div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-person"></i>
+                                        Guardian Name
+                                    </div>
+                                    <div class="info-value" id="dc_guardian_name">--</div>
+                                </div>
+                            </div>
+
+                            <div class="info-grid full mt-3">
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-file-earmark-text"></i>
+                                        Report
+                                    </div>
+                                    <div class="info-value long-text" id="dc_report">--</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Referral Details Section -->
+                    <div id="referralSection" class="section-card d-none">
+                        <div class="section-header warning">
+                            <div class="section-icon warning">
+                                <i class="bi bi-arrow-right-circle-fill"></i>
+                            </div>
+                            <h6 class="section-title pb-0 mb-0">Referral Details</h6>
+                        </div>
+                        <div class="section-body">
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-calendar-check"></i>
+                                        Referral Date
+                                    </div>
+                                    <div class="info-value" id="dc_referral_date">--</div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-hospital"></i>
+                                        Hospital Name
+                                    </div>
+                                    <div class="info-value" id="dc_refer_to_hospital">--</div>
+                                </div>
+                            </div>
+
+                            <div class="info-grid full mt-3">
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-chat-left-text"></i>
+                                        Reason for Referral
+                                    </div>
+                                    <div class="info-value long-text" id="dc_reason_for_referral">--</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-close-modal" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i>
+                        Close
+                    </button>
+                    <button type="button" class="btn btn-print">
+                        <i class="bi bi-printer"></i>
+                        Print Details
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    
+    <?php echo $__env->make('components.modals.discharge-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <!-- Chart JS -->
     <script src="assets/plugins/chartjs/chart.min.js"></script>
     <script src="assets/plugins/chartjs/chart-data.js"></script>
     <script>
-        let operations = @json($operations); // All operations from DB
+        let operations = <?php echo json_encode($operations, 15, 512) ?>; // All operations from DB
 
         document.getElementById('operation_category').addEventListener('change', function() {
 
@@ -4536,8 +4559,8 @@
     </script>
 
     <script>
-        let medicines = @json($medicinesByCategory);
-        let dosages = @json($dosages); // grouped by medicine_id
+        let medicines = <?php echo json_encode($medicinesByCategory, 15, 512) ?>;
+        let dosages = <?php echo json_encode($dosages, 15, 512) ?>; // grouped by medicine_id
 
         let mediCatDropdown = document.getElementById('medi_cat');
         let medDropdown = document.getElementById('med_name');
@@ -4573,144 +4596,143 @@
 
 
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
+<script>
+document.addEventListener("DOMContentLoaded", function () {
 
-            const chargeTypeSelect = document.getElementById("add_charge_type");
-            const chargeCategorySelect = document.getElementById("charge_category2");
-            const chargeSelect = document.getElementById("charge_id");
+    const chargeTypeSelect     = document.getElementById("add_charge_type");
+    const chargeCategorySelect = document.getElementById("charge_category2");
+    const chargeSelect         = document.getElementById("charge_id");
 
-            const standardChargeInp = document.getElementById("addstandard_charge");
-            const tpaChargeInp = document.getElementById("addscd_charge");
-            const qtyInp = document.getElementById("qty");
-            const totalInp = document.getElementById("apply_charge");
-            const discountPercInp = document.getElementById("discount_percentage_add_charge");
-            const discountAmtInp = document.getElementById("discount_percentage_amount");
-            const taxPercInp = document.getElementById("charge_tax");
-            const taxAmtInp = document.getElementById("tax_amt");
-            const netAmountInp = document.getElementById("final_amount");
+    const standardChargeInp = document.getElementById("addstandard_charge");
+    const tpaChargeInp      = document.getElementById("addscd_charge");
+    const qtyInp            = document.getElementById("qty");
+    const totalInp          = document.getElementById("apply_charge");
+    const discountPercInp   = document.getElementById("discount_percentage_add_charge");
+    const discountAmtInp    = document.getElementById("discount_percentage_amount");
+    const taxPercInp        = document.getElementById("charge_tax");
+    const taxAmtInp         = document.getElementById("tax_amt");
+    const netAmountInp      = document.getElementById("final_amount");
 
-            const previewBody = document.getElementById("preview_charges");
-            const addBtn = document.querySelector("button[name='charge_data']");
+    const previewBody = document.getElementById("preview_charges");
+    const addBtn = document.querySelector("button[name='charge_data']");
 
-            /*--------------------------------------------------
-             | FETCH CHARGE TYPES
-             --------------------------------------------------*/
-            fetch("{{ route('getChargeTypes') }}")
-                .then(res => res.json())
-                .then(data => {
-                    window.chargeTypeData = data;
-                    chargeTypeSelect.innerHTML = `<option value="">Select</option>`;
-                    data.forEach(type => {
-                        chargeTypeSelect.innerHTML += `
+    /*--------------------------------------------------
+     | FETCH CHARGE TYPES
+     --------------------------------------------------*/
+    fetch("<?php echo e(route('getChargeTypes')); ?>")
+        .then(res => res.json())
+        .then(data => {
+            window.chargeTypeData = data;
+            chargeTypeSelect.innerHTML = `<option value="">Select</option>`;
+            data.forEach(type => {
+                chargeTypeSelect.innerHTML += `
                     <option value="${type.id}">${type.charge_type}</option>
                 `;
-                    });
-                });
+            });
+        });
 
-            /*--------------------------------------------------
-             | FETCH CATEGORIES BY TYPE
-             --------------------------------------------------*/
-            chargeTypeSelect.addEventListener("change", function() {
+    /*--------------------------------------------------
+     | FETCH CATEGORIES BY TYPE
+     --------------------------------------------------*/
+    chargeTypeSelect.addEventListener("change", function () {
 
-                chargeCategorySelect.innerHTML = `<option value="">Select</option>`;
-                chargeSelect.innerHTML = `<option value="">Select</option>`;
+        chargeCategorySelect.innerHTML = `<option value="">Select</option>`;
+        chargeSelect.innerHTML = `<option value="">Select</option>`;
 
-                if (!this.value) return;
+        if (!this.value) return;
 
-                fetch("{{ route('getChargeCategoriesByTypeId', ['id' => 'ID']) }}".replace('ID', this
-                        .value))
-                    .then(res => res.json())
-                    .then(data => {
-                        window.chargeCategoryData = data;
-                        data.forEach(cat => {
-                            chargeCategorySelect.innerHTML += `
+        fetch("<?php echo e(route('getChargeCategoriesByTypeId', ['id' => 'ID'])); ?>".replace('ID', this.value))
+            .then(res => res.json())
+            .then(data => {
+                window.chargeCategoryData = data;
+                data.forEach(cat => {
+                    chargeCategorySelect.innerHTML += `
                         <option value="${cat.id}">${cat.name}</option>
                     `;
-                        });
-                    });
+                });
             });
+    });
 
-            /*--------------------------------------------------
-             | FETCH CHARGES BY CATEGORY
-             --------------------------------------------------*/
-            chargeCategorySelect.addEventListener("change", function() {
+    /*--------------------------------------------------
+     | FETCH CHARGES BY CATEGORY
+     --------------------------------------------------*/
+    chargeCategorySelect.addEventListener("change", function () {
 
-                chargeSelect.innerHTML = `<option value="">Select</option>`;
+        chargeSelect.innerHTML = `<option value="">Select</option>`;
 
-                if (!this.value) return;
+        if (!this.value) return;
 
-                fetch("{{ route('getCharges', ['id' => 'ID']) }}".replace('ID', this.value))
-                    .then(res => res.json())
-                    .then(data => {
-                        window.chargeData = data;
-                        data.forEach(charge => {
-                            chargeSelect.innerHTML += `
+        fetch("<?php echo e(route('getCharges', ['id' => 'ID'])); ?>".replace('ID', this.value))
+            .then(res => res.json())
+            .then(data => {
+                window.chargeData = data;
+                data.forEach(charge => {
+                    chargeSelect.innerHTML += `
                         <option value="${charge.id}">${charge.name}</option>
                     `;
-                        });
-                    });
+                });
             });
+    });
 
-            /*--------------------------------------------------
-             | AUTO-FILL ON CHARGE SELECT (ONCE)
-             --------------------------------------------------*/
-            chargeSelect.addEventListener("change", function() {
+    /*--------------------------------------------------
+     | AUTO-FILL ON CHARGE SELECT (ONCE)
+     --------------------------------------------------*/
+    chargeSelect.addEventListener("change", function () {
 
-                const chargeId = this.value;
-                const selectedCharge = window.chargeData.find(c => c.id == chargeId);
-                if (!selectedCharge) return;
+        const chargeId = this.value;
+        const selectedCharge = window.chargeData.find(c => c.id == chargeId);
+        if (!selectedCharge) return;
 
-                standardChargeInp.value = selectedCharge.standard_charge ?? 0;
-                tpaChargeInp.value = 0;
-                qtyInp.value = 1;
-                discountPercInp.value = 0;
-                taxPercInp.value = selectedCharge.tax_category?.percentage ?? 0;
+        standardChargeInp.value = selectedCharge.standard_charge ?? 0;
+        tpaChargeInp.value      = 0;
+        qtyInp.value            = 1;
+        discountPercInp.value   = 0;
+        taxPercInp.value        = selectedCharge.tax_category?.percentage ?? 0;
 
-                calculateAmount();
-            });
+        calculateAmount();
+    });
 
-            /*--------------------------------------------------
-             | REAL-TIME CALCULATION (EDITABLE SAFE)
-             --------------------------------------------------*/
-            [
-                standardChargeInp,
-                qtyInp,
-                discountPercInp,
-                taxPercInp
-            ].forEach(el => el.addEventListener("input", calculateAmount));
+    /*--------------------------------------------------
+     | REAL-TIME CALCULATION (EDITABLE SAFE)
+     --------------------------------------------------*/
+    [
+        standardChargeInp,
+        qtyInp,
+        discountPercInp,
+        taxPercInp
+    ].forEach(el => el.addEventListener("input", calculateAmount));
 
-            function calculateAmount() {
+    function calculateAmount() {
 
-                const standard = parseFloat(standardChargeInp.value) || 0;
-                const qty = parseFloat(qtyInp.value) || 1;
+        const standard = parseFloat(standardChargeInp.value) || 0;
+        const qty      = parseFloat(qtyInp.value) || 1;
 
-                const discountPerc = parseFloat(discountPercInp.value) || 0;
-                const taxPerc = parseFloat(taxPercInp.value) || 0;
+        const discountPerc = parseFloat(discountPercInp.value) || 0;
+        const taxPerc      = parseFloat(taxPercInp.value) || 0;
 
-                const appliedCharge = standard * qty;
-                const discountAmt = appliedCharge * (discountPerc / 100);
-                const taxAmt = appliedCharge * (taxPerc / 100);
-                const netAmount = appliedCharge + taxAmt - discountAmt;
+        const appliedCharge = standard * qty;
+        const discountAmt   = appliedCharge * (discountPerc / 100);
+        const taxAmt        = appliedCharge * (taxPerc / 100);
+        const netAmount     = appliedCharge + taxAmt - discountAmt;
 
-                totalInp.value = appliedCharge.toFixed(2);
-                discountAmtInp.value = discountAmt.toFixed(2);
-                taxAmtInp.value = taxAmt.toFixed(2);
-                netAmountInp.value = netAmount.toFixed(2);
-            }
+        totalInp.value       = appliedCharge.toFixed(2);
+        discountAmtInp.value = discountAmt.toFixed(2);
+        taxAmtInp.value      = taxAmt.toFixed(2);
+        netAmountInp.value   = netAmount.toFixed(2);
+    }
 
-            /*--------------------------------------------------
-             | ADD ROW TO PREVIEW TABLE
-             --------------------------------------------------*/
-            addBtn.addEventListener("click", function(e) {
-                e.preventDefault();
+    /*--------------------------------------------------
+     | ADD ROW TO PREVIEW TABLE
+     --------------------------------------------------*/
+    addBtn.addEventListener("click", function (e) {
+        e.preventDefault();
 
-                if (!chargeTypeSelect.value || !chargeCategorySelect.value || !chargeSelect.value) {
-                    alert("Please fill required fields");
-                    return;
-                }
+        if (!chargeTypeSelect.value || !chargeCategorySelect.value || !chargeSelect.value) {
+            alert("Please fill required fields");
+            return;
+        }
 
-                const row = `
+        const row = `
         <tr>
             <td>${document.getElementById("charge_date").value}</td>
             <td>${chargeTypeSelect.selectedOptions[0].text}</td>
@@ -4744,23 +4766,23 @@
         </tr>
         `;
 
-                previewBody.insertAdjacentHTML("beforeend", row);
+        previewBody.insertAdjacentHTML("beforeend", row);
 
-                document.getElementById("addChargeForm").reset();
-                totalInp.value = discountAmtInp.value = taxAmtInp.value = netAmountInp.value = 0;
-            });
+        document.getElementById("addChargeForm").reset();
+        totalInp.value = discountAmtInp.value = taxAmtInp.value = netAmountInp.value = 0;
+    });
 
-            /*--------------------------------------------------
-             | DELETE ROW
-             --------------------------------------------------*/
-            document.addEventListener("click", function(e) {
-                if (e.target.classList.contains("delete-charge-row")) {
-                    e.target.closest("tr").remove();
-                }
-            });
+    /*--------------------------------------------------
+     | DELETE ROW
+     --------------------------------------------------*/
+    document.addEventListener("click", function (e) {
+        if (e.target.classList.contains("delete-charge-row")) {
+            e.target.closest("tr").remove();
+        }
+    });
 
-        });
-    </script>
+});
+</script>
 
     <script>
         $(document).ready(function() {
@@ -4822,7 +4844,7 @@
             const nurseSelect = document.getElementById('nurse')
             nurseSelect.innerHTML = '<option value="">Loading...</option>';
 
-            fetch("{{ route('getNurses') }}")
+            fetch("<?php echo e(route('getNurses')); ?>")
                 .then(response => response.json())
                 .then(data => {
                     window.nursesData = data;
@@ -4831,7 +4853,7 @@
                         const option = document.createElement('option');
                         option.value = nurse.id;
                         option.textContent = nurse.name;
-                        if ("{{ old('nurse') }}" == nurse.id) {
+                        if ("<?php echo e(old('nurse')); ?>" == nurse.id) {
                             option.selected = true;
                         }
                         nurseSelect.appendChild(option);
@@ -4874,7 +4896,7 @@
         $(document).ready(function() {
 
             // Load bed groups on page load
-            $.get("{{ route('getBedGroups') }}", function(data) {
+            $.get("<?php echo e(route('getBedGroups')); ?>", function(data) {
                 let options = '<option value="">Select Bed Group</option>';
                 data.forEach(function(group) {
                     options +=
@@ -4889,7 +4911,7 @@
                 $('#new_bed').html('<option value="">Loading...</option>');
 
                 if (groupId) {
-                    $.get("{{ route('get.available.beds') }}", {
+                    $.get("<?php echo e(route('get.available.beds')); ?>", {
                         bed_group_id: groupId
                     }, function(data) {
                         let options = '<option value="">Select New Bed</option>';
@@ -4945,4 +4967,58 @@
         }
     </script>
 
-@endsection
+    <script>
+        const modal = document.getElementById('dischargeDetailsModal');
+
+        modal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const data = JSON.parse(button.getAttribute('data-discharge'));
+
+            // Common fields
+            document.getElementById('dc_discharge_date').innerText = data.discharge_date ?? '-';
+            document.getElementById('dc_operation').innerText = data.operation ?? '-';
+            document.getElementById('dc_diagnosis').innerText = data.diagnosis ?? '-';
+            document.getElementById('dc_investigations').innerText = data.investigations ?? '-';
+            document.getElementById('dc_treatment_home').innerText = data.treatment_home ?? '-';
+            document.getElementById('dc_note').innerText = data.note ?? '-';
+
+            // Status badge
+            const statusEl = document.getElementById('dc_status');
+            statusEl.className = 'badge';
+
+            if (data.discharge_status == "death") {
+                statusEl.innerText = 'Death';
+                statusEl.classList.add('bg-danger');
+            } else if (data.discharge_status == "referral") {
+                statusEl.innerText = 'Referral';
+                statusEl.classList.add('bg-warning');
+            } else {
+                statusEl.innerText = 'Normal';
+                statusEl.classList.add('bg-success');
+            }
+
+            // Hide sections initially
+            document.getElementById('deathSection').classList.add('d-none');
+            document.getElementById('referralSection').classList.add('d-none');
+
+            // Death section
+            if (data.discharge_status == "death") {
+                document.getElementById('deathSection').classList.remove('d-none');
+                document.getElementById('dc_death_date').innerText = data.death_date ?? '-';
+                document.getElementById('dc_guardian_name').innerText = data.guardian_name ?? '-';
+                document.getElementById('dc_report').innerText = data.report ?? '-';
+            }
+
+            // Referral section
+            if (data.discharge_status == "referral") {
+                document.getElementById('referralSection').classList.remove('d-none');
+                document.getElementById('dc_referral_date').innerText = data.refer_date ?? '-';
+                document.getElementById('dc_refer_to_hospital').innerText = data.refer_to_hospital ?? '-';
+                document.getElementById('dc_reason_for_referral').innerText = data.reason_for_referral ?? '-';
+            }
+        });
+    </script>
+
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.adminLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp82\htdocs\hims\resources\views/admin/ipd/ipd_view.blade.php ENDPATH**/ ?>

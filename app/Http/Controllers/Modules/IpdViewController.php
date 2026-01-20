@@ -11,6 +11,7 @@ use App\Models\IpdPrescription;
 use App\Models\MedicationReport;
 use App\Models\MedicineCategory;
 use App\Models\MedicineDosage;
+use App\Models\DoctorVisit;
 use App\Models\NurseNote;
 use App\Models\Operation;
 use App\Models\OperationCategory;
@@ -111,6 +112,7 @@ class IpdViewController extends Controller
         $PatientTimelines = PatientTimeline::with('patient')->where('patient_id', $patient_id)->get();
         $vitalDetails     = PatientVital::with('vital')->where('patient_id', $patient_id)->get();
         $radiologyReports = RadiologyReport::with('radiology')->where('patient_id', $ipd->patient->id)->get();
+        $doctorvisits     = DoctorVisit::with(['patient', 'doctor'])->where('patient_id', $ipd->patient->id)->get();
         if ($ipd->discharged == 'yes') {
             $ipd->dischargeCard = DischargeCard::where('ipd_details_id', $id)->firstOrFail();
 
@@ -120,15 +122,12 @@ class IpdViewController extends Controller
             }
         }
         $currentUser = User::with('userRole')->where('id', Auth::id())->firstOrFail();
-//         dd(
-//     $ipd->id,
-//     $ipd->patient,
-//     optional($ipd->patient)->patient_name
-// );
+
         //dd($currentUser->username);
         return view('admin.ipd.ipd_view', compact(
             'ipd',
             'doctors',
+            'doctorvisits',
             'medDosages',
             'operationCategories',
             'transactions',
