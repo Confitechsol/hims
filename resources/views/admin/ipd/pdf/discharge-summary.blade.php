@@ -88,6 +88,10 @@
         margin-bottom: 10px;
     }
 
+    .table-box td {
+        vertical-align: middle;
+    }
+
     .discharge_no_label {
         width: auto;
         text-wrap: nowrap;
@@ -213,7 +217,9 @@
             <td class="colon">:</td>
             <td class="value">{{ $data->under_care_dr }}</td>
 
-            <td class="value"></td>
+            <td class="label under_care">Registration No.</td>
+            <td class="colon">:</td>
+            <td class="value">{{ $data->registration_no }}</td>
         </tr>
     </table>
     {{-- MEDICAL CONTENT --}}
@@ -223,6 +229,12 @@
 
         <h4>Treatment / OT Note</h4>
         {!! $data->ot_note !!}
+
+        <h4>Diagnosis</h4>
+        {!! $data->diagnosis !!}
+
+        <h4>Course in Hospital</h4>
+        {!! $data->course_in_hospital !!}
 
         <h4>Diagnosis</h4>
         {!! $data->diagnosis !!}

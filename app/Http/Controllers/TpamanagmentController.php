@@ -13,6 +13,10 @@ class TpamanagmentController extends Controller
 {
     function index(Request $request)
     {
+        $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
         $query = Organisation::query();
         if ($request->has("search")) {
             $search = $request->input('search');
@@ -30,9 +34,10 @@ class TpamanagmentController extends Controller
                 "total" => count($data)
             );
         }
-        $organisations = $query->get();
-
-        return view('admin.tpa.tpamanagement', compact('organisations'));
+       // $organisations = $query->get();
+        
+        $organisations = $query->paginate($perPage);
+        return view('admin.tpa.tpamanagement', compact('organisations','perPage'));
 
     }
 
