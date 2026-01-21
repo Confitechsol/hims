@@ -226,8 +226,9 @@
                     filtered.forEach(ipd => {
                         const div = document.createElement('div');
                         div.className = 'autocomplete-suggestion';
+                        const dischargeBadge = ipd.discharged ? '<span style="color: #28a745; font-weight: bold; margin-left: 5px;">[Discharged]</span>' : '';
                         div.innerHTML = `
-                            <div class="suggestion-name">${ipd.ipd_no} - ${ipd.patient_name}</div>
+                            <div class="suggestion-name">${ipd.ipd_no} - ${ipd.patient_name}${dischargeBadge}</div>
                             <div class="suggestion-details">Phone: ${ipd.phone || 'N/A'}</div>
                         `;
                         div.addEventListener('click', function() {
@@ -306,7 +307,13 @@
             document.getElementById('exportEstimateBtn').addEventListener('click', function() {
                 var ipdId = document.getElementById('ipd_id').value;
                 if (!ipdId) {
-                    alert('Please select an IPD patient first');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Selection Required',
+                        text: 'Please select an IPD patient first',
+                        confirmButtonColor: '#750096',
+                        confirmButtonText: 'OK'
+                    });
                     return;
                 }
                 window.open('{{ url("ipd/billing") }}/' + ipdId + '/export-estimate', '_blank');
@@ -315,10 +322,47 @@
             document.getElementById('exportFinalBtn').addEventListener('click', function() {
                 var ipdId = document.getElementById('ipd_id').value;
                 if (!ipdId) {
-                    alert('Please select an IPD patient first');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Selection Required',
+                        text: 'Please select an IPD patient first',
+                        confirmButtonColor: '#750096',
+                        confirmButtonText: 'OK'
+                    });
                     return;
                 }
-                window.open('{{ url("ipd/billing") }}/' + ipdId + '/export-final', '_blank');
+                
+                // Check if patient is discharged before opening final bill
+                fetch('{{ url("ipd/billing") }}/' + ipdId + '/check-discharged')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.discharged) {
+                            // Patient is discharged, open final bill
+                            window.open('{{ url("ipd/billing") }}/' + ipdId + '/export-final', '_blank');
+                        } else {
+                            // Patient is not discharged, show professional alert
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Patient Not Discharged',
+                                html: '<div style="text-align: left;"><p style="margin-bottom: 10px;">' + 
+                                      (data.message || 'Final bill can only be generated for discharged patients.') + 
+                                      '</p><p style="color: #666; font-size: 14px;">Please discharge the patient first before generating the final bill.</p></div>',
+                                confirmButtonColor: '#750096',
+                                confirmButtonText: 'OK',
+                                width: '500px'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error checking discharge status:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error checking discharge status. Please try again.',
+                            confirmButtonColor: '#750096',
+                            confirmButtonText: 'OK'
+                        });
+                    });
             });
 
             function loadBreakupBill(ipdId) {
