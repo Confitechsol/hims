@@ -92,11 +92,30 @@ class RadiologyController extends Controller
     }
 
     // radiology units
-    public function radiologyUnitIndex()
+    public function radiologyUnitIndex(Request $request)
     {
-        $radiologyUnits = RadiologyUnit::all();
+             $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
+     $search = $request->input('search');
+    
+    // $radiologyUnits = RadiologyUnit::all();
 
-        return view("admin.setup.radiology_unit", compact("radiologyUnits"));
+    $radiologyUnits = RadiologyUnit::query();
+
+    if (!empty($search)) {
+        $radiologyUnits->where(function ($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%");
+              
+        });
+    }
+
+    $radiologyUnits = $radiologyUnits
+        ->paginate($perPage)
+        ->withQueryString();
+
+        return view("admin.setup.radiology_unit", compact("radiologyUnits",'perPage', 'search'));
     }
 
     public function storeUnit(Request $request)
@@ -145,16 +164,28 @@ class RadiologyController extends Controller
     }
 
     // radiology parameter
-    public function radiologyParameterIndex()
+    public function radiologyParameterIndex(Request $request)
     {
-        $radiologyParameters = RadiologyParameter::all();
-        $units               = [];
+        $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
 
+    $search = $request->input('search');
+       // $radiologyParameters = RadiologyParameter::all();
+       $query = RadiologyParameter::query();
+        
+     if (!empty($search)) {
+        $query->where('parameter_name', 'like', "%{$search}%"); // assuming 'name' column exists
+    }
+    $radiologyParameters = $query->paginate($perPage)->withQueryString();
+    $units               = [];
         foreach ($radiologyParameters as $value) {
             $units[$value->id] = RadiologyUnit::find($value->unit);
         }
         $unitData = RadiologyUnit::all();
-        return view("admin.setup.radiology_parameter", compact("radiologyParameters", "units", 'unitData'));
+       // $unitData = RadiologyUnit::query();
+        return view("admin.setup.radiology_parameter", compact("radiologyParameters", "units", 'unitData', "perPage", "search"));
     }
 
     public function storeParameter(Request $request)
