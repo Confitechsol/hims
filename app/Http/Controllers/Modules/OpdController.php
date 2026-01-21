@@ -891,4 +891,7 @@ class OpdController extends Controller
 
         return redirect()->back()->with('success', 'Prescription updated successfully.');
     }
+    public function printPrescription(){
+        return "Under Development";
+    }
 }
