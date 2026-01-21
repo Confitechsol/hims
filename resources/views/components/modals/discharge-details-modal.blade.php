@@ -381,6 +381,8 @@
 
                                       <div class="patient_details">
                                           <div class="patient_items">
+                                              <div class="patient_head">Registration No.</div>
+                                              <div class="colon">:</div>
                                               <div class="patient_data" id="registration_no_text"></div>
                                           </div>
                                       </div>
@@ -388,21 +390,24 @@
 
                                   <div class="text">
 
-                                      <h4>Present Complains :</h4>
+                                      <h6>Present Complains :</h6>
                                       <div class="general_list" id="present_complains_html"></div>
 
                                       <br />
 
-                                      <h4>Treatment Done/Procedure Performed / OT Note :</h4>
+                                      <h6>Treatment Done/Procedure Performed / OT Note :</h6>
                                       <div class="general_list" id="ot_note_html"></div>
 
                                       <br />
 
-                                      <h4>Diagnosis :</h4>
+                                      <h6>Diagnosis :</h6>
                                       <div class="general_list" id="diagnosis_html"></div>
 
                                       <br />
 
+                                      <h6>Course in Hospital :</h6>
+                                      <div class="general_list" id="course_in_hospital_html"></div>
+                                      <br />
                                       {{-- <p>Follow Up date: Review after 14 - 12 days</p>
                                       <p>Condition at Discharge: Haemodynamically Stable.</p>
                                       <p>Investigation : Investigation done before admission.</p>
@@ -412,7 +417,7 @@
 
                                       {{-- <br /> --}}
 
-                                      <h4>Discharge Advice:</h4>
+                                      <h6>Discharge Advice:</h6>
                                       <div class="general_list" id="discharge_advice_html"></div>
                                       {{-- <ol > --}}
                                       {{-- <li>TAB CEFAKIND (500) 1 TAB BDPC X 5 DAYS</li>
@@ -498,7 +503,7 @@
               setText('mobile_text', data.phone);
               setText('bed_text', data.bed);
               setText('under_care_text', data.under_care_dr);
-              //   setText('registration_no', data.registration_no);
+              setText('registration_no_text', data.registration_no);
               //   setText('discharge_type_text', data.reason_discharge);
 
               /* -------------------------
@@ -519,6 +524,7 @@
               ------------------------- */
 
               setHTML('diagnosis_html', data.diagnosis);
+              setHTML('course_in_hospital_html', data.course_in_hospital);
               setHTML('ot_note_html', data.ot_note);
               setHTML('discharge_advice_html', data.discharge_advice);
               setHTML('present_complains_html', data.present_complaints);

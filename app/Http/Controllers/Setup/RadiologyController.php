@@ -11,11 +11,30 @@ use Illuminate\Support\Facades\Auth;
 
 class RadiologyController extends Controller
 {
-    public function radiologyCategoryIndex()
+    public function radiologyCategoryIndex(Request $request)
     {
-        $radiologyCategories = RadiologyCategory::all();
 
-        return view("admin.setup.radiology_category", compact("radiologyCategories"));
+         $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
+     $search = $request->input('search');
+
+    //$radiologyCategories = RadiologyCategory::all();
+
+    $radiologyCategories = RadiologyCategory::query();
+
+    if (!empty($search)) {
+        $radiologyCategories->where(function ($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%");
+              
+        });
+    }
+    //  $radiologyCategories = $radiologyCategories->paginate($perPage);
+    $radiologyCategories = $radiologyCategories
+        ->paginate($perPage)
+        ->withQueryString();
+        return view("admin.setup.radiology_category", compact("radiologyCategories",'perPage', 'search'));
     }
 
     public function store(Request $request)

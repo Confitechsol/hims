@@ -407,8 +407,8 @@
                                                 <div class="col-md-3">
                                                     <label for="finding_type" class="form-label">Finding
                                                         Category</label>
-                                                    <select class="form-select select2-input" name="finding_type[]"
-                                                        id="finding_type" multiple>
+                                                    <select class="form-select select2-input finding_type"
+                                                        name="finding_type[]" id="finding_type" multiple>
                                                         <option value="1">General Examination</option>
                                                         <option value="2">Vitals</option>
                                                         <option value="3">Cardiovascular System</option>
@@ -421,11 +421,6 @@
                                                         Finding List</label>
                                                     <select class="form-control select2-input" name="findings[]"
                                                         id="finding" multiple>
-                                                        <option value="1">General Examination</option>
-                                                        <option value="2">Vitals</option>
-                                                        <option value="3">Cardiovascular System</option>
-                                                        <option value="4">Gynecological</option>
-                                                        <option value="5">ENT / Oral Cavity</option>
                                                     </select>
                                                 </div>
                                                 <div class="col-md-3">
@@ -436,8 +431,7 @@
                                                 <div class="col-md-3">
                                                     <label for="finding_print" class="form-label">Finding Print
                                                     </label><br><input type="checkbox" name="finding_print"
-                                                        id="finding_print" rows="15" value="yes"
-                                                        checked="">
+                                                        id="finding_print" rows="15" value="yes" checked="">
                                                 </div>
                                             </div>
 
@@ -448,7 +442,7 @@
                                                 <div class="col-lg-3 col-md-4 col-sm-6 col-xs-6">
                                                     <div>
                                                         <label class="form-label">Medicine Category</label>
-                                                        <select class="form-control medicine_category"
+                                                        <select class="form-control select2 medicine_category"
                                                             style="width:100%" name="medicine_categories[]"
                                                             data-select2-initialized="false">
                                                             <option value="">Select</option>
@@ -524,6 +518,7 @@
                                                     <div>
                                                         <button type="button"
                                                             class="btn btn-sm btn-danger delete_row" data-row-id="1"
+                                                            onclick="removeMedicine(this)"
                                                             autocomplete="off"><i class="fa fa-remove"></i></button>
                                                     </div>
                                                 </div>
@@ -747,22 +742,13 @@
             success: function(response) {
                 $.each(response, function(i, item) {
                     medicineSelect.append(
-                        `<option value="${item.medicine_category_id}">${item.medicine_name}</option>`
+                        `<option value="${item.id}">${item.medicine_name}</option>`
                     );
                 });
                 medicineSelect.trigger('change.select2');
             }
         });
-    });
-    $(document).on('change', '.medicine_name', function() {
-        let row = $(this).closest('.medicine-row');
-        let medicineId = $(this).val();
-        let dosageSelect = row.find('.medicine_dosage');
-
-        dosageSelect.empty().append('<option value="">Select</option>');
-
-        if (!medicineId) return;
-        let url = getDoses.replace(':id', medicineId);
+        url = getDoses.replace(':id', categoryId);
         $.ajax({
             url: url,
             type: 'GET',
@@ -772,6 +758,32 @@
                         `<option value="${item.id}">${item.dosage}</option>`);
                 });
                 dosageSelect.trigger('change.select2');
+            }
+        });
+    });
+    $('.finding_type').on('change', function() {
+        let finding_types = $(this).val();
+        if (finding_types?.length < 0) return;
+        let url = "{{ route('getFindings') }}";
+        let finding_list = $("#finding");
+        finding_list.empty();
+        $.ajax({
+            url: url,
+            contentType: "application/json",
+            dataType: "json",
+            headers: {
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+            },
+            data: JSON.stringify({
+                category_ids: finding_types
+            }),
+            type: 'POST',
+            success: function(response) {
+                $.each(response, function(i, item) {
+                    finding_list.append(
+                        `<option value="${item.id}">${item.name}</option>`);
+                });
+                finding_list.trigger('change');
             }
         });
     });
@@ -836,7 +848,7 @@
         </div>
 
         <div class="col-lg-1 d-flex align-items-center">
-            <button type="button" class="btn btn-sm btn-danger delete_row">
+            <button type="button" class="btn btn-sm btn-danger delete_row" data-row-id="${rowCount}" onclick="removeMedicine(this)">
                 <i class="fa fa-remove"></i>
             </button>
         </div>
@@ -847,4 +859,12 @@
             initSelect2InModal(`#row${rowCount}`);
         });
     });
+    function removeMedicine(elm){
+        if($(".medicine-row").length < 2){
+            return ;
+        }
+        let rowId = $(elm).data("row-id");
+        $(`#row${rowId}`).remove();
+        console.log($(elm).data("row-id"));
+    }
 </script>

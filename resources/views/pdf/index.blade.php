@@ -157,28 +157,29 @@
     .text {
         font-size: 10px;
     }
+
     @media print {
-            @page {
-                size: A4;
-                margin: 0;
-            }
-
-            body {
-                margin: 0;
-                padding: 0;
-                overflow: hidden;
-            }
-
-            #pdf-content {
-                transform-origin: top left;
-                page-break-inside: avoid;
-            }
-
-            * {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
+        @page {
+            size: A4;
+            margin: 0;
         }
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        #pdf-content {
+            transform-origin: top left;
+            page-break-inside: avoid;
+        }
+
+        * {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+    }
 </style>
 
 <body>
@@ -197,11 +198,11 @@
                 @endif
             </div>
             <div class="about_info">
-                <p>{{$hospital->name ?? ""}} </p>
-                <p>{{$hospital->address ?? ""}}</p>
-                <p>Phone - {{$hospital->phone ?? ""}}</p>
+                <p>{{ $hospital->name ?? '' }} </p>
+                <p>{{ $hospital->address ?? '' }}</p>
+                <p>Phone - {{ $hospital->phone ?? '' }}</p>
                 <p>Ambulance :- 96747 77261</p>
-                <p>E-mail: {{$hospital->email ?? ""}}</p>
+                <p>E-mail: {{ $hospital->email ?? '' }}</p>
             </div>
         </div>
 
@@ -390,6 +391,10 @@
                     :
                     <div class="patient_data">
                         {{ $IpdPatient->patient['guardian_phone'] ?? '' }}
+                        @if (!empty($IpdPatient->patient['guardian_phone']) && !empty($IpdPatient->patient['emergency_contact_no']))
+                            ,
+                        @endif
+                        {{ $IpdPatient->patient['emergency_contact_no'] ?? '' }}
                     </div>
                 </div>
 
@@ -434,23 +439,51 @@
                         {{-- Dr. {{ $IpdPatient->doctor['name'] }} {{ $IpdPatient->doctor['surname'] }}
                         ({{ $IpdPatient->doctor['registration_no'] }}) --}}
                         @php
-                        $doctors = [];
-            
-                        if(!empty($IpdPatient->doctor)) {
-                            $doctors[] = 'Dr. '.$IpdPatient->doctor['name'] . ' ' . $IpdPatient->doctor['surname'] . ' (' . $IpdPatient->doctor['registration_no'] . ')';
-                        }
-                        if(!empty($IpdPatient->doctor2)) {
-                            $doctors[] = 'Dr. '.$IpdPatient->doctor2['name'] . ' ' . ($IpdPatient->doctor2['surname'] ?? '') . ' (' . ($IpdPatient->doctor2['registration_no'] ?? '') . ')';
-                        }
-                        if(!empty($IpdPatient->doctor3)) {
-                            $doctors[] = ''.$IpdPatient->doctor3['name'] . ' ' . ($IpdPatient->doctor3['surname'] ?? '') . ' (' . ($IpdPatient->doctor3['registration_no'] ?? '') . ')';
-                        }
-                        if(!empty($IpdPatient->doctor4)) {
-                            $doctors[] = 'Dr. '.$IpdPatient->doctor4['name'] . ' ' . ($IpdPatient->doctor4['surname'] ?? '') . ' (' . ($IpdPatient->doctor4['registration_no'] ?? '') . ')';
-                        }
-                    @endphp
-            
-                    {{ implode(', ', $doctors) }}
+                            $doctors = [];
+
+                            if (!empty($IpdPatient->doctor)) {
+                                $doctors[] =
+                                    'Dr. ' .
+                                    $IpdPatient->doctor['name'] .
+                                    ' ' .
+                                    $IpdPatient->doctor['surname'] .
+                                    ' (' .
+                                    $IpdPatient->doctor['registration_no'] .
+                                    ')';
+                            }
+                            if (!empty($IpdPatient->doctor2)) {
+                                $doctors[] =
+                                    'Dr. ' .
+                                    $IpdPatient->doctor2['name'] .
+                                    ' ' .
+                                    ($IpdPatient->doctor2['surname'] ?? '') .
+                                    ' (' .
+                                    ($IpdPatient->doctor2['registration_no'] ?? '') .
+                                    ')';
+                            }
+                            if (!empty($IpdPatient->doctor3)) {
+                                $doctors[] =
+                                    '' .
+                                    $IpdPatient->doctor3['name'] .
+                                    ' ' .
+                                    ($IpdPatient->doctor3['surname'] ?? '') .
+                                    ' (' .
+                                    ($IpdPatient->doctor3['registration_no'] ?? '') .
+                                    ')';
+                            }
+                            if (!empty($IpdPatient->doctor4)) {
+                                $doctors[] =
+                                    'Dr. ' .
+                                    $IpdPatient->doctor4['name'] .
+                                    ' ' .
+                                    ($IpdPatient->doctor4['surname'] ?? '') .
+                                    ' (' .
+                                    ($IpdPatient->doctor4['registration_no'] ?? '') .
+                                    ')';
+                            }
+                        @endphp
+
+                        {{ implode(', ', $doctors) }}
                     </div>
                 </div>
 
@@ -562,7 +595,9 @@
                     patient. Yes [ ] No. [ ] If you don t disclose in the consent form
                     by ticking Yes/No, then Samaritan Clinic Pvt. Ltd. will not be
                     liable for any reimbursement insu</li>
-                <li>In the event of a delay in body release due to unavoidable reasons, the deceased will be respectfully transferred to the mortuary freezer after four hours (4 hours), subject to consent from the next of kin.</li>    
+                <li>In the event of a delay in body release due to unavoidable reasons, the deceased will be
+                    respectfully transferred to the mortuary freezer after four hours (4 hours), subject to consent from
+                    the next of kin.</li>
             </ol>
             <p>Witness Signature with relation</p>
         </div>
@@ -608,25 +643,53 @@
             </div>
             <div class="admission_item">
                 <p>
-                    <b>Under Care Doctor</b> :       
+                    <b>Under Care Doctor</b> :
                     @php
-                    $doctors = [];
-        
-                    if(!empty($IpdPatient->doctor)) {
-                        $doctors[] = 'Dr. '.$IpdPatient->doctor['name'] . ' ' . $IpdPatient->doctor['surname'] . ' (' . $IpdPatient->doctor['registration_no'] . ')';
-                    }
-                    if(!empty($IpdPatient->doctor2)) {
-                        $doctors[] = 'Dr. '.$IpdPatient->doctor2['name'] . ' ' . ($IpdPatient->doctor2['surname'] ?? '') . ' (' . ($IpdPatient->doctor2['registration_no'] ?? '') . ')';
-                    }
-                    if(!empty($IpdPatient->doctor3)) {
-                        $doctors[] = ''.$IpdPatient->doctor3['name'] . ' ' . ($IpdPatient->doctor3['surname'] ?? '') . ' (' . ($IpdPatient->doctor3['registration_no'] ?? '') . ')';
-                    }
-                    if(!empty($IpdPatient->doctor4)) {
-                        $doctors[] = 'Dr. '.$IpdPatient->doctor4['name'] . ' ' . ($IpdPatient->doctor4['surname'] ?? '') . ' (' . ($IpdPatient->doctor4['registration_no'] ?? '') . ')';
-                    }
-                @endphp
-        
-                {{ implode(', ', $doctors) }}
+                        $doctors = [];
+
+                        if (!empty($IpdPatient->doctor)) {
+                            $doctors[] =
+                                'Dr. ' .
+                                $IpdPatient->doctor['name'] .
+                                ' ' .
+                                $IpdPatient->doctor['surname'] .
+                                ' (' .
+                                $IpdPatient->doctor['registration_no'] .
+                                ')';
+                        }
+                        if (!empty($IpdPatient->doctor2)) {
+                            $doctors[] =
+                                'Dr. ' .
+                                $IpdPatient->doctor2['name'] .
+                                ' ' .
+                                ($IpdPatient->doctor2['surname'] ?? '') .
+                                ' (' .
+                                ($IpdPatient->doctor2['registration_no'] ?? '') .
+                                ')';
+                        }
+                        if (!empty($IpdPatient->doctor3)) {
+                            $doctors[] =
+                                '' .
+                                $IpdPatient->doctor3['name'] .
+                                ' ' .
+                                ($IpdPatient->doctor3['surname'] ?? '') .
+                                ' (' .
+                                ($IpdPatient->doctor3['registration_no'] ?? '') .
+                                ')';
+                        }
+                        if (!empty($IpdPatient->doctor4)) {
+                            $doctors[] =
+                                'Dr. ' .
+                                $IpdPatient->doctor4['name'] .
+                                ' ' .
+                                ($IpdPatient->doctor4['surname'] ?? '') .
+                                ' (' .
+                                ($IpdPatient->doctor4['registration_no'] ?? '') .
+                                ')';
+                        }
+                    @endphp
+
+                    {{ implode(', ', $doctors) }}
                 </p>
             </div>
         </div>

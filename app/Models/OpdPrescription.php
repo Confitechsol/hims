@@ -45,4 +45,9 @@ class OpdPrescription extends Model
         return $this->belongsTo(OpdDetail::class, 'opd_id');
     }
 
+    public function medicines()
+    {
+        return $this->hasMany(OpdMedicine::class, 'prescription_id');
+    }
+
 }

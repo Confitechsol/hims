@@ -48,7 +48,7 @@ class IpdController extends Controller
         $charges    = Charge::all();
         $references = ['Direct', 'Doctor', 'Marketer', 'Other'];
         if ($isIpdTab) {
-            $ipd = IpdDetail::with('patient','ipdPatients', 'doctor', 'bedDetail', 'bedGroup.floorDetail')
+            $ipd = IpdDetail::with('patient', 'ipdPatients', 'doctor', 'bedDetail', 'bedGroup.floorDetail')
                 ->when($search, function ($query) use ($search) {
                     $query->where(function ($q) use ($search) {
                         $q->where('ipd_no', 'LIKE', "%{$search}%")
@@ -66,7 +66,7 @@ class IpdController extends Controller
                 })->get();
         } else {
             // $patients = Patient::with(['ipds.doctor'])->get();
-            $patients = IpdDetail::with('patient','ipdPatients', 'doctor')->where('discharged', 'yes')
+            $patients = IpdDetail::with('patient', 'ipdPatients', 'doctor')->where('discharged', 'yes')
                 ->when($search, function ($query) use ($search) {
                     $query->where(function ($q) use ($search) {
                         $q->whereHas('patient', function ($p) use ($search) {
@@ -92,9 +92,9 @@ class IpdController extends Controller
             'casualty'             => 'string',
             'reference'            => 'nullable|string',
             'doctor_id'            => 'nullable|exists:doctor,id',
-            'doctor2_id'            => 'nullable|exists:doctor,id',
-            'doctor3_id'            => 'nullable|exists:doctor,id',
-            'doctor4_id'            => 'nullable|exists:doctor,id',
+            'doctor2_id'           => 'nullable|exists:doctor,id',
+            'doctor3_id'           => 'nullable|exists:doctor,id',
+            'doctor4_id'           => 'nullable|exists:doctor,id',
             'credit_limit'         => 'nullable|numeric|min:0',
             'live_consultation'    => 'nullable|string|max:100',
             'bed_group'            => 'nullable|exists:bed_group,id',
@@ -125,8 +125,8 @@ class IpdController extends Controller
         try {
             $symptomType          = array_filter($request->input('symptoms_type', []));
             $symptomTitle         = array_filter($request->input('symptoms_title', []));
-           $symptomType  = array_filter($request->input('symptoms_type', []));
-        $symptomTitle = array_filter($request->input('symptoms_title', []));
+            $symptomType          = array_filter($request->input('symptoms_type', []));
+            $symptomTitle         = array_filter($request->input('symptoms_title', []));
             $implodedSymptomType  = implode(", ", $symptomType);
             $implodedSymptomTitle = implode(", ", $symptomTitle);
 
@@ -149,7 +149,7 @@ class IpdController extends Controller
             // Patient Details
             $ipd->patient_id = $request->patient_id;
             // Doctor Details
-            $ipd->cons_doctor = $request->doctor_id;
+            $ipd->cons_doctor  = $request->doctor_id;
             $ipd->cons_doctor2 = $request->doctor2_id;
             $ipd->cons_doctor3 = $request->doctor3_id;
             $ipd->cons_doctor4 = $request->doctor4_id;
@@ -181,9 +181,9 @@ class IpdController extends Controller
             $ipdPatient->patient_id = $request->patient_id ?? null;
             $ipdPatient->ipd_id     = $ipd->id ?? null;
             $ipdPatient->doctor_id  = $request->doctor_id ?? null;
-            $ipdPatient->doctor2_id  = $request->doctor2_id ?? null;
-            $ipdPatient->doctor3_id  = $request->doctor3_id ?? null;
-            $ipdPatient->doctor4_id  = $request->doctor4_id ?? null;
+            $ipdPatient->doctor2_id = $request->doctor2_id ?? null;
+            $ipdPatient->doctor3_id = $request->doctor3_id ?? null;
+            $ipdPatient->doctor4_id = $request->doctor4_id ?? null;
 
             $ipdPatient->save();
 
@@ -299,11 +299,11 @@ class IpdController extends Controller
             }
             // dd($opd);
             // Doctor Details
-            $ipd->patient_id  = $request->patient_id;
-            $ipd->cons_doctor = $request->consultant_doctor;
-            $ipd->cons_doctor2  = $request->consultant_doctor2 ?? null;
-            $ipd->cons_doctor3  = $request->consultant_doctor3 ?? null;
-            $ipd->cons_doctor4  = $request->consultant_doctor4 ?? null;
+            $ipd->patient_id   = $request->patient_id;
+            $ipd->cons_doctor  = $request->consultant_doctor;
+            $ipd->cons_doctor2 = $request->consultant_doctor2 ?? null;
+            $ipd->cons_doctor3 = $request->consultant_doctor3 ?? null;
+            $ipd->cons_doctor4 = $request->consultant_doctor4 ?? null;
 
             // Visit Details
             $ipd->date         = $request->admission_date;
@@ -326,9 +326,9 @@ class IpdController extends Controller
 
             $ipdPatient->patient_id = $request->patient_id ?? null;
             $ipdPatient->doctor_id  = $request->consultant_doctor ?? null;
-            $ipdPatient->doctor2_id  = $request->consultant_doctor2 ?? null;
-            $ipdPatient->doctor3_id  = $request->consultant_doctor3 ?? null;
-            $ipdPatient->doctor4_id  = $request->consultant_doctor4 ?? null;
+            $ipdPatient->doctor2_id = $request->consultant_doctor2 ?? null;
+            $ipdPatient->doctor3_id = $request->consultant_doctor3 ?? null;
+            $ipdPatient->doctor4_id = $request->consultant_doctor4 ?? null;
             $ipdPatient->save();
 
             DB::commit();
@@ -425,37 +425,36 @@ class IpdController extends Controller
         return response()->json($ipdMedicines, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
 
     }
-  public function getIpdRadPathById($id)
-{
-    $prescription = IpdPrescription::with('prescribedBy')->find($id);
+    public function getIpdRadPathById($id)
+    {
+        $prescription = IpdPrescription::with('prescribedBy')->find($id);
 
-    if (!$prescription) {
+        if (! $prescription) {
+            return response()->json([
+                'prescription' => null,
+                'pathology'    => [],
+                'radiology'    => [],
+            ]);
+        }
+
+        // Convert "3,4" → [3,4]
+        $pathologyIds = $prescription->pathology_id
+            ? array_filter(explode(',', $prescription->pathology_id))
+            : [];
+
+        $radiologyIds = $prescription->radiology_id
+            ? array_filter(explode(',', $prescription->radiology_id))
+            : [];
+
+        $pathology = Pathology::whereIn('id', $pathologyIds)->get();
+        $radiology = Radio::whereIn('id', $radiologyIds)->get();
+
         return response()->json([
-            'prescription' => null,
-            'pathology' => [],
-            'radiology' => [],
+            'prescription' => $prescription,
+            'pathology'    => $pathology,
+            'radiology'    => $radiology,
         ]);
     }
-
-    // Convert "3,4" → [3,4]
-    $pathologyIds = $prescription->pathology_id
-        ? array_filter(explode(',', $prescription->pathology_id))
-        : [];
-
-    $radiologyIds = $prescription->radiology_id
-        ? array_filter(explode(',', $prescription->radiology_id))
-        : [];
-
-    $pathology = Pathology::whereIn('id', $pathologyIds)->get();
-    $radiology = Radio::whereIn('id', $radiologyIds)->get();
-
-    return response()->json([
-        'prescription' => $prescription,
-        'pathology' => $pathology,
-        'radiology' => $radiology,
-    ]);
-}
-
 
     public function addNurseNote(Request $request)
     {
@@ -1033,6 +1032,7 @@ class IpdController extends Controller
         $validated = $request->validate([
             'ipd_details_id'     => ['required', 'integer', 'exists:ipd_details,id'],
             'patient_name'       => ['required', 'string', 'max:255'],
+            'patient_id'         => ['nullable', 'integer'],
             'admission_no'       => ['nullable', 'string'],
             'discharge_date'     => ['required', 'date'],
             'discharge_time'     => ['nullable'],
@@ -1048,6 +1048,7 @@ class IpdController extends Controller
             'relation'           => ['nullable', 'string'],
             'nationality'        => ['nullable', 'string'],
             'under_care_dr'      => ['nullable', 'string'],
+            'registration_no'    => ['nullable', 'string'],
             'referral'           => ['nullable', 'string'],
             'corporate'          => ['nullable', 'string'],
             'reason_discharge'   => ['nullable', 'string'],
@@ -1060,6 +1061,7 @@ class IpdController extends Controller
             'diagnosis'          => ['nullable', 'string'],
             'ot_note'            => ['nullable', 'string'],
             'discharge_advice'   => ['nullable', 'string'],
+            'course_in_hospital' => ['nullable', 'string'],
             'present_complaints' => ['nullable', 'string'],
             'remarks'            => ['nullable', 'string'],
             'discharged_by'      => ['nullable', 'string'],
@@ -1086,6 +1088,7 @@ class IpdController extends Controller
                 'discharge_no'       => $dischargeNo,
                 'ipd_details_id'     => $validated['ipd_details_id'],
                 'patient_name'       => $validated['patient_name'],
+                'patient_id'         => $validated['patient_id'],
                 'admission_no'       => $validated['admission_no'] ?? null,
                 'admission_date'     => $validated['admission_date'] ?? null,
                 'admit_time'         => $validated['admit_time'] ?? null,
@@ -1101,6 +1104,7 @@ class IpdController extends Controller
                 'relation'           => $validated['relation'] ?? null,
                 'nationality'        => $validated['nationality'] ?? null,
                 'under_care_dr'      => $validated['under_care_dr'] ?? null,
+                'registration_no'    => $validated['registration_no'] ?? null,
                 'referral'           => $validated['referral'] ?? null,
                 'corporate'          => $validated['corporate'] ?? null,
                 'reason_discharge'   => $validated['reason_discharge'] ?? null,
@@ -1112,6 +1116,7 @@ class IpdController extends Controller
                 'diagnosis'          => $validated['diagnosis'] ?? null,
                 'ot_note'            => $validated['ot_note'] ?? null,
                 'discharge_advice'   => $validated['discharge_advice'] ?? null,
+                'course_in_hospital' => $validated['course_in_hospital'] ?? null,
                 'present_complaints' => $validated['present_complaints'] ?? null,
                 'remarks'            => $validated['remarks'] ?? null,
                 'discharged_by'      => $validated['discharged_by'] ?? null,
@@ -1134,6 +1139,7 @@ class IpdController extends Controller
                 'ipd_details_id'     => $validated['ipd_details_id'],
                 'discharge_number'   => $dischargeNo,
                 'patient_name'       => $validated['patient_name'],
+                'patient_id'         => $validated['patient_id'],
                 'admission_no'       => $validated['admission_no'] ?? null,
                 'barcode'            => $barcodeBinary,
 
@@ -1154,6 +1160,7 @@ class IpdController extends Controller
                 'nationality'        => $validated['nationality'] ?? null,
 
                 'under_care_dr'      => $validated['under_care_dr'] ?? null,
+                'registration_no'    => $validated['registration_no'] ?? null,
                 'referral'           => $validated['referral'] ?? null,
                 'corporate'          => $validated['corporate'] ?? null,
 
@@ -1170,6 +1177,7 @@ class IpdController extends Controller
                 'diagnosis'          => $validated['diagnosis'] ?? null,
                 'ot_note'            => $validated['ot_note'] ?? null,
                 'discharge_advice'   => $validated['discharge_advice'] ?? null,
+                'course_in_hospital' => $validated['course_in_hospital'] ?? null,
                 'present_complaints' => $validated['present_complaints'] ?? null,
                 'remarks'            => $validated['remarks'] ?? null,
 
