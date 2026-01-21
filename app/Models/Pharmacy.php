@@ -32,6 +32,9 @@ class Pharmacy extends Model
         'gst_percentage' => 'decimal:2',
     ];
 
+    protected $attributes = [
+        'gst_percentage' => 0,
+    ];
     /**
      * Relationship: A medicine belongs to a medicine category
      */
