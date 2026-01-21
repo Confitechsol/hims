@@ -23,13 +23,18 @@
                                             <div
                                                 class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
 
-                                                <div class="input-icon-start position-relative me-2">
-                                                    <span class="input-icon-addon">
-                                                        <i class="ti ti-search"></i>
-                                                    </span>
-                                                    <input type="text" class="form-control shadow-sm" placeholder="Search">
-
-                                                </div>
+                                                <form method="GET" action="{{ route('roles') }}">
+                                                    <div class="input-icon-start position-relative me-2">
+                                                        <span class="input-icon-addon">
+                                                            <i class="ti ti-search"></i>
+                                                        </span>
+                                                        <input type="text"
+                                                            name="search"
+                                                            class="form-control shadow-sm"
+                                                            placeholder="Search role..."
+                                                            value="{{ request('search') }}">
+                                                    </div>
+                                                </form>
                                                 <div class="text-end d-flex">
                                                     <a href="javascript:void(0);"
                                                         class="btn btn-primary text-white ms-2 fs-13 btn-md"
@@ -101,6 +106,7 @@
                                                             <th>Role</th>
                                                             <th>Type</th>
                                                             <th>Action</th>
+                                                            <th>Status</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -128,21 +134,30 @@
                                                                         data-role-id="{{ $role->id }}" data-role-name="{{ $role->name }}" onclick="openRoleModal(this)">
                                                                         <i class="ti ti-pencil"></i>
                                                                     </a>
-                                                                    <a href="javascript:void(0);" 
+                                                                    <!-- <a href="javascript:void(0);" 
                                                                     class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
                                                                     data-bs-toggle="tooltip" 
                                                                     title="Delete"
                                                                     onclick="confirmDelete('delete-role-{{ $role->id }}', 'Delete Role?', 'Are you sure you want to delete this role?')">
                                                                         <i class="ti ti-trash"></i>
-                                                                    </a>
+                                                                    </a> -->
 
-                                                                    <form id="delete-role-{{ $role->id }}" 
-                                                                        action="{{ route('roles.destroy', $role->id) }}" 
-                                                                        method="POST" style="display: none;">
-                                                                        @csrf
-                                                                        @method('DELETE')
-                                                                    </form>
                                                                 </td>
+                                                                <td>
+                                                                <form
+                                                                    action="{{ route('roles.status', [$role->id]) }}"
+                                                                    method="POST">
+                                                                    @csrf
+                                                                    <div class="form-check form-switch mb-0">
+                                                                        <input class="form-check-input status-toggle"
+                                                                            type="checkbox" role="switch"
+                                                                            id="switchCheckDefault_{{ $role->id }}"
+                                                                            name="is_active" data-id="{{ $role->id }}"
+                                                                            {{ $role->is_active == 1 ? 'checked' : '' }}>
+                                                                    </div>
+
+                                                                </form>
+                                                            </td>
                                                             </tr>
                                                         @endforeach
                                                     </tbody>
@@ -168,6 +183,13 @@
 
 
     <!-- Bootstrap 5 JS bundle (includes Popper) -->
+     <script>
+        document.querySelectorAll('.status-toggle').forEach(input => {
+            input.addEventListener('change', function() {
+                this.closest('form').submit();
+            });
+        });
+    </script>
 <script>
 function openRoleModal(element) {
     const roleId = element.getAttribute('data-role-id');

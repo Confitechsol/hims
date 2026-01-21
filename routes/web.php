@@ -136,6 +136,7 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/roles/store', [RolesController::class, 'store'])->name('roles.store');
     Route::put('/roles/update/{id}', [RolesController::class, 'update'])->name('roles.update');
     Route::delete('/roles/destroy/{id}', [RolesController::class, 'destroy'])->name('roles.destroy');
+    Route::post('/roles/updateStatus/{id}', [RolesController::class, 'updateStatus'])->name('roles.status');
     Route::get('/languages', function () {
         return view('admin.setup.languages');
     })->name('languages');
@@ -354,8 +355,8 @@ Route::prefix('doctor-visit')->group(function () {
     Route::get('/create', [DoctorVisitController::class, 'create'])->name('doctor-visit.create');
     Route::post('/store', [DoctorVisitController::class, 'store'])->name('doctor-visit.store');
     Route::get('/api/patient-visits/{patientId}', [DoctorVisitController::class, 'getPatientVisits'])->name('doctor-visit.api.patient-visits');
-
-
+    Route::get('/api/visit/{id}', [DoctorVisitController::class, 'getVisit'])->name('doctor-visit.api.visit');
+    Route::delete('/api/visit/{id}', [DoctorVisitController::class, 'destroy'])->name('doctor-visit.api.destroy');
 });
 
 Route::prefix('pathology-category')->group(function () {
@@ -584,6 +585,14 @@ Route::post('/discharge-card/store', [IpdController::class, 'storeDischarge'])
 Route::get('/billing', function () {
     return view('admin.billing.billing');
 })->name('billing');
+
+// IPD Billing Routes
+Route::prefix('ipd/billing')->group(function () {
+    Route::get('/search', [App\Http\Controllers\IpdBillingController::class, 'search'])->name('ipd.billing.search');
+    Route::get('/{ipdId}/breakup', [App\Http\Controllers\IpdBillingController::class, 'breakup'])->name('ipd.billing.breakup');
+    Route::get('/{ipdId}/export-estimate', [App\Http\Controllers\IpdBillingController::class, 'exportEstimate'])->name('ipd.billing.export.estimate');
+    Route::get('/{ipdId}/export-final', [App\Http\Controllers\IpdBillingController::class, 'exportFinal'])->name('ipd.billing.export.final');
+});
 Route::get('/patient_profile', function () {
     return view('admin.patient_profile');
 })->name('patient_profile');

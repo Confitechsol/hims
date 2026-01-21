@@ -9,15 +9,22 @@ use Illuminate\Support\Facades\Auth;
 
 class RolesController extends Controller
 {
-    public function index()
-    {
-        // Fetch all roles for the current hospital (optional filtering by branch)
-        $roles = Role::where('hospital_id', auth()->user()->hospital_id)
-            ->orderBy('id', 'desc')
-            ->get();
+    public function index(Request $request)
+{
+    $query = Role::where('hospital_id', auth()->user()->hospital_id);
 
-        return view('admin.setup.role', compact('roles'));
+    // 🔍 Search by role name or type
+    if ($request->filled('search')) {
+        $query->where(function ($q) use ($request) {
+            $q->where('name', 'like', '%' . $request->search . '%')
+              ->orWhere('slug', 'like', '%' . $request->search . '%');
+        });
     }
+
+    $roles = $query->orderBy('id', 'desc')->get();
+
+    return view('admin.setup.role', compact('roles'));
+}
     public function store(Request $request)
     {
         // dd($request->all());
@@ -60,6 +67,14 @@ class RolesController extends Controller
         $role->delete();
 
         return redirect()->back()->with('success', 'Role deleted successfully.');
+    }
+    public function updateStatus(Request $request, $id)
+    {
+        $roles = Role::findOrFail($id);
+        // dd($request->is_active == null);
+        $roles->is_active = $request->is_active == null ? 0 : 1;
+        $roles->save();
+        return redirect()->back()->with('success', 'Role Status Updated');
     }
     
 }

@@ -34,8 +34,9 @@
                     </div>
                 @endif
                 
-                <form action="{{ route('doctor-visit.store') }}" method="POST" id="docvisitSection">
+                <form action="{{ route('doctor-visit.store') }}" method="POST" id="docvisitSection" onsubmit="handleFormSubmit(event)">
                     @csrf
+                    <input type="hidden" name="edit_id" id="edit_id" value="">
                     
                     <!-- Patient and Bill Information -->
                     <div class="row mb-4">
@@ -191,7 +192,7 @@
                                     </thead>
                                     <tbody id="testTableBody">
                                         <tr>
-                                            <td colspan="10" class="text-center text-muted">Please select a patient to view previous visits</td>
+                                            <td colspan="11" class="text-center text-muted">Please select a patient to view previous visits</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -201,8 +202,8 @@
                     </div>
 
                     <div class="d-flex justify-content-end gap-2 mt-4">
-                        <a href="{{ route('doctor-visit.create') }}" class="btn btn-secondary">Reset</a>
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">Submit</button>
                     </div>
 
                 </form>
@@ -271,6 +272,32 @@ document.addEventListener('DOMContentLoaded', function() {
     const patientIdOnLoad = document.getElementById('patient_id').value;
     if (patientIdOnLoad) {
         loadPatientVisits(patientIdOnLoad);
+    }
+    
+    // Reload table after form submission (edit/create)
+    const reloadPatientId = sessionStorage.getItem('reloadPatientVisits');
+    if (reloadPatientId) {
+        // Set patient ID if not already set
+        if (!patientIdOnLoad) {
+            document.getElementById('patient_id').value = reloadPatientId;
+            const patient = patientData.find(p => p.id == reloadPatientId);
+            if (patient) {
+                document.getElementById('patient_search').value = patient.patient_name;
+            }
+        }
+        // Reload table
+        setTimeout(() => {
+            loadPatientVisits(reloadPatientId);
+            sessionStorage.removeItem('reloadPatientVisits');
+        }, 300);
+    } else if (patientIdOnLoad) {
+        // Also reload if there's a success message and patient is selected
+        const successMessage = document.querySelector('.alert-success');
+        if (successMessage) {
+            setTimeout(() => {
+                loadPatientVisits(patientIdOnLoad);
+            }, 300);
+        }
     }
 });
 
@@ -417,7 +444,7 @@ function updateHighlight(suggestions) {
 // Load patient visits
 function loadPatientVisits(patientId) {
     const tbody = document.getElementById('testTableBody');
-    tbody.innerHTML = '<tr><td colspan="10" class="text-center">Loading...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="11" class="text-center">Loading...</td></tr>';
     
     const url = `{{ url('/doctor-visit/api/patient-visits') }}/${patientId}`;
     
@@ -473,18 +500,170 @@ function loadPatientVisits(patientId) {
                         <td>${visitTime}</td>
                         <td>${entryDate}</td>
                         <td>${visitType}</td>
-                        <td>Action</td>
+                        <td>
+                            <button class="btn btn-sm btn-info" onclick="editVisit(${visit.id})" title="Edit">
+                                <i class="ti ti-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteVisit(${visit.id})" title="Delete">
+                                <i class="ti ti-trash"></i>
+                            </button>
+                        </td>
                     `;
                     tbody.appendChild(row);
                 });
             } else {
-                tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">No previous visits found</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="11" class="text-center text-muted">No previous visits found</td></tr>';
             }
         })
         .catch(error => {
             console.error('Error loading patient visits:', error);
-            tbody.innerHTML = '<tr><td colspan="10" class="text-center text-danger">Error loading visits</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="11" class="text-center text-danger">Error loading visits</td></tr>';
         });
+}
+
+// Edit visit function
+function editVisit(visitId) {
+    const url = `{{ url('/doctor-visit/api/visit') }}/${visitId}`;
+    
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(visit => {
+            // Set edit ID
+            document.getElementById('edit_id').value = visit.id;
+            
+            // Set patient
+            document.getElementById('patient_id').value = visit.patient_id;
+            const patient = patientData.find(p => p.id == visit.patient_id);
+            if (patient) {
+                document.getElementById('patient_search').value = patient.patient_name;
+            }
+            
+            // Set doctor
+            document.getElementById('doctor_id').value = visit.doctor_id;
+            if (window.jQuery && $.fn.select2) {
+                $('#doctor_id').trigger('change');
+            }
+            
+            // Set reporting date
+            const reportingDate = new Date(visit.reporting_date);
+            const dateStr = reportingDate.toISOString().slice(0, 16);
+            document.getElementById('date').value = dateStr;
+            
+            // Set visit type
+            document.querySelector('select[name="visit_type"]').value = visit.charge_id;
+            document.querySelector('select[name="visit_type"]').dispatchEvent(new Event('change'));
+            
+            // Set rate
+            document.getElementById('rate').value = visit.rate;
+            
+            // Set no of visit
+            document.getElementById('no_of_visit').value = visit.no_of_visit;
+            
+            // Set amount
+            document.getElementById('amount').value = visit.amount;
+            
+            // Set doctor pay amount
+            document.querySelector('input[name="doctor_pay_amount"]').value = visit.doctor_pay_amount || 0;
+            
+            // Set visit date
+            const visitDate = new Date(visit.visit_date);
+            const visitDateStr = visitDate.toISOString().split('T')[0];
+            document.querySelector('input[name="visit_date"]').value = visitDateStr;
+            
+            // Set visit time
+            document.querySelector('input[name="visit_time"]').value = visit.visit_time;
+            
+            // Change submit button text
+            document.getElementById('submitBtn').textContent = 'Update';
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        })
+        .catch(error => {
+            console.error('Error loading visit:', error);
+            alert('Error loading visit data. Please try again.');
+        });
+}
+
+// Delete visit function
+function deleteVisit(visitId) {
+    if (!confirm('Are you sure you want to delete this visit record?')) {
+        return;
+    }
+    
+    const url = `{{ url('/doctor-visit/api/visit') }}/${visitId}`;
+    const patientId = document.getElementById('patient_id').value;
+    
+    const csrfToken = document.querySelector('input[name="_token"]')?.value || 
+                     document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    
+    fetch(url, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': csrfToken,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                alert('Visit deleted successfully!');
+                // Reload patient visits
+                if (patientId) {
+                    loadPatientVisits(patientId);
+                }
+            } else {
+                alert('Error deleting visit: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting visit:', error);
+            alert('Error deleting visit. Please try again.');
+        });
+}
+
+// Handle form submit
+function handleFormSubmit(event) {
+    const form = event.target;
+    const patientId = document.getElementById('patient_id').value;
+    const editId = document.getElementById('edit_id').value;
+    
+    // Store patient ID for reload after redirect
+    if (patientId) {
+        sessionStorage.setItem('reloadPatientVisits', patientId);
+    }
+}
+
+// Reset form function
+function resetForm() {
+    document.getElementById('docvisitSection').reset();
+    document.getElementById('edit_id').value = '';
+    document.getElementById('patient_id').value = '';
+    document.getElementById('patient_search').value = '';
+    document.getElementById('submitBtn').textContent = 'Submit';
+    
+    // Clear Select2 if initialized
+    if (window.jQuery && $.fn.select2) {
+        $('#doctor_id').val('').trigger('change');
+    }
+    
+    // Clear table
+    document.getElementById('testTableBody').innerHTML = 
+        '<tr><td colspan="11" class="text-center text-muted">Please select a patient to view previous visits</td></tr>';
+    
+    // Clear session storage
+    sessionStorage.removeItem('reloadPatientVisits');
 }
 
 </script>

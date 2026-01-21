@@ -843,6 +843,78 @@
                         <div class="card shadow-sm border-0 mt-2">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Doctor Visit Details
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Table start -->
+                                <div class="table-responsive table-nowrap">
+                                    <table class="table border">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>Doctor Name</th>
+                                                <th>Rate</th>
+                                                <th>No. of Visit</th>
+                                                <th>Amount</th>
+                                                <th>Date</th>
+                                                <th>Time</th>
+                                                <th>Entry</th>
+                                                <th>Visit Type</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse($doctorvisits as $doctorvisit)
+                                                <tr>
+                                                    <td>
+                                                        {{ $doctorvisit->doctor->name ?? '-' }}
+                                                    </td>
+
+                                                    <td>
+                                                       {{ $doctorvisit->rate ?? '-' }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ $doctorvisit->no_of_visit ?? '-' }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ $doctorvisit->amount ?? '-' }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ $doctorvisit->date ?? '-' }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ $doctorvisit->time ?? '-' }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ $doctorvisit->entry ?? '-' }}
+                                                    </td>
+
+                                                    <td class="text-end">
+                                                        {{ $doctorvisit->visit_type ?? '-' }}
+                                                    </td>
+
+
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="6" class="text-center text-muted">
+                                                        No payments found
+                                                    </td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- Table end -->
+                            </div>
+                        </div>
+                        <div class="card shadow-sm border-0 mt-2">
+                            <div class="card-header"
+                                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                                 <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Nurse Notes
                                 </h5>
                             </div>
