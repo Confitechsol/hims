@@ -25,6 +25,7 @@ return new class extends Migration
             // 🔹 Patient & Admission
             $table->string('discharge_number', 20)->nullable();
             $table->string('patient_name');
+            $table->integer('patient_id')->nullable();
             $table->string('admission_no')->nullable();
             $table->string('bed')->nullable();
 
@@ -49,6 +50,7 @@ return new class extends Migration
 
             // 🔹 Medical / Admin
             $table->string('under_care_dr')->nullable();
+            $table->string('registration_no')->nullable();
             $table->string('referral')->nullable();
             $table->string('corporate')->nullable();
 
@@ -63,6 +65,7 @@ return new class extends Migration
             $table->text('diagnosis')->nullable();
             $table->text('ot_note')->nullable();
             $table->text('discharge_advice')->nullable();
+            $table->text('course_in_hospital')->nullable();
             $table->text('present_complaints')->nullable();
             $table->text('remarks')->nullable();
 

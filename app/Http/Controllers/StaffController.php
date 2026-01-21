@@ -19,10 +19,33 @@ use Illuminate\Support\Facades\Auth;
 
 class StaffController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $staffs = Staff::with('department')->get();
-        return view('admin.staff.staffs', compact("staffs"));
+    
+    $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
+        $search = $request->input('search');
+       
+        $staffs = Staff::with('department');
+        if ($search) {
+            $staffs = $staffs->where(function($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%")
+                      ->orWhere('employee_id', 'like', "%{$search}%")
+                      ->orWhere('contact_no', 'like', "%{$search}%")
+                       ->orWhere('specialization', 'like', "%{$search}%");
+            });
+        }
+
+        $staffs = $staffs->paginate($perPage);
+
+    //     return response()->json([
+    //     'status' => true,
+    //     'message' => 'Staff list fetched successfully',
+    //     'data' => $staffs
+    // ]);
+       return view('admin.staff.staffs', compact('staffs','perPage', 'search'));
     }
     public function create()
     {

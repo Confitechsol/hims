@@ -24,6 +24,7 @@ class DischargeCard extends Model
         'discharge_number',
 
         'patient_name',
+        'patient_id',
         'admission_no',
         'discharge_date',
         'discharge_time',
@@ -39,6 +40,7 @@ class DischargeCard extends Model
         'relation',
         'nationality',
         'under_care_dr',
+        'registration_no',
         'referral',
         'corporate',
         'reason_discharge',
@@ -50,6 +52,7 @@ class DischargeCard extends Model
         'diagnosis',
         'ot_note',
         'discharge_advice',
+        'course_in_hospital',
         'present_complaints',
         'remarks',
         'discharged_by',
