@@ -500,6 +500,7 @@
                                 Under Care Dr
                             </label>
                             <input type="text" class="form-control" id="under_care_dr" name="under_care_dr">
+                            <input type="hidden" class="form-control" id="registration_no" name="registration_no">
                         </div>
 
                         <div class="col-md-6">
@@ -621,6 +622,13 @@
                             <textarea class="form-control" id="ot_note" name="ot_note" rows="4"></textarea>
                         </div>
                         <div class="col-md-12">
+                            <label for="course_in_hospital" class="form-label">
+                                <i class="bi bi-clipboard-data"></i>
+                                Course in hospital
+                            </label>
+                            <textarea class="form-control" id="course_in_hospital" name="course_in_hospital" rows="4"></textarea>
+                        </div>
+                        <div class="col-md-12">
                             <label for="discharge_advice" class="form-label">
                                 <i class="bi bi-clipboard-data"></i>
                                 Discharge Advice
@@ -699,6 +707,13 @@
             console.error(error);
         });
 </script>
+<script>
+    ClassicEditor
+        .create(document.querySelector('#course_in_hospital'))
+        .catch(error => {
+            console.error(error);
+        });
+</script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -739,7 +754,8 @@
             setValue('admit_time', getTimeOnly(ipd.date));
 
             // 🔹 Medical
-            setValue('under_care_dr', ipd.doctor?.name);
+            setValue('under_care_dr', `${ipd.doctor?.name} ${ipd.doctor?.surname}`);
+            setValue('registration_no', ipd.doctor?.registration_no);
             setValue('discharged_by', currentUser.username);
             setValue('current_user', currentUser.user_role.name);
             // setValue('corporate', ipd.corporate);
