@@ -25,6 +25,7 @@ return new class extends Migration
             // 🔹 Patient & Admission
             $table->string('discharge_number', 20)->nullable();
             $table->string('patient_name');
+            $table->integer('patient_id')->nullable();
             $table->string('admission_no')->nullable();
             $table->string('bed')->nullable();
 

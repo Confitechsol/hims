@@ -24,6 +24,7 @@ class DischargeCard extends Model
         'discharge_number',
 
         'patient_name',
+        'patient_id',
         'admission_no',
         'discharge_date',
         'discharge_time',
