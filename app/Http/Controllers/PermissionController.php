@@ -21,7 +21,8 @@ class PermissionController extends Controller
 public function permissionsOld(Role $role)
 {
     
-    $permissionGroups = PermissionGroup::all();
+    $permissionGroups = PermissionGroup::where('is_active', 1)->get();
+    //dd($permissionGroups);
 
     $permissionCategory = PermissionCategory::with(['rolePermissions' => function($q) use ($role) {
         $q->where('role_id', $role->id);
@@ -38,7 +39,7 @@ public function permissions(Role $role)
 {
     $permissionGroups = PermissionGroup::with(['categories.rolePermissions' => function($q) use ($role) {
         $q->where('role_id', $role->id);
-    }])->get();
+    }])->where('is_active', 1)->get();
 
     return view('admin.setup.permissions', [
         'permissionGroups' => $permissionGroups,
