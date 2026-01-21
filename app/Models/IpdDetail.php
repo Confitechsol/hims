@@ -99,4 +99,8 @@ class IpdDetail extends Model
     {
         return $this->hasMany(ConsultantRegister::class, 'ipd_id', 'id');
     }
+    public function ipdPatients()
+    {
+        return $this->hasOne(IpdPatient::class, 'ipd_id', 'id');
+    }
 }

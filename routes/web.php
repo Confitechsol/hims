@@ -15,6 +15,7 @@ use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\DeathController;
 use App\Http\Controllers\DischargePdfController;
 use App\Http\Controllers\DoctorController;
+use App\Http\Controllers\DoctorVisitController;
 use App\Http\Controllers\DutyRosterController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\ExcelImportController;
@@ -135,6 +136,7 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/roles/store', [RolesController::class, 'store'])->name('roles.store');
     Route::put('/roles/update/{id}', [RolesController::class, 'update'])->name('roles.update');
     Route::delete('/roles/destroy/{id}', [RolesController::class, 'destroy'])->name('roles.destroy');
+    Route::post('/roles/updateStatus/{id}', [RolesController::class, 'updateStatus'])->name('roles.status');
     Route::get('/languages', function () {
         return view('admin.setup.languages');
     })->name('languages');
@@ -349,6 +351,14 @@ Route::middleware(['admin'])->group(function () {
 //     return view('admin.setup.medicine_group');
 // })->name('medicine-group');
 
+Route::prefix('doctor-visit')->group(function () {
+    Route::get('/create', [DoctorVisitController::class, 'create'])->name('doctor-visit.create');
+    Route::post('/store', [DoctorVisitController::class, 'store'])->name('doctor-visit.store');
+    Route::get('/api/patient-visits/{patientId}', [DoctorVisitController::class, 'getPatientVisits'])->name('doctor-visit.api.patient-visits');
+    Route::get('/api/visit/{id}', [DoctorVisitController::class, 'getVisit'])->name('doctor-visit.api.visit');
+    Route::delete('/api/visit/{id}', [DoctorVisitController::class, 'destroy'])->name('doctor-visit.api.destroy');
+});
+
 Route::prefix('pathology-category')->group(function () {
     Route::get('/', [PathologyController::class, 'pathologyCategories'])->name('pathology-category');
     Route::post('/store', [PathologyController::class, 'storeCategory'])->name('pathology-category.store');
@@ -545,6 +555,10 @@ Route::put('/ipd_view/update', [IpdViewController::class, 'update'])->name('medi
 Route::put('/ipd_view/delete/{id}', [IpdViewController::class, 'delete'])->name('medication.delete');
 Route::post('/ipd_view/operation/store', [IpdViewController::class, 'storeOperation'])->name('operation.store');
 Route::put('/ipd_view/operation/update/{id}', [IpdViewController::class, 'updateOperation'])->name('operation.update');
+Route::post('/ipd_view/pathology/update/{id}', [IpdViewController::class, 'updatePathReport'])->name('ipd.updateReport');
+Route::get('/pathology-report/download/{id}',[IpdViewController::class, 'downloadPathReport'])->name('path.report.download');
+Route::post('/ipd_view/radiology/update/{id}', [IpdViewController::class, 'updateRadioReport'])->name('ipd.updateRadioReport');
+Route::get('/radio-report/download/{id}',[IpdViewController::class, 'downloadRadioReport'])->name('radio.report.download');
 Route::post('/transaction/store', [TransactionController::class, 'store'])->name('transactions.store');
 Route::post('/transaction/print', [TransactionController::class, 'store'])->name('transactions.print');
 Route::post('/transaction/show', [TransactionController::class, 'store'])->name('transactions.show');
@@ -571,6 +585,14 @@ Route::post('/discharge-card/store', [IpdController::class, 'storeDischarge'])
 Route::get('/billing', function () {
     return view('admin.billing.billing');
 })->name('billing');
+
+// IPD Billing Routes
+Route::prefix('ipd/billing')->group(function () {
+    Route::get('/search', [App\Http\Controllers\IpdBillingController::class, 'search'])->name('ipd.billing.search');
+    Route::get('/{ipdId}/breakup', [App\Http\Controllers\IpdBillingController::class, 'breakup'])->name('ipd.billing.breakup');
+    Route::get('/{ipdId}/export-estimate', [App\Http\Controllers\IpdBillingController::class, 'exportEstimate'])->name('ipd.billing.export.estimate');
+    Route::get('/{ipdId}/export-final', [App\Http\Controllers\IpdBillingController::class, 'exportFinal'])->name('ipd.billing.export.final');
+});
 Route::get('/patient_profile', function () {
     return view('admin.patient_profile');
 })->name('patient_profile');
@@ -1014,3 +1036,11 @@ Route::get('/ipdDischargePatient', function () {
 
 Route::get('/discharge/pdf/{id}', [DischargePdfController::class, 'generate'])
     ->name('discharge.pdf');
+
+//OPD View
+// Route::post('/opd/add_prescription', [OpdController::class, 'storePrescription'])->name('opd.addPrescription');
+Route::get('/opd/prescription/{id}', [OpdController::class, 'showPrescription'])->name('opd.prescription.show');
+Route::get('/opd/prescription/{id}/edit', [OpdController::class, 'editPrescription'])->name('opd.prescription.edit');
+Route::get('/opd/prescription/{id}/print', [OpdController::class, 'printPrescription'])->name('opd.prescription.print');
+Route::put('/opd/prescription/{id}', [OpdController::class, 'updatePrescription'])->name('opd.prescription.update');
+Route::delete('/opd/prescription/{id}', [OpdController::class, 'deletePrescription'])->name('opd.prescription.delete');

@@ -16,11 +16,30 @@ use Illuminate\Support\Facades\Auth;
 
 class DoctorController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $doctors = Doctor::with('department')->get();
-        return view('admin.doctor.doctors', compact("doctors"));
+
+
+    $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
     }
+
+    $search = $request->input('search');
+
+    $query = Doctor::with('department');
+
+    // 🔍 Search by doctor name OR phone number
+    if (!empty($search)) {
+        $query->where(function ($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhere('contact_no', 'like', "%{$search}%");
+        });
+    }
+
+    $doctors = $query->paginate($perPage);
+    return view('admin.doctor.doctors', compact('doctors', 'perPage', 'search'));
+   }
     public function create()
     {
         $roles = Role::all();
@@ -36,7 +55,7 @@ class DoctorController extends Controller
         return response()->json($specialists);
     }
     public function edit($id) {
-        return view('admin.Doctor.addDoctor', [
+        return view('admin.doctor.addDoctor', [
             'doctor' => Doctor::findOrFail($id),
             'roles' => Role::all(),
             'designations' => StaffDesignation::all(),

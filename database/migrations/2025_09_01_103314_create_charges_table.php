@@ -23,7 +23,8 @@ return new class extends Migration
             $table->date('date')->nullable()->index();                                   // date DATE NULL
             $table->mediumText('description')->nullable();                               // description mediumtext NULL
             $table->string('status', 100);                                               // status varchar(100) NOT NULL
-            $table->timestamp('created_at')->useCurrent();
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 

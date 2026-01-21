@@ -12,7 +12,7 @@
 
                 <div class="card-body">
                     <form id="settings_form" method="POST"
-                        action="{{ isset($branch) && $branch->exists ? route('profile.update') : route('profile.store') }}"
+                        action="{{ isset($hospital) && $hospital->exists ? route('profile.update') : route('profile.store') }}"
                         enctype="multipart/form-data">
                         @csrf
 
@@ -22,12 +22,12 @@
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Hospital Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" name="hospital_name"
-                                    value="{{ $branch->name ?? 'My Hospital' }}">
+                                    value="{{ $hospital->name ?? 'My Hospital' }}">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Hospital Code</label>
                                 <input type="text" class="form-control" name="hospital_code"
-                                    value="{{ $branch->branch_id ?? 'HSP001' }}">
+                                    value="{{ $hospital->branch_id ?? 'HSP001' }}">
                             </div>
                         </div>
                         <hr>
@@ -36,7 +36,7 @@
                         <div class="mb-3">
                             <label class="form-label fw-bold">Address <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" name="address"
-                                value="{{ $branch->address ?? '123 Main Street, City' }}">
+                                value="{{ $hospital->address ?? '123 Main Street, City' }}">
                         </div>
 
                         {{-- Phone & Email --}}
@@ -44,12 +44,12 @@
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Phone <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" name="phone"
-                                    value="{{ $branch->phone ?? '+91 9876543210' }}">
+                                    value="{{ $hospital->phone ?? '+91 9876543210' }}">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Email <span class="text-danger">*</span></label>
                                 <input type="email" class="form-control" name="email"
-                                    value="{{ $branch->email ?? 'info@hospital.com' }}">
+                                    value="{{ $hospital->email ?? 'info@hospital.com' }}">
                             </div>
                         </div>
 
@@ -59,8 +59,8 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Hospital Logo</label><br>
-                                @if (isset($branch) && $branch->image)
-                                    <img src="{{ asset('storage/' . $branch->image) }}" class="img-thumbnail me-2"
+                                @if (isset($hospital) && $hospital->image)
+                                    <img src="{{ asset('storage/' . $hospital->image) }}" class="img-thumbnail me-2"
                                         style="height:40px;">
                                 @else
                                     <img src="{{ asset('uploads/hospital_content/logo/images.png') }}"
@@ -70,8 +70,8 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Small Logo</label><br>
-                                @if (isset($branch) && $branch->mini_logo)
-                                    <img src="{{ asset('storage/' . $branch->mini_logo) }}" class="img-thumbnail me-2"
+                                @if (isset($hospital) && $hospital->mini_logo)
+                                    <img src="{{ asset('storage/' . $hospital->mini_logo) }}" class="img-thumbnail me-2"
                                         style="height:40px;">
                                 @else
                                     <img src="{{ asset('uploads/hospital_content/logo/images.png') }}"
@@ -88,12 +88,12 @@
                                 <label class="form-label">Select Language</label>
                                 <select class="form-select" name="language">
                                     <option value="English"
-                                        {{ ($branch->languages ?? 'English') == 'English' ? 'selected' : '' }}>English
+                                        {{ ($hospital->languages ?? 'English') == 'English' ? 'selected' : '' }}>English
                                     </option>
                                     <option value="Hindi"
-                                        {{ ($branch->languages ?? 'English') == 'Hindi' ? 'selected' : '' }}>Hindi</option>
+                                        {{ ($hospital->languages ?? 'English') == 'Hindi' ? 'selected' : '' }}>Hindi</option>
                                     <option value="Bengali"
-                                        {{ ($branch->languages ?? 'English') == 'Bengali' ? 'selected' : '' }}>Bengali
+                                        {{ ($hospital->languages ?? 'English') == 'Bengali' ? 'selected' : '' }}>Bengali
                                     </option>
                                 </select>
                             </div>
@@ -106,10 +106,10 @@
                                 <label class="form-label">Date Format</label>
                                 <select class="form-select" name="date_format">
                                     <option value="DD-MM-YYYY"
-                                        {{ ($branch->date_format ?? 'DD-MM-YYYY') == 'DD-MM-YYYY' ? 'selected' : '' }}>
+                                        {{ ($hospital->date_format ?? 'DD-MM-YYYY') == 'DD-MM-YYYY' ? 'selected' : '' }}>
                                         DD-MM-YYYY</option>
                                     <option value="MM-DD-YYYY"
-                                        {{ ($branch->date_format ?? 'DD-MM-YYYY') == 'MM-DD-YYYY' ? 'selected' : '' }}>
+                                        {{ ($hospital->date_format ?? 'DD-MM-YYYY') == 'MM-DD-YYYY' ? 'selected' : '' }}>
                                         MM-DD-YYYY</option>
                                 </select>
                             </div>
@@ -117,10 +117,10 @@
                                 <label class="form-label">Time Zone</label>
                                 <select class="form-select" name="time_zone">
                                     <option value="Asia/Kolkata"
-                                        {{ ($branch->timezone ?? 'Asia/Kolkata') == 'Asia/Kolkata' ? 'selected' : '' }}>
+                                        {{ ($hospital->timezone ?? 'Asia/Kolkata') == 'Asia/Kolkata' ? 'selected' : '' }}>
                                         Asia/Kolkata</option>
                                     <option value="UTC"
-                                        {{ ($branch->timezone ?? 'Asia/Kolkata') == 'UTC' ? 'selected' : '' }}>UTC</option>
+                                        {{ ($hospital->timezone ?? 'Asia/Kolkata') == 'UTC' ? 'selected' : '' }}>UTC</option>
                                 </select>
                             </div>
                         </div>
@@ -128,10 +128,10 @@
                             <label class="form-label">Time Format</label>
                             <select class="form-select" name="time_format">
                                 <option value="24-hour"
-                                    {{ ($branch->time_format ?? '24-hour') == '24-hour' ? 'selected' : '' }}>24-hour
+                                    {{ ($hospital->time_format ?? '24-hour') == '24-hour' ? 'selected' : '' }}>24-hour
                                 </option>
                                 <option value="12-hour"
-                                    {{ ($branch->time_format ?? '24-hour') == '12-hour' ? 'selected' : '' }}>12-hour
+                                    {{ ($hospital->time_format ?? '24-hour') == '12-hour' ? 'selected' : '' }}>12-hour
                                 </option>
                             </select>
                         </div>

@@ -40,6 +40,8 @@ class RadiologyReport extends Model
         'generated_by',
         'collection_specialist',
         'collection_date',
+        'radio_doc_path',
+        'collection_by',
         'approved_by',
     ];
 

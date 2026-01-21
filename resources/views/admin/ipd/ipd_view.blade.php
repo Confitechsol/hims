@@ -619,7 +619,7 @@
                     <a href="#bed_issue" data-bs-toggle="tab" aria-expanded="true"
                         class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
                             class="fa-solid fa-bed text-primary pe-1"></i>
-                        <span>Bed Issue</span>
+                        <span>Bed Transfer</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -838,6 +838,78 @@
                                     </a>
 
                                 </div> --}}
+                            </div>
+                        </div>
+                        <div class="card shadow-sm border-0 mt-2">
+                            <div class="card-header"
+                                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Doctor Visit Details
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Table start -->
+                                <div class="table-responsive table-nowrap">
+                                    <table class="table border">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>Doctor Name</th>
+                                                <th>Rate</th>
+                                                <th>No. of Visit</th>
+                                                <th>Amount</th>
+                                                <th>Date</th>
+                                                <th>Time</th>
+                                                <th>Entry</th>
+                                                <th>Visit Type</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse($doctorvisits as $doctorvisit)
+                                                <tr>
+                                                    <td>
+                                                        {{ $doctorvisit->doctor->name ?? '-' }}
+                                                    </td>
+
+                                                    <td>
+                                                       {{ $doctorvisit->rate ?? '-' }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ $doctorvisit->no_of_visit ?? '-' }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ $doctorvisit->amount ?? '-' }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ $doctorvisit->date ?? '-' }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ $doctorvisit->time ?? '-' }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ $doctorvisit->entry ?? '-' }}
+                                                    </td>
+
+                                                    <td class="text-end">
+                                                        {{ $doctorvisit->visit_type ?? '-' }}
+                                                    </td>
+
+
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="6" class="text-center text-muted">
+                                                        No payments found
+                                                    </td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- Table end -->
                             </div>
                         </div>
                         <div class="card shadow-sm border-0 mt-2">
@@ -1197,7 +1269,7 @@
                                                 <th>Name</th>
                                                 <th>Charge Type</th>
                                                 <th>Standard Charge (INR)</th>
-                                                <th>Tax</th>
+                                                <!-- <th>Tax</th> -->
                                                 <th>Applied Charge (INR)</th>
                                                 <th>Amount (INR)</th>
                                             </tr>
@@ -1209,21 +1281,21 @@
                                                         ($charge->charge->standard_charge *
                                                             $charge->charge->taxCategory->percentage) /
                                                         100;
-                                                    $amount = $charge->charge->standard_charge + $taxAmount;
+                                                    $amount = $charge->standard_charge + $taxAmount;
                                                 @endphp
                                                 <tr>
                                                     <td>
-                                                        {{ $charge->charge->name }}
+                                                        {{ $charge->charge->name ?? '-'}}
                                                     </td>
                                                     <td style="text-transform: capitalize;">
-                                                        {{ $charge->chargeCategory->chargeType->charge_type }}
+                                                        {{ $charge->chargeCategory?->chargeType?->charge_type ?? '-' }}
                                                     </td>
-                                                    <td class="text-right">{{ $charge->charge->standard_charge }}</td>
-                                                    <td class="text-right">
-                                                        ({{ $charge->charge->taxCategory->percentage }}%)
+                                                    <td class="text-right">{{ $charge->standard_charge ?? '-'}}</td>
+                                                    <!-- <td class="text-right">
+                                                        ({{ $charge->charge->taxCategory->percentage ?? '-' }}%)
                                                         {{ $taxAmount }}
-                                                    </td>
-                                                    <td class="text-right">{{ $charge->charge->standard_charge }}</td>
+                                                    </td> -->
+                                                    <td class="text-right">{{ $charge->standard_charge ?? '-' }}</td>
                                                     <td class="text-right">{{ $amount }}</td>
                                                 </tr>
                                             @endforeach
@@ -2241,6 +2313,15 @@
                                                         </span>
                                                         <input type="text" class="form-control shadow-sm"
                                                             placeholder="Search">
+                                                        @if ($errors->any())
+                                                            <div class="alert alert-danger">
+                                                                <ul class="mb-0">
+                                                                    @foreach ($errors->all() as $error)
+                                                                        <li>{{ $error }}</li>
+                                                                    @endforeach
+                                                                </ul>
+                                                            </div>
+                                                        @endif
 
                                                     </div>
                                                 </div>
@@ -2274,18 +2355,37 @@
                                                                     <td>{{ $lab->approved_by ?? '--' }}</td>
                                                                     <td>
                                                                         <div class="d-flex gap-2">
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                                <i class="ti ti-menu"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    title="Show"></i></a>
+                                                                            <!-- Edit -->
+                                                                            <a href="javascript:void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-warning rounded-pill editLabBtn"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#addPathLabModal"
+                                                                                data-lab-id="{{ $lab->id }}"
+                                                                                title="Edit">
+                                                                                    <i class="ti ti-edit"></i>
+                                                                            </a>
+
+                                                                            <!-- Download -->
+                                                                            @if($lab->path_doc_path)
+                                                                                <a href="{{ route('path.report.download', $lab->id) }}"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                                                title="Download"
+                                                                                download>
+                                                                                    <i class="ti ti-download"></i>
+                                                                                </a>
+                                                                            @else
+                                                                                <a href="javascript:void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill disabled"
+                                                                                title="No file available"
+                                                                                >
+                                                                                    <i class="ti ti-download"></i>
+                                                                                </a>
+                                                                            @endif
                                                                         </div>
                                                                     </td>
                                                                 </tr>
+                                                                @include('components.modals.add-pathlab-report')
                                                             @endforeach
-
-
-
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -2356,14 +2456,36 @@
                                                                     <td>{{ $lab->approved_by ?? '--' }}</td>
                                                                     <td>
                                                                         <div class="d-flex gap-2">
-                                                                            <a href="javascript: void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                                <i class="ti ti-menu"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    title="Show"></i></a>
+                                                                            <!-- Edit -->
+                                                                            <a href="javascript:void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-warning rounded-pill editLabBtn"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#addRadioLabModal"
+                                                                                data-lab-id="{{ $lab->id }}"
+                                                                                title="Edit">
+                                                                                    <i class="ti ti-edit"></i>
+                                                                            </a>
+
+                                                                            <!-- Download -->
+                                                                            @if($lab->radio_doc_path)
+                                                                                <a href="{{ route('radio.report.download', $lab->id) }}"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                                                title="Download"
+                                                                                download>
+                                                                                    <i class="ti ti-download"></i>
+                                                                                </a>
+                                                                            @else
+                                                                                <a href="javascript:void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill disabled"
+                                                                                title="No file available"
+                                                                                >
+                                                                                    <i class="ti ti-download"></i>
+                                                                                </a>
+                                                                            @endif
                                                                         </div>
                                                                     </td>
                                                                 </tr>
+                                                                @include('components.modals.add-radlab-report')
                                                             @endforeach
 
 
@@ -2956,17 +3078,17 @@
                                                                                                     Name<small
                                                                                                         class="req">
                                                                                                         *</small></label>
-                                                                                                <select name="charge_id"
-                                                                                                    id="charge_id"
-                                                                                                    style="width: 100%"
-                                                                                                    class="form-control addcharge  select2 reset_value "
-                                                                                                    tabindex="-1"
-                                                                                                    aria-hidden="true">
-                                                                                                    <option
-                                                                                                        value="">
-                                                                                                        Select
-                                                                                                    </option>
-                                                                                                </select>
+                                                                                                        <select name="charge_id"
+                                                                                                            id="charge_id"
+                                                                                                            style="width: 100%"
+                                                                                                            class="form-control addcharge  select2 reset_value "
+                                                                                                            tabindex="-1"
+                                                                                                            aria-hidden="true">
+                                                                                                            <option
+                                                                                                                value="">
+                                                                                                                Select
+                                                                                                            </option>
+                                                                                                        </select>
                                                                                             </div>
                                                                                         </div>
                                                                                         <div class="col-md-2">
@@ -2975,13 +3097,12 @@
                                                                                                     class="form-label">Standard
                                                                                                     Charge
                                                                                                     (INR)</label>
-                                                                                                <input type="text"
-                                                                                                    name="standard_charge"
-                                                                                                    id="addstandard_charge"
-                                                                                                    class="form-control reset_value standard_charge"
-                                                                                                    value="">
-                                                                                                <span
-                                                                                                    class="text-danger"></span>
+                                                                                                    <input type="text"
+                                                                                                        name="standard_charge"
+                                                                                                        id="addstandard_charge"
+                                                                                                        class="form-control reset_value standard_charge"
+                                                                                                        value="">
+                                                                                                        <span class="text-danger"></span>
                                                                                             </div>
                                                                                         </div>
                                                                                         <div class="col-md-2">
@@ -3219,7 +3340,7 @@
                                                                 <th>Applied Charge (INR)</th>
                                                                 <th>TPA Charge (INR)</th>
                                                                 <th>Discount</th>
-                                                                <th>Tax</th>
+                                                                <!-- <th>Tax</th> -->
                                                                 <th>Amount (INR)</th>
                                                                 <!-- <th>Action</th> -->
                                                             </tr>
@@ -3245,24 +3366,24 @@
                                                                         {{ \Carbon\Carbon::parse($charge->date)->format('d-m-Y') }}
                                                                     </td>
                                                                     <td>
-                                                                        {{ $charge->charge->name }}
+                                                                        {{ $charge->charge->name ?? '-' }}
                                                                     </td>
                                                                     <td style="text-transform: capitalize;">
-                                                                        {{ $charge->chargeCategory->chargeType->charge_type }}
+                                                                        {{ $charge->chargeCategory?->chargeType?->charge_type ?? '-' }}
                                                                     </td>
                                                                     <td class="text-right">
-                                                                        {{ $charge->chargeCategory->name }}
+                                                                        {{ $charge->chargeCategory->name ?? '-' }}
                                                                     </td>
 
                                                                     <td class="text-right">
-                                                                        {{ $charge->qty }}</td>
+                                                                        {{ $charge->qty ?? '-' }}</td>
                                                                     <td class="text-right">
-                                                                        {{ $charge->standard_charge }}</td>
+                                                                        {{ $charge->standard_charge ?? '-' }}</td>
                                                                     <td class="text-right">0.00</td>
                                                                     <td>{{ $discountAmount }}&nbsp;({{ $charge->discount }}%)
                                                                     </td>
-                                                                    <td>{{ $taxAmount }}&nbsp;({{ $charge->charge->taxCategory->percentage }}%)
-                                                                    </td>
+                                                                    <!-- <td>{{ $taxAmount }}&nbsp;({{ $charge->charge->taxCategory->percentage }}%)
+                                                                    </td> -->
                                                                     <td>{{ $amount }}</td>
                                                                     <!-- <td>
                                                                                 <div class="d-flex gap-2">
@@ -3876,7 +3997,7 @@
                                                                 data-ipd-id="{{ $ipd->id }}"><i
                                                                     class="ti ti-plus me-1"></i>Add Prescription</a>
                                                         </div>
-                                                        @include('components.modals.add-prescription-modal')
+                                                       @include('components.modals.add-prescription-modal') 
                                                         <!-- First Modal -->
                                                         <div class="modal fade" id="add_timeline" tabindex="-1"
                                                             aria-hidden="true">
@@ -4096,7 +4217,7 @@
                         <div class="card shadow-sm flex-fill w-100">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Bed Assign
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>New Bed Assign
                                 </h5>
                             </div>
                             <div class="card-body">

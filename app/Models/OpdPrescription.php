@@ -13,6 +13,8 @@ class OpdPrescription extends Model
 
     // Mass assignable attributes
     protected $fillable = [
+        'prescription_number',
+        'prescribed_by',
         'opd_id',
         'visit_id',
         'header_note',
@@ -26,6 +28,8 @@ class OpdPrescription extends Model
         'radiology_id',
         'date',
         'notification_to',
+        'attachment',
+        'attachment_name'
     ];
 
     // Casts for automatic data conversion
@@ -39,6 +43,11 @@ class OpdPrescription extends Model
     public function opd()
     {
         return $this->belongsTo(OpdDetail::class, 'opd_id');
+    }
+
+    public function medicines()
+    {
+        return $this->hasMany(OpdMedicine::class, 'prescription_id');
     }
 
 }

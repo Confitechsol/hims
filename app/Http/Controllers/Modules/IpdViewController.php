@@ -11,6 +11,7 @@ use App\Models\IpdPrescription;
 use App\Models\MedicationReport;
 use App\Models\MedicineCategory;
 use App\Models\MedicineDosage;
+use App\Models\DoctorVisit;
 use App\Models\NurseNote;
 use App\Models\Operation;
 use App\Models\OperationCategory;
@@ -29,6 +30,8 @@ use App\Models\Vital;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class IpdViewController extends Controller
 {
@@ -45,7 +48,9 @@ class IpdViewController extends Controller
     }
     public function showIpd(Request $request, $id)
     {
+       
         $ipd             = IpdDetail::with('patient.bloodGroup', 'patient.organisation', 'doctor', 'bedDetail', 'bedGroup', 'treatmentHistory')->where('id', $id)->firstOrFail();
+        // dd($request->all(),$id, $ipd);
         $bedShiftHistory = PatientBedHistory::with('ipd', 'bedGroup', 'bed')->where('is_active', 'yes')->where('ipd_id', $id)->first();
         $symptomIds      = array_filter(
             explode(',', $ipd->symptoms_title),
@@ -107,6 +112,7 @@ class IpdViewController extends Controller
         $PatientTimelines = PatientTimeline::with('patient')->where('patient_id', $patient_id)->get();
         $vitalDetails     = PatientVital::with('vital')->where('patient_id', $patient_id)->get();
         $radiologyReports = RadiologyReport::with('radiology')->where('patient_id', $ipd->patient->id)->get();
+        $doctorvisits     = DoctorVisit::with(['patient', 'doctor'])->where('patient_id', $ipd->patient->id)->get();
         if ($ipd->discharged == 'yes') {
             $ipd->dischargeCard = DischargeCard::where('ipd_details_id', $id)->firstOrFail();
 
@@ -116,10 +122,12 @@ class IpdViewController extends Controller
             }
         }
         $currentUser = User::with('userRole')->where('id', Auth::id())->firstOrFail();
-        // dd($currentUser->username);
+
+        //dd($currentUser->username);
         return view('admin.ipd.ipd_view', compact(
             'ipd',
             'doctors',
+            'doctorvisits',
             'medDosages',
             'operationCategories',
             'transactions',
@@ -286,6 +294,108 @@ class IpdViewController extends Controller
         $operation->update($validated);
 
         return redirect()->back()->with('success', 'Operation updated successfully.');
+    }
+    public function updatePathReport(Request $request, $labId)
+    {
+        
+        $request->validate([
+            'attachment'        => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'collected_by'      => 'nullable|string|max:255',
+            'approved_by'       => 'nullable|numeric',
+            'collection_date'   => 'nullable|date',
+        ]);
+        
+        
+
+        $report = PathologyReport::where('id', $labId)->first();
+
+        if (!$report) {
+            return back()->with('error', 'Pathology report not found.');
+        }
+
+        // Handle attachment upload
+        if ($request->hasFile('attachment')) {
+
+            // delete old file if exists
+            if ($report->attachment && Storage::disk('public')->exists($report->attachment)) {
+                Storage::disk('public')->delete($report->attachment);
+            }
+
+            $path = $request->file('attachment')
+                            ->store('pathology_reports', 'public');
+
+            $report->path_doc_path = $path;
+        }
+
+        // Update fields
+        $report->collected_by    = $request->collected_by;
+        $report->approved_by     = $request->approved_by;
+        $report->collection_date = Carbon::parse($request->collection_date);
+
+        $report->save();
+
+        return back()->with('success', 'Pathology report updated successfully.');
+    }
+    public function updateRadioReport(Request $request, $labId)
+    {
+        
+        $request->validate([
+            'attachment'        => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'collected_by'      => 'nullable|string|max:255',
+            'approved_by'       => 'nullable|numeric',
+            'collection_date'   => 'nullable|date',
+        ]);
+        
+        
+
+        $report = RadiologyReport::where('id', $labId)->first();
+
+        if (!$report) {
+            return back()->with('error', 'Radiology report not found.');
+        }
+
+        // Handle attachment upload
+        if ($request->hasFile('attachment')) {
+
+            // delete old file if exists
+            if ($report->attachment && Storage::disk('public')->exists($report->attachment)) {
+                Storage::disk('public')->delete($report->attachment);
+            }
+
+            $path = $request->file('attachment')
+                            ->store('radiology_reports', 'public');
+
+            $report->radio_doc_path = $path;
+        }
+
+        // Update fields
+        $report->collected_by    = $request->collected_by;
+        $report->approved_by     = $request->approved_by;
+        $report->collection_date = Carbon::parse($request->collection_date);
+
+        $report->save();
+
+        return back()->with('success', 'Radiology report updated successfully.');
+    }
+    public function downloadPathReport($id)
+    {
+        $report = PathologyReport::findOrFail($id);
+
+        if (!$report->path_doc_path || !Storage::disk('public')->exists($report->path_doc_path)) {
+            return back()->with('error', 'Report file not found.');
+        }
+
+        return Storage::disk('public')->download($report->path_doc_path);
+    }
+    public function downloadRadioReport($id)
+    {
+        $report = RadiologyReport::findOrFail($id);
+
+        if (!$report->radio_doc_path || !Storage::disk('public')->exists($report->radio_doc_path)) {
+            return back()->with('error', 'Report file not found.');
+        }
+
+        return Storage::disk('public')->download($report->radio_doc_path);
     }
 
 }

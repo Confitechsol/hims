@@ -138,7 +138,7 @@
                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
                                                                 data-id="{{ $opdDetails->id }}">
                                                                 <i class="ti ti-pencil"></i></a>
-                                                            <form action="" class="d-inline"
+                                                            <!-- <form action="" class="d-inline"
                                                                 id="delete-form-{{ $opdDetails->id }}" method="POST">
                                                                 @csrf
                                                                 @method('DELETE')
@@ -147,7 +147,7 @@
                                                                     data-opd-id="{{ $opdDetails->id }}"
                                                                     data-form-id="delete-form-{{ $opdDetails->id }}">
                                                                     <i class="ti ti-trash"></i></a>
-                                                            </form>
+                                                            </form> -->
                                                         </td>
                                                     </tr>
                                                 @endforeach
