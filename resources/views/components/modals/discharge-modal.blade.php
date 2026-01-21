@@ -358,7 +358,8 @@
                                 <i class="bi bi-person"></i>
                                 Patient Name <span class="required">*</span>
                             </label>
-                            <input type="text" class="form-control" id="patient_name" name="patient_name" required>
+                            <input type="text" class="form-control" id="patient_name_text" name="patient_name" required>
+                            <input type="hidden" class="form-control" id="patient_id_text" name="patient_id" required>
                         </div>
 
                         <div class="col-md-6">
@@ -366,21 +367,21 @@
                                 <i class="bi bi-credit-card"></i>
                                 Admission No.
                             </label>
-                            <input type="text" class="form-control" id="admission_no" name="admission_no">
+                            <input type="text" class="form-control" id="admission_no_text" name="admission_no">
                         </div>
                         <div class="col-md-3">
                             <label for="bed" class="form-label">
                                 <i class="bi bi-hospital"></i>
                                 Bed
                             </label>
-                            <input type="text" class="form-control" id="bed" name="bed">
+                            <input type="text" class="form-control" id="bed_text" name="bed">
                         </div>
                         <div class="col-md-3">
                             <label for="discharge_time" class="form-label">
                                 <i class="bi bi-clock"></i>
                                 Discharge Time
                             </label>
-                            <input type="time" class="form-control" id="discharge_time" name="discharge_time">
+                            <input type="time" class="form-control" id="discharge_time_text" name="discharge_time">
                         </div>
 
                         <div class="col-md-3">
@@ -388,7 +389,7 @@
                                 <i class="bi bi-calendar-event"></i>
                                 Discharge Date <span class="required">*</span>
                             </label>
-                            <input type="date" class="form-control" id="discharge_date" name="discharge_date"
+                            <input type="date" class="form-control" id="discharge_date_text" name="discharge_date"
                                 required>
                         </div>
 
@@ -399,7 +400,7 @@
                                 <i class="bi bi-clock-history"></i>
                                 Admit Time
                             </label>
-                            <input type="time" class="form-control" id="admit_time" name="admit_time" readonly>
+                            <input type="time" class="form-control" id="admit_time_text" name="admit_time" readonly>
                         </div>
                     </div>
 
@@ -416,7 +417,7 @@
                                 <i class="bi bi-calendar3"></i>
                                 Age
                             </label>
-                            <input type="text" class="form-control" id="age" name="age" step="0.01">
+                            <input type="text" class="form-control" id="age_text" name="age" step="0.01">
                         </div>
 
                         <div class="col-md-2">
@@ -424,7 +425,7 @@
                                 <i class="bi bi-gender-ambiguous"></i>
                                 Gender
                             </label>
-                            <select class="form-select" id="gender" name="gender">
+                            <select class="form-select" id="gender_text" name="gender">
                                 <option value="">Select</option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
@@ -437,7 +438,7 @@
                                 <i class="bi bi-telephone"></i>
                                 Phone
                             </label>
-                            <input type="tel" class="form-control" id="phone" name="phone">
+                            <input type="tel" class="form-control" id="phone_text" name="phone">
                         </div>
 
                         <div class="col-md-4">
@@ -445,7 +446,7 @@
                                 <i class="bi bi-heart"></i>
                                 Marital Status
                             </label>
-                            <select class="form-select" id="marital_status" name="marital_status">
+                            <select class="form-select" id="marital_status_text" name="marital_status">
                                 <option value="">Select</option>
                                 <option value="Married">Married</option>
                                 <option value="Single">Single</option>
@@ -459,7 +460,7 @@
                                 <i class="bi bi-geo-alt"></i>
                                 Address
                             </label>
-                            <textarea class="form-control" id="address" name="address" rows="3"></textarea>
+                            <textarea class="form-control" id="address_text" name="address" rows="3"></textarea>
                         </div>
 
                         <div class="col-md-4">
@@ -467,7 +468,7 @@
                                 <i class="bi bi-calendar-check"></i>
                                 Admission Date
                             </label>
-                            <input type="date" class="form-control" id="admission_date" name="admission_date">
+                            <input type="date" class="form-control" id="admission_date_text" name="admission_date">
                         </div>
 
                         <div class="col-md-4">
@@ -475,7 +476,7 @@
                                 <i class="bi bi-person-check"></i>
                                 W/O S/O D/O
                             </label>
-                            <input type="text" class="form-control" id="guardian" name="guardian">
+                            <input type="text" class="form-control" id="guardian_text" name="guardian">
                         </div>
 
                         <div class="col-md-4">
@@ -483,7 +484,7 @@
                                 <i class="bi bi-people"></i>
                                 Relation
                             </label>
-                            <input type="text" class="form-control" id="relation" name="relation">
+                            <input type="text" class="form-control" id="relation_text" name="relation">
                         </div>
 
                         <div class="col-md-4">
@@ -491,7 +492,7 @@
                                 <i class="bi bi-flag"></i>
                                 Nationality
                             </label>
-                            <input type="text" class="form-control" id="nationality" name="nationality">
+                            <input type="text" class="form-control" id="nationality_text" name="nationality">
                         </div>
 
                         <div class="col-md-6">
@@ -499,7 +500,8 @@
                                 <i class="bi bi-person-badge"></i>
                                 Under Care Dr
                             </label>
-                            <input type="text" class="form-control" id="under_care_dr" name="under_care_dr">
+                            <input type="text" class="form-control" id="under_care_dr_text" name="under_care_dr">
+                            <input type="hidden" class="form-control" id="registration_no_text" name="registration_no">
                         </div>
 
                         <div class="col-md-6">
@@ -507,7 +509,7 @@
                                 <i class="bi bi-arrow-right-circle"></i>
                                 Referral
                             </label>
-                            <input type="text" class="form-control" id="referral" name="referral">
+                            <input type="text" class="form-control" id="referral_text" name="referral">
                         </div>
 
                         <div class="col-md-12">
@@ -515,7 +517,7 @@
                                 <i class="bi bi-building"></i>
                                 Corporate
                             </label>
-                            <input type="text" class="form-control" id="corporate" name="corporate">
+                            <input type="text" class="form-control" id="corporate_text" name="corporate">
                         </div>
                     </div>
 
@@ -532,7 +534,7 @@
                                 <i class="bi bi-clipboard-check"></i>
                                 Discharge Type
                             </label>
-                            <select class="form-select" id="reason_discharge" name="reason_discharge" required>
+                            <select class="form-select" id="reason_discharge_text" name="reason_discharge" required>
                                 <option value="">Select</option>
                                 <option value="DORB">DORB</option>
                                 <option value="Transfer To Higher Setup">Transfer To Higher Setup</option>
@@ -547,7 +549,7 @@
                                 <i class="bi bi-calendar-plus"></i>
                                 OT Date
                             </label>
-                            <input type="date" class="form-control" id="ot_date" name="ot_date">
+                            <input type="date" class="form-control" id="ot_date_text" name="ot_date">
                         </div>
 
                         <div class="col-md-4">
@@ -555,28 +557,28 @@
                                 <i class="bi bi-activity"></i>
                                 O.T Type
                             </label>
-                            <input type="text" class="form-control" id="ot_type" name="ot_type">
+                            <input type="text" class="form-control" id="ot_type_text" name="ot_type">
                         </div>
                         <div class="col-md-4">
                             <label for="ot_name" class="form-label">
                                 <i class="bi bi-activity"></i>
                                 O.T Name
                             </label>
-                            <input type="text" class="form-control" id="ot_name" name="ot_name">
+                            <input type="text" class="form-control" id="ot_name_text" name="ot_name">
                         </div>
                         <div class="col-md-2">
                             <label for="ot_done" class="form-label">
                                 <i class="bi bi-activity"></i>
                                 O.T Count
                             </label>
-                            <input type="number" class="form-control" id="ot_done" name="ot_done">
+                            <input type="number" class="form-control" id="ot_done_text" name="ot_done">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="ot_done_by">
                                 <i class="bi bi-person-badge-fill"></i>
                                 OT Done By
                             </label>
-                            <select multiple name="ot_done_by[]" id="ot_done_by" class="form-select p-0">
+                            <select multiple name="ot_done_by[]" id="ot_done_by_text" class="form-select p-0">
                                 <option>select</option>
                             </select>
                         </div>
@@ -586,7 +588,7 @@
                                 <i class="bi bi-chat-left-text"></i>
                                 Remarks
                             </label>
-                            <textarea class="form-control" id="remarks" name="remarks" rows="3"></textarea>
+                            <textarea class="form-control" id="remarks_text" name="remarks" rows="3"></textarea>
                         </div>
                     </div>
 
@@ -603,7 +605,7 @@
                                 <i class="bi bi-clipboard2-pulse"></i>
                                 Diagnosis
                             </label>
-                            <textarea class="form-control" id="diagnosis" name="diagnosis" rows="6"></textarea>
+                            <textarea class="form-control" id="diagnosis_text" name="diagnosis" rows="6"></textarea>
                         </div>
 
                         <div class="col-md-12">
@@ -611,21 +613,28 @@
                                 <i class="bi bi-clipboard-data"></i>
                                 Present Complaints (Reason for Admission)
                             </label>
-                            <textarea class="form-control" id="present_complaints" name="present_complaints" rows="4"></textarea>
+                            <textarea class="form-control" id="present_complaints_text" name="present_complaints" rows="4"></textarea>
                         </div>
                         <div class="col-md-12">
                             <label for="ot_note" class="form-label">
                                 <i class="bi bi-clipboard-data"></i>
                                 Treatment Done / OT Note
                             </label>
-                            <textarea class="form-control" id="ot_note" name="ot_note" rows="4"></textarea>
+                            <textarea class="form-control" id="ot_note_text" name="ot_note" rows="4"></textarea>
+                        </div>
+                        <div class="col-md-12">
+                            <label for="course_in_hospital" class="form-label">
+                                <i class="bi bi-clipboard-data"></i>
+                                Course in hospital
+                            </label>
+                            <textarea class="form-control" id="course_in_hospital_text" name="course_in_hospital" rows="4"></textarea>
                         </div>
                         <div class="col-md-12">
                             <label for="discharge_advice" class="form-label">
                                 <i class="bi bi-clipboard-data"></i>
                                 Discharge Advice
                             </label>
-                            <textarea class="form-control" id="discharge_advice" name="discharge_advice" rows="4"></textarea>
+                            <textarea class="form-control" id="discharge_advice_text" name="discharge_advice" rows="4"></textarea>
                         </div>
                     </div>
 
@@ -642,7 +651,7 @@
                                 <i class="bi bi-person-check-fill"></i>
                                 Discharged By
                             </label>
-                            <input type="text" class="form-control" id="discharged_by" name="discharged_by">
+                            <input type="text" class="form-control" id="discharged_by_text" name="discharged_by">
                         </div>
 
                         <div class="col-md-6">
@@ -650,7 +659,7 @@
                                 <i class="bi bi-person-circle"></i>
                                 Current User
                             </label>
-                            <input type="text" class="form-control" id="current_user" name="current_user">
+                            <input type="text" class="form-control" id="current_user_text" name="current_user">
                         </div>
                     </div>
                     <!-- Action Buttons -->
@@ -680,21 +689,28 @@
 </script> --}}
 <script>
     ClassicEditor
-        .create(document.querySelector('#diagnosis'))
+        .create(document.querySelector('#diagnosis_text'))
         .catch(error => {
             console.error(error);
         });
 </script>
 <script>
     ClassicEditor
-        .create(document.querySelector('#discharge_advice'))
+        .create(document.querySelector('#discharge_advice_text'))
         .catch(error => {
             console.error(error);
         });
 </script>
 <script>
     ClassicEditor
-        .create(document.querySelector('#ot_note'))
+        .create(document.querySelector('#ot_note_text'))
+        .catch(error => {
+            console.error(error);
+        });
+</script>
+<script>
+    ClassicEditor
+        .create(document.querySelector('#course_in_hospital_text'))
         .catch(error => {
             console.error(error);
         });
@@ -710,6 +726,8 @@
 
             // 🔹 Parse data attributes
             const ipd = JSON.parse(button.getAttribute('data-ipd') || '{}');
+            console.log(ipd);
+
             const doctors = JSON.parse(button.getAttribute('data-doctors') || '[]');
             const currentUser = JSON.parse(button.getAttribute('data-user') || '{}')
             window.currentUser = currentUser.role
@@ -717,31 +735,33 @@
             document.getElementById('ipd-id').value = ipd.id ?? '';
 
             // 🔹 Basic Information
-            setValue('patient_name', ipd.patient?.patient_name);
-            setValue('admission_no', ipd.ipd_no);
+            setValue('patient_id_text', ipd.patient?.id);
+            setValue('patient_name_text', ipd.patient?.patient_name);
+            setValue('admission_no_text', ipd.ipd_no);
             // setValue('admission_no', ipd.admission_no);
-            setValue('bed', `${ipd.bed_detail?.name} - ${ipd.bed_group?.name}`);
+            setValue('bed_text', `${ipd.bed_detail?.name} - ${ipd.bed_group?.name}`);
 
             // setValue('admission_date', ipd.admission_date);
             // setValue('admit_time', ipd.admit_time);
 
             // 🔹 Patient Details
-            setValue('age',
+            setValue('age_text',
                 `${ipd.patient?.age} Years ${ipd.patient?.month} Months ${ipd.patient?.day} Days`);
-            setSelectValue('gender', ipd.patient?.gender);
-            setValue('phone', ipd.patient?.mobileno);
-            setSelectValue('marital_status', ipd.patient?.marital_status);
-            setValue('address', ipd.patient?.address);
+            setSelectValue('gender_text', ipd.patient?.gender);
+            setValue('phone_text', ipd.patient?.mobileno);
+            setSelectValue('marital_status_text', ipd.patient?.marital_status);
+            setValue('address_text', ipd.patient?.address);
 
-            setValue('guardian', ipd.patient?.guardian_name);
-            setValue('nationality', "Indian");
-            setValue('admission_date', formatDateYYYYMMDD(ipd.date));
-            setValue('admit_time', getTimeOnly(ipd.date));
+            setValue('guardian_text', ipd.patient?.guardian_name);
+            setValue('nationality_text', "Indian");
+            setValue('admission_date_text', formatDateYYYYMMDD(ipd.date));
+            setValue('admit_time_text', getTimeOnly(ipd.date));
 
             // 🔹 Medical
-            setValue('under_care_dr', ipd.doctor?.name);
-            setValue('discharged_by', currentUser.username);
-            setValue('current_user', currentUser.user_role.name);
+            setValue('under_care_dr_text', `${ipd.doctor?.name} ${ipd.doctor?.surname}`);
+            setValue('registration_no_text', ipd.doctor?.registration_no);
+            setValue('discharged_by_text', currentUser.username);
+            setValue('current_user_text', currentUser.user_role.name);
             // setValue('corporate', ipd.corporate);
 
             // 🔹 OT Done By (MULTI SELECT)
@@ -754,7 +774,7 @@
             //     option.textContent = doc.name;
             //     otSelect.appendChild(option);
             // });
-            new TomSelect('#ot_done_by', {
+            new TomSelect('#ot_done_by_text', {
                 options: doctors.map(doc => ({
                     value: `${doc.name} ${doc.surname}`,
                     label: `${doc.name} ${doc.surname}`
@@ -772,10 +792,10 @@
             const now = new Date();
             now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
 
-            document.getElementById('discharge_date').value =
+            document.getElementById('discharge_date_text').value =
                 now.toISOString().split('T')[0];
 
-            document.getElementById('discharge_time').value =
+            document.getElementById('discharge_time_text').value =
                 now.toISOString().split('T')[1].slice(0, 5);
         });
 
