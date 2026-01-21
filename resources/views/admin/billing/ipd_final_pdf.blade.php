@@ -427,6 +427,11 @@
                                     @endif
                                 </td>
                             </tr>
+                            <tr>
+                                <td class="patient_label">Phone No.</td>
+                                <td class="patient_colon">:</td>
+                                <td class="patient_value">{{ $ipd->patient && $ipd->patient->mobileno ? $ipd->patient->mobileno : 'N/A' }}</td>
+                            </tr>
                             @if($ipd->doctor)
                             <tr>
                                 <td class="patient_label">Under Doctor</td>
