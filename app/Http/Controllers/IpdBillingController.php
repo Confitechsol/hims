@@ -619,20 +619,23 @@ class IpdBillingController extends Controller
             $ipd = IpdDetail::findOrFail($ipdId);
             
             $isDischarged = $ipd->discharged == 'yes';
-            $hasDischargeDate = !empty($ipd->discharged_date);
+            
+            // Get discharge card to check discharge date
+            $dischargeCard = DischargeCard::where('ipd_details_id', $ipdId)->first();
+            $hasDischargeDate = $dischargeCard && !empty($dischargeCard->discharge_date);
             
             $message = '';
             if (!$isDischarged) {
                 $message = 'Patient is not discharged. Please discharge the patient first before generating final bill.';
             } elseif (!$hasDischargeDate) {
-                $message = 'Patient is discharged but discharge date is missing. Please update the discharge date before generating final bill.';
+                $message = 'Patient is discharged but discharge date is missing in discharge card. Please update the discharge card before generating final bill.';
             } else {
                 $message = 'Patient is discharged. Final bill can be generated.';
             }
             
             return response()->json([
                 'discharged' => $isDischarged && $hasDischargeDate,
-                'discharged_date' => $ipd->discharged_date,
+                'discharged_date' => $dischargeCard ? $dischargeCard->discharge_date : null,
                 'has_discharge_date' => $hasDischargeDate,
                 'message' => $message
             ]);
@@ -667,12 +670,21 @@ class IpdBillingController extends Controller
                 abort(400, 'Final bill can only be generated for discharged patients. Please discharge the patient first.');
             }
 
-            // Check if discharge date exists, if not use current date as fallback
-            if (!$ipd->discharged_date) {
-                \Log::warning('Discharge date missing for IPD', ['ipd_id' => $ipdId, 'ipd_no' => $ipd->ipd_no]);
-                // Use current date as fallback instead of aborting
-                $ipd->discharged_date = now()->toDateString();
+            // Get discharge date and time from discharge_card table
+            \Log::info('Getting discharge card information');
+            $dischargeCard = DischargeCard::where('ipd_details_id', $ipdId)->first();
+            
+            if (!$dischargeCard || !$dischargeCard->discharge_date) {
+                abort(400, 'Discharge card not found or discharge date is missing. Please ensure the patient has a discharge card with discharge date.');
             }
+            
+            $dischargeDate = $dischargeCard->discharge_date;
+            $dischargeTime = $dischargeCard->discharge_time;
+            
+            \Log::info('Discharge information retrieved', [
+                'discharge_date' => $dischargeDate,
+                'discharge_time' => $dischargeTime
+            ]);
 
             \Log::info('Calculating breakup');
             $breakup = $this->calculateBreakup($ipdId);
@@ -743,17 +755,7 @@ class IpdBillingController extends Controller
             // You can modify this logic based on your business requirements
             $billNumber = 'F-' . str_pad($ipd->id, 6, '0', STR_PAD_LEFT) . '/' . $yearRange;
 
-            // Get discharge date and time from ipd_details table (discharged_date field)
-            // Also check discharge_card for discharge_time if available
-            $dischargeDate = $ipd->discharged_date;
-            $dischargeTime = null;
-            
-            // Try to get discharge time from discharge_card table if available
-            $dischargeCard = DischargeCard::where('ipd_details_id', $ipdId)->first();
-            if ($dischargeCard && $dischargeCard->discharge_time) {
-                $dischargeTime = $dischargeCard->discharge_time;
-            }
-            
+            // Discharge date and time are already retrieved from discharge_card above
             $billDate = $dischargeDate ?? now();
 
             // Calculate discount (if any)
