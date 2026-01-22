@@ -431,7 +431,7 @@ function loadBirthCertDesign(birthId) {
     </div>
     </div>
     </div>
-    <x-modals.birth-modal type="add" id="createModal" class="modal-fullscreen" title="Add Birth Record" action="{{ route('birth.create') }}"
+    <x-modals.birth-modal type="add" id="createModal" title="Add Birth Record" action="{{ route('birth.create') }}"
         :fields="[
             [
                 'name' => 'child_name',
@@ -449,13 +449,14 @@ function loadBirthCertDesign(birthId) {
             ['name' => 'contact_person_phone', 'label' => 'Phone','required' => true, 'type' => 'text',  'size' => '6'],
             ['name' => 'address', 'label' => 'Address', 'type' => 'text',  'size' => '12'],
             ['name' => 'caseId', 'label' => 'Case Id', 'type' => 'text',  'size' => '6'],
-            ['name' => 'patient_id', 'label' => 'Patient Id', 'type' => 'text',  'size' => '6'],
+            ['name' => 'patient_id', 'label' => 'Patient', 'type' => 'select', 'required' => true, 'class'=>'select2-input', 'options' => $patients->pluck('patient_name','id')->toArray(),  'size' => '6'],
            [
                 'name' => 'mother_name',
                 'label' => 'Mother Name ',
                 'type' => 'text',
                 'required' => true,
                 'size' => '5',
+                'readonly'=>true
             ],
             {{-- [
                 'name' => 'mother_address',
@@ -582,5 +583,20 @@ function loadBirthCertDesign(birthId) {
         ]" :columns="3" />
 
    
+@section('script')
+<script>
+$(document).on('shown.bs.modal', '#createModal', function() {
+$('#createModal select[name="patient_id"]').on('change',function(){
+    if($(this).val()){
+const data = $(this).select2('data');
+$('#createModal input[name="mother_name"]').val(data[0].text);
+    }
+    else{
+        $('#createModal input[name="mother_name"]').val("");
+    }
 
+});
+});
+</script>
+@endsection
 @endsection()

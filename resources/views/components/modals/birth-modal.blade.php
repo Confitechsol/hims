@@ -10,7 +10,7 @@
     'fileTypes'
 ])
 
-<div class="modal fade" id="{{ $id }}" tabindex="-1" aria-hidden="true">
+<div class="modal fade use-select2" id="{{ $id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <form action="{{ $action }}" method="POST" id="{{ $id }}-form" enctype="multipart/form-data">
@@ -49,7 +49,7 @@
                                         @endif
                                     </label>
                                     @if ($field['type'] === 'select')
-                                        <select name="{{ $field['name'] }}" id="{{ $field['name'] }}" class="form-select" data-field="{{ $field['name'] }}"
+                                        <select name="{{ $field['name'] }}" id="{{ $field['name'] }}" class="form-select {{ isset($field['class']) ? $field['class'] : '' }}" data-field="{{ $field['name'] }}"
                                         @if (!empty($field['required'])) required @endif
                                         >
                                             <option value="">Select {{ $field['label'] }}</option>
