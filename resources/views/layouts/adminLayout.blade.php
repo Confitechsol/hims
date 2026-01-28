@@ -786,7 +786,7 @@
 
         $(document).on('shown.bs.modal', '.use-select2', function() {
             const $modal = $(this);
-
+            const $modalBody = $modal.find('.modal-body');
             $modal.find('.select2-input').each(function() {
                 const $select = $(this);
 
@@ -797,7 +797,7 @@
                 const oldValue = $select.val();
 
                 $select.select2({
-                    dropdownParent: $modal,
+                    dropdownParent: $modalBody,
                     width: '100%'
                 });
                 if (oldValue) {

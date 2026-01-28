@@ -10,6 +10,7 @@ use App\Models\RadiologyBilling;
 use App\Models\Transaction;
 use App\Models\DoctorVisit;
 use App\Models\Hospital;
+use App\Models\DischargeCard;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -24,12 +25,8 @@ class IpdBillingController extends Controller
     {
         $search = $request->get('search', '');
         
-        // If no search term, return all active IPD patients (for initial load)
-        $query = IpdDetail::with(['patient', 'doctor'])
-            ->where(function($q) {
-                $q->where('discharged', '!=', 'yes')
-                  ->orWhereNull('discharged');
-            });
+        // Include all IPD patients (both discharged and non-discharged) for billing purposes
+        $query = IpdDetail::with(['patient', 'doctor']);
 
         // Apply search filter if provided
         if (!empty($search)) {
@@ -42,17 +39,21 @@ class IpdBillingController extends Controller
             });
         }
 
-        $ipdPatients = $query->limit(100)->get();
+        $ipdPatients = $query->orderBy('date', 'desc')->limit(100)->get();
 
         $data = $ipdPatients->map(function($ipd) {
             $patient = $ipd->patient;
+            $isDischarged = $ipd->discharged == 'yes';
+            $dischargeStatus = $isDischarged ? ' (Discharged)' : '';
             
             return [
                 'id' => $ipd->id,
                 'ipd_no' => $ipd->ipd_no ?? 'N/A',
                 'patient_name' => $patient->patient_name ?? 'N/A',
                 'phone' => $patient->mobileno ?? '',
-                'display_text' => ($ipd->ipd_no ?? 'N/A') . ' - ' . ($patient->patient_name ?? 'N/A'),
+                'discharged' => $isDischarged,
+                'discharged_date' => $ipd->discharged_date,
+                'display_text' => ($ipd->ipd_no ?? 'N/A') . ' - ' . ($patient->patient_name ?? 'N/A') . $dischargeStatus,
             ];
         });
 
@@ -610,56 +611,137 @@ class IpdBillingController extends Controller
     }
 
     /**
+     * Check if IPD patient is discharged (for AJAX check before generating final bill)
+     */
+    public function checkDischarged($ipdId)
+    {
+        try {
+            $ipd = IpdDetail::findOrFail($ipdId);
+            
+            $isDischarged = $ipd->discharged == 'yes';
+            
+            // Get discharge card to check discharge date
+            $dischargeCard = DischargeCard::where('ipd_details_id', $ipdId)->first();
+            $hasDischargeDate = $dischargeCard && !empty($dischargeCard->discharge_date);
+            
+            $message = '';
+            if (!$isDischarged) {
+                $message = 'Patient is not discharged. Please discharge the patient first before generating final bill.';
+            } elseif (!$hasDischargeDate) {
+                $message = 'Patient is discharged but discharge date is missing in discharge card. Please update the discharge card before generating final bill.';
+            } else {
+                $message = 'Patient is discharged. Final bill can be generated.';
+            }
+            
+            return response()->json([
+                'discharged' => $isDischarged && $hasDischargeDate,
+                'discharged_date' => $dischargeCard ? $dischargeCard->discharge_date : null,
+                'has_discharge_date' => $hasDischargeDate,
+                'message' => $message
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'discharged' => false,
+                'message' => 'Error checking discharge status: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Export Final Bill PDF
      */
     public function exportFinal($ipdId)
     {
         try {
+            \Log::info('exportFinal started', ['ipd_id' => $ipdId]);
+            
             $ipd = IpdDetail::with(['patient.organisation', 'doctor', 'bedGroup', 'bedDetail'])
                 ->findOrFail($ipdId);
+            
+            \Log::info('IPD found', ['ipd_no' => $ipd->ipd_no, 'discharged' => $ipd->discharged]);
 
+            // Check if patient exists
+            if (!$ipd->patient) {
+                abort(400, 'Patient information is missing for this IPD record.');
+            }
+
+            // Check if patient is discharged
+            if ($ipd->discharged != 'yes') {
+                abort(400, 'Final bill can only be generated for discharged patients. Please discharge the patient first.');
+            }
+
+            // Get discharge date and time from discharge_card table
+            \Log::info('Getting discharge card information');
+            $dischargeCard = DischargeCard::where('ipd_details_id', $ipdId)->first();
+            
+            if (!$dischargeCard || !$dischargeCard->discharge_date) {
+                abort(400, 'Discharge card not found or discharge date is missing. Please ensure the patient has a discharge card with discharge date.');
+            }
+            
+            $dischargeDate = $dischargeCard->discharge_date;
+            $dischargeTime = $dischargeCard->discharge_time;
+            
+            \Log::info('Discharge information retrieved', [
+                'discharge_date' => $dischargeDate,
+                'discharge_time' => $dischargeTime
+            ]);
+
+            \Log::info('Calculating breakup');
             $breakup = $this->calculateBreakup($ipdId);
+            \Log::info('Breakup calculated', ['total_charges' => $breakup['total_charges']]);
 
             // Get payment details
+            \Log::info('Getting payment details');
             $payments = Transaction::where('ipd_id', $ipdId)
                 ->where('type', 'payment')
                 ->where('section', 'ipd')
                 ->orderBy('payment_date', 'asc')
-                ->get();
+                ->get() ?? collect();
 
             // Get detailed breakdown
+            \Log::info('Getting bed charges details');
             $bedChargesDetails = IpdDaywiseBedCharge::where('ipd_id', $ipdId)
                 ->where('is_active', 'yes')
                 ->with(['bedGroup', 'bed'])
                 ->orderBy('charge_date', 'asc')
-                ->get();
+                ->get() ?? collect();
 
+            \Log::info('Getting IPD charges details');
             $ipdChargesDetails = IpdCharges::where('ipd_id', $ipdId)
                 ->with(['charge', 'chargeCategory'])
                 ->orderBy('date', 'asc')
-                ->get();
+                ->get() ?? collect();
 
-            $pathologyDetails = collect();
-            if ($ipd->case_reference_id) {
-                $pathologyDetails = PathologyBilling::where('case_reference_id', $ipd->case_reference_id)
-                    ->with(['pathology'])
-                    ->orderBy('date', 'asc')
-                    ->get();
-            }
+            // Pathology Details - Get all tests with names (same logic as estimate)
+            \Log::info('Getting pathology details');
+            $pathologyDetails = PathologyBilling::where(function($query) use ($ipd) {
+                $query->where(function($q) use ($ipd) {
+                    $q->where('patient_id', $ipd->patient_id)
+                      ->whereDate('date', '>=', $ipd->date);
+                });
+                if ($ipd->case_reference_id) {
+                    $query->orWhere('case_reference_id', $ipd->case_reference_id);
+                }
+            })->orderBy('date', 'asc')->get() ?? collect();
 
-            $radiologyDetails = collect();
-            if ($ipd->case_reference_id) {
-                $radiologyDetails = RadiologyBilling::where('case_reference_id', $ipd->case_reference_id)
-                    ->with(['radiology'])
-                    ->orderBy('date', 'asc')
-                    ->get();
-            }
+            // Radiology Details - Get all tests with names (same logic as estimate)
+            \Log::info('Getting radiology details');
+            $radiologyDetails = RadiologyBilling::where(function($query) use ($ipd) {
+                $query->where(function($q) use ($ipd) {
+                    $q->where('patient_id', $ipd->patient_id)
+                      ->whereDate('date', '>=', $ipd->date);
+                });
+                if ($ipd->case_reference_id) {
+                    $query->orWhere('case_reference_id', $ipd->case_reference_id);
+                }
+            })->orderBy('date', 'asc')->get() ?? collect();
 
+            \Log::info('Getting doctor visit details');
             $doctorVisitDetails = DoctorVisit::where('patient_id', $ipd->patient_id)
-                ->where('visit_date', '>=', $ipd->date)
+                ->whereDate('visit_date', '>=', $ipd->date)
                 ->with(['doctor', 'charge'])
                 ->orderBy('visit_date', 'asc')
-                ->get();
+                ->get() ?? collect();
 
             // Get hospital information
             $hospital = Hospital::first();
@@ -673,8 +755,7 @@ class IpdBillingController extends Controller
             // You can modify this logic based on your business requirements
             $billNumber = 'F-' . str_pad($ipd->id, 6, '0', STR_PAD_LEFT) . '/' . $yearRange;
 
-            // Get discharge date
-            $dischargeDate = $ipd->discharged_date ?? ($ipd->discharged == 'yes' ? now() : null);
+            // Discharge date and time are already retrieved from discharge_card above
             $billDate = $dischargeDate ?? now();
 
             // Calculate discount (if any)
@@ -738,54 +819,102 @@ class IpdBillingController extends Controller
                        stripos($categoryName, 'Anesthesia') !== false;
             });
 
+            // Pathology Details - Get all tests with names (same as estimate)
+            \Log::info('Processing pathology test names', ['count' => $pathologyDetails->count()]);
+            $pathologyTestNames = [];
+            $pathologyTotal = 0;
+            
+            foreach ($pathologyDetails as $bill) {
+                try {
+                    $reports = DB::table('pathology_report')
+                        ->where('pathology_bill_id', $bill->id)
+                        ->join('pathology', 'pathology_report.pathology_id', '=', 'pathology.id')
+                        ->select('pathology.test_name', 'pathology_report.apply_charge')
+                        ->get();
+                    
+                    foreach ($reports as $report) {
+                        if ($report->test_name) {
+                            $pathologyTestNames[] = $report->test_name;
+                            $pathologyTotal += $report->apply_charge ?? 0;
+                        }
+                    }
+                } catch (\Exception $e) {
+                    \Log::warning('Error processing pathology bill', ['bill_id' => $bill->id, 'error' => $e->getMessage()]);
+                }
+            }
+            
+            // Use breakup totals if calculated totals are 0
+            if ($pathologyTotal == 0 && isset($breakup['pathology_charges'])) {
+                $pathologyTotal = $breakup['pathology_charges'];
+            }
+
+            // Radiology Details - Get all tests with names (same as estimate)
+            \Log::info('Processing radiology test names', ['count' => $radiologyDetails->count()]);
+            $radiologyTestNames = [];
+            $radiologyTotal = 0;
+            
+            foreach ($radiologyDetails as $bill) {
+                try {
+                    $reports = DB::table('radiology_report')
+                        ->where('radiology_bill_id', $bill->id)
+                        ->join('radio', 'radiology_report.radiology_id', '=', 'radio.id')
+                        ->select('radio.test_name', 'radiology_report.apply_charge')
+                        ->get();
+                    
+                    foreach ($reports as $report) {
+                        if ($report->test_name) {
+                            $radiologyTestNames[] = $report->test_name;
+                            $radiologyTotal += $report->apply_charge ?? 0;
+                        }
+                    }
+                } catch (\Exception $e) {
+                    \Log::warning('Error processing radiology bill', ['bill_id' => $bill->id, 'error' => $e->getMessage()]);
+                }
+            }
+            
+            // Use breakup totals if calculated totals are 0
+            if ($radiologyTotal == 0 && isset($breakup['radiology_charges'])) {
+                $radiologyTotal = $breakup['radiology_charges'];
+            }
+
             // Combine pathology and radiology as investigation charges
             $investigationCharges = $pathologyDetails->sum('total') + $radiologyDetails->sum('total');
 
-            // First pass: Render to get accurate page count
-            $tempPdf = Pdf::loadView('admin.billing.ipd_final_pdf', compact(
-                'ipd', 'breakup', 'bedChargesDetails', 'bedChargesGrouped', 'ipdChargesDetails',
-                'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'payments',
-                'hospital', 'billNumber', 'billDate', 'dischargeDate', 'discount',
-                'grandTotal', 'totalAdvance', 'balance', 'grandTotalInWords', 
-                'totalAdvanceInWords', 'balanceInWords', 'otCharges', 'medicineCharges',
-                'surgeonCharges', 'anesthesiaCharges', 'investigationCharges'
-            ));
-            
-            $tempPdf->setOption('enable-php', false);
-            $tempPdf->setOption('enable-local-file-access', true);
-            $tempPdf->setPaper('a4', 'portrait');
-            
-            // Render to get page count
-            $dompdf = $tempPdf->getDomPDF();
-            $dompdf->render();
-            
-            // Get total pages
-            try {
-                $canvas = $dompdf->getCanvas();
-                $totalPages = method_exists($canvas, 'get_page_count') ? $canvas->get_page_count() : $dompdf->get_page_count();
-            } catch (\Exception $e) {
-                $totalPages = $dompdf->get_page_count();
+            // Ensure arrays are initialized even if empty
+            if (empty($pathologyTestNames)) {
+                $pathologyTestNames = [];
             }
-            
-            if (!$totalPages || $totalPages <= 0) {
-                $totalPages = 1;
+            if (empty($radiologyTestNames)) {
+                $radiologyTestNames = [];
             }
 
-            // Second pass: Render with accurate page count
+            \Log::info('Starting PDF generation', [
+                'pathology_tests' => count($pathologyTestNames),
+                'radiology_tests' => count($radiologyTestNames)
+            ]);
+
+            // Set totalPages to 1 initially (will be calculated by PDF script)
+            $totalPages = 1;
+
+            // Generate PDF
+            \Log::info('Loading PDF view');
             $pdf = Pdf::loadView('admin.billing.ipd_final_pdf', compact(
                 'ipd', 'breakup', 'bedChargesDetails', 'bedChargesGrouped', 'ipdChargesDetails',
                 'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'payments',
-                'hospital', 'billNumber', 'billDate', 'dischargeDate', 'discount',
+                'hospital', 'billNumber', 'billDate', 'dischargeDate', 'dischargeTime', 'discount',
                 'grandTotal', 'totalAdvance', 'balance', 'grandTotalInWords', 
                 'totalAdvanceInWords', 'balanceInWords', 'otCharges', 'medicineCharges',
-                'surgeonCharges', 'anesthesiaCharges', 'investigationCharges', 'totalPages'
+                'surgeonCharges', 'anesthesiaCharges', 'investigationCharges', 'totalPages',
+                'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal'
             ));
             
+            \Log::info('PDF view loaded, setting options');
             $pdf->setOption('enable-php', true);
             $pdf->setOption('isPhpEnabled', true);
             $pdf->setOption('enable-local-file-access', true);
             $pdf->setPaper('a4', 'portrait');
 
+            \Log::info('PDF generated successfully, returning download');
             return $pdf->download('IPD_Final_Bill_' . $ipd->ipd_no . '.pdf');
         } catch (\Exception $e) {
             \Log::error('Error in exportFinal: ' . $e->getMessage(), [
@@ -794,7 +923,20 @@ class IpdBillingController extends Controller
                 'line' => $e->getLine(),
                 'ipd_id' => $ipdId
             ]);
-            abort(500, 'Error generating PDF: ' . $e->getMessage() . ' (Check logs for details)');
+            
+            // Return a user-friendly error message
+            $errorMessage = 'Error generating final bill PDF. ';
+            $errorMessage .= 'Please check the logs for details or contact support.';
+            $errorMessage .= ' Error: ' . $e->getMessage();
+            
+            if (request()->expectsJson() || request()->wantsJson()) {
+                return response()->json([
+                    'error' => true,
+                    'message' => $errorMessage
+                ], 500);
+            }
+            
+            abort(500, $errorMessage);
         }
     }
 }

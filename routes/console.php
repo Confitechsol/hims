@@ -14,5 +14,6 @@ Schedule::command('ipd:calculate-bed-charges')
     ->timezone('Asia/Kolkata') // Adjust to your server timezone
     ->withoutOverlapping()
     ->runInBackground()
-    ->onOneServer() // If using multiple servers, ensure only one runs
-    ->appendOutputTo(storage_path('logs/bed-charges-scheduler.log'));
+    // Removed onOneServer() to avoid cache dependency issues
+    ->appendOutputTo(storage_path('logs/bed-charges-scheduler.log'))
+    ->emailOutputOnFailure(env('ADMIN_EMAIL', null)); // Optional: email on failure

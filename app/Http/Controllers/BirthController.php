@@ -51,8 +51,9 @@ class BirthController extends Controller
         $birthReports = $query->paginate($perPage);
         $doctors = Doctor::where('is_active',1)->select('id','name')->get();
         $hospital = Hospital::where('is_active',1)->select('hospital_id','name')->first();
+        $patients = Patient::where('gender','Female')->get();
     // return response()->json($birthReports, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
-     return view('admin.birthordeath.index', compact('birthReports','doctors','hospital'));
+     return view('admin.birthordeath.index', compact('birthReports','doctors','hospital','patients'));
 
 //     return response()->json([
 //     'birthReports' => $birthReports,
@@ -65,6 +66,7 @@ class BirthController extends Controller
     public function create(Request $request)
     {
         $validated = $request->validate([
+            'patient_id' => 'required',
             'child_name' => 'required|string|max:255',
             'gender' => 'required|string|max:10',
             'weight' => 'required|string|max:20',
@@ -119,8 +121,9 @@ class BirthController extends Controller
                 // Keep the existing image from DB
                 $report_image = null;
             }
-
+        $mother =  Patient::where('id',$validated['patient_id'])->first();
         BirthReport::create([
+            'patient_id' => $validated['patient_id'],
             'child_name' => $validated['child_name'],
             'gender' => $validated['gender'],
             'weight' => $validated['weight'],
@@ -128,7 +131,7 @@ class BirthController extends Controller
             'contact' => $validated['contact_person_phone'] ?? null,
             'address' => $validated['address'] ?? null,
             'case_reference_id' => $validated['caseId'] ?? null,
-            'mother_name' => $validated['mother_name'],
+            'mother_name' => $mother->patient_name,
             'father_name' => $validated['father_name'],
             'birth_report' => $validated['report'] ?? null,
             'child_pic' => $baby_image,
