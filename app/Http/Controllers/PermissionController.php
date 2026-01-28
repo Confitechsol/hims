@@ -35,44 +35,44 @@ public function permissionsOld(Role $role)
         'roleId' => $role->id,
     ]);
 }
-public function permissions(Role $role)
-{
-    $permissionGroups = PermissionGroup::with(['categories.rolePermissions' => function($q) use ($role) {
-        $q->where('role_id', $role->id);
-    }])->where('is_active', 1)->get();
+    public function permissions(Role $role)
+    {
+        $permissionGroups = PermissionGroup::with(['categories.rolePermissions' => function($q) use ($role) {
+            $q->where('role_id', $role->id);
+        }])->where('is_active', 1)->get();
 
-    return view('admin.setup.permissions', [
-        'permissionGroups' => $permissionGroups,
-        'role' => $role,
-        'roleId' => $role->id,
-    ]);
-}
-public function savePermissions(Request $request)
-{
-    $roleId = $request->role_id;
-    $permissions = $request->permissions; // array from checkboxes
-
-    foreach ($permissions as $permCatId => $types) {
-        RolesPermission::updateOrCreate(
-            [
-                'role_id' => $roleId,
-                'perm_cat_id' => $permCatId,
-                'hospital_id' => auth()->user()->hospital_id ?? null,
-            ],
-            [
-                'can_view'   => in_array('can_view', $types),
-                'can_add'    => in_array('can_add', $types),
-                'can_edit'   => in_array('can_edit', $types),
-                'can_delete' => in_array('can_delete', $types),
-            ]
-        );
+        return view('admin.setup.permissions', [
+            'permissionGroups' => $permissionGroups,
+            'role' => $role,
+            'roleId' => $role->id,
+        ]);
     }
+    public function savePermissions(Request $request)
+    {
+        $roleId = $request->role_id;
+        $permissions = $request->permissions; // array from checkboxes
 
-    return response()->json([
-        'success' => true,
-        'message' => 'Permissions saved successfully.'
-    ]);
-}
+        foreach ($permissions as $permCatId => $types) {
+            RolesPermission::updateOrCreate(
+                [
+                    'role_id' => $roleId,
+                    'perm_cat_id' => $permCatId,
+                    'hospital_id' => auth()->user()->hospital_id ?? null,
+                ],
+                [
+                    'can_view'   => in_array('can_view', $types),
+                    'can_add'    => in_array('can_add', $types),
+                    'can_edit'   => in_array('can_edit', $types),
+                    'can_delete' => in_array('can_delete', $types),
+                ]
+            );
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Permissions saved successfully.'
+        ]);
+    }
 
 
 
