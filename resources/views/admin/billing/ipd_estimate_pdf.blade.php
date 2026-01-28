@@ -299,6 +299,28 @@
             margin: 10px 0 5px 0;
             text-transform: uppercase;
         }
+
+        .payment-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 9px;
+        }
+
+        .payment-table th {
+            background-color: transparent;
+            color: #000;
+            padding: 5px;
+            text-align: left;
+            border: 1px solid #282828;
+            font-weight: 700;
+        }
+
+        .payment-table td {
+            padding: 4px 5px;
+            border: 1px solid #282828;
+            background-color: transparent;
+        }
     </style>
 </head>
 <body>
@@ -601,6 +623,46 @@
                 <tr style="font-weight: bold;">
                     <td colspan="3" class="text-right">Subtotal:</td>
                     <td class="text-right">Rs. {{ number_format($breakup['doctor_visit_charges'], 2) }}</td>
+                </tr>
+            </tbody>
+        </table>
+        @endif
+
+        <!-- Payment Details -->
+        @if(isset($payments) && $payments->count() > 0)
+        <div class="section-title">Payment Details</div>
+        <table class="payment-table">
+            <thead>
+                <tr>
+                    <th>Payment Date</th>
+                    <th>Receipt No.</th>
+                    <th>Payment Mode</th>
+                    <th class="text-right">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($payments as $payment)
+                <tr>
+                    <td>{{ \Carbon\Carbon::parse($payment->payment_date ?? $payment->created_at)->format('d-m-Y') }}</td>
+                    <td>R/{{ str_pad($payment->id, 6, '0', STR_PAD_LEFT) }}</td>
+                    <td>
+                        @php
+                            $paymentMode = $payment->payment_mode ?? null;
+                            if ($paymentMode == '1' || $paymentMode === 1) {
+                                echo 'Cash';
+                            } elseif (!empty($paymentMode)) {
+                                echo $paymentMode;
+                            } else {
+                                echo 'N/A';
+                            }
+                        @endphp
+                    </td>
+                    <td class="text-right">Rs. {{ number_format($payment->amount, 2) }}</td>
+                </tr>
+                @endforeach
+                <tr style="font-weight: bold;">
+                    <td colspan="3" class="text-right">Total Payments:</td>
+                    <td class="text-right">Rs. {{ number_format($breakup['total_payments'] ?? 0, 2) }}</td>
                 </tr>
             </tbody>
         </table>

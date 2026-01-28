@@ -53,6 +53,20 @@
                             </div>
                         </div>
 
+                        {{-- Hospital Landlines --}}
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Hospital Landline 1</label>
+                                <input type="text" class="form-control" name="hospital_landline_1"
+                                    value="{{ $hospital->hospital_landline_1 ?? '' }}" placeholder="Enter landline number">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Hospital Landline 2</label>
+                                <input type="text" class="form-control" name="hospital_landline_2"
+                                    value="{{ $hospital->hospital_landline_2 ?? '' }}" placeholder="Enter landline number">
+                            </div>
+                        </div>
+
                         <hr>
 
                         {{-- Logos --}}

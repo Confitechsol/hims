@@ -32,6 +32,8 @@ class ProfileController extends Controller
         $hospital->hospital_id    = $request->hospital_code;
         $hospital->address        = $request->address;
         $hospital->phone          = $request->phone;
+        $hospital->hospital_landline_1 = $request->hospital_landline_1;
+        $hospital->hospital_landline_2 = $request->hospital_landline_2;
         $hospital->email          = $request->email;
         $hospital->languages      = $request->language;
         $hospital->date_format    = $request->date_format;
@@ -83,6 +85,8 @@ class ProfileController extends Controller
         $hospital->hospital_id    = $request->hospital_code; // assuming hospital_id is the code
         $hospital->address        = $request->address;
         $hospital->phone          = $request->phone;
+        $hospital->hospital_landline_1 = $request->hospital_landline_1;
+        $hospital->hospital_landline_2 = $request->hospital_landline_2;
         $hospital->email          = $request->email;
         $hospital->languages      = $request->language;
         $hospital->date_format    = $request->date_format;

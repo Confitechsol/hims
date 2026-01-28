@@ -683,7 +683,18 @@
                 <tr>
                     <td>{{ \Carbon\Carbon::parse($payment->payment_date ?? $payment->created_at)->format('d-m-Y') }}</td>
                     <td>R/{{ str_pad($payment->id, 6, '0', STR_PAD_LEFT) }}</td>
-                    <td>{{ $payment->payment_mode ?? 'N/A' }}</td>
+                    <td>
+                        @php
+                            $paymentMode = $payment->payment_mode ?? null;
+                            if ($paymentMode == '1' || $paymentMode === 1) {
+                                echo 'Cash';
+                            } elseif (!empty($paymentMode)) {
+                                echo $paymentMode;
+                            } else {
+                                echo 'N/A';
+                            }
+                        @endphp
+                    </td>
                     <td class="text-right">Rs. {{ number_format($payment->amount, 2) }}</td>
                 </tr>
                 @endforeach
