@@ -9,9 +9,28 @@ use Illuminate\Http\Request;
 
 class PathologyController extends Controller
 {
-    public function pathologyCategories()
+    public function pathologyCategories(Request $request)
     {
-        $categories = PathologyCategory::all();
+        $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
+
+    $search = $request->input('search');
+    $query = PathologyCategory::query();
+
+    if (!empty($search)) {
+        $query->where(function ($q) use ($search) {
+            $q->where('category_name', 'like', "%{$search}%");
+             
+        });
+    }
+    $categories = $query->paginate($perPage);
+    //     return response()->json([
+    //     'status' => true,
+    //     'message' => 'Staff list fetched successfully',
+    //     'data' => $categories
+    // ]);
         return view('admin.setup.pathology_category', compact('categories'));
     }
     public function storeCategory(Request $request)
