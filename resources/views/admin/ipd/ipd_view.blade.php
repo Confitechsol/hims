@@ -3514,10 +3514,37 @@
                                                                                         data-placeholder="Enter Patient Name or Id…">
                                                                                         <option value="0">Select
                                                                                         </option>
-                                                                                        <option value="1">Cash
-                                                                                        </option>
+                                                                                        <option value="Cash">Cash</option>
+                                                                                        <option value="Cheque">Cheque</option>
+                                                                                        <option value="transfer_to_bank_account">Transfer to Bank Account</option>
+                                                                                        <option value="UPI">UPI</option>
+                                                                                        <option value="Online">Online</option>
+                                                                                        <option value="Other">Other</option>
                                                                                     </select>
                                                                                 </div>
+                                                                                <div class="row gy-3 mt-2" id="chequeFields" style="display: none;">
+                                                                                    <div class="col-md-6">
+                                                                                        <label for="cheque_no" class="form-label">
+                                                                                            Cheque No <span class="text-danger">*</span>
+                                                                                        </label>
+                                                                                        <input type="text" name="cheque_no" id="cheque_no" class="form-control">
+                                                                                    </div>
+
+                                                                                    <div class="col-md-6">
+                                                                                        <label for="cheque_date" class="form-label">
+                                                                                            Cheque Date <span class="text-danger">*</span>
+                                                                                        </label>
+                                                                                        <input type="date" name="cheque_date" id="cheque_date" class="form-control">
+                                                                                    </div>
+
+                                                                                    <!-- <div class="col-md-4">
+                                                                                        <label for="cheque_attachment" class="form-label">
+                                                                                            Attachment
+                                                                                        </label>
+                                                                                        <input type="file" name="cheque_attachment" id="cheque_attachment" class="form-control">
+                                                                                    </div> -->
+                                                                                </div>
+
                                                                                 <div class="col-md-6">
                                                                                     <label for="note"
                                                                                         class="form-label">Note
@@ -3526,12 +3553,12 @@
                                                                                 </div>
                                                                             </div>
 
-                                                                    </div>
-                                                                    <div class="modal-footer">
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary">Save</button>
-                                                                    </div>
-                                                                    </form>
+                                                                            </div>
+                                                                            <div class="modal-footer">
+                                                                                <button type="submit"
+                                                                                    class="btn btn-primary">Save</button>
+                                                                            </div>
+                                                                        </form>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -4501,6 +4528,23 @@
     <!-- Chart JS -->
     <script src="assets/plugins/chartjs/chart.min.js"></script>
     <script src="assets/plugins/chartjs/chart-data.js"></script>
+    <script>
+        document.getElementById('payment_mode').addEventListener('change', function () {
+            const chequeFields = document.getElementById('chequeFields');
+
+            if (this.value === 'Cheque') {
+                chequeFields.style.display = 'flex';
+                chequeFields.querySelectorAll('input').forEach(el => el.required = true);
+            } else {
+                chequeFields.style.display = 'none';
+                chequeFields.querySelectorAll('input').forEach(el => {
+                    el.required = false;
+                    el.value = '';
+                });
+            }
+        });
+    </script>
+
     <script>
         let operations = @json($operations); // All operations from DB
 

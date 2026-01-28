@@ -20,9 +20,11 @@ class TransactionController extends Controller
 
 
        Transaction::create([
-    'transaction_date' => $request->date,
+    'transaction_date' => $request->payment_date,
     'amount'           => $request->amount,
     'payment_mode'     => $request->payment_mode,
+    'cheque_no'        => $request->cheque_no,
+    'cheque_date'      => $request->cheque_date,
     'note'             => $request->note,
 
     'ipd_id'           => $request->ipd_id,
