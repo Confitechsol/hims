@@ -23,13 +23,32 @@ class RadiologyBillingController extends Controller
     /**
      * Display a listing of radiology bills
      */
-    public function index()
+    public function index(Request $request)
     {
-        $bills = RadiologyBilling::with(['patient', 'doctor'])
-            ->orderBy('id', 'desc')
-            ->paginate(15);
-        
-        return view('admin.radiology.billing.index', compact('bills'));
+
+    $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
+
+    $search = $request->input('search');
+    $query = RadiologyBilling::with(['patient', 'doctor'])
+        ->orderBy('id', 'desc');
+
+    if (!empty($search)) {
+        $query->where(function ($q) use ($search) {
+            $q->where('doctor_name', 'like', "%{$search}%");
+        });
+    }
+
+    $bills = $query->paginate($perPage);
+
+    //     return response()->json([
+    //     'status' => true,
+    //     'message' => 'Staff list fetched successfully',
+    //     'data' => $bills
+    // ]);
+       return view('admin.radiology.billing.index', compact('bills'));
     }
 
     /**
