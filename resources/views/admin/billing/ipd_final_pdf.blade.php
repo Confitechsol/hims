@@ -348,6 +348,13 @@
                         <p style="margin: 1px 0;"><strong>{{ $hospital->name ?? 'Hospital Name' }}</strong></p>
                         <p style="margin: 1px 0;">{{ $hospital->address ?? 'Hospital Address' }}</p>
                         <p style="margin: 1px 0;">Phone - {{ $hospital->phone ?? 'Phone Number' }}</p>
+                        @if(!empty($hospital->hospital_landline_1) || !empty($hospital->hospital_landline_2))
+                        <p style="margin: 1px 0;">Landline - 
+                            @if(!empty($hospital->hospital_landline_1)){{ $hospital->hospital_landline_1 }}@endif
+                            @if(!empty($hospital->hospital_landline_1) && !empty($hospital->hospital_landline_2)), @endif
+                            @if(!empty($hospital->hospital_landline_2)){{ $hospital->hospital_landline_2 }}@endif
+                        </p>
+                        @endif
                         <p style="margin: 1px 0;">E-mail: {{ $hospital->email ?? 'Email' }}</p>
                     </td>
                 </tr>
@@ -680,23 +687,39 @@
             </thead>
             <tbody>
                 @foreach($payments as $payment)
+                @php
+                    $paymentMode = $payment->payment_mode ?? null;
+                    $isCash = ($paymentMode == '1' || $paymentMode === 1 || strtolower($paymentMode) == 'cash');
+                    $paymentModeText = 'N/A';
+                    if ($paymentMode == '1' || $paymentMode === 1) {
+                        $paymentModeText = 'Cash';
+                    } elseif (!empty($paymentMode)) {
+                        $paymentModeText = $paymentMode;
+                    }
+                @endphp
                 <tr>
                     <td>{{ \Carbon\Carbon::parse($payment->payment_date ?? $payment->created_at)->format('d-m-Y') }}</td>
                     <td>R/{{ str_pad($payment->id, 6, '0', STR_PAD_LEFT) }}</td>
-                    <td>
-                        @php
-                            $paymentMode = $payment->payment_mode ?? null;
-                            if ($paymentMode == '1' || $paymentMode === 1) {
-                                echo 'Cash';
-                            } elseif (!empty($paymentMode)) {
-                                echo $paymentMode;
-                            } else {
-                                echo 'N/A';
-                            }
-                        @endphp
-                    </td>
+                    <td>{{ $paymentModeText }}</td>
                     <td class="text-right">Rs. {{ number_format($payment->amount, 2) }}</td>
                 </tr>
+                @if(!$isCash && ($payment->cheque_no || $payment->cheque_date || $payment->note))
+                <tr style="background-color: #f9f9f9;">
+                    <td colspan="4" style="padding-left: 30px; font-size: 8px;">
+                        @if($payment->cheque_no)
+                            <strong>Cheque No.:</strong> {{ $payment->cheque_no }}
+                        @endif
+                        @if($payment->cheque_date)
+                            @if($payment->cheque_no) | @endif
+                            <strong>Cheque Date:</strong> {{ \Carbon\Carbon::parse($payment->cheque_date)->format('d-m-Y') }}
+                        @endif
+                        @if($payment->note)
+                            @if($payment->cheque_no || $payment->cheque_date) | @endif
+                            <strong>Note:</strong> {{ $payment->note }}
+                        @endif
+                    </td>
+                </tr>
+                @endif
                 @endforeach
                 <tr style="font-weight: bold;">
                     <td colspan="3" class="text-right">Total Payments:</td>
