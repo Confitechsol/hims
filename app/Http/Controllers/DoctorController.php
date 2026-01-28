@@ -38,6 +38,11 @@ class DoctorController extends Controller
     }
 
     $doctors = $query->paginate($perPage);
+    //     return response()->json([
+    //     'status' => true,
+    //     'message' => 'Staff list fetched successfully',
+    //     'data' => $staffs
+    // ]);
     return view('admin.doctor.doctors', compact('doctors', 'perPage', 'search'));
    }
     public function create()
