@@ -1340,7 +1340,7 @@
                                                     </td>
 
                                                     <td>
-                                                        {{ $transaction->payment_mode == 1 ? 'Cash' : '-' }}
+                                                        {{ $transaction->payment_mode }}
                                                     </td>
 
                                                     <td class="text-end">
@@ -3593,10 +3593,10 @@
                                                                     </td>
 
                                                                     <td>
-                                                                        {{ $transaction->payment_mode == 1 ? 'Cash' : '-' }}
+                                                                        {{ $transaction->payment_mode }}
                                                                     </td>
 
-                                                                    <td class="text-end">
+                                                                    <td>
                                                                         {{ number_format($transaction->amount, 2) }}
                                                                     </td>
 
