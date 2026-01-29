@@ -23,11 +23,31 @@ class PathologyBillingController extends Controller
     /**
      * Display a listing of pathology bills
      */
-    public function index()
+    public function index(Request $request)
     {
-        $bills = PathologyBilling::with(['patient', 'doctor', 'organisation'])
-            ->orderBy('id', 'desc')
-            ->paginate(15);
+         $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
+
+    $search = $request->input('search');
+        $query = PathologyBilling::with(['patient', 'doctor', 'organisation']);
+      
+            if (!empty($search)) {
+        $query->where(function ($q) use ($search) {
+            $q->where('doctor_name', 'like', "%{$search}%")
+                ->orWhereHas('patient', function ($patientQuery) use ($search) {
+                    $patientQuery->where('patient_name', 'like', "%{$search}%");
+                });
+        });
+    }
+
+     $bills = $query->paginate($perPage);
+    //      return response()->json([
+    //     'status' => true,
+    //     'message' => 'Staff list fetched successfully',
+    //     'data' => $bills
+    // ]);
         
         return view('admin.pathology.billing.index', compact('bills'));
     }
