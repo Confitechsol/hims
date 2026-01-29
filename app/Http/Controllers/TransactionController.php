@@ -20,20 +20,20 @@ class TransactionController extends Controller
 
 
        Transaction::create([
-    'transaction_date' => $request->payment_date,
-    'amount'           => $request->amount,
-    'payment_mode'     => $request->payment_mode,
-    'cheque_no'        => $request->cheque_no,
-    'cheque_date'      => $request->cheque_date,
-    'note'             => $request->note,
+        'transaction_date' => $request->payment_date,
+        'amount'           => $request->amount,
+        'payment_mode'     => $request->payment_mode,
+        'cheque_no'        => $request->cheque_no,
+        'cheque_date'      => $request->cheque_date,
+        'note'             => $request->note,
 
-    'ipd_id'           => $request->ipd_id,
-    'patient_id'       => $request->patient_id,
-    'type'             => $request->type,      // payment
-    'section'          => $request->section,   // ipd
+        'ipd_id'           => $request->ipd_id,
+        'patient_id'       => $request->patient_id,
+        'type'             => $request->type,      // payment
+        'section'          => $request->section,   // ipd
 
-    'created_by'       => auth()->id(),
-]);
+        'created_by'       => auth()->id(),
+    ]);
 
 
         return redirect()->back()->with('success', 'Payment added successfully');
