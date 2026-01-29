@@ -375,30 +375,6 @@
                                             value="{{ isset($ipd) ? $ipd->id : '' }}">
                                         <div class="form-group">
                                             <label class="form-label">Header Note</label>
-                                            <div class="toolbar" id="toolbar">
-                                                <select id="formatBlock">
-                                                    <option value="p">Normal text</option>
-                                                    <option value="h1">Heading 1</option>
-                                                    <option value="h2">Heading 2</option>
-                                                    <option value="h3">Heading 3</option>
-                                                </select>
-
-                                                <button data-cmd="bold"><b>Bold</b></button>
-                                                <button data-cmd="italic"><i>Italic</i></button>
-                                                <button data-cmd="underline"><u>Underline</u></button>
-                                                <button data-cmd="small"><small>Small</small></button>
-
-                                                <button data-cmd="formatBlock" data-value="blockquote">❝</button>
-                                                <button data-cmd="insertUnorderedList">• List</button>
-                                                <button data-cmd="insertOrderedList">1. List</button>
-
-                                                <button data-cmd="justifyLeft">⬅</button>
-                                                <button data-cmd="justifyCenter">⬍</button>
-                                                <button data-cmd="justifyRight">➡</button>
-
-                                                <button data-cmd="removeFormat">↺</button>
-                                            </div>
-
                                             <textarea id="editor" contenteditable="true" class="editor-area w-100" name="header_note"></textarea>
                                             <hr>
                                         </div>
@@ -549,25 +525,6 @@
                                         <div class="col-sm-12">
                                             <div class="form-group">
                                                 <label class="form-label">follow Up Advice</label>
-                                                <div class="toolbar" data-editor="footer" id="toolbar-footer">
-                                                    <select id="formatBlock-footer">
-                                                        <option value="p">Normal text</option>
-                                                        <option value="h1">Heading 1</option>
-                                                        <option value="h2">Heading 2</option>
-                                                        <option value="h3">Heading 3</option>
-                                                    </select>
-                                                    <button data-cmd="bold"><b>Bold</b></button>
-                                                    <button data-cmd="italic"><i>Italic</i></button>
-                                                    <button data-cmd="underline"><u>Underline</u></button>
-                                                    <button data-cmd="small"><small>Small</small></button>
-                                                    <button data-cmd="formatBlock" data-value="blockquote">❝</button>
-                                                    <button data-cmd="insertUnorderedList">• List</button>
-                                                    <button data-cmd="insertOrderedList">1. List</button>
-                                                    <button data-cmd="justifyLeft">⬅</button>
-                                                    <button data-cmd="justifyCenter">⬍</button>
-                                                    <button data-cmd="justifyRight">➡</button>
-                                                    <button data-cmd="removeFormat">↺</button>
-                                                </div>
                                                 <textarea id="editor-footer" contenteditable="true" class="editor-area w-100" name="footer_note">
                                                 </textarea>
                                             </div>

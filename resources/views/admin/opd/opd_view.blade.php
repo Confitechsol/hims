@@ -1197,7 +1197,7 @@
 
                                                                             <a href="javascript: void(0);"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill"
-                                                                                data-is-ipd="false"
+                                                                                data-is-opd="false"
                                                                                 data-id="{{ $visit->opdDetail->id }}"
                                                                                 data-pres-id = "{{ $visit->id }}"
                                                                                 data-bs-toggle="modal"
@@ -2877,19 +2877,32 @@
                                                                     <td>--</td>
                                                                     <td>
                                                                         <div class="d-flex gap-2">
+                                                                            <a href="javascript: void(0);"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#showPrescriptionModal"
+                                                                                data-is-opd="true"
+                                                                                data-id="{{ $opd->id }}"
+                                                                                data-pres-id = "{{ $prescription->id }}"
+                                                                                data-prescription-date="{{ \Carbon\Carbon::parse($prescription->created_at) }}"
+                                                                                >
+                                                                                <i class="fa-solid fa-prescription"
+                                                                                    data-bs-toggle="tooltip"
+                                                                                    title="Show"></i>
+                                                                            </a>
                                                                             <a href="{{ route('opd.prescription.edit', $prescription->id) }}"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-warning rounded-pill"
                                                                                 data-bs-toggle="tooltip"
                                                                                 title="Edit">
                                                                                 <i class="fa-solid fa-pencil"></i>
                                                                             </a>
-                                                                            <a href="{{ route('opd.prescription.print', $prescription->id) }}"
+                                                                            {{-- <a href="{{ route('opd.prescription.print', $prescription->id) }}"
                                                                                 target="_blank"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
                                                                                 data-bs-toggle="tooltip"
                                                                                 title="Print">
                                                                                 <i class="fa-solid fa-print"></i>
-                                                                            </a>
+                                                                            </a> --}}
                                                                         </div>
                                                                     </td>
                                                                 </tr>
@@ -2915,7 +2928,7 @@
     <!-- tab content end -->
     </div>
     @include('components.modals.opd.add-prescription-modal')
-    @include('components.modals.show-prescription-modal')
+    @include('components.modals.opd.show-prescription-modal')
 
     <!-- Chart JS -->
     <script src="assets/plugins/chartjs/chart.min.js"></script>

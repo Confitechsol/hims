@@ -49,5 +49,8 @@ class OpdPrescription extends Model
     {
         return $this->hasMany(OpdMedicine::class, 'prescription_id');
     }
-
+    public function prescribedBy()
+    {
+        return $this->belongsTo(Doctor::class, 'prescribed_by','doctor_id');
+    }
 }
