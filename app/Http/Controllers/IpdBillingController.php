@@ -449,6 +449,14 @@ class IpdBillingController extends Controller
                 ->orderBy('visit_date', 'asc')
                 ->get() ?? collect();
             
+            // Get payment details
+            \Log::info('Getting payment details');
+            $payments = Transaction::where('ipd_id', $ipdId)
+                ->where('type', 'payment')
+                ->where('section', 'ipd')
+                ->orderBy('payment_date', 'asc')
+                ->get() ?? collect();
+            
             // Ensure pathologyDetails and radiologyDetails are collections
             if (!isset($pathologyDetails)) {
                 $pathologyDetails = collect();
@@ -542,7 +550,7 @@ class IpdBillingController extends Controller
             // First pass: Render to get accurate page count
             $tempPdf = Pdf::loadView('admin.billing.ipd_estimate_pdf', compact(
                 'ipd', 'breakup', 'bedChargesDetails', 'ipdChargesDetails',
-                'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails',
+                'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'payments',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
                 'totalChargesInWords', 'totalPaymentsInWords', 'outstandingInWords', 'netBalanceInWords',
                 'hospital'
@@ -582,7 +590,7 @@ class IpdBillingController extends Controller
             // Second pass: Render with accurate page count stored in view
             $pdf = Pdf::loadView('admin.billing.ipd_estimate_pdf', compact(
                 'ipd', 'breakup', 'bedChargesDetails', 'ipdChargesDetails',
-                'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails',
+                'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'payments',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
                 'totalChargesInWords', 'totalPaymentsInWords', 'outstandingInWords', 'netBalanceInWords',
                 'hospital', 'totalPages'

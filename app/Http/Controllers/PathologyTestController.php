@@ -19,15 +19,34 @@ class PathologyTestController extends Controller
     /**
      * Display a listing of pathology tests
      */
-    public function index()
+    public function index(Request $request)
     {
-        $tests = Pathology::with([
-            'category'
-        ])
-            ->orderBy('id', 'desc')
-            ->get();
+
+    $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
+
+    $search = $request->input('search');
+    $query = Pathology::with(['category'])
+        ->orderBy('id', 'desc');
+
+    if (!empty($search)) {
+        $query->where(function ($q) use ($search) {
+            $q->where('test_name', 'like', "%{$search}%")
+              ->orWhere('sub_category', 'like', "%{$search}%");
+        });
+    }
+
+    $tests = $query->paginate($perPage);
+
+    //      return response()->json([
+    //     'status' => true,
+    //     'message' => 'Staff list fetched successfully',
+    //     'data' => $tests
+    // ]);
         
-        return view('admin.pathology.test.index', compact('tests'));
+       return view('admin.pathology.test.index', compact('tests'));
     }
 
     /**
