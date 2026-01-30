@@ -536,6 +536,7 @@ Route::post('/getSymptoms', [OpdController::class, 'getSymptoms'])->name('getSym
 Route::get('/opd_view/{id}', [OpdController::class, 'showOpd'])->name('opd.show');
 Route::get('/getOpdById/{id}', [OpdController::class, 'getOpdById'])->name('getOpdById');
 Route::get('/getOpdMedicineById/{id}', [OpdController::class, 'getOpdMedicineById'])->name('getOpdMedicineById');
+Route::get('/getOpdRadPathById/{id}', [OpdController::class, 'getOpdRadPathById'])->name('getOpdRadPathById');
 Route::post('/add_prescription', [OpdController::class, 'storePrescription'])->name('opd.addPrescription');
 Route::post('/opd_medication', [OpdController::class, 'createOpdMedication'])->name('opd.createMedication');
 Route::post('/opd_charge', [OpdController::class, 'addOpdCharge'])->name('opd.addOpdCharge');
