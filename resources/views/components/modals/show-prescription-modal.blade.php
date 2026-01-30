@@ -12,11 +12,11 @@
                 <button type="button" class="btn-close btn-close-modal custom-btn-close" data-bs-dismiss="modal"
                     aria-label="Close"><i class="ti ti-x"></i></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-0">
 
 
-                <div class="card">
-                    <div class="card-body">
+                <div class="card border-0 mb-0">
+                    <div class="card-body pb-0 mb-0">
                         <!-- Items -->
                         <div class="d-flex align-items-center justify-content-between border-1 border-bottom pb-3 mb-3">
                             <div class="hospital_logo">
@@ -99,7 +99,7 @@
                                                 <th>SNO</th>
                                                 <th>Pathology Test Name</th>
                                                 <th>Radiology Test Name</th>
-                                                
+
                                             </tr>
                                         </thead>
                                         <tbody id="pathRadTableBody">
@@ -121,9 +121,9 @@
                         <!-- Items -->
 
                         <div
-                            class="pb-3 mb-3 border-1 border-bottom d-flex align-items-center justify-content-between flex-wrap gap-2">
+                            class="pb-3 border-1 border-bottom d-flex align-items-center justify-content-between flex-wrap gap-2">
                             <div class="">
-                                <h6 class="mb-1 fs-16 fw-semibold" > Follow Up </h6>
+                                <h6 class="mb-1 fs-16 fw-semibold"> Follow Up </h6>
                                 <p id="pres_followup"></p>
                             </div>
                             <div class="">
@@ -133,16 +133,21 @@
                             </div>
                         </div>
 
-                        <div class="text-center d-flex align-items-center justify-content-center">
-                            <a href="#" class="btn btn-md btn-dark me-2 d-flex align-items-center"> <i
-                                    class="fa-brands fa-whatsapp"></i> Whatsapp</a>
-                            <a href="#" class="btn btn-md btn-primary d-flex align-items-center"> <i
-                                    class="fa-solid fa-at"></i> Email</a>
-                        </div>
+
 
                     </div>
                 </div>
 
+            </div>
+            <div class="modal-footer">
+                <div class="text-center w-100 d-flex align-items-center justify-content-center">
+                    <a href="#" class="btn btn-md btn-dark me-2 d-flex align-items-center"> <i
+                            class="fa-brands fa-whatsapp"></i> Whatsapp</a>
+                    <a href="#" class="btn btn-md btn-primary me-2 d-flex align-items-center"> <i
+                            class="fa-solid fa-at"></i> Email</a>
+                    <a href="#" onclick="printPdf()" class="btn btn-md btn-warning d-flex align-items-center"> <i
+                            class="fa-solid fa-print"></i> Print</a>
+                </div>
             </div>
         </div>
     </div>
@@ -150,74 +155,75 @@
 
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
 
-    const showPrescriptionModal = document.getElementById("showPrescriptionModal");
+        const showPrescriptionModal = document.getElementById("showPrescriptionModal");
 
-    showPrescriptionModal.addEventListener('show.bs.modal', function (event) {
+        showPrescriptionModal.addEventListener('show.bs.modal', function(event) {
 
-        const button = event.relatedTarget;
+            const button = event.relatedTarget;
 
-        const drName = document.getElementById('doctor_name');
-        const qualification = document.getElementById('qualification');
-        const dAdvice = document.getElementById('prescription_advice');
-        const department = document.getElementById('department');
-        const followup = document.getElementById('pres_followup');
-        const ipdDate = document.getElementById('ipd_date');
-        const pName = document.getElementById('patient_name');
-        const ageGender = document.getElementById('age_gender');
-        const bGrp = document.getElementById('blood_group');
-        const pId = document.getElementById('p_id');
-        const drSign = document.getElementById('dr_sign');
-        const specialization = document.getElementById('dr_sign_specialization');
-        const presType = document.getElementById('pres_type');
+            const drName = document.getElementById('doctor_name');
+            const qualification = document.getElementById('qualification');
+            const dAdvice = document.getElementById('prescription_advice');
+            const department = document.getElementById('department');
+            const followup = document.getElementById('pres_followup');
+            const ipdDate = document.getElementById('ipd_date');
+            const pName = document.getElementById('patient_name');
+            const ageGender = document.getElementById('age_gender');
+            const bGrp = document.getElementById('blood_group');
+            const pId = document.getElementById('p_id');
+            const drSign = document.getElementById('dr_sign');
+            const specialization = document.getElementById('dr_sign_specialization');
+            const presType = document.getElementById('pres_type');
 
-        const isIpd = button.getAttribute('data-is-ipd');
+            const isIpd = button.getAttribute('data-is-ipd');
 
-        if (isIpd === "true") {
+            if (isIpd === "true") {
 
-            const ipd_id = button.getAttribute('data-id');
-            const pres_id = button.getAttribute('data-pres-id');
+                const ipd_id = button.getAttribute('data-id');
+                const pres_id = button.getAttribute('data-pres-id');
+                const prescribe_date = button.getAttribute('data-prescription-date');
+                /* ================= IPD DETAILS ================= */
+                fetch(`{{ route('getIpdById', ['id' => 'ID']) }}`.replace('ID', ipd_id))
+                    .then(res => res.json())
+                    .then(data => {
 
-            /* ================= IPD DETAILS ================= */
-            fetch(`{{ route('getIpdById', ['id' => 'ID']) }}`.replace('ID', ipd_id))
-                .then(res => res.json())
-                .then(data => {
+                        // drName.innerHTML = data.doctor?.name ?? '-';
+                        // drSign.innerHTML = data.doctor?.name ?? '-';
+                        specialization.innerHTML = data.doctor?.specialization ?? '-';
+                        qualification.innerHTML = data.doctor?.qualification ?? '-';
+                        department.innerHTML = data.doctor?.department?.department_name ?? '-';
 
-                    // drName.innerHTML = data.doctor?.name ?? '-';
-                    // drSign.innerHTML = data.doctor?.name ?? '-';
-                    specialization.innerHTML = data.doctor?.specialization ?? '-';
-                    qualification.innerHTML = data.doctor?.qualification ?? '-';
-                    department.innerHTML = data.doctor?.department?.department_name ?? '-';
+                        // ipdDate.innerHTML = data.date ?? '-';
+                        ipdDate.innerHTML = prescribe_date ?? '-';
+                        pName.innerHTML = data.patient?.patient_name ?? '-';
+                        ageGender.innerHTML =
+                            (data.patient?.age ?? '-') + ' Y / ' + (data.patient?.gender ?? '-');
+                        bGrp.innerHTML = data.patient?.blood_group?.name ?? '-';
+                        pId.innerHTML = data.patient?.patient_id ?? '--';
 
-                    ipdDate.innerHTML = data.date ?? '-';
-                    pName.innerHTML = data.patient?.patient_name ?? '-';
-                    ageGender.innerHTML =
-                        (data.patient?.age ?? '-') + ' Y / ' + (data.patient?.gender ?? '-');
-                    bGrp.innerHTML = data.patient?.blood_group?.name ?? '-';
-                    pId.innerHTML = data.patient?.patient_id ?? '--';
+                        presType.innerHTML = 'IPD Prescription';
+                    });
 
-                    presType.innerHTML = 'IPD Prescription';
-                });
+                /* ================= IPD MEDICINES ================= */
+                fetch(`{{ route('getIpdMedicineById', ['id' => 'ID']) }}`.replace('ID', pres_id))
+                    .then(res => res.json())
+                    .then(data => {
 
-            /* ================= IPD MEDICINES ================= */
-            fetch(`{{ route('getIpdMedicineById', ['id' => 'ID']) }}`.replace('ID', pres_id))
-                .then(res => res.json())
-                .then(data => {
+                        const tableBody = document.getElementById("medicineTableBody");
+                        tableBody.innerHTML = "";
 
-                    const tableBody = document.getElementById("medicineTableBody");
-                    tableBody.innerHTML = "";
-
-                    if (!data.length) {
-                        tableBody.innerHTML = `
+                        if (!data.length) {
+                            tableBody.innerHTML = `
                             <tr>
                                 <td colspan="6" class="text-center">No Records Found</td>
                             </tr>`;
-                        return;
-                    }
+                            return;
+                        }
 
-                    data.forEach((item, index) => {
-                        tableBody.insertAdjacentHTML("beforeend", `
+                        data.forEach((item, index) => {
+                            tableBody.insertAdjacentHTML("beforeend", `
                             <tr>
                                 <td>${index + 1}</td>
                                 <td>${item.pharmacy?.medicine_name ?? '-'}</td>
@@ -228,57 +234,131 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <td>${item.dose_interval?.name ?? '-'}</td>
                             </tr>
                         `);
+                        });
                     });
-                });
 
-            /* ================= IPD PATHOLOGY + RADIOLOGY ================= */
-            fetch(`{{ route('getIpdRadPathById', ['id' => 'ID']) }}`.replace('ID', pres_id))
-                .then(res => res.json())
-                .then(data => {
-                    console.log('Path/Rad API:', data);
+                /* ================= IPD PATHOLOGY + RADIOLOGY ================= */
+                fetch(`{{ route('getIpdRadPathById', ['id' => 'ID']) }}`.replace('ID', pres_id))
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log('Path/Rad API:', data);
 
-                    drName.innerHTML = data.prescription?.prescribed_by?.name ?? '-';
-                    drSign.innerHTML = data.prescription?.prescribed_by?.name ?? '-';
+                        drName.innerHTML = data.prescription?.prescribed_by?.name ?? '-';
+                        drSign.innerHTML = data.prescription?.prescribed_by?.name ?? '-';
 
-                    console.log('Advice value:', data.prescription.advice);
-                    dAdvice.innerHTML = data?.prescription?.advice ?? '-';
-                    followup.innerHTML = data?.prescription?.footer_note ?? '-';
-                    console.log('Full Prescription:', data.prescription);
-                    console.log('Prescription doctor:',data.prescription?.prescribed_by?.name);
-                    console.log('Advice value:', data.prescription.advice);
-                    const tableBody = document.getElementById("pathRadTableBody");
-                    tableBody.innerHTML = "";
+                        console.log('Advice value:', data.prescription.advice);
+                        dAdvice.innerHTML = data?.prescription?.advice ?? '-';
+                        followup.innerHTML = data?.prescription?.footer_note ?? '-';
+                        console.log('Full Prescription:', data.prescription);
+                        console.log('Prescription doctor:', data.prescription?.prescribed_by?.name);
+                        console.log('Advice value:', data.prescription.advice);
+                        const tableBody = document.getElementById("pathRadTableBody");
+                        tableBody.innerHTML = "";
 
-                    const pathology = data.pathology || [];
-                    const radiology = data.radiology || [];
+                        const pathology = data.pathology || [];
+                        const radiology = data.radiology || [];
 
-                    const maxLength = Math.max(pathology.length, radiology.length);
+                        const maxLength = Math.max(pathology.length, radiology.length);
 
-                    if (maxLength === 0) {
-                        tableBody.innerHTML = `
+                        if (maxLength === 0) {
+                            tableBody.innerHTML = `
                             <tr>
                                 <td colspan="3" class="text-center">No Records Found</td>
                             </tr>
                         `;
-                        return;
-                    }
+                            return;
+                        }
 
-                    for (let i = 0; i < maxLength; i++) {
-                        tableBody.insertAdjacentHTML("beforeend", `
+                        for (let i = 0; i < maxLength; i++) {
+                            tableBody.insertAdjacentHTML("beforeend", `
                             <tr>
                                 <td>${i + 1}</td>
                                 <td>${pathology[i]?.test_name ?? '-'}</td>
                                 <td>${radiology[i]?.test_name ?? '-'}</td>
                             </tr>
                         `);
-                    }
+                        }
 
-                    
-                })
-                
-                .catch(err => console.error('Error loading tests:', err));
-        }
+
+                    })
+
+                    .catch(err => console.error('Error loading tests:', err));
+            }
+        });
     });
-});
-</script>
 
+    function generatePdf() {
+        return new Promise((resolve) => {
+            const target = document.querySelector("#showPrescriptionModal .modal-body .card");
+            const clone = target.cloneNode(true);
+            clone.style.position = "absolute";
+            clone.style.top = "-9999px";
+            clone.style.height = "auto";
+            clone.style.width = "210mm";
+            clone.style.overflow = "visible";
+
+            document.body.appendChild(clone);
+
+            html2canvas(clone, {
+                scale: 2,
+                useCORS: true
+            }).then(canvas => {
+                const {
+                    jsPDF
+                } = window.jspdf;
+
+                const pdf = new jsPDF('p', 'mm', 'a4');
+
+                const imgData = canvas.toDataURL('image/png');
+
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+
+                const imgWidth = pdfWidth;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                // Center vertically if smaller than A4
+                const y = imgHeight < pdfHeight ? (pdfHeight - imgHeight) / 2 : 0;
+
+                pdf.addImage(imgData, 'PNG', 0, y, imgWidth, imgHeight);
+
+                resolve(pdf);
+                document.body.removeChild(clone);
+            });
+        });
+    }
+
+    function printPdf() {
+        Swal.fire({
+            title: 'Generating PDF...',
+            text: 'Please wait a moment',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => {
+                Swal.showLoading();
+
+                setTimeout(() => {
+                    generatePdf().then(pdf => {
+                Swal.close();
+                const blob = pdf.output('bloburl');
+
+                const printWindow = window.open(blob);
+                printWindow.onload = () => {
+                    printWindow.focus();
+                    printWindow.print();
+                };
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops!',
+                    text: 'Failed to generate PDF'
+                });
+                console.error(error);
+            });
+                },0);
+            }
+        });
+
+    }
+</script>

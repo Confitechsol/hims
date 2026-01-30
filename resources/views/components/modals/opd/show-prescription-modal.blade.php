@@ -316,7 +316,7 @@
                 pdf.addImage(imgData, 'PNG', 0, y, imgWidth, imgHeight);
 
                 resolve(pdf);
-                // document.body.removeChild(clone);
+                document.body.removeChild(clone);
             });
         });
     }

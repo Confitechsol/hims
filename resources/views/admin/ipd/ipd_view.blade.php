@@ -4180,7 +4180,8 @@
                                                                                 data-bs-target="#showPrescriptionModal"
                                                                                 data-is-ipd="true"
                                                                                 data-id="{{ $ipd->id }}"
-                                                                                data-pres-id = "{{ $prescription->id }}">
+                                                                                data-pres-id = "{{ $prescription->id }}"
+                                                                                data-prescription-date="{{ \Carbon\Carbon::parse($prescription->created_at) }}">
                                                                                 <i class="fa-solid fa-prescription"
                                                                                     data-bs-toggle="tooltip"
                                                                                     title="Show"></i>
@@ -4191,13 +4192,13 @@
                                                                                 title="Edit">
                                                                                 <i class="fa-solid fa-pencil"></i>
                                                                             </a>
-                                                                            <a href="{{ route('ipd.prescription.print', $prescription->id) }}"
+                                                                            {{-- <a href="{{ route('ipd.prescription.print', $prescription->id) }}"
                                                                                 target="_blank"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
                                                                                 data-bs-toggle="tooltip"
                                                                                 title="Print">
                                                                                 <i class="fa-solid fa-print"></i>
-                                                                            </a>
+                                                                            </a> --}}
                                                                         </div>
                                                                         @include('components.modals.show-prescription-modal')
                                                                     </td>
