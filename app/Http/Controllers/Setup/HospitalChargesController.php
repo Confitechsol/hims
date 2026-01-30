@@ -15,8 +15,33 @@ use App\Models\OrganisationsCharge;
 
 class HospitalChargesController extends Controller
 {
-    public function index(){
-       $charges = Charge::with(['category.chargeType','taxCategory','unit'])->get();
+    public function index(Request $request){
+
+    $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
+
+    $search = $request->input('search');
+
+     //  $charges = Charge::with(['category.chargeType','taxCategory','unit'])->get();
+      $query = Charge::with([
+        'category.chargeType',
+        'taxCategory',
+        'unit'
+    ]);
+
+    if (!empty($search)) {
+        $query->where(function ($q) use ($search) {
+            $q->where('charge_name', 'like', "%{$search}%")
+              ->orWhere('charge_code', 'like', "%{$search}%")
+              ->orWhereHas('category', function ($qc) use ($search) {
+                  $qc->where('name', 'like', "%{$search}%");
+              });
+        });
+    }
+     $charges = $query->paginate($perPage)->withQueryString();
+
        $charge_types = ChargeTypeMaster::get();
        $chargeCategories = ChargeCategory::get();
        $charge_unit= ChargeUnit::get();
@@ -29,7 +54,14 @@ class HospitalChargesController extends Controller
         // );
        
     //  return  $charge_tax_category_id;
-         return view('admin.setup.charges',compact('charges','charge_types','charge_unit','charge_tax_category_id','organisation_names','chargeCategories','organisation_charges'));
+    // if ($request->ajax()) {
+    //     return response()->json([
+    //         'status'  => true,
+    //         'message' => 'Charge list fetched successfully',
+    //         'data'    => $charges
+    //     ]);
+    // }
+       return view('admin.setup.charges',compact('charges','charge_types','charge_unit','charge_tax_category_id','organisation_names','chargeCategories','organisation_charges','perPage','search'));
     }
 
     public function store(Request $request){
