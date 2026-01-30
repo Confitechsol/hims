@@ -68,7 +68,7 @@ class HospitalChargesController extends Controller
     $request->validate ( [
         'charge_type' => 'required',
         'charge_category' => 'required',
-        'tax_category' => 'required',
+        'tax_category' => 'nullable',
         'standard_charge'=>'required',
         'charge_name'=>'required',
         'unit_type'=>'required',

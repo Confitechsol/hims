@@ -377,8 +377,7 @@
                                                                             </div>
                                                                             <div class="col-md-6">
                                                                                 <label for="" class="form-label">Tax
-                                                                                    Category <span
-                                                                                        class="text-danger">*</span></label>
+                                                                                    Category </label>
                                                                                 <select name="tax_category" id="tax_category"
                                                                                     class="form-select" autocomplete="off"
                                                                                     required

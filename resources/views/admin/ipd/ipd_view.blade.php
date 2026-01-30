@@ -2625,23 +2625,44 @@
                                                                         <div class="col-md-4 mb-3">
                                                                             <label class="form-label">Assistant Consultant
                                                                                 1</label>
-                                                                            <input type="text"
+                                                                            <!-- <input type="text"
                                                                                 name="ass_consultant_1"
-                                                                                class="form-control">
+                                                                                class="form-control"> -->
+                                                                                <select name="ass_consultant_1" class="form-select">
+                                                                                    <option value="">Select Assistant Consultant 2
+                                                                                    </option>
+                                                                                    @foreach ($doctors as $doctor)
+                                                                                        <option value="{{ $doctor->id }}">
+                                                                                            {{ $doctor->name }}</option>
+                                                                                    @endforeach
+                                                                                </select>
                                                                         </div>
 
                                                                         <div class="col-md-4 mb-3">
                                                                             <label class="form-label">Assistant Consultant
                                                                                 2</label>
-                                                                            <input type="text"
-                                                                                name="ass_consultant_2"
-                                                                                class="form-control">
+                                                                            
+                                                                                <select name="ass_consultant_2" class="form-select">
+                                                                                    <option value="">Select Assistant Consultant 2
+                                                                                    </option>
+                                                                                    @foreach ($doctors as $doctor)
+                                                                                        <option value="{{ $doctor->id }}">
+                                                                                            {{ $doctor->name }}</option>
+                                                                                    @endforeach
+                                                                                </select>
                                                                         </div>
 
                                                                         <div class="col-md-4 mb-3">
                                                                             <label class="form-label">Anesthetist</label>
-                                                                            <input type="text" name="anesthetist"
-                                                                                class="form-control">
+                                                                            
+                                                                            <select name="anesthetist" class="form-select">
+                                                                                    <option value="">Select Anesthetist
+                                                                                    </option>
+                                                                                    @foreach ($doctors as $doctor)
+                                                                                        <option value="{{ $doctor->id }}">
+                                                                                            {{ $doctor->name }}</option>
+                                                                                    @endforeach
+                                                                                </select>
                                                                         </div>
 
                                                                         <div class="col-md-4 mb-3">
@@ -2649,6 +2670,7 @@
                                                                                 Type</label>
                                                                             <input type="text" name="anaethesia_type"
                                                                                 class="form-control">
+                                                                            
                                                                         </div>
 
                                                                         <div class="col-md-4 mb-3">
@@ -2854,29 +2876,55 @@
                                                                                             <label
                                                                                                 class="form-label">Assistant
                                                                                                 Consultant 1</label>
-                                                                                            <input type="text"
-                                                                                                name="ass_consultant_1"
-                                                                                                class="form-control"
-                                                                                                value="{{ $operation->ass_consultant_1 }}">
+                                                                                            
+                                                                                                <select name="ass_consultant_1"
+                                                                                                    class="form-select">
+                                                                                                    <option value="">
+                                                                                                    Select Consultant</option>
+                                                                                                    @foreach ($doctors as $doctor)
+                                                                                                        <option
+                                                                                                            value="{{ $doctor->id }}"
+                                                                                                            {{ $operation->ass_consultant_1 == $doctor->id ? 'selected' : '' }}>
+                                                                                                            {{ $doctor->name }}
+                                                                                                        </option>
+                                                                                                    @endforeach
+                                                                                                </select>
                                                                                         </div>
 
                                                                                         <div class="col-md-4 mb-3">
                                                                                             <label
                                                                                                 class="form-label">Assistant
                                                                                                 Consultant 2</label>
-                                                                                            <input type="text"
-                                                                                                name="ass_consultant_2"
-                                                                                                class="form-control"
-                                                                                                value="{{ $operation->ass_consultant_2 }}">
+                                                                                                <select name="ass_consultant_2"
+                                                                                                    class="form-select">
+                                                                                                    <option value="">
+                                                                                                    Select Consultant</option>
+                                                                                                    @foreach ($doctors as $doctor)
+                                                                                                        <option
+                                                                                                            value="{{ $doctor->id }}"
+                                                                                                            {{ $operation->ass_consultant_2 == $doctor->id ? 'selected' : '' }}>
+                                                                                                            {{ $doctor->name }}
+                                                                                                        </option>
+                                                                                                    @endforeach
+                                                                                                </select>
                                                                                         </div>
 
                                                                                         <div class="col-md-4 mb-3">
                                                                                             <label
                                                                                                 class="form-label">Anesthetist</label>
-                                                                                            <input type="text"
-                                                                                                name="anesthetist"
-                                                                                                class="form-control"
-                                                                                                value="{{ $operation->anesthetist }}">
+                                                                                            
+                                                                                                <select name="anesthetist"
+                                                                                                    class="form-select">
+                                                                                                    <option value="">
+                                                                                                    Select Consultant</option>
+                                                                                                    @foreach ($doctors as $doctor)
+                                                                                                        <option
+                                                                                                            value="{{ $doctor->id }}"
+                                                                                                            {{ $operation->ass_consultant_2 == $doctor->id ? 'selected' : '' }}>
+                                                                                                            {{ $doctor->name }}
+                                                                                                        </option>
+                                                                                                    @endforeach
+                                                                                                </select>
                                                                                         </div>
 
                                                                                         <div class="col-md-4 mb-3">
