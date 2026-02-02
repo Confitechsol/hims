@@ -1342,7 +1342,7 @@
                                                     </td>
 
                                                     <td>
-                                                        {{ $transaction->payment_mode == 1 ? 'Cash' : '-' }}
+                                                        {{ $transaction->payment_mode }}
                                                     </td>
 
                                                     <td class="text-end">
@@ -2627,23 +2627,44 @@
                                                                         <div class="col-md-4 mb-3">
                                                                             <label class="form-label">Assistant Consultant
                                                                                 1</label>
-                                                                            <input type="text"
+                                                                            <!-- <input type="text"
                                                                                 name="ass_consultant_1"
-                                                                                class="form-control">
+                                                                                class="form-control"> -->
+                                                                                <select name="ass_consultant_1" class="form-select">
+                                                                                    <option value="">Select Assistant Consultant 2
+                                                                                    </option>
+                                                                                    @foreach ($doctors as $doctor)
+                                                                                        <option value="{{ $doctor->id }}">
+                                                                                            {{ $doctor->name }}</option>
+                                                                                    @endforeach
+                                                                                </select>
                                                                         </div>
 
                                                                         <div class="col-md-4 mb-3">
                                                                             <label class="form-label">Assistant Consultant
                                                                                 2</label>
-                                                                            <input type="text"
-                                                                                name="ass_consultant_2"
-                                                                                class="form-control">
+                                                                            
+                                                                                <select name="ass_consultant_2" class="form-select">
+                                                                                    <option value="">Select Assistant Consultant 2
+                                                                                    </option>
+                                                                                    @foreach ($doctors as $doctor)
+                                                                                        <option value="{{ $doctor->id }}">
+                                                                                            {{ $doctor->name }}</option>
+                                                                                    @endforeach
+                                                                                </select>
                                                                         </div>
 
                                                                         <div class="col-md-4 mb-3">
                                                                             <label class="form-label">Anesthetist</label>
-                                                                            <input type="text" name="anesthetist"
-                                                                                class="form-control">
+                                                                            
+                                                                            <select name="anesthetist" class="form-select">
+                                                                                    <option value="">Select Anesthetist
+                                                                                    </option>
+                                                                                    @foreach ($doctors as $doctor)
+                                                                                        <option value="{{ $doctor->id }}">
+                                                                                            {{ $doctor->name }}</option>
+                                                                                    @endforeach
+                                                                                </select>
                                                                         </div>
 
                                                                         <div class="col-md-4 mb-3">
@@ -2651,6 +2672,7 @@
                                                                                 Type</label>
                                                                             <input type="text" name="anaethesia_type"
                                                                                 class="form-control">
+                                                                            
                                                                         </div>
 
                                                                         <div class="col-md-4 mb-3">
@@ -2856,29 +2878,55 @@
                                                                                             <label
                                                                                                 class="form-label">Assistant
                                                                                                 Consultant 1</label>
-                                                                                            <input type="text"
-                                                                                                name="ass_consultant_1"
-                                                                                                class="form-control"
-                                                                                                value="{{ $operation->ass_consultant_1 }}">
+                                                                                            
+                                                                                                <select name="ass_consultant_1"
+                                                                                                    class="form-select">
+                                                                                                    <option value="">
+                                                                                                    Select Consultant</option>
+                                                                                                    @foreach ($doctors as $doctor)
+                                                                                                        <option
+                                                                                                            value="{{ $doctor->id }}"
+                                                                                                            {{ $operation->ass_consultant_1 == $doctor->id ? 'selected' : '' }}>
+                                                                                                            {{ $doctor->name }}
+                                                                                                        </option>
+                                                                                                    @endforeach
+                                                                                                </select>
                                                                                         </div>
 
                                                                                         <div class="col-md-4 mb-3">
                                                                                             <label
                                                                                                 class="form-label">Assistant
                                                                                                 Consultant 2</label>
-                                                                                            <input type="text"
-                                                                                                name="ass_consultant_2"
-                                                                                                class="form-control"
-                                                                                                value="{{ $operation->ass_consultant_2 }}">
+                                                                                                <select name="ass_consultant_2"
+                                                                                                    class="form-select">
+                                                                                                    <option value="">
+                                                                                                    Select Consultant</option>
+                                                                                                    @foreach ($doctors as $doctor)
+                                                                                                        <option
+                                                                                                            value="{{ $doctor->id }}"
+                                                                                                            {{ $operation->ass_consultant_2 == $doctor->id ? 'selected' : '' }}>
+                                                                                                            {{ $doctor->name }}
+                                                                                                        </option>
+                                                                                                    @endforeach
+                                                                                                </select>
                                                                                         </div>
 
                                                                                         <div class="col-md-4 mb-3">
                                                                                             <label
                                                                                                 class="form-label">Anesthetist</label>
-                                                                                            <input type="text"
-                                                                                                name="anesthetist"
-                                                                                                class="form-control"
-                                                                                                value="{{ $operation->anesthetist }}">
+                                                                                            
+                                                                                                <select name="anesthetist"
+                                                                                                    class="form-select">
+                                                                                                    <option value="">
+                                                                                                    Select Consultant</option>
+                                                                                                    @foreach ($doctors as $doctor)
+                                                                                                        <option
+                                                                                                            value="{{ $doctor->id }}"
+                                                                                                            {{ $operation->ass_consultant_2 == $doctor->id ? 'selected' : '' }}>
+                                                                                                            {{ $doctor->name }}
+                                                                                                        </option>
+                                                                                                    @endforeach
+                                                                                                </select>
                                                                                         </div>
 
                                                                                         <div class="col-md-4 mb-3">
@@ -3516,10 +3564,37 @@
                                                                                         data-placeholder="Enter Patient Name or Id…">
                                                                                         <option value="0">Select
                                                                                         </option>
-                                                                                        <option value="1">Cash
-                                                                                        </option>
+                                                                                        <option value="Cash">Cash</option>
+                                                                                        <option value="Cheque">Cheque</option>
+                                                                                        <option value="transfer_to_bank_account">Transfer to Bank Account</option>
+                                                                                        <option value="UPI">UPI</option>
+                                                                                        <option value="Online">Online</option>
+                                                                                        <option value="Other">Other</option>
                                                                                     </select>
                                                                                 </div>
+                                                                                <div class="row gy-3 mt-2" id="chequeFields" style="display: none;">
+                                                                                    <div class="col-md-6">
+                                                                                        <label for="cheque_no" class="form-label">
+                                                                                            Cheque No <span class="text-danger">*</span>
+                                                                                        </label>
+                                                                                        <input type="text" name="cheque_no" id="cheque_no" class="form-control">
+                                                                                    </div>
+
+                                                                                    <div class="col-md-6">
+                                                                                        <label for="cheque_date" class="form-label">
+                                                                                            Cheque Date <span class="text-danger">*</span>
+                                                                                        </label>
+                                                                                        <input type="date" name="cheque_date" id="cheque_date" class="form-control">
+                                                                                    </div>
+
+                                                                                    <!-- <div class="col-md-4">
+                                                                                        <label for="cheque_attachment" class="form-label">
+                                                                                            Attachment
+                                                                                        </label>
+                                                                                        <input type="file" name="cheque_attachment" id="cheque_attachment" class="form-control">
+                                                                                    </div> -->
+                                                                                </div>
+
                                                                                 <div class="col-md-6">
                                                                                     <label for="note"
                                                                                         class="form-label">Note
@@ -3528,12 +3603,12 @@
                                                                                 </div>
                                                                             </div>
 
-                                                                    </div>
-                                                                    <div class="modal-footer">
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary">Save</button>
-                                                                    </div>
-                                                                    </form>
+                                                                            </div>
+                                                                            <div class="modal-footer">
+                                                                                <button type="submit"
+                                                                                    class="btn btn-primary">Save</button>
+                                                                            </div>
+                                                                        </form>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -3568,10 +3643,10 @@
                                                                     </td>
 
                                                                     <td>
-                                                                        {{ $transaction->payment_mode == 1 ? 'Cash' : '-' }}
+                                                                        {{ $transaction->payment_mode }}
                                                                     </td>
 
-                                                                    <td class="text-end">
+                                                                    <td>
                                                                         {{ number_format($transaction->amount, 2) }}
                                                                     </td>
 
@@ -4107,7 +4182,8 @@
                                                                                 data-bs-target="#showPrescriptionModal"
                                                                                 data-is-ipd="true"
                                                                                 data-id="{{ $ipd->id }}"
-                                                                                data-pres-id = "{{ $prescription->id }}">
+                                                                                data-pres-id = "{{ $prescription->id }}"
+                                                                                data-prescription-date="{{ \Carbon\Carbon::parse($prescription->created_at) }}">
                                                                                 <i class="fa-solid fa-prescription"
                                                                                     data-bs-toggle="tooltip"
                                                                                     title="Show"></i>
@@ -4118,13 +4194,13 @@
                                                                                 title="Edit">
                                                                                 <i class="fa-solid fa-pencil"></i>
                                                                             </a>
-                                                                            <a href="{{ route('ipd.prescription.print', $prescription->id) }}"
+                                                                            {{-- <a href="{{ route('ipd.prescription.print', $prescription->id) }}"
                                                                                 target="_blank"
                                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
                                                                                 data-bs-toggle="tooltip"
                                                                                 title="Print">
                                                                                 <i class="fa-solid fa-print"></i>
-                                                                            </a>
+                                                                            </a> --}}
                                                                         </div>
                                                                         @include('components.modals.show-prescription-modal')
                                                                     </td>
@@ -4273,6 +4349,14 @@
                                                     <select name="new_bed" id="new_bed" class="form-select">
                                                         <option value="">Select New Bed</option>
                                                     </select>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <label for="bed_charge_transfer" class="form-label">Bed Charge (INR) <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="number" class="form-control" name="bed_charge" 
+                                                        id="bed_charge_transfer" step="0.01" min="0" placeholder="0.00">
+                                                    <small class="text-muted">Auto-filled from bed group (editable)</small>
                                                 </div>
 
                                                 <div class="col-md-12 text-end mt-4">
@@ -4503,6 +4587,23 @@
     <!-- Chart JS -->
     <script src="assets/plugins/chartjs/chart.min.js"></script>
     <script src="assets/plugins/chartjs/chart-data.js"></script>
+    <script>
+        document.getElementById('payment_mode').addEventListener('change', function () {
+            const chequeFields = document.getElementById('chequeFields');
+
+            if (this.value === 'Cheque') {
+                chequeFields.style.display = 'flex';
+                chequeFields.querySelectorAll('input').forEach(el => el.required = true);
+            } else {
+                chequeFields.style.display = 'none';
+                chequeFields.querySelectorAll('input').forEach(el => {
+                    el.required = false;
+                    el.value = '';
+                });
+            }
+        });
+    </script>
+
     <script>
         let operations = @json($operations); // All operations from DB
 
@@ -4891,6 +4992,18 @@
                 $('#new_bed').html('<option value="">Loading...</option>');
 
                 if (groupId) {
+                    // Fetch bed charge for selected bed group
+                    $.get("{{ url('/getBedGroupCharge') }}/" + groupId, function(data) {
+                        if (data && data.bed_cost) {
+                            $('#bed_charge_transfer').val(data.bed_cost);
+                        } else {
+                            $('#bed_charge_transfer').val('');
+                        }
+                    }).fail(function() {
+                        $('#bed_charge_transfer').val('');
+                    });
+
+                    // Load available beds
                     $.get("{{ route('get.available.beds') }}", {
                         bed_group_id: groupId
                     }, function(data) {
@@ -4902,6 +5015,7 @@
                     });
                 } else {
                     $('#new_bed').html('<option value="">Select New Bed</option>');
+                    $('#bed_charge_transfer').val('');
                 }
             });
 

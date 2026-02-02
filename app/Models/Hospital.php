@@ -21,6 +21,8 @@ class Hospital extends Model
         'biometric_device',
         'email',
         'phone',
+        'hospital_landline_1',
+        'hospital_landline_2',
         'address',
         'start_month',
         'session_id',

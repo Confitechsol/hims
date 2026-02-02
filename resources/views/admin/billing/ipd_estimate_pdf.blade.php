@@ -299,6 +299,28 @@
             margin: 10px 0 5px 0;
             text-transform: uppercase;
         }
+
+        .payment-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 9px;
+        }
+
+        .payment-table th {
+            background-color: transparent;
+            color: #000;
+            padding: 5px;
+            text-align: left;
+            border: 1px solid #282828;
+            font-weight: 700;
+        }
+
+        .payment-table td {
+            padding: 4px 5px;
+            border: 1px solid #282828;
+            background-color: transparent;
+        }
     </style>
 </head>
 <body>
@@ -326,6 +348,13 @@
                         <p style="margin: 1px 0;"><strong>{{ $hospital->name ?? 'Hospital Name' }}</strong></p>
                         <p style="margin: 1px 0;">{{ $hospital->address ?? 'Hospital Address' }}</p>
                         <p style="margin: 1px 0;">Phone - {{ $hospital->phone ?? 'Phone Number' }}</p>
+                        @if(!empty($hospital->hospital_landline_1) || !empty($hospital->hospital_landline_2))
+                        <p style="margin: 1px 0;">Landline - 
+                            @if(!empty($hospital->hospital_landline_1)){{ $hospital->hospital_landline_1 }}@endif
+                            @if(!empty($hospital->hospital_landline_1) && !empty($hospital->hospital_landline_2)), @endif
+                            @if(!empty($hospital->hospital_landline_2)){{ $hospital->hospital_landline_2 }}@endif
+                        </p>
+                        @endif
                         <p style="margin: 1px 0;">E-mail: {{ $hospital->email ?? 'Email' }}</p>
                     </td>
                 </tr>
@@ -387,6 +416,11 @@
                                         N/A
                                     @endif
                                 </td>
+                            </tr>
+                            <tr>
+                                <td class="patient_label">Phone No.</td>
+                                <td class="patient_colon">:</td>
+                                <td class="patient_value">{{ $ipd->patient->mobileno ?? 'N/A' }}</td>
                             </tr>
                             @if($ipd->doctor)
                             <tr>
@@ -496,6 +530,52 @@
         </table>
         @endif
 
+        <!-- CGST Charges -->
+        @if(isset($gstChargesGrouped['cgst']) && count($gstChargesGrouped['cgst']) > 0)
+        <table class="charges-table">
+            <thead>
+                <tr>
+                    <th colspan="2">CGST CHARGES</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($gstChargesGrouped['cgst'] as $cgst)
+                <tr>
+                    <td>{{ $cgst['description'] }}</td>
+                    <td class="text-right">Rs. {{ number_format($cgst['amount'], 2) }}</td>
+                </tr>
+                @endforeach
+                <tr style="font-weight: bold;">
+                    <td class="text-right">Subtotal:</td>
+                    <td class="text-right">Rs. {{ number_format($breakup['cgst_charges'] ?? 0, 2) }}</td>
+                </tr>
+            </tbody>
+        </table>
+        @endif
+
+        <!-- SGST Charges -->
+        @if(isset($gstChargesGrouped['sgst']) && count($gstChargesGrouped['sgst']) > 0)
+        <table class="charges-table">
+            <thead>
+                <tr>
+                    <th colspan="2">SGST CHARGES</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($gstChargesGrouped['sgst'] as $sgst)
+                <tr>
+                    <td>{{ $sgst['description'] }}</td>
+                    <td class="text-right">Rs. {{ number_format($sgst['amount'], 2) }}</td>
+                </tr>
+                @endforeach
+                <tr style="font-weight: bold;">
+                    <td class="text-right">Subtotal:</td>
+                    <td class="text-right">Rs. {{ number_format($breakup['sgst_charges'] ?? 0, 2) }}</td>
+                </tr>
+            </tbody>
+        </table>
+        @endif
+
         <!-- IPD Charges -->
         @if(isset($ipdChargesDetails) && $ipdChargesDetails->count() > 0)
         <table class="charges-table">
@@ -596,6 +676,62 @@
                 <tr style="font-weight: bold;">
                     <td colspan="3" class="text-right">Subtotal:</td>
                     <td class="text-right">Rs. {{ number_format($breakup['doctor_visit_charges'], 2) }}</td>
+                </tr>
+            </tbody>
+        </table>
+        @endif
+
+        <!-- Payment Details -->
+        @if(isset($payments) && $payments->count() > 0)
+        <div class="section-title">Payment Details</div>
+        <table class="payment-table">
+            <thead>
+                <tr>
+                    <th>Payment Date</th>
+                    <th>Receipt No.</th>
+                    <th>Payment Mode</th>
+                    <th class="text-right">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($payments as $payment)
+                @php
+                    $paymentMode = $payment->payment_mode ?? null;
+                    $isCash = ($paymentMode == '1' || $paymentMode === 1 || strtolower($paymentMode) == 'cash');
+                    $paymentModeText = 'N/A';
+                    if ($paymentMode == '1' || $paymentMode === 1) {
+                        $paymentModeText = 'Cash';
+                    } elseif (!empty($paymentMode)) {
+                        $paymentModeText = $paymentMode;
+                    }
+                @endphp
+                <tr>
+                    <td>{{ \Carbon\Carbon::parse($payment->payment_date ?? $payment->created_at)->format('d-m-Y') }}</td>
+                    <td>R/{{ str_pad($payment->id, 6, '0', STR_PAD_LEFT) }}</td>
+                    <td>{{ $paymentModeText }}</td>
+                    <td class="text-right">Rs. {{ number_format($payment->amount, 2) }}</td>
+                </tr>
+                @if(!$isCash && ($payment->cheque_no || $payment->cheque_date || $payment->note))
+                <tr style="background-color: #f9f9f9;">
+                    <td colspan="4" style="padding-left: 30px; font-size: 8px;">
+                        @if($payment->cheque_no)
+                            <strong>Cheque No.:</strong> {{ $payment->cheque_no }}
+                        @endif
+                        @if($payment->cheque_date)
+                            @if($payment->cheque_no) | @endif
+                            <strong>Cheque Date:</strong> {{ \Carbon\Carbon::parse($payment->cheque_date)->format('d-m-Y') }}
+                        @endif
+                        @if($payment->note)
+                            @if($payment->cheque_no || $payment->cheque_date) | @endif
+                            <strong>Note:</strong> {{ $payment->note }}
+                        @endif
+                    </td>
+                </tr>
+                @endif
+                @endforeach
+                <tr style="font-weight: bold;">
+                    <td colspan="3" class="text-right">Total Payments:</td>
+                    <td class="text-right">Rs. {{ number_format($breakup['total_payments'] ?? 0, 2) }}</td>
                 </tr>
             </tbody>
         </table>

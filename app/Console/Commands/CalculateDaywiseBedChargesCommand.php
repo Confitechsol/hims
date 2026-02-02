@@ -81,12 +81,25 @@ class CalculateDaywiseBedChargesCommand extends Command
             foreach ($ipdPatients->chunk($batchSize) as $batch) {
                 foreach ($batch as $ipd) {
                     try {
-                        \App\Jobs\ProcessDaywiseBedChargeJob::dispatch($ipd->id, $chargeDate);
-                        $processed++;
+                        // Process directly instead of dispatching to queue
+                        // This ensures charges are calculated immediately without requiring a queue worker
+                        $result = $service->calculateDaywiseCharges($ipd->id, $chargeDate);
+                        
+                        if ($result['success']) {
+                            $processed++;
+                        } else {
+                            $failed++;
+                            Log::warning("Failed to calculate bed charge for IPD ID: {$ipd->id}", [
+                                'error' => $result['message'] ?? 'Unknown error',
+                                'charge_date' => $chargeDate,
+                            ]);
+                        }
                     } catch (\Exception $e) {
                         $failed++;
-                        Log::error("Failed to dispatch job for IPD ID: {$ipd->id}", [
+                        Log::error("Error processing bed charge for IPD ID: {$ipd->id}", [
                             'error' => $e->getMessage(),
+                            'trace' => $e->getTraceAsString(),
+                            'charge_date' => $chargeDate,
                         ]);
                     }
                     $bar->advance();
@@ -102,20 +115,20 @@ class CalculateDaywiseBedChargesCommand extends Command
                 ['Metric', 'Count'],
                 [
                     ['Total Patients', $totalPatients],
-                    ['Jobs Dispatched', $processed],
-                    ['Failed Dispatches', $failed],
+                    ['Successfully Processed', $processed],
+                    ['Failed', $failed],
                     ['Charge Date', $chargeDate],
                 ]
             );
 
             Log::info('Daywise bed charges calculation completed', [
                 'total_patients' => $totalPatients,
-                'jobs_dispatched' => $processed,
-                'failed_dispatches' => $failed,
+                'successfully_processed' => $processed,
+                'failed' => $failed,
                 'charge_date' => $chargeDate,
             ]);
 
-            $this->info("Jobs have been dispatched to the queue. Monitor queue workers for processing status.");
+            $this->info("Bed charges calculation completed!");
             $this->info("Check logs at: storage/logs/laravel.log");
 
             return Command::SUCCESS;

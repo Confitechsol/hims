@@ -67,6 +67,7 @@ use App\Http\Controllers\Setup\MedicineUnitController as SetupMedicineUnitContro
 use App\Http\Controllers\Setup\PackageController;
 use App\Http\Controllers\Setup\PrefixesController;
 use App\Http\Controllers\Setup\ProfileController;
+use App\Http\Controllers\Setup\GstMasterController;
 use App\Http\Controllers\Setup\RadiologyController;
 use App\Http\Controllers\Setup\UnitController;
 use App\Http\Controllers\Setup\UsersController;
@@ -77,6 +78,7 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\TransactionReportController;
 use App\Http\Controllers\VisitorsController;
 use App\Http\Controllers\VitalController;
+use App\Http\Controllers\AmbulanceController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -131,6 +133,14 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/prefix', [PrefixesController::class, 'index'])->name('prefix');
     Route::post('/prefix/store', [PrefixesController::class, 'store'])->name('prefix.store');
     Route::put('/prefixes/update', [PrefixesController::class, 'update'])->name('prefixes.update');
+
+    Route::get('/gst-master', [GstMasterController::class, 'index'])->name('gst_master.index');
+    Route::post('/gst-master/store', [GstMasterController::class, 'store'])->name('gst_master.store');
+    Route::put('/gst-master/update', [GstMasterController::class, 'update'])->name('gst_master.update');
+    Route::delete('/gst-master/destroy', [GstMasterController::class, 'destroy'])->name('gst_master.destroy');
+    Route::post('/gst-master/import', [GstMasterController::class, 'importCsv'])->name('gst_master.import');
+    Route::get('/gst-master/export', [GstMasterController::class, 'exportCsv'])->name('gst_master.export');
+    Route::get('/gst-master/download-sample', [GstMasterController::class, 'downloadSampleCsv'])->name('gst_master.download.sample');
 
     Route::get('/roles', [RolesController::class, 'index'])->name('roles');
     Route::post('/roles/store', [RolesController::class, 'store'])->name('roles.store');
@@ -204,6 +214,7 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/bed-groups/store', [BedGroupController::class, 'store'])->name('bed-groups.store');
     Route::put('/bed-groups/update', [BedGroupController::class, 'update'])->name('bed-groups.update');
     Route::delete('/bed-groups/destroy', [BedGroupController::class, 'destroy'])->name('bed-groups.destroy');
+    Route::get('/bed-groups/gst-masters', [BedGroupController::class, 'getGstMasters'])->name('bed-groups.gst-masters');
 
     Route::get('/bed-types', [BedTypeController::class, 'index'])->name('bed-types.index');
     Route::post('/bed-types/store', [BedTypeController::class, 'store'])->name('bed-types.store');
@@ -535,6 +546,7 @@ Route::post('/getSymptoms', [OpdController::class, 'getSymptoms'])->name('getSym
 Route::get('/opd_view/{id}', [OpdController::class, 'showOpd'])->name('opd.show');
 Route::get('/getOpdById/{id}', [OpdController::class, 'getOpdById'])->name('getOpdById');
 Route::get('/getOpdMedicineById/{id}', [OpdController::class, 'getOpdMedicineById'])->name('getOpdMedicineById');
+Route::get('/getOpdRadPathById/{id}', [OpdController::class, 'getOpdRadPathById'])->name('getOpdRadPathById');
 Route::post('/add_prescription', [OpdController::class, 'storePrescription'])->name('opd.addPrescription');
 Route::post('/opd_medication', [OpdController::class, 'createOpdMedication'])->name('opd.createMedication');
 Route::post('/opd_charge', [OpdController::class, 'addOpdCharge'])->name('opd.addOpdCharge');
@@ -549,6 +561,7 @@ Route::delete('/ipd/{id}/remove-package', [IpdController::class, 'removePackage'
 Route::get('/getBedGroups', [IpdController::class, 'getBedGroups'])->name('getBedGroups');
 Route::get('/get-available-beds', [IpdController::class, 'getAvailableBeds'])->name('get.available.beds');
 Route::get('/getBedNumbers/{id}', [IpdController::class, 'getBedNumbers'])->name('getBedNumbers');
+Route::get('/getBedGroupCharge/{id}', [IpdController::class, 'getBedGroupCharge'])->name('getBedGroupCharge');
 Route::get('/ipd_view/{id}', [IpdViewController::class, 'showIpd'])->name('ipd.show');
 Route::post('/ipd_view/medicine/store', [IpdViewController::class, 'store'])->name('medication.store');
 Route::put('/ipd_view/update', [IpdViewController::class, 'update'])->name('medication.update');
@@ -590,6 +603,7 @@ Route::get('/billing', function () {
 Route::prefix('ipd/billing')->group(function () {
     Route::get('/search', [App\Http\Controllers\IpdBillingController::class, 'search'])->name('ipd.billing.search');
     Route::get('/{ipdId}/breakup', [App\Http\Controllers\IpdBillingController::class, 'breakup'])->name('ipd.billing.breakup');
+    Route::get('/{ipdId}/check-discharged', [App\Http\Controllers\IpdBillingController::class, 'checkDischarged'])->name('ipd.billing.check.discharged');
     Route::get('/{ipdId}/export-estimate', [App\Http\Controllers\IpdBillingController::class, 'exportEstimate'])->name('ipd.billing.export.estimate');
     Route::get('/{ipdId}/export-final', [App\Http\Controllers\IpdBillingController::class, 'exportFinal'])->name('ipd.billing.export.final');
 });
@@ -682,8 +696,7 @@ Route::prefix('dutyroster')->group(function () {
     // Route::delete('/destroy', [DutyRosterController::class, 'destroy'])->name('dutyroster.destroy');
     // Route::get('/show/{id}', [DutyRosterController::class, 'show'])->name('dutyroster.show');
 });
-Route::prefix('ambulance')->group(function () {
-});
+
 Route::prefix('staffs')->group(function () {
 
     Route::get('/', [StaffController::class, 'index'])->name('staffs.index');
@@ -712,6 +725,25 @@ Route::prefix('bloodBank')->group(function () {
     Route::put('/edit/{id}', [BloodDonorController::class, 'editDoner'])->name('bloodBank.editDoner');
     Route::put('/update/{id}', [BloodDonorController::class, 'updateDonor'])->name('bloodBank.updateDoner');
     Route::delete('/destroy/{id}', [BloodDonorController::class, 'destroyDonor'])->name('bloodBank.deleteDoner');
+
+});
+Route::prefix('ambulance')->group(function () {
+
+    Route::get('/index', [AmbulanceController::class, 'index'])->name('ambulanceCall.index');
+    Route::post('/addCall', [AmbulanceController::class, 'addCall'])->name('ambulanceCall.addCall');
+    Route::put('/editCall/{id}', [AmbulanceController::class, 'editCall'])->name('ambulanceCall.editCall');
+    Route::put('/updateCall/{id}', [AmbulanceController::class, 'updateCall'])->name('ambulanceCall.updateCall');
+    Route::delete('/destroyCall/{id}', [AmbulanceController::class, 'destroyCall'])->name('ambulanceCall.deleteCall');
+
+    Route::get('/charges/by-category/{category}', [AmbulanceController::class, 'getChargesByCategory'])->name('charges.byCategory');
+    Route::get('/charges/{charge}', [AmbulanceController::class, 'getChargeDetails'])->name('ambulanceCall.deleteCall');
+
+
+    Route::get('/issue', [AmbulanceController::class, 'bloodIssues'])->name('issue-blood.index');
+    Route::post('/addDonors', [AmbulanceController::class, 'addDonors'])->name('bloodBank.addDoner');
+    Route::put('/edit/{id}', [AmbulanceController::class, 'editDoner'])->name('bloodBank.editDoner');
+    Route::put('/update/{id}', [AmbulanceController::class, 'updateDonor'])->name('bloodBank.updateDoner');
+    Route::delete('/destroy/{id}', [AmbulanceController::class, 'destroyDonor'])->name('bloodBank.deleteDoner');
 
 });
 Route::prefix('certificate')->group(function () {

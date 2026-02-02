@@ -15,28 +15,38 @@ use App\Models\OrganisationsCharge;
 
 class HospitalChargesController extends Controller
 {
-    public function index(){
-       $charges = Charge::with(['category.chargeType','taxCategory','unit'])->get();
-       $charge_types = ChargeTypeMaster::get();
-       $chargeCategories = ChargeCategory::get();
-       $charge_unit= ChargeUnit::get();
-       $charge_tax_category_id=TaxCategory::get();
-       $organisation_names=organisation::get();
-       $organisation_charges = OrganisationsCharge::get();
-        // return array(
-        //     "charge_types"=>$charge_types,
-        //     "charge_categories"=>$chargeCategories
-        // );
-       
-    //  return  $charge_tax_category_id;
-         return view('admin.setup.charges',compact('charges','charge_types','charge_unit','charge_tax_category_id','organisation_names','chargeCategories','organisation_charges'));
-    }
+    public function index(Request $request){
+       $charges = Charge::query();
+       $charge_types = ChargeTypeMaster::all();
+       $chargeCategories = ChargeCategory::all();
+       $charge_unit= ChargeUnit::all();
+       $charge_tax_category_id=TaxCategory::all();
+       $organisation_names=organisation::all();
+       $organisation_charges = OrganisationsCharge::all();
+       $perPage   = intval($request->input('perPage', 10));
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
 
+        if ($request->has('search')) {
+         $search_term = $request->search;
+            $charges->where(function ($query) use ($search_term) {
+                $query->where('name', 'like', "%{$search_term}%");
+            });
+         $charges = $charges->paginate($perPage);
+         return ["result" => $charges];
+    }
+     $charges = $charges->paginate($perPage);
+
+     return view('admin.setup.charges',compact('charges','charge_types','charge_unit','charge_tax_category_id','organisation_names','chargeCategories','organisation_charges'));
+
+    }
+   
     public function store(Request $request){
     $request->validate ( [
         'charge_type' => 'required',
         'charge_category' => 'required',
-        'tax_category' => 'required',
+        'tax_category' => 'nullable',
         'standard_charge'=>'required',
         'charge_name'=>'required',
         'unit_type'=>'required',

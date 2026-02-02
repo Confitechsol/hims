@@ -7,30 +7,88 @@ use Illuminate\Http\Request;
 use App\Models\ChargeTypeMaster;
 use App\Models\ChargeTypeModule;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class HospitalChargeTypeController extends Controller
 {
-    public function index(){
-     $chargetypes = ChargeTypeMaster::get();
-     $chargestypemodule = DB::table('charge_type_module as ctm')
-    ->join('charge_type_master as ctmst', 'ctm.charge_type_master_id', '=', 'ctmst.id')
-    ->select('ctm.*', 'ctmst.charge_type')
-    ->whereRaw('ctm.id IN (
-        SELECT MIN(id) 
-        FROM charge_type_module 
-        GROUP BY module_shortcode
-    )')
-    ->orderBy('ctm.id')
-    ->get();
-       $filter = [];
-       foreach($chargetypes as $chargetype){
-          $modules = ChargeTypeModule::where('charge_type_master_id', $chargetype->id)->pluck('module_shortcode')->toArray();
-          $filter[$chargetype->id] = $modules;
-       }
-     //   return array("filter"=>$filter,"chargestypemodule"=>$chargestypemodule);
-         return view('admin.setup.charge_type',compact('chargetypes','chargestypemodule','filter'));
+    // public function index(){
+    //  $chargetypes = ChargeTypeMaster::get();
+    //  $chargestypemodule = DB::table('charge_type_module as ctm')
+    // ->join('charge_type_master as ctmst', 'ctm.charge_type_master_id', '=', 'ctmst.id')
+    // ->select('ctm.*', 'ctmst.charge_type')
+    // ->whereRaw('ctm.id IN (
+    //     SELECT MIN(id) 
+    //     FROM charge_type_module 
+    //     GROUP BY module_shortcode
+    // )')
+    // ->orderBy('ctm.id')
+    // ->get();
+    //    $filter = [];
+    //    foreach($chargetypes as $chargetype){
+    //       $modules = ChargeTypeModule::where('charge_type_master_id', $chargetype->id)->pluck('module_shortcode')->toArray();
+    //       $filter[$chargetype->id] = $modules;
+    //    }
+    //  //   return array("filter"=>$filter,"chargestypemodule"=>$chargestypemodule);
+    //      return view('admin.setup.charge_type',compact('chargetypes','chargestypemodule','filter'));
+    // }
+
+ public function index(Request $request)
+{
+    $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
     }
+
+    $page = LengthAwarePaginator::resolveCurrentPage();
+
+    $chargetypes = ChargeTypeMaster::all();
+
+    // Base query (DO NOT call get() here)
+    $query = DB::table('charge_type_module as ctm')
+        ->join('charge_type_master as ctmst', 'ctm.charge_type_master_id', '=', 'ctmst.id')
+        ->select('ctm.*', 'ctmst.charge_type')
+        ->whereRaw('ctm.id IN (
+            SELECT MIN(id)
+            FROM charge_type_module
+            GROUP BY module_shortcode
+        )')
+        ->orderBy('ctm.id');
+
+    // total rows
+    $total = $query->count();
+
+    // paginated result
+    $results = $query
+        ->offset(($page - 1) * $perPage)
+        ->limit($perPage)
+        ->get();
+
+    // ✅ THIS converts Collection → Paginator
+    $chargestypemodule = new LengthAwarePaginator(
+        $results,
+        $total,
+        $perPage,
+        $page,
+        [
+            'path' => request()->url(),
+            'query' => request()->query()
+        ]
+    );
+
+    // filter logic
+    $filter = [];
+    foreach ($chargetypes as $chargetype) {
+        $filter[$chargetype->id] = ChargeTypeModule::where(
+            'charge_type_master_id',
+            $chargetype->id
+        )->pluck('module_shortcode')->toArray();
+    }
+
+    return view(
+        'admin.setup.charge_type',
+        compact('chargetypes', 'chargestypemodule', 'filter')
+    );
+}
 
     public function store(Request $request ){
     $request->validate ( [

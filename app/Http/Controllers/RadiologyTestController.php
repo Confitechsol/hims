@@ -17,13 +17,26 @@ class RadiologyTestController extends Controller
     /**
      * Display a listing of radiology tests
      */
-    public function index()
+    public function index(Request $request)
     {
-        $tests = Radio::with(['radiologyCategory'])
-            ->orderBy('id', 'desc')
-            ->get();
-        
-        return view('admin.radiology.test.index', compact('tests'));
+
+     $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
+
+    $search = $request->input('search');
+    $query = Radio::with(['radiologyCategory'])
+        ->orderBy('id', 'desc');
+
+    if (!empty($search)) {
+        $query->where(function ($q) use ($search) {
+            $q->where('test_name', 'like', "%{$search}%");
+        });
+    }
+    $tests = $query->paginate($perPage);
+   
+       return view('admin.radiology.test.index', compact('tests'));
     }
 
     /**

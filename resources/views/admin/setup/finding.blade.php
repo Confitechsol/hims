@@ -22,13 +22,21 @@
                                     <div
                                         class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
 
-                                        <div class="input-icon-start position-relative me-2">
-                                            <span class="input-icon-addon">
-                                                <i class="ti ti-search"></i>
-                                            </span>
-                                            <input type="text" class="form-control shadow-sm" placeholder="Search">
-
-                                        </div>
+                                        <form action="{{ route('users') }}" method="GET">
+                                            <div class="d-flex align-items-center">
+                                                <div class="input-icon-start position-relative me-2">
+                                                    <span class="input-icon-addon">
+                                                        <i class="ti ti-search"></i>
+                                                    </span>
+                                                    <input type="text" id="language-search" name="search"
+                                                        value="{{ request('search') }}" class="form-control shadow-sm"
+                                                        placeholder="Search">
+                                                </div>
+                                                <div>
+                                                    <button class="btn btn-primary" type="submit">Search</button>
+                                                </div>
+                                            </div>
+                                        </form>
                                         <div class="page_btn d-flex">
                                             <div class="text-end d-flex">
                                                 <a href="javascript:void(0);"
