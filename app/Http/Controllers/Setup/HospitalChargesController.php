@@ -28,14 +28,11 @@ class HospitalChargesController extends Controller
             $perPage = 10;
         }
 
-        if (!empty($search)) {
-        $charges->where(function ($q) use ($search) {
-            $q->where('charge_name', 'like', "%{$search}%")
-              ->orWhere('charge_code', 'like', "%{$search}%")
-              ->orWhereHas('category', function ($qc) use ($search) {
-                  $qc->where('name', 'like', "%{$search}%");
-              });
-        });
+        if ($request->has('search')) {
+         $search_term = $request->search;
+            $charges->where(function ($query) use ($search_term) {
+                $query->where('name', 'like', "%{$search_term}%");
+            });
          $charges = $charges->paginate($perPage);
          return ["result" => $charges];
     }
