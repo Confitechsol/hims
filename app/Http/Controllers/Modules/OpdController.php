@@ -623,10 +623,41 @@ class OpdController extends Controller
     }
     public function getOpdMedicineById(Request $request, $id)
     {
-        $opdPrescription = OpdPrescription::where('visit_id', $id)->firstOrFail();
-        $opdMedicines    = OpdMedicine::with('pharmacy', 'medicineDosage.unit', 'doseInterval', 'doseDuration')->where('prescription_id', $opdPrescription->id)->get();
+        // $opdPrescription = OpdPrescription::where('visit_id', $id)->firstOrFail();
+        $opdMedicines    = OpdMedicine::with('pharmacy', 'medicineDosage.unit', 'doseInterval', 'doseDuration')->where('prescription_id', $id)->get();
         // dd($opdMedicines);
         return response()->json($opdMedicines, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
+    }
+
+    public function getOpdRadPathById($id)
+    {
+        $prescription = OpdPrescription::with('prescribedBy')->find($id);
+
+        if (! $prescription) {
+            return response()->json([
+                'prescription' => null,
+                'pathology'    => [],
+                'radiology'    => [],
+            ]);
+        }
+
+        // Convert "3,4" → [3,4]
+        $pathologyIds = $prescription->pathology_id
+            ? array_filter(explode(',', $prescription->pathology_id))
+            : [];
+
+        $radiologyIds = $prescription->radiology_id
+            ? array_filter(explode(',', $prescription->radiology_id))
+            : [];
+
+        $pathology = Pathology::whereIn('id', $pathologyIds)->get();
+        $radiology = Radio::whereIn('id', $radiologyIds)->get();
+
+        return response()->json([
+            'prescription' => $prescription,
+            'pathology'    => $pathology,
+            'radiology'    => $radiology,
+        ]);
     }
 
     public function getChargeTypes(Request $request)

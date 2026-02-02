@@ -78,6 +78,7 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\TransactionReportController;
 use App\Http\Controllers\VisitorsController;
 use App\Http\Controllers\VitalController;
+use App\Http\Controllers\AmbulanceController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -545,6 +546,7 @@ Route::post('/getSymptoms', [OpdController::class, 'getSymptoms'])->name('getSym
 Route::get('/opd_view/{id}', [OpdController::class, 'showOpd'])->name('opd.show');
 Route::get('/getOpdById/{id}', [OpdController::class, 'getOpdById'])->name('getOpdById');
 Route::get('/getOpdMedicineById/{id}', [OpdController::class, 'getOpdMedicineById'])->name('getOpdMedicineById');
+Route::get('/getOpdRadPathById/{id}', [OpdController::class, 'getOpdRadPathById'])->name('getOpdRadPathById');
 Route::post('/add_prescription', [OpdController::class, 'storePrescription'])->name('opd.addPrescription');
 Route::post('/opd_medication', [OpdController::class, 'createOpdMedication'])->name('opd.createMedication');
 Route::post('/opd_charge', [OpdController::class, 'addOpdCharge'])->name('opd.addOpdCharge');
@@ -694,8 +696,7 @@ Route::prefix('dutyroster')->group(function () {
     // Route::delete('/destroy', [DutyRosterController::class, 'destroy'])->name('dutyroster.destroy');
     // Route::get('/show/{id}', [DutyRosterController::class, 'show'])->name('dutyroster.show');
 });
-Route::prefix('ambulance')->group(function () {
-});
+
 Route::prefix('staffs')->group(function () {
 
     Route::get('/', [StaffController::class, 'index'])->name('staffs.index');
@@ -724,6 +725,25 @@ Route::prefix('bloodBank')->group(function () {
     Route::put('/edit/{id}', [BloodDonorController::class, 'editDoner'])->name('bloodBank.editDoner');
     Route::put('/update/{id}', [BloodDonorController::class, 'updateDonor'])->name('bloodBank.updateDoner');
     Route::delete('/destroy/{id}', [BloodDonorController::class, 'destroyDonor'])->name('bloodBank.deleteDoner');
+
+});
+Route::prefix('ambulance')->group(function () {
+
+    Route::get('/index', [AmbulanceController::class, 'index'])->name('ambulanceCall.index');
+    Route::post('/addCall', [AmbulanceController::class, 'addCall'])->name('ambulanceCall.addCall');
+    Route::put('/editCall/{id}', [AmbulanceController::class, 'editCall'])->name('ambulanceCall.editCall');
+    Route::put('/updateCall/{id}', [AmbulanceController::class, 'updateCall'])->name('ambulanceCall.updateCall');
+    Route::delete('/destroyCall/{id}', [AmbulanceController::class, 'destroyCall'])->name('ambulanceCall.deleteCall');
+
+    Route::get('/charges/by-category/{category}', [AmbulanceController::class, 'getChargesByCategory'])->name('charges.byCategory');
+    Route::get('/charges/{charge}', [AmbulanceController::class, 'getChargeDetails'])->name('ambulanceCall.deleteCall');
+
+
+    Route::get('/issue', [AmbulanceController::class, 'bloodIssues'])->name('issue-blood.index');
+    Route::post('/addDonors', [AmbulanceController::class, 'addDonors'])->name('bloodBank.addDoner');
+    Route::put('/edit/{id}', [AmbulanceController::class, 'editDoner'])->name('bloodBank.editDoner');
+    Route::put('/update/{id}', [AmbulanceController::class, 'updateDonor'])->name('bloodBank.updateDoner');
+    Route::delete('/destroy/{id}', [AmbulanceController::class, 'destroyDonor'])->name('bloodBank.deleteDoner');
 
 });
 Route::prefix('certificate')->group(function () {

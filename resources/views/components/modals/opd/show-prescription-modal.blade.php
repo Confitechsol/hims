@@ -12,11 +12,9 @@
                 <button type="button" class="btn-close btn-close-modal custom-btn-close" data-bs-dismiss="modal"
                     aria-label="Close"><i class="ti ti-x"></i></button>
             </div>
-            <div class="modal-body p-0">
-
-
-                <div class="card border-0 mb-0">
-                    <div class="card-body pb-0 mb-0">
+            <div class="modal-body">
+                <div class="card border-0">
+                    <div class="card-body">
                         <!-- Items -->
                         <div class="d-flex align-items-center justify-content-between border-1 border-bottom pb-3 mb-3">
                             <div class="hospital_logo">
@@ -50,7 +48,7 @@
                                 <p class="text-dark mb-1"> Department : <span class="text-body" id="department"> </span>
                                 </p>
                                 <p class="text-dark mb-1"> Prescribed on : <span class="text-body"
-                                        id="ipd_date"></span> </p>
+                                        id="opd_date"></span> </p>
                             </div>
                         </div>
 
@@ -121,7 +119,7 @@
                         <!-- Items -->
 
                         <div
-                            class="pb-3 border-1 border-bottom d-flex align-items-center justify-content-between flex-wrap gap-2">
+                            class="pb-3 mb-3 border-1 border-bottom d-flex align-items-center justify-content-between flex-wrap gap-2">
                             <div class="">
                                 <h6 class="mb-1 fs-16 fw-semibold"> Follow Up </h6>
                                 <p id="pres_followup"></p>
@@ -133,11 +131,8 @@
                             </div>
                         </div>
 
-
-
                     </div>
                 </div>
-
             </div>
             <div class="modal-footer">
                 <div class="text-center w-100 d-flex align-items-center justify-content-center">
@@ -168,7 +163,7 @@
             const dAdvice = document.getElementById('prescription_advice');
             const department = document.getElementById('department');
             const followup = document.getElementById('pres_followup');
-            const ipdDate = document.getElementById('ipd_date');
+            const opdDate = document.getElementById('opd_date');
             const pName = document.getElementById('patient_name');
             const ageGender = document.getElementById('age_gender');
             const bGrp = document.getElementById('blood_group');
@@ -177,15 +172,15 @@
             const specialization = document.getElementById('dr_sign_specialization');
             const presType = document.getElementById('pres_type');
 
-            const isIpd = button.getAttribute('data-is-ipd');
+            const isOpd = button.getAttribute('data-is-opd');
 
-            if (isIpd === "true") {
+            if (isOpd === "true") {
 
-                const ipd_id = button.getAttribute('data-id');
+                const opd_id = button.getAttribute('data-id');
                 const pres_id = button.getAttribute('data-pres-id');
                 const prescribe_date = button.getAttribute('data-prescription-date');
-                /* ================= IPD DETAILS ================= */
-                fetch(`{{ route('getIpdById', ['id' => 'ID']) }}`.replace('ID', ipd_id))
+                /* ================= OPD DETAILS ================= */
+                fetch(`{{ route('getOpdById', ['id' => 'ID']) }}`.replace('ID', opd_id))
                     .then(res => res.json())
                     .then(data => {
 
@@ -195,19 +190,18 @@
                         qualification.innerHTML = data.doctor?.qualification ?? '-';
                         department.innerHTML = data.doctor?.department?.department_name ?? '-';
 
-                        // ipdDate.innerHTML = data.date ?? '-';
-                        ipdDate.innerHTML = prescribe_date ?? '-';
+                        opdDate.innerHTML = prescribe_date ?? '-';
                         pName.innerHTML = data.patient?.patient_name ?? '-';
                         ageGender.innerHTML =
                             (data.patient?.age ?? '-') + ' Y / ' + (data.patient?.gender ?? '-');
                         bGrp.innerHTML = data.patient?.blood_group?.name ?? '-';
                         pId.innerHTML = data.patient?.patient_id ?? '--';
 
-                        presType.innerHTML = 'IPD Prescription';
+                        presType.innerHTML = 'OPD Prescription';
                     });
 
-                /* ================= IPD MEDICINES ================= */
-                fetch(`{{ route('getIpdMedicineById', ['id' => 'ID']) }}`.replace('ID', pres_id))
+                /* ================= OPD MEDICINES ================= */
+                fetch(`{{ route('getOpdMedicineById', ['id' => 'ID']) }}`.replace('ID', pres_id))
                     .then(res => res.json())
                     .then(data => {
 
@@ -237,8 +231,8 @@
                         });
                     });
 
-                /* ================= IPD PATHOLOGY + RADIOLOGY ================= */
-                fetch(`{{ route('getIpdRadPathById', ['id' => 'ID']) }}`.replace('ID', pres_id))
+                /* ================= OPD PATHOLOGY + RADIOLOGY ================= */
+                fetch(`{{ route('getOpdRadPathById', ['id' => 'ID']) }}`.replace('ID', pres_id))
                     .then(res => res.json())
                     .then(data => {
                         console.log('Path/Rad API:', data);
@@ -294,7 +288,6 @@
             clone.style.position = "absolute";
             clone.style.top = "-9999px";
             clone.style.height = "auto";
-            clone.style.width = "210mm";
             clone.style.overflow = "visible";
 
             document.body.appendChild(clone);
@@ -336,9 +329,9 @@
             allowEscapeKey: false,
             didOpen: () => {
                 Swal.showLoading();
-
-                setTimeout(() => {
-                    generatePdf().then(pdf => {
+            }
+        });
+        generatePdf().then(pdf => {
                 Swal.close();
                 const blob = pdf.output('bloburl');
 
@@ -356,9 +349,5 @@
                 });
                 console.error(error);
             });
-                },0);
-            }
-        });
-
     }
 </script>

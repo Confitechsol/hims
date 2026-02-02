@@ -67,10 +67,30 @@ class PathologyController extends Controller
 
         return redirect()->back()->with('success', 'Pathology Category deleted successfully.');
     }
-    public function pathologyUnits()
+    public function pathologyUnits(Request $request)
     {
-        $units = Unit::where('unit_type', 'Pathology')->get();
-        return view('admin.setup.pathology_unit', compact('units'));
+
+       $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
+    $search = $request->input('search');
+
+        $query = Unit::where('unit_type', 'Pathology');
+
+     if (!empty($search)) {
+        $query->where(function ($q) use ($search) {
+            $q->where('unit_name', 'like', "%{$search}%");
+        });
+    }
+    $units = $query->paginate($perPage);
+
+    //     return response()->json([
+    //     'status' => true,
+    //     'message' => 'Staff list fetched successfully',
+    //     'data' => $units
+    // ]);
+       return view('admin.setup.pathology_unit', compact('units'));
     }
 
     public function storeUnit(Request $request)
