@@ -1049,6 +1049,7 @@ class IpdController extends Controller
             'released_date' => 'required|date',
             'bed_group'     => 'required',
             'new_bed'       => 'required',
+            'bed_charge'    => 'required|numeric|min:0',
         ]);
 
         $ipd = IpdDetail::findOrFail($request->ipd_id);
@@ -1084,6 +1085,45 @@ class IpdController extends Controller
         $ipd->bed          = $request->new_bed;
         $ipd->bed_group_id = $request->bed_group;
         $ipd->save();
+
+        // --- Create bed charge entry for transfer date ---
+        $transferDate = Carbon::parse($request->released_date);
+        $chargeDate = $transferDate->format('Y-m-d');
+        
+        // Get bed group to fetch bed_cost for bed_charge_rate
+        $bedGroup = BedGroup::find($request->bed_group);
+        $bedChargeRate = $bedGroup ? ($bedGroup->bed_cost ?? 0) : 0;
+        
+        // Calculate period (10 AM to next 10 AM)
+        // Start: Previous day 10:00 AM
+        $periodStart = $transferDate->copy()->subDay()->setTime(10, 0, 0);
+        // End: Current day 10:00 AM
+        $periodEnd = $transferDate->copy()->setTime(10, 0, 0);
+        
+        $periodStartDate = $periodStart->format('Y-m-d');
+        $periodEndDate = $periodEnd->format('Y-m-d');
+        
+        // Create or update bed charge entry for transfer date
+        IpdDaywiseBedCharge::updateOrCreate(
+            [
+                'ipd_id' => $ipd->id,
+                'charge_date' => $chargeDate,
+            ],
+            [
+                'hospital_id' => $ipd->hospital_id,
+                'branch_id' => $ipd->branch_id ?? null,
+                'case_reference_id' => $ipd->case_reference_id ?? null,
+                'patient_id' => $ipd->patient_id,
+                'period_start_date' => $periodStartDate,
+                'period_end_date' => $periodEndDate,
+                'bed_group_id' => $request->bed_group,
+                'bed_id' => $request->new_bed,
+                'bed_charge' => $request->bed_charge,
+                'bed_charge_rate' => $bedChargeRate,
+                'no_of_days' => 1,
+                'is_active' => 'yes',
+            ]
+        );
 
         return redirect()->back()->with('success', 'Bed assigned successfully.');
     }
