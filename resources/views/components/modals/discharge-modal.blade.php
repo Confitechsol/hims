@@ -735,7 +735,7 @@
                             <div class="row g-3">
                                 <div class="col-md-4">
                                     <label class="form-label">Medicine Name</label>
-                                    <select class="med-medicine" name="meds[]" id="meds" required>
+                                    <select class="med-medicine" name="meds[]" id="meds">
                                         <option value="">Select Medicine</option>
                                         {{-- @foreach ($medicines as $med)
                                             <option value="{{ $med->id }}">{{ $med->name }}</option>
@@ -755,7 +755,7 @@
 
                                 <div class="col-md-4">
                                     <label class="form-label">Interval</label>
-                                    <select class="med-interval" name="med_interval[]" required>
+                                    <select class="med-interval" name="med_interval[]">
                                         <option value="">Select</option>
 
                                     </select>
@@ -763,7 +763,7 @@
 
                                 <div class="col-md-4">
                                     <label class="form-label">Duration</label>
-                                    <select class="med-duration" name="med_duration[]" required>
+                                    <select class="med-duration" name="med_duration[]">
                                         <option value="">Select Duration</option>
 
                                     </select>
