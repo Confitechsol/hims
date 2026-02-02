@@ -556,9 +556,9 @@ Route::put('/ipd_view/delete/{id}', [IpdViewController::class, 'delete'])->name(
 Route::post('/ipd_view/operation/store', [IpdViewController::class, 'storeOperation'])->name('operation.store');
 Route::put('/ipd_view/operation/update/{id}', [IpdViewController::class, 'updateOperation'])->name('operation.update');
 Route::post('/ipd_view/pathology/update/{id}', [IpdViewController::class, 'updatePathReport'])->name('ipd.updateReport');
-Route::get('/pathology-report/download/{id}',[IpdViewController::class, 'downloadPathReport'])->name('path.report.download');
+Route::get('/pathology-report/download/{id}', [IpdViewController::class, 'downloadPathReport'])->name('path.report.download');
 Route::post('/ipd_view/radiology/update/{id}', [IpdViewController::class, 'updateRadioReport'])->name('ipd.updateRadioReport');
-Route::get('/radio-report/download/{id}',[IpdViewController::class, 'downloadRadioReport'])->name('radio.report.download');
+Route::get('/radio-report/download/{id}', [IpdViewController::class, 'downloadRadioReport'])->name('radio.report.download');
 Route::post('/transaction/store', [TransactionController::class, 'store'])->name('transactions.store');
 Route::post('/transaction/print', [TransactionController::class, 'store'])->name('transactions.print');
 Route::post('/transaction/show', [TransactionController::class, 'store'])->name('transactions.show');
@@ -965,8 +965,11 @@ Route::prefix('setup')->group(function () {
 Route::get('/getMedicineCategories', [MedicineController::class, 'getCategories'])->name('getMedicineCategories');
 Route::get('/getMedicines/{categoryId}', [MedicineController::class, 'getMedicines'])->name('getMedicines');
 Route::get('/getDoses/{categoryId}', [MedicineController::class, 'getDoses'])->name('getDoses');
+Route::get('/getDoses/{categoryId}', [MedicineController::class, 'getDoses'])->name('getDoses');
 Route::get('/getDoseIntervals', [MedicineController::class, 'getIntervals'])->name('getDoseIntervals');
 Route::get('/getDoseDurations', [MedicineController::class, 'getDurations'])->name('getDoseDurations');
+Route::get('/medMaster', [MedicineController::class, 'medicineMasters'])->name('med.master');
+Route::get('/getAllDoses', [MedicineController::class, 'getAllDoses'])->name('getAllDoses');
 
 Route::get('/blood_bank_status', function () {
     return view('admin.blood-bank-doner.blood_bank_status');

@@ -25,9 +25,38 @@ class DischargePdfController extends Controller
             $ipd->barcode = $this->encodeImage($ipd->barcode);
 
         }
-        $showHeaderFooter = $request->query('hf', 1);
+        $medCombinations = [];
+        $meds            = array_filter(
+            explode(',', $ipd->medicines),
+            fn($med) => $med !== null && trim($med) !== ''
+        );
+        $intervals = array_filter(
+            explode(',', $ipd->intervals),
+            fn($inv) => $inv !== null && trim($inv) !== ''
+        );
+        $durations = array_filter(
+            explode(',', $ipd->durations),
+            fn($dur) => $dur !== null && trim($dur) !== ''
+        );
+        $count = min(count($meds), count($intervals), count($durations));
 
-        $pdf = Pdf::loadView('admin.ipd.pdf.discharge-summary', [
+        for ($i = 0; $i < $count; $i++) {
+            $medCombinations[] = "{$meds[$i]} {$intervals[$i]} x {$durations[$i]}";
+        }
+
+        $medListHtml = '<ol style="padding-left:2.5rem;margin:0;">';
+
+        foreach ($medCombinations as $med) {
+            $medListHtml .= '<li>' . e($med) . '</li>';
+        }
+
+        $medListHtml .= '</ol>';
+        if (empty($medCombinations)) {
+            $medListHtml = null;
+        }
+        $ipd->discharge_medicines_html = $medListHtml;
+        $showHeaderFooter              = $request->query('hf', 1);
+        $pdf                           = Pdf::loadView('admin.ipd.pdf.discharge-summary', [
             'data'             => $ipd,
             'showHeaderFooter' => (bool) $showHeaderFooter,
         ])->setPaper('A4', 'portrait');

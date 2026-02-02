@@ -650,7 +650,9 @@
                                     @if ($ipd->discharged == 'yes')
                                         <button class="bg-transparent border-0" data-bs-toggle="modal"
                                             data-bs-target="#dischargePreviewModal"
-                                            data-discharge='@json($ipd->dischargeCard)'><i
+                                            data-discharge='@json($ipd->dischargeCard)'
+                                            data-medicines='@json($ipd->discharge_medicines)'
+                                            ><i
                                                 class="bi bi-clipboard-pulse text-white"></i></button>
                                     @else
                                         <button class="bg-transparent border-0" data-bs-toggle="modal"
@@ -3997,7 +3999,7 @@
                                                                 data-ipd-id="{{ $ipd->id }}"><i
                                                                     class="ti ti-plus me-1"></i>Add Prescription</a>
                                                         </div>
-                                                       @include('components.modals.add-prescription-modal') 
+                                                       @include('components.modals.add-prescription-modal')
                                                         <!-- First Modal -->
                                                         <div class="modal fade" id="add_timeline" tabindex="-1"
                                                             aria-hidden="true">

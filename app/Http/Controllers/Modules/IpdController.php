@@ -48,7 +48,7 @@ class IpdController extends Controller
         $charges    = Charge::all();
         $references = ['Direct', 'Doctor', 'Marketer', 'Other'];
         if ($isIpdTab) {
-            $ipd = IpdDetail::with('patient', 'ipdPatients', 'doctor', 'bedDetail', 'bedGroup.floorDetail')
+            $ipd = IpdDetail::with('patient', 'ipdPatients', 'doctor', 'bedDetail', 'bedGroup.floorDetail')->where('discharged', null)
                 ->when($search, function ($query) use ($search) {
                     $query->where(function ($q) use ($search) {
                         $q->where('ipd_no', 'LIKE', "%{$search}%")
@@ -1064,6 +1064,12 @@ class IpdController extends Controller
             'course_in_hospital' => ['nullable', 'string'],
             'present_complaints' => ['nullable', 'string'],
             'remarks'            => ['nullable', 'string'],
+            'meds'               => ['nullable', 'array'],
+            'meds.*'             => ['string'],
+            'med_interval'       => ['nullable', 'array'],
+            'med_interval.*'     => ['string'],
+            'med_duration'       => ['nullable', 'array'],
+            'med_duration.*'     => ['string'],
             'discharged_by'      => ['nullable', 'string'],
             'current_user'       => ['nullable', 'string'],
         ]);
@@ -1081,8 +1087,16 @@ class IpdController extends Controller
             } else {
                 $lastNumber = 0;
             }
-            $nextNumber     = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
-            $dischargeNo    = 'D-' . $nextNumber;
+            $nextNumber  = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+            $dischargeNo = 'D-' . $nextNumber;
+
+            $meds              = array_filter($request->meds, fn($med) => $med !== null && $med !== '');
+            $intervals         = array_filter($request->med_interval, fn($interval) => $interval !== null && $interval !== '');
+            $durations         = array_filter($request->med_duration, fn($duration) => $duration !== null && $duration !== '');
+            $implodedMeds      = implode(", ", $meds);
+            $implodedIntervals = implode(", ", $intervals);
+            $implodedDurations = implode(", ", $durations);
+
             $barcodePayload = [
                 'type'               => 'DISCHARGE',
                 'discharge_no'       => $dischargeNo,
@@ -1181,6 +1195,10 @@ class IpdController extends Controller
                 'present_complaints' => $validated['present_complaints'] ?? null,
                 'remarks'            => $validated['remarks'] ?? null,
 
+                'medicines'          => $implodedMeds ?? null,
+                'intervals'          => $implodedIntervals ?? null,
+                'durations'          => $implodedDurations ?? null,
+
                 'discharged_by'      => $validated['discharged_by'] ?? null,
                 'created_by'         => Auth::id(),
             ]);
@@ -1198,7 +1216,7 @@ class IpdController extends Controller
                 ->with('success', 'Patient discharged successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            // dd($e);
+            dd($e);
             \Log::error($e);
             return back()
                 ->with('error', 'Something went wrong while saving discharge details.')

@@ -318,6 +318,76 @@
     .ck-editor__editable {
         min-height: 300px;
     }
+
+    /* Medicine Row Styles */
+    .med-row {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        position: relative;
+        animation: slideDown 0.3s ease-out;
+    }
+
+    .med-row-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .med-row-number {
+        font-weight: 700;
+        color: #ab00db;
+        font-size: 0.95rem;
+    }
+
+    .btn-remove-medicine {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 0.375rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-remove-medicine:hover {
+        background: #c82333;
+        transform: scale(1.05);
+    }
+
+    .btn-add-medicine {
+        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+        color: white;
+        border: none;
+        padding: 0.625rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+
+    .btn-add-medicine:hover {
+        background: linear-gradient(135deg, #218838 0%, #155724 100%);
+        box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
+        transform: translateY(-1px);
+    }
+
+    .btn-add-medicine i {
+        font-size: 1.1rem;
+    }
+
+    .medicine-container {
+        margin-bottom: 1.5rem;
+    }
 </style>
 
 <div class="modal fade" id="patientDischargeModal" tabindex="-1" aria-labelledby="patientDischargeModalLabel"
@@ -335,7 +405,16 @@
             </div>
 
             <!-- Form Body -->
+            <div id="medLoader"
+                class="position-absolute top-0 start-0 w-100 h-100 align-items-center justify-content-center bg-white bg-opacity-75"
+                style="z-index: 1056; display: none;">
+                <div class="text-center">
+                    <div class="spinner-border text-primary mb-2" role="status"></div>
+                    <div class="fw-semibold">Loading Form data...</div>
+                </div>
+            </div>
             <div class="modal-body">
+
                 <div class="alert-custom">
                     <i class="bi bi-exclamation-triangle-fill alert-icon"></i>
                     <p class="alert-text">Please note that before discharging, check patient bill.</p>
@@ -358,7 +437,8 @@
                                 <i class="bi bi-person"></i>
                                 Patient Name <span class="required">*</span>
                             </label>
-                            <input type="text" class="form-control" id="patient_name_text" name="patient_name" required>
+                            <input type="text" class="form-control" id="patient_name_text" name="patient_name"
+                                required>
                             <input type="hidden" class="form-control" id="patient_id_text" name="patient_id" required>
                         </div>
 
@@ -468,7 +548,8 @@
                                 <i class="bi bi-calendar-check"></i>
                                 Admission Date
                             </label>
-                            <input type="date" class="form-control" id="admission_date_text" name="admission_date">
+                            <input type="date" class="form-control" id="admission_date_text"
+                                name="admission_date">
                         </div>
 
                         <div class="col-md-4">
@@ -501,7 +582,8 @@
                                 Under Care Dr
                             </label>
                             <input type="text" class="form-control" id="under_care_dr_text" name="under_care_dr">
-                            <input type="hidden" class="form-control" id="registration_no_text" name="registration_no">
+                            <input type="hidden" class="form-control" id="registration_no_text"
+                                name="registration_no">
                         </div>
 
                         <div class="col-md-6">
@@ -590,6 +672,112 @@
                             </label>
                             <textarea class="form-control" id="remarks_text" name="remarks" rows="3"></textarea>
                         </div>
+                    </div>
+
+                    <!-- Medicines Section -->
+                    <h5 class="section-title mt-4">
+                        <i class="bi bi-capsule"></i>
+                        Discharge Medications
+                    </h5>
+
+
+                    {{-- modal row template --}}
+                    <template id="medRowTemplate">
+                        <div class="med-row">
+                            <div class="medicine-row-header d-flex justify-content-between">
+                                <span class="medicine-row-number"></span>
+                                <button type="button" class="btn-remove-medicine btn btn-danger btn-sm">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+
+                            <div class="row g-3 mt-2">
+                                <div class="col-md-4">
+                                    <label class="form-label">Medicine Name</label>
+                                    <select class="med-medicine" name="meds[]">
+                                        <option value="">Select Medicine</option>
+                                    </select>
+                                </div>
+
+                                {{-- <div class="col-md-3">
+                                    <label class="form-label">Dose</label>
+                                    <select class="form-select med-dose" name="med_doses[]">
+                                        <option value="">Select Dose</option>
+                                    </select>
+                                </div> --}}
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Interval</label>
+                                    <select class="med-interval" name="med_interval[]"></select>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Duration</label>
+                                    <select class="med-duration" name="med_duration[]"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                    <div class="medicine-container" id="medContainer">
+                        <!-- Medicine rows will be added here dynamically -->
+                        <div class="med-row" data-index="1">
+                            <div class="medicine-row-header" class="d-flex justify-content-between">
+                                <span class="medicine-row-number">
+                                    <i class="bi bi-capsule-pill"></i> Medicine <span
+                                        class="badge bg-primary">1</span>
+                                </span>
+                                <button type="button" class="btn-remove-medicine d-none">
+                                    <i class="bi bi-trash"></i> Remove
+                                </button>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">Medicine Name</label>
+                                    <select class="med-medicine" name="meds[]" id="meds" required>
+                                        <option value="">Select Medicine</option>
+                                        {{-- @foreach ($medicines as $med)
+                                            <option value="{{ $med->id }}">{{ $med->name }}</option>
+                                        @endforeach --}}
+                                    </select>
+                                </div>
+
+                                {{-- <div class="col-md-3">
+                                    <label class="form-label">Dose</label>
+                                    <select class="form-select med-dose" name="med_doses[]" id="med-doses" required>
+                                        <option value="">Select Dose</option> --}}
+                                {{-- @foreach ($doses as $dose)
+                                            <option value="{{ $dose->id }}">{{ $dose->name }}</option>
+                                        @endforeach --}}
+                                {{-- </select>
+                                </div> --}}
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Interval</label>
+                                    <select class="med-interval" name="med_interval[]" required>
+                                        <option value="">Select</option>
+
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Duration</label>
+                                    <select class="med-duration" name="med_duration[]" required>
+                                        <option value="">Select Duration</option>
+
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="text-end mb-3">
+                        <button type="button" class="btn-add-medicine" id="addMedBtn">
+                            <i class="bi bi-plus-circle"></i>
+                            Add Medicine
+                        </button>
                     </div>
 
 
@@ -716,20 +904,151 @@
         });
 </script>
 
+
 <script>
+    let doseIntervals = [];
+    let doseDurations = [];
+    let medMaster = [];
+
+    function showMedLoader() {
+        document.getElementById('medLoader').style.display = 'flex';
+        document.getElementById('addMedBtn').disabled = true;
+    }
+
+    function hideMedLoader() {
+        document.getElementById('medLoader').style.display = 'none';
+        document.getElementById('addMedBtn').disabled = false;
+    }
+
+    function initTomSelects(row) {
+        const medicineSelect = row.querySelector('.med-medicine');
+        const intervalSelect = row.querySelector('.med-interval');
+        const durationSelect = row.querySelector('.med-duration');
+
+        if (medicineSelect && !medicineSelect.tomselect) {
+            new TomSelect(medicineSelect, {
+                options: medMaster.map(i => ({
+                    value: i.name,
+                    label: i.name
+                })),
+                valueField: 'value',
+                labelField: 'label',
+                searchField: 'label',
+                placeholder: 'Select Interval'
+            });
+        }
+
+        if (intervalSelect && !intervalSelect.tomselect) {
+            new TomSelect(intervalSelect, {
+                options: doseIntervals.map(i => ({
+                    value: i.name,
+                    label: i.name
+                })),
+                valueField: 'value',
+                labelField: 'label',
+                searchField: 'label',
+                placeholder: 'Select Interval'
+            });
+        }
+
+        if (durationSelect && !durationSelect.tomselect) {
+            new TomSelect(durationSelect, {
+                options: doseDurations.map(d => ({
+                    value: d.name,
+                    label: d.name
+                })),
+                valueField: 'value',
+                labelField: 'label',
+                searchField: 'label',
+                placeholder: 'Select Duration'
+            });
+        }
+    }
     document.addEventListener('DOMContentLoaded', function() {
 
         const dischargeModal = document.getElementById('patientDischargeModal');
+        const container = document.getElementById('medContainer');
+        const addBtn = document.getElementById('addMedBtn');
+        const template = document.getElementById('medRowTemplate');
 
-        dischargeModal.addEventListener('show.bs.modal', function(event) {
+
+        dischargeModal.addEventListener('show.bs.modal', async function(event) {
             const button = event.relatedTarget;
 
+            showMedLoader()
+            try {
+                /* ---- Fetch ONCE ---- */
+                if (!doseIntervals.length) {
+                    doseIntervals = await fetch("{{ route('getDoseIntervals') }}").then(r => r
+                        .json());
+                }
+
+                if (!doseDurations.length) {
+                    doseDurations = await fetch("{{ route('getDoseDurations') }}").then(r => r
+                        .json());
+                }
+                if (!medMaster.length) {
+                    medMaster = await fetch("{{ route('med.master') }}").then(r => r.json());
+                }
+
+                /* ---- Init FIRST static row ---- */
+                const firstRow = container.querySelector('.med-row');
+                if (firstRow) {
+                    initTomSelects(firstRow);
+                }
+
+
+
+            } catch (error) {
+                console.error(err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed to load data',
+                    text: 'Please try again',
+                });
+            } finally {
+                console.log("In Hide");
+
+                hideMedLoader();
+            }
+
+            /* ------------------------------
+                    ADD MEDICINE ROW
+                    --------------------------------*/
+            addBtn.addEventListener('click', () => {
+                showMedLoader();
+                setTimeout(() => {
+                    // existing add row logic
+                    hideMedLoader();
+                }, 100);
+                const index = container.querySelectorAll('.med-row').length + 1;
+
+                const clone = template.content.cloneNode(true);
+                const row = clone.querySelector('.med-row');
+
+                row.dataset.index = index;
+
+                row.querySelector('.medicine-row-number').innerHTML =
+                    `<i class="bi bi-capsule-pill"></i> Medicine
+             <span class="badge bg-primary">${index}</span>`;
+
+                /* Remove row */
+                row.querySelector('.btn-remove-medicine').onclick = () => row.remove();
+
+                container.appendChild(row);
+
+                /* Init TomSelect AFTER append */
+                initTomSelects(row);
+            });
+
+            // const firstRow = document.querySelector('.med-row');
+            // initTomSelects(firstRow, intervals, durations);
             // 🔹 Parse data attributes
             const ipd = JSON.parse(button.getAttribute('data-ipd') || '{}');
-            console.log(ipd);
 
             const doctors = JSON.parse(button.getAttribute('data-doctors') || '[]');
             const currentUser = JSON.parse(button.getAttribute('data-user') || '{}')
+
             window.currentUser = currentUser.role
             // 🔹 Basic identifiers
             document.getElementById('ipd-id').value = ipd.id ?? '';
@@ -746,7 +1065,8 @@
 
             // 🔹 Patient Details
             setValue('age_text',
-                `${ipd.patient?.age} Years ${ipd.patient?.month} Months ${ipd.patient?.day} Days`);
+                `${ipd.patient?.age} Years ${ipd.patient?.month} Months ${ipd.patient?.day} Days`
+            );
             setSelectValue('gender_text', ipd.patient?.gender);
             setValue('phone_text', ipd.patient?.mobileno);
             setSelectValue('marital_status_text', ipd.patient?.marital_status);
@@ -762,6 +1082,7 @@
             setValue('registration_no_text', ipd.doctor?.registration_no);
             setValue('discharged_by_text', currentUser.username);
             setValue('current_user_text', currentUser.user_role.name);
+
             // setValue('corporate', ipd.corporate);
 
             // 🔹 OT Done By (MULTI SELECT)
@@ -797,6 +1118,7 @@
 
             document.getElementById('discharge_time_text').value =
                 now.toISOString().split('T')[1].slice(0, 5);
+
         });
 
         /**

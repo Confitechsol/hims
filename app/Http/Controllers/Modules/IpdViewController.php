@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Modules;
 use App\Http\Controllers\Controller;
 use App\Models\DischargeCard;
 use App\Models\Doctor;
+use App\Models\DoctorVisit;
 use App\Models\Finding;
 use App\Models\IpdCharges;
 use App\Models\IpdDetail;
@@ -11,7 +12,6 @@ use App\Models\IpdPrescription;
 use App\Models\MedicationReport;
 use App\Models\MedicineCategory;
 use App\Models\MedicineDosage;
-use App\Models\DoctorVisit;
 use App\Models\NurseNote;
 use App\Models\Operation;
 use App\Models\OperationCategory;
@@ -27,10 +27,10 @@ use App\Models\Symptom;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Vital;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 
 class IpdViewController extends Controller
@@ -46,10 +46,11 @@ class IpdViewController extends Controller
         }
         return null;
     }
+
     public function showIpd(Request $request, $id)
     {
-       
-        $ipd             = IpdDetail::with('patient.bloodGroup', 'patient.organisation', 'doctor', 'bedDetail', 'bedGroup', 'treatmentHistory')->where('id', $id)->firstOrFail();
+
+        $ipd = IpdDetail::with('patient.bloodGroup', 'patient.organisation', 'doctor', 'bedDetail', 'bedGroup', 'treatmentHistory')->where('id', $id)->firstOrFail();
         // dd($request->all(),$id, $ipd);
         $bedShiftHistory = PatientBedHistory::with('ipd', 'bedGroup', 'bed')->where('is_active', 'yes')->where('ipd_id', $id)->first();
         $symptomIds      = array_filter(
@@ -114,7 +115,28 @@ class IpdViewController extends Controller
         $radiologyReports = RadiologyReport::with('radiology')->where('patient_id', $ipd->patient->id)->get();
         $doctorvisits     = DoctorVisit::with(['patient', 'doctor'])->where('patient_id', $ipd->patient->id)->get();
         if ($ipd->discharged == 'yes') {
-            $ipd->dischargeCard = DischargeCard::where('ipd_details_id', $id)->firstOrFail();
+            $dischargeCard      = DischargeCard::where('ipd_details_id', $id)->firstOrFail();
+            $ipd->dischargeCard = $dischargeCard;
+            $medCombinations    = [];
+            $meds               = array_filter(
+                explode(',', $dischargeCard->medicines),
+                fn($med) => $med !== null && trim($med) !== ''
+            );
+            $intervals = array_filter(
+                explode(',', $dischargeCard->intervals),
+                fn($inv) => $inv !== null && trim($inv) !== ''
+            );
+            $durations = array_filter(
+                explode(',', $dischargeCard->durations),
+                fn($dur) => $dur !== null && trim($dur) !== ''
+            );
+            $count = min(count($meds), count($intervals), count($durations));
+
+            for ($i = 0; $i < $count; $i++) {
+                $medCombinations[] = "{$meds[$i]} {$intervals[$i]} x {$durations[$i]}";
+            }
+
+            $ipd->discharge_medicines = $medCombinations;
 
             if ($ipd->dischargeCard->barcode) {
                 $ipd->dischargeCard->barcode = $this->encodeImage($ipd->dischargeCard->barcode);
@@ -123,6 +145,7 @@ class IpdViewController extends Controller
         }
         $currentUser = User::with('userRole')->where('id', Auth::id())->firstOrFail();
 
+        // dd($ipd);
         //dd($currentUser->username);
         return view('admin.ipd.ipd_view', compact(
             'ipd',
@@ -297,19 +320,17 @@ class IpdViewController extends Controller
     }
     public function updatePathReport(Request $request, $labId)
     {
-        
+
         $request->validate([
-            'attachment'        => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-            'collected_by'      => 'nullable|string|max:255',
-            'approved_by'       => 'nullable|numeric',
-            'collection_date'   => 'nullable|date',
+            'attachment'      => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'collected_by'    => 'nullable|string|max:255',
+            'approved_by'     => 'nullable|numeric',
+            'collection_date' => 'nullable|date',
         ]);
-        
-        
 
         $report = PathologyReport::where('id', $labId)->first();
 
-        if (!$report) {
+        if (! $report) {
             return back()->with('error', 'Pathology report not found.');
         }
 
@@ -322,7 +343,7 @@ class IpdViewController extends Controller
             }
 
             $path = $request->file('attachment')
-                            ->store('pathology_reports', 'public');
+                ->store('pathology_reports', 'public');
 
             $report->path_doc_path = $path;
         }
@@ -338,19 +359,17 @@ class IpdViewController extends Controller
     }
     public function updateRadioReport(Request $request, $labId)
     {
-        
+
         $request->validate([
-            'attachment'        => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-            'collected_by'      => 'nullable|string|max:255',
-            'approved_by'       => 'nullable|numeric',
-            'collection_date'   => 'nullable|date',
+            'attachment'      => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'collected_by'    => 'nullable|string|max:255',
+            'approved_by'     => 'nullable|numeric',
+            'collection_date' => 'nullable|date',
         ]);
-        
-        
 
         $report = RadiologyReport::where('id', $labId)->first();
 
-        if (!$report) {
+        if (! $report) {
             return back()->with('error', 'Radiology report not found.');
         }
 
@@ -363,7 +382,7 @@ class IpdViewController extends Controller
             }
 
             $path = $request->file('attachment')
-                            ->store('radiology_reports', 'public');
+                ->store('radiology_reports', 'public');
 
             $report->radio_doc_path = $path;
         }
@@ -381,7 +400,7 @@ class IpdViewController extends Controller
     {
         $report = PathologyReport::findOrFail($id);
 
-        if (!$report->path_doc_path || !Storage::disk('public')->exists($report->path_doc_path)) {
+        if (! $report->path_doc_path || ! Storage::disk('public')->exists($report->path_doc_path)) {
             return back()->with('error', 'Report file not found.');
         }
 
@@ -391,7 +410,7 @@ class IpdViewController extends Controller
     {
         $report = RadiologyReport::findOrFail($id);
 
-        if (!$report->radio_doc_path || !Storage::disk('public')->exists($report->radio_doc_path)) {
+        if (! $report->radio_doc_path || ! Storage::disk('public')->exists($report->radio_doc_path)) {
             return back()->with('error', 'Report file not found.');
         }
 
