@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\BedGroup;
 use App\Models\Floor;
+use App\Models\GstMaster;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -22,10 +23,10 @@ class BedGroupController extends Controller
             $bedGroups->where(function ($query) use ($search_term) {
                 $query->where('name', 'like', "%{$search_term}%");
             });
-            $bedGroups = $bedGroups->paginate($perPage);
+            $bedGroups = $bedGroups->with('floorDetail')->paginate($perPage);
             return ["result" => $bedGroups];
         }
-        $bedGroups = $bedGroups->paginate($perPage);
+        $bedGroups = $bedGroups->with('floorDetail')->paginate($perPage);
         return view('admin.bed-group.index', compact('bedGroups', 'floors'));
     }
 
@@ -43,6 +44,8 @@ class BedGroupController extends Controller
             'color'       => $request->color,
             'bed_cost'    => $request->bed_cost,
             'description' => $request->description ?? "",
+            'sac_hsn_code' => $request->sac_hsn_code ?? null,
+            'gst_rate'    => $request->gst_rate ?? null,
             'is_active'   => 0,
         ]);
 
@@ -58,9 +61,14 @@ class BedGroupController extends Controller
             'floor' => 'required',
         ]);
 
-        $group        = BedGroup::findOrFail($request->id);
-        $group->name  = $request->name;
+        $group = BedGroup::findOrFail($request->id);
+        $group->name = $request->name;
         $group->color = $request->color;
+        $group->bed_cost = $request->bed_cost ?? $group->bed_cost;
+        $group->description = $request->description ?? $group->description;
+        $group->sac_hsn_code = $request->sac_hsn_code ?? $group->sac_hsn_code;
+        $group->gst_rate = $request->gst_rate ?? $group->gst_rate;
+        $group->floor = $request->floor ?? $group->floor;
         $group->save();
 
         return redirect()->back()->with('success', 'Bed group updated successfully.');
@@ -75,5 +83,33 @@ class BedGroupController extends Controller
         BedGroup::findOrFail($request->id)->delete();
 
         return redirect()->back()->with('success', 'Bed group deleted successfully.');
+    }
+
+    public function getGstMasters(Request $request)
+    {
+        $search = $request->input('search', '');
+        
+        $gstMasters = GstMaster::query();
+        
+        if ($search) {
+            $gstMasters->where(function($query) use ($search) {
+                $query->where('code', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+        
+        $gstMasters = $gstMasters->orderBy('code', 'asc')->limit(50)->get();
+        
+        return response()->json([
+            'success' => true,
+            'data' => $gstMasters->map(function($gst) {
+                return [
+                    'id' => $gst->id,
+                    'code' => $gst->code,
+                    'description' => $gst->description,
+                    'gst_rate' => $gst->gst_rate
+                ];
+            })
+        ]);
     }
 }

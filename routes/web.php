@@ -67,6 +67,7 @@ use App\Http\Controllers\Setup\MedicineUnitController as SetupMedicineUnitContro
 use App\Http\Controllers\Setup\PackageController;
 use App\Http\Controllers\Setup\PrefixesController;
 use App\Http\Controllers\Setup\ProfileController;
+use App\Http\Controllers\Setup\GstMasterController;
 use App\Http\Controllers\Setup\RadiologyController;
 use App\Http\Controllers\Setup\UnitController;
 use App\Http\Controllers\Setup\UsersController;
@@ -132,6 +133,14 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/prefix', [PrefixesController::class, 'index'])->name('prefix');
     Route::post('/prefix/store', [PrefixesController::class, 'store'])->name('prefix.store');
     Route::put('/prefixes/update', [PrefixesController::class, 'update'])->name('prefixes.update');
+
+    Route::get('/gst-master', [GstMasterController::class, 'index'])->name('gst_master.index');
+    Route::post('/gst-master/store', [GstMasterController::class, 'store'])->name('gst_master.store');
+    Route::put('/gst-master/update', [GstMasterController::class, 'update'])->name('gst_master.update');
+    Route::delete('/gst-master/destroy', [GstMasterController::class, 'destroy'])->name('gst_master.destroy');
+    Route::post('/gst-master/import', [GstMasterController::class, 'importCsv'])->name('gst_master.import');
+    Route::get('/gst-master/export', [GstMasterController::class, 'exportCsv'])->name('gst_master.export');
+    Route::get('/gst-master/download-sample', [GstMasterController::class, 'downloadSampleCsv'])->name('gst_master.download.sample');
 
     Route::get('/roles', [RolesController::class, 'index'])->name('roles');
     Route::post('/roles/store', [RolesController::class, 'store'])->name('roles.store');
@@ -205,6 +214,7 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/bed-groups/store', [BedGroupController::class, 'store'])->name('bed-groups.store');
     Route::put('/bed-groups/update', [BedGroupController::class, 'update'])->name('bed-groups.update');
     Route::delete('/bed-groups/destroy', [BedGroupController::class, 'destroy'])->name('bed-groups.destroy');
+    Route::get('/bed-groups/gst-masters', [BedGroupController::class, 'getGstMasters'])->name('bed-groups.gst-masters');
 
     Route::get('/bed-types', [BedTypeController::class, 'index'])->name('bed-types.index');
     Route::post('/bed-types/store', [BedTypeController::class, 'store'])->name('bed-types.store');
@@ -551,6 +561,7 @@ Route::delete('/ipd/{id}/remove-package', [IpdController::class, 'removePackage'
 Route::get('/getBedGroups', [IpdController::class, 'getBedGroups'])->name('getBedGroups');
 Route::get('/get-available-beds', [IpdController::class, 'getAvailableBeds'])->name('get.available.beds');
 Route::get('/getBedNumbers/{id}', [IpdController::class, 'getBedNumbers'])->name('getBedNumbers');
+Route::get('/getBedGroupCharge/{id}', [IpdController::class, 'getBedGroupCharge'])->name('getBedGroupCharge');
 Route::get('/ipd_view/{id}', [IpdViewController::class, 'showIpd'])->name('ipd.show');
 Route::post('/ipd_view/medicine/store', [IpdViewController::class, 'store'])->name('medication.store');
 Route::put('/ipd_view/update', [IpdViewController::class, 'update'])->name('medication.update');

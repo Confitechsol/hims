@@ -901,6 +901,12 @@
                                     <option value="">Loading...</option>
                                 </select>
                             </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Bed Charge (INR) <span class="required">*</span></label>
+                                <input type="number" class="form-control" name="bed_charge" id="bed_charge_input" 
+                                    step="0.01" min="0" placeholder="0.00">
+                                <small class="text-muted">Auto-filled from bed group (editable)</small>
+                            </div>
                             {{-- <div class="col-md-6">
                                 <label class="form-label">Charge Category</label>
                                 <select class="form-select" name="charge_category" id="charge_category_select">
@@ -1471,9 +1477,15 @@
                         .trigger('change.select2');
                 });
 
-            // Bed Group Change → Load Bed Numbers
+            // Bed Group Change → Load Bed Numbers and Bed Charge
             bedGroupSelect.off('change.select2load').on('change.select2load', function() {
                 const selectedId = $(this).val();
+                const bedChargeInput = document.getElementById('bed_charge_input');
+
+                // Reset bed charge
+                if (bedChargeInput) {
+                    bedChargeInput.value = '';
+                }
 
                 bedNumberSelect
                     .prop('disabled', true)
@@ -1482,6 +1494,30 @@
                     .trigger('change.select2');
 
                 if (!selectedId) return;
+
+                // Fetch bed group charge
+                const chargeUrl = "{{ route('getBedGroupCharge', ['id' => 'ID']) }}";
+                const chargeFinalUrl = chargeUrl.replace('ID', selectedId);
+                
+                fetch(chargeFinalUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.bed_cost) {
+                            if (bedChargeInput) {
+                                bedChargeInput.value = parseFloat(data.bed_cost).toFixed(2);
+                            }
+                        } else {
+                            if (bedChargeInput) {
+                                bedChargeInput.value = '0.00';
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching bed charge:', error);
+                        if (bedChargeInput) {
+                            bedChargeInput.value = '0.00';
+                        }
+                    });
 
                 const baseUrl = "{{ route('getBedNumbers', ['id' => 'ID']) }}";
                 const finalUrl = baseUrl.replace('ID', selectedId);
