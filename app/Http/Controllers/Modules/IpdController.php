@@ -11,6 +11,7 @@ use App\Models\Doctor;
 use App\Models\Finding;
 use App\Models\IpdCharges;
 use App\Models\IpdDetail;
+use App\Models\IpdDaywiseBedCharge;
 use App\Models\IpdMedicine;
 use App\Models\IpdPatient;
 use App\Models\IpdPrescription;
@@ -99,6 +100,7 @@ class IpdController extends Controller
             'live_consultation'    => 'nullable|string|max:100',
             'bed_group'            => 'nullable|exists:bed_group,id',
             'bed_number'           => 'nullable|exists:bed,id',
+            'bed_charge'           => 'nullable|numeric|min:0',
             'symptoms_type'        => 'nullable|array',
             'symptoms_type.*'      => 'string',
             'symptoms_title'       => 'array',
@@ -198,6 +200,52 @@ class IpdController extends Controller
 
             $bedDetail->is_active = 'no';
             $bedDetail->save();
+
+            // Create initial bed charge entry for admission date
+            if ($request->bed_group && $request->admission_date) {
+                $bedGroup = BedGroup::find($request->bed_group);
+                $bedChargeRate = $bedGroup->bed_cost ?? 0.00;
+                
+                // Get bed charge from request or use bed_group.bed_cost
+                $bedCharge = $request->bed_charge ?? $bedChargeRate;
+                
+                if ($bedCharge > 0) {
+                    // Calculate admission date period (10 AM to next 10 AM)
+                    $admissionDate = Carbon::parse($request->admission_date);
+                    $chargeDate = $admissionDate->format('Y-m-d');
+                    
+                    // Start: Previous day 10:00 AM
+                    $periodStart = $admissionDate->copy()->subDay()->setTime(10, 0, 0);
+                    // End: Current day 10:00 AM
+                    $periodEnd = $admissionDate->copy()->setTime(10, 0, 0);
+                    
+                    $periodStartDate = $periodStart->format('Y-m-d');
+                    $periodEndDate = $periodEnd->format('Y-m-d');
+                    
+                    // Create bed charge entry
+                    IpdDaywiseBedCharge::updateOrCreate(
+                        [
+                            'ipd_id' => $ipd->id,
+                            'charge_date' => $chargeDate,
+                        ],
+                        [
+                            'hospital_id' => $ipd->hospital_id,
+                            'branch_id' => $ipd->branch_id ?? null,
+                            'case_reference_id' => $ipd->case_reference_id ?? null,
+                            'patient_id' => $ipd->patient_id,
+                            'period_start_date' => $periodStartDate,
+                            'period_end_date' => $periodEndDate,
+                            'bed_group_id' => $request->bed_group,
+                            'bed_id' => $request->bed_number,
+                            'bed_charge' => $bedCharge,
+                            'bed_charge_rate' => $bedChargeRate,
+                            'no_of_days' => 1,
+                            'is_active' => 'yes',
+                        ]
+                    );
+                }
+            }
+
             DB::commit();
 
             return redirect()->route('ipd')->with('success', 'IPD record created successfully . ')
@@ -358,6 +406,23 @@ class IpdController extends Controller
             ->get();
         // dd($bedNumbers);
         return response()->json($bedNumbers, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
+    }
+
+    public function getBedGroupCharge(Request $request, $id)
+    {
+        try {
+            $bedGroup = BedGroup::findOrFail($id);
+            return response()->json([
+                'success' => true,
+                'bed_cost' => $bedGroup->bed_cost ?? 0.00,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'bed_cost' => 0.00,
+                'message' => 'Bed group not found',
+            ], 404);
+        }
     }
 
     public function showIpd(Request $request, $id)
