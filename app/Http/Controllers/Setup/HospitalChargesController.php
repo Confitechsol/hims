@@ -16,54 +16,35 @@ use App\Models\OrganisationsCharge;
 class HospitalChargesController extends Controller
 {
     public function index(Request $request){
+       $charges = Charge::query();
+       $charge_types = ChargeTypeMaster::all();
+       $chargeCategories = ChargeCategory::all();
+       $charge_unit= ChargeUnit::all();
+       $charge_tax_category_id=TaxCategory::all();
+       $organisation_names=organisation::all();
+       $organisation_charges = OrganisationsCharge::all();
+       $perPage   = intval($request->input('perPage', 10));
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
 
-    $perPage = (int) $request->input('perPage', 10);
-    if ($perPage <= 0) {
-        $perPage = 10;
-    }
-
-    $search = $request->input('search');
-
-     //  $charges = Charge::with(['category.chargeType','taxCategory','unit'])->get();
-      $query = Charge::with([
-        'category.chargeType',
-        'taxCategory',
-        'unit'
-    ]);
-
-    if (!empty($search)) {
-        $query->where(function ($q) use ($search) {
+        if (!empty($search)) {
+        $charges->where(function ($q) use ($search) {
             $q->where('charge_name', 'like', "%{$search}%")
               ->orWhere('charge_code', 'like', "%{$search}%")
               ->orWhereHas('category', function ($qc) use ($search) {
                   $qc->where('name', 'like', "%{$search}%");
               });
         });
+         $charges = $charges->paginate($perPage);
+         return ["result" => $charges];
     }
-     $charges = $query->paginate($perPage)->withQueryString();
+     $charges = $charges->paginate($perPage);
 
-       $charge_types = ChargeTypeMaster::get();
-       $chargeCategories = ChargeCategory::get();
-       $charge_unit= ChargeUnit::get();
-       $charge_tax_category_id=TaxCategory::get();
-       $organisation_names=organisation::get();
-       $organisation_charges = OrganisationsCharge::get();
-        // return array(
-        //     "charge_types"=>$charge_types,
-        //     "charge_categories"=>$chargeCategories
-        // );
-       
-    //  return  $charge_tax_category_id;
-    // if ($request->ajax()) {
-    //     return response()->json([
-    //         'status'  => true,
-    //         'message' => 'Charge list fetched successfully',
-    //         'data'    => $charges
-    //     ]);
-    // }
-       return view('admin.setup.charges',compact('charges','charge_types','charge_unit','charge_tax_category_id','organisation_names','chargeCategories','organisation_charges','perPage','search'));
+     return view('admin.setup.charges',compact('charges','charge_types','charge_unit','charge_tax_category_id','organisation_names','chargeCategories','organisation_charges'));
+
     }
-
+   
     public function store(Request $request){
     $request->validate ( [
         'charge_type' => 'required',
