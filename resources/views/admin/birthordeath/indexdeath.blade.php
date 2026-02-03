@@ -218,6 +218,16 @@
                                                                                                     height: 70px;
                                                                                                     margin-bottom: 15px;
                                                                                                 }
+
+                                                                                                .cut_list {
+                                                                                                    border: dashed 2px #9C27B0;
+                                                                                                }
+
+                                                                                                .heading {
+                                                                                                    color: #750096;
+                                                                                                    padding-top: 12px;
+                                                                                                    text-align: center;
+                                                                                                }
                                                                                             </style>
                                                                                             <div class="certificate">
                                                                                                 <div class="header">
@@ -268,10 +278,192 @@
                                                                                                     {{$report->patient->address ?? '-' }}
                                                                                                 </div>
 
+                                                                                                <div class="cut_list"></div>
+
+                                                                                                <div class="heading">
+                                                                                                    <h3>Death Certificate</h3>
+                                                                                                </div>
 
 
+                                                                                                <div class="row">
+                                                                                                    <div class="col">
+                                                                                                        <label>Name of Hospital :</label>
+                                                                                                        <div class="line-data">
+                                                                                                            Samaritan Clinic Pvt. Ltd.
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                    <div class="col">
+                                                                                                        <label>(Patient Reg No.) :</label>
+                                                                                                        <div class="line-data">
+                                                                                                            A-002405/25-26
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                    <div class="col">
+                                                                                                        <label>Date :</label>
+                                                                                                        <div class="line-data">
+                                                                                                            10/01/2026
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div class="row">
+                                                                                                    <div class="col">
+                                                                                                        <label>Address :</label>
+                                                                                                        <div class="line-data">
+                                                                                                            4,Roy Mansion, Elgin Road,
+                                                                                                            10/4D, Lala lajpat Rai Sarani,
+                                                                                                            Kolkata -700020,
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div class="row">
+                                                                                                    <div class="col">
+                                                                                                        <label>Certified that Shri/Smt/Kum
+                                                                                                            :</label>
+                                                                                                        <div class="line-data">
+                                                                                                            Anwari Khatun
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                    <div class="col">
+                                                                                                        <label>S/W/D of Shri/Smt:</label>
+                                                                                                        <div class="line-data">
+                                                                                                            Halim
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div class="row">
+                                                                                                    <div class="col">
+                                                                                                        <label>Sex :</label>
+                                                                                                        <div
+                                                                                                            class="line-data d-flex gap-2 align-items-center">
+                                                                                                            M
+                                                                                                            <input type="checkbox" name=""
+                                                                                                                id="">
+                                                                                                            /
+                                                                                                            F
+                                                                                                            <input type="checkbox" name=""
+                                                                                                                id="">
+                                                                                                            /
+                                                                                                            Others
+                                                                                                            <input type="checkbox" name=""
+                                                                                                                id="">
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                    <div class="col">
+                                                                                                        <label>Religion :</label>
+                                                                                                        <div class="line-data">
+                                                                                                            Islam
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                    <div class="col">
+                                                                                                        <label>Occupation :</label>
+                                                                                                        <div class="line-data">
 
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div class="row">
+                                                                                                    <div class="col">
+                                                                                                        <label>Address :</label>
+                                                                                                        <div class="line-data">
 
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div class="row">
+                                                                                                    <div class="col">
+                                                                                                        <label>Under Doctor:</label>
+                                                                                                        <div class="line-data">
+                                                                                                            DR. Niladri
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div class="row">
+                                                                                                    <div class="col">
+                                                                                                        <label>Admitted on this hospital
+                                                                                                            :</label>
+                                                                                                        <div class="line-data">
+                                                                                                            04/01/2026
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                    <div class="col">
+                                                                                                        <label>Time :</label>
+                                                                                                        <div class="line-data">
+                                                                                                            11:32 P.M.
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                    <div class="col">
+                                                                                                        <label>hours :</label>
+                                                                                                        <div class="line-data">
+
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div class="row">
+                                                                                                    <div class="col">
+                                                                                                        <label>Expired on :</label>
+                                                                                                        <div class="line-data">
+                                                                                                            10/01/2026
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                    <div class="col">
+                                                                                                        <label>Time :</label>
+                                                                                                        <div class="line-data">
+                                                                                                            08:30 A.M..
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                    <div class="col">
+                                                                                                        <label>hours :</label>
+                                                                                                        <div class="line-data">
+
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div class="row">
+                                                                                                    <div class="col">
+                                                                                                        <label>Due to (a) :</label>
+                                                                                                        <div class="line-data">
+
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                    <div class="col">
+                                                                                                        <label>Due to (b) :</label>
+                                                                                                        <div class="line-data">
+
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                    <div class="col">
+                                                                                                        <label>Due to (c) :</label>
+                                                                                                        <div class="line-data">
+
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div class="row">
+                                                                                                    <div class="col">
+                                                                                                        <label>Full Signature :</label>
+                                                                                                        <div class="line-data">
+
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div class="row">
+                                                                                                    <div class="col">
+                                                                                                        <label>Full Name (IN BLOCK LETTER)
+                                                                                                            :</label>
+                                                                                                        <div class="line-data">
+
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div class="row">
+                                                                                                    <div class="col">
+                                                                                                        <label>Medical Registration No.
+                                                                                                            :</label>
+                                                                                                        <div class="line-data">
+
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
 
 
 
