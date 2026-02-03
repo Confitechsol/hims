@@ -530,6 +530,52 @@
         </table>
         @endif
 
+        <!-- CGST Charges -->
+        @if(isset($gstChargesGrouped['cgst']) && count($gstChargesGrouped['cgst']) > 0)
+        <table class="charges-table">
+            <thead>
+                <tr>
+                    <th colspan="2">CGST CHARGES</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($gstChargesGrouped['cgst'] as $cgst)
+                <tr>
+                    <td>{{ $cgst['description'] }}</td>
+                    <td class="text-right">Rs. {{ number_format($cgst['amount'], 2) }}</td>
+                </tr>
+                @endforeach
+                <tr style="font-weight: bold;">
+                    <td class="text-right">Subtotal:</td>
+                    <td class="text-right">Rs. {{ number_format($breakup['cgst_charges'] ?? 0, 2) }}</td>
+                </tr>
+            </tbody>
+        </table>
+        @endif
+
+        <!-- SGST Charges -->
+        @if(isset($gstChargesGrouped['sgst']) && count($gstChargesGrouped['sgst']) > 0)
+        <table class="charges-table">
+            <thead>
+                <tr>
+                    <th colspan="2">SGST CHARGES</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($gstChargesGrouped['sgst'] as $sgst)
+                <tr>
+                    <td>{{ $sgst['description'] }}</td>
+                    <td class="text-right">Rs. {{ number_format($sgst['amount'], 2) }}</td>
+                </tr>
+                @endforeach
+                <tr style="font-weight: bold;">
+                    <td class="text-right">Subtotal:</td>
+                    <td class="text-right">Rs. {{ number_format($breakup['sgst_charges'] ?? 0, 2) }}</td>
+                </tr>
+            </tbody>
+        </table>
+        @endif
+
         <!-- IPD Charges -->
         @if(isset($ipdChargesDetails) && $ipdChargesDetails->count() > 0)
         <table class="charges-table">

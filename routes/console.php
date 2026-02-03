@@ -9,11 +9,12 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 // Schedule daywise bed charges calculation daily at 10:05 AM
-Schedule::command('ipd:calculate-bed-charges')
-    ->dailyAt('10:05')
-    ->timezone('Asia/Kolkata') // Adjust to your server timezone
-    ->withoutOverlapping()
-    ->runInBackground()
-    // Removed onOneServer() to avoid cache dependency issues
-    ->appendOutputTo(storage_path('logs/bed-charges-scheduler.log'))
-    ->emailOutputOnFailure(env('ADMIN_EMAIL', null)); // Optional: email on failure
+// DISABLED: Bed charges are now calculated dynamically from PatientBedHistory when generating bills
+// Schedule::command('ipd:calculate-bed-charges')
+//     ->dailyAt('10:05')
+//     ->timezone('Asia/Kolkata') // Adjust to your server timezone
+//     ->withoutOverlapping()
+//     ->runInBackground()
+//     // Removed onOneServer() to avoid cache dependency issues
+//     ->appendOutputTo(storage_path('logs/bed-charges-scheduler.log'))
+//     ->emailOutputOnFailure(env('ADMIN_EMAIL', null)); // Optional: email on failure

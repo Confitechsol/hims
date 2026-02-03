@@ -17,6 +17,8 @@ class BedGroup extends Model
         'name',
         'color',
         'description',
+        'sac_hsn_code',
+        'gst_rate',
         'floor',
         'bed_cost',
         'is_active',
@@ -24,6 +26,7 @@ class BedGroup extends Model
 
     protected $casts = [
         'bed_cost'  => 'decimal:2',
+        'gst_rate'  => 'decimal:2',
         'is_active' => 'boolean',
         'floor'     => 'integer',
     ];

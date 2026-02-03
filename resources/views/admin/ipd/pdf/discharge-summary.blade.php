@@ -224,23 +224,35 @@
     </table>
     {{-- MEDICAL CONTENT --}}
     <div class="text-box">
-        <h4>Present Complaints</h4>
-        {!! $data->present_complaints !!}
+        @if ($data->present_complaints != null || $data->present_complaints != '')
+            <h4>Present Complaints</h4>
+            {!! $data->present_complaints !!}
+        @endif
 
-        <h4>Treatment / OT Note</h4>
-        {!! $data->ot_note !!}
+        @if ($data->ot_note != null || $data->ot_note != '')
+            <h4>Treatment / OT Note</h4>
+            {!! $data->ot_note !!}
+        @endif
 
-        <h4>Diagnosis</h4>
-        {!! $data->diagnosis !!}
+        @if ($data->course_in_hospital != null || $data->course_in_hospital != '')
+            <h4>Course in Hospital</h4>
+            {!! $data->course_in_hospital !!}
+        @endif
 
-        <h4>Course in Hospital</h4>
-        {!! $data->course_in_hospital !!}
+        @if ($data->discharge_medicines_html != null || $data->discharge_medicines_html != '')
+            <h4>Advised Medicines</h4>
+            {!! $data->discharge_medicines_html !!}
+        @endif
 
-        <h4>Diagnosis</h4>
-        {!! $data->diagnosis !!}
+        @if ($data->diagnosis != null || $data->diagnosis != '')
+            <h4>Diagnosis</h4>
+            {!! $data->diagnosis !!}
+        @endif
 
-        <h4>Discharge Advice</h4>
-        {!! $data->discharge_advice !!}
+        @if ($data->discharge_advice != null || $data->discharge_advice != '')
+            <h4>Discharge Advice</h4>
+            {!! $data->discharge_advice !!}
+        @endif
     </div>
 
     {{-- FOOTER --}}
