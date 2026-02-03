@@ -58,13 +58,19 @@
                                                 <div class="row g-3">
 
                                                     <div class="col-md-6">
+                                                        <label class="form-label">Patient name</label>
+                                                        <select name="patient_id" class="form-select">
+                                                            <option value="">Select Patient</option>
+                                                            @foreach ($patients as $patient)
+                                                                <option value="{{ $patient->id }}">
+                                                                    {{ $patient->patient_name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6">
                                                         <label class="form-label">Contact No</label>
                                                         <input type="text" name="contact_no" class="form-control" required>
-                                                    </div>
-
-                                                    <div class="col-md-6">
-                                                        <label class="form-label">Driver</label>
-                                                        <input type="text" name="driver" class="form-control">
                                                     </div>
 
                                                     <div class="col-md-6">
@@ -87,6 +93,10 @@
                                                                 </option>
                                                             @endforeach
                                                         </select>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Driver</label>
+                                                        <input type="text" name="driver" class="form-control">
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">Charge Category</label>
@@ -195,7 +205,7 @@
                                             </td>
 
                                             <td>
-                                                {{ $call->patient->name ?? 'Walk-in' }}
+                                                {{ $call->patient->patient_name ?? 'Walk-in' }}
                                             </td>
 
                                             <td>{{ $call->contact_no }}</td>

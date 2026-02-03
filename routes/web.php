@@ -634,7 +634,7 @@ Route::prefix('/inventory')->group(function () {
     Route::get('/get-items/{categoryId}', [InventoriesController::class, 'getItems'])->name('get.items');
     Route::post('/store', [InventoriesController::class, 'store'])->name('itemstock.store');
     Route::get('/edit/{id}', [InventoriesController::class, 'edit'])->name('itemstock.edit');
-    Route::get('/update', [InventoriesController::class, 'update'])->name('itemstock.update');
+    Route::put('/update/{id}', [InventoriesController::class, 'update'])->name('itemstock.update');
     Route::get('/destroy', [InventoriesController::class, 'destroy'])->name('itemstock.destroy');
 
     Route::get('/items', [InventoriesController::class, 'items'])->name('items');
@@ -1000,11 +1000,14 @@ Route::get('/radiology_test', [ExcelImportController::class, 'importRadiology'])
 Route::post('/radiology_import', [ExcelImportController::class, 'importRadiologyExcel'])->name('radiology.import');
 Route::get('/radiology_test_export', [ExcelImportController::class, 'exportRadiologyTestExcel'])->name('radiologyTests.export');
 
-Route::get('/finance', function () {
-    return view('admin.reports.finance.index');
-})->name('finance');
-Route::get('/reports/dailyTransactionReport', [TransactionReportController::class, 'dailyTransactionReport'])->name('reports.daily.transaction');
-
+Route::prefix('reports')->group(function () {
+Route::get('/finance', function () {return view('admin.reports.finance.index');})->name('finance');
+Route::get('/inventory', [InventoriesController::class, 'reports'])->name('inventory-reports');
+Route::get('/inventory-stock', [InventoriesController::class, 'stockReports'])->name('inventory-stock-reports');
+Route::get('/inventory-item', [InventoriesController::class, 'itemReports'])->name('inventory-item-reports');
+Route::get('/inventory-asset', [InventoriesController::class, 'assetReport'])->name('inventory-item-reports');
+Route::get('dailyTransactionReport', [TransactionReportController::class, 'dailyTransactionReport'])->name('reports.daily.transaction');
+});
 Route::get('/allTransactionReport', function () {
     return view('admin.reports.finance.all-transaction-report');
 })->name('allTransactionReport');

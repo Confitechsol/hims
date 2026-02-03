@@ -36,9 +36,9 @@ class ItemStock extends Model
      * Relationship: ItemStock belongs to Item
      */
     public function itemCategory()
-{
-    return $this->belongsTo(ItemCategory::class, 'item_category_id');
-}
+    {
+        return $this->belongsTo(ItemCategory::class, 'item_category_id');
+    }
     public function item()
     {
         return $this->belongsTo(Item::class, 'item_id');
@@ -62,5 +62,9 @@ class ItemStock extends Model
     public function batches()
     {
     return $this->hasMany(ItemStockBatches::class, 'item_stock_id');
+    }
+    public function issues()
+    {
+        return $this->hasMany(ItemIssue::class, 'item_id');
     }
 }

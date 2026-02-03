@@ -449,6 +449,7 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
+                                     <li><a href="{{ route('inventory-reports') }}"  class="{{ request()->routeIs('inventory-reports') ? 'active' : '' }}">Inventory Reports
                                     <li><a href="{{ route('finance') }}" class="{{ request()->routeIs('finance') ? 'active' : '' }}">Finance Report
                                             </a></li>
                                     

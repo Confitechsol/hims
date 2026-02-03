@@ -7,6 +7,7 @@ use App\Models\AmbulanceCall;
 use App\Models\Vehicle;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ChargeCategory;
+use App\Models\Patient;
 use App\Models\Charge;
 
 class AmbulanceController extends Controller
@@ -17,9 +18,10 @@ class AmbulanceController extends Controller
             ->latest('date')
             ->paginate(10);
         $vehicles = Vehicle::all();
+        $patients = Patient::all();
         $chargeCategories = ChargeCategory::all();
 
-        return view('admin.ambulance.ambulanceCallList', compact('calls','vehicles','chargeCategories'));
+        return view('admin.ambulance.ambulanceCallList', compact('calls','vehicles','chargeCategories','patients'));
     }
 
     /**
@@ -28,9 +30,9 @@ class AmbulanceController extends Controller
     public function addCall(Request $request)
     {
         $validated = $request->validate([
-            'hospital_id'          => 'required|integer',
-            'branch_id'            => 'required|integer',
-            'patient_id'           => 'nullable|integer',
+            'hospital_id'          => 'nullable|string',
+            'branch_id'            => 'nullable|string',
+            'patient_id'           => 'nullable|string',
             'case_reference_id'    => 'nullable|integer',
             'vehicle_id'           => 'nullable|integer',
             'contact_no'           => 'required|string|max:20',
