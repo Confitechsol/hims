@@ -33,7 +33,7 @@ class HospitalChargesController extends Controller
             $charges->where(function ($query) use ($search_term) {
                 $query->where('name', 'like', "%{$search_term}%");
             });
-         $charges = $charges->paginate($perPage);
+         $charges = $charges->with('category.chargeType','unit','taxCategory')->paginate($perPage);
          return ["result" => $charges];
     }
      $charges = $charges->paginate($perPage);
