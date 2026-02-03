@@ -13,14 +13,20 @@ class HospitalUnitTypeController extends Controller
     public function index(Request $request){
         
        $query = ChargeUnit::query();
-       $perPage = $request->input('per_page', 10); 
-   if ($request->has('search')) {
-        $search = $request->input('search');
-        $query->where('unit', 'like', "%{$search}%");
-        $data = $query->paginate($perPage);
-        return $data;
-    }
-    $unittype =   $query->paginate($perPage);
+         $perPage   = intval($request->input('perPage', 10));
+          if ($perPage <= 0) {
+                $perPage = 10;
+          }
+    
+          if ($request->has('search')) {
+            $search_term = $request->search;
+                $query->where(function ($query) use ($search_term) {
+                 $query->where('unit', 'like', "%{$search_term}%");
+                });
+            $unittype = $query->paginate($perPage);
+            return ["result" => $unittype];
+        }
+        $unittype = $query->paginate($perPage);
     return view('admin.setup.unit_type',compact('unittype'));
     }
 
