@@ -514,6 +514,7 @@
                                     <li><a href="{{ route('profile') }}" class="{{ request()->routeIs('doctors.index') ? 'active' : '' }}">General Settings</a></li>
                                     <li><a href="{{ route('email-setting') }}" class="{{ request()->routeIs('email-setting') ? 'active' : '' }}">Email Settings</a></li>
                                     <li><a href="{{ route('prefix') }}" class="{{ request()->routeIs('prefix') ? 'active' : '' }}">Prefix Settings</a></li>
+                                    <li><a href="{{ route('gst_master.index') }}" class="{{ request()->routeIs('gst_master.*') ? 'active' : '' }}">GST Master</a></li>
                                     <li><a href="{{ route('roles') }}" class="{{ request()->routeIs('roles') ? 'active' : '' }}">Roles Permissions</a></li>
                                     <li><a href="{{ route('database.backups') }}" class="{{ request()->routeIs('database.backups') ? 'active' : '' }}">Backup/Restore</a></li>
                                     <li><a href="{{ route('languages') }}" class="{{ request()->routeIs('languages') ? 'active' : '' }}">Languages</a></li>

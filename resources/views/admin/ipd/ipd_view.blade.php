@@ -650,7 +650,9 @@
                                     @if ($ipd->discharged == 'yes')
                                         <button class="bg-transparent border-0" data-bs-toggle="modal"
                                             data-bs-target="#dischargePreviewModal"
-                                            data-discharge='@json($ipd->dischargeCard)'><i
+                                            data-discharge='@json($ipd->dischargeCard)'
+                                            data-medicines='@json($ipd->discharge_medicines)'
+                                            ><i
                                                 class="bi bi-clipboard-pulse text-white"></i></button>
                                     @else
                                         <button class="bg-transparent border-0" data-bs-toggle="modal"
@@ -4072,7 +4074,7 @@
                                                                 data-ipd-id="{{ $ipd->id }}"><i
                                                                     class="ti ti-plus me-1"></i>Add Prescription</a>
                                                         </div>
-                                                       @include('components.modals.add-prescription-modal') 
+                                                       @include('components.modals.add-prescription-modal')
                                                         <!-- First Modal -->
                                                         <div class="modal fade" id="add_timeline" tabindex="-1"
                                                             aria-hidden="true">
@@ -4347,6 +4349,14 @@
                                                     <select name="new_bed" id="new_bed" class="form-select">
                                                         <option value="">Select New Bed</option>
                                                     </select>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <label for="bed_charge_transfer" class="form-label">Bed Charge (INR) <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="number" class="form-control" name="bed_charge" 
+                                                        id="bed_charge_transfer" step="0.01" min="0" placeholder="0.00">
+                                                    <small class="text-muted">Auto-filled from bed group (editable)</small>
                                                 </div>
 
                                                 <div class="col-md-12 text-end mt-4">
@@ -4982,6 +4992,18 @@
                 $('#new_bed').html('<option value="">Loading...</option>');
 
                 if (groupId) {
+                    // Fetch bed charge for selected bed group
+                    $.get("{{ url('/getBedGroupCharge') }}/" + groupId, function(data) {
+                        if (data && data.bed_cost) {
+                            $('#bed_charge_transfer').val(data.bed_cost);
+                        } else {
+                            $('#bed_charge_transfer').val('');
+                        }
+                    }).fail(function() {
+                        $('#bed_charge_transfer').val('');
+                    });
+
+                    // Load available beds
                     $.get("{{ route('get.available.beds') }}", {
                         bed_group_id: groupId
                     }, function(data) {
@@ -4993,6 +5015,7 @@
                     });
                 } else {
                     $('#new_bed').html('<option value="">Select New Bed</option>');
+                    $('#bed_charge_transfer').val('');
                 }
             });
 

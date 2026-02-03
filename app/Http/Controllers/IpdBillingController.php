@@ -11,6 +11,9 @@ use App\Models\Transaction;
 use App\Models\DoctorVisit;
 use App\Models\Hospital;
 use App\Models\DischargeCard;
+use App\Models\PatientBedHistory;
+use App\Models\BedGroup;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -81,9 +84,122 @@ class IpdBillingController extends Controller
     }
 
     /**
-     * Calculate breakup bill
+     * Calculate bed charges dynamically from PatientBedHistory
+     * 
+     * @param int $ipdId
+     * @param string|null $endDate End date for calculation (Y-m-d format). If null, uses current date.
+     * @return array ['total' => float, 'details' => array]
      */
-    private function calculateBreakup($ipdId)
+    private function calculateBedChargesFromHistory($ipdId, $endDate = null)
+    {
+        $ipd = IpdDetail::find($ipdId);
+        if (!$ipd) {
+            return ['total' => 0, 'details' => []];
+        }
+
+        $admissionDate = Carbon::parse($ipd->date);
+        $endDate = $endDate ? Carbon::parse($endDate) : Carbon::now();
+        
+        // Get all bed history records for this IPD patient (including inactive ones for historical calculation)
+        $bedHistories = PatientBedHistory::where('ipd_id', $ipdId)
+            ->with(['bedGroup', 'bed'])
+            ->orderBy('from_date', 'asc')
+            ->get();
+
+        if ($bedHistories->isEmpty()) {
+            return ['total' => 0, 'details' => []];
+        }
+
+        $totalCharges = 0;
+        $totalCgst = 0;
+        $totalSgst = 0;
+        $details = [];
+        $currentDate = $admissionDate->copy();
+
+        // Calculate charges for each day from admission to end date
+        while ($currentDate->lte($endDate)) {
+            $chargeDate = $currentDate->format('Y-m-d');
+            
+            // Calculate period: 10 AM previous day to 10 AM current day
+            $periodStart = $currentDate->copy()->subDay()->setTime(10, 0, 0);
+            $periodEnd = $currentDate->copy()->setTime(10, 0, 0);
+            
+            // Find which bed was assigned during this period
+            $activeBed = null;
+            foreach ($bedHistories as $history) {
+                $fromDate = Carbon::parse($history->from_date);
+                $toDate = $history->to_date ? Carbon::parse($history->to_date) : null;
+                
+                // Check if this bed history was active during the period
+                if ($fromDate->lte($periodEnd) && (!$toDate || $toDate->gte($periodStart))) {
+                    // If multiple beds, use the most recent one
+                    if (!$activeBed || $fromDate->gt(Carbon::parse($activeBed->from_date))) {
+                        $activeBed = $history;
+                    }
+                }
+            }
+            
+            if ($activeBed && $activeBed->bedGroup) {
+                $bedCost = $activeBed->bedGroup->bed_cost ?? 0;
+                $totalCharges += $bedCost;
+                
+                // Calculate GST if bed charge > 5000
+                $gstRate = 0;
+                $cgstAmount = 0;
+                $sgstAmount = 0;
+                $sacHsnCode = null;
+                
+                if ($bedCost > 5000 && $activeBed->bedGroup->gst_rate) {
+                    $gstRate = $activeBed->bedGroup->gst_rate;
+                    $sacHsnCode = $activeBed->bedGroup->sac_hsn_code;
+                    
+                    // Calculate GST: CGST and SGST are each half of the total GST rate
+                    $totalGstAmount = ($bedCost * $gstRate) / 100;
+                    $cgstAmount = $totalGstAmount / 2; // CGST is half
+                    $sgstAmount = $totalGstAmount / 2; // SGST is half
+                    
+                    $totalCgst += $cgstAmount;
+                    $totalSgst += $sgstAmount;
+                }
+                
+                // Create object compatible with IpdDaywiseBedCharge structure
+                $detail = new \stdClass();
+                $detail->charge_date = $chargeDate;
+                $detail->period_start_date = $periodStart->format('Y-m-d');
+                $detail->period_end_date = $periodEnd->format('Y-m-d');
+                $detail->bed_group_id = $activeBed->bed_group_id;
+                $detail->bed_id = $activeBed->bed_id;
+                $detail->bed_charge = $bedCost;
+                $detail->bed_charge_rate = $bedCost;
+                $detail->no_of_days = 1;
+                $detail->bedGroup = $activeBed->bedGroup;
+                $detail->bed = $activeBed->bed;
+                $detail->gst_rate = $gstRate;
+                $detail->cgst_amount = $cgstAmount;
+                $detail->sgst_amount = $sgstAmount;
+                $detail->sac_hsn_code = $sacHsnCode;
+                
+                $details[] = $detail;
+            }
+            
+            $currentDate->addDay();
+        }
+
+        return [
+            'total' => $totalCharges,
+            'total_cgst' => $totalCgst,
+            'total_sgst' => $totalSgst,
+            'details' => $details,
+        ];
+    }
+
+    /**
+     * Calculate breakup bill
+     * 
+     * @param int $ipdId
+     * @param string|null $endDate End date for calculation (Y-m-d format). If null, uses current date.
+     */
+    private function calculateBreakup($ipdId, $endDate = null)
     {
         // Get IPD record first
         $ipd = IpdDetail::find($ipdId);
@@ -101,10 +217,11 @@ class IpdBillingController extends Controller
             ];
         }
 
-        // Bed Charges
-        $bedCharges = IpdDaywiseBedCharge::where('ipd_id', $ipdId)
-            ->where('is_active', 'yes')
-            ->sum('bed_charge');
+        // Bed Charges - Calculate dynamically from PatientBedHistory
+        $bedChargesData = $this->calculateBedChargesFromHistory($ipdId, $endDate);
+        $bedCharges = $bedChargesData['total'];
+        $cgstCharges = $bedChargesData['total_cgst'] ?? 0;
+        $sgstCharges = $bedChargesData['total_sgst'] ?? 0;
 
         // IPD Charges (from ipd_charges table)
         $ipdCharges = IpdCharges::where('ipd_id', $ipdId)
@@ -143,8 +260,8 @@ class IpdBillingController extends Controller
                 ->sum('amount');
         }
 
-        // Total Charges
-        $totalCharges = $bedCharges + $ipdCharges + $pathologyCharges + $radiologyCharges + $doctorVisitCharges;
+        // Total Charges (including GST)
+        $totalCharges = $bedCharges + $ipdCharges + $pathologyCharges + $radiologyCharges + $doctorVisitCharges + $cgstCharges + $sgstCharges;
 
         // Total Payments
         $totalPayments = Transaction::where('ipd_id', $ipdId)
@@ -161,6 +278,8 @@ class IpdBillingController extends Controller
             'pathology_charges' => $pathologyCharges,
             'radiology_charges' => $radiologyCharges,
             'doctor_visit_charges' => $doctorVisitCharges,
+            'cgst_charges' => $cgstCharges,
+            'sgst_charges' => $sgstCharges,
             'total_charges' => $totalCharges,
             'total_payments' => $totalPayments,
             'outstanding' => $outstanding,
@@ -176,26 +295,22 @@ class IpdBillingController extends Controller
         $patientId = $ipd->patient_id;
         $caseReferenceId = $ipd->case_reference_id;
         
-        // Bed Charges Details
-        $bedChargesDetails = IpdDaywiseBedCharge::where('ipd_id', $ipdId)
-            ->where('is_active', 'yes')
-            ->with(['bedGroup', 'bed'])
-            ->orderBy('charge_date', 'asc')
-            ->get()
-            ->map(function($charge) {
-                return [
-                    'date' => $charge->charge_date,
-                    'period_start' => $charge->period_start_date,
-                    'period_end' => $charge->period_end_date,
-                    'bed_group' => $charge->bedGroup->name ?? 'N/A',
-                    'bed' => $charge->bed->name ?? 'N/A',
-                    'rate' => $charge->bed_charge_rate ?? 0,
-                    'days' => $charge->no_of_days ?? 1,
-                    'amount' => $charge->bed_charge ?? 0,
-                    'type' => 'bed',
-                    'description' => 'Bed Charge - ' . ($charge->bedGroup->name ?? 'N/A') . ' - ' . ($charge->bed->name ?? 'N/A'),
-                ];
-            });
+        // Bed Charges Details - Calculate dynamically from PatientBedHistory
+        $bedChargesData = $this->calculateBedChargesFromHistory($ipdId);
+        $bedChargesDetails = collect($bedChargesData['details'])->map(function($charge) {
+            return [
+                'date' => $charge->charge_date,
+                'period_start' => $charge->period_start_date,
+                'period_end' => $charge->period_end_date,
+                'bed_group' => $charge->bedGroup->name ?? 'N/A',
+                'bed' => $charge->bed->name ?? 'N/A',
+                'rate' => $charge->bed_charge_rate ?? 0,
+                'days' => $charge->no_of_days ?? 1,
+                'amount' => $charge->bed_charge ?? 0,
+                'type' => 'bed',
+                'description' => 'Bed Charge - ' . ($charge->bedGroup->name ?? 'N/A') . ' - ' . ($charge->bed->name ?? 'N/A'),
+            ];
+        });
 
         // IPD Charges Details
         $ipdChargesDetails = IpdCharges::where('ipd_id', $ipdId)
@@ -346,6 +461,74 @@ class IpdBillingController extends Controller
     }
 
     /**
+     * Prepare GST charges grouped by bed group
+     * 
+     * @param \Illuminate\Support\Collection $bedChargesDetails
+     * @return array ['cgst' => array, 'sgst' => array]
+     */
+    private function prepareGstCharges($bedChargesDetails)
+    {
+        $cgstGrouped = [];
+        $sgstGrouped = [];
+        
+        // Group GST charges by bed group
+        $gstByBedGroup = [];
+        foreach ($bedChargesDetails as $charge) {
+            if (isset($charge->cgst_amount) && $charge->cgst_amount > 0) {
+                $bedGroupName = $charge->bedGroup->name ?? 'Unknown';
+                $bedGroupId = $charge->bed_group_id;
+                
+                if (!isset($gstByBedGroup[$bedGroupId])) {
+                    $gstByBedGroup[$bedGroupId] = [
+                        'bed_group_name' => $bedGroupName,
+                        'sac_code' => $charge->sac_hsn_code ?? '',
+                        'gst_rate' => $charge->gst_rate ?? 0,
+                        'cgst_rate' => ($charge->gst_rate ?? 0) / 2,
+                        'days' => 0,
+                        'cgst_per_day' => 0,
+                        'sgst_per_day' => 0,
+                        'total_cgst' => 0,
+                        'total_sgst' => 0,
+                    ];
+                }
+                
+                $gstByBedGroup[$bedGroupId]['days']++;
+                $gstByBedGroup[$bedGroupId]['total_cgst'] += $charge->cgst_amount;
+                $gstByBedGroup[$bedGroupId]['total_sgst'] += $charge->sgst_amount;
+                
+                // Calculate per day amount (should be same for all days)
+                if ($gstByBedGroup[$bedGroupId]['cgst_per_day'] == 0) {
+                    $gstByBedGroup[$bedGroupId]['cgst_per_day'] = $charge->cgst_amount;
+                    $gstByBedGroup[$bedGroupId]['sgst_per_day'] = $charge->sgst_amount;
+                }
+            }
+        }
+        
+        // Convert to arrays for CGST and SGST
+        foreach ($gstByBedGroup as $group) {
+            $description = $group['days'] . ' ' . $group['bed_group_name'] . ' @' . number_format($group['cgst_per_day'], 0);
+            if ($group['sac_code']) {
+                $description .= ' (SAC-' . $group['sac_code'] . ' @ ' . number_format($group['cgst_rate'], 2) . '%)';
+            }
+            
+            $cgstGrouped[] = [
+                'description' => $description,
+                'amount' => $group['total_cgst'],
+            ];
+            
+            $sgstGrouped[] = [
+                'description' => $description,
+                'amount' => $group['total_sgst'],
+            ];
+        }
+        
+        return [
+            'cgst' => $cgstGrouped,
+            'sgst' => $sgstGrouped,
+        ];
+    }
+
+    /**
      * Export Estimate/Breakup Bill PDF
      */
     public function exportEstimate($ipdId)
@@ -361,12 +544,12 @@ class IpdBillingController extends Controller
             $breakup = $this->calculateBreakup($ipdId);
             \Log::info('Breakup calculated', ['total_charges' => $breakup['total_charges']]);
 
-            // Get detailed breakdown - Initialize with empty collections
-            $bedChargesDetails = IpdDaywiseBedCharge::where('ipd_id', $ipdId)
-                ->where('is_active', 'yes')
-                ->with(['bedGroup', 'bed'])
-                ->orderBy('charge_date', 'asc')
-                ->get() ?? collect();
+            // Get detailed breakdown - Calculate dynamically from PatientBedHistory
+            $bedChargesData = $this->calculateBedChargesFromHistory($ipdId);
+            $bedChargesDetails = collect($bedChargesData['details']);
+            
+            // Prepare GST charges grouped by bed group
+            $gstChargesGrouped = $this->prepareGstCharges($bedChargesDetails);
 
             $ipdChargesDetails = IpdCharges::where('ipd_id', $ipdId)
                 ->with(['charge', 'chargeCategory'])
@@ -593,7 +776,7 @@ class IpdBillingController extends Controller
                 'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'payments',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
                 'totalChargesInWords', 'totalPaymentsInWords', 'outstandingInWords', 'netBalanceInWords',
-                'hospital', 'totalPages'
+                'hospital', 'totalPages', 'gstChargesGrouped'
             ));
             
             // Enable PHP scripts for page numbering
@@ -695,7 +878,7 @@ class IpdBillingController extends Controller
             ]);
 
             \Log::info('Calculating breakup');
-            $breakup = $this->calculateBreakup($ipdId);
+            $breakup = $this->calculateBreakup($ipdId, $dischargeDate);
             \Log::info('Breakup calculated', ['total_charges' => $breakup['total_charges']]);
 
             // Get payment details
@@ -706,13 +889,13 @@ class IpdBillingController extends Controller
                 ->orderBy('payment_date', 'asc')
                 ->get() ?? collect();
 
-            // Get detailed breakdown
+            // Get detailed breakdown - Calculate dynamically from PatientBedHistory up to discharge date
             \Log::info('Getting bed charges details');
-            $bedChargesDetails = IpdDaywiseBedCharge::where('ipd_id', $ipdId)
-                ->where('is_active', 'yes')
-                ->with(['bedGroup', 'bed'])
-                ->orderBy('charge_date', 'asc')
-                ->get() ?? collect();
+            $bedChargesData = $this->calculateBedChargesFromHistory($ipdId, $dischargeDate);
+            $bedChargesDetails = collect($bedChargesData['details']);
+            
+            // Prepare GST charges grouped by bed group
+            $gstChargesGrouped = $this->prepareGstCharges($bedChargesDetails);
 
             \Log::info('Getting IPD charges details');
             $ipdChargesDetails = IpdCharges::where('ipd_id', $ipdId)
@@ -913,7 +1096,8 @@ class IpdBillingController extends Controller
                 'grandTotal', 'totalAdvance', 'balance', 'grandTotalInWords', 
                 'totalAdvanceInWords', 'balanceInWords', 'otCharges', 'medicineCharges',
                 'surgeonCharges', 'anesthesiaCharges', 'investigationCharges', 'totalPages',
-                'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal'
+                'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
+                'gstChargesGrouped'
             ));
             
             \Log::info('PDF view loaded, setting options');
