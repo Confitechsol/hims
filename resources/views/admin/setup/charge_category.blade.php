@@ -287,13 +287,15 @@
             <td>${item.charge_type.charge_type}</td>
             <td>${item.description}</td>
             <td>
-                <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                <a href="javascript:void(0);"
+                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                 data-bs-toggle="modal"
                     data-bs-target="#editModal"
                     data-id="${item.id}"
                     data-name="${item.name}"
                     data-chargeType="${item.charge_type.charge_type}"
                     data-description="${item.description}">
-                    Edit
+                    <i class="ti ti-pencil"></i>
                 </button>
                 <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
                     data-bs-target="#deleteModal"
