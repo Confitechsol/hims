@@ -18,15 +18,28 @@ use Carbon\Carbon;
 
 class DutyRosterController extends Controller
 {
-    public function rosterListDetails()
+    public function rosterListDetails(Request $request)
     {
-        // Eager load the related shift for efficiency
-        $rosters = DutyRosterList::with('dutyRosterShift')
-            ->orderBy('id', 'desc')
-            ->get();
+        $rosters = DutyRosterList::query();
+        $dutyRosterShift=DutyRosterShift::all();
         $shifts = DutyRosterShift::all();
 
-        return view('admin.duty-roster.roster_list_details', compact('rosters','shifts'));
+        $perPage   = intval($request->input('perPage', 10));
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
+
+        if ($request->has('search')) {
+         $search_term = $request->search;
+            $rosters->whereHas('dutyRosterShift', function ($query) use ($search_term) {
+                $query->where('shift_name', 'like', "%{$search_term}%");
+            });
+        $rosters = $rosters->with('dutyRosterShift','shifts')->paginate($perPage);
+         return ["result" => $rosters];
+        }
+        $rosters = $rosters->paginate($perPage);
+
+        return view('admin.duty-roster.roster_list_details', compact('rosters','shifts','dutyRosterShift'));
     }
     public function addRoster(Request $request)
     {
