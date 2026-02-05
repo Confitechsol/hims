@@ -88,15 +88,28 @@ class DutyRosterController extends Controller
         return response()->json(['success' => 'Duty roster deleted successfully.']);
     }
 
-    public function showShift()
+    public function showShift(Request $request)
     {
         // Eager load the related shift for efficiency
-        $rosters = DutyRosterList::with('dutyRosterShift')
-            ->orderBy('id', 'desc')
-            ->get();
+        $rosters = DutyRosterList::query();
         $shifts = DutyRosterShift::all();
 
-        return view('admin.duty-roster.roster_shift', compact('shifts'));
+          $perPage   = intval($request->input('perPage', 10));
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
+
+         if ($request->has('search')) {
+         $search_term = $request->search;
+            $rosters->whereHas('dutyRosterShift', function ($query) use ($search_term) {
+                $query->where('shift_name', 'like', "%{$search_term}%");
+            });
+        $rosters = $rosters->with('dutyRosterShift','shifts')->paginate($perPage);
+         return ["result" => $rosters];
+        }
+        $rosters = $rosters->paginate($perPage);
+
+        return view('admin.duty-roster.roster_shift', compact('shifts','rosters'));
     }
 
     public function addShift(Request $request)
