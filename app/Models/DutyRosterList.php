@@ -47,4 +47,10 @@ class DutyRosterList extends Model
     {
         return $this->hasMany(DutyRosterAssign::class, 'duty_roster_list_id');
     }
+
+    // Alias for dutyRosterShift to match 'shifts' relationship usage
+    public function shifts()
+    {
+        return $this->belongsTo(DutyRosterShift::class, 'duty_roster_shift_id', 'id');
+    }
 }
