@@ -1,7 +1,15 @@
 <style>
-    @page {
+    /* @page {
         size: A4;
         margin: 0;
+    } */
+
+    @page {
+        size: A4;
+        margin-top: 180px;
+        margin-bottom: 40px;
+        margin-left: 0px;
+        margin-right: 0px;
     }
 
     body {
@@ -9,16 +17,21 @@
         padding: 0;
         font-family: DejaVu Sans, sans-serif;
         font-size: 10px;
+        background-image: url("{{ public_path('/assets/images/body.webp') }}");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 100% 100%;
     }
 
     .main_box {
-        width: 210mm;
-        height: 297mm;
-        position: relative;
-        background-image: url("{{ public_path('/assets/images/body.webp') }}");
-        background-position: center;
+        widows: 100%;
+        /* width: 210mm; */
+        /* height: 297mm; */
+        /* position: relative; */
+        /* background-image: url("{{ public_path('/assets/images/body.webp') }}"); */
+        /* background-position: center;
         background-repeat: no-repeat;
-        background-size: 100% 100%;
+        background-size: 100% 100%; */
     }
 
     .header img,
@@ -70,10 +83,25 @@
         margin: 2px 0;
     }
 
-    .footer {
+    /* .footer {
         position: absolute;
         bottom: 0;
         width: 100%;
+    } */
+    .header {
+        position: fixed;
+        top: -180px;
+        left: 0;
+        right: 0;
+        height: 180px;
+    }
+
+    .footer {
+        position: fixed;
+        bottom: -40px;
+        left: 0;
+        right: 0;
+        height: 40px;
     }
 
     .table-box-border,
@@ -127,12 +155,26 @@
     } */
 </style>
 
+
+@if ($showHeaderFooter)
+    <div class="header">
+        <img src="{{ public_path('assets/images/header.webp') }}">
+    </div>
+@endif
+
+{{-- FOOTER --}}
+@if ($showHeaderFooter)
+    <div class="footer">
+        <img src="{{ public_path('assets/images/footer.webp') }}">
+    </div>
+@endif
+
 <div class="main_box">
 
     {{-- HEADER --}}
-    <div class="header {{ !$showHeaderFooter ? 'hidden' : '' }}">
+    {{-- <div class="header {{ !$showHeaderFooter ? 'hidden' : '' }}">
         <img src="{{ public_path('assets/images/header.webp') }}">
-    </div>
+    </div> --}}
 
     {{-- TITLE --}}
     <div class="section-title">
@@ -229,6 +271,11 @@
             {!! $data->present_complaints !!}
         @endif
 
+        @if ($data->diagnosis != null || $data->diagnosis != '')
+            <h4>Diagnosis</h4>
+            {!! $data->diagnosis !!}
+        @endif
+
         @if ($data->ot_note != null || $data->ot_note != '')
             <h4>Treatment / OT Note</h4>
             {!! $data->ot_note !!}
@@ -244,9 +291,19 @@
             {!! $data->discharge_medicines_html !!}
         @endif
 
-        @if ($data->diagnosis != null || $data->diagnosis != '')
-            <h4>Diagnosis</h4>
-            {!! $data->diagnosis !!}
+        @if ($data->investigation != null || $data->investigation != '')
+            <h4>Investigations</h4>
+            {!! $data->investigation !!}
+        @endif
+
+        @if ($data->urgent_care != null || $data->urgent_care != '')
+            <h4>Urgent Care Instructions</h4>
+            {!! $data->urgent_care !!}
+        @endif
+
+        @if ($data->diet_advice != null || $data->diet_advice != '')
+            <h4>Diet Advice</h4>
+            {!! $data->diet_advice !!}
         @endif
 
         @if ($data->discharge_advice != null || $data->discharge_advice != '')
@@ -256,9 +313,9 @@
     </div>
 
     {{-- FOOTER --}}
-    <div class="footer {{ !$showHeaderFooter ? 'hidden' : '' }}">
+    {{-- <div class="footer {{ !$showHeaderFooter ? 'hidden' : '' }}">
         <img src="{{ public_path('assets/images/footer.webp') }}">
-    </div>
+    </div> --}}
 
 </div>
 

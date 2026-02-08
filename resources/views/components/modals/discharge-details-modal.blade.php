@@ -26,7 +26,8 @@
           box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
           margin: 20px auto;
           width: 210mm;
-          height: 297mm;
+          /* height: 297mm; */
+          height: auto;
           min-height: 297mm;
           line-height: 10px;
       }
@@ -226,12 +227,17 @@
 
       .document-wrapper {
           height: 100%;
+          min-height: inherit;
       }
 
       .document-container {
-          display: grid;
+          /* display: grid;
           grid-template-rows: auto 1fr auto;
+          height: 100%; */
+          display: flex;
+          flex-direction: column;
           height: 100%;
+          min-height: inherit;
       }
 
       .footer {
@@ -273,14 +279,15 @@
                                   <img src="{{ asset('assets/images/header.webp') }}" alt="header" />
                               </div>
 
-                              <div class="body_area">
+                              <div class="body_area flex-grow-1">
                                   <div class="heading1">
                                       <h4>DISCHARGE SUMMARY & CERTIFICATE</h4>
                                   </div>
 
                                   <div class="admission_info mb-3">
                                       <div class="admission_item">
-                                          <p><b>DISCHARGE NO.</b> : <span class="red" id="dis_discharge_no"></span></p>
+                                          <p><b>DISCHARGE NO.</b> : <span class="red" id="dis_discharge_no"></span>
+                                          </p>
                                       </div>
                                       <div class="admission_item heading">
                                           <h4 id="dis_discharge_type_head"></h4>
@@ -395,13 +402,13 @@
 
                                       <br />
 
-                                      <h6 id="dis_ot_note_label">Treatment Done/Procedure Performed / OT Note :</h6>
-                                      <div class="general_list" id="dis_ot_note_html"></div>
+                                      <h6 id="dis_diagnosis_label">Diagnosis :</h6>
+                                      <div class="general_list" id="dis_diagnosis_html"></div>
 
                                       <br />
 
-                                      <h6 id="dis_diagnosis_label">Diagnosis :</h6>
-                                      <div class="general_list" id="dis_diagnosis_html"></div>
+                                      <h6 id="dis_ot_note_label">Treatment Done/Procedure Performed / OT Note :</h6>
+                                      <div class="general_list" id="dis_ot_note_html"></div>
 
                                       <br />
 
@@ -410,9 +417,18 @@
                                       <br />
 
 
-                                      {{-- <br /> --}}
                                       <h6 id="discharge_medicine_label">Advised Medicines:</h6>
                                       <div class="general_list" id="discharge_medicine_list"></div>
+                                      <br />
+                                      <h6 id="dis_investigation_label">Investigations:</h6>
+                                      <div class="general_list" id="dis_investigation_html"></div>
+                                      <br />
+                                      <h6 id="dis_urgent_care_label">Urgent Care Instructions:</h6>
+                                      <div class="general_list" id="dis_urgent_care_html"></div>
+                                      <br />
+                                      <h6 id="dis_diet_advice_label">Diet Advice:</h6>
+                                      <div class="general_list" id="dis_diet_advice_html"></div>
+                                      <br />
 
                                       <h6 id="dis_discharge_advice_label">Discharge Advice:</h6>
                                       <div class="general_list" id="dis_discharge_advice_html"></div>
@@ -442,10 +458,10 @@
               </div>
               <div class="modal-footer pb-0">
                   <div class="d-flex align-items-center gap-2 ms-auto me-3">
-                      <button type="button" class="btn btn-outline-secondary" onclick="downloadDocument()">
+                      {{-- <button type="button" class="btn btn-outline-secondary" onclick="downloadDocument()">
                           <i class="bi bi-download"></i>
                           Download
-                      </button>
+                      </button> --}}
                       <div class="form-check form-switch toggle-switch">
                           <input class="form-check-input toggle-switch" type="checkbox" role="switch"
                               id="toggleHeaderFooter" checked>
@@ -457,7 +473,7 @@
                       </a> --}}
                       <button type="button" class="btn btn-primary" onclick="openPdf({{ $ipd->id }})">
                           <i class="bi bi-printer"></i>
-                          Print
+                          Print / Download
                       </button>
                   </div>
               </div>
@@ -528,6 +544,21 @@
                   hideLabel('dis_course_in_hospital_label')
               } else {
                   setHTML('dis_course_in_hospital_html', data.course_in_hospital);
+              }
+              if (data.investigation === "" || data.investigation === null) {
+                  hideLabel('dis_investigation_label')
+              } else {
+                  setHTML('dis_investigation_html', data.investigation);
+              }
+              if (data.urgent_care === "" || data.urgent_care === null) {
+                  hideLabel('dis_urgent_care_label')
+              } else {
+                  setHTML('dis_urgent_care_html', data.urgent_care);
+              }
+              if (data.diet_advice === "" || data.diet_advice === null) {
+                  hideLabel('dis_diet_advice_label')
+              } else {
+                  setHTML('dis_diet_advice_html', data.diet_advice);
               }
 
               if (data.ot_note === "" || data.ot_note === null) {

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AmbulanceController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AppointmentsController;
 use App\Http\Controllers\AppSwitchController;
@@ -47,6 +48,7 @@ use App\Http\Controllers\Setup\DosageDurationController;
 use App\Http\Controllers\Setup\DoseDurationController;
 use App\Http\Controllers\Setup\DoseIntervalController;
 use App\Http\Controllers\Setup\FindingsController;
+use App\Http\Controllers\Setup\GstMasterController;
 use App\Http\Controllers\Setup\HospitalChargeCategoryController;
 use App\Http\Controllers\Setup\HospitalChargesController;
 use App\Http\Controllers\Setup\HospitalChargeTypeController;
@@ -67,7 +69,6 @@ use App\Http\Controllers\Setup\MedicineUnitController as SetupMedicineUnitContro
 use App\Http\Controllers\Setup\PackageController;
 use App\Http\Controllers\Setup\PrefixesController;
 use App\Http\Controllers\Setup\ProfileController;
-use App\Http\Controllers\Setup\GstMasterController;
 use App\Http\Controllers\Setup\RadiologyController;
 use App\Http\Controllers\Setup\UnitController;
 use App\Http\Controllers\Setup\UsersController;
@@ -78,7 +79,6 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\TransactionReportController;
 use App\Http\Controllers\VisitorsController;
 use App\Http\Controllers\VitalController;
-use App\Http\Controllers\AmbulanceController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -737,7 +737,6 @@ Route::prefix('ambulance')->group(function () {
 
     Route::get('/charges/by-category/{category}', [AmbulanceController::class, 'getChargesByCategory'])->name('charges.byCategory');
     Route::get('/charges/{charge}', [AmbulanceController::class, 'getChargeDetails'])->name('ambulanceCall.deleteCall');
-
 
     Route::get('/issue', [AmbulanceController::class, 'bloodIssues'])->name('issue-blood.index');
     Route::post('/addDonors', [AmbulanceController::class, 'addDonors'])->name('bloodBank.addDoner');
