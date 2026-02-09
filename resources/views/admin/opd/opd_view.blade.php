@@ -349,7 +349,6 @@
             border-radius: 3px;
         }
     </style>
-
     <div class="p-4">
         @if (session('success'))
             <script>
@@ -1754,7 +1753,7 @@
                                                                                                 <input type="hidden" name="opd_id" id="opd_id" value="{{ $opd->id }}">
                                                                                                 <select name="charge_type"
                                                                                                     id="add_charge_type"
-                                                                                                    class="form-control charge_type select2 reset_value select2-hidden-accessible"
+                                                                                                    class="form-control charge_type reset_value"
                                                                                                     style="width: 100%"
                                                                                                     tabindex="-1"
                                                                                                     aria-hidden="true">
@@ -1777,7 +1776,7 @@
                                                                                                     name="charge_category2"
                                                                                                     id="charge_category2"
                                                                                                     style="width: 100%"
-                                                                                                    class="form-control select2 charge_category2 reset_value select2-hidden-accessible"
+                                                                                                    class="form-control charge_category2 reset_value"
                                                                                                     tabindex="-1"
                                                                                                     aria-hidden="true">
                                                                                                     <option value="">
@@ -1796,7 +1795,7 @@
                                                                                                 <select name="charge_id"
                                                                                                     id="charge_id"
                                                                                                     style="width: 100%"
-                                                                                                    class="form-control addcharge  select2 reset_value select2-hidden-accessible"
+                                                                                                    class="form-control addcharge  select2 reset_value"
                                                                                                     tabindex="-1"
                                                                                                     aria-hidden="true">
                                                                                                     <option value="">
@@ -2938,7 +2937,6 @@
             const chargeTypeSelect = document.getElementById("add_charge_type")
             const chargeCategorySelect = document.getElementById("charge_category2")
             const chargeSelect = document.getElementById("charge_id")
-
 
 
             fetch("{{ route('getChargeTypes') }}").then(response => response.json())

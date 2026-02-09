@@ -28,8 +28,8 @@
         <button class="btn btn-warning" onclick="printTable('{{$id}}')">Print</button>
     </div>
 </div>
-</div>
-<div class="input-icon-start position-relative mb-3">
+
+<div class="input-icon-start position-relative mt-2 mb-3">
     <span class="input-icon-addon">
         <i class="ti ti-search"></i>
     </span>

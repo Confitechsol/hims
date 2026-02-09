@@ -35,12 +35,12 @@
                     </div>
                     <div class="d-flex align-items-center flex-wrap gap-2">
                         <div class="text-end d-flex">
-                            <a href="javascript:void(0);" class="btn btn-primary text-white ms-2 btn-md"
+                            {{-- <a href="javascript:void(0);" class="btn btn-primary text-white ms-2 btn-md"
                                 data-bs-toggle="modal" data-bs-target="#add_appointment">
-                                <i class="ti ti-plus me-1"></i>Add Roster</a>
+                                <i class="ti ti-plus me-1"></i>Add Roster</a> --}}
                         </div>
                         <!-- First Modal -->
-                        <div class="modal fade use-select2" id="add_appointment" tabindex="-1" aria-hidden="true">
+                        <div class="modal fade use-select2" id="createModal" tabindex="-1" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered modal-lg">
                                 <div class="modal-content">
                                     <form method="POST" action="{{ route('dutyroster.assignStaff') }}">
@@ -148,6 +148,8 @@
 
             </div>
             <div class="card-body">
+            {{-- Search & Add --}}
+                         <x-table-actions.actions id="staff_roster" name="Staff Roster" />
     @if($rosterSummary->isEmpty())
         <p class="text-center">No roster assignments found.</p>
     @else
