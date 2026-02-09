@@ -392,7 +392,7 @@
 
 <div class="modal fade" id="patientDischargeModal" tabindex="-1" aria-labelledby="patientDischargeModalLabel"
     aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable modal-fullscreen">
         <div class="modal-content">
             <!-- Modal Header -->
             <div class="modal-header">
@@ -789,6 +789,14 @@
 
                     <div class="row g-3">
                         <div class="col-md-12">
+                            <label for="present_complaints" class="form-label">
+                                <i class="bi bi-clipboard-data"></i>
+                                Present Complaints (Reason for Admission)
+                            </label>
+                            <textarea class="form-control" id="present_complaints_text" name="present_complaints" rows="4"></textarea>
+                        </div>
+
+                        <div class="col-md-12">
                             <label for="diagnosis" class="form-label">
                                 <i class="bi bi-clipboard2-pulse"></i>
                                 Diagnosis
@@ -796,13 +804,6 @@
                             <textarea class="form-control" id="diagnosis_text" name="diagnosis" rows="6"></textarea>
                         </div>
 
-                        <div class="col-md-12">
-                            <label for="present_complaints" class="form-label">
-                                <i class="bi bi-clipboard-data"></i>
-                                Present Complaints (Reason for Admission)
-                            </label>
-                            <textarea class="form-control" id="present_complaints_text" name="present_complaints" rows="4"></textarea>
-                        </div>
                         <div class="col-md-12">
                             <label for="ot_note" class="form-label">
                                 <i class="bi bi-clipboard-data"></i>
@@ -823,6 +824,28 @@
                                 Discharge Advice
                             </label>
                             <textarea class="form-control" id="discharge_advice_text" name="discharge_advice" rows="4"></textarea>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label for="investigation_text" class="form-label">
+                                <i class="bi bi-clipboard-data"></i>
+                                Investigation
+                            </label>
+                            <textarea class="form-control" id="investigation_text" name="investigation" rows="4"></textarea>
+                        </div>
+                        <div class="col-md-12">
+                            <label for="urgent_care_text" class="form-label">
+                                <i class="bi bi-clipboard-data"></i>
+                                Urgent Care Instructions
+                            </label>
+                            <textarea class="form-control" id="urgent_care_text" name="urgent_care" rows="4"></textarea>
+                        </div>
+                        <div class="col-md-12">
+                            <label for="diet_advice_text" class="form-label">
+                                <i class="bi bi-clipboard-data"></i>
+                                Diet Advice
+                            </label>
+                            <textarea class="form-control" id="diet_advice_text" name="diet_advice" rows="4"></textarea>
                         </div>
                     </div>
 
@@ -852,7 +875,7 @@
                     </div>
                     <!-- Action Buttons -->
                     <div class="action-buttons mt-4">
-                        <button type="button" class="btn btn-outline-primary">
+                        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal" aria-label="Close">
                             <i class="bi bi-x-circle"></i>
                             Cancel
                         </button>
@@ -885,6 +908,27 @@
 <script>
     ClassicEditor
         .create(document.querySelector('#discharge_advice_text'))
+        .catch(error => {
+            console.error(error);
+        });
+</script>
+<script>
+    ClassicEditor
+        .create(document.querySelector('#investigation_text'))
+        .catch(error => {
+            console.error(error);
+        });
+</script>
+<script>
+    ClassicEditor
+        .create(document.querySelector('#urgent_care_text'))
+        .catch(error => {
+            console.error(error);
+        });
+</script>
+<script>
+    ClassicEditor
+        .create(document.querySelector('#diet_advice_text'))
         .catch(error => {
             console.error(error);
         });

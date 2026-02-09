@@ -501,7 +501,7 @@
         }
 
         function editCharge(id) {
-            let charge = charges.find(item => item.id == id);
+            let charge = charges.data.find(item => item.id == id);
             let edit_charges = document.getElementById("edit_charges");
             edit_charges.querySelector("input[name='charge_id']").value = id;
             var myModal = new bootstrap.Modal(edit_charges);
