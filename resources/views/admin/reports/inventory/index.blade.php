@@ -44,7 +44,15 @@
                             </a>
                         </div>
                         <div class="col-md-3">
-                            <a href="incomeReport">
+                            <a href="{{ route('inventory-asset-reports') }}">
+                                <div class="module_billing">
+                                    <i class="fa-solid fa-calendar-check"></i>
+                                    <p>Inventory Asset Report</p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{{ route('inventory-issue-reports') }}">
                                 <div class="module_billing">
                                     <i class="fa-solid fa-calendar-check"></i>
                                     <p>Inventory Issue Report</p>

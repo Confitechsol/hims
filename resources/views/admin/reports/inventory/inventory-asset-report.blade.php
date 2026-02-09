@@ -112,8 +112,7 @@
                                                             <th>Supplier</th>
                                                             <th>Store</th>
                                                             <th class="text-end">Qty</th>
-                                                            <th class="text-end">Purchase Price</th>
-                                                            <th class="text-end">Total Cost</th>
+                                                            <th class="text-end">Total Purchase Price</th>
                                                             <th class="text-end">Salvage Value</th>
                                                             <th class="text-center">Useful Life (yrs)</th>
                                                             <th class="text-end">Annual Depreciation</th>
@@ -136,10 +135,6 @@
                                                                 <td>{{ $asset->store->item_store ?? '-' }}</td>
 
                                                                 <td class="text-end">{{ $asset->quantity }}</td>
-
-                                                                <td class="text-end">
-                                                                    {{ number_format($asset->purchase_price, 2) }}
-                                                                </td>
 
                                                                 <td class="text-end">
                                                                     {{ number_format($asset->total_cost, 2) }}

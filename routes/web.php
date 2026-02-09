@@ -731,10 +731,14 @@ Route::prefix('ambulance')->group(function () {
 
     Route::get('/index', [AmbulanceController::class, 'index'])->name('ambulanceCall.index');
     Route::post('/addCall', [AmbulanceController::class, 'addCall'])->name('ambulanceCall.addCall');
-    Route::put('/editCall/{id}', [AmbulanceController::class, 'editCall'])->name('ambulanceCall.editCall');
+    Route::get('/editCall/{id}', [AmbulanceController::class, 'editCall'])->name('ambulanceCall.editCall');
     Route::put('/updateCall/{id}', [AmbulanceController::class, 'updateCall'])->name('ambulanceCall.updateCall');
     Route::delete('/destroyCall/{id}', [AmbulanceController::class, 'destroyCall'])->name('ambulanceCall.deleteCall');
-
+    Route::get('/list', [AmbulanceController::class, 'ambulanceList'])->name('ambulanceList.index');
+    Route::post('/addList', [AmbulanceController::class, 'addList'])->name('ambulanceList.addList');
+    Route::get('/editList/{id}', [AmbulanceController::class, 'editList'])->name('ambulanceList.editList');
+    Route::put('/updateList/{id}', [AmbulanceController::class, 'updateList'])->name('ambulanceList.updateList');
+    Route::delete('/destroyList/{id}', [AmbulanceController::class, 'destroyList'])->name('ambulanceList.deleteList');
     Route::get('/charges/by-category/{category}', [AmbulanceController::class, 'getChargesByCategory'])->name('charges.byCategory');
     Route::get('/charges/{charge}', [AmbulanceController::class, 'getChargeDetails'])->name('ambulanceCall.deleteCall');
 
@@ -1019,7 +1023,8 @@ Route::get('/finance', function () {return view('admin.reports.finance.index');}
 Route::get('/inventory', [InventoriesController::class, 'reports'])->name('inventory-reports');
 Route::get('/inventory-stock', [InventoriesController::class, 'stockReports'])->name('inventory-stock-reports');
 Route::get('/inventory-item', [InventoriesController::class, 'itemReports'])->name('inventory-item-reports');
-Route::get('/inventory-asset', [InventoriesController::class, 'assetReport'])->name('inventory-item-reports');
+Route::get('/inventory-asset', [InventoriesController::class, 'assetReport'])->name('inventory-asset-reports');
+Route::get('/inventory-issue', [InventoriesController::class, 'issueReport'])->name('inventory-issue-reports');
 Route::get('dailyTransactionReport', [TransactionReportController::class, 'dailyTransactionReport'])->name('reports.daily.transaction');
 });
 Route::get('/allTransactionReport', function () {

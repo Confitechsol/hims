@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Vehicle extends Model
 {
@@ -11,7 +12,10 @@ class Vehicle extends Model
 
     protected $table = 'vehicles';
     protected $primaryKey = 'id';
-    public $timestamps = false; // only created_at is present, no updated_at
+    public $timestamps = false; 
+    use SoftDeletes;
+
+    protected $dates = ['deleted_at'];
 
     protected $fillable = [
         'hospital_id',

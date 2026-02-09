@@ -38,6 +38,11 @@
                                     data-bs-target="#addAmbulanceCallModal">
                                     <i class="ti ti-plus me-1"></i>Add New Ambulance Call
                                 </button>
+                                <a type="button"
+                                    class="btn btn-primary text-white ms-2 fs-13 btn-md"
+                                    href="{{ route('ambulanceList.index') }}">
+                                    Ambulance List
+                                </a>
                             </div>
                             <div class="modal fade" id="addAmbulanceCallModal" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog modal-lg modal-dialog-centered modal-scrollable">
@@ -230,10 +235,143 @@
 
                                             <td>
                                                 <div class="d-flex">
-                                                    <a href="{{ route('ambulanceCall.editCall', $call->id) }}"
-                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                        <i class="ti ti-pencil"></i>
+                                                    <a href="javascript:void(0)"
+                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-ambulance-call"
+                                                        data-fetch-url="{{ route('ambulanceCall.editCall', $call->id) }}"
+                                                        data-update-url="{{ route('ambulanceCall.updateCall', $call->id) }}">
+                                                            <i class="ti ti-pencil"></i>
                                                     </a>
+
+                                                    <div class="modal fade" id="editAmbulanceCallModal" tabindex="-1" aria-hidden="true">
+                                                        <div class="modal-dialog modal-lg modal-dialog-centered modal-scrollable">
+                                                            <div class="modal-content">
+
+                                                                <form id="editAmbulanceCallForm" method="POST">
+                                                                    @csrf
+                                                                    @method('PUT')
+
+                                                                    <input type="hidden" name="id" id="edit_id">
+
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title">
+                                                                            <i class="fas fa-ambulance me-2"></i>Edit Ambulance Call
+                                                                        </h5>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                                    </div>
+
+                                                                    <div class="modal-body">
+                                                                        <div class="row g-3">
+
+                                                                            <div class="col-md-6">
+                                                                                <label class="form-label">Patient Name</label>
+                                                                                <select name="patient_id" id="edit_patient_id" class="form-select">
+                                                                                    <option value="">Select Patient</option>
+                                                                                    @foreach ($patients as $patient)
+                                                                                        <option value="{{ $patient->id }}">
+                                                                                            {{ $patient->patient_name }}
+                                                                                        </option>
+                                                                                    @endforeach
+                                                                                </select>
+                                                                            </div>
+
+                                                                            <div class="col-md-6">
+                                                                                <label class="form-label">Contact No</label>
+                                                                                <input type="text" name="contact_no" id="edit_contact_no" class="form-control">
+                                                                            </div>
+
+                                                                            <div class="col-md-6">
+                                                                                <label class="form-label">Call From</label>
+                                                                                <input type="text" name="call_from" id="edit_call_from" class="form-control">
+                                                                            </div>
+
+                                                                            <div class="col-md-6">
+                                                                                <label class="form-label">Call To</label>
+                                                                                <input type="text" name="call_to" id="edit_call_to" class="form-control">
+                                                                            </div>
+
+                                                                            <div class="col-md-6">
+                                                                                <label class="form-label">Vehicle</label>
+                                                                                <select name="vehicle_id" id="edit_vehicle_id" class="form-select">
+                                                                                    <option value="">Select Vehicle</option>
+                                                                                    @foreach ($vehicles as $vehicle)
+                                                                                        <option value="{{ $vehicle->id }}">
+                                                                                            {{ $vehicle->vehicle_no ?? $vehicle->vehicle_model }}
+                                                                                        </option>
+                                                                                    @endforeach
+                                                                                </select>
+                                                                            </div>
+
+                                                                            <div class="col-md-6">
+                                                                                <label class="form-label">Driver</label>
+                                                                                <input type="text" name="driver" id="edit_driver" class="form-control">
+                                                                            </div>
+
+                                                                            <div class="col-md-6">
+                                                                                <label class="form-label">Charge Category</label>
+                                                                                <select name="charge_category_id" id="edit_charge_category_id" class="form-select">
+                                                                                    <option value="">Select Category</option>
+                                                                                    @foreach ($chargeCategories as $category)
+                                                                                        <option value="{{ $category->id }}">
+                                                                                            {{ $category->name }}
+                                                                                        </option>
+                                                                                    @endforeach
+                                                                                </select>
+                                                                            </div>
+
+                                                                            <div class="col-md-6">
+                                                                                <label class="form-label">Charge Name</label>
+                                                                                <select name="charge_id" id="edit_charge_id" class="form-select">
+                                                                                    <option value="">Select Charge</option>
+                                                                                </select>
+                                                                            </div>
+
+                                                                            <div class="col-md-6">
+                                                                                <label class="form-label">Standard Charge</label>
+                                                                                <input type="number" step="0.01" name="standard_charge"
+                                                                                    id="edit_standard_charge" class="form-control">
+                                                                            </div>
+
+                                                                            <div class="col-md-6">
+                                                                                <label class="form-label">Date</label>
+                                                                                <input type="datetime-local" name="date" id="edit_date" class="form-control">
+                                                                            </div>
+
+                                                                            <div class="col-md-12">
+                                                                                <label class="form-label">Address</label>
+                                                                                <textarea name="address" id="edit_address" class="form-control" rows="2"></textarea>
+                                                                            </div>
+
+                                                                            <div class="col-md-6">
+                                                                                <label class="form-label">Amount</label>
+                                                                                <input type="number" step="0.01" name="amount" id="edit_amount" class="form-control">
+                                                                            </div>
+
+                                                                            <div class="col-md-6">
+                                                                                <label class="form-label">Net Amount</label>
+                                                                                <input type="number" step="0.01" name="net_amount" id="edit_net_amount" class="form-control">
+                                                                            </div>
+
+                                                                            <div class="col-md-12">
+                                                                                <label class="form-label">Note</label>
+                                                                                <textarea name="note" id="edit_note" class="form-control" rows="2"></textarea>
+                                                                            </div>
+
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                                                                        <button type="submit" class="btn btn-primary">
+                                                                            Update Ambulance Call
+                                                                        </button>
+                                                                    </div>
+
+                                                                </form>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
 
                                                     <form action="{{ route('ambulanceCall.deleteCall', $call->id) }}"
                                                         method="POST" class="ms-1">
@@ -328,5 +466,100 @@
                 });
         });
     </script>
+    
+
+    <script>
+        function loadEditCharges(categoryId, selectedChargeId = null) {
+            const chargeSelect = document.getElementById('edit_charge_id');
+
+            chargeSelect.innerHTML = '<option value="">Select Charge</option>';
+            chargeSelect.disabled = true;
+
+            if (!categoryId) return;
+
+            const url = "{{ route('charges.byCategory', ':id') }}".replace(':id', categoryId);
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    data.forEach(charge => {
+                        const selected = charge.id == selectedChargeId ? 'selected' : '';
+                        chargeSelect.innerHTML +=
+                            `<option value="${charge.id}" ${selected}>${charge.name}</option>`;
+                    });
+                    chargeSelect.disabled = false;
+                });
+        }
+    </script>
+    <script>
+        document.getElementById('edit_charge_category_id')
+            .addEventListener('change', function () {
+
+                loadEditCharges(this.value);
+                document.getElementById('edit_standard_charge').value = '';
+        });
+    </script>
+    <script>
+        document.querySelectorAll('.edit-ambulance-call').forEach(btn => {
+            btn.addEventListener('click', function () {
+
+                fetch(this.dataset.fetchUrl)
+                    .then(res => res.json())
+                    .then(data => {
+
+                        document.getElementById('edit_id').value = data.id;
+                        document.getElementById('edit_patient_id').value = data.patient_id;
+                        document.getElementById('edit_contact_no').value = data.contact_no;
+                        document.getElementById('edit_call_from').value = data.call_from;
+                        document.getElementById('edit_call_to').value = data.call_to;
+                        document.getElementById('edit_vehicle_id').value = data.vehicle_id;
+                        document.getElementById('edit_driver').value = data.driver;
+                        document.getElementById('edit_standard_charge').value = data.standard_charge;
+                        document.getElementById('edit_address').value = data.address;
+                        document.getElementById('edit_amount').value = data.amount;
+                        document.getElementById('edit_net_amount').value = data.net_amount;
+                        document.getElementById('edit_note').value = data.note;
+                        document.getElementById('edit_date').value = data.date?.replace(' ', 'T');
+
+                        // set category
+                        document.getElementById('edit_charge_category_id').value =
+                            data.charge_category_id;
+
+                        // load charges & auto-select saved charge 🔥
+                        loadEditCharges(
+                            data.charge_category_id,
+                            data.charge_id
+                        );
+
+                        // set update route
+                        document.getElementById('editAmbulanceCallForm').action =
+                            this.dataset.updateUrl;
+
+                        // open modal
+                        new bootstrap.Modal(
+                            document.getElementById('editAmbulanceCallModal')
+                        ).show();
+                    });
+            });
+        });
+    </script>
+<script>
+document.getElementById('edit_charge_id')
+    .addEventListener('change', function () {
+
+        if (!this.value) return;
+
+        fetch(`/charges/${this.value}`)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('edit_standard_charge').value =
+                    data.standard_charge;
+            });
+});
+</script>
+
+
+
+
 
 @endsection

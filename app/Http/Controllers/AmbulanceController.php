@@ -24,9 +24,6 @@ class AmbulanceController extends Controller
         return view('admin.ambulance.ambulanceCallList', compact('calls','vehicles','chargeCategories','patients'));
     }
 
-    /**
-     * Store a new ambulance call
-     */
     public function addCall(Request $request)
     {
         $validated = $request->validate([
@@ -63,27 +60,21 @@ class AmbulanceController extends Controller
             ->with('success', 'Ambulance call created successfully.');
     }
 
-    /**
-     * Get ambulance call for edit (page or modal)
-     */
     public function editCall($id)
     {
-        $call = AmbulanceCall::findOrFail($id);
+        return response()->json(
+            $call = AmbulanceCall::with(['patient', 'vehicle', 'generatedBy'])->findOrFail($id)
+        );
 
-        return view('ambulance.edit', compact('call'));
+        
     }
 
-    /**
-     * Update an ambulance call
-     */
     public function updateCall(Request $request, $id)
     {
-        $call = AmbulanceCall::findOrFail($id);
-
         $validated = $request->validate([
-            'hospital_id'          => 'required|integer',
-            'branch_id'            => 'required|integer',
-            'patient_id'           => 'nullable|integer',
+            'hospital_id'          => 'nullable|string',
+            'branch_id'            => 'nullable|string',
+            'patient_id'           => 'nullable|string',
             'case_reference_id'    => 'nullable|integer',
             'vehicle_id'           => 'nullable|integer',
             'contact_no'           => 'required|string|max:20',
@@ -105,16 +96,18 @@ class AmbulanceController extends Controller
             'note'                 => 'nullable|string',
         ]);
 
-        $call->update($validated);
+        $ambulanceCall = AmbulanceCall::findOrFail($id);
+
+        // optional: track who updated
+        $validated['updated_by'] = Auth::id();
+
+        $ambulanceCall->update($validated);
 
         return redirect()
-            ->route('ambulance.ambulanceCallList')
+            ->route('ambulanceCall.index')
             ->with('success', 'Ambulance call updated successfully.');
     }
 
-    /**
-     * Delete ambulance call
-     */
     public function destroyCall($id)
     {
         AmbulanceCall::findOrFail($id)->delete();
@@ -136,4 +129,82 @@ class AmbulanceController extends Controller
         return Charge::select('id', 'standard_charge')
             ->findOrFail($chargeId);
     }
+    public function ambulanceList()
+    {
+        
+        $vehicles = Vehicle::paginate(10);
+        
+
+        return view('admin.ambulance.ambulanceList', compact('vehicles'));
+    }
+
+    public function editList($id)
+    {
+        return response()->json(
+            Vehicle::findOrFail($id)
+        );
+    }
+
+    public function addList(Request $request)
+    {
+        $request->validate([
+            'vehicle_no'         => 'required|string|max:50',
+            'vehicle_model'      => 'required|string|max:100',
+            'year_made'          => 'required|string|max:10',
+            'driver_name'        => 'required|string|max:100',
+            'driver_license'     => 'required|string|max:100',
+            'driver_contact_no'  => 'required|string|max:15',       
+            'note'               => 'nullable|string',
+        ]);
+
+        Vehicle::create([
+            'vehicle_no'         => $request->vehicle_no,
+            'vehicle_model'      => $request->vehicle_model,
+            'manufacture_year'   => $request->year_made,
+            'driver_name'        => $request->driver_name,
+            'driver_licence'     => $request->driver_license,
+            'driver_contact'     => $request->driver_contact_no,
+            'vehicle_type'       => $request->vehicle_type,
+            'note'               => $request->note,
+        ]);
+
+        return redirect()->back()->with('success', 'Ambulance added successfully.');
+    }
+
+    public function updateList(Request $request, $id)
+    {
+        $request->validate([
+            'vehicle_no'         => 'required|string|max:50',
+            'vehicle_model'      => 'required|string|max:100',
+            'year_made'          => 'required|string|max:10',
+            'driver_name'        => 'required|string|max:100',
+            'driver_license'     => 'required|string|max:100',
+            'driver_contact_no'  => 'required|string|max:15',
+            'note'               => 'nullable|string',
+        ]);
+
+        $vehicle = Vehicle::findOrFail($id);
+
+        $vehicle->update([
+            'vehicle_no'         => $request->vehicle_no,
+            'vehicle_model'      => $request->vehicle_model,
+            'manufacture_year'   => $request->year_made,
+            'driver_name'        => $request->driver_name,
+            'driver_licence'     => $request->driver_license,
+            'driver_contact'     => $request->driver_contact_no,
+            'vehicle_type'       => $request->vehicle_type,
+            'note'               => $request->note,
+        ]);
+
+        return redirect()->back()->with('success', 'Ambulance updated successfully.');
+    }
+    
+    public function destroyList($id)
+    {
+        $vehicle = Vehicle::findOrFail($id);
+        $vehicle->delete(); 
+
+        return redirect()->back()->with('success', 'Ambulance deleted successfully.');
+    }
+
 }
