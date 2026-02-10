@@ -603,6 +603,8 @@ Route::get('/billing', function () {
 Route::prefix('ipd/billing')->group(function () {
     Route::get('/search', [App\Http\Controllers\IpdBillingController::class, 'search'])->name('ipd.billing.search');
     Route::get('/{ipdId}/breakup', [App\Http\Controllers\IpdBillingController::class, 'breakup'])->name('ipd.billing.breakup');
+    Route::post('/{ipdId}/discount', [App\Http\Controllers\IpdBillingController::class, 'updateDiscount'])->name('ipd.billing.discount.update');
+    Route::post('/{ipdId}/due-patient-party', [App\Http\Controllers\IpdBillingController::class, 'updateDuePatientParty'])->name('ipd.billing.due.patient.party.update');
     Route::get('/{ipdId}/check-discharged', [App\Http\Controllers\IpdBillingController::class, 'checkDischarged'])->name('ipd.billing.check.discharged');
     Route::get('/{ipdId}/export-estimate', [App\Http\Controllers\IpdBillingController::class, 'exportEstimate'])->name('ipd.billing.export.estimate');
     Route::get('/{ipdId}/export-final', [App\Http\Controllers\IpdBillingController::class, 'exportFinal'])->name('ipd.billing.export.final');
