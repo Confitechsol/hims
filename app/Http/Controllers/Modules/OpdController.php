@@ -925,4 +925,54 @@ class OpdController extends Controller
     public function printPrescription(){
         return "Under Development";
     }
+    public function reports()
+    {
+       return view('admin.reports.opd.index');
+    }
+    public function opdReport(Request $request)
+    {
+        $opdReports = OpdDetail::query()
+            ->join('opd_visits', 'opd_visits.opd_id', '=', 'opd_details.id')
+            ->with(['patient', 'doctor'])
+            ->select('opd_details.*', 'opd_visits.visit_id', 'opd_visits.created_at')
+            ->when($request->date_from && $request->date_to, function ($q) use ($request) {
+                $q->whereBetween('opd_visits.created_at', [
+                    $request->date_from,
+                    $request->date_to,
+                ]);
+            })
+            ->when($request->gender, function ($q) use ($request) {
+                $q->whereHas('patient', function ($sub) use ($request) {
+                    $sub->where('gender', $request->gender);
+                });
+            })
+            ->when($request->search, function ($q) use ($request) {
+                $q->where('opd_visits.opd_id', 'like', '%' . $request->search . '%');
+            })
+            ->orderBy('opd_visits.created_at', 'desc')
+            ->get();
+
+        return view('admin.reports.opd.opd_reports', compact('opdReports'));
+    }
+    public function opdBalanceReport(Request $request)
+{
+    $opdReports = OpdDetail::with(['patient'])
+        ->when($request->date_from && $request->date_to, function ($q) use ($request) {
+            $q->whereBetween('appointment_date', [
+                $request->date_from,
+                $request->date_to
+            ]);
+        })
+        ->when($request->search, function ($q) use ($request) {
+            $q->where('opd_no', 'like', '%' . $request->search . '%');
+        })
+        ->orderBy('appointment_date', 'desc')
+        ->get();
+
+    return view('admin.reports.opd.opd_balance_reports', compact('opdReports'));
+}
+
+
+
+
 }
