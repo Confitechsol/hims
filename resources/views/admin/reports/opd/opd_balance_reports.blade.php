@@ -24,65 +24,75 @@
                 <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> OPD Balance Report </h5>
-                        <a href="opdReportsIndex" class="text-white fw-bold"><i class="fa-solid fa-angles-left text-white"></i>
+                        <a href="{{ route('opd.reports') }}" class="text-white fw-bold"><i class="fa-solid fa-angles-left text-white"></i>
                             OPD</a>
                     </div>
                 </div>
 
                 <div class="card-body">
-                    <form action="">
+                    <form action="{{ route('opd.opd_reports') }}" method="GET">
                         <div class="row align-items-center gy-4">
 
+                            {{-- Date From --}}
                             <div class="col-md-3">
-                                <label for="time_duration" class="form-label">Time Duration <span
-                                        class="text-danger">*</span></label>
-                                <select name="time_duration" id="time_duration" class="form-select">
-                                    <option value="" selected disabled>Select</option>
-                                    <option value="today">Today</option>
-                                    <option value="this_week">This Week</option>
+                                <label class="form-label">
+                                    Date From <span class="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="date"
+                                    name="date_from"
+                                    class="form-control"
+                                    value="{{ request('date_from') }}"
+                                    max="{{ now()->toDateString() }}"
+                                >
+                            </div>
+
+                            {{-- Date To --}}
+                            <div class="col-md-3">
+                                <label class="form-label">
+                                    Date To <span class="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="date"
+                                    name="date_to"
+                                    class="form-control"
+                                    value="{{ request('date_to') }}"
+                                    max="{{ now()->toDateString() }}"
+                                >
+                            </div>
+
+                            {{-- Gender --}}
+                            <div class="col-md-3">
+                                <label class="form-label">Gender</label>
+                                <select name="gender" class="form-select">
+                                    <option value="">All</option>
+                                    <option value="Male" {{ request('gender') == 'Male' ? 'selected' : '' }}>Male</option>
+                                    <option value="Female" {{ request('gender') == 'Female' ? 'selected' : '' }}>Female</option>
+                                    <option value="Other" {{ request('gender') == 'Other' ? 'selected' : '' }}>Other</option>
                                 </select>
                             </div>
 
+                            {{-- Search --}}
                             <div class="col-md-3">
-                                <label for="from_age" class="form-label"> From Age </label>
-                                <select name="from_age" id="from_age" class="form-select">
-                                    <option value="" selected disabled>Select</option>
-                                    <option value="1">1</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="to_age" class="form-label"> To Age </label>
-                                <select name="to_age" id="to_age" class="form-select">
-                                    <option value="" selected disabled>Select</option>
-                                    <option value="1">1</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="gender" class="form-label"> Gender </label>
-                                <select name="gender" id="gender" class="form-select">
-                                    <option value="" selected disabled>Select</option>
-                                    <option value="male">Male</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="discharge" class="form-label"> Discharge </label>
-                                <select name="discharge" id="discharge" class="form-select">
-                                    <option value="" selected disabled>Select</option>
-                                    <option value="0">Fever</option>
-                                </select>
-                            </div>
-                          
-
-                            <div class="col-md-3">
-                                <label for="miscellaneous" class="form-label"> Miscellaneous </label>
-                                <select name="miscellaneous" id="miscellaneous" class="form-select">
-                                    <option value="" selected disabled>Select</option>
-                                    <option value="antenatal">Antenatal</option>
-                                </select>
+                                <label class="form-label">Search</label>
+                                <input
+                                    type="text"
+                                    name="search"
+                                    class="form-control"
+                                    placeholder="OPD No / Patient Name / Mobile"
+                                    value="{{ request('search') }}"
+                                >
                             </div>
 
-                            <div class="col-md-12 text-end">
-                                <button type="button" class="btn btn-primary btn-sm mt-4">Search</button>
+                            {{-- Buttons --}}
+                            <div class="col-md-12 mt-3">
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    Search
+                                </button>
+
+                                <a href="{{ route('opd.opd_reports') }}" class="btn btn-secondary btn-sm">
+                                    Reset
+                                </a>
                             </div>
 
                         </div>
@@ -101,54 +111,63 @@
                                 <div class="col-lg-12">
                                     <div class="card">
                                         <div class="card-body">
-                                            <div
-                                                class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
-                                                <div class="input-icon-start position-relative me-2">
-                                                    <span class="input-icon-addon">
-                                                        <i class="ti ti-search"></i>
-                                                    </span>
-                                                    <input type="text" class="form-control shadow-sm" placeholder="Search">
+                                            
 
-                                                </div>
-                                            </div>
-
-
-                                            <!-- Table start -->
                                             <div class="table-responsive table-nowrap">
+                                                <!-- Table start -->
                                                 <table class="table border">
                                                     <thead class="thead-light">
                                                         <tr>
-
                                                             <th>OPD No</th>
                                                             <th>Patient Name</th>
-                                                            <th>Case ID </th>
+                                                            <th>Case ID</th>
                                                             <th>Age</th>
                                                             <th>Gender</th>
                                                             <th>Mobile Number</th>
                                                             <th>Antenatal</th>
-                                                            <th>Discharge</th>
-                                                            <th>Net Amount(SAR) </th>
-                                                            <th>Paid Amount(SAR) </th>
-                                                            <th>Balance Amount(SAR) </th>
+                                                            <th>Discharged</th>
+                                                            <th>Net Amount (SAR)</th>
+                                                            <th>Paid Amount (SAR)</th>
+                                                            <th>Balance Amount (SAR)</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                        </tr>
+                                                        @forelse($opdReports as $opd)
+                                                            <tr>
+                                                                <td>{{ $opd->opd_no }}</td>
+                                                                <td>{{ $opd->patient->name ?? '-' }}</td>
+                                                                <td>{{ $opd->case_type ?? '-' }}</td>
+                                                                <td>{{ $opd->patient->age ?? '-' }}</td>
+                                                                <td>{{ $opd->patient->gender ?? '-' }}</td>
+                                                                <td>{{ $opd->patient->mobile ?? '-' }}</td>
+                                                                <td>
+                                                                    {{ strtolower($opd->case_type) === 'antenatal' ? 'Yes' : 'No' }}
+                                                                </td>
+                                                                <td>
+                                                                    {{ $opd->status == 'discharged' ? 'Yes' : 'No' }}
+                                                                </td>
+                                                                <td class="text-end">
+                                                                    {{ number_format($opd->amount ?? 0, 2) }}
+                                                                </td>
+                                                                <td class="text-end">
+                                                                    {{ number_format($opd->paid_amount ?? 0, 2) }}
+                                                                </td>
+                                                                <td class="text-end">
+                                                                    {{ number_format(($opd->amount ?? 0) - ($opd->paid_amount ?? 0), 2) }}
+                                                                </td>
+                                                            </tr>
+                                                        @empty
+                                                            <tr>
+                                                                <td colspan="11" class="text-center text-muted">
+                                                                    No OPD records found
+                                                                </td>
+                                                            </tr>
+                                                        @endforelse
                                                     </tbody>
                                                 </table>
                                             </div>
+
+
                                             <!-- Table end -->
                                         </div>
                                     </div>

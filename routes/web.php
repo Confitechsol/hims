@@ -552,6 +552,8 @@ Route::post('/opd_medication', [OpdController::class, 'createOpdMedication'])->n
 Route::post('/opd_charge', [OpdController::class, 'addOpdCharge'])->name('opd.addOpdCharge');
 Route::post('/opd_visit', [OpdController::class, 'storeVisitDetails'])->name('opd.visit.store');
 
+
+
 Route::get('/ipd', [IpdController::class, 'index'])->name('ipd');
 Route::post('/ipd/store', [IpdController::class, 'store'])->name('ipd.store');
 Route::get('/ipd/edit/{id}', [IpdController::class, 'edit'])->name('ipd.edit');
@@ -1025,6 +1027,10 @@ Route::get('/inventory-item', [InventoriesController::class, 'itemReports'])->na
 Route::get('/inventory-asset', [InventoriesController::class, 'assetReport'])->name('inventory-asset-reports');
 Route::get('/inventory-issue', [InventoriesController::class, 'issueReport'])->name('inventory-issue-reports');
 Route::get('dailyTransactionReport', [TransactionReportController::class, 'dailyTransactionReport'])->name('reports.daily.transaction');
+
+Route::get('/opd-reports-index', [OpdController::class, 'reports'])->name('opd.reports');
+Route::get('/opd-reports', [OpdController::class, 'opdReport'])->name('opd.opd_reports');
+Route::get('/opd-balance-reports', [OpdController::class, 'opdBalanceReport'])->name('opd.opd_balance_reports');
 });
 Route::get('/allTransactionReport', function () {
     return view('admin.reports.finance.all-transaction-report');
@@ -1049,12 +1055,8 @@ Route::get('/processingTransactionReport', function () {
 })->name('processingTransactionReport');
 
 // OPD
-Route::get('/opdReportsIndex', function () {
-    return view('admin.reports.opd.index');
-})->name('opdReportsIndex');
-Route::get('/opdReports', function () {
-    return view('admin.reports.opd.opd_reports');
-})->name('opdReports');
+
+
 Route::get('/opdBalanceReports', function () {
     return view('admin.reports.opd.opd_balance_reports');
 })->name('opdBalanceReports');

@@ -28,7 +28,7 @@
                 <div class="card-body">
                     <div class="row align-items-center gy-4">
                         <div class="col-md-4">
-                            <a href="opdReports">
+                            <a href="{{ route('opd.opd_reports') }}">
                                 <div class="module_billing">
                                     <i class="fa-solid fa-calendar-check"></i>
                                     <p>OPD Report</p>
@@ -36,21 +36,21 @@
                             </a>
                         </div>
                         <div class="col-md-4">
-                            <a href="opdBalanceReports">
+                            <a href="{{ route('opd.opd_balance_reports') }}">
                                 <div class="module_billing">
                                     <i class="fa-solid fa-calendar-check"></i>
                                     <p>OPD Balance Report</p>
                                 </div>
                             </a>
                         </div>
-                        <div class="col-md-4">
+                        <!-- <div class="col-md-4">
                             <a href="opdDischargePatient">
                                 <div class="module_billing">
                                     <i class="fa-solid fa-calendar-check"></i>
                                     <p>OPD Discharge Patient</p>
                                 </div>
                             </a>
-                        </div>
+                        </div> -->
                      
 
                     </div>

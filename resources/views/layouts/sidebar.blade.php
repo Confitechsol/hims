@@ -453,7 +453,7 @@
                                     <li><a href="{{ route('finance') }}" class="{{ request()->routeIs('finance') ? 'active' : '' }}">Finance Report
                                             </a></li>
                                     
-                                    <li><a href="{{ route('finance') }}" class="{{ request()->routeIs('finance') ? 'active' : '' }}">OPD
+                                    <li><a href="{{ route('opd.reports') }}" class="{{ request()->routeIs('opd.reports') ? 'active' : '' }}">OPD
                                             Report</a></li>
                                     <li><a href="{{ route('finance') }}"  class="{{ request()->routeIs('death') ? 'active' : '' }}">IPD
                                             Report</a></li>

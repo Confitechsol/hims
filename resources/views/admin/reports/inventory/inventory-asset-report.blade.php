@@ -31,56 +31,56 @@
 
                 <div class="card-body">
                     <form action="{{ route('inventory-stock-reports') }}" method="GET">
-    <div class="row align-items-center gy-4">
+                        <div class="row align-items-center gy-4">
 
-        <div class="col-md-4">
-            <label class="form-label">
-                Date From <span class="text-danger">*</span>
-            </label>
-            <input
-                type="date"
-                name="date_from"
-                class="form-control"
-                value="{{ request('date_from') }}"
-                max="{{ now()->toDateString() }}"
-            >
-        </div>
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    Date From <span class="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="date"
+                                    name="date_from"
+                                    class="form-control"
+                                    value="{{ request('date_from') }}"
+                                    max="{{ now()->toDateString() }}"
+                                >
+                            </div>
 
-        <div class="col-md-4">
-            <label class="form-label">
-                Date To <span class="text-danger">*</span>
-            </label>
-            <input
-                type="date"
-                name="date_to"
-                class="form-control"
-                value="{{ request('date_to') }}"
-                max="{{ now()->toDateString() }}"
-            >
-        </div>
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    Date To <span class="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="date"
+                                    name="date_to"
+                                    class="form-control"
+                                    value="{{ request('date_to') }}"
+                                    max="{{ now()->toDateString() }}"
+                                >
+                            </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Search</label>
-            <input type="text"
-                   name="search"
-                   class="form-control"
-                   placeholder="Item / Category / Supplier / Store"
-                   value="{{ request('search') }}">
-        </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Search</label>
+                                <input type="text"
+                                    name="search"
+                                    class="form-control"
+                                    placeholder="Item / Category / Supplier / Store"
+                                    value="{{ request('search') }}">
+                            </div>
 
-        <div class="col-md-4 mt-4">
-            <button type="submit" class="btn btn-primary btn-sm">
-                Search
-            </button>
+                            <div class="col-md-4 mt-4">
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    Search
+                                </button>
 
-            <a href="{{ route('inventory-stock-reports') }}"
-               class="btn btn-secondary btn-sm">
-                Reset
-            </a>
-        </div>
+                                <a href="{{ route('inventory-stock-reports') }}"
+                                class="btn btn-secondary btn-sm">
+                                    Reset
+                                </a>
+                            </div>
 
-    </div>
-</form>
+                        </div>
+                    </form>
 
 
 
