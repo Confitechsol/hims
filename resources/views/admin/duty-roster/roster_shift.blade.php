@@ -11,13 +11,13 @@
                         <h4 class="fw-bold mb-0">Duty Roster List Details</h4>
                     </div>
                     <div class="d-flex align-items-center flex-wrap gap-2">
-                        <a href="javascript:void(0);" class="btn btn-primary text-white ms-2 btn-md"
+                        {{-- <a href="javascript:void(0);" class="btn btn-primary text-white ms-2 btn-md"
                             data-bs-toggle="modal" data-bs-target="#add_shift">
                             <i class="ti ti-plus me-1"></i> Add Shift
-                        </a>
+                        </a> --}}
 
                         <!-- Add Shift Modal -->
-                        <div class="modal fade" id="add_shift" tabindex="-1" aria-hidden="true">
+                        <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered modal-md">
                                 <div class="modal-content">
                                     <form method="POST" action="{{ route('dutyroster.addShift') }}">
@@ -60,6 +60,8 @@
             </div>
 
             <div class="card-body">
+            {{-- Search & Add --}}
+                         <x-table-actions.actions id="roster_shift" name="Roster Shift" />
                 @if($shifts->isEmpty())
                     <p class="text-center">No roster details found.</p>
                 @else
@@ -104,6 +106,45 @@
                         </table>
 
                     </div>
+                    {{-- Pagination Links --}}
+                                    <div class="mt-3" id="pagination-wrapper">
+                                        @php
+                                            $currentPage = $rosters->currentPage();
+                                            $lastPage = $rosters->lastPage();
+                                        @endphp
+
+                                        {{-- Previous --}}
+                                        @if ($rosters->onFirstPage())
+                                            <button class="btn btn-outline-secondary btn-sm me-1" disabled>« Prev</button>
+                                        @else
+                                            <a href="{{ $rosters->previousPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                                                class="btn btn-outline-secondary btn-sm me-1">
+                                                « Prev
+                                            </a>
+                                        @endif
+
+                                        {{-- Page numbers --}}
+                                        @for ($page = 1; $page <= $lastPage; $page++)
+                                            @if ($page == $currentPage)
+                                                <button class="btn btn-primary btn-sm me-1">{{ $page }}</button>
+                                            @else
+                                                <a href="{{ $rosters->url($page) }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                                                    class="btn btn-outline-secondary btn-sm me-1">
+                                                    {{ $page }}
+                                                </a>
+                                            @endif
+                                        @endfor
+
+                                        {{-- Next --}}
+                                        @if ($rosters->hasMorePages())
+                                            <a href="{{ $rosters->nextPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                                                class="btn btn-outline-secondary btn-sm">
+                                                Next »
+                                            </a>
+                                        @else
+                                            <button class="btn btn-outline-secondary btn-sm" disabled>Next »</button>
+                                        @endif
+                                    </div>
                 @endif
             </div>
         </div>

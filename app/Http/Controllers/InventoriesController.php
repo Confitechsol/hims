@@ -11,6 +11,7 @@ use App\Models\ItemStore;
 use App\Models\ItemSupplier;
 use App\Models\Staff;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -145,15 +146,16 @@ class InventoriesController extends Controller
 
             // ✅ Delete all previous batch entries
             ItemStockBatches::where('item_stock_id', $stock->id)->delete();
-
+            $item_stock_id = $stock->id;
             // ✅ Recreate all batches (Capital or Consumable based on inputs)
             if ($request->has('capital_batches')) {
                 foreach ($request->capital_batches as $batch) {
                     if (! empty($batch['batch_no'])) {
                         ItemStockBatches::create([
-                            'item_stock_id'       => $request->stock_id,
+                            'item_stock_id'       => $item_stock_id,
                             'batch_no'            => $batch['batch_no'],
                             'serial_no'           => $batch['serial_no'] ?? null,
+                            'purchase_price'      => $batch['purchase_price'] ?? null,
                             'salvage_value'       => $batch['salvage_value'] ?? null,
                             'useful_life'         => $batch['useful_life'] ?? null,
                             'annual_depreciation' => $batch['annual_depreciation'] ?? null,
@@ -167,9 +169,10 @@ class InventoriesController extends Controller
                 foreach ($request->consumable_batches as $batch) {
                     if (! empty($batch['batch_no'])) {
                         ItemStockBatches::create([
-                            'item_stock_id'       => $request->stock_id,
+                            'item_stock_id'       => $item_stock_id,
                             'batch_no'            => $batch['batch_no'],
                             'serial_no'           => $batch['serial_no'] ?? null,
+                            'purchase_price'      => $batch['purchase_price'] ?? null,
                             'salvage_value'       => null,
                             'useful_life'         => null,
                             'annual_depreciation' => null,
@@ -492,5 +495,295 @@ class InventoriesController extends Controller
             return redirect()->back()->with('error', 'Failed to delete item: ' . $e->getMessage());
         }
     }
+    
+    public function reports()
+    {
+         return view('admin.reports.inventory.index');
+    }
+    // public function stockReports(Request $request)
+    // {
+    //     $dateFrom = $request->date_from;
+    //     $dateTo   = $request->date_to;
+    //     $search   = $request->search;
+
+    //     $stockReport = ItemStock::with([
+    //             'item',
+    //             'itemCategory',
+    //             'supplier',
+    //             'store'
+    //         ])
+    //         ->withSum(['issues as total_issued' => function ($q) use ($dateFrom, $dateTo) {
+    //             if ($dateFrom && $dateTo) {
+    //                 $q->whereBetween('date', [$dateFrom, $dateTo]);
+    //             }
+    //         }], 'quantity')
+
+    //         ->when($dateFrom && $dateTo, function ($query) use ($dateFrom, $dateTo) {
+    //             $query->whereBetween('date', [$dateFrom, $dateTo]);
+    //         })
+
+    //         ->when($search, function ($query) use ($search) {
+    //             $query->where(function ($q) use ($search) {
+    //                 $q->whereHas('item', function ($q1) use ($search) {
+    //                     $q1->where('name', 'like', "%{$search}%");
+    //                 })
+    //                 ->WhereHas('itemCategory', function ($q2) use ($search) {
+    //                     $q2->where('item_category', 'like', "%{$search}%");
+    //                 })
+    //                 ->orWhereHas('supplier', function ($q3) use ($search) {
+    //                     $q3->where('item_supplier', 'like', "%{$search}%");
+    //                 })
+    //                 ->orWhereHas('store', function ($q4) use ($search) {
+    //                     $q4->where('item_store', 'like', "%{$search}%");
+    //                 });
+    //             });
+    //         })
+
+    //         ->where('is_active', 'yes')
+    //         ->get()
+    //         ->map(function ($stock) {
+    //             $stock->total_quantity = $stock->quantity;
+    //             $stock->total_issued   = $stock->total_issued ?? 0;
+    //             $stock->available_quantity =
+    //                 $stock->total_quantity - $stock->total_issued;
+
+    //             return $stock;
+    //         });
+
+    //     return view(
+    //         'admin.reports.inventory.inventory-stock-report',
+    //         compact('stockReport', 'dateFrom', 'dateTo', 'search')
+    //     );
+    // }
+    public function stockReports(Request $request)
+    {
+        $dateFrom = $request->date_from;
+        $dateTo   = $request->date_to;
+        $search   = $request->search;
+
+        $stockReport = ItemStock::with([
+                'item',
+                'itemCategory',
+                'supplier',
+                'store'
+            ])
+            ->withSum([
+                'issues as total_issued' => function ($q) use ($dateFrom, $dateTo) {
+                    if ($dateFrom && $dateTo) {
+                        $q->whereBetween('date', [$dateFrom, $dateTo]);
+                    }
+                }
+            ], 'quantity')
+
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+
+                    $q->whereHas('item', function ($q1) use ($search) {
+                            $q1->where('name', 'like', "%{$search}%");
+                        })
+
+                    ->orWhereHas('itemCategory', function ($q2) use ($search) {
+                            $q2->where('item_category', 'like', "%{$search}%");
+                        })
+
+                    ->orWhereHas('supplier', function ($q3) use ($search) {
+                            $q3->where('item_supplier', 'like', "%{$search}%");
+                        })
+
+                    ->orWhereHas('store', function ($q4) use ($search) {
+                            $q4->where('item_store', 'like', "%{$search}%");
+                        });
+
+                });
+            })
+
+            ->where('is_active', 'yes')
+            ->get()
+            ->map(function ($stock) {
+                $stock->total_quantity     = $stock->quantity;
+                $stock->total_issued       = $stock->total_issued ?? 0;
+                $stock->available_quantity =
+                    $stock->total_quantity - $stock->total_issued;
+
+                return $stock;
+            });
+
+        return view(
+            'admin.reports.inventory.inventory-stock-report',
+            compact('stockReport', 'dateFrom', 'dateTo', 'search')
+        );
+    }
+
+    public function itemReports(Request $request)
+    {
+        $dateFrom = $request->date_from;
+        $dateTo   = $request->date_to;
+        $search   = $request->search;
+
+        $items = Item::with('category')
+
+            ->when($dateFrom && $dateTo, function ($query) use ($dateFrom, $dateTo) {
+                $query->whereBetween('date', [$dateFrom, $dateTo]);
+            })
+
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+
+                    $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('unit', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+
+                    ->orWhereHas('category', function ($qc) use ($search) {
+                        $qc->where('item_category', 'like', "%{$search}%");
+                    });
+
+                });
+            })
+
+            ->orderBy('name')
+            ->get();
+
+        return view(
+            'admin.reports.inventory.inventory-item-report',
+            compact('items', 'dateFrom', 'dateTo', 'search')
+        );
+    }
+    public function assetReport(Request $request)
+    {
+        $dateFrom = $request->date_from;
+        $dateTo   = $request->date_to;
+        $search   = $request->search;
+
+        $assets = ItemStock::with([
+                'item',
+                'itemCategory',
+                'batches',
+                'supplier',
+                'store'
+            ])
+            ->when($dateFrom && $dateTo, function ($query) use ($dateFrom, $dateTo) {
+                $query->whereBetween('date', [$dateFrom, $dateTo]);
+            })
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('item', function ($qi) use ($search) {
+                            $qi->where('name', 'like', "%{$search}%");
+                        })
+                    ->orWhereHas('itemCategory', function ($qc) use ($search) {
+                            $qc->where('item_category', 'like', "%{$search}%");
+                        })
+                    ->orWhereHas('supplier', function ($qs) use ($search) {
+                            $qs->where('item_supplier', 'like', "%{$search}%");
+                        })
+                    ->orWhereHas('store', function ($qt) use ($search) {
+                            $qt->where('item_store', 'like', "%{$search}%");
+                        });
+                });
+            })
+            ->where('is_active', 'yes')
+            ->orderBy('date', 'desc')
+            ->get()
+            ->map(function ($asset) {
+
+                // 🔹 Batch aggregations
+                $asset->salvage_value = $asset->batches->sum('salvage_value');
+                $asset->annual_depreciation = $asset->batches->sum('annual_depreciation');
+                $asset->useful_life = $asset->batches->avg('useful_life');
+                $asset->expiry_date = $asset->batches->min('expiry_date');
+
+                // 🔹 Cost calculations
+                $asset->total_cost = $asset->batches->whereNotNull('purchase_price')->sum('purchase_price');
+
+                // 🔹 Net Book Value
+                $asset->net_book_value =
+                    $asset->total_cost - $asset->salvage_value;
+
+                // 🔹 Asset age
+                $asset->asset_age =
+                    $asset->date
+                        ? Carbon::parse($asset->date)->diffInYears(now())
+                        : null;
+
+                return $asset;
+            });
+
+        return view(
+            'admin.reports.inventory.inventory-asset-report',
+            compact('assets', 'dateFrom', 'dateTo', 'search')
+        );
+    }
+    public function issueReport(Request $request)
+{
+    $dateFrom = $request->date_from;
+    $dateTo   = $request->date_to;
+    $search   = $request->search;
+    $returned = $request->is_returned; // yes / no / null
+
+    $issues = ItemIssue::with([
+            'item',
+            'category',
+            'department',
+            'issuedTo'
+        ])
+
+        // 🔹 Date filter (issue date)
+        ->when($dateFrom && $dateTo, function ($query) use ($dateFrom, $dateTo) {
+            $query->whereBetween('issue_date', [$dateFrom, $dateTo]);
+        })
+
+        // 🔹 Returned filter
+        ->when($returned !== null && $returned !== '', function ($query) use ($returned) {
+            $query->where('is_returned', $returned);
+        })
+
+        // 🔹 Search filter
+        ->when($search, function ($query) use ($search) {
+            $query->where(function ($q) use ($search) {
+
+                $q->whereHas('item', function ($qi) use ($search) {
+                        $qi->where('name', 'like', "%{$search}%");
+                    })
+                  ->orWhereHas('category', function ($qc) use ($search) {
+                        $qc->where('item_category', 'like', "%{$search}%");
+                    })
+                  ->orWhereHas('department', function ($qd) use ($search) {
+                        $qd->where('name', 'like', "%{$search}%");
+                    })
+                  ->orWhereHas('issuedTo', function ($qs) use ($search) {
+                        $qs->where('name', 'like', "%{$search}%");
+                    });
+
+            });
+        })
+
+        ->where('is_active', 'yes')
+        ->orderBy('issue_date', 'desc')
+        ->get()
+
+        // 🔹 Computed fields
+        ->map(function ($issue) {
+
+            $issue->issue_status = $issue->is_returned === 'yes'
+                ? 'Returned'
+                : 'Issued';
+
+            $issue->issue_age = $issue->issue_date
+                ? Carbon::parse($issue->issue_date)->diffInDays(now())
+                : null;
+
+            return $issue;
+        });
+
+    return view(
+        'admin.reports.inventory.inventory-issue-report',
+        compact('issues', 'dateFrom', 'dateTo', 'search', 'returned')
+    );
+}
+
+
+
+
+
+
 
 }

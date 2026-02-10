@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AmbulanceController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AppointmentsController;
 use App\Http\Controllers\AppSwitchController;
@@ -47,6 +48,7 @@ use App\Http\Controllers\Setup\DosageDurationController;
 use App\Http\Controllers\Setup\DoseDurationController;
 use App\Http\Controllers\Setup\DoseIntervalController;
 use App\Http\Controllers\Setup\FindingsController;
+use App\Http\Controllers\Setup\GstMasterController;
 use App\Http\Controllers\Setup\HospitalChargeCategoryController;
 use App\Http\Controllers\Setup\HospitalChargesController;
 use App\Http\Controllers\Setup\HospitalChargeTypeController;
@@ -67,7 +69,6 @@ use App\Http\Controllers\Setup\MedicineUnitController as SetupMedicineUnitContro
 use App\Http\Controllers\Setup\PackageController;
 use App\Http\Controllers\Setup\PrefixesController;
 use App\Http\Controllers\Setup\ProfileController;
-use App\Http\Controllers\Setup\GstMasterController;
 use App\Http\Controllers\Setup\RadiologyController;
 use App\Http\Controllers\Setup\UnitController;
 use App\Http\Controllers\Setup\UsersController;
@@ -78,7 +79,6 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\TransactionReportController;
 use App\Http\Controllers\VisitorsController;
 use App\Http\Controllers\VitalController;
-use App\Http\Controllers\AmbulanceController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -569,9 +569,9 @@ Route::put('/ipd_view/delete/{id}', [IpdViewController::class, 'delete'])->name(
 Route::post('/ipd_view/operation/store', [IpdViewController::class, 'storeOperation'])->name('operation.store');
 Route::put('/ipd_view/operation/update/{id}', [IpdViewController::class, 'updateOperation'])->name('operation.update');
 Route::post('/ipd_view/pathology/update/{id}', [IpdViewController::class, 'updatePathReport'])->name('ipd.updateReport');
-Route::get('/pathology-report/download/{id}',[IpdViewController::class, 'downloadPathReport'])->name('path.report.download');
+Route::get('/pathology-report/download/{id}', [IpdViewController::class, 'downloadPathReport'])->name('path.report.download');
 Route::post('/ipd_view/radiology/update/{id}', [IpdViewController::class, 'updateRadioReport'])->name('ipd.updateRadioReport');
-Route::get('/radio-report/download/{id}',[IpdViewController::class, 'downloadRadioReport'])->name('radio.report.download');
+Route::get('/radio-report/download/{id}', [IpdViewController::class, 'downloadRadioReport'])->name('radio.report.download');
 Route::post('/transaction/store', [TransactionController::class, 'store'])->name('transactions.store');
 Route::post('/transaction/print', [TransactionController::class, 'store'])->name('transactions.print');
 Route::post('/transaction/show', [TransactionController::class, 'store'])->name('transactions.show');
@@ -647,7 +647,7 @@ Route::prefix('/inventory')->group(function () {
     Route::get('/get-items/{categoryId}', [InventoriesController::class, 'getItems'])->name('get.items');
     Route::post('/store', [InventoriesController::class, 'store'])->name('itemstock.store');
     Route::get('/edit/{id}', [InventoriesController::class, 'edit'])->name('itemstock.edit');
-    Route::get('/update', [InventoriesController::class, 'update'])->name('itemstock.update');
+    Route::put('/update/{id}', [InventoriesController::class, 'update'])->name('itemstock.update');
     Route::get('/destroy', [InventoriesController::class, 'destroy'])->name('itemstock.destroy');
 
     Route::get('/items', [InventoriesController::class, 'items'])->name('items');
@@ -733,13 +733,16 @@ Route::prefix('ambulance')->group(function () {
 
     Route::get('/index', [AmbulanceController::class, 'index'])->name('ambulanceCall.index');
     Route::post('/addCall', [AmbulanceController::class, 'addCall'])->name('ambulanceCall.addCall');
-    Route::put('/editCall/{id}', [AmbulanceController::class, 'editCall'])->name('ambulanceCall.editCall');
+    Route::get('/editCall/{id}', [AmbulanceController::class, 'editCall'])->name('ambulanceCall.editCall');
     Route::put('/updateCall/{id}', [AmbulanceController::class, 'updateCall'])->name('ambulanceCall.updateCall');
     Route::delete('/destroyCall/{id}', [AmbulanceController::class, 'destroyCall'])->name('ambulanceCall.deleteCall');
-
+    Route::get('/list', [AmbulanceController::class, 'ambulanceList'])->name('ambulanceList.index');
+    Route::post('/addList', [AmbulanceController::class, 'addList'])->name('ambulanceList.addList');
+    Route::get('/editList/{id}', [AmbulanceController::class, 'editList'])->name('ambulanceList.editList');
+    Route::put('/updateList/{id}', [AmbulanceController::class, 'updateList'])->name('ambulanceList.updateList');
+    Route::delete('/destroyList/{id}', [AmbulanceController::class, 'destroyList'])->name('ambulanceList.deleteList');
     Route::get('/charges/by-category/{category}', [AmbulanceController::class, 'getChargesByCategory'])->name('charges.byCategory');
     Route::get('/charges/{charge}', [AmbulanceController::class, 'getChargeDetails'])->name('ambulanceCall.deleteCall');
-
 
     Route::get('/issue', [AmbulanceController::class, 'bloodIssues'])->name('issue-blood.index');
     Route::post('/addDonors', [AmbulanceController::class, 'addDonors'])->name('bloodBank.addDoner');
@@ -999,8 +1002,11 @@ Route::prefix('setup')->group(function () {
 Route::get('/getMedicineCategories', [MedicineController::class, 'getCategories'])->name('getMedicineCategories');
 Route::get('/getMedicines/{categoryId}', [MedicineController::class, 'getMedicines'])->name('getMedicines');
 Route::get('/getDoses/{categoryId}', [MedicineController::class, 'getDoses'])->name('getDoses');
+Route::get('/getDoses/{categoryId}', [MedicineController::class, 'getDoses'])->name('getDoses');
 Route::get('/getDoseIntervals', [MedicineController::class, 'getIntervals'])->name('getDoseIntervals');
 Route::get('/getDoseDurations', [MedicineController::class, 'getDurations'])->name('getDoseDurations');
+Route::get('/medMaster', [MedicineController::class, 'medicineMasters'])->name('med.master');
+Route::get('/getAllDoses', [MedicineController::class, 'getAllDoses'])->name('getAllDoses');
 
 Route::get('/blood_bank_status', function () {
     return view('admin.blood-bank-doner.blood_bank_status');
@@ -1013,11 +1019,15 @@ Route::get('/radiology_test', [ExcelImportController::class, 'importRadiology'])
 Route::post('/radiology_import', [ExcelImportController::class, 'importRadiologyExcel'])->name('radiology.import');
 Route::get('/radiology_test_export', [ExcelImportController::class, 'exportRadiologyTestExcel'])->name('radiologyTests.export');
 
-Route::get('/finance', function () {
-    return view('admin.reports.finance.index');
-})->name('finance');
-Route::get('/reports/dailyTransactionReport', [TransactionReportController::class, 'dailyTransactionReport'])->name('reports.daily.transaction');
-
+Route::prefix('reports')->group(function () {
+Route::get('/finance', function () {return view('admin.reports.finance.index');})->name('finance');
+Route::get('/inventory', [InventoriesController::class, 'reports'])->name('inventory-reports');
+Route::get('/inventory-stock', [InventoriesController::class, 'stockReports'])->name('inventory-stock-reports');
+Route::get('/inventory-item', [InventoriesController::class, 'itemReports'])->name('inventory-item-reports');
+Route::get('/inventory-asset', [InventoriesController::class, 'assetReport'])->name('inventory-asset-reports');
+Route::get('/inventory-issue', [InventoriesController::class, 'issueReport'])->name('inventory-issue-reports');
+Route::get('dailyTransactionReport', [TransactionReportController::class, 'dailyTransactionReport'])->name('reports.daily.transaction');
+});
 Route::get('/allTransactionReport', function () {
     return view('admin.reports.finance.all-transaction-report');
 })->name('allTransactionReport');

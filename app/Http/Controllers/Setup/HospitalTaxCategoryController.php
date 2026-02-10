@@ -11,10 +11,23 @@ use Illuminate\Validation\Rule;
 
 class HospitalTaxCategoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $taxcatogery = TaxCategory::get();
-        //  return $taxcatogery;
+        $taxcatogery = TaxCategory::query();
+         $perPage   = intval($request->input('perPage', 10));
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
+         if ($request->has('search')) {
+         $search_term = $request->search;
+            $taxcatogery->where(function ($query) use ($search_term) {
+                $query->where('name', 'like', "%{$search_term}%");
+            });
+        
+         $taxcatogery = $taxcatogery->paginate($perPage);
+         return ["result" => $taxcatogery];
+    }
+      $taxcatogery = $taxcatogery->paginate($perPage);
         return view('admin.setup.tax_category', compact('taxcatogery'));
     }
 

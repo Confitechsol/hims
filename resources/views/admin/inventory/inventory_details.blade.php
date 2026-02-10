@@ -182,11 +182,7 @@
                                     <th>Date</th>
                                     <th>Description</th>
                                     <th>Quantity</th>
-                                    <th>Purchase Price</th>
-                                    <th>Expiry Date</th>
-                                    <th>Salvage Value</th>
-                                    <th>Useful Life</th>
-                                    <th>Depreciation</th>
+                                    
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -200,11 +196,7 @@
                                         <td>{{ $stock->date ? \Carbon\Carbon::parse($stock->date)->format('d-M-Y') : 'N/A' }}</td>
                                         <td>{{ $stock->message ?? '-' }}</td>
                                         <td>{{ $stock->quantity }}</td>
-                                        <td>{{ number_format($stock->purchase_price, 2) }}</td>
-                                        <td>{{ $stock->expiry_date ? \Carbon\Carbon::parse($stock->expiry_date)->format('d-M-Y') : '-' }}</td>
-                                        <td>{{ $stock->salvage_value ?? '-' }}</td>
-                                        <td>{{ $stock->useful_life ?? '-' }}</td>
-                                        <td>{{ $stock->annual_depreciation ?? '-' }}</td>
+
                                         <td>
                                             <div class="btn-group">
                                                 <a href="javascript:void(0);" 

@@ -10,8 +10,8 @@ use App\Models\DischargeCard;
 use App\Models\Doctor;
 use App\Models\Finding;
 use App\Models\IpdCharges;
-use App\Models\IpdDetail;
 use App\Models\IpdDaywiseBedCharge;
+use App\Models\IpdDetail;
 use App\Models\IpdMedicine;
 use App\Models\IpdPatient;
 use App\Models\IpdPrescription;
@@ -49,7 +49,7 @@ class IpdController extends Controller
         $charges    = Charge::all();
         $references = ['Direct', 'Doctor', 'Marketer', 'Other'];
         if ($isIpdTab) {
-            $ipd = IpdDetail::with('patient', 'ipdPatients', 'doctor', 'bedDetail', 'bedGroup.floorDetail')
+            $ipd = IpdDetail::with('patient', 'ipdPatients', 'doctor', 'bedDetail', 'bedGroup.floorDetail')->where('discharged', null)
                 ->when($search, function ($query) use ($search) {
                     $query->where(function ($q) use ($search) {
                         $q->where('ipd_no', 'LIKE', "%{$search}%")
@@ -203,44 +203,44 @@ class IpdController extends Controller
 
             // Create initial bed charge entry for admission date
             if ($request->bed_group && $request->admission_date) {
-                $bedGroup = BedGroup::find($request->bed_group);
+                $bedGroup      = BedGroup::find($request->bed_group);
                 $bedChargeRate = $bedGroup->bed_cost ?? 0.00;
-                
+
                 // Get bed charge from request or use bed_group.bed_cost
                 $bedCharge = $request->bed_charge ?? $bedChargeRate;
-                
+
                 if ($bedCharge > 0) {
                     // Calculate admission date period (10 AM to next 10 AM)
                     $admissionDate = Carbon::parse($request->admission_date);
-                    $chargeDate = $admissionDate->format('Y-m-d');
-                    
+                    $chargeDate    = $admissionDate->format('Y-m-d');
+
                     // Start: Previous day 10:00 AM
                     $periodStart = $admissionDate->copy()->subDay()->setTime(10, 0, 0);
                     // End: Current day 10:00 AM
                     $periodEnd = $admissionDate->copy()->setTime(10, 0, 0);
-                    
+
                     $periodStartDate = $periodStart->format('Y-m-d');
-                    $periodEndDate = $periodEnd->format('Y-m-d');
-                    
+                    $periodEndDate   = $periodEnd->format('Y-m-d');
+
                     // Create bed charge entry
                     IpdDaywiseBedCharge::updateOrCreate(
                         [
-                            'ipd_id' => $ipd->id,
+                            'ipd_id'      => $ipd->id,
                             'charge_date' => $chargeDate,
                         ],
                         [
-                            'hospital_id' => $ipd->hospital_id,
-                            'branch_id' => $ipd->branch_id ?? null,
+                            'hospital_id'       => $ipd->hospital_id,
+                            'branch_id'         => $ipd->branch_id ?? null,
                             'case_reference_id' => $ipd->case_reference_id ?? null,
-                            'patient_id' => $ipd->patient_id,
+                            'patient_id'        => $ipd->patient_id,
                             'period_start_date' => $periodStartDate,
-                            'period_end_date' => $periodEndDate,
-                            'bed_group_id' => $request->bed_group,
-                            'bed_id' => $request->bed_number,
-                            'bed_charge' => $bedCharge,
-                            'bed_charge_rate' => $bedChargeRate,
-                            'no_of_days' => 1,
-                            'is_active' => 'yes',
+                            'period_end_date'   => $periodEndDate,
+                            'bed_group_id'      => $request->bed_group,
+                            'bed_id'            => $request->bed_number,
+                            'bed_charge'        => $bedCharge,
+                            'bed_charge_rate'   => $bedChargeRate,
+                            'no_of_days'        => 1,
+                            'is_active'         => 'yes',
                         ]
                     );
                 }
@@ -413,14 +413,14 @@ class IpdController extends Controller
         try {
             $bedGroup = BedGroup::findOrFail($id);
             return response()->json([
-                'success' => true,
+                'success'  => true,
                 'bed_cost' => $bedGroup->bed_cost ?? 0.00,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'success' => false,
+                'success'  => false,
                 'bed_cost' => 0.00,
-                'message' => 'Bed group not found',
+                'message'  => 'Bed group not found',
             ], 404);
         }
     }
@@ -1088,40 +1088,40 @@ class IpdController extends Controller
 
         // --- Create bed charge entry for transfer date ---
         $transferDate = Carbon::parse($request->released_date);
-        $chargeDate = $transferDate->format('Y-m-d');
-        
+        $chargeDate   = $transferDate->format('Y-m-d');
+
         // Get bed group to fetch bed_cost for bed_charge_rate
-        $bedGroup = BedGroup::find($request->bed_group);
+        $bedGroup      = BedGroup::find($request->bed_group);
         $bedChargeRate = $bedGroup ? ($bedGroup->bed_cost ?? 0) : 0;
-        
+
         // Calculate period (10 AM to next 10 AM)
         // Start: Previous day 10:00 AM
         $periodStart = $transferDate->copy()->subDay()->setTime(10, 0, 0);
         // End: Current day 10:00 AM
         $periodEnd = $transferDate->copy()->setTime(10, 0, 0);
-        
+
         $periodStartDate = $periodStart->format('Y-m-d');
-        $periodEndDate = $periodEnd->format('Y-m-d');
-        
+        $periodEndDate   = $periodEnd->format('Y-m-d');
+
         // Create or update bed charge entry for transfer date
         IpdDaywiseBedCharge::updateOrCreate(
             [
-                'ipd_id' => $ipd->id,
+                'ipd_id'      => $ipd->id,
                 'charge_date' => $chargeDate,
             ],
             [
-                'hospital_id' => $ipd->hospital_id,
-                'branch_id' => $ipd->branch_id ?? null,
+                'hospital_id'       => $ipd->hospital_id,
+                'branch_id'         => $ipd->branch_id ?? null,
                 'case_reference_id' => $ipd->case_reference_id ?? null,
-                'patient_id' => $ipd->patient_id,
+                'patient_id'        => $ipd->patient_id,
                 'period_start_date' => $periodStartDate,
-                'period_end_date' => $periodEndDate,
-                'bed_group_id' => $request->bed_group,
-                'bed_id' => $request->new_bed,
-                'bed_charge' => $request->bed_charge,
-                'bed_charge_rate' => $bedChargeRate,
-                'no_of_days' => 1,
-                'is_active' => 'yes',
+                'period_end_date'   => $periodEndDate,
+                'bed_group_id'      => $request->bed_group,
+                'bed_id'            => $request->new_bed,
+                'bed_charge'        => $request->bed_charge,
+                'bed_charge_rate'   => $bedChargeRate,
+                'no_of_days'        => 1,
+                'is_active'         => 'yes',
             ]
         );
 
@@ -1166,9 +1166,18 @@ class IpdController extends Controller
             'diagnosis'          => ['nullable', 'string'],
             'ot_note'            => ['nullable', 'string'],
             'discharge_advice'   => ['nullable', 'string'],
+            'investigation'      => ['nullable', 'string'],
+            'urgent_care'        => ['nullable', 'string'],
+            'diet_advice'        => ['nullable', 'string'],
             'course_in_hospital' => ['nullable', 'string'],
             'present_complaints' => ['nullable', 'string'],
             'remarks'            => ['nullable', 'string'],
+            'meds'               => ['nullable', 'array'],
+            'meds.*'             => ['string'],
+            'med_interval'       => ['nullable', 'array'],
+            'med_interval.*'     => ['string'],
+            'med_duration'       => ['nullable', 'array'],
+            'med_duration.*'     => ['string'],
             'discharged_by'      => ['nullable', 'string'],
             'current_user'       => ['nullable', 'string'],
         ]);
@@ -1186,8 +1195,16 @@ class IpdController extends Controller
             } else {
                 $lastNumber = 0;
             }
-            $nextNumber     = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
-            $dischargeNo    = 'D-' . $nextNumber;
+            $nextNumber  = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+            $dischargeNo = 'D-' . $nextNumber;
+
+            $meds              = array_filter($request->meds, fn($med) => $med !== null && $med !== '');
+            $intervals         = array_filter($request->med_interval, fn($interval) => $interval !== null && $interval !== '');
+            $durations         = array_filter($request->med_duration, fn($duration) => $duration !== null && $duration !== '');
+            $implodedMeds      = implode(", ", $meds);
+            $implodedIntervals = implode(", ", $intervals);
+            $implodedDurations = implode(", ", $durations);
+
             $barcodePayload = [
                 'type'               => 'DISCHARGE',
                 'discharge_no'       => $dischargeNo,
@@ -1221,6 +1238,9 @@ class IpdController extends Controller
                 'diagnosis'          => $validated['diagnosis'] ?? null,
                 'ot_note'            => $validated['ot_note'] ?? null,
                 'discharge_advice'   => $validated['discharge_advice'] ?? null,
+                'investigation'      => $validated['investigation'] ?? null,
+                'urgent_care'        => $validated['urgent_care'] ?? null,
+                'diet_advice'        => $validated['diet_advice'] ?? null,
                 'course_in_hospital' => $validated['course_in_hospital'] ?? null,
                 'present_complaints' => $validated['present_complaints'] ?? null,
                 'remarks'            => $validated['remarks'] ?? null,
@@ -1282,9 +1302,16 @@ class IpdController extends Controller
                 'diagnosis'          => $validated['diagnosis'] ?? null,
                 'ot_note'            => $validated['ot_note'] ?? null,
                 'discharge_advice'   => $validated['discharge_advice'] ?? null,
+                'investigation'      => $validated['investigation'] ?? null,
+                'urgent_care'        => $validated['urgent_care'] ?? null,
+                'diet_advice'        => $validated['diet_advice'] ?? null,
                 'course_in_hospital' => $validated['course_in_hospital'] ?? null,
                 'present_complaints' => $validated['present_complaints'] ?? null,
                 'remarks'            => $validated['remarks'] ?? null,
+
+                'medicines'          => $implodedMeds ?? null,
+                'intervals'          => $implodedIntervals ?? null,
+                'durations'          => $implodedDurations ?? null,
 
                 'discharged_by'      => $validated['discharged_by'] ?? null,
                 'created_by'         => Auth::id(),
@@ -1303,7 +1330,7 @@ class IpdController extends Controller
                 ->with('success', 'Patient discharged successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            // dd($e);
+            dd($e);
             \Log::error($e);
             return back()
                 ->with('error', 'Something went wrong while saving discharge details.')

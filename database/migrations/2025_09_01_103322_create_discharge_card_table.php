@@ -65,9 +65,15 @@ return new class extends Migration
             $table->text('diagnosis')->nullable();
             $table->text('ot_note')->nullable();
             $table->text('discharge_advice')->nullable();
+            $table->text('investigation')->nullable();
+            $table->text('urgent_care')->nullable();
+            $table->text('diet_advice')->nullable();
             $table->text('course_in_hospital')->nullable();
             $table->text('present_complaints')->nullable();
             $table->text('remarks')->nullable();
+            $table->text('medicines')->nullable();
+            $table->text('intervals')->nullable();
+            $table->text('durations')->nullable();
 
             // 🔹 Meta
             $table->string('discharged_by', 255)->nullable()->index();

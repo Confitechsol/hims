@@ -147,7 +147,8 @@
                                                         <td>{{ $ipdDetails->credit_limit }}</td>
                                                         <td>
                                                             <a href="{{ route('ipd.edit', [$ipdDetails->id]) }}"
-                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill" title="Edit">
+                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                                title="Edit">
                                                                 <i class="ti ti-pencil"></i>
                                                             </a>
                                                             <a href="{{ route('ipd.pdf', [$ipdDetails->ipdPatients['id'] ?? 0]) }}"
@@ -168,6 +169,7 @@
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
+                                                    <th>IPD No.</th>
                                                     <th>Name</th>
                                                     <th>Phone</th>
                                                     <th>Email</th>
@@ -184,8 +186,10 @@
                                                 @foreach ($ipd as $ipdDetails)
                                                     <tr>
                                                         <td>{{ $loop->iteration }}</td>
-                                                        <td><a href="#"
-                                                                class="text-primary">{{ $ipdDetails->patient->patient_name }}</a>
+                                                        <td><a href="{{ route('ipd.show', ['id' => $ipdDetails->id]) }}"
+                                                                class="text-primary">{{ $ipdDetails->ipd_no }}</a>
+                                                        </td>
+                                                        <td>{{ $ipdDetails->patient->patient_name }}
                                                         </td>
                                                         <td>{{ $ipdDetails->patient->mobileno }}</td>
                                                         <td>{{ $ipdDetails->patient->email }}</td>
@@ -317,8 +321,7 @@
                 </div>
 
                 <div class="modal-body p-0">
-                    <iframe id="pdfFrame" src="{{ session('pdf_url') }}"
-                    style="width:100%; height:80vh; border:none;">
+                    <iframe id="pdfFrame" src="{{ session('pdf_url') }}" style="width:100%; height:80vh; border:none;">
                     </iframe>
                 </div>
 
@@ -399,10 +402,10 @@
         }
     </script>
     @if (session('pdf_url'))
-    <script>
-        const modal = new bootstrap.Modal(document.getElementById('pdfModal'));
-        modal.show();
-    </script>
+        <script>
+            const modal = new bootstrap.Modal(document.getElementById('pdfModal'));
+            modal.show();
+        </script>
     @endif
     {{-- filters --}}
 

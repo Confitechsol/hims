@@ -9,9 +9,24 @@ use App\Models\ChargeTypeMaster;
 
 class HospitalChargeCategoryController extends Controller
 {
-    public function index(){
-       $chargesCatogery = ChargeCategory::with(['chargeType'])->get();
-       $charge_types = ChargeTypeMaster::get();
+    public function index(Request $request){
+
+       $chargesCatogery = ChargeCategory::query();
+       
+       $charge_types = ChargeTypeMaster::all();
+        $perPage   = intval($request->input('perPage', 10));
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
+       if ($request->has('search')) {
+         $search_term = $request->search;
+            $chargesCatogery->where(function ($query) use ($search_term) {
+                $query->where('name', 'like', "%{$search_term}%");
+            });
+         $chargesCatogery = $chargesCatogery->with('chargeType')->paginate($perPage);
+         return ["result" => $chargesCatogery];
+       }
+       $chargesCatogery = $chargesCatogery->paginate($perPage);
          return view('admin.setup.charge_category',compact('chargesCatogery','charge_types'));
     }
 

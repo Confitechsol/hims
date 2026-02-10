@@ -26,7 +26,8 @@
           box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
           margin: 20px auto;
           width: 210mm;
-          height: 297mm;
+          /* height: 297mm; */
+          height: auto;
           min-height: 297mm;
           line-height: 10px;
       }
@@ -203,7 +204,7 @@
       }
 
       .text h4 {
-        font-size: 10px;
+          font-size: 10px;
       }
 
       .admission_item {
@@ -226,12 +227,17 @@
 
       .document-wrapper {
           height: 100%;
+          min-height: inherit;
       }
 
       .document-container {
-          display: grid;
+          /* display: grid;
           grid-template-rows: auto 1fr auto;
+          height: 100%; */
+          display: flex;
+          flex-direction: column;
           height: 100%;
+          min-height: inherit;
       }
 
       .footer {
@@ -273,20 +279,21 @@
                                   <img src="{{ asset('assets/images/header.webp') }}" alt="header" />
                               </div>
 
-                              <div class="body_area">
+                              <div class="body_area flex-grow-1">
                                   <div class="heading1">
                                       <h4>DISCHARGE SUMMARY & CERTIFICATE</h4>
                                   </div>
 
                                   <div class="admission_info mb-3">
                                       <div class="admission_item">
-                                          <p><b>DISCHARGE NO.</b> : <span class="red" id="discharge_no"></span></p>
+                                          <p><b>DISCHARGE NO.</b> : <span class="red" id="dis_discharge_no"></span>
+                                          </p>
                                       </div>
                                       <div class="admission_item heading">
-                                          <h4 id="discharge_type_head"></h4>
+                                          <h4 id="dis_discharge_type_head"></h4>
                                       </div>
                                       <div class="admission_item heading">
-                                          <img id="barcode" class="img-fluid rounded shadow-sm"
+                                          <img id="dis_barcode" class="img-fluid rounded shadow-sm"
                                               style="max-height:50px; height:50px; min-width:120px; object-fit:cover;">
                                       </div>
                                   </div>
@@ -296,35 +303,35 @@
                                           <div class="patient_items">
                                               <div class="patient_head">PATIENT NAME</div>
                                               <div class="colon">:</div>
-                                              <div class="patient_data" id="patient_name_text"></div>
+                                              <div class="patient_data" id="dis_patient_name_text"></div>
                                           </div>
 
                                           <div class="patient_items">
                                               <div class="patient_head">ADDRESS</div>
                                               <div class="colon">:</div>
-                                              <div class="patient_data" id="patient_address_text">
+                                              <div class="patient_data" id="dis_patient_address_text">
                                               </div>
                                           </div>
 
                                           <div class="patient_items">
                                               <div class="patient_head">Admission Date</div>
                                               <div class="colon">:</div>
-                                              <div class="patient_data w-auto" id="admission_date_text"></div>
+                                              <div class="patient_data w-auto" id="dis_admission_date_text"></div>
                                           </div>
                                           <div class="patient_items">
                                               <div class="patient_head">Admission Time</div>
                                               <div class="colon">:</div>
-                                              <div class="patient_data w-auto" id="admission_time_text"></div>
+                                              <div class="patient_data w-auto" id="dis_admission_time_text"></div>
                                           </div>
                                           <div class="patient_items">
                                               <div class="patient_head">OT Date</div>
                                               <div class="colon">:</div>
-                                              <div class="patient_data" id="ot_date_text"></div>
+                                              <div class="patient_data" id="dis_ot_date_text"></div>
                                           </div>
                                           <div class="patient_items">
                                               <div class="patient_head">Admission No.</div>
                                               <div class="colon">:</div>
-                                              <div class="patient_data" id="admission_no_text"></div>
+                                              <div class="patient_data" id="dis_admission_no_text"></div>
                                           </div>
                                       </div>
 
@@ -333,29 +340,29 @@
                                           <div class="patient_items">
                                               <div class="patient_head">Sex</div>
                                               <div class="colon">:</div>
-                                              <div class="patient_data" id="gender_text"></div>
+                                              <div class="patient_data" id="dis_gender_text"></div>
                                           </div>
                                           <div class="patient_items">
                                               <div class="patient_head">Age</div>
                                               <div class="colon">:</div>
-                                              <div class="patient_data" id="age_text"></div>
+                                              <div class="patient_data" id="dis_age_text"></div>
                                           </div>
 
 
                                           <div class="patient_items">
                                               <div class="patient_head">Contact No</div>
                                               <div class="colon">:</div>
-                                              <div class="patient_data" id="mobile_text"></div>
+                                              <div class="patient_data" id="dis_mobile_text"></div>
                                           </div>
                                           <div class="patient_items">
                                               <div class="patient_head">Discharge Date</div>
                                               <div class="colon">:</div>
-                                              <div class="patient_data w-auto" id="discharge_date_text"></div>
+                                              <div class="patient_data w-auto" id="dis_discharge_date_text"></div>
                                           </div>
                                           <div class="patient_items">
                                               <div class="patient_head">Discharge Time</div>
                                               <div class="colon">:</div>
-                                              <div class="patient_data w-auto" id="discharge_time_text"></div>
+                                              <div class="patient_data w-auto" id="dis_discharge_time_text"></div>
                                           </div>
                                           {{-- <div class="patient_items">
                                               <div class="patient_head">Discharge Type</div>
@@ -365,7 +372,7 @@
                                           <div class="patient_items">
                                               <div class="patient_head">BED</div>
                                               <div class="colon">:</div>
-                                              <div class="patient_data" id="bed_text"></div>
+                                              <div class="patient_data" id="dis_bed_text"></div>
                                           </div>
                                       </div>
                                   </div>
@@ -375,7 +382,7 @@
                                           <div class="patient_items">
                                               <div class="patient_head">Under Care</div>
                                               <div class="colon">:</div>
-                                              <div class="patient_data" id="under_care_text"></div>
+                                              <div class="patient_data" id="dis_under_care_text"></div>
                                           </div>
                                       </div>
 
@@ -383,53 +390,51 @@
                                           <div class="patient_items">
                                               <div class="patient_head">Registration No.</div>
                                               <div class="colon">:</div>
-                                              <div class="patient_data" id="registration_no_text"></div>
+                                              <div class="patient_data" id="dis_registration_no_text"></div>
                                           </div>
                                       </div>
                                   </div>
 
                                   <div class="text">
 
-                                      <h6>Present Complains :</h6>
-                                      <div class="general_list" id="present_complains_html"></div>
+                                      <h6 id="dis_present_complains_label">Present Complains :</h6>
+                                      <div class="general_list" id="dis_present_complains_html"></div>
 
                                       <br />
 
-                                      <h6>Treatment Done/Procedure Performed / OT Note :</h6>
-                                      <div class="general_list" id="ot_note_html"></div>
+                                      <h6 id="dis_diagnosis_label">Diagnosis :</h6>
+                                      <div class="general_list" id="dis_diagnosis_html"></div>
 
                                       <br />
 
-                                      <h6>Diagnosis :</h6>
-                                      <div class="general_list" id="diagnosis_html"></div>
+                                      <h6 id="dis_ot_note_label">Treatment Done/Procedure Performed / OT Note :</h6>
+                                      <div class="general_list" id="dis_ot_note_html"></div>
 
                                       <br />
 
-                                      <h6>Course in Hospital :</h6>
-                                      <div class="general_list" id="course_in_hospital_html"></div>
+                                      <h6 id="dis_course_in_hospital_label">Course in Hospital :</h6>
+                                      <div class="general_list" id="dis_course_in_hospital_html"></div>
                                       <br />
-                                      {{-- <p>Follow Up date: Review after 14 - 12 days</p>
-                                      <p>Condition at Discharge: Haemodynamically Stable.</p>
-                                      <p>Investigation : Investigation done before admission.</p>
-                                      <p>Course in Hospital : IV and Oral medication.</p>
-                                      <p>When and how to obtain urgent care : SOS/ER</p>
-                                      <p>DIET ADVICE: Semi-Solid Diet.</p> --}}
 
-                                      {{-- <br /> --}}
 
-                                      <h6>Discharge Advice:</h6>
-                                      <div class="general_list" id="discharge_advice_html"></div>
-                                      {{-- <ol > --}}
-                                      {{-- <li>TAB CEFAKIND (500) 1 TAB BDPC X 5 DAYS</li>
-                                          <li>TAB PARASAFE (650) 1 TAB QDS X 2 WEEKS</li>
-                                          <li>TAB PANTOP (40) 1TAB ODAC X 2 WEEKS</li>
-                                          <li>CAP ARISTOZYME 1 CAP BD X2 MONTHS</li>
-                                          <li>SYP EMTY 2 TSF ODHS X 2 WEEKS</li>
-                                          <li>Change of dressing after 10 - 12 days at clinic.</li> --}}
-                                      {{-- </ol> --}}
+                                      <h6 id="discharge_medicine_label">Advised Medicines:</h6>
+                                      <div class="general_list" id="discharge_medicine_list"></div>
+                                      <br />
+                                      <h6 id="dis_investigation_label">Investigations:</h6>
+                                      <div class="general_list" id="dis_investigation_html"></div>
+                                      <br />
+                                      <h6 id="dis_urgent_care_label">Urgent Care Instructions:</h6>
+                                      <div class="general_list" id="dis_urgent_care_html"></div>
+                                      <br />
+                                      <h6 id="dis_diet_advice_label">Diet Advice:</h6>
+                                      <div class="general_list" id="dis_diet_advice_html"></div>
+                                      <br />
+
+                                      <h6 id="dis_discharge_advice_label">Discharge Advice:</h6>
+                                      <div class="general_list" id="dis_discharge_advice_html"></div>
 
                                       <div class="end">
-                                          <p>---- xxxx -- END -- xxxx ---</p>
+                                          {{-- <p>---- xxxx -- END -- xxxx ---</p> --}}
                                       </div>
 
                                       <div class="bottom_box">
@@ -453,10 +458,10 @@
               </div>
               <div class="modal-footer pb-0">
                   <div class="d-flex align-items-center gap-2 ms-auto me-3">
-                      <button type="button" class="btn btn-outline-secondary" onclick="downloadDocument()">
+                      {{-- <button type="button" class="btn btn-outline-secondary" onclick="downloadDocument()">
                           <i class="bi bi-download"></i>
                           Download
-                      </button>
+                      </button> --}}
                       <div class="form-check form-switch toggle-switch">
                           <input class="form-check-input toggle-switch" type="checkbox" role="switch"
                               id="toggleHeaderFooter" checked>
@@ -468,7 +473,7 @@
                       </a> --}}
                       <button type="button" class="btn btn-primary" onclick="openPdf({{ $ipd->id }})">
                           <i class="bi bi-printer"></i>
-                          Print
+                          Print / Download
                       </button>
                   </div>
               </div>
@@ -485,6 +490,7 @@
 
               const button = event.relatedTarget;
               const data = JSON.parse(button.getAttribute('data-discharge'));
+              const medicines = JSON.parse(button.getAttribute('data-medicines'));
               console.log(data);
 
               if (!data) return;
@@ -493,45 +499,97 @@
                  SIMPLE TEXT FIELDS
               ------------------------- */
 
-              setText('discharge_type_head', data.reason_discharge);
-              setText('discharge_no', data.discharge_number);
-              setText('patient_name_text', data.patient_name);
-              setText('patient_address_text', data.address);
-              setText('admission_no_text', data.admission_no);
-              setText('gender_text', data.gender);
-              setText('age_text', data.age);
-              setText('mobile_text', data.phone);
-              setText('bed_text', data.bed);
-              setText('under_care_text', data.under_care_dr);
-              setText('registration_no_text', data.registration_no);
+              setText('dis_discharge_type_head', data.reason_discharge);
+              setText('dis_discharge_no', data.discharge_number);
+              setText('dis_patient_name_text', data.patient_name);
+              setText('dis_patient_address_text', data.address);
+              setText('dis_admission_no_text', data.admission_no);
+              setText('dis_gender_text', data.gender);
+              setText('dis_age_text', data.age);
+              setText('dis_mobile_text', data.phone);
+              setText('dis_bed_text', data.bed);
+              setText('dis_under_care_text', data.under_care_dr);
+              setText('dis_registration_no_text', data.registration_no);
               //   setText('discharge_type_text', data.reason_discharge);
 
               /* -------------------------
                  DATE & TIME HANDLING
               ------------------------- */
-              setText('admission_date_text', formatDate(new Date(data.admission_date)));
-              setText('admission_time_text', data.admit_time);
+              setText('dis_admission_date_text', formatDate(new Date(data.admission_date)));
+              setText('dis_admission_time_text', data.admit_time);
 
-              setText('discharge_date_text', data.discharge_date);
-              setText('discharge_time_text', data.discharge_time);
+              setText('dis_discharge_date_text', data.discharge_date);
+              setText('dis_discharge_time_text', data.discharge_time);
 
               if (data.ot_date) {
-                  setText('ot_date_text', data.ot_date);
+                  setText('dis_ot_date_text', data.ot_date);
+              }
+
+              if (medicines.length > 0) {
+                  setOrderedList('discharge_medicine_list', medicines)
+              } else {
+                  hideLabel('discharge_medicine_label')
               }
 
               /* -------------------------
                  CKEDITOR (HTML) FIELDS
               ------------------------- */
+              if (data.diagnosis === "" || data.diagnosis === null) {
+                  hideLabel('dis_diagnosis_label')
+              } else {
+                  setHTML('dis_diagnosis_html', data.diagnosis);
+              }
 
-              setHTML('diagnosis_html', data.diagnosis);
-              setHTML('course_in_hospital_html', data.course_in_hospital);
-              setHTML('ot_note_html', data.ot_note);
-              setHTML('discharge_advice_html', data.discharge_advice);
-              setHTML('present_complains_html', data.present_complaints);
+              if (data.course_in_hospital === "" || data.course_in_hospital === null) {
+                  hideLabel('dis_course_in_hospital_label')
+              } else {
+                  setHTML('dis_course_in_hospital_html', data.course_in_hospital);
+              }
+              if (data.investigation === "" || data.investigation === null) {
+                  hideLabel('dis_investigation_label')
+              } else {
+                  setHTML('dis_investigation_html', data.investigation);
+              }
+              if (data.urgent_care === "" || data.urgent_care === null) {
+                  hideLabel('dis_urgent_care_label')
+              } else {
+                  setHTML('dis_urgent_care_html', data.urgent_care);
+              }
+              if (data.diet_advice === "" || data.diet_advice === null) {
+                  hideLabel('dis_diet_advice_label')
+              } else {
+                  setHTML('dis_diet_advice_html', data.diet_advice);
+              }
 
-              setImage('barcode', data.barcode);
+              if (data.ot_note === "" || data.ot_note === null) {
+                  hideLabel('dis_ot_note_label')
+              } else {
+                  setHTML('dis_ot_note_html', data.ot_note);
+              }
+
+              if (data.discharge_advice === "" || data.discharge_advice === null) {
+                  hideLabel('dis_discharge_advice_label')
+              } else {
+                  setHTML('dis_discharge_advice_html', data.discharge_advice);
+              }
+
+              if (data.present_complaints === "" || data.present_complaints === null) {
+                  hideLabel('dis_present_complains_label')
+              } else {
+                  setHTML('dis_present_complains_html', data.present_complaints);
+              }
+
+              setImage('dis_barcode', data.barcode);
           });
 
+      function hideLabel(id) {
+          const el = document.getElementById(id);
+          if (!el) {
+              console.warn(`Element not found: ${id}`);
+              return;
+          }
+          if (el) el.style.display = "none" ?? '';
+      }
 
       function setText(id, value) {
           const el = document.getElementById(id);
@@ -541,6 +599,36 @@
           }
           if (el) el.textContent = value ?? '';
       }
+
+      function setOrderedList(id, items = []) {
+          const el = document.getElementById(id);
+
+          if (!el) {
+              console.warn(`Element not found: ${id}`);
+              return;
+          }
+
+          el.innerHTML = '';
+
+          if (!Array.isArray(items) || !items.length) {
+              el.textContent = '—';
+              return;
+          }
+
+          const ol = document.createElement('ol');
+          ol.style.paddingLeft = '2rem'; // optional bootstrap spacing
+
+          items.forEach(item => {
+              if (item && String(item).trim() !== '') {
+                  const li = document.createElement('li');
+                  li.textContent = item;
+                  ol.appendChild(li);
+              }
+          });
+
+          el.appendChild(ol);
+      }
+
 
       function setHTML(id, html) {
           const el = document.getElementById(id);
