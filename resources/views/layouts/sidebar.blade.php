@@ -341,6 +341,8 @@
                                             </a></li>
                                     <li><a href="{{ route('expense') }}" class="{{ request()->routeIs('expense') ? 'active' : '' }}">Expenses
                                             </a></li>
+                                    <li><a href="{{ route('money-receipt.index') }}" class="{{ request()->routeIs('money-receipt.*') ? 'active' : '' }}">Money Receipt
+                                            </a></li>
                                     
                                 </ul>
                             </li>
