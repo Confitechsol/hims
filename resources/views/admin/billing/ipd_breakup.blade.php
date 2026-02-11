@@ -194,26 +194,125 @@
             </div>
         </div>
 
-        <!-- Payment Summary -->
+        <!-- Discount (Final Bill Only) - before Payment Summary -->
         <div class="card mb-3">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="fas fa-percent me-2"></i> Discount (Final Bill Only)</h6>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-3">Discounts apply only to the final bill. Save before exporting the final bill PDF.</p>
+                <form id="discountForm" class="row g-3">
+                    @csrf
+                    <input type="hidden" name="ipd_id" value="{{ $ipd->id }}">
+                    <div class="col-md-4">
+                        <label for="mou_discount" class="form-label">MOU Discount (₹) <small class="text-muted">TPA/Insurance</small></label>
+                        <input type="number" step="0.01" min="0" class="form-control" id="mou_discount" name="mou_discount" placeholder="0.00" value="{{ number_format((float)($ipd->mou_discount ?? 0), 2, '.', '') }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="special_discount" class="form-label">Special / Hospital Discount (₹)</label>
+                        <input type="number" step="0.01" min="0" class="form-control" id="special_discount" name="special_discount" placeholder="0.00" value="{{ number_format((float)($ipd->special_discount ?? 0), 2, '.', '') }}">
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary" id="discountSaveBtn">
+                            <i class="fas fa-save me-1"></i> Save Discount
+                        </button>
+                    </div>
+                </form>
+                <div id="discountMessage" class="mt-2 small" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- DUE ON ACCOUNT OF PATIENT PARTY (Under Doctor - Final Bill) -->
+        <div class="card mb-3">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="fas fa-user-doctor me-2"></i> DUE ON ACCOUNT OF PATIENT PARTY</h6>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-3">Under doctor at admission. This amount is deducted from outstanding and shown on the final bill.</p>
+                <form id="duePatientPartyForm" class="row g-3">
+                    @csrf
+                    <input type="hidden" name="ipd_id" value="{{ $ipd->id }}">
+                    <div class="col-md-4">
+                        <label for="due_patient_party_doctor_id" class="form-label">Doctor</label>
+                        <select class="form-select" id="due_patient_party_doctor_id" name="due_patient_party_doctor_id">
+                            <option value="">-- Select Doctor --</option>
+                            @foreach($doctors ?? [] as $doc)
+                                <option value="{{ $doc->id }}" {{ (isset($ipd->due_patient_party_doctor_id) && $ipd->due_patient_party_doctor_id == $doc->id) ? 'selected' : '' }}>
+                                    {{ $doc->name ?? '' }} {{ $doc->surname ?? '' }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="due_patient_party_receipt_type" class="form-label">Receipt Type</label>
+                        <select class="form-select" id="due_patient_party_receipt_type" name="due_patient_party_receipt_type">
+                            <option value="">-- Select Type --</option>
+                            <option value="Current" {{ (isset($ipd->due_patient_party_receipt_type) && $ipd->due_patient_party_receipt_type == 'Current') ? 'selected' : '' }}>Current</option>
+                            <option value="Patient Due" {{ (isset($ipd->due_patient_party_receipt_type) && $ipd->due_patient_party_receipt_type == 'Patient Due') ? 'selected' : '' }}>Patient Due</option>
+                            <option value="Corporate Due" {{ (isset($ipd->due_patient_party_receipt_type) && $ipd->due_patient_party_receipt_type == 'Corporate Due') ? 'selected' : '' }}>Corporate Due</option>
+                            <option value="In Admissible" {{ (isset($ipd->due_patient_party_receipt_type) && $ipd->due_patient_party_receipt_type == 'In Admissible') ? 'selected' : '' }}>In Admissible</option>
+                            <option value="Booking" {{ (isset($ipd->due_patient_party_receipt_type) && $ipd->due_patient_party_receipt_type == 'Booking') ? 'selected' : '' }}>Booking</option>
+                            <option value="Refund" {{ (isset($ipd->due_patient_party_receipt_type) && $ipd->due_patient_party_receipt_type == 'Refund') ? 'selected' : '' }}>Refund</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="due_patient_party_amount" class="form-label">Amount (₹)</label>
+                        <input type="number" step="0.01" min="0" class="form-control" id="due_patient_party_amount" name="due_patient_party_amount" placeholder="0.00" value="{{ number_format((float)($ipd->due_patient_party_amount ?? 0), 2, '.', '') }}">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100" id="duePatientPartySaveBtn">
+                            <i class="fas fa-save me-1"></i> Save
+                        </button>
+                    </div>
+                </form>
+                <div id="duePatientPartyMessage" class="mt-2 small" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Payment Summary -->
+        <div class="card mb-3" id="paymentSummaryCard" data-outstanding="{{ $breakup['outstanding'] }}" data-due-patient-party="{{ $breakup['due_patient_party_amount'] ?? 0 }}">
             <div class="card-header bg-light">
                 <h6 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i> Payment Summary</h6>
             </div>
             <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card border-success">
+                <div class="row g-3">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card border-success h-100">
                             <div class="card-body">
                                 <h6 class="text-success">Total Payments</h6>
-                                <h3 class="text-success mb-0">₹ {{ number_format($breakup['total_payments'], 2) }}</h3>
+                                <h4 class="text-success mb-0">₹ {{ number_format($breakup['total_payments'], 2) }}</h4>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="card border-danger">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card border-warning h-100">
                             <div class="card-body">
-                                <h6 class="text-danger">Outstanding Amount</h6>
-                                <h3 class="text-danger mb-0">₹ {{ number_format($breakup['outstanding'], 2) }}</h3>
+                                <h6 class="text-warning">Outstanding (before discount)</h6>
+                                <h4 class="text-warning mb-0">₹ {{ number_format($breakup['outstanding'], 2) }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-2">
+                        <div class="card border-info h-100">
+                            <div class="card-body">
+                                <h6 class="text-info">Total Discount</h6>
+                                <h4 class="text-info mb-0" id="summaryTotalDiscount">₹ {{ number_format($breakup['total_discount'] ?? 0, 2) }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-2">
+                        <div class="card border-secondary h-100">
+                            <div class="card-body">
+                                <h6 class="text-secondary">Due (Patient Party)</h6>
+                                <h4 class="text-secondary mb-0" id="summaryDuePatientParty">₹ {{ number_format($breakup['due_patient_party_amount'] ?? 0, 2) }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-2">
+                        <div class="card border-danger h-100">
+                            <div class="card-body">
+                                <h6 class="text-danger">Net Balance (Due)</h6>
+                                <h4 class="text-danger mb-0 fw-bold" id="summaryNetBalance">₹ {{ number_format($breakup['net_balance'] ?? $breakup['outstanding'], 2) }}</h4>
                             </div>
                         </div>
                     </div>

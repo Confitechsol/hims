@@ -13,6 +13,7 @@ use App\Models\Hospital;
 use App\Models\DischargeCard;
 use App\Models\PatientBedHistory;
 use App\Models\BedGroup;
+use App\Models\Doctor;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -71,16 +72,94 @@ class IpdBillingController extends Controller
      */
     public function breakup($ipdId)
     {
-        $ipd = IpdDetail::with(['patient', 'doctor', 'bedGroup', 'bedDetail'])
+        $ipd = IpdDetail::with(['patient', 'doctor', 'bedGroup', 'bedDetail', 'duePatientPartyDoctor'])
             ->findOrFail($ipdId);
+
+        $doctors = Doctor::orderBy('name')->get(['id', 'name', 'surname']);
 
         // Calculate all charges
         $breakup = $this->calculateBreakup($ipdId);
-        
+
+        // Discount and due patient party for display (final bill logic)
+        $totalDiscount = (float) ($ipd->mou_discount ?? 0) + (float) ($ipd->special_discount ?? 0);
+        $duePatientPartyAmount = (float) ($ipd->due_patient_party_amount ?? 0);
+        $outstanding = $breakup['outstanding'] ?? 0;
+        $netBalance = max(0, $outstanding - $totalDiscount - $duePatientPartyAmount);
+        $breakup['total_discount'] = $totalDiscount;
+        $breakup['due_patient_party_amount'] = $duePatientPartyAmount;
+        $breakup['net_balance'] = $netBalance;
+
         // Get detailed date-wise breakdown
         $detailedBreakup = $this->getDetailedBreakup($ipdId, $ipd);
 
-        return view('admin.billing.ipd_breakup', compact('ipd', 'breakup', 'detailedBreakup'));
+        return view('admin.billing.ipd_breakup', compact('ipd', 'breakup', 'detailedBreakup', 'doctors'));
+    }
+
+    /**
+     * Update discount for final bill (MOU Discount + Special/Hospital Discount).
+     * Affects only the final bill; estimate bill is unchanged.
+     */
+    public function updateDiscount(Request $request, $ipdId)
+    {
+        $request->validate([
+            'mou_discount' => 'nullable|numeric|min:0',
+            'special_discount' => 'nullable|numeric|min:0',
+        ]);
+
+        $ipd = IpdDetail::findOrFail($ipdId);
+        $ipd->mou_discount = (float) ($request->input('mou_discount') ?? 0);
+        $ipd->special_discount = (float) ($request->input('special_discount') ?? 0);
+        $ipd->save();
+
+        $totalDiscount = $ipd->mou_discount + $ipd->special_discount;
+        $duePatientPartyAmount = (float) ($ipd->due_patient_party_amount ?? 0);
+        $breakup = $this->calculateBreakup($ipdId);
+        $outstanding = $breakup['outstanding'] ?? 0;
+        $netBalance = max(0, $outstanding - $totalDiscount - $duePatientPartyAmount);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Discount saved. It will apply to the final bill only.',
+            'mou_discount' => $ipd->mou_discount,
+            'special_discount' => $ipd->special_discount,
+            'total_discount' => $totalDiscount,
+            'due_patient_party_amount' => $duePatientPartyAmount,
+            'outstanding' => $outstanding,
+            'net_balance' => $netBalance,
+        ]);
+    }
+
+    /**
+     * Update Due on Account of Patient Party (doctor + amount). Deducts from outstanding on final bill.
+     */
+    public function updateDuePatientParty(Request $request, $ipdId)
+    {
+        $request->validate([
+            'due_patient_party_doctor_id' => 'nullable|exists:doctor,id',
+            'due_patient_party_amount' => 'nullable|numeric|min:0',
+            'due_patient_party_receipt_type' => 'nullable|string|in:Current,Patient Due,Corporate Due,In Admissible,Booking,Refund',
+        ]);
+
+        $ipd = IpdDetail::findOrFail($ipdId);
+        $ipd->due_patient_party_doctor_id = $request->input('due_patient_party_doctor_id') ?: null;
+        $ipd->due_patient_party_amount = (float) ($request->input('due_patient_party_amount') ?? 0);
+        $ipd->due_patient_party_receipt_type = $request->input('due_patient_party_receipt_type') ?: null;
+        $ipd->save();
+
+        $totalDiscount = (float) ($ipd->mou_discount ?? 0) + (float) ($ipd->special_discount ?? 0);
+        $duePatientPartyAmount = (float) ($ipd->due_patient_party_amount ?? 0);
+        $breakup = $this->calculateBreakup($ipdId);
+        $outstanding = $breakup['outstanding'] ?? 0;
+        $netBalance = max(0, $outstanding - $totalDiscount - $duePatientPartyAmount);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Due on account of patient party saved. It will reflect on the final bill.',
+            'due_patient_party_doctor_id' => $ipd->due_patient_party_doctor_id,
+            'due_patient_party_amount' => $duePatientPartyAmount,
+            'outstanding' => $outstanding,
+            'net_balance' => $netBalance,
+        ]);
     }
 
     /**
@@ -264,10 +343,21 @@ class IpdBillingController extends Controller
         $totalCharges = $bedCharges + $ipdCharges + $pathologyCharges + $radiologyCharges + $doctorVisitCharges + $cgstCharges + $sgstCharges;
 
         // Total Payments
-        $totalPayments = Transaction::where('ipd_id', $ipdId)
+        // Note: Refund receipts should reduce the net payment,
+        // so we treat transactions with receipt_type = 'Refund'
+        // as negative amounts in the total.
+        $paymentTransactions = Transaction::where('ipd_id', $ipdId)
             ->where('type', 'payment')
             ->where('section', 'ipd')
-            ->sum('amount');
+            ->get();
+
+        $totalPayments = $paymentTransactions->sum(function ($t) {
+            $amount = (float) ($t->amount ?? 0);
+            if (strcasecmp($t->receipt_type ?? '', 'Refund') === 0) {
+                return -abs($amount);
+            }
+            return $amount;
+        });
 
         // Outstanding
         $outstanding = $totalCharges - $totalPayments;
@@ -846,7 +936,7 @@ class IpdBillingController extends Controller
         try {
             \Log::info('exportFinal started', ['ipd_id' => $ipdId]);
             
-            $ipd = IpdDetail::with(['patient.organisation', 'doctor', 'bedGroup', 'bedDetail'])
+            $ipd = IpdDetail::with(['patient.organisation', 'doctor', 'bedGroup', 'bedDetail', 'duePatientPartyDoctor'])
                 ->findOrFail($ipdId);
             
             \Log::info('IPD found', ['ipd_no' => $ipd->ipd_no, 'discharged' => $ipd->discharged]);
@@ -949,13 +1039,19 @@ class IpdBillingController extends Controller
             // Discharge date and time are already retrieved from discharge_card above
             $billDate = $dischargeDate ?? now();
 
-            // Calculate discount (if any)
-            $discount = 0; // You may need to add discount logic based on your system
+            // Discount from IPD (MOU + Special/Hospital) — applies to final bill only
+            $mouDiscount = (float) ($ipd->mou_discount ?? 0);
+            $specialDiscount = (float) ($ipd->special_discount ?? 0);
+            $discount = $mouDiscount + $specialDiscount;
+
+            // Due on account of patient party (under doctor) — deducted from balance
+            $duePatientPartyAmount = (float) ($ipd->due_patient_party_amount ?? 0);
 
             // Calculate balance
             $grandTotal = $breakup['total_charges'];
             $totalAdvance = $breakup['total_payments'];
-            $balance = $grandTotal - $totalAdvance - $discount;
+            $balance = $grandTotal - $totalAdvance - $discount - $duePatientPartyAmount;
+            $balance = max(0, $balance);
 
             // Convert amounts to words
             $grandTotalInWords = 'Zero Rupees Only';
@@ -1092,7 +1188,8 @@ class IpdBillingController extends Controller
             $pdf = Pdf::loadView('admin.billing.ipd_final_pdf', compact(
                 'ipd', 'breakup', 'bedChargesDetails', 'bedChargesGrouped', 'ipdChargesDetails',
                 'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'payments',
-                'hospital', 'billNumber', 'billDate', 'dischargeDate', 'dischargeTime', 'discount',
+                'hospital', 'billNumber', 'billDate', 'dischargeDate', 'dischargeTime',
+                'discount', 'mouDiscount', 'specialDiscount', 'duePatientPartyAmount',
                 'grandTotal', 'totalAdvance', 'balance', 'grandTotalInWords', 
                 'totalAdvanceInWords', 'balanceInWords', 'otCharges', 'medicineCharges',
                 'surgeonCharges', 'anesthesiaCharges', 'investigationCharges', 'totalPages',

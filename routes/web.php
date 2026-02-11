@@ -552,6 +552,8 @@ Route::post('/opd_medication', [OpdController::class, 'createOpdMedication'])->n
 Route::post('/opd_charge', [OpdController::class, 'addOpdCharge'])->name('opd.addOpdCharge');
 Route::post('/opd_visit', [OpdController::class, 'storeVisitDetails'])->name('opd.visit.store');
 
+
+
 Route::get('/ipd', [IpdController::class, 'index'])->name('ipd');
 Route::post('/ipd/store', [IpdController::class, 'store'])->name('ipd.store');
 Route::get('/ipd/edit/{id}', [IpdController::class, 'edit'])->name('ipd.edit');
@@ -576,6 +578,23 @@ Route::post('/transaction/store', [TransactionController::class, 'store'])->name
 Route::post('/transaction/print', [TransactionController::class, 'store'])->name('transactions.print');
 Route::post('/transaction/show', [TransactionController::class, 'store'])->name('transactions.show');
 Route::post('/transaction/destroy', [TransactionController::class, 'store'])->name('transactions.destroy');
+
+// Money Receipt Routes
+Route::get('/money-receipt', [App\Http\Controllers\MoneyReceiptController::class, 'index'])->name('money-receipt.index');
+Route::get('/money-receipt/create', [App\Http\Controllers\MoneyReceiptController::class, 'create'])->name('money-receipt.create');
+Route::post('/money-receipt', [App\Http\Controllers\MoneyReceiptController::class, 'store'])->name('money-receipt.store');
+Route::get('/money-receipt/{id}', [App\Http\Controllers\MoneyReceiptController::class, 'show'])->name('money-receipt.show');
+Route::get('/money-receipt/{id}/edit', [App\Http\Controllers\MoneyReceiptController::class, 'edit'])->name('money-receipt.edit');
+Route::put('/money-receipt/{id}', [App\Http\Controllers\MoneyReceiptController::class, 'update'])->name('money-receipt.update');
+Route::delete('/money-receipt/{id}', [App\Http\Controllers\MoneyReceiptController::class, 'destroy'])->name('money-receipt.destroy');
+Route::get('/money-receipt/{id}/print', [App\Http\Controllers\MoneyReceiptController::class, 'print'])->name('money-receipt.print');
+
+// Money Receipt API Routes
+Route::get('/api/money-receipt/search-ipd', [App\Http\Controllers\MoneyReceiptController::class, 'searchIpd'])->name('money-receipt.api.search-ipd');
+Route::get('/api/money-receipt/search-patient', [App\Http\Controllers\MoneyReceiptController::class, 'searchPatient'])->name('money-receipt.api.search-patient');
+Route::get('/api/money-receipt/patient-final-bill', [App\Http\Controllers\MoneyReceiptController::class, 'getPatientFinalBill'])->name('money-receipt.api.patient-final-bill');
+Route::get('/api/money-receipt/ipd-details/{id}', [App\Http\Controllers\MoneyReceiptController::class, 'getIpdDetails'])->name('money-receipt.api.ipd-details');
+Route::get('/api/money-receipt/next-receipt-no', [App\Http\Controllers\MoneyReceiptController::class, 'getNextReceiptNo'])->name('money-receipt.api.next-receipt-no');
 Route::get('/getNurses', [IpdController::class, 'getNurses'])->name('getNurses');
 Route::get('/getIpdById/{id}', [IpdController::class, 'getIpdById'])->name('getIpdById');
 Route::get('/getIpdMedicineById/{id}', [IpdController::class, 'getIpdMedicineById'])->name('getIpdMedicineById');
@@ -603,6 +622,8 @@ Route::get('/billing', function () {
 Route::prefix('ipd/billing')->group(function () {
     Route::get('/search', [App\Http\Controllers\IpdBillingController::class, 'search'])->name('ipd.billing.search');
     Route::get('/{ipdId}/breakup', [App\Http\Controllers\IpdBillingController::class, 'breakup'])->name('ipd.billing.breakup');
+    Route::post('/{ipdId}/discount', [App\Http\Controllers\IpdBillingController::class, 'updateDiscount'])->name('ipd.billing.discount.update');
+    Route::post('/{ipdId}/due-patient-party', [App\Http\Controllers\IpdBillingController::class, 'updateDuePatientParty'])->name('ipd.billing.due.patient.party.update');
     Route::get('/{ipdId}/check-discharged', [App\Http\Controllers\IpdBillingController::class, 'checkDischarged'])->name('ipd.billing.check.discharged');
     Route::get('/{ipdId}/export-estimate', [App\Http\Controllers\IpdBillingController::class, 'exportEstimate'])->name('ipd.billing.export.estimate');
     Route::get('/{ipdId}/export-final', [App\Http\Controllers\IpdBillingController::class, 'exportFinal'])->name('ipd.billing.export.final');
@@ -645,7 +666,7 @@ Route::prefix('/inventory')->group(function () {
     Route::get('/get-items/{categoryId}', [InventoriesController::class, 'getItems'])->name('get.items');
     Route::post('/store', [InventoriesController::class, 'store'])->name('itemstock.store');
     Route::get('/edit/{id}', [InventoriesController::class, 'edit'])->name('itemstock.edit');
-    Route::get('/update', [InventoriesController::class, 'update'])->name('itemstock.update');
+    Route::put('/update/{id}', [InventoriesController::class, 'update'])->name('itemstock.update');
     Route::get('/destroy', [InventoriesController::class, 'destroy'])->name('itemstock.destroy');
 
     Route::get('/items', [InventoriesController::class, 'items'])->name('items');
@@ -731,10 +752,14 @@ Route::prefix('ambulance')->group(function () {
 
     Route::get('/index', [AmbulanceController::class, 'index'])->name('ambulanceCall.index');
     Route::post('/addCall', [AmbulanceController::class, 'addCall'])->name('ambulanceCall.addCall');
-    Route::put('/editCall/{id}', [AmbulanceController::class, 'editCall'])->name('ambulanceCall.editCall');
+    Route::get('/editCall/{id}', [AmbulanceController::class, 'editCall'])->name('ambulanceCall.editCall');
     Route::put('/updateCall/{id}', [AmbulanceController::class, 'updateCall'])->name('ambulanceCall.updateCall');
     Route::delete('/destroyCall/{id}', [AmbulanceController::class, 'destroyCall'])->name('ambulanceCall.deleteCall');
-
+    Route::get('/list', [AmbulanceController::class, 'ambulanceList'])->name('ambulanceList.index');
+    Route::post('/addList', [AmbulanceController::class, 'addList'])->name('ambulanceList.addList');
+    Route::get('/editList/{id}', [AmbulanceController::class, 'editList'])->name('ambulanceList.editList');
+    Route::put('/updateList/{id}', [AmbulanceController::class, 'updateList'])->name('ambulanceList.updateList');
+    Route::delete('/destroyList/{id}', [AmbulanceController::class, 'destroyList'])->name('ambulanceList.deleteList');
     Route::get('/charges/by-category/{category}', [AmbulanceController::class, 'getChargesByCategory'])->name('charges.byCategory');
     Route::get('/charges/{charge}', [AmbulanceController::class, 'getChargeDetails'])->name('ambulanceCall.deleteCall');
 
@@ -1013,11 +1038,19 @@ Route::get('/radiology_test', [ExcelImportController::class, 'importRadiology'])
 Route::post('/radiology_import', [ExcelImportController::class, 'importRadiologyExcel'])->name('radiology.import');
 Route::get('/radiology_test_export', [ExcelImportController::class, 'exportRadiologyTestExcel'])->name('radiologyTests.export');
 
-Route::get('/finance', function () {
-    return view('admin.reports.finance.index');
-})->name('finance');
-Route::get('/reports/dailyTransactionReport', [TransactionReportController::class, 'dailyTransactionReport'])->name('reports.daily.transaction');
+Route::prefix('reports')->group(function () {
+Route::get('/finance', function () {return view('admin.reports.finance.index');})->name('finance');
+Route::get('/inventory', [InventoriesController::class, 'reports'])->name('inventory-reports');
+Route::get('/inventory-stock', [InventoriesController::class, 'stockReports'])->name('inventory-stock-reports');
+Route::get('/inventory-item', [InventoriesController::class, 'itemReports'])->name('inventory-item-reports');
+Route::get('/inventory-asset', [InventoriesController::class, 'assetReport'])->name('inventory-asset-reports');
+Route::get('/inventory-issue', [InventoriesController::class, 'issueReport'])->name('inventory-issue-reports');
+Route::get('dailyTransactionReport', [TransactionReportController::class, 'dailyTransactionReport'])->name('reports.daily.transaction');
 
+Route::get('/opd-reports-index', [OpdController::class, 'reports'])->name('opd.reports');
+Route::get('/opd-reports', [OpdController::class, 'opdReport'])->name('opd.opd_reports');
+Route::get('/opd-balance-reports', [OpdController::class, 'opdBalanceReport'])->name('opd.opd_balance_reports');
+});
 Route::get('/allTransactionReport', function () {
     return view('admin.reports.finance.all-transaction-report');
 })->name('allTransactionReport');
@@ -1041,12 +1074,8 @@ Route::get('/processingTransactionReport', function () {
 })->name('processingTransactionReport');
 
 // OPD
-Route::get('/opdReportsIndex', function () {
-    return view('admin.reports.opd.index');
-})->name('opdReportsIndex');
-Route::get('/opdReports', function () {
-    return view('admin.reports.opd.opd_reports');
-})->name('opdReports');
+
+
 Route::get('/opdBalanceReports', function () {
     return view('admin.reports.opd.opd_balance_reports');
 })->name('opdBalanceReports');

@@ -371,11 +371,143 @@
                     .then(html => {
                         document.getElementById('breakupBillContent').innerHTML = html;
                         document.getElementById('breakupBillSection').style.display = 'block';
+                        initDiscountForm();
                     })
                     .catch(error => {
                         console.error('Error loading bill breakup:', error);
                         document.getElementById('breakupBillContent').innerHTML = '<div class="alert alert-danger">Error loading bill breakup. Please try again.</div>';
                     });
+            }
+
+            function updateDiscountSummary() {
+                const mouInput = document.getElementById('mou_discount');
+                const specialInput = document.getElementById('special_discount');
+                const duePartyInput = document.getElementById('due_patient_party_amount');
+                const summaryCard = document.getElementById('paymentSummaryCard');
+                const totalDiscountEl = document.getElementById('summaryTotalDiscount');
+                const duePartyEl = document.getElementById('summaryDuePatientParty');
+                const netBalanceEl = document.getElementById('summaryNetBalance');
+                if (!summaryCard || !netBalanceEl) return;
+                const outstanding = parseFloat(summaryCard.getAttribute('data-outstanding')) || 0;
+                const mou = (mouInput ? parseFloat(mouInput.value) : 0) || 0;
+                const special = (specialInput ? parseFloat(specialInput.value) : 0) || 0;
+                const dueParty = (duePartyInput ? parseFloat(duePartyInput.value) : 0) || 0;
+                const totalDiscount = mou + special;
+                const netBalance = Math.max(0, outstanding - totalDiscount - dueParty);
+                if (totalDiscountEl) totalDiscountEl.textContent = '₹ ' + totalDiscount.toFixed(2);
+                if (duePartyEl) duePartyEl.textContent = '₹ ' + dueParty.toFixed(2);
+                netBalanceEl.textContent = '₹ ' + netBalance.toFixed(2);
+            }
+
+            function initDiscountForm() {
+                const form = document.getElementById('discountForm');
+                const msgEl = document.getElementById('discountMessage');
+                if (!form || !msgEl) return;
+                const mouInput = document.getElementById('mou_discount');
+                const specialInput = document.getElementById('special_discount');
+                if (mouInput) {
+                    mouInput.addEventListener('input', updateDiscountSummary);
+                    mouInput.addEventListener('change', updateDiscountSummary);
+                    mouInput.addEventListener('keyup', updateDiscountSummary);
+                }
+                if (specialInput) {
+                    specialInput.addEventListener('input', updateDiscountSummary);
+                    specialInput.addEventListener('change', updateDiscountSummary);
+                    specialInput.addEventListener('keyup', updateDiscountSummary);
+                }
+                const duePartyInput = document.getElementById('due_patient_party_amount');
+                if (duePartyInput) {
+                    duePartyInput.addEventListener('input', updateDiscountSummary);
+                    duePartyInput.addEventListener('change', updateDiscountSummary);
+                    duePartyInput.addEventListener('keyup', updateDiscountSummary);
+                }
+                form.onsubmit = function(e) {
+                    e.preventDefault();
+                    const ipdId = form.querySelector('input[name="ipd_id"]').value;
+                    const btn = document.getElementById('discountSaveBtn');
+                    if (btn) btn.disabled = true;
+                    msgEl.style.display = 'none';
+                    const token = form.querySelector('input[name="_token"]').value;
+                    const formData = new FormData(form);
+                    formData.set('mou_discount', form.mou_discount.value ? parseFloat(form.mou_discount.value) : 0);
+                    formData.set('special_discount', form.special_discount.value ? parseFloat(form.special_discount.value) : 0);
+                    fetch('{{ url("ipd/billing") }}/' + ipdId + '/discount', {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': token,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: formData
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            msgEl.className = 'mt-2 small text-success';
+                            msgEl.textContent = data.message + ' Total discount: ₹ ' + (data.total_discount || 0).toFixed(2);
+                            msgEl.style.display = 'block';
+                            // Update Payment Summary so outstanding / net balance reflect discount
+                            const totalDiscountEl = document.getElementById('summaryTotalDiscount');
+                            const netBalanceEl = document.getElementById('summaryNetBalance');
+                            if (totalDiscountEl) totalDiscountEl.textContent = '₹ ' + (data.total_discount || 0).toFixed(2);
+                            const duePartyEl = document.getElementById('summaryDuePatientParty');
+                            if (duePartyEl && data.due_patient_party_amount != null) duePartyEl.textContent = '₹ ' + parseFloat(data.due_patient_party_amount).toFixed(2);
+                            if (netBalanceEl) netBalanceEl.textContent = '₹ ' + (data.net_balance != null ? data.net_balance.toFixed(2) : (data.outstanding - (data.total_discount || 0) - (data.due_patient_party_amount || 0)).toFixed(2));
+                        } else {
+                            msgEl.className = 'mt-2 small text-danger';
+                            msgEl.textContent = data.message || 'Failed to save discount.';
+                            msgEl.style.display = 'block';
+                        }
+                    })
+                    .catch(err => {
+                        msgEl.className = 'mt-2 small text-danger';
+                        msgEl.textContent = 'Error saving discount. Please try again.';
+                        msgEl.style.display = 'block';
+                    })
+                    .finally(() => { if (btn) btn.disabled = false; });
+                };
+
+                const dueForm = document.getElementById('duePatientPartyForm');
+                const dueMsgEl = document.getElementById('duePatientPartyMessage');
+                if (dueForm && dueMsgEl) {
+                    dueForm.onsubmit = function(e) {
+                        e.preventDefault();
+                        const ipdId = dueForm.querySelector('input[name="ipd_id"]').value;
+                        const btn = document.getElementById('duePatientPartySaveBtn');
+                        if (btn) btn.disabled = true;
+                        dueMsgEl.style.display = 'none';
+                        const token = dueForm.querySelector('input[name="_token"]').value;
+                        const formData = new FormData(dueForm);
+                        formData.set('due_patient_party_amount', dueForm.due_patient_party_amount.value ? parseFloat(dueForm.due_patient_party_amount.value) : 0);
+                        fetch('{{ url("ipd/billing") }}/' + ipdId + '/due-patient-party', {
+                            method: 'POST',
+                            headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': token, 'X-Requested-With': 'XMLHttpRequest' },
+                            body: formData
+                        })
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success) {
+                                dueMsgEl.className = 'mt-2 small text-success';
+                                dueMsgEl.textContent = data.message;
+                                dueMsgEl.style.display = 'block';
+                                const duePartyEl = document.getElementById('summaryDuePatientParty');
+                                const netBalanceEl = document.getElementById('summaryNetBalance');
+                                if (duePartyEl) duePartyEl.textContent = '₹ ' + (data.due_patient_party_amount || 0).toFixed(2);
+                                if (netBalanceEl) netBalanceEl.textContent = '₹ ' + (data.net_balance != null ? data.net_balance.toFixed(2) : '0.00');
+                            } else {
+                                dueMsgEl.className = 'mt-2 small text-danger';
+                                dueMsgEl.textContent = data.message || 'Failed to save.';
+                                dueMsgEl.style.display = 'block';
+                            }
+                        })
+                        .catch(() => {
+                            dueMsgEl.className = 'mt-2 small text-danger';
+                            dueMsgEl.textContent = 'Error saving. Please try again.';
+                            dueMsgEl.style.display = 'block';
+                        })
+                        .finally(() => { if (btn) btn.disabled = false; });
+                    };
+                }
             }
         });
     </script>

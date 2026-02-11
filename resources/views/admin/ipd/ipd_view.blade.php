@@ -1330,7 +1330,8 @@
                                                 <th>Date</th>
                                                 <th>Note</th>
                                                 <th>Payment Mode</th>
-                                                <th>Paid Amount (INR)</th>
+                                                <th class="text-end">Paid Amount (INR)</th>
+                                                <th class="text-center">Money Receipt</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -1356,7 +1357,18 @@
                                                         {{ number_format($transaction->amount, 2) }}
                                                     </td>
 
-
+                                                    <td class="text-center">
+                                                        @if(!empty($transaction->receipt_no))
+                                                            <a href="{{ route('money-receipt.print', $transaction->id) }}"
+                                                               class="btn btn-sm btn-primary"
+                                                               target="_blank"
+                                                               title="Print Money Receipt">
+                                                                <i class="ti ti-printer"></i>
+                                                            </a>
+                                                        @else
+                                                            <span class="text-muted">-</span>
+                                                        @endif
+                                                    </td>
                                                 </tr>
                                             @empty
                                                 <tr>
@@ -3655,7 +3667,7 @@
                                                                 <th>Note</th>
                                                                 <th>Payment Mode</th>
                                                                 <th>Paid Amount (INR)</th>
-                                                                <!-- <th>Action</th> -->
+                                                                <th class="text-center">Money Receipt</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -3681,36 +3693,18 @@
                                                                         {{ number_format($transaction->amount, 2) }}
                                                                     </td>
 
-                                                                    <!-- <td>
-                                                                                <div class="d-flex gap-2">
-                                                                                    {{-- Print --}}
-                                                                                    <a href="{{ route('transactions.print', $transaction->id) }}"
-                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill"
-                                                                                    data-bs-toggle="tooltip" title="Print">
-                                                                                        <i class="fa-solid fa-print"></i>
-                                                                                    </a>
-
-                                                                                    {{-- View --}}
-                                                                                    <a href="{{ route('transactions.show', $transaction->id) }}"
-                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill"
-                                                                                    data-bs-toggle="tooltip" title="Show">
-                                                                                        <i class="ti ti-pencil"></i>
-                                                                                    </a>
-
-                                                                                    {{-- Delete --}}
-                                                                                    <form action="{{ route('transactions.destroy', $transaction->id) }}"
-                                                                                        method="POST"
-                                                                                        onsubmit="return confirm('Delete this payment?')">
-                                                                                        @csrf
-                                                                                        @method('DELETE')
-                                                                                        <button type="submit"
-                                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
-                                                                                            data-bs-toggle="tooltip" title="Delete">
-                                                                                            <i class="ti ti-trash"></i>
-                                                                                        </button>
-                                                                                    </form>
-                                                                                </div>
-                                                                            </td> -->
+                                                                    <td class="text-center">
+                                                                        @if(!empty($transaction->receipt_no))
+                                                                            <a href="{{ route('money-receipt.print', $transaction->id) }}"
+                                                                               class="btn btn-sm btn-primary"
+                                                                               target="_blank"
+                                                                               title="Print Money Receipt">
+                                                                                <i class="ti ti-printer"></i>
+                                                                            </a>
+                                                                        @else
+                                                                            <span class="text-muted">-</span>
+                                                                        @endif
+                                                                    </td>
                                                                 </tr>
                                                             @empty
                                                                 <tr>

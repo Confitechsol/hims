@@ -45,10 +45,21 @@ class IpdDetail extends Model
         'net_amount',
         'tax',
         'amount',
+        'mou_discount',
+        'special_discount',
+        'due_patient_party_doctor_id',
+        'due_patient_party_amount',
+        'due_patient_party_receipt_type',
         'live_consult',
         'generated_by',
         'is_antenatal',
         'ipd_no',
+    ];
+
+    protected $casts = [
+        'mou_discount' => 'decimal:2',
+        'special_discount' => 'decimal:2',
+        'due_patient_party_amount' => 'decimal:2',
     ];
 
     /**
@@ -79,6 +90,11 @@ class IpdDetail extends Model
     public function doctor()
     {
         return $this->belongsTo(Doctor::class, 'cons_doctor');
+    }
+
+    public function duePatientPartyDoctor()
+    {
+        return $this->belongsTo(Doctor::class, 'due_patient_party_doctor_id');
     }
 
     public function organisation()

@@ -264,11 +264,11 @@
                                     <i class="ti ti-map-pin"></i><span>Doctor Visit</span>
                                 </a>
                             </li>
-                            <!-- <li>
-                                <a href="#">
-                                    <i class="ti ti-map-pin"></i><span>Front Office</span>
+                            <li>
+                                <a href="{{ route('ambulanceCall.index') }}" class="{{ request()->routeIs('ambulanceCall.index') ? 'active' : '' }}">
+                                    <i class="ti ti-map-pin"></i><span>Ambulance Call</span>
                                 </a>
-                            </li> -->
+                            </li>
                             <li class="submenu">
                                 <a href="javascript:void(0);" class="active subdrop">
                                     <i class="ti ti-layout-dashboard"></i><span>Duty Roster</span>
@@ -340,6 +340,8 @@
                                     <li><a href="{{ route('income') }}" class="{{ request()->routeIs('income') ? 'active' : '' }}">Income
                                             </a></li>
                                     <li><a href="{{ route('expense') }}" class="{{ request()->routeIs('expense') ? 'active' : '' }}">Expenses
+                                            </a></li>
+                                    <li><a href="{{ route('money-receipt.index') }}" class="{{ request()->routeIs('money-receipt.*') ? 'active' : '' }}">Money Receipt
                                             </a></li>
                                     
                                 </ul>
@@ -449,10 +451,11 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
+                                     <li><a href="{{ route('inventory-reports') }}"  class="{{ request()->routeIs('inventory-reports') ? 'active' : '' }}">Inventory Reports
                                     <li><a href="{{ route('finance') }}" class="{{ request()->routeIs('finance') ? 'active' : '' }}">Finance Report
                                             </a></li>
                                     
-                                    <li><a href="{{ route('finance') }}" class="{{ request()->routeIs('finance') ? 'active' : '' }}">OPD
+                                    <li><a href="{{ route('opd.reports') }}" class="{{ request()->routeIs('opd.reports') ? 'active' : '' }}">OPD
                                             Report</a></li>
                                     <li><a href="{{ route('finance') }}"  class="{{ request()->routeIs('death') ? 'active' : '' }}">IPD
                                             Report</a></li>

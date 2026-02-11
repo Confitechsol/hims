@@ -23,18 +23,17 @@
             <div class="card shadow-sm border-0 mt-4">
                 <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> OPD Report </h5>
-                        <a href="{{ route('opd.reports') }}" class="text-white fw-bold"><i class="fa-solid fa-angles-left text-white"></i>
-                            OPD</a>
+                        <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Inventory Stock Report </h5>
+                        <a href="{{ route('inventory-reports') }}" class="text-white fw-bold"><i class="fa-solid fa-angles-left text-white"></i>
+                            Inventory</a>
                     </div>
                 </div>
 
                 <div class="card-body">
-                    <form action="{{ route('opd.opd_reports') }}" method="GET">
+                    <form action="{{ route('inventory-stock-reports') }}" method="GET">
                         <div class="row align-items-center gy-4">
 
-                            {{-- Date From --}}
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <label class="form-label">
                                     Date From <span class="text-danger">*</span>
                                 </label>
@@ -47,8 +46,7 @@
                                 >
                             </div>
 
-                            {{-- Date To --}}
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <label class="form-label">
                                     Date To <span class="text-danger">*</span>
                                 </label>
@@ -61,42 +59,30 @@
                                 >
                             </div>
 
-                            {{-- Gender --}}
-                            <div class="col-md-3">
-                                <label class="form-label">Gender</label>
-                                <select name="gender" class="form-select">
-                                    <option value="">All</option>
-                                    <option value="Male" {{ request('gender') == 'Male' ? 'selected' : '' }}>Male</option>
-                                    <option value="Female" {{ request('gender') == 'Female' ? 'selected' : '' }}>Female</option>
-                                    <option value="Other" {{ request('gender') == 'Other' ? 'selected' : '' }}>Other</option>
-                                </select>
-                            </div>
-
-                            {{-- Search --}}
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <label class="form-label">Search</label>
-                                <input
-                                    type="text"
+                                <input type="text"
                                     name="search"
                                     class="form-control"
-                                    placeholder="OPD No / Patient Name / Mobile"
-                                    value="{{ request('search') }}"
-                                >
+                                    placeholder="Item / Category / Supplier / Store"
+                                    value="{{ request('search') }}">
                             </div>
 
-                            {{-- Buttons --}}
-                            <div class="col-md-12 mt-3">
+                            <div class="col-md-4 mt-4">
                                 <button type="submit" class="btn btn-primary btn-sm">
                                     Search
                                 </button>
 
-                                <a href="{{ route('opd.opd_reports') }}" class="btn btn-secondary btn-sm">
+                                <a href="{{ route('inventory-stock-reports') }}"
+                                class="btn btn-secondary btn-sm">
                                     Reset
                                 </a>
                             </div>
 
                         </div>
                     </form>
+
+
 
                 </div>
             </div>
@@ -116,53 +102,77 @@
 
                                             <!-- Table start -->
                                             <div class="table-responsive table-nowrap">
+                                                
                                                 <table class="table border">
                                                     <thead class="thead-light">
                                                         <tr>
-                                                            <th>Date</th>
-                                                            <th>OPD No</th>
-                                                            <th>OPD Checkup ID</th>
-                                                            <th>Patient Name</th>
-                                                            <th>Age</th>
-                                                            <th>Gender</th>
-                                                            <th>Mobile Number</th>
-                                                            <th>Is Antenatal</th>
-                                                            <th>Guardian Name</th>
-                                                            <th>Doctor Name</th>
-                                                            <th>Symptoms</th>
-                                                            <th>Findings</th>
+                                                            <th>#</th>
+                                                            <th>Asset Name</th>
+                                                            <th>Category</th>
+                                                            <th>Supplier</th>
+                                                            <th>Store</th>
+                                                            <th class="text-end">Qty</th>
+                                                            <th class="text-end">Total Purchase Price</th>
+                                                            <th class="text-end">Salvage Value</th>
+                                                            <th class="text-center">Useful Life (yrs)</th>
+                                                            <th class="text-end">Annual Depreciation</th>
+                                                            <th class="text-center">Expiry Date</th>
+                                                            <th class="text-end">Net Book Value</th>
                                                         </tr>
                                                     </thead>
 
                                                     <tbody>
-                                                        @forelse($opdReports as $opd)
+                                                        @forelse($assets as $index => $asset)
                                                             <tr>
-                                                                <td>{{ \Carbon\Carbon::parse($opd->date)->format('d-m-Y') }}</td>
-                                                                <td>{{ $opd->opd_no }}</td>
-                                                                <td>{{ $opd->opd_visits->visit_id ?? '-' }}</td>
-                                                                <td>{{ $opd->patient->patient_name ?? '-' }}</td>
-                                                                <td>{{ $opd->patient->age ?? '-' }}</td>
-                                                                <td>{{ $opd->patient->gender ?? '-' }}</td>
-                                                                <td>{{ $opd->patient->mobile ?? '-' }}</td>
-                                                                <td>
-                                                                    {{ $opd->is_antenatal ? 'Yes' : 'No' }}
+                                                                <td>{{ $index + 1 }}</td>
+
+                                                                <td>{{ $asset->item->name ?? '-' }}</td>
+
+                                                                <td>{{ $asset->itemCategory->item_category ?? '-' }}</td>
+
+                                                                <td>{{ $asset->supplier->item_supplier ?? '-' }}</td>
+
+                                                                <td>{{ $asset->store->item_store ?? '-' }}</td>
+
+                                                                <td class="text-end">{{ $asset->quantity }}</td>
+
+                                                                <td class="text-end">
+                                                                    {{ number_format($asset->total_cost, 2) }}
                                                                 </td>
-                                                                <td>{{ $opd->guardian_name ?? '-' }}</td>
-                                                                <td>{{ $opd->doctor->name ?? '-' }}</td>
-                                                                <td>{{ $opd->symptoms ?? '-' }}</td>
-                                                                <td>{{ $opd->findings ?? '-' }}</td>
+
+                                                                <td class="text-end">
+                                                                    {{ number_format($asset->salvage_value, 2) }}
+                                                                </td>
+
+                                                                <td class="text-center">
+                                                                    {{ $asset->useful_life ?? '-' }}
+                                                                </td>
+
+                                                                <td class="text-end">
+                                                                    {{ number_format($asset->annual_depreciation ?? 0, 2) }}
+                                                                </td>
+
+                                                                <td class="text-center">
+                                                                    {{ $asset->expiry_date
+                                                                        ? \Carbon\Carbon::parse($asset->expiry_date)->format('d-m-Y')
+                                                                        : '-' }}
+                                                                </td>
+
+                                                                <td class="text-end fw-bold">
+                                                                    {{ number_format($asset->net_book_value, 2) }}
+                                                                </td>
                                                             </tr>
                                                         @empty
                                                             <tr>
-                                                                <td colspan="12" class="text-center text-muted">
-                                                                    No OPD records found
+                                                                <td colspan="13" class="text-center text-muted">
+                                                                    No assets found for the selected criteria.
                                                                 </td>
                                                             </tr>
                                                         @endforelse
                                                     </tbody>
                                                 </table>
-                                            </div>
 
+                                            </div>
                                             <!-- Table end -->
                                         </div>
                                     </div>

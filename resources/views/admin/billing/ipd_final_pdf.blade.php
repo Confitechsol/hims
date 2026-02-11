@@ -806,10 +806,35 @@
                 <span class="summary-label">Total Payments:</span>
                 <span class="summary-value">Rs. {{ number_format($breakup['total_payments'] ?? 0, 2) }}</span>
             </div>
+            @if(isset($mouDiscount) && $mouDiscount > 0)
+            <div class="summary-row">
+                <span class="summary-label">MOU Discount (TPA/Insurance):</span>
+                <span class="summary-value">Rs. {{ number_format($mouDiscount, 2) }}</span>
+            </div>
+            @endif
+            @if(isset($specialDiscount) && $specialDiscount > 0)
+            <div class="summary-row">
+                <span class="summary-label">Special / Hospital Discount:</span>
+                <span class="summary-value">Rs. {{ number_format($specialDiscount, 2) }}</span>
+            </div>
+            @endif
             @if(isset($discount) && $discount > 0)
             <div class="summary-row">
-                <span class="summary-label">Discount:</span>
+                <span class="summary-label">Total Discount:</span>
                 <span class="summary-value">Rs. {{ number_format($discount, 2) }}</span>
+            </div>
+            @endif
+            @if(isset($duePatientPartyAmount) && $duePatientPartyAmount > 0)
+            <div class="summary-row">
+                <span class="summary-label">Due on Account of Patient Party
+                    @if(isset($ipd->duePatientPartyDoctor))
+                        (Dr. {{ $ipd->duePatientPartyDoctor->name ?? '' }} {{ $ipd->duePatientPartyDoctor->surname ?? '' }})
+                    @endif
+                    @if(isset($ipd->due_patient_party_receipt_type) && $ipd->due_patient_party_receipt_type)
+                        [{{ $ipd->due_patient_party_receipt_type }}]
+                    @endif:
+                </span>
+                <span class="summary-value">Rs. {{ number_format($duePatientPartyAmount, 2) }}</span>
             </div>
             @endif
             <div class="summary-row">
