@@ -277,6 +277,71 @@
                                                                                                 <div class="line-data">
                                                                                                     {{$report->patient->address ?? '-' }}
                                                                                                 </div>
+                                                                                                <div class="col-12 mt-3 mb-2">
+                                                                                                    <label class="fw-bold mb-2">Cause of Death</label>
+
+                                                                                                    <div class="table-responsive">
+                                                                                                        <table class="table table-bordered">
+                                                                                                            <thead>
+                                                                                                                <tr>
+                                                                                                                    <th width="30%">Type</th>
+                                                                                                                    <th>Details</th>
+                                                                                                                </tr>
+                                                                                                            </thead>
+                                                                                                            <tbody>
+                                                                                                                <tr>
+                                                                                                                    <td><strong>Immediate Cause</strong></td>
+                                                                                                                    <td>
+                                                                                                                        {{ '-' }}
+                                                                                                                    </td>
+                                                                                                                </tr>
+                                                                                                                <tr>
+                                                                                                                    <td><strong>Antecedent Cause</strong></td>
+                                                                                                                    <td>
+                                                                                                                        {{  '-' }}
+                                                                                                                    </td>
+                                                                                                                </tr>
+                                                                                                                <tr>
+                                                                                                                    <td><strong>Underlying Cause</strong></td>
+                                                                                                                    <td>
+                                                                                                                        {{  '-' }}
+                                                                                                                    </td>
+                                                                                                                </tr>
+                                                                                                                <tr>
+                                                                                                                    <td><strong>Manner Of Death</strong></td>
+                                                                                                                    <td>
+                                                                                                                        {{  '-' }}
+                                                                                                                    </td>
+                                                                                                                </tr>
+                                                                                                                <tr>
+                                                                                                                    <td><strong>How did the injury occured?</strong></td>
+                                                                                                                    <td>
+                                                                                                                        {{  '-' }}
+                                                                                                                    </td>
+                                                                                                                </tr>
+                                                                                                                
+                                                                                                            </tbody>
+                                                                                                        </table>
+                                                                                                    </div>
+
+                                                                                                    <div class="row mt-5">
+                                                                                                    <div class="col-6 text-start">
+                                                                                                        <div style="border-top: 1px solid #000; width: 250px; margin-top: 60px;">
+                                                                                                            <p class="mb-0 mt-2">Doctor's Signature</p>
+                                                                                                            <small>Name & Registration No.</small>
+                                                                                                        </div>
+                                                                                                    </div>
+
+                                                                                                    <div class="col-6 text-end">
+                                                                                                        <div style="border-top: 1px solid #000; width: 250px; margin-top: 60px; float: right;">
+                                                                                                            <p class="mb-0 mt-2">Authorized Signature</p>
+                                                                                                            <small>Hospital Seal</small>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                
+                                                                                                </div>
+                                                                                                
 
                                                                                                 <div class="cut_list"></div>
 
