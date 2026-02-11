@@ -23,6 +23,10 @@ class DeathReport extends Model
         'death_report',
         'is_active',
         'patient_name',
+        'doctor_name',
+        'due_to_a',
+        'due_to_b',
+        'due_to_c',
     ];
 
     public $timestamps = false;   // ✅ VERY IMPORTANT
@@ -34,6 +38,26 @@ class DeathReport extends Model
     {
         return $this->belongsTo(Patient::class, 'patient_id');
     }
+
+    /**
+     * A death report belongs to a hospital
+     */
+    public function hospital()
+    {
+        return $this->belongsTo(Hospital::class, 'hospital_id','hospital_id');
+    }
+
+    public function ipd_details()
+    {
+        return $this->belongsTo(IpdDetails::class, 'patient_id');
+    }
+
+    function doctor()
+    {
+        return $this->belongsTo(Doctor::class, 'doctor_id');
+    }
+
+    
 
     /**
      * A death report belongs to a case reference

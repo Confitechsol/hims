@@ -4,15 +4,18 @@ namespace App\Http\Controllers;
 use App\Models\DeathReport;
 use Illuminate\Http\Request;
 use App\Models\Patient;
+use App\Models\Doctor;
+use App\Models\Hospital;
 class DeathController extends Controller
 {
     function index(Request $request){     
-    $query = DeathReport::with(['patient'])->get();
-     $perPage = intval($request->input('perPage', 5));
+   
+     $query = DeathReport::with(['patient','ipd_details','hospital','doctor']);
+     $perPage = intval($request->input('perPage', 10));
      if ($perPage <= 0) {
-        $perPage = 5;
+        $perPage = 10;
     }
-    $query = DeathReport::with(['patient']);
+   
     if ($request->has('search')) {
         $search_term = $request->search;
         $query->where(function ($q) use ($search_term) {
@@ -23,9 +26,11 @@ class DeathController extends Controller
                 });
         });
     }
-    $deathReports = $query->paginate($perPage);
-      //  return response()->json($deathReports , 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
-      return view('admin.birthordeath.indexdeath', compact('deathReports'));
+     $deathReports = $query->paginate($perPage);
+     $doctors = Doctor::where('is_active',1)->select('name')->get();
+     $hospital = Hospital::where('is_active',1)->select('hospital_id','name')->first();
+    // return response()->json($deathReports , 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
+     return view('admin.birthordeath.indexdeath', compact('deathReports', 'doctors','hospital'));
     }
 
 
@@ -40,6 +45,12 @@ class DeathController extends Controller
         'guardian_name'  => 'required|string|max:255',
         'attachment_name' => 'nullable|string|max:255',
         'attachment'     => 'nullable|file|mimes:jpg,jpeg,png,pdf,docx|max:5120',
+        'doctor_name'    => 'required|string|max:255',
+        'due_to_a'  => 'nullable|string|max:255',
+        'due_to_b'  => 'nullable|string|max:255',
+        'due_to_c'  => 'nullable|string|max:255',
+
+
     ]);
 
     
@@ -52,7 +63,6 @@ class DeathController extends Controller
     }
   //  dd($validated);
     DeathReport::create([
-        
         'case_reference_id' => $validated['case_reference_id'],
         'patient_id'       => $validated['patient_id'],
         'patient_name'  =>  $validated['patient_name'],
@@ -60,7 +70,12 @@ class DeathController extends Controller
         'guardian_name' => $validated['guardian_name'],
         'attachment_name'  => $validated['attachment_name'], 
         'attachment'    => $attachment,   // ✅ Store BLOB
-        'is_active'     => 1
+        'is_active'     => 1,
+        'doctor_name' => $validated['doctor_name'],
+        'due_to_a' => $validated['due_to_a'] ?? null,
+        'due_to_b' => $validated['due_to_b'] ?? null,
+        'due_to_c' => $validated['due_to_c'] ?? null,
+
     ]);
 
     return redirect()->back()->with('success', 'Death Record Added Successfully');
