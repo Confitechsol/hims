@@ -50,6 +50,7 @@ class OpdController extends Controller
         $search      = $request->get('search');
         $isOpdTab    = $request->get('tab', 'opd') == 'opd';
         $doctors     = Doctor::all();
+        $references = ['Direct', 'Doctor', 'Marketer', 'Other'];
         $opdSymptoms = [];
         if ($isOpdTab) {
             $opdDetails = OpdDetail::with('patient.bloodGroup', 'doctor', 'chargeCategory', 'charge')
@@ -97,7 +98,7 @@ class OpdController extends Controller
         }
 
         // $opd         = OpdDetail::with('patient', 'doctor', 'chargeCategory', 'charge')->get();
-        return view("admin.opd.index", compact("opd", 'opdSymptoms', 'doctors', 'isOpdTab'));
+        return view("admin.opd.index", compact("opd", 'references', 'opdSymptoms', 'doctors', 'isOpdTab'));
     }
 
     public function store(Request $request)

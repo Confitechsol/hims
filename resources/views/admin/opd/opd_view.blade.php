@@ -414,13 +414,13 @@
                     <span>Lab Investigation</span>
                 </a>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
                 <a href="#operations" data-bs-toggle="tab" aria-expanded="true"
                     class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
                         class="fa-solid fa-scissors text-primary pe-1"></i>
                     <span>Operations</span>
                 </a>
-            </li>
+            </li> -->
             <li class="nav-item">
                 <a href="#charges" data-bs-toggle="tab" aria-expanded="true"
                     class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
@@ -943,14 +943,14 @@
                                 <!-- Table end -->
                             </div>
                         </div>
-                        <div class="card shadow-sm border-0 mt-2">
+                        <!-- <div class="card shadow-sm border-0 mt-2">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                                 <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Operation
                                 </h5>
                             </div>
                             <div class="card-body">
-                                <!-- Table start -->
+                                
                                 <div class="table-responsive table-nowrap">
                                     <table class="table border">
                                         <thead class="thead-light">
@@ -975,9 +975,9 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                <!-- Table end -->
+                                
                             </div>
-                        </div>
+                        </div> -->
                         <div class="card shadow-sm border-0 mt-2">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
@@ -1055,17 +1055,53 @@
                                                 <th>Date</th>
                                                 <th>Note</th>
                                                 <th>Payment Mode</th>
-                                                <th>Paid Amount (INR)</th>
+                                                <th class="text-end">Paid Amount (INR)</th>
+                                                <th class="text-center">Money Receipt</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td class="text-right">TRID83</td>
-                                                <td class="text-right">10/13/2025 06:25 PM</td>
-                                                <td class="text-right">SmartPay Transaction ID: 528612554379</td>
-                                                <td class="text-right"><br> </td>
-                                                <td class="text-right">20.00</td>
-                                            </tr>
+                                            @forelse($transactions as $transaction)
+                                                <tr>
+                                                    <td>
+                                                        {{ $transaction->transaction_no ?? 'TRID' . $transaction->id }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ \Carbon\Carbon::parse($transaction->transaction_date)->format('d/m/Y h:i A') }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ $transaction->note ?? '-' }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ $transaction->payment_mode }}
+                                                    </td>
+
+                                                    <td class="text-end">
+                                                        {{ number_format($transaction->amount, 2) }}
+                                                    </td>
+
+                                                    <td class="text-center">
+                                                        @if(!empty($transaction->receipt_no))
+                                                            <a href="{{ route('money-receipt.print', $transaction->id) }}"
+                                                               class="btn btn-sm btn-primary"
+                                                               target="_blank"
+                                                               title="Print Money Receipt">
+                                                                <i class="ti ti-printer"></i>
+                                                            </a>
+                                                        @else
+                                                            <span class="text-muted">-</span>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="6" class="text-center text-muted">
+                                                        No payments found
+                                                    </td>
+                                                </tr>
+                                            @endforelse
                                         </tbody>
                                     </table>
                                 </div>
@@ -1588,8 +1624,8 @@
                     </div>
                 </div>
             </div>
-            <div class="tab-pane" id="operations">
-                <!-- row start -->
+            <!-- <div class="tab-pane" id="operations">
+                
                 <div class="row">
                     <div class="col-12 d-flex">
                         <div class="card shadow-sm flex-fill w-100">
@@ -1614,7 +1650,7 @@
 
                                                     </div>
                                                 </div>
-                                                <!-- Table start -->
+                                                
                                                 <div class="table-responsive table-nowrap">
                                                     <table class="table border">
                                                         <thead class="thead-light">
@@ -1660,7 +1696,7 @@
                                                         </tbody>
                                                     </table>
                                                 </div>
-                                                <!-- Table end -->
+                                                
                                             </div>
                                         </div>
                                     </div>
@@ -1669,7 +1705,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
             <div class="tab-pane" id="charges">
                 <!-- row start -->
                 <div class="row">
@@ -2278,12 +2314,12 @@
                                                     <table class="table border">
                                                         <thead class="thead-light">
                                                             <tr>
-                                                                <th>Transaction ID</th>
+                                                                <th>Transaction ID </th>
                                                                 <th>Date</th>
                                                                 <th>Note</th>
                                                                 <th>Payment Mode</th>
-                                                                <th>Paid Amount (INR)</th>
-                                                                <th>Action</th>
+                                                                <th class="text-end">Paid Amount (INR)</th>
+                                                                <th class="text-center">Money Receipt</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -2305,40 +2341,22 @@
                                                                         {{ $transaction->payment_mode }}
                                                                     </td>
 
-                                                                    <td>
+                                                                    <td class="text-end">
                                                                         {{ number_format($transaction->amount, 2) }}
                                                                     </td>
 
-                                                                    <!-- <td>
-                                                                                <div class="d-flex gap-2">
-                                                                                    {{-- Print --}}
-                                                                                    <a href="{{ route('transactions.print', $transaction->id) }}"
-                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill"
-                                                                                    data-bs-toggle="tooltip" title="Print">
-                                                                                        <i class="fa-solid fa-print"></i>
-                                                                                    </a>
-
-                                                                                    {{-- View --}}
-                                                                                    <a href="{{ route('transactions.show', $transaction->id) }}"
-                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill"
-                                                                                    data-bs-toggle="tooltip" title="Show">
-                                                                                        <i class="ti ti-pencil"></i>
-                                                                                    </a>
-
-                                                                                    {{-- Delete --}}
-                                                                                    <form action="{{ route('transactions.destroy', $transaction->id) }}"
-                                                                                        method="POST"
-                                                                                        onsubmit="return confirm('Delete this payment?')">
-                                                                                        @csrf
-                                                                                        @method('DELETE')
-                                                                                        <button type="submit"
-                                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
-                                                                                            data-bs-toggle="tooltip" title="Delete">
-                                                                                            <i class="ti ti-trash"></i>
-                                                                                        </button>
-                                                                                    </form>
-                                                                                </div>
-                                                                            </td> -->
+                                                                    <td class="text-center">
+                                                                        @if(!empty($transaction->receipt_no))
+                                                                            <a href="{{ route('money-receipt.print', $transaction->id) }}"
+                                                                            class="btn btn-sm btn-primary"
+                                                                            target="_blank"
+                                                                            title="Print Money Receipt">
+                                                                                <i class="ti ti-printer"></i>
+                                                                            </a>
+                                                                        @else
+                                                                            <span class="text-muted">-</span>
+                                                                        @endif
+                                                                    </td>
                                                                 </tr>
                                                             @empty
                                                                 <tr>
@@ -2350,6 +2368,7 @@
                                                         </tbody>
                                                     </table>
                                                 </div>
+                                                
                                                 <!-- Table end -->
                                             </div>
                                         </div>
