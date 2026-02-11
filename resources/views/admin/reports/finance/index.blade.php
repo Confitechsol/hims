@@ -91,6 +91,14 @@
                                 </div>
                             </a>
                         </div>
+                        <div class="col-md-3">
+                            <a href="{{ route('reports.money-receipt-register') }}">
+                                <div class="module_billing">
+                                    <i class="fa-solid fa-receipt"></i>
+                                    <p>Money Receipt Register</p>
+                                </div>
+                            </a>
+                        </div>
 
                     </div>
                 </div>
