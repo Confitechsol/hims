@@ -578,6 +578,23 @@ Route::post('/transaction/store', [TransactionController::class, 'store'])->name
 Route::post('/transaction/print', [TransactionController::class, 'store'])->name('transactions.print');
 Route::post('/transaction/show', [TransactionController::class, 'store'])->name('transactions.show');
 Route::post('/transaction/destroy', [TransactionController::class, 'store'])->name('transactions.destroy');
+
+// Money Receipt Routes
+Route::get('/money-receipt', [App\Http\Controllers\MoneyReceiptController::class, 'index'])->name('money-receipt.index');
+Route::get('/money-receipt/create', [App\Http\Controllers\MoneyReceiptController::class, 'create'])->name('money-receipt.create');
+Route::post('/money-receipt', [App\Http\Controllers\MoneyReceiptController::class, 'store'])->name('money-receipt.store');
+Route::get('/money-receipt/{id}', [App\Http\Controllers\MoneyReceiptController::class, 'show'])->name('money-receipt.show');
+Route::get('/money-receipt/{id}/edit', [App\Http\Controllers\MoneyReceiptController::class, 'edit'])->name('money-receipt.edit');
+Route::put('/money-receipt/{id}', [App\Http\Controllers\MoneyReceiptController::class, 'update'])->name('money-receipt.update');
+Route::delete('/money-receipt/{id}', [App\Http\Controllers\MoneyReceiptController::class, 'destroy'])->name('money-receipt.destroy');
+Route::get('/money-receipt/{id}/print', [App\Http\Controllers\MoneyReceiptController::class, 'print'])->name('money-receipt.print');
+
+// Money Receipt API Routes
+Route::get('/api/money-receipt/search-ipd', [App\Http\Controllers\MoneyReceiptController::class, 'searchIpd'])->name('money-receipt.api.search-ipd');
+Route::get('/api/money-receipt/search-patient', [App\Http\Controllers\MoneyReceiptController::class, 'searchPatient'])->name('money-receipt.api.search-patient');
+Route::get('/api/money-receipt/patient-final-bill', [App\Http\Controllers\MoneyReceiptController::class, 'getPatientFinalBill'])->name('money-receipt.api.patient-final-bill');
+Route::get('/api/money-receipt/ipd-details/{id}', [App\Http\Controllers\MoneyReceiptController::class, 'getIpdDetails'])->name('money-receipt.api.ipd-details');
+Route::get('/api/money-receipt/next-receipt-no', [App\Http\Controllers\MoneyReceiptController::class, 'getNextReceiptNo'])->name('money-receipt.api.next-receipt-no');
 Route::get('/getNurses', [IpdController::class, 'getNurses'])->name('getNurses');
 Route::get('/getIpdById/{id}', [IpdController::class, 'getIpdById'])->name('getIpdById');
 Route::get('/getIpdMedicineById/{id}', [IpdController::class, 'getIpdMedicineById'])->name('getIpdMedicineById');

@@ -343,10 +343,21 @@ class IpdBillingController extends Controller
         $totalCharges = $bedCharges + $ipdCharges + $pathologyCharges + $radiologyCharges + $doctorVisitCharges + $cgstCharges + $sgstCharges;
 
         // Total Payments
-        $totalPayments = Transaction::where('ipd_id', $ipdId)
+        // Note: Refund receipts should reduce the net payment,
+        // so we treat transactions with receipt_type = 'Refund'
+        // as negative amounts in the total.
+        $paymentTransactions = Transaction::where('ipd_id', $ipdId)
             ->where('type', 'payment')
             ->where('section', 'ipd')
-            ->sum('amount');
+            ->get();
+
+        $totalPayments = $paymentTransactions->sum(function ($t) {
+            $amount = (float) ($t->amount ?? 0);
+            if (strcasecmp($t->receipt_type ?? '', 'Refund') === 0) {
+                return -abs($amount);
+            }
+            return $amount;
+        });
 
         // Outstanding
         $outstanding = $totalCharges - $totalPayments;

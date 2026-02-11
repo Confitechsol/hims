@@ -43,6 +43,16 @@ class Transaction extends Model
         'payment_date',
         'note',
         'received_by',
+        'receipt_no',
+        'receipt_type',
+        'slip_no',
+        'booking_no',
+        'final_bill_no',
+        'tds',
+        'paid_by',
+        'narration',
+        'remarks',
+        'bank_name',
         'created_at',
     ];
 
@@ -114,5 +124,54 @@ class Transaction extends Model
     public function receiver()
     {
         return $this->belongsTo(User::class, 'received_by');
+    }
+
+    /**
+     * Get financial year based on start_month setting
+     */
+    public static function getFinancialYear($date = null)
+    {
+        $date = $date ? \Carbon\Carbon::parse($date) : \Carbon\Carbon::now();
+        
+        // Get start_month from hospital settings (default to April if not set)
+        $hospital = \App\Models\Hospital::first();
+        $startMonth = $hospital && $hospital->start_month ? (int) $hospital->start_month : 4; // Default to April
+        
+        $currentMonth = $date->month;
+        $currentYear = $date->year;
+        
+        // If current month is before start month, financial year started in previous calendar year
+        if ($currentMonth < $startMonth) {
+            $financialYear = $currentYear - 1;
+        } else {
+            $financialYear = $currentYear;
+        }
+        
+        return $financialYear;
+    }
+
+    /**
+     * Generate next receipt number (format: MR-YYYY-NNNN)
+     * YYYY is based on financial year (accounting year)
+     */
+    public static function generateReceiptNo($date = null)
+    {
+        $financialYear = self::getFinancialYear($date);
+        $prefix = 'MR-' . $financialYear . '-';
+        
+        // Get the last receipt number for this financial year
+        $lastReceipt = self::where('receipt_no', 'like', $prefix . '%')
+            ->orderBy('receipt_no', 'desc')
+            ->first();
+        
+        if ($lastReceipt && $lastReceipt->receipt_no) {
+            // Extract the number part
+            $lastNumber = (int) substr($lastReceipt->receipt_no, -4);
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
+        
+        return $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
     }
 }
