@@ -77,6 +77,7 @@ use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\TpamanagmentController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\TransactionReportController;
+use App\Http\Controllers\MoneyReceiptRegisterController;
 use App\Http\Controllers\VisitorsController;
 use App\Http\Controllers\VitalController;
 use Illuminate\Support\Facades\Route;
@@ -595,6 +596,7 @@ Route::get('/api/money-receipt/search-patient', [App\Http\Controllers\MoneyRecei
 Route::get('/api/money-receipt/patient-final-bill', [App\Http\Controllers\MoneyReceiptController::class, 'getPatientFinalBill'])->name('money-receipt.api.patient-final-bill');
 Route::get('/api/money-receipt/ipd-details/{id}', [App\Http\Controllers\MoneyReceiptController::class, 'getIpdDetails'])->name('money-receipt.api.ipd-details');
 Route::get('/api/money-receipt/next-receipt-no', [App\Http\Controllers\MoneyReceiptController::class, 'getNextReceiptNo'])->name('money-receipt.api.next-receipt-no');
+Route::get('/api/money-receipt/case-prescription-no', [App\Http\Controllers\MoneyReceiptController::class, 'getCasePrescriptionNo'])->name('money-receipt.api.case-prescription-no');
 Route::get('/getNurses', [IpdController::class, 'getNurses'])->name('getNurses');
 Route::get('/getIpdById/{id}', [IpdController::class, 'getIpdById'])->name('getIpdById');
 Route::get('/getIpdMedicineById/{id}', [IpdController::class, 'getIpdMedicineById'])->name('getIpdMedicineById');
@@ -1046,6 +1048,9 @@ Route::get('/inventory-item', [InventoriesController::class, 'itemReports'])->na
 Route::get('/inventory-asset', [InventoriesController::class, 'assetReport'])->name('inventory-asset-reports');
 Route::get('/inventory-issue', [InventoriesController::class, 'issueReport'])->name('inventory-issue-reports');
 Route::get('dailyTransactionReport', [TransactionReportController::class, 'dailyTransactionReport'])->name('reports.daily.transaction');
+Route::get('/money-receipt-register', [MoneyReceiptRegisterController::class, 'index'])->name('reports.money-receipt-register');
+Route::get('/money-receipt-register/excel', [MoneyReceiptRegisterController::class, 'exportExcel'])->name('reports.money-receipt-register.excel');
+Route::get('/money-receipt-register/pdf', [MoneyReceiptRegisterController::class, 'exportPdf'])->name('reports.money-receipt-register.pdf');
 
 Route::get('/opd-reports-index', [OpdController::class, 'reports'])->name('opd.reports');
 Route::get('/opd-reports', [OpdController::class, 'opdReport'])->name('opd.opd_reports');

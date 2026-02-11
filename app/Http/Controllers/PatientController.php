@@ -114,6 +114,7 @@ class PatientController extends Controller
             'tpa_id'                => 'nullable|string|max:100',
             'tpa_validity'          => 'nullable|string|max:100',
             'national_id_number'    => 'nullable|string|max:50',
+            'occupation'            => 'nullable|string|max:255',
         ]);
 
         //dd($validated);
@@ -170,6 +171,7 @@ class PatientController extends Controller
             'insurance_id'          => $data['tpa_id'] ?? null,
             'insurance_validity'    => $data['tpa_validity'] ?? null,
             'identification_number' => $data['national_id_number'] ?? null,
+            'occupation'            => $data['occupation'] ?? null,
         ]);
 
         return redirect()->back()->with('success', 'Patient saved successfully!');

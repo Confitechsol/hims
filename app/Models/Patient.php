@@ -60,6 +60,7 @@ class Patient extends Model
         'tpa_validity',
         'languages_speak',
         'newspaper_preference',
+        'occupation',
     ];
 
     protected $casts = [

@@ -499,6 +499,17 @@
                             @enderror
                         </div>
 
+                         {{-- Occupation --}}
+                        <div class="col-md-6">
+                            <label for="occupations" class="form-label">Occupation</label>
+                            <input type="text" id="occupation" name="occupations"
+                                class="form-control @error('occupations') is-invalid @enderror"
+                                value="{{ old('occupations') }}" />
+                            @error('occupations')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
                     </div>
 
             </div>

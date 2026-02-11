@@ -517,7 +517,7 @@ function loadBirthCertDesign(birthId) {
                 'size' => '5',
             ],
 
-         [ 'name' => 'doctor', 'label' => 'Doctors', 'type' => 'select', 'required' => true, 'options' => $doctors->pluck('name','id')->toArray(),  'size' => '5'],
+         [ 'name' => 'doctor', 'label' => 'Doctors', 'type' => 'select', 'required' => true, 'options' => $doctors->pluck('name')->toArray(),  'size' => '5'],
      
        
 

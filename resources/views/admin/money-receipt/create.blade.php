@@ -81,12 +81,13 @@
                                     <label class="form-label">Patient Name <span class="text-danger">*</span></label>
                                     <div class="autocomplete-container">
                                         <input type="text" id="patient_search" class="form-control" 
-                                            placeholder="Search by IPD No, Patient Name, or Phone" autocomplete="off" required>
+                                            placeholder="Search by IPD/OPD No, Patient Name, or Phone" autocomplete="off" required>
                                         <input type="hidden" name="patient_id" id="patient_id" value="{{ old('patient_id') }}">
                                         <input type="hidden" name="ipd_id" id="ipd_id" value="{{ old('ipd_id') }}">
+                                        <input type="hidden" name="opd_id" id="opd_id" value="{{ old('opd_id') }}">
                                         <div id="patient_suggestions" class="autocomplete-suggestions"></div>
                                     </div>
-                                    <small class="text-muted">Start typing to search (IPD No, Patient Name, Phone)</small>
+                                    <small class="text-muted">Start typing to search (IPD/OPD No, Patient Name, Phone)</small>
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">Phone</label>
@@ -101,6 +102,12 @@
                                     <input type="text" name="final_bill_no" id="final_bill_no" class="form-control" 
                                         value="{{ old('final_bill_no') }}" readonly placeholder="Will auto-populate if final bill exists">
                                     <small class="text-muted">Auto-populated from patient's IPD/OPD records</small>
+                                </div>
+                                <div class="col-md-6" id="casePrescriptionField" style="display: none;">
+                                    <label class="form-label">Case/Prescription No.</label>
+                                    <input type="text" name="case_prescription_no" id="case_prescription_no" class="form-control" 
+                                        readonly placeholder="Will auto-populate based on receipt type">
+                                    <small class="text-muted">Auto-populated for OPD/IPD Doctor Consultation, Pathology, and Radiology</small>
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label">Age</label>
@@ -256,21 +263,31 @@
 
 <style>
 .autocomplete-container {
-    position: relative;
+    position: relative !important;
+    z-index: 1;
 }
 .autocomplete-suggestions {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    border: 1px solid #ddd;
-    border-top: none;
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 1000;
-    display: none;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: white !important;
+    border: 1px solid #ddd !important;
+    border-top: none !important;
+    max-height: 200px !important;
+    overflow-y: auto !important;
+    z-index: 99999 !important;
+    display: none !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+    width: 100% !important;
+    margin-top: 0 !important;
+}
+.autocomplete-suggestions[style*="display: block"] {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 .autocomplete-suggestion {
     padding: 10px;
@@ -284,6 +301,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Money Receipt form loaded'); // Debug
     // Update receipt number when payment date changes
     const paymentDateInput = document.getElementById('payment_date');
     const receiptNoDisplay = document.getElementById('receipt_no_display');
@@ -326,32 +344,114 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Receipt Type change - show/hide case/prescription number field
+    const receiptTypeSelect = document.querySelector('select[name="receipt_type"]');
+    const casePrescriptionField = document.getElementById('casePrescriptionField');
+    const casePrescriptionInput = document.getElementById('case_prescription_no');
+    const ipdIdInput = document.getElementById('ipd_id');
+    const opdIdInput = document.getElementById('opd_id');
+    
+    function updateCasePrescriptionNo() {
+        const receiptType = receiptTypeSelect ? receiptTypeSelect.value : '';
+        const opdId = opdIdInput ? opdIdInput.value : '';
+        const ipdId = ipdIdInput ? ipdIdInput.value : '';
+        
+        // Receipt types that need case/prescription number
+        const showFieldTypes = [
+            'OPD Doctor Consultation', 
+            'OPD Pathology', 
+            'OPD Radiology', 
+            'IPD Pathology', 
+            'IPD Radiology'
+        ];
+        
+        if (showFieldTypes.includes(receiptType) && (opdId || ipdId)) {
+            casePrescriptionField.style.display = 'block';
+            
+            // Fetch case/prescription number
+            const params = new URLSearchParams({
+                receipt_type: receiptType,
+                opd_id: opdId || '',
+                ipd_id: ipdId || ''
+            });
+            
+            fetch('{{ route("money-receipt.api.case-prescription-no") }}?' + params)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.case_prescription_no) {
+                        casePrescriptionInput.value = data.case_prescription_no;
+                    } else {
+                        casePrescriptionInput.value = '';
+                    }
+                })
+                .catch(err => {
+                    console.error('Error fetching case/prescription number:', err);
+                    casePrescriptionInput.value = '';
+                });
+        } else {
+            casePrescriptionField.style.display = 'none';
+            casePrescriptionInput.value = '';
+        }
+    }
+    
+    if (receiptTypeSelect) {
+        receiptTypeSelect.addEventListener('change', updateCasePrescriptionNo);
+    }
+
     // Patient autocomplete (searches IPD numbers, patient name, phone)
     const patientInput = document.getElementById('patient_search');
     const patientSuggestions = document.getElementById('patient_suggestions');
     const patientIdInput = document.getElementById('patient_id');
-    const ipdIdInput = document.getElementById('ipd_id');
+    // ipdIdInput and opdIdInput already declared above for case/prescription number
     const finalBillNoInput = document.getElementById('final_bill_no');
     let patientTimeout;
 
     if (patientInput) {
-        patientInput.addEventListener('input', function() {
+        console.log('Patient input field found'); // Debug
+        patientInput.addEventListener('input', function(e) {
+            console.log('Input event triggered, value:', this.value); // Debug
             clearTimeout(patientTimeout);
             const search = this.value.trim();
             
             if (search.length < 2) {
-                patientSuggestions.style.display = 'none';
+                patientSuggestions.style.setProperty('display', 'none', 'important');
                 return;
             }
 
+            console.log('Searching for:', search); // Debug
+            const routeUrl = '{{ route("money-receipt.api.search-patient") }}';
+            const searchUrl = routeUrl + '?search=' + encodeURIComponent(search);
+            console.log('Search URL:', searchUrl); // Debug
+            console.log('Patient suggestions element:', patientSuggestions); // Debug
+
             patientTimeout = setTimeout(() => {
-                fetch('{{ route("money-receipt.api.search-patient") }}?search=' + encodeURIComponent(search))
-                    .then(r => r.json())
+                console.log('Making fetch request...'); // Debug
+                fetch(searchUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin'
+                })
+                    .then(r => {
+                        console.log('Response status:', r.status); // Debug
+                        if (!r.ok) {
+                            throw new Error('Network response was not ok: ' + r.status);
+                        }
+                        return r.json();
+                    })
                     .then(data => {
-                        if (data.data && data.data.length > 0) {
+                        console.log('Search results:', data); // Debug log
+                        console.log('Patient suggestions element before update:', patientSuggestions); // Debug
+                        console.log('Current display style:', patientSuggestions.style.display); // Debug
+                        
+                        if (data && data.data && Array.isArray(data.data) && data.data.length > 0) {
                             patientSuggestions.innerHTML = data.data.map(item => 
                                 `<div class="autocomplete-suggestion" 
                                     data-patient-id="${item.id}" 
+                                    data-patient-name="${item.patient_name || ''}"
                                     data-phone="${item.phone || ''}" 
                                     data-address="${item.address || ''}"
                                     data-age="${item.age || ''}"
@@ -362,13 +462,32 @@ document.addEventListener('DOMContentLoaded', function() {
                                     data-bill-type="${item.bill_type || ''}"
                                     data-bill-no="${item.bill_no || ''}"
                                     data-bill-id="${item.bill_id || ''}">
-                                    ${item.display_text}
+                                    ${item.display_text || ''}
                                 </div>`
                             ).join('');
-                            patientSuggestions.style.display = 'block';
+                            
+                            // Force display with inline style and important
+                            patientSuggestions.style.setProperty('display', 'block', 'important');
+                            patientSuggestions.style.setProperty('visibility', 'visible', 'important');
+                            patientSuggestions.style.setProperty('opacity', '1', 'important');
+                            patientSuggestions.style.setProperty('z-index', '9999', 'important');
+                            
+                            console.log('Suggestions displayed:', data.data.length); // Debug
+                            console.log('Display style after update:', patientSuggestions.style.display); // Debug
+                            console.log('Suggestions HTML length:', patientSuggestions.innerHTML.length); // Debug
                         } else {
-                            patientSuggestions.style.display = 'none';
+                            patientSuggestions.innerHTML = '<div class="autocomplete-suggestion" style="color: #999; padding: 10px;">No patients found</div>';
+                            patientSuggestions.style.setProperty('display', 'block', 'important');
+                            patientSuggestions.style.setProperty('visibility', 'visible', 'important');
+                            console.log('No results found'); // Debug
                         }
+                    })
+                    .catch(err => {
+                        console.error('Error searching patients:', err);
+                        console.error('Error details:', err.message, err.stack);
+                        patientSuggestions.innerHTML = '<div class="autocomplete-suggestion" style="color: #dc3545; padding: 10px;">Error searching patients: ' + err.message + '</div>';
+                        patientSuggestions.style.setProperty('display', 'block', 'important');
+                        patientSuggestions.style.setProperty('visibility', 'visible', 'important');
                     });
             }, 300);
         });
@@ -376,14 +495,21 @@ document.addEventListener('DOMContentLoaded', function() {
         patientSuggestions.addEventListener('click', function(e) {
             if (e.target.classList.contains('autocomplete-suggestion')) {
                 const patientId = e.target.getAttribute('data-patient-id');
+                const patientName = e.target.getAttribute('data-patient-name');
                 const phone = e.target.getAttribute('data-phone');
                 const address = e.target.getAttribute('data-address');
                 const billType = e.target.getAttribute('data-bill-type');
                 const billNo = e.target.getAttribute('data-bill-no');
                 const billId = e.target.getAttribute('data-bill-id');
                 
-                // Set patient info
-                patientInput.value = e.target.textContent.split(' - ')[0].split(' (')[0];
+                // Set patient info - show patient name along with IPD/OPD number
+                let displayValue = patientName || '';
+                if (billNo && patientName) {
+                    displayValue = billNo + ' - ' + patientName;
+                } else if (billNo) {
+                    displayValue = billNo;
+                }
+                patientInput.value = displayValue;
                 patientIdInput.value = patientId;
                 document.getElementById('patient_phone').value = phone || '';
                 document.getElementById('patient_address').value = address || '';
@@ -397,8 +523,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Set bill info
                 if (billType === 'IPD' && billId) {
                     ipdIdInput.value = billId;
+                    opdIdInput.value = '';
+                } else if (billType === 'OPD' && billId) {
+                    opdIdInput.value = billId;
+                    ipdIdInput.value = '';
                 } else {
                     ipdIdInput.value = '';
+                    opdIdInput.value = '';
                 }
 
                 // Auto-populate Final Bill No and load patient details
@@ -406,21 +537,35 @@ document.addEventListener('DOMContentLoaded', function() {
                     fetch('{{ route("money-receipt.api.patient-final-bill") }}?patient_id=' + patientId)
                         .then(r => r.json())
                         .then(data => {
-                            if (data.final_bill_no && data.bill_type === 'IPD') {
+                            if (data.final_bill_no) {
                                 finalBillNoInput.value = data.final_bill_no;
-                                ipdIdInput.value = data.bill_id;
                                 
-                                // Show doctor charges if IPD has due patient party
-                                if (data.doctor_charges > 0) {
-                                    document.getElementById('doctor_name').value = data.doctor_name || '';
-                                    document.getElementById('doctor_charges').value = '₹ ' + parseFloat(data.doctor_charges).toFixed(2);
-                                    document.getElementById('doctorChargesCard').style.display = 'block';
+                                if (data.bill_type === 'IPD' && data.bill_id) {
+                                    ipdIdInput.value = data.bill_id;
+                                    opdIdInput.value = '';
+                                    
+                                    // Show doctor charges if IPD has due patient party
+                                    if (data.doctor_charges > 0) {
+                                        document.getElementById('doctor_name').value = data.doctor_name || '';
+                                        document.getElementById('doctor_charges').value = '₹ ' + parseFloat(data.doctor_charges).toFixed(2);
+                                        document.getElementById('doctorChargesCard').style.display = 'block';
+                                    } else {
+                                        document.getElementById('doctorChargesCard').style.display = 'none';
+                                    }
+                                } else if (data.bill_type === 'OPD' && data.bill_id) {
+                                    opdIdInput.value = data.bill_id;
+                                    ipdIdInput.value = '';
+                                    document.getElementById('doctorChargesCard').style.display = 'none';
                                 } else {
                                     document.getElementById('doctorChargesCard').style.display = 'none';
                                 }
+                                
+                                // Update case/prescription number if applicable
+                                updateCasePrescriptionNo();
                             } else {
                                 finalBillNoInput.value = '';
                                 document.getElementById('doctorChargesCard').style.display = 'none';
+                                updateCasePrescriptionNo();
                             }
                         });
                     
@@ -439,9 +584,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // Close suggestions when clicking outside
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.autocomplete-container')) {
-            patientSuggestions.style.display = 'none';
+            patientSuggestions.style.setProperty('display', 'none', 'important');
         }
     });
+    
+    // Test function to manually show dropdown (for debugging)
+    window.testShowDropdown = function() {
+        if (patientSuggestions) {
+            patientSuggestions.innerHTML = '<div class="autocomplete-suggestion" style="padding: 10px;">Test suggestion 1</div><div class="autocomplete-suggestion" style="padding: 10px;">Test suggestion 2</div>';
+            patientSuggestions.style.setProperty('display', 'block', 'important');
+            patientSuggestions.style.setProperty('visibility', 'visible', 'important');
+            patientSuggestions.style.setProperty('opacity', '1', 'important');
+            console.log('Test dropdown shown. Check if it\'s visible now.');
+        }
+    };
 });
 </script>
 
