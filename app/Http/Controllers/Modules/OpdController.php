@@ -26,6 +26,7 @@ use App\Models\Prefix;
 use App\Models\Symptom;
 use App\Models\SymptomsClassification;
 use App\Models\VisitDetail;
+use App\Models\Transaction;
 use App\Models\Vital;
 use Carbon\Carbon;
 use Exception;
@@ -460,6 +461,7 @@ class OpdController extends Controller
         // $opdVisits         = OpdVisits::with('patient', 'opd.doctor')->where('opd_id', $id)->get();
         $opdVisits   = VisitDetail::with('opdDetail', 'doctor')->where('opd_details_id', $id)->get();
         $opdPrescriptions  = OpdPrescription::where('opd_id', $id)->get();
+        $transactions      = Transaction::with('opd')->where('opd_id', $opd->id)->where('patient_id', $opd->patient->id)->get();
         $opdSymptoms = [];
         foreach ($opdVisits as $opdDetail) {
             // Split comma-separated symptom IDs and clean up
@@ -483,7 +485,7 @@ class OpdController extends Controller
         $doseIntervals = DoseInterval::select('id', 'name')->get();
         $doseDurations  = DoseDuration::select('id', 'name')->get();
         // Store in array using OPD number as key
-        return view('admin.opd.opd_view', compact('opd', 'symptoms', 'vitals', 'vitalDetails', 'pharmacyDetails', 'medDosages', 'dosages', 'PatientTimelines', 'medicineCategories', 'medicationReport', 'operationDetail', 'opdCharges', 'labInvestigations', 'opdVisits', 'opdSymptoms', 'opdPrescriptions', 'pathologies', 'radiologies', 'doseIntervals', 'doseDurations'));
+        return view('admin.opd.opd_view', compact('opd', 'symptoms','transactions', 'vitals', 'vitalDetails', 'pharmacyDetails', 'medDosages', 'dosages', 'PatientTimelines', 'medicineCategories', 'medicationReport', 'operationDetail', 'opdCharges', 'labInvestigations', 'opdVisits', 'opdSymptoms', 'opdPrescriptions', 'pathologies', 'radiologies', 'doseIntervals', 'doseDurations'));
     }
 
     public function storePrescription(Request $request)

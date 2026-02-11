@@ -63,7 +63,7 @@ class Transaction extends Model
 
     public function opd()
     {
-        return $this->belongsTo(Opd::class, 'opd_id');
+        return $this->belongsTo(OpdDetail::class, 'opd_id');
     }
 
     public function ipd()

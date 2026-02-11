@@ -2204,7 +2204,17 @@
                                                                     </div>
 
                                                                     <div class="modal-body">
-
+                                                                        <form action="{{ route('transactions.store') }}"
+                                                                            method="POST">
+                                                                            @csrf
+                                                                            <input type="hidden" name="opd_id"
+                                                                                value="{{ $opd->id }}">
+                                                                            <input type="hidden" name="patient_id"
+                                                                                value="{{ $opd->patient_id }}">
+                                                                            <input type="hidden" name="type"
+                                                                                value="payment">
+                                                                            <input type="hidden" name="section"
+                                                                                value="opd">
                                                                         <div class="row gy-3 py-4 mx-1">
 
                                                                             <div class="col-md-6">
@@ -2231,10 +2241,18 @@
 
                                                                                 </label>
                                                                                 <select name="payment_mode"
-                                                                                    id="payment_mode" class="form-select">
-                                                                                    <option value="0">Select</option>
-                                                                                    <option value="1">Cash</option>
-                                                                                </select>
+                                                                                        id="payment_mode"
+                                                                                        class="form-select"
+                                                                                        data-placeholder="Enter Patient Name or Id…">
+                                                                                        <option value="0">Select
+                                                                                        </option>
+                                                                                        <option value="Cash">Cash</option>
+                                                                                        <option value="Cheque">Cheque</option>
+                                                                                        <option value="transfer_to_bank_account">Transfer to Bank Account</option>
+                                                                                        <option value="UPI">UPI</option>
+                                                                                        <option value="Online">Online</option>
+                                                                                        <option value="Other">Other</option>
+                                                                                    </select>
                                                                             </div>
                                                                             <div class="col-md-6">
                                                                                 <label for="note"
@@ -2249,6 +2267,7 @@
                                                                         <button type="submit"
                                                                             class="btn btn-primary">Save</button>
                                                                     </div>
+                                                                </form>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -2268,35 +2287,66 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr>
-                                                                <td>
-                                                                    TRID95
-                                                                </td>
-                                                                <td>10/14/2025 11:45 AM </td>
-                                                                <td>SmartPay Transaction ID: 528706160448
-                                                                </td>
-                                                                <td></td>
-                                                                <td>20.00</td>
-                                                                <td>
-                                                                    <div class="d-flex gap-2">
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
-                                                                            <i class="fa-solid fa-print"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Print"></i></a>
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill">
-                                                                            <i class="ti ti-pencil"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Show"></i></a>
-                                                                        <a href="javascript: void(0);"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                            <i class="ti ti-trash"
-                                                                                data-bs-toggle="tooltip"
-                                                                                title="Show"></i></a>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
+                                                            @forelse($transactions as $transaction)
+                                                                <tr>
+                                                                    <td>
+                                                                        {{ $transaction->transaction_no ?? 'TRID' . $transaction->id }}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {{ \Carbon\Carbon::parse($transaction->transaction_date)->format('d/m/Y h:i A') }}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {{ $transaction->note ?? '-' }}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {{ $transaction->payment_mode }}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {{ number_format($transaction->amount, 2) }}
+                                                                    </td>
+
+                                                                    <!-- <td>
+                                                                                <div class="d-flex gap-2">
+                                                                                    {{-- Print --}}
+                                                                                    <a href="{{ route('transactions.print', $transaction->id) }}"
+                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill"
+                                                                                    data-bs-toggle="tooltip" title="Print">
+                                                                                        <i class="fa-solid fa-print"></i>
+                                                                                    </a>
+
+                                                                                    {{-- View --}}
+                                                                                    <a href="{{ route('transactions.show', $transaction->id) }}"
+                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill"
+                                                                                    data-bs-toggle="tooltip" title="Show">
+                                                                                        <i class="ti ti-pencil"></i>
+                                                                                    </a>
+
+                                                                                    {{-- Delete --}}
+                                                                                    <form action="{{ route('transactions.destroy', $transaction->id) }}"
+                                                                                        method="POST"
+                                                                                        onsubmit="return confirm('Delete this payment?')">
+                                                                                        @csrf
+                                                                                        @method('DELETE')
+                                                                                        <button type="submit"
+                                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
+                                                                                            data-bs-toggle="tooltip" title="Delete">
+                                                                                            <i class="ti ti-trash"></i>
+                                                                                        </button>
+                                                                                    </form>
+                                                                                </div>
+                                                                            </td> -->
+                                                                </tr>
+                                                            @empty
+                                                                <tr>
+                                                                    <td colspan="6" class="text-center text-muted">
+                                                                        No payments found
+                                                                    </td>
+                                                                </tr>
+                                                            @endforelse
                                                         </tbody>
                                                     </table>
                                                 </div>
