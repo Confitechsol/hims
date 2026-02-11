@@ -289,19 +289,19 @@
                                                                                                     <div class="col">
                                                                                                         <label>Name of Hospital :</label>
                                                                                                         <div class="line-data">
-                                                                                                            Samaritan Clinic Pvt. Ltd.
+                                                                                                           {{$report->hospital->name ?? '-' }} 
                                                                                                         </div>
                                                                                                     </div>
                                                                                                     <div class="col">
                                                                                                         <label>(Patient Reg No.) :</label>
                                                                                                         <div class="line-data">
-                                                                                                            A-002405/25-26
+                                                                                                            {{$report->ipd_details->ipd_no ?? '-' }}
                                                                                                         </div>
                                                                                                     </div>
                                                                                                     <div class="col">
                                                                                                         <label>Date :</label>
                                                                                                         <div class="line-data">
-                                                                                                            10/01/2026
+                                                                                                             {{ $report->death_date ? \Carbon\Carbon::parse($report->death_date)->format('d F Y') : '-' }}
                                                                                                         </div>
                                                                                                     </div>
                                                                                                 </div>
@@ -309,9 +309,7 @@
                                                                                                     <div class="col">
                                                                                                         <label>Address :</label>
                                                                                                         <div class="line-data">
-                                                                                                            4,Roy Mansion, Elgin Road,
-                                                                                                            10/4D, Lala lajpat Rai Sarani,
-                                                                                                            Kolkata -700020,
+                                                                                                            {{$report->hospital->address ?? '-' }}
                                                                                                         </div>
                                                                                                     </div>
                                                                                                 </div>
@@ -320,20 +318,20 @@
                                                                                                         <label>Certified that Shri/Smt/Kum
                                                                                                             :</label>
                                                                                                         <div class="line-data">
-                                                                                                            Anwari Khatun
+                                                                                                           {{ $report->patient_name }}
                                                                                                         </div>
                                                                                                     </div>
                                                                                                     <div class="col">
                                                                                                         <label>S/W/D of Shri/Smt:</label>
                                                                                                         <div class="line-data">
-                                                                                                            Halim
+                                                                                                            {{ $report->guardian_name }}
                                                                                                         </div>
                                                                                                     </div>
                                                                                                 </div>
                                                                                                 <div class="row">
                                                                                                     <div class="col">
                                                                                                         <label>Sex :</label>
-                                                                                                        <div
+                                                                                                        {{-- <div
                                                                                                             class="line-data d-flex gap-2 align-items-center">
                                                                                                             M
                                                                                                             <input type="checkbox" name=""
@@ -346,17 +344,23 @@
                                                                                                             Others
                                                                                                             <input type="checkbox" name=""
                                                                                                                 id="">
+                                                                                                        </div> --}}
+                                                                                                        <div class="line-data">
+                                                                                                           {{$report->patient->gender ?? '-' }}
                                                                                                         </div>
+                                                                                                       
+                                                                                
                                                                                                     </div>
                                                                                                     <div class="col">
                                                                                                         <label>Religion :</label>
                                                                                                         <div class="line-data">
-                                                                                                            Islam
+                                                                                                             {{$report->patient->religion ?? '-' }}
                                                                                                         </div>
                                                                                                     </div>
                                                                                                     <div class="col">
                                                                                                         <label>Occupation :</label>
                                                                                                         <div class="line-data">
+                                                                                                        {{$report->patient->occupation ?? '-' }}
 
                                                                                                         </div>
                                                                                                     </div>
@@ -365,6 +369,7 @@
                                                                                                     <div class="col">
                                                                                                         <label>Address :</label>
                                                                                                         <div class="line-data">
+                                                                                                        {{$report->patient->address ?? '-' }}
 
                                                                                                         </div>
                                                                                                     </div>
@@ -373,7 +378,7 @@
                                                                                                     <div class="col">
                                                                                                         <label>Under Doctor:</label>
                                                                                                         <div class="line-data">
-                                                                                                            DR. Niladri
+                                                                                                            {{$report->doctor_name ?? '-' }}
                                                                                                         </div>
                                                                                                     </div>
                                                                                                 </div>
@@ -382,13 +387,13 @@
                                                                                                         <label>Admitted on this hospital
                                                                                                             :</label>
                                                                                                         <div class="line-data">
-                                                                                                            04/01/2026
+                                                                                                          {{$report->patient->created_at ? \Carbon\Carbon::parse($report->patient->created_at)->format('d F Y') : '-' }}  
                                                                                                         </div>
                                                                                                     </div>
                                                                                                     <div class="col">
                                                                                                         <label>Time :</label>
                                                                                                         <div class="line-data">
-                                                                                                            11:32 P.M.
+                                                                                                            {{$report->patient->created_at ? \Carbon\Carbon::parse($report->patient->created_at)->format('h:i A') : '-' }}
                                                                                                         </div>
                                                                                                     </div>
                                                                                                     <div class="col">
@@ -402,13 +407,13 @@
                                                                                                     <div class="col">
                                                                                                         <label>Expired on :</label>
                                                                                                         <div class="line-data">
-                                                                                                            10/01/2026
+                                                                                                            {{ $report->death_date ? \Carbon\Carbon::parse($report->death_date)->format('d F Y') : '-' }}
                                                                                                         </div>
                                                                                                     </div>
                                                                                                     <div class="col">
                                                                                                         <label>Time :</label>
                                                                                                         <div class="line-data">
-                                                                                                            08:30 A.M..
+                                                                                                            {{ $report->death_date ? \Carbon\Carbon::parse($report->death_date)->format('h:i A') : '-' }}
                                                                                                         </div>
                                                                                                     </div>
                                                                                                     <div class="col">
@@ -422,18 +427,21 @@
                                                                                                     <div class="col">
                                                                                                         <label>Due to (a) :</label>
                                                                                                         <div class="line-data">
+                                                                                                        {{$report->due_to_a ?? '-' }}
 
                                                                                                         </div>
                                                                                                     </div>
                                                                                                     <div class="col">
                                                                                                         <label>Due to (b) :</label>
                                                                                                         <div class="line-data">
+                                                                                                        {{$report->due_to_b ?? '-' }}
 
                                                                                                         </div>
                                                                                                     </div>
                                                                                                     <div class="col">
                                                                                                         <label>Due to (c) :</label>
                                                                                                         <div class="line-data">
+                                                                                                        {{$report->due_to_c ?? '-' }}
 
                                                                                                         </div>
                                                                                                     </div>
@@ -451,6 +459,7 @@
                                                                                                         <label>Full Name (IN BLOCK LETTER)
                                                                                                             :</label>
                                                                                                         <div class="line-data">
+                                                                                                        {{ strtoupper($report->patient->patient_name ?? '-') }}
 
                                                                                                         </div>
                                                                                                     </div>
@@ -587,9 +596,13 @@
                 'type' => 'text',
                 'readonly' => true,
             ],
-            ['name' => 'death_date', 'label' => 'Death Date', 'type' => 'date', 'required' => true, 'size' => '4'],
+            [ 'name' => 'doctor_name', 'label' => 'Doctors',  'type' => 'select', 'required' => true, 'options' => $doctors->pluck('name','name')->toArray(),  'size' => '5'],
+            ['name' => 'death_date', 'label' => 'Death Date', 'type' => 'date', 'required' => true, 'size' => '6'],
 
             ['name' => 'guardian_name', 'label' => 'Guardian Name ', 'type' => 'text', 'required' => true, 'size' => '12'],
+            ['name' => 'due_to_a', 'label' => 'Due to (a)', 'type' => 'text', 'required' => false, 'size' => '5'],
+            ['name' => 'due_to_b', 'label' => 'Due to (b)', 'type' => 'text', 'required' => false, 'size' => '5'],
+            ['name' => 'due_to_c', 'label' => 'Due to (c)', 'type' => 'text', 'required' => false, 'size' => '5'],
             [
                 'name' => 'attachment_name',
                 'label' => 'Report',
@@ -598,6 +611,7 @@
                 'size' => '6',
             ],
             ['name' => 'attachment', 'label' => 'Attachment', 'type' => 'file', 'required' => false, 'size' => '6',],
+            
 
         ]" :columns="3" />
     <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Death Name"
