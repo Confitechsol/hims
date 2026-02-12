@@ -49,6 +49,7 @@ return new class extends Migration
             $table->string('tpa_code', 255)->nullable();
             $table->string('tpa_validity', 255)->nullable();
             $table->date('disable_at')->nullable();
+            $table->string('occupation', 255)->nullable();
 
             $table->timestamp('created_at')->useCurrent()->useCurrentOnUpdate();
         });

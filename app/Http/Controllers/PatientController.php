@@ -81,6 +81,7 @@ class PatientController extends Controller
     // }
     public function store(Request $request)
     {
+        //dd($request->all());
         $validated = Validator::make($request->all(), [
             'name'                  => 'required|string|max:255',
             'guardian_name'         => 'nullable|string|max:255',
