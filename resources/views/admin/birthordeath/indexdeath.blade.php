@@ -319,6 +319,18 @@
                                                                                                                         {{  '-' }}
                                                                                                                     </td>
                                                                                                                 </tr>
+                                                                                                                <tr>
+                                                                                                                    <td><strong>If deasesed was a female, was pregnancy associated with it?</strong></td>
+                                                                                                                    <td>
+                                                                                                                        {{  '-' }}
+                                                                                                                    </td>
+                                                                                                                </tr>
+                                                                                                                <tr>
+                                                                                                                    <td><strong>If Yes,was there a delivery?</strong></td>
+                                                                                                                    <td>
+                                                                                                                        {{  '-' }}
+                                                                                                                    </td>
+                                                                                                                </tr>
                                                                                                                 
                                                                                                             </tbody>
                                                                                                         </table>
@@ -327,15 +339,15 @@
                                                                                                     <div class="row mt-5">
                                                                                                     <div class="col-6 text-start">
                                                                                                         <div style="border-top: 1px solid #000; width: 250px; margin-top: 60px;">
-                                                                                                            <p class="mb-0 mt-2">Doctor's Signature</p>
-                                                                                                            <small>Name & Registration No.</small>
+                                                                                                            <p class="mb-0 mt-2">Date of Verification</p>
+                                                                                                            <small>See Reverse For Instruction</small>
                                                                                                         </div>
                                                                                                     </div>
 
                                                                                                     <div class="col-6 text-end">
                                                                                                         <div style="border-top: 1px solid #000; width: 250px; margin-top: 60px; float: right;">
                                                                                                             <p class="mb-0 mt-2">Authorized Signature</p>
-                                                                                                            <small>Hospital Seal</small>
+                                                                                                            <small>Full Signature,Registration No. of Medical Attendant</small>
                                                                                                         </div>
                                                                                                     </div>
                                                                                                 </div>
