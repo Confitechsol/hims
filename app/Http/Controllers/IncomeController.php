@@ -8,6 +8,11 @@ use Illuminate\Http\Request;
 class IncomeController extends Controller
 {
     function index(Request $request){
+        // Check if user can view income (permission category ID: 9)
+        if (!canView(9)) {
+            abort(403, 'You do not have permission to view income records.');
+        }
+        
         $incomes = Income::with(['incomeHead']);
         $incomeHeads = IncomeHead::all();
          $perPage = intval($request->input('perPage', 5));
@@ -31,6 +36,11 @@ class IncomeController extends Controller
 
     }
     function create(Request $request){
+        // Check if user can add income (permission category ID: 9)
+        if (!canAdd(9)) {
+            abort(403, 'You do not have permission to create income records.');
+        }
+        
         $request->validate([
             'income_head_id' => 'required|exists:income_head,id',
             'name' => 'required|string|max:255',
@@ -67,6 +77,11 @@ class IncomeController extends Controller
     }
     public function update(Request $request, $id)
     {
+        // Check if user can edit income (permission category ID: 9)
+        if (!canEdit(9)) {
+            abort(403, 'You do not have permission to edit income records.');
+        }
+        
         $request->validate([
             'income_head_id' => 'required|exists:income_head,id',
             'name' => 'required|string|max:255',
@@ -115,6 +130,11 @@ class IncomeController extends Controller
     }
     
     function destroy(Request $request){
+        // Check if user can delete income (permission category ID: 9)
+        if (!canDelete(9)) {
+            abort(403, 'You do not have permission to delete income records.');
+        }
+        
         $request->validate([
             'id' => 'required|exists:income,id',
         ]);

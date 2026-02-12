@@ -8,6 +8,10 @@ use Illuminate\Http\Request;
 class ExpenseController extends Controller
 {
      function index(Request $request){
+        // Check if user can view expense (permission category ID: 12)
+        if (!canView(12)) {
+            abort(403, 'You do not have permission to view expense records.');
+        }
 
      //   $expenses = Expense::with('expenseHead')->get();
           $expenses = Expense::with(['expenseHead']);
@@ -40,6 +44,11 @@ class ExpenseController extends Controller
 
     public function create(Request $request)
     {
+        // Check if user can add expense (permission category ID: 12)
+        if (!canAdd(12)) {
+            abort(403, 'You do not have permission to create expense records.');
+        }
+        
         $validated = $request->validate([
             'expense_name' => 'required',
             'name' => 'required|string|max:255',
@@ -92,6 +101,11 @@ class ExpenseController extends Controller
 
     public function update(Request $request, $id)
     {
+        // Check if user can edit expense (permission category ID: 12)
+        if (!canEdit(12)) {
+            abort(403, 'You do not have permission to edit expense records.');
+        }
+        
         $expense = Expense::findOrFail($id);
 
         $validated = $request->validate([
@@ -152,6 +166,11 @@ class ExpenseController extends Controller
 
     public function delete($id)
     {
+        // Check if user can delete expense (permission category ID: 12)
+        if (!canDelete(12)) {
+            abort(403, 'You do not have permission to delete expense records.');
+        }
+        
         $expense = Expense::findOrFail($id);
 
         // Remove uploaded document if stored locally
