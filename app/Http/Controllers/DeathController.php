@@ -29,7 +29,7 @@ class DeathController extends Controller
      $deathReports = $query->paginate($perPage);
      $doctors = Doctor::where('is_active',1)->select('name')->get();
      $hospital = Hospital::where('is_active',1)->select('hospital_id','name')->first();
-    // return response()->json($deathReports , 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
+     //return response()->json($deathReports , 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
      return view('admin.birthordeath.indexdeath', compact('deathReports', 'doctors','hospital'));
     }
 

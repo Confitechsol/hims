@@ -546,6 +546,8 @@
                                                                                                         <label>Medical Registration No.
                                                                                                             :</label>
                                                                                                         <div class="line-data">
+                                                                                                            {{ $report->doctor->registration_no ?? '-' }}
+
 
                                                                                                         </div>
                                                                                                     </div>
