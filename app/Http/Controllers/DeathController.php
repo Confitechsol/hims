@@ -130,6 +130,12 @@ class DeathController extends Controller
             'guardian_name' => 'required|string|max:255',
             'report' => 'nullable|string|max:255', // mapped to attachment_name
             'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf,docx|max:5120',
+            'doctor_name' => 'required|string|max:255',
+            'due_to_a'  => 'nullable|string|max:255',
+            'due_to_b'  => 'nullable|string|max:255',
+            'due_to_c'  => 'nullable|string|max:255',
+            'manner_of_death' =>  'required',
+
         ]);
 
         // Update simple fields — note view uses 'case_id' and 'report' names for edit form
@@ -155,6 +161,13 @@ class DeathController extends Controller
                 $death->attachment_name = $file->getClientOriginalName();
             }
         }
+
+        $death->doctor_name = $validated['doctor_name'];
+        $death->due_to_a = $validated['due_to_a'] ?? null;
+        $death->due_to_b = $validated['due_to_b'] ?? null;
+        $death->due_to_c = $validated['due_to_c'] ?? null;
+        $death->manner_of_death = $validated['manner_of_death'] ?? null;
+        
 
         $death->save();
 

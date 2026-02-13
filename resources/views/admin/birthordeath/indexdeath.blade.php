@@ -94,7 +94,13 @@
                                                                                 data-death_date="{{ \Carbon\Carbon::parse($report->death_date)->format('Y-m-d') }}"
                                                                                 data-guardian_name="{{ $report->guardian_name }}"
                                                                                 data-report="{{ $report->attachment_name }}"
-                                                                                data-id="{{ $report->id }}">
+                                                                                data-id="{{ $report->id }}"
+                                                                                data-due_to_a="{{ $report->due_to_a }}"
+                                                                                data-due_to_b="{{ $report->due_to_b }}"
+                                                                                data-due_to_c="{{ $report->due_to_c }}"
+                                                                                data-manner_of_death="{{ $report->manner_of_death }}"
+                                                                                data-doctor_name="{{ $report->doctor->name ?? '' }}"
+                                                                                >
                                                                                 <i class="ti ti-pencil"></i>
                                                                             </button>
                                                                             <form action="{{ route('death.delete', $report->id) }}"
@@ -731,6 +737,8 @@
                 'type' => 'text',
                 'readonly' => true,
             ],
+            [ 'name' => 'doctor_name', 'label' => 'Doctors',  'type' => 'select', 'required' => true, 'options' => $doctors->pluck('name','name')->toArray(),  'size' => '5'],
+
             ['name' => 'death_date', 'label' => 'Death Date', 'type' => 'date', 'required' => true, 'size' => '4'],
             ['name' => 'guardian_name', 'label' => 'Guardian Name ', 'type' => 'text', 'required' => true, 'size' => '12'],
             [
@@ -741,7 +749,24 @@
                 'size' => '6',
             ],
             ['name' => 'attachment', 'label' => 'Attachment', 'type' => 'file', 'required' => false, 'size' => '6',],
-
+             ['name' => 'due_to_a', 'label' => 'Due to (a)', 'type' => 'text', 'required' => false, 'size' => '5'],
+            ['name' => 'due_to_b', 'label' => 'Due to (b)', 'type' => 'text', 'required' => false, 'size' => '5'],
+            ['name' => 'due_to_c', 'label' => 'Due to (c)', 'type' => 'text', 'required' => false, 'size' => '5'],
+           
+            
+             [
+                'name' => 'manner_of_death',
+                'label' => 'Manner Of Death',
+                'type' => 'select',
+                'required' => false,
+                'size' => '5',
+                'options' => [
+                'Accident' => 'Accident',
+                'Natural Death' => 'Natural Death',
+                'Suicide' => 'Suicide',
+                'Homicide' => 'Homicide',
+                'Pending Investigation' => 'Pending Investigation',
+           ],],
         ]" :columns="3" />
 
     <script>
