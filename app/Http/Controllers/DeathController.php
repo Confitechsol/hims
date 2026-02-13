@@ -11,9 +11,9 @@ class DeathController extends Controller
     function index(Request $request){     
    
      $query = DeathReport::with(['patient','ipd_details','hospital','doctor']);
-     $perPage = intval($request->input('perPage', 10));
+     $perPage = intval($request->input('perPage', 5));
      if ($perPage <= 0) {
-        $perPage = 10;
+        $perPage = 5;
     }
    
     if ($request->has('search')) {
@@ -167,7 +167,7 @@ class DeathController extends Controller
         $death->due_to_b = $validated['due_to_b'] ?? null;
         $death->due_to_c = $validated['due_to_c'] ?? null;
         $death->manner_of_death = $validated['manner_of_death'] ?? null;
-        
+
 
         $death->save();
 
