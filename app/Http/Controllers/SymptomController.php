@@ -8,11 +8,25 @@ use App\Models\SymptomsClassification;
 
 class SymptomController extends Controller
 {
-    public function symptomHead()
+    public function symptomHead(Request $request)
     {
-         $symptoms = Symptom::with('classification')->get();
+         $symptoms = Symptom::query();
          $classifications = SymptomsClassification::all();
-        return view('admin.setup.symptoms_head', compact('symptoms','classifications'));
+          $perPage   = intval($request->input('perPage', 10));
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
+            if ($request->has('search')) {
+                $search_term = $request->search;
+                $symptoms = $symptoms->where('symptoms_title', 'like', "%{$search_term}%");
+                 $symptoms = $symptoms->with('classification')->paginate($perPage);
+            return ["result" => $symptoms];
+            }
+             
+    
+           $symptoms = $symptoms->paginate($perPage);
+         
+          return view('admin.setup.symptoms_head', compact('symptoms','classifications'));
     }
 
     public function storeSymptomHead(Request $request)
