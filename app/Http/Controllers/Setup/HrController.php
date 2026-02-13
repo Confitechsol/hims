@@ -15,7 +15,18 @@ class HrController extends Controller
     // Leave Type
     public function index(Request $request)
     {
-        $leaves = LeaveType::all();
+        $leaves = LeaveType::query();
+        $perPage   = intval($request->input('perPage', 10));
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
+        if ($request->has('search')) {
+            $search_term = $request->search;
+            $leaves = $leaves->where('type', 'like', "%{$search_term}%");
+            $leaves = $leaves->paginate($perPage);
+            return ["result" => $leaves];
+        }
+            $leaves = $leaves->paginate($perPage);
         return view("admin.setup.leave_type", compact("leaves"));
     }
 
