@@ -88,7 +88,18 @@ class HrController extends Controller
     // Department
     public function indexDepartment(Request $request)
     {
-        $departments = Department::all();
+        $departments = Department::query();
+        $perPage   = intval($request->input('perPage', 10));
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
+        if ($request->has('search')) {
+            $search_term = $request->search;
+            $departments = $departments->where('department_name', 'like', "%{$search_term}%");
+             $departments = $departments->paginate($perPage);
+            return ["result" => $departments];
+        }
+         $departments = $departments->paginate($perPage);
         return view("admin.setup.department", compact("departments"));
     }
     public function storeDepartment(Request $request)
