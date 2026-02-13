@@ -268,7 +268,7 @@
                                                                                                     <div class="col">
                                                                                                         <label>Guardian Name</label>
                                                                                                         <div class="line-data">
-                                                                                                            {{ isset($report->birth_date) ? \Carbon\Carbon::parse($report->birth_date)->format('h:i A') : \Carbon\Carbon::parse($report->created_at)->format('h:i A') }}
+                                                                                                        {{$report->patient->guardian_name ?? '-' }}
                                                                                                         </div>
                                                                                                     </div>
 
@@ -292,25 +292,25 @@
                                                                                                                 <tr>
                                                                                                                     <td><strong>Immediate Cause</strong></td>
                                                                                                                     <td>
-                                                                                                                        {{ '-' }}
+                                                                                                                        {{ $report->due_to_a }}
                                                                                                                     </td>
                                                                                                                 </tr>
                                                                                                                 <tr>
                                                                                                                     <td><strong>Antecedent Cause</strong></td>
                                                                                                                     <td>
-                                                                                                                        {{  '-' }}
+                                                                                                                        {{ $report->due_to_b }}
                                                                                                                     </td>
                                                                                                                 </tr>
                                                                                                                 <tr>
                                                                                                                     <td><strong>Underlying Cause</strong></td>
                                                                                                                     <td>
-                                                                                                                        {{  '-' }}
+                                                                                                                        {{ $report->due_to_c }}
                                                                                                                     </td>
                                                                                                                 </tr>
                                                                                                                 <tr>
                                                                                                                     <td><strong>Manner Of Death</strong></td>
                                                                                                                     <td>
-                                                                                                                        {{  '-' }}
+                                                                                                                        {{ $report->manner_of_death }}
                                                                                                                     </td>
                                                                                                                 </tr>
                                                                                                                 <tr>
@@ -682,6 +682,7 @@
             ['name' => 'due_to_a', 'label' => 'Due to (a)', 'type' => 'text', 'required' => false, 'size' => '5'],
             ['name' => 'due_to_b', 'label' => 'Due to (b)', 'type' => 'text', 'required' => false, 'size' => '5'],
             ['name' => 'due_to_c', 'label' => 'Due to (c)', 'type' => 'text', 'required' => false, 'size' => '5'],
+           
             [
                 'name' => 'attachment_name',
                 'label' => 'Report',
@@ -690,7 +691,19 @@
                 'size' => '6',
             ],
             ['name' => 'attachment', 'label' => 'Attachment', 'type' => 'file', 'required' => false, 'size' => '6',],
-            
+             [
+                'name' => 'manner_of_death',
+                'label' => 'Manner Of Death',
+                'type' => 'select',
+                'required' => false,
+                'size' => '5',
+                'options' => [
+                'Accident' => 'Accident',
+                'Natural Death' => 'Natural Death',
+                'Suicide' => 'Suicide',
+                'Homicide' => 'Homicide',
+                'Pending Investigation' => 'Pending Investigation',
+           ],],
 
         ]" :columns="3" />
     <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Death Name"

@@ -49,6 +49,7 @@ class DeathController extends Controller
         'due_to_a'  => 'nullable|string|max:255',
         'due_to_b'  => 'nullable|string|max:255',
         'due_to_c'  => 'nullable|string|max:255',
+        'manner_of_death' =>  'required',
 
 
     ]);
@@ -75,6 +76,7 @@ class DeathController extends Controller
         'due_to_a' => $validated['due_to_a'] ?? null,
         'due_to_b' => $validated['due_to_b'] ?? null,
         'due_to_c' => $validated['due_to_c'] ?? null,
+        'manner_of_death' => $validated['manner_of_death'] ?? null,
 
     ]);
 

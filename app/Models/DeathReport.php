@@ -27,6 +27,7 @@ class DeathReport extends Model
         'due_to_a',
         'due_to_b',
         'due_to_c',
+        'manner_of_death',
     ];
 
     public $timestamps = false;   // ✅ VERY IMPORTANT
