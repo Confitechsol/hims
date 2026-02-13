@@ -74,9 +74,20 @@ class SymptomController extends Controller
         return redirect()->back()->with('success', 'Symptom deleted successfully.');
     }
 
-     public function symptomType()
+     public function symptomType(Request $request)
     {
-        $symptomTypes = SymptomsClassification::all();
+        $symptomTypes = SymptomsClassification::query();
+        $perPage   = intval($request->input('perPage', 10));
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
+        if ($request->has('search')) {
+            $search_term = $request->search;
+            $symptomTypes = $symptomTypes->where('symptoms_type', 'like', "%{$search_term}%");
+             $symptomTypes = $symptomTypes->paginate($perPage);
+            return ["result" => $symptomTypes];
+        }
+         $symptomTypes = $symptomTypes->paginate($perPage);
         return view('admin.setup.symptoms_type', compact('symptomTypes'));
     }
 
