@@ -30,7 +30,7 @@
                 </div>
 
                 <div class="card-body">
-                    <form action="{{ route('opd.opd_reports') }}" method="GET">
+                    <form action="{{ route('opd.opd_balance_reports') }}" method="GET">
                         <div class="row align-items-center gy-4">
 
                             {{-- Date From --}}
@@ -90,7 +90,7 @@
                                     Search
                                 </button>
 
-                                <a href="{{ route('opd.opd_reports') }}" class="btn btn-secondary btn-sm">
+                                <a href="{{ route('opd.opd_balance_reports') }}" class="btn btn-secondary btn-sm">
                                     Reset
                                 </a>
                             </div>
@@ -120,12 +120,12 @@
                                                         <tr>
                                                             <th>OPD No</th>
                                                             <th>Patient Name</th>
-                                                            <th>Case ID</th>
+                                                            <th>Patient Type</th>
                                                             <th>Age</th>
                                                             <th>Gender</th>
                                                             <th>Mobile Number</th>
-                                                            <th>Antenatal</th>
-                                                            <th>Discharged</th>
+                                                            <!-- <th>Antenatal</th> -->
+                                                            
                                                             <th>Net Amount (SAR)</th>
                                                             <th>Paid Amount (SAR)</th>
                                                             <th>Balance Amount (SAR)</th>
@@ -135,17 +135,12 @@
                                                         @forelse($opdReports as $opd)
                                                             <tr>
                                                                 <td>{{ $opd->opd_no }}</td>
-                                                                <td>{{ $opd->patient->name ?? '-' }}</td>
+                                                                <td>{{ $opd->patient->patient_name ?? '-' }}</td>
                                                                 <td>{{ $opd->case_type ?? '-' }}</td>
                                                                 <td>{{ $opd->patient->age ?? '-' }}</td>
                                                                 <td>{{ $opd->patient->gender ?? '-' }}</td>
-                                                                <td>{{ $opd->patient->mobile ?? '-' }}</td>
-                                                                <td>
-                                                                    {{ strtolower($opd->case_type) === 'antenatal' ? 'Yes' : 'No' }}
-                                                                </td>
-                                                                <td>
-                                                                    {{ $opd->status == 'discharged' ? 'Yes' : 'No' }}
-                                                                </td>
+                                                                <td>{{ $opd->patient->mobileno ?? '-' }}</td>
+                                                               
                                                                 <td class="text-end">
                                                                     {{ number_format($opd->amount ?? 0, 2) }}
                                                                 </td>

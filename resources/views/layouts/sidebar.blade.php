@@ -465,7 +465,7 @@
                                     </li>
                                     <li><a href="{{ route('opd.reports') }}" class="{{ request()->routeIs('opd.reports') ? 'active' : '' }}">OPD
                                             Report</a></li>
-                                    <li><a href="{{ route('finance') }}"  class="{{ request()->routeIs('death') ? 'active' : '' }}">IPD
+                                    <li><a href="{{ route('ipd.reports') }}"  class="{{ request()->routeIs('death') ? 'active' : '' }}">IPD
                                             Report</a></li>
                                     <li><a href="{{ route('finance') }}"  class="{{ request()->routeIs('death') ? 'active' : '' }}">Appointment
                                             Report</a></li>
