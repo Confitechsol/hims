@@ -94,7 +94,13 @@
                                                                                 data-death_date="{{ \Carbon\Carbon::parse($report->death_date)->format('Y-m-d') }}"
                                                                                 data-guardian_name="{{ $report->guardian_name }}"
                                                                                 data-report="{{ $report->attachment_name }}"
-                                                                                data-id="{{ $report->id }}">
+                                                                                data-id="{{ $report->id }}"
+                                                                                data-due_to_a="{{ $report->due_to_a }}"
+                                                                                data-due_to_b="{{ $report->due_to_b }}"
+                                                                                data-due_to_c="{{ $report->due_to_c }}"
+                                                                                data-manner_of_death="{{ $report->manner_of_death }}"
+                                                                                data-doctor_name="{{ $report->doctor->name ?? '' }}"
+                                                                                >
                                                                                 <i class="ti ti-pencil"></i>
                                                                             </button>
                                                                             <form action="{{ route('death.delete', $report->id) }}"
@@ -268,7 +274,7 @@
                                                                                                     <div class="col">
                                                                                                         <label>Guardian Name</label>
                                                                                                         <div class="line-data">
-                                                                                                            {{ isset($report->birth_date) ? \Carbon\Carbon::parse($report->birth_date)->format('h:i A') : \Carbon\Carbon::parse($report->created_at)->format('h:i A') }}
+                                                                                                        {{$report->patient->guardian_name ?? '-' }}
                                                                                                         </div>
                                                                                                     </div>
 
@@ -292,25 +298,25 @@
                                                                                                                 <tr>
                                                                                                                     <td><strong>Immediate Cause</strong></td>
                                                                                                                     <td>
-                                                                                                                        {{ '-' }}
+                                                                                                                        {{ $report->due_to_a }}
                                                                                                                     </td>
                                                                                                                 </tr>
                                                                                                                 <tr>
                                                                                                                     <td><strong>Antecedent Cause</strong></td>
                                                                                                                     <td>
-                                                                                                                        {{  '-' }}
+                                                                                                                        {{ $report->due_to_b }}
                                                                                                                     </td>
                                                                                                                 </tr>
                                                                                                                 <tr>
                                                                                                                     <td><strong>Underlying Cause</strong></td>
                                                                                                                     <td>
-                                                                                                                        {{  '-' }}
+                                                                                                                        {{ $report->due_to_c }}
                                                                                                                     </td>
                                                                                                                 </tr>
                                                                                                                 <tr>
                                                                                                                     <td><strong>Manner Of Death</strong></td>
                                                                                                                     <td>
-                                                                                                                        {{  '-' }}
+                                                                                                                        {{ $report->manner_of_death }}
                                                                                                                     </td>
                                                                                                                 </tr>
                                                                                                                 <tr>
@@ -546,6 +552,8 @@
                                                                                                         <label>Medical Registration No.
                                                                                                             :</label>
                                                                                                         <div class="line-data">
+                                                                                                            {{ $report->doctor->registration_no ?? '-' }}
+
 
                                                                                                         </div>
                                                                                                     </div>
@@ -680,6 +688,7 @@
             ['name' => 'due_to_a', 'label' => 'Due to (a)', 'type' => 'text', 'required' => false, 'size' => '5'],
             ['name' => 'due_to_b', 'label' => 'Due to (b)', 'type' => 'text', 'required' => false, 'size' => '5'],
             ['name' => 'due_to_c', 'label' => 'Due to (c)', 'type' => 'text', 'required' => false, 'size' => '5'],
+           
             [
                 'name' => 'attachment_name',
                 'label' => 'Report',
@@ -688,7 +697,19 @@
                 'size' => '6',
             ],
             ['name' => 'attachment', 'label' => 'Attachment', 'type' => 'file', 'required' => false, 'size' => '6',],
-            
+             [
+                'name' => 'manner_of_death',
+                'label' => 'Manner Of Death',
+                'type' => 'select',
+                'required' => false,
+                'size' => '5',
+                'options' => [
+                'Accident' => 'Accident',
+                'Natural Death' => 'Natural Death',
+                'Suicide' => 'Suicide',
+                'Homicide' => 'Homicide',
+                'Pending Investigation' => 'Pending Investigation',
+           ],],
 
         ]" :columns="3" />
     <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Death Name"
@@ -716,6 +737,8 @@
                 'type' => 'text',
                 'readonly' => true,
             ],
+            [ 'name' => 'doctor_name', 'label' => 'Doctors',  'type' => 'select', 'required' => true, 'options' => $doctors->pluck('name','name')->toArray(),  'size' => '5'],
+
             ['name' => 'death_date', 'label' => 'Death Date', 'type' => 'date', 'required' => true, 'size' => '4'],
             ['name' => 'guardian_name', 'label' => 'Guardian Name ', 'type' => 'text', 'required' => true, 'size' => '12'],
             [
@@ -726,7 +749,24 @@
                 'size' => '6',
             ],
             ['name' => 'attachment', 'label' => 'Attachment', 'type' => 'file', 'required' => false, 'size' => '6',],
-
+             ['name' => 'due_to_a', 'label' => 'Due to (a)', 'type' => 'text', 'required' => false, 'size' => '5'],
+            ['name' => 'due_to_b', 'label' => 'Due to (b)', 'type' => 'text', 'required' => false, 'size' => '5'],
+            ['name' => 'due_to_c', 'label' => 'Due to (c)', 'type' => 'text', 'required' => false, 'size' => '5'],
+           
+            
+             [
+                'name' => 'manner_of_death',
+                'label' => 'Manner Of Death',
+                'type' => 'select',
+                'required' => false,
+                'size' => '5',
+                'options' => [
+                'Accident' => 'Accident',
+                'Natural Death' => 'Natural Death',
+                'Suicide' => 'Suicide',
+                'Homicide' => 'Homicide',
+                'Pending Investigation' => 'Pending Investigation',
+           ],],
         ]" :columns="3" />
 
     <script>

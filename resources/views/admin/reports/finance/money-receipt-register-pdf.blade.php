@@ -31,37 +31,41 @@
                 <th>Receipt Number</th>
                 <th>Receipt Date</th>
                 <th class="text-right">Receipt Amount</th>
+                <th>Receipt Type</th>
                 <th>Payment/Receipt Mode</th>
                 <th>Bed Number</th>
                 <th>Username (Entered By)</th>
             </tr>
         </thead>
         <tbody>
-            @forelse($result['grouped'] as $date => $categories)
-                @foreach(['Received', 'Refund'] as $category)
-                    @php $items = $categories[$category] ?? []; @endphp
-                    @if(count($items) > 0)
-                        <tr class="section-row">
-                            <td colspan="9">{{ \Carbon\Carbon::parse($date)->format('d/m/Y') }} — {{ $category }}</td>
-                        </tr>
-                        @foreach($items as $r)
-                        <tr>
-                            <td>{{ $r['admission_date'] }}</td>
-                            <td>{{ $r['admission_number'] }}</td>
-                            <td>{{ $r['patient_name'] }}</td>
-                            <td>{{ $r['receipt_no'] }}</td>
-                            <td>{{ $r['receipt_date'] }}</td>
-                            <td class="text-right">{{ number_format($r['receipt_amount'], 2) }}</td>
-                            <td>{{ $r['payment_mode'] }}</td>
-                            <td>{{ $r['bed_number'] }}</td>
-                            <td>{{ $r['username'] }}</td>
-                        </tr>
-                        @endforeach
-                    @endif
+            @forelse($result['grouped'] as $date => $receiptTypes)
+                @foreach($receiptTypes as $receiptType => $categories)
+                    @foreach(['Received', 'Refund'] as $category)
+                        @php $items = $categories[$category] ?? []; @endphp
+                        @if(count($items) > 0)
+                            <tr class="section-row">
+                                <td colspan="10">{{ \Carbon\Carbon::parse($date)->format('d/m/Y') }} — {{ $receiptType }} — {{ $category }}</td>
+                            </tr>
+                            @foreach($items as $r)
+                            <tr>
+                                <td>{{ $r['admission_date'] }}</td>
+                                <td>{{ $r['admission_number'] }}</td>
+                                <td>{{ $r['patient_name'] }}</td>
+                                <td>{{ $r['receipt_no'] }}</td>
+                                <td>{{ $r['receipt_date'] }}</td>
+                                <td class="text-right">{{ number_format($r['receipt_amount'], 2) }}</td>
+                                <td>{{ $r['receipt_type'] }}</td>
+                                <td>{{ $r['payment_mode'] }}</td>
+                                <td>{{ $r['bed_number'] }}</td>
+                                <td>{{ $r['username'] }}</td>
+                            </tr>
+                            @endforeach
+                        @endif
+                    @endforeach
                 @endforeach
             @empty
                 <tr>
-                    <td colspan="9" class="text-right">No records.</td>
+                    <td colspan="10" class="text-right">No records.</td>
                 </tr>
             @endforelse
         </tbody>

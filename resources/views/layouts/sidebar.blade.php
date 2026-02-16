@@ -455,12 +455,13 @@
                                      <li><a href="{{ route('finance') }}" class="{{ request()->routeIs('finance') ? 'active' : '' }}">Finance Report
                                             </a></li>
                                     <li class="submenu">
-                                        <a href="javascript:void(0);" class="{{ request()->routeIs('reports.money-receipt-register*') ? 'active subdrop' : '' }}">
+                                        <a href="javascript:void(0);" class="{{ request()->routeIs('reports.money-receipt-register*') || request()->routeIs('reports.cash-register*') ? 'active subdrop' : '' }}">
                                             <i class="ti ti-report-money"></i><span>Accounting Report</span>
                                             <span class="menu-arrow"></span>
                                         </a>
                                         <ul>
                                             <li><a href="{{ route('reports.money-receipt-register') }}" class="{{ request()->routeIs('reports.money-receipt-register') ? 'active' : '' }}">Money Receipt Register</a></li>
+                                            <li><a href="{{ route('reports.cash-register') }}" class="{{ request()->routeIs('reports.cash-register') ? 'active' : '' }}">Cash Register</a></li>
                                         </ul>
                                     </li>
                                     <li><a href="{{ route('opd.reports') }}" class="{{ request()->routeIs('opd.reports') ? 'active' : '' }}">OPD

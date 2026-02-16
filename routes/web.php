@@ -78,6 +78,7 @@ use App\Http\Controllers\TpamanagmentController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\TransactionReportController;
 use App\Http\Controllers\MoneyReceiptRegisterController;
+use App\Http\Controllers\CashRegisterController;
 use App\Http\Controllers\VisitorsController;
 use App\Http\Controllers\VitalController;
 use Illuminate\Support\Facades\Route;
@@ -1051,6 +1052,9 @@ Route::prefix('reports')->group(function () {
     Route::get('/money-receipt-register', [MoneyReceiptRegisterController::class, 'index'])->name('reports.money-receipt-register');
     Route::get('/money-receipt-register/excel', [MoneyReceiptRegisterController::class, 'exportExcel'])->name('reports.money-receipt-register.excel');
     Route::get('/money-receipt-register/pdf', [MoneyReceiptRegisterController::class, 'exportPdf'])->name('reports.money-receipt-register.pdf');
+Route::get('/cash-register', [CashRegisterController::class, 'index'])->name('reports.cash-register');
+Route::get('/cash-register/excel', [CashRegisterController::class, 'exportExcel'])->name('reports.cash-register.excel');
+Route::get('/cash-register/pdf', [CashRegisterController::class, 'exportPdf'])->name('reports.cash-register.pdf');
 
     Route::get('/opd-reports-index', [OpdController::class, 'reports'])->name('opd.reports');
     Route::get('/opd-reports', [OpdController::class, 'opdReport'])->name('opd.opd_reports');

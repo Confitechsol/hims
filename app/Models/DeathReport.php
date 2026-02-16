@@ -27,6 +27,7 @@ class DeathReport extends Model
         'due_to_a',
         'due_to_b',
         'due_to_c',
+        'manner_of_death',
     ];
 
     public $timestamps = false;   // ✅ VERY IMPORTANT
@@ -54,7 +55,7 @@ class DeathReport extends Model
 
     function doctor()
     {
-        return $this->belongsTo(Doctor::class, 'doctor_id');
+        return $this->belongsTo(Doctor::class, 'doctor_name','name');
     }
 
     

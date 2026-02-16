@@ -40,6 +40,7 @@ class Transaction extends Model
         'payment_mode',
         'cheque_no',
         'cheque_date',
+        'payment_reference',
         'payment_date',
         'note',
         'received_by',

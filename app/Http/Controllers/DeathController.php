@@ -11,9 +11,9 @@ class DeathController extends Controller
     function index(Request $request){     
    
      $query = DeathReport::with(['patient','ipd_details','hospital','doctor']);
-     $perPage = intval($request->input('perPage', 10));
+     $perPage = intval($request->input('perPage', 5));
      if ($perPage <= 0) {
-        $perPage = 10;
+        $perPage = 5;
     }
    
     if ($request->has('search')) {
@@ -29,7 +29,7 @@ class DeathController extends Controller
      $deathReports = $query->paginate($perPage);
      $doctors = Doctor::where('is_active',1)->select('name')->get();
      $hospital = Hospital::where('is_active',1)->select('hospital_id','name')->first();
-    // return response()->json($deathReports , 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
+     //return response()->json($deathReports , 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
      return view('admin.birthordeath.indexdeath', compact('deathReports', 'doctors','hospital'));
     }
 
@@ -49,6 +49,7 @@ class DeathController extends Controller
         'due_to_a'  => 'nullable|string|max:255',
         'due_to_b'  => 'nullable|string|max:255',
         'due_to_c'  => 'nullable|string|max:255',
+        'manner_of_death' =>  'required',
 
 
     ]);
@@ -75,6 +76,7 @@ class DeathController extends Controller
         'due_to_a' => $validated['due_to_a'] ?? null,
         'due_to_b' => $validated['due_to_b'] ?? null,
         'due_to_c' => $validated['due_to_c'] ?? null,
+        'manner_of_death' => $validated['manner_of_death'] ?? null,
 
     ]);
 
@@ -128,6 +130,12 @@ class DeathController extends Controller
             'guardian_name' => 'required|string|max:255',
             'report' => 'nullable|string|max:255', // mapped to attachment_name
             'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf,docx|max:5120',
+            'doctor_name' => 'required|string|max:255',
+            'due_to_a'  => 'nullable|string|max:255',
+            'due_to_b'  => 'nullable|string|max:255',
+            'due_to_c'  => 'nullable|string|max:255',
+            'manner_of_death' =>  'required',
+
         ]);
 
         // Update simple fields — note view uses 'case_id' and 'report' names for edit form
@@ -153,6 +161,13 @@ class DeathController extends Controller
                 $death->attachment_name = $file->getClientOriginalName();
             }
         }
+
+        $death->doctor_name = $validated['doctor_name'];
+        $death->due_to_a = $validated['due_to_a'] ?? null;
+        $death->due_to_b = $validated['due_to_b'] ?? null;
+        $death->due_to_c = $validated['due_to_c'] ?? null;
+        $death->manner_of_death = $validated['manner_of_death'] ?? null;
+
 
         $death->save();
 

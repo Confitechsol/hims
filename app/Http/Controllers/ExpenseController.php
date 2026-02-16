@@ -46,6 +46,11 @@ class ExpenseController extends Controller
             'invoice_number' => 'nullable|string|max:255',
             'date' => 'required|date',
             'amount' => 'required|numeric',
+            'payment_mode' => 'required|string|in:Cash,Cheque,Card,UPI,Online,Transfer to Bank Account,Other',
+            'bank_name' => 'nullable|string|max:255',
+            'cheque_no' => 'nullable|string|max:100',
+            'cheque_date' => 'nullable|date',
+            'payment_reference' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:1000',
             'attach_document' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:4096',
         ]);
@@ -82,6 +87,11 @@ class ExpenseController extends Controller
             'invoice_no' => $validated['invoice_number'] ?? null,
             'date' => $validated['date'],
             'amount' => $validated['amount'],
+            'payment_mode' => $validated['payment_mode'],
+            'bank_name' => $validated['bank_name'] ?? null,
+            'cheque_no' => $validated['cheque_no'] ?? null,
+            'cheque_date' => $validated['cheque_date'] ?? null,
+            'payment_reference' => $validated['payment_reference'] ?? null,
             'note' => $validated['description'] ?? null,
             'documents' => $document,
             'is_active' => 1,
@@ -100,6 +110,11 @@ class ExpenseController extends Controller
             'invoice_number' => 'nullable|string|max:255',
             'date' => 'required|date',
             'amount' => 'required|numeric',
+            'payment_mode' => 'nullable|string|in:Cash,Cheque,Card,UPI,Online,Transfer to Bank Account,Other',
+            'bank_name' => 'nullable|string|max:255',
+            'cheque_no' => 'nullable|string|max:100',
+            'cheque_date' => 'nullable|date',
+            'payment_reference' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:1000',
             'attach_document' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:4096',
         ]);
@@ -143,6 +158,11 @@ class ExpenseController extends Controller
         $expense->invoice_no = $validated['invoice_number'] ?? null;
         $expense->date = $validated['date'];
         $expense->amount = $validated['amount'];
+        $expense->payment_mode = $validated['payment_mode'] ?? $expense->payment_mode;
+        $expense->bank_name = $validated['bank_name'] ?? $expense->bank_name;
+        $expense->cheque_no = $validated['cheque_no'] ?? $expense->cheque_no;
+        $expense->cheque_date = $validated['cheque_date'] ?? $expense->cheque_date;
+        $expense->payment_reference = $validated['payment_reference'] ?? $expense->payment_reference;
         $expense->note = $validated['description'] ?? null;
 
         $expense->save();

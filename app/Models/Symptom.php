@@ -32,8 +32,11 @@ class Symptom extends Model
     protected $casts = [
         'created_at' => 'datetime',
     ];
-     public function classification()
+   
+
+    public function classification()
     {
         return $this->belongsTo(SymptomsClassification::class, 'type', 'id');
     }
+
 }

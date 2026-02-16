@@ -71,6 +71,8 @@
                                                     <th>Description</th>
                                                     <th>Expense Head</th>
                                                     <th>Amount (INR)</th>
+                                                    <th>Payment Type</th>
+                                                    <th>Bank / Cheque No.</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -83,6 +85,16 @@
                                                         <td>{{ $expense->note }}</td>
                                                         <td>{{ $expense->expenseHead->exp_category ?? '-' }}</td>
                                                         <td>{{ $expense->amount }}</td>
+                                                        <td>{{ $expense->payment_mode ?? '-' }}</td>
+                                                        <td>
+                                                            @if($expense->payment_mode && in_array($expense->payment_mode, ['Cheque', 'Card']) && ($expense->bank_name || $expense->cheque_no))
+                                                                {{ $expense->bank_name ?? '' }}{{ $expense->bank_name && $expense->cheque_no ? ' - ' : '' }}{{ $expense->cheque_no ?? '' }}
+                                                            @elseif($expense->payment_reference)
+                                                                {{ $expense->payment_reference }}
+                                                            @else
+                                                                -
+                                                            @endif
+                                                        </td>
                                                         <td>
                                                             <div class="d-flex">
                                                                 <button
@@ -93,6 +105,11 @@
                                                                     data-date="{{ optional($expense->date)?->format('Y-m-d') ?? $expense->date }}"
                                                                     data-description="{{ $expense->note }}"
                                                                     data-amount="{{ $expense->amount }}"
+                                                                    data-payment_mode="{{ $expense->payment_mode ?? '' }}"
+                                                                    data-bank_name="{{ $expense->bank_name ?? '' }}"
+                                                                    data-cheque_no="{{ $expense->cheque_no ?? '' }}"
+                                                                    data-cheque_date="{{ $expense->cheque_date ? \Carbon\Carbon::parse($expense->cheque_date)->format('Y-m-d') : '' }}"
+                                                                    data-payment_reference="{{ $expense->payment_reference ?? '' }}"
                                                                     data-expense_name="{{ $expense->expenseHead->id ?? '' }}"
                                                                     data-attach_document="{{ $expense->attach_document ?? '' }}">
                                                                     <i class="ti ti-pencil"></i>
@@ -172,6 +189,15 @@
                 return [$item->id => $item->exp_category];
             })->toArray();
         }
+        $paymentModeOptions = [
+            'Cash' => 'Cash',
+            'Cheque' => 'Cheque',
+            'Card' => 'Card',
+            'UPI' => 'UPI',
+            'Online' => 'Online',
+            'Transfer to Bank Account' => 'Transfer to Bank Account',
+            'Other' => 'Other',
+        ];
     @endphp
 
     <x-modals.form-modal type="add" id="createModal" title="Add Expense" action="{{ route('expense.create') }}"
@@ -186,16 +212,7 @@
             ],
             ['name' => 'name', 'label' => 'Name', 'type' => 'text', 'required' => true, 'size' => '3'],
             ['name' => 'invoice_number', 'label' => 'Invoice Number', 'type' => 'text', 'required' => true, 'size' => '4'],
-           
-           [
-    'name' => 'date',
-    'label' => 'Date',
-    'type' => 'date',
-    'required' => true,
-    'size' => '12'
-         ],
-
-           
+            ['name' => 'date', 'label' => 'Date', 'type' => 'date', 'required' => true, 'size' => '12'],
             [
                 'name' => 'amount',
                 'label' => 'Amount (INR) ',
@@ -203,15 +220,20 @@
                 'required' => true,
                 'size' => '6',
             ],
-            ['name' => 'attach_document', 'label' => 'Attach Document', 'type' => 'file', 'required' => false, 'size' => '6',],
-
             [
-                'name' => 'description',
-                'label' => 'Description',
-                'type' => 'text',
+                'name' => 'payment_mode',
+                'label' => 'Payment Type',
+                'type' => 'select',
+                'options' => $paymentModeOptions,
                 'required' => true,
                 'size' => '6',
             ],
+            ['name' => 'bank_name', 'label' => 'Bank Name', 'type' => 'text', 'required' => false, 'size' => '4'],
+            ['name' => 'cheque_date', 'label' => 'Cheque Receipt Date', 'type' => 'date', 'required' => false, 'size' => '4'],
+            ['name' => 'cheque_no', 'label' => 'Cheque / CARD No.', 'type' => 'text', 'required' => false, 'size' => '4'],
+            ['name' => 'payment_reference', 'label' => 'Transaction / Reference No.', 'type' => 'text', 'required' => false, 'size' => '4'],
+            ['name' => 'attach_document', 'label' => 'Attach Document', 'type' => 'file', 'required' => false, 'size' => '6'],
+            ['name' => 'description', 'label' => 'Description', 'type' => 'text', 'required' => true, 'size' => '6'],
         ]" :columns="3" />
     <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Expense"
         action="{{ url('/expense/update') }}" :fields="[
@@ -226,16 +248,7 @@
             ],
             ['name' => 'name', 'label' => 'Name', 'type' => 'text', 'required' => true, 'size' => '3'],
             ['name' => 'invoice_number', 'label' => 'Invoice Number', 'type' => 'text', 'required' => true, 'size' => '4'],
-           
-           [
-    'name' => 'date',
-    'label' => 'Date',
-    'type' => 'date',
-    'required' => true,
-    'size' => '12'
-         ],
-
-           
+            ['name' => 'date', 'label' => 'Date', 'type' => 'date', 'required' => true, 'size' => '12'],
             [
                 'name' => 'amount',
                 'label' => 'Amount (INR) ',
@@ -243,15 +256,71 @@
                 'required' => true,
                 'size' => '6',
             ],
-            ['name' => 'attach_document', 'label' => 'Attach Document', 'type' => 'file', 'required' => false, 'size' => '6',],
-
             [
-                'name' => 'description',
-                'label' => 'Description',
-                'type' => 'text',
+                'name' => 'payment_mode',
+                'label' => 'Payment Type',
+                'type' => 'select',
+                'options' => $paymentModeOptions,
+                'required' => true,
                 'size' => '6',
             ],
+            ['name' => 'bank_name', 'label' => 'Bank Name', 'type' => 'text', 'required' => false, 'size' => '4'],
+            ['name' => 'cheque_date', 'label' => 'Cheque Receipt Date', 'type' => 'date', 'required' => false, 'size' => '4'],
+            ['name' => 'cheque_no', 'label' => 'Cheque / CARD No.', 'type' => 'text', 'required' => false, 'size' => '4'],
+            ['name' => 'payment_reference', 'label' => 'Transaction / Reference No.', 'type' => 'text', 'required' => false, 'size' => '4'],
+            ['name' => 'attach_document', 'label' => 'Attach Document', 'type' => 'file', 'required' => false, 'size' => '6'],
+            ['name' => 'description', 'label' => 'Description', 'type' => 'text', 'size' => '6'],
         ]" :columns="3" />
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function toggleExpenseChequeFields(modal) {
+                if (!modal) return;
+                var paymentSelect = modal.querySelector('select[name="payment_mode"], [data-field="payment_mode"]');
+                var mode = paymentSelect ? paymentSelect.value : '';
+                var isChequeCard = (mode === 'Cheque' || mode === 'Card');
+                var isUpiOnline = (mode === 'UPI' || mode === 'Online');
+                var isTransfer = (mode === 'Transfer to Bank Account');
+
+                ['bank_name', 'cheque_no', 'cheque_date'].forEach(function(fieldName) {
+                    var el = modal.querySelector('[name="' + fieldName + '"], [data-field="' + fieldName + '"]');
+                    if (el) {
+                        var col = el.closest('.col-md-4') || el.closest('[class*="col-"]');
+                        if (col) {
+                            var show = (fieldName === 'bank_name') ? (isChequeCard || isTransfer) : isChequeCard;
+                            col.style.display = show ? 'block' : 'none';
+                        }
+                    }
+                });
+                var refEl = modal.querySelector('[name="payment_reference"], [data-field="payment_reference"]');
+                if (refEl) {
+                    var refCol = refEl.closest('.col-md-4') || refEl.closest('[class*="col-"]');
+                    if (refCol) refCol.style.display = (isUpiOnline || isTransfer) ? 'block' : 'none';
+                }
+            }
+            var createModal = document.getElementById('createModal');
+            var editModal = document.getElementById('edit_modal');
+            if (createModal) {
+                setTimeout(function() { toggleExpenseChequeFields(createModal); }, 50);
+                createModal.addEventListener('show.bs.modal', function() {
+                    setTimeout(function() { toggleExpenseChequeFields(createModal); }, 100);
+                });
+                createModal.addEventListener('change', function(e) {
+                    if (e.target.name === 'payment_mode' || e.target.getAttribute('data-field') === 'payment_mode')
+                        toggleExpenseChequeFields(createModal);
+                });
+            }
+            if (editModal) {
+                setTimeout(function() { toggleExpenseChequeFields(editModal); }, 50);
+                editModal.addEventListener('show.bs.modal', function() {
+                    setTimeout(function() { toggleExpenseChequeFields(editModal); }, 100);
+                });
+                editModal.addEventListener('change', function(e) {
+                    if (e.target.name === 'payment_mode' || e.target.getAttribute('data-field') === 'payment_mode')
+                        toggleExpenseChequeFields(editModal);
+                });
+            }
+        });
+    </script>
 
 @endsection()
