@@ -78,6 +78,7 @@ use App\Http\Controllers\TpamanagmentController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\TransactionReportController;
 use App\Http\Controllers\MoneyReceiptRegisterController;
+use App\Http\Controllers\CashRegisterController;
 use App\Http\Controllers\VisitorsController;
 use App\Http\Controllers\VitalController;
 use Illuminate\Support\Facades\Route;
@@ -1041,20 +1042,30 @@ Route::post('/radiology_import', [ExcelImportController::class, 'importRadiology
 Route::get('/radiology_test_export', [ExcelImportController::class, 'exportRadiologyTestExcel'])->name('radiologyTests.export');
 
 Route::prefix('reports')->group(function () {
-Route::get('/finance', function () {return view('admin.reports.finance.index');})->name('finance');
-Route::get('/inventory', [InventoriesController::class, 'reports'])->name('inventory-reports');
-Route::get('/inventory-stock', [InventoriesController::class, 'stockReports'])->name('inventory-stock-reports');
-Route::get('/inventory-item', [InventoriesController::class, 'itemReports'])->name('inventory-item-reports');
-Route::get('/inventory-asset', [InventoriesController::class, 'assetReport'])->name('inventory-asset-reports');
-Route::get('/inventory-issue', [InventoriesController::class, 'issueReport'])->name('inventory-issue-reports');
-Route::get('dailyTransactionReport', [TransactionReportController::class, 'dailyTransactionReport'])->name('reports.daily.transaction');
-Route::get('/money-receipt-register', [MoneyReceiptRegisterController::class, 'index'])->name('reports.money-receipt-register');
-Route::get('/money-receipt-register/excel', [MoneyReceiptRegisterController::class, 'exportExcel'])->name('reports.money-receipt-register.excel');
-Route::get('/money-receipt-register/pdf', [MoneyReceiptRegisterController::class, 'exportPdf'])->name('reports.money-receipt-register.pdf');
+    Route::get('/finance', function () {return view('admin.reports.finance.index');})->name('finance');
+    Route::get('/inventory', [InventoriesController::class, 'reports'])->name('inventory-reports');
+    Route::get('/inventory-stock', [InventoriesController::class, 'stockReports'])->name('inventory-stock-reports');
+    Route::get('/inventory-item', [InventoriesController::class, 'itemReports'])->name('inventory-item-reports');
+    Route::get('/inventory-asset', [InventoriesController::class, 'assetReport'])->name('inventory-asset-reports');
+    Route::get('/inventory-issue', [InventoriesController::class, 'issueReport'])->name('inventory-issue-reports');
+    Route::get('dailyTransactionReport', [TransactionReportController::class, 'dailyTransactionReport'])->name('reports.daily.transaction');
+    Route::get('/money-receipt-register', [MoneyReceiptRegisterController::class, 'index'])->name('reports.money-receipt-register');
+    Route::get('/money-receipt-register/excel', [MoneyReceiptRegisterController::class, 'exportExcel'])->name('reports.money-receipt-register.excel');
+    Route::get('/money-receipt-register/pdf', [MoneyReceiptRegisterController::class, 'exportPdf'])->name('reports.money-receipt-register.pdf');
+Route::get('/cash-register', [CashRegisterController::class, 'index'])->name('reports.cash-register');
+Route::get('/cash-register/excel', [CashRegisterController::class, 'exportExcel'])->name('reports.cash-register.excel');
+Route::get('/cash-register/pdf', [CashRegisterController::class, 'exportPdf'])->name('reports.cash-register.pdf');
 
-Route::get('/opd-reports-index', [OpdController::class, 'reports'])->name('opd.reports');
-Route::get('/opd-reports', [OpdController::class, 'opdReport'])->name('opd.opd_reports');
-Route::get('/opd-balance-reports', [OpdController::class, 'opdBalanceReport'])->name('opd.opd_balance_reports');
+    Route::get('/opd-reports-index', [OpdController::class, 'reports'])->name('opd.reports');
+    Route::get('/opd-reports', [OpdController::class, 'opdReport'])->name('opd.opd_reports');
+    Route::get('/opd-balance-reports', [OpdController::class, 'opdBalanceReport'])->name('opd.opd_balance_reports');
+
+    Route::get('/ipd-reports-index', [IpdController::class, 'reports'])->name('ipd.reports');
+    Route::get('/ipd-reports', [IpdController::class, 'ipdReport'])->name('ipd.ipd_reports');
+    Route::get('/ipd-balance-reports', [ipdController::class, 'ipdBalanceReport'])->name('ipd.ipd_balance_reports');
+    Route::get('/ipd-discharge-reports', [ipdController::class, 'ipdDischargeReport'])->name('ipd.ipd-discharge-reports');
+
+
 });
 Route::get('/allTransactionReport', function () {
     return view('admin.reports.finance.all-transaction-report');
@@ -1089,18 +1100,7 @@ Route::get('/opdDischargePatient', function () {
 })->name('opdDischargePatient');
 
 // ipd
-Route::get('/ipdReportsIndex', function () {
-    return view('admin.reports.ipd.index');
-})->name('ipdReportsIndex');
-Route::get('/ipdReports', function () {
-    return view('admin.reports.ipd.ipd_reports');
-})->name('ipdReports');
-Route::get('/ipdBalanceReports', function () {
-    return view('admin.reports.ipd.ipd_balance_reports');
-})->name('ipdBalanceReports');
-Route::get('/ipdDischargePatient', function () {
-    return view('admin.reports.ipd.ipd_discharge_patient');
-})->name('ipdDischargePatient');
+
 
 Route::get('/discharge/pdf/{id}', [DischargePdfController::class, 'generate'])
     ->name('discharge.pdf');

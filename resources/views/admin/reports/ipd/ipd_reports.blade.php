@@ -30,76 +30,69 @@
                 </div>
 
                 <div class="card-body">
-                    <form action="">
+                    <form action="{{ route('ipd.ipd_reports') }}" method="GET">
                         <div class="row align-items-center gy-4">
 
+                            {{-- Date From --}}
                             <div class="col-md-3">
-                                <label for="time_duration" class="form-label">Time Duration <span
-                                        class="text-danger">*</span></label>
-                                <select name="time_duration" id="time_duration" class="form-select">
-                                    <option value="" selected disabled>Select</option>
-                                    <option value="today">Today</option>
-                                    <option value="this_week">This Week</option>
-                                </select>
+                                <label class="form-label">
+                                    Date From <span class="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="date"
+                                    name="date_from"
+                                    class="form-control"
+                                    value="{{ request('date_from') }}"
+                                    max="{{ now()->toDateString() }}"
+                                >
                             </div>
+
+                            {{-- Date To --}}
                             <div class="col-md-3">
-                                <label for="doctor" class="form-label">Doctor </label>
-                                <select name="doctor" id="doctor" class="form-select">
-                                    <option value="" selected disabled>Select</option>
-                                    <option value="doc1">Anjali Rao (D011)</option>
+                                <label class="form-label">
+                                    Date To <span class="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="date"
+                                    name="date_to"
+                                    class="form-control"
+                                    value="{{ request('date_to') }}"
+                                    max="{{ now()->toDateString() }}"
+                                >
+                            </div>
+
+                            {{-- Gender --}}
+                            <div class="col-md-3">
+                                <label class="form-label">Gender</label>
+                                <select name="gender" class="form-select">
+                                    <option value="">All</option>
+                                    <option value="Male" {{ request('gender') == 'Male' ? 'selected' : '' }}>Male</option>
+                                    <option value="Female" {{ request('gender') == 'Female' ? 'selected' : '' }}>Female</option>
+                                    <option value="Other" {{ request('gender') == 'Other' ? 'selected' : '' }}>Other</option>
                                 </select>
                             </div>
 
+                            {{-- Search --}}
                             <div class="col-md-3">
-                                <label for="from_age" class="form-label"> From Age </label>
-                                <select name="from_age" id="from_age" class="form-select">
-                                    <option value="" selected disabled>Select</option>
-                                    <option value="1">1</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="to_age" class="form-label"> To Age </label>
-                                <select name="to_age" id="to_age" class="form-select">
-                                    <option value="" selected disabled>Select</option>
-                                    <option value="1">1</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="gender" class="form-label"> Gender </label>
-                                <select name="gender" id="gender" class="form-select">
-                                    <option value="" selected disabled>Select</option>
-                                    <option value="male">Male</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="symptoms" class="form-label"> Symptoms </label>
-                                <select name="symptoms" id="symptoms" class="form-select">
-                                    <option value="" selected disabled>Select</option>
-                                    <optgroup label="General">
-                                        <option>Fever</option>
-                                    </optgroup>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="findings" class="form-label"> Findings </label>
-                                <select name="findings" id="findings" class="form-select">
-                                    <optgroup label="General Examination">
-                                        <option> Pallor present, No icterus, Febrile, BMI normal, Conscious and oriented
-                                        </option>
-                                    </optgroup>
-                                </select>
+                                <label class="form-label">Search</label>
+                                <input
+                                    type="text"
+                                    name="search"
+                                    class="form-control"
+                                    placeholder="IPD No / Patient Name / Mobile"
+                                    value="{{ request('search') }}"
+                                >
                             </div>
 
-                            <div class="col-md-3">
-                                <label for="miscellaneous" class="form-label"> Miscellaneous </label>
-                                <select name="miscellaneous" id="miscellaneous" class="form-select">
-                                    <option value="" selected disabled>Select</option>
-                                    <option value="antenatal">Antenatal</option>
-                                </select>
-                            </div>
+                            {{-- Buttons --}}
+                            <div class="col-md-12 mt-3">
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    Search
+                                </button>
 
-                            <div class="col-md-12 text-end">
-                                <button type="button" class="btn btn-primary btn-sm mt-4">Search</button>
+                                <a href="{{ route('ipd.ipd_reports') }}" class="btn btn-secondary btn-sm">
+                                    Reset
+                                </a>
                             </div>
 
                         </div>
@@ -136,7 +129,7 @@
                                                     <thead class="thead-light">
                                                         <tr>
 
-                                                            <th>Date</th>
+                                                            
                                                             <th>IPD No</th>
                                                             <th>Patient Name</th>
                                                             <th>Age</th>
@@ -144,25 +137,57 @@
                                                             <th>Mobile Number</th>
                                                             <th>Guardian Name</th>  
                                                             <th>Doctor Name	</th>
-                                                            <th>Symptoms</th>
-                                                            <th>Findings</th>
-                                                            <th>Antenatal</th>
+                                                            <th>Status</th>
+                                                            <th>Date</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                        </tr>
+                                                        @forelse($ipdReports as $report)
+                                                            <tr>
+                                                                <td>{{ $report->ipd_no ?? '-' }}</td>
+                                                                
+
+                                                                <td>{{ $report->patient->patient_name ?? '-' }}</td>
+
+                                                                <td>
+                                                                    {{ $report->patient->age ?? '-' }}
+                                                                </td>
+
+                                                                <td>
+                                                                    {{ $report->patient->gender ?? '-' }}
+                                                                </td>
+
+                                                            
+
+                                                                <td>
+                                                                    {{ $report->patient->mobileno ?? '-' }}
+                                                                </td>
+
+                                                                <td>
+                                                                    {{ $report->patient->guardian_name ?? '-' }}
+                                                                </td>
+                                                                <td>
+                                                                    {{ $report->doctor->name ?? '-' }}
+                                                                </td>
+
+                                                                <td>
+                                                                    {{ strtolower($report->discharged) === 'yes' ? 'Yes' : 'No' }}
+                                                                </td>
+                                                                
+
+                                                                <td>
+                                                                    {{ $report->date ?? '-' }}
+                                                                </td>
+
+                                                              
+                                                            </tr>
+                                                        @empty
+                                                            <tr>
+                                                                <td colspan="13" class="text-center">
+                                                                    No IPD Records Found
+                                                                </td>
+                                                            </tr>
+                                                        @endforelse
                                                     </tbody>
                                                 </table>
                                             </div>

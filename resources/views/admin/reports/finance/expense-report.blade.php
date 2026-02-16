@@ -80,16 +80,17 @@
                                                 <table class="table border">
                                                     <thead class="thead-light">
                                                         <tr>
-
-                                                            <th>Name </th>
+                                                            <th>Name</th>
                                                             <th>Invoice Number</th>
                                                             <th>Expense Head</th>
                                                             <th>Date</th>
                                                             <th>Amount (SAR)</th>
+                                                            <th>Payment Type</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr>
+                                                            <td></td>
                                                             <td></td>
                                                             <td></td>
                                                             <td></td>

@@ -217,11 +217,11 @@
                                 </div>
                             </div>
 
-                            <!-- Cheque Detail -->
+                            <!-- Cheque Detail (Cheque / Card) -->
                             <div class="row g-3 mt-2" id="chequeFields" style="display: {{ in_array($receipt->payment_mode, ['Cheque', 'Card']) ? 'block' : 'none' }};">
                                 <div class="col-md-4">
                                     <label class="form-label">Bank Name</label>
-                                    <input type="text" name="bank_name" class="form-control" 
+                                    <input type="text" name="bank_name" id="cheque_bank_name" class="form-control" 
                                         value="{{ old('bank_name', $receipt->bank_name) }}" placeholder="Bank Name">
                                 </div>
                                 <div class="col-md-4">
@@ -233,6 +233,20 @@
                                     <label class="form-label">Cheque / CARD No.</label>
                                     <input type="text" name="cheque_no" class="form-control" 
                                         value="{{ old('cheque_no', $receipt->cheque_no) }}" placeholder="Cheque or Card Number">
+                                </div>
+                            </div>
+
+                            <!-- UPI / Online / Transfer to Bank -->
+                            <div class="row g-3 mt-2" id="upiTransferFields" style="display: {{ in_array($receipt->payment_mode, ['UPI', 'Online', 'Transfer to Bank Account']) ? 'block' : 'none' }};">
+                                <div class="col-md-4" id="transferBankNameCol" style="display: {{ $receipt->payment_mode === 'Transfer to Bank Account' ? 'block' : 'none' }};">
+                                    <label class="form-label">Bank Name</label>
+                                    <input type="text" name="bank_name" id="transfer_bank_name" class="form-control" 
+                                        value="{{ old('bank_name', $receipt->bank_name) }}" placeholder="Bank Name">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Transaction / Reference No.</label>
+                                    <input type="text" name="payment_reference" class="form-control" 
+                                        value="{{ old('payment_reference', $receipt->payment_reference ?? '') }}" placeholder="UPI ref, transaction ID, or transfer reference">
                                 </div>
                             </div>
 
@@ -311,18 +325,30 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Payment Mode change - show/hide cheque fields
+    // Payment Mode change - show/hide cheque, UPI/Online/Transfer fields
     const paymentModeSelect = document.getElementById('payment_mode');
     const chequeFields = document.getElementById('chequeFields');
-    
+    const upiTransferFields = document.getElementById('upiTransferFields');
+    const transferBankNameCol = document.getElementById('transferBankNameCol');
+    const chequeBankName = document.getElementById('cheque_bank_name');
+    const transferBankName = document.getElementById('transfer_bank_name');
+
+    function togglePaymentExtraFields() {
+        const mode = paymentModeSelect ? paymentModeSelect.value : '';
+        const isChequeCard = (mode === 'Cheque' || mode === 'Card');
+        const isUpiOnline = (mode === 'UPI' || mode === 'Online');
+        const isTransfer = (mode === 'Transfer to Bank Account');
+
+        if (chequeFields) chequeFields.style.display = isChequeCard ? 'block' : 'none';
+        if (upiTransferFields) upiTransferFields.style.display = (isUpiOnline || isTransfer) ? 'block' : 'none';
+        if (transferBankNameCol) transferBankNameCol.style.display = isTransfer ? 'block' : 'none';
+        if (chequeBankName) chequeBankName.name = isChequeCard ? 'bank_name' : 'bank_name_skip';
+        if (transferBankName) transferBankName.name = isTransfer ? 'bank_name' : 'bank_name_skip';
+    }
+
     if (paymentModeSelect) {
-        paymentModeSelect.addEventListener('change', function() {
-            if (this.value === 'Cheque' || this.value === 'Card') {
-                chequeFields.style.display = 'block';
-            } else {
-                chequeFields.style.display = 'none';
-            }
-        });
+        paymentModeSelect.addEventListener('change', togglePaymentExtraFields);
+        togglePaymentExtraFields();
     }
 
     // Receipt Type change - show/hide case/prescription number field
