@@ -800,7 +800,7 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Casualty</label>
+                                <label class="form-label">Emergency</label>
                                 <select class="form-select" name="casualty">
                                     <option value="No">No</option>
                                     <option value="Yes">Yes</option>
@@ -808,8 +808,15 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Reference</label>
-                                <input type="text" class="form-control" name="reference"
-                                    placeholder="Enter reference">
+                                
+                                <select name="reference" id="" class="form-select">
+                                    <option value="">Select Reference</option>
+                                    <option value="Direct">Direct</option>
+                                    <option value="Doctor">Doctor</option>
+                                    <option value="Marketer">Marketer</option>
+                                    <option value="Other">Other</option>
+                                    
+                                </select>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Consultant Doctor <span class="required">*</span></label>

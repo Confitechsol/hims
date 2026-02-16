@@ -833,8 +833,14 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Reference</label>
-                                <input type="text" class="form-control" name="reference"
-                                    placeholder="Enter reference">
+                                {{-- <input type="text" class="form-control" name="reference"
+                                    placeholder="Enter reference"> --}}
+                                <select name="reference" id="" class="form-select">
+                                    <option value="">Select Reference</option>
+                                    @foreach ($references as $reference)
+                                        <option value="{{ $reference }}">{{ $reference }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Consultant Doctor <span class="required">*</span></label>

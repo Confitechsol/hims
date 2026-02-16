@@ -15,7 +15,18 @@ class HrController extends Controller
     // Leave Type
     public function index(Request $request)
     {
-        $leaves = LeaveType::all();
+        $leaves = LeaveType::query();
+        $perPage   = intval($request->input('perPage', 10));
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
+        if ($request->has('search')) {
+            $search_term = $request->search;
+            $leaves = $leaves->where('type', 'like', "%{$search_term}%");
+            $leaves = $leaves->paginate($perPage);
+            return ["result" => $leaves];
+        }
+            $leaves = $leaves->paginate($perPage);
         return view("admin.setup.leave_type", compact("leaves"));
     }
 
@@ -77,7 +88,18 @@ class HrController extends Controller
     // Department
     public function indexDepartment(Request $request)
     {
-        $departments = Department::all();
+        $departments = Department::query();
+        $perPage   = intval($request->input('perPage', 10));
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
+        if ($request->has('search')) {
+            $search_term = $request->search;
+            $departments = $departments->where('department_name', 'like', "%{$search_term}%");
+             $departments = $departments->paginate($perPage);
+            return ["result" => $departments];
+        }
+        $departments = $departments->paginate($perPage);
         return view("admin.setup.department", compact("departments"));
     }
     public function storeDepartment(Request $request)
@@ -139,7 +161,20 @@ class HrController extends Controller
     // Designation
     public function indexDesignation(Request $request)
     {
-        $designations = StaffDesignation::all();
+        $designations = StaffDesignation::query();
+        $perPage   = intval($request->input('perPage', 10));
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
+
+         if ($request->has('search')) {
+            $search_term = $request->search;
+            $designations = $designations->where('designation', 'like', "%{$search_term}%");
+            $designations = $designations->paginate($perPage);
+            return ["result" => $designations];
+        }
+         $designations = $designations->paginate($perPage);
+
         return view("admin.setup.designation", compact("designations"));
     }
 
