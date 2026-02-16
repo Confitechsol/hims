@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Transaction;
 use App\Models\PatientBedHistory;
+use App\Models\OpdPrescription;
+use App\Models\IpdPrescription;
+use App\Models\PathologyBilling;
+use App\Models\RadiologyBilling;
 use App\Models\IpdDetail;
 use App\Models\OpdDetail;
 use App\Models\Patient;
@@ -16,19 +20,8 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 
-class MoneyReceiptRegisterController extends Controller
+class CashRegisterController extends Controller
 {
-    /**
-     * Receipt type to report category: Current & Patient Due = Received, Refund = Refund
-     */
-    protected function getReportCategory(?string $receiptType): string
-    {
-        if (strcasecmp($receiptType ?? '', 'Refund') === 0) {
-            return 'Refund';
-        }
-        return 'Received';
-    }
-
     /**
      * Get patient name for a transaction - check all loaded relationships first, then SQL fallback
      */
@@ -58,29 +51,19 @@ class MoneyReceiptRegisterController extends Controller
             }
         }
         
-        // Method 4: Use Pathology Billing -> patient relationship (need to load if not loaded)
-        if ($transaction->pathology_billing_id) {
-            if (!$transaction->relationLoaded('pathologyBilling')) {
-                $transaction->load('pathologyBilling.patient');
-            }
-            if ($transaction->pathologyBilling && $transaction->pathologyBilling->patient && $transaction->pathologyBilling->patient->patient_name) {
-                $name = trim($transaction->pathologyBilling->patient->patient_name);
-                if (!empty($name)) {
-                    return $name;
-                }
+        // Method 4: Use Pathology Billing -> patient relationship (already loaded)
+        if ($transaction->pathologyBilling && $transaction->pathologyBilling->patient && $transaction->pathologyBilling->patient->patient_name) {
+            $name = trim($transaction->pathologyBilling->patient->patient_name);
+            if (!empty($name)) {
+                return $name;
             }
         }
         
-        // Method 5: Use Radiology Billing -> patient relationship (need to load if not loaded)
-        if ($transaction->radiology_billing_id) {
-            if (!$transaction->relationLoaded('radiologyBilling')) {
-                $transaction->load('radiologyBilling.patient');
-            }
-            if ($transaction->radiologyBilling && $transaction->radiologyBilling->patient && $transaction->radiologyBilling->patient->patient_name) {
-                $name = trim($transaction->radiologyBilling->patient->patient_name);
-                if (!empty($name)) {
-                    return $name;
-                }
+        // Method 5: Use Radiology Billing -> patient relationship (already loaded)
+        if ($transaction->radiologyBilling && $transaction->radiologyBilling->patient && $transaction->radiologyBilling->patient->patient_name) {
+            $name = trim($transaction->radiologyBilling->patient->patient_name);
+            if (!empty($name)) {
+                return $name;
             }
         }
         
@@ -117,6 +100,152 @@ class MoneyReceiptRegisterController extends Controller
     }
 
     /**
+     * Get case/prescription number for a transaction
+     */
+    protected function getCasePrescriptionNo(Transaction $transaction): string
+    {
+        $receiptType = $transaction->receipt_type ?? null;
+        $opdId = $transaction->opd_id ?? null;
+        $ipdId = $transaction->ipd_id ?? null;
+        
+        $casePrescriptionNo = '-';
+        
+        // Receipt types that need case/prescription number
+        $opdReceiptTypes = ['OPD Doctor Consultation', 'OPD Pathology', 'OPD Radiology'];
+        $ipdReceiptTypes = ['IPD Pathology', 'IPD Radiology'];
+        
+        if (in_array($receiptType, $opdReceiptTypes) && $opdId && $opdId > 0) {
+            $prescription = null;
+            
+            // For OPD Doctor Consultation, get latest prescription
+            if ($receiptType === 'OPD Doctor Consultation') {
+                $prescription = OpdPrescription::where('opd_id', $opdId)
+                    ->orderBy('date', 'desc')
+                    ->orderBy('id', 'desc')
+                    ->first();
+            }
+            // For OPD Pathology, get prescription with pathology_id
+            elseif ($receiptType === 'OPD Pathology') {
+                $prescription = OpdPrescription::where('opd_id', $opdId)
+                    ->whereNotNull('pathology_id')
+                    ->orderBy('date', 'desc')
+                    ->orderBy('id', 'desc')
+                    ->first();
+                
+                // If not found, try to get any prescription for this OPD
+                if (!$prescription) {
+                    $prescription = OpdPrescription::where('opd_id', $opdId)
+                        ->orderBy('date', 'desc')
+                        ->orderBy('id', 'desc')
+                        ->first();
+                }
+            }
+            // For OPD Radiology, get prescription with radiology_id
+            elseif ($receiptType === 'OPD Radiology') {
+                $prescription = OpdPrescription::where('opd_id', $opdId)
+                    ->whereNotNull('radiology_id')
+                    ->orderBy('date', 'desc')
+                    ->orderBy('id', 'desc')
+                    ->first();
+                
+                // If not found, try to get any prescription for this OPD
+                if (!$prescription) {
+                    $prescription = OpdPrescription::where('opd_id', $opdId)
+                        ->orderBy('date', 'desc')
+                        ->orderBy('id', 'desc')
+                        ->first();
+                }
+            }
+            
+            if ($prescription) {
+                if (!empty($prescription->prescription_number)) {
+                    $casePrescriptionNo = trim($prescription->prescription_number);
+                } elseif ($prescription->id) {
+                    $casePrescriptionNo = 'PRES-' . $prescription->id;
+                }
+            }
+        }
+        elseif (in_array($receiptType, $ipdReceiptTypes) && $ipdId && $ipdId > 0) {
+            $prescription = null;
+            
+            // For IPD Pathology, get prescription with pathology tests
+            if ($receiptType === 'IPD Pathology') {
+                $prescription = IpdPrescription::where('ipd_id', $ipdId)
+                    ->whereNotNull('pathology_id')
+                    ->orderBy('date', 'desc')
+                    ->orderBy('id', 'desc')
+                    ->first();
+                
+                // If not found, try to get any prescription for this IPD
+                if (!$prescription) {
+                    $prescription = IpdPrescription::where('ipd_id', $ipdId)
+                        ->orderBy('date', 'desc')
+                        ->orderBy('id', 'desc')
+                        ->first();
+                }
+            }
+            // For IPD Radiology, get prescription with radiology tests
+            elseif ($receiptType === 'IPD Radiology') {
+                $prescription = IpdPrescription::where('ipd_id', $ipdId)
+                    ->whereNotNull('radiology_id')
+                    ->orderBy('date', 'desc')
+                    ->orderBy('id', 'desc')
+                    ->first();
+                
+                // If not found, try to get any prescription for this IPD
+                if (!$prescription) {
+                    $prescription = IpdPrescription::where('ipd_id', $ipdId)
+                        ->orderBy('date', 'desc')
+                        ->orderBy('id', 'desc')
+                        ->first();
+                }
+            }
+            
+            if ($prescription) {
+                if (!empty($prescription->prescription_number)) {
+                    $casePrescriptionNo = trim($prescription->prescription_number);
+                } elseif ($prescription->id) {
+                    $casePrescriptionNo = 'PRES-' . $prescription->id;
+                }
+            }
+        }
+        
+        return $casePrescriptionNo;
+    }
+
+    /**
+     * Get discount amount for a transaction
+     * Checks IPD/OPD discounts and Pathology/Radiology billing discounts
+     */
+    protected function getDiscountAmount(Transaction $transaction): float
+    {
+        $discount = 0;
+        
+        // For IPD transactions, get discount from ipd_details
+        if ($transaction->ipd_id && $transaction->ipd) {
+            $ipd = $transaction->ipd;
+            $discount = (float) ($ipd->mou_discount ?? 0) + (float) ($ipd->special_discount ?? 0);
+        }
+        // For OPD transactions, get discount from opd_details
+        elseif ($transaction->opd_id && $transaction->opd) {
+            $opd = $transaction->opd;
+            $discount = (float) ($opd->discount ?? 0);
+        }
+        
+        // Add discount from Pathology Billing if linked (use eager-loaded relationship)
+        if ($transaction->pathology_billing_id && $transaction->pathologyBilling) {
+            $discount += (float) ($transaction->pathologyBilling->discount ?? 0);
+        }
+        
+        // Add discount from Radiology Billing if linked (use eager-loaded relationship)
+        if ($transaction->radiology_billing_id && $transaction->radiologyBilling) {
+            $discount += (float) ($transaction->radiologyBilling->discount ?? 0);
+        }
+        
+        return $discount;
+    }
+
+    /**
      * Get bed name for an IPD (latest bed from patient_bed_history)
      */
     protected function getBedNameForIpd(?int $ipdId): string
@@ -140,7 +269,7 @@ class MoneyReceiptRegisterController extends Controller
     }
 
     /**
-     * Build register data: date range, grouped by date and Receipt Type (Received / Refund)
+     * Build register data: date range, cash transactions only, grouped by date
      */
     protected function getRegisterData(string $dateFrom, string $dateTo): array
     {
@@ -156,6 +285,7 @@ class MoneyReceiptRegisterController extends Controller
                 'radiologyBilling.patient'
             ])
             ->whereNotNull('receipt_no')
+            ->where('payment_mode', 'Cash') // Only cash transactions
             ->whereBetween('payment_date', [
                 $dateFrom . ' 00:00:00',
                 $dateTo . ' 23:59:59',
@@ -233,7 +363,6 @@ class MoneyReceiptRegisterController extends Controller
 
         $data = [];
         foreach ($rows as $t) {
-            $category = $this->getReportCategory($t->receipt_type);
             $paymentDate = $t->payment_date ? Carbon::parse($t->payment_date) : null;
             $dateKey = $paymentDate ? $paymentDate->format('Y-m-d') : '';
 
@@ -253,6 +382,12 @@ class MoneyReceiptRegisterController extends Controller
             if ($t->ipd_id) {
                 $bedNumber = $bedMap[$t->ipd_id ?? 0] ?? '-';
             }
+
+            // Get case/prescription number
+            $casePrescriptionNo = $this->getCasePrescriptionNo($t);
+            
+            // Get discount amount
+            $discountAmount = $this->getDiscountAmount($t);
 
             // Get patient name from map (preferred) or fallback to helper method
             $patientName = $patientNameMap[$t->id] ?? $this->getPatientNameForTransaction($t);
@@ -283,28 +418,26 @@ class MoneyReceiptRegisterController extends Controller
                 'receipt_date'     => $paymentDate ? $paymentDate->format('d/m/Y H:i') : '-',
                 'receipt_amount'   => (float) ($t->amount ?? 0),
                 'receipt_type'     => $t->receipt_type ?? '-',
-                'payment_mode'     => $t->payment_mode ?? '-',
+                'case_prescription_no' => $casePrescriptionNo,
+                'discount_amount'  => $discountAmount,
                 'bed_number'       => $bedNumber,
                 'username'         => $t->receiver->username ?? '-',
                 'date_key'         => $dateKey,
-                'category'        => $category,
             ];
         }
 
-        // Group by date then by receipt type then by category (Received, Refund)
+        // Group by date then by receipt type
         $grouped = [];
         foreach ($data as $row) {
             $d = $row['date_key'];
             $rt = $row['receipt_type'];
-            $c = $row['category'];
-            
             if (!isset($grouped[$d])) {
                 $grouped[$d] = [];
             }
             if (!isset($grouped[$d][$rt])) {
-                $grouped[$d][$rt] = ['Received' => [], 'Refund' => []];
+                $grouped[$d][$rt] = [];
             }
-            $grouped[$d][$rt][$c][] = $row;
+            $grouped[$d][$rt][] = $row;
         }
         ksort($grouped);
 
@@ -333,7 +466,7 @@ class MoneyReceiptRegisterController extends Controller
             $result = $this->getRegisterData($dateFrom, $dateTo);
         }
 
-        return view('admin.reports.finance.money-receipt-register', compact('result', 'dateFrom', 'dateTo'));
+        return view('admin.reports.finance.cash-register', compact('result', 'dateFrom', 'dateTo'));
     }
 
     /**
@@ -351,12 +484,12 @@ class MoneyReceiptRegisterController extends Controller
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle('Money Receipt Register');
+        $sheet->setTitle('Cash Register');
 
         $headers = [
             'Admission Date', 'Admission Number', 'Patient Name', 'Receipt Number',
-            'Receipt Date', 'Receipt Amount', 'Receipt Type', 'Payment/Receipt Mode', 'Bed Number',
-            'Username (Entered By)',
+            'Receipt Date', 'Receipt Amount', 'Case/Prescription No', 'Discount Amount',
+            'Bed Number', 'Username (Entered By)',
         ];
         $col = 'A';
         foreach ($headers as $h) {
@@ -368,30 +501,24 @@ class MoneyReceiptRegisterController extends Controller
 
         $rowNum = 2;
         foreach ($result['grouped'] as $date => $receiptTypes) {
-            foreach ($receiptTypes as $receiptType => $categories) {
-                foreach (['Received', 'Refund'] as $cat) {
-                    $items = $categories[$cat] ?? [];
-                    if (empty($items)) {
-                        continue;
-                    }
-                    foreach ($items as $r) {
-                        $sheet->setCellValue('A' . $rowNum, $r['admission_date']);
-                        $sheet->setCellValue('B' . $rowNum, $r['admission_number']);
-                        $sheet->setCellValue('C' . $rowNum, $r['patient_name']);
-                        $sheet->setCellValue('D' . $rowNum, $r['receipt_no']);
-                        $sheet->setCellValue('E' . $rowNum, $r['receipt_date']);
-                        $sheet->setCellValue('F' . $rowNum, $r['receipt_amount']);
-                        $sheet->setCellValue('G' . $rowNum, $r['receipt_type']);
-                        $sheet->setCellValue('H' . $rowNum, $r['payment_mode']);
-                        $sheet->setCellValue('I' . $rowNum, $r['bed_number']);
-                        $sheet->setCellValue('J' . $rowNum, $r['username']);
-                        $rowNum++;
-                    }
+            foreach ($receiptTypes as $receiptType => $items) {
+                foreach ($items as $r) {
+                    $sheet->setCellValue('A' . $rowNum, $r['admission_date']);
+                    $sheet->setCellValue('B' . $rowNum, $r['admission_number']);
+                    $sheet->setCellValue('C' . $rowNum, $r['patient_name']);
+                    $sheet->setCellValue('D' . $rowNum, $r['receipt_no']);
+                    $sheet->setCellValue('E' . $rowNum, $r['receipt_date']);
+                    $sheet->setCellValue('F' . $rowNum, $r['receipt_amount']);
+                    $sheet->setCellValue('G' . $rowNum, $r['case_prescription_no']);
+                    $sheet->setCellValue('H' . $rowNum, $r['discount_amount']);
+                    $sheet->setCellValue('I' . $rowNum, $r['bed_number']);
+                    $sheet->setCellValue('J' . $rowNum, $r['username']);
+                    $rowNum++;
                 }
             }
         }
 
-        $filename = 'Money_Receipt_Register_' . $dateFrom . '_to_' . $dateTo . '.xlsx';
+        $filename = 'Cash_Register_' . $dateFrom . '_to_' . $dateTo . '.xlsx';
         $writer = new Xlsx($spreadsheet);
         $tempFile = storage_path('app/public/' . $filename);
         @mkdir(dirname($tempFile), 0755, true);
@@ -414,10 +541,10 @@ class MoneyReceiptRegisterController extends Controller
         $result   = $this->getRegisterData($dateFrom, $dateTo);
         $hospital = \App\Models\Hospital::first();
 
-        $pdf = Pdf::loadView('admin.reports.finance.money-receipt-register-pdf', compact('result', 'hospital'));
+        $pdf = Pdf::loadView('admin.reports.finance.cash-register-pdf', compact('result', 'hospital'));
         $pdf->setPaper('a4', 'landscape');
 
-        $filename = 'Money_Receipt_Register_' . $dateFrom . '_to_' . $dateTo . '.pdf';
+        $filename = 'Cash_Register_' . $dateFrom . '_to_' . $dateTo . '.pdf';
         return $pdf->download($filename);
     }
 }
