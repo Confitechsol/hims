@@ -1440,4 +1440,107 @@ class IpdController extends Controller
 //             ->withInput();
 //     }
 // }
+    public function reports()
+    {
+       return view('admin.reports.ipd.index');
+    }
+    public function ipdReport(Request $request)
+{
+    $ipdReports = IpdDetail::query()
+
+        ->with(['patient', 'doctor'])
+
+        ->when($request->date_from && $request->date_to, function ($q) use ($request) {
+            $q->whereBetween('admission_date', [
+                $request->date_from,
+                $request->date_to,
+            ]);
+        })
+
+        ->when($request->gender, function ($q) use ($request) {
+            $q->whereHas('patient', function ($sub) use ($request) {
+                $sub->where('gender', $request->gender);
+            });
+        })
+
+        ->when($request->search, function ($q) use ($request) {
+            $q->where('ipd_no', 'like', '%' . $request->search . '%');
+        })
+
+        ->orderByDesc('date') // or id
+        ->get();
+
+        //dd($ipdReports);
+
+    return view('admin.reports.ipd.ipd_reports', compact('ipdReports'));
+}
+    public function ipdBalanceReport(Request $request)
+    {
+        $ipdReports = IpdDetail::query()
+
+            ->with(['patient', 'visits'])
+
+            ->withSum('charge as amount_charged', 'standard_charge')
+            ->withSum('transactions as amount_paid', 'amount')
+
+            ->when($request->date_from && $request->date_to, function ($q) use ($request) {
+                $q->whereHas('visits', function ($sub) use ($request) {
+                    $sub->whereBetween('admission_date', [
+                        $request->date_from,
+                        $request->date_to
+                    ]);
+                });
+            })
+
+            ->when($request->gender, function ($q) use ($request) {
+                $q->whereHas('patient', function ($sub) use ($request) {
+                    $sub->where('gender', $request->gender);
+                });
+            })
+
+            ->when($request->search, function ($q) use ($request) {
+                $q->where('ipd_no', 'like', '%' . $request->search . '%');
+            })
+
+            ->orderByDesc('id')
+            ->get()
+            ->map(function ($ipd) {
+                $ipd->amount_charged = $ipd->amount_charged ?? 0;
+                $ipd->amount_paid = $ipd->amount_paid ?? 0;
+                $ipd->balance = $ipd->amount_charged - $ipd->amount_paid;
+                return $ipd;
+            });
+
+        return view('admin.reports.ipd.ipd_balance_reports', compact('ipdReports'));
+    }
+    public function ipdDischargeReport(Request $request)
+    {
+        $discharges = DischargeCard::query()
+
+            ->with('ipdDetails') // optional if you need IPD info
+
+            ->whereNotNull('ipd_details_id') // ✅ Only IPD patients
+
+            ->when($request->date_from && $request->date_to, function ($q) use ($request) {
+                $q->whereBetween('discharge_date', [
+                    $request->date_from,
+                    $request->date_to
+                ]);
+            })
+
+            ->when($request->search, function ($q) use ($request) {
+                $q->where(function ($sub) use ($request) {
+                    $sub->where('patient_name', 'like', '%' . $request->search . '%')
+                        ->orWhere('patient_id', 'like', '%' . $request->search . '%')
+                        ->orWhere('discharge_number', 'like', '%' . $request->search . '%')
+                        ->orWhere('admission_no', 'like', '%' . $request->search . '%');
+                });
+            })
+
+            ->orderByDesc('discharge_date')
+            ->get();
+
+        return view('admin.reports.ipd.ipd_discharge_patient', compact('discharges'));
+    }
+
 }

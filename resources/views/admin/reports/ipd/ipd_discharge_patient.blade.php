@@ -25,151 +25,154 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> IPD Discharge Patient
                             Report </h5>
-                        <a href="ipdReportsIndex" class="text-white fw-bold"><i
+                        <a href="{{ route('ipd.reports') }}" class="text-white fw-bold"><i
                                 class="fa-solid fa-angles-left text-white"></i>
                             IPD</a>
                     </div>
                 </div>
 
                 <div class="card-body">
-                    <form action="">
+                    <form action="{{ route('ipd.ipd-discharge-reports') }}" method="GET">
                         <div class="row align-items-center gy-4">
 
-                            <div class="col-md-3">
-                                <label for="time_duration" class="form-label">Time Duration <span
-                                        class="text-danger">*</span></label>
-                                <select name="time_duration" id="time_duration" class="form-select">
-                                    <option value="" selected disabled>Select</option>
-                                    <option value="today">Today</option>
-                                    <option value="this_week">This Week</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="doctor" class="form-label">Doctor </label>
-                                <select name="doctor" id="doctor" class="form-select">
-                                    <option value="" selected disabled>Select</option>
-                                    <option value="doc1">Anjali Rao (D011)</option>
-                                </select>
-                            </div>
+                                                    {{-- Date From --}}
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">
+                                                            Date From <span class="text-danger">*</span>
+                                                        </label>
+                                                        <input
+                                                            type="date"
+                                                            name="date_from"
+                                                            class="form-control"
+                                                            value="{{ request('date_from') }}"
+                                                            max="{{ now()->toDateString() }}"
+                                                        >
+                                                    </div>
 
-                            <div class="col-md-3">
-                                <label for="from_age" class="form-label"> From Age </label>
-                                <select name="from_age" id="from_age" class="form-select">
-                                    <option value="" selected disabled>Select</option>
-                                    <option value="1">1</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="to_age" class="form-label"> To Age </label>
-                                <select name="to_age" id="to_age" class="form-select">
-                                    <option value="" selected disabled>Select</option>
-                                    <option value="1">1</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="gender" class="form-label"> Gender </label>
-                                <select name="gender" id="gender" class="form-select">
-                                    <option value="" selected disabled>Select</option>
-                                    <option value="male">Male</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="discharge" class="form-label"> Discharge Status </label>
-                                <select name="discharge" id="discharge" class="form-select">
-                                    <option value="" selected disabled>Select</option>
-                                    <option>Death</option>
-                                </select>
-                            </div>
+                                                    {{-- Date To --}}
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">
+                                                            Date To <span class="text-danger">*</span>
+                                                        </label>
+                                                        <input
+                                                            type="date"
+                                                            name="date_to"
+                                                            class="form-control"
+                                                            value="{{ request('date_to') }}"
+                                                            max="{{ now()->toDateString() }}"
+                                                        >
+                                                    </div>
 
-                            <div class="col-md-3">
-                                <label for="miscellaneous" class="form-label"> Miscellaneous </label>
-                                <select name="miscellaneous" id="miscellaneous" class="form-select">
-                                    <option value="" selected disabled>Select</option>
-                                    <option value="antenatal">Antenatal</option>
-                                </select>
-                            </div>
+                                                    {{-- Gender --}}
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Gender</label>
+                                                        <select name="gender" class="form-select">
+                                                            <option value="">All</option>
+                                                            <option value="Male" {{ request('gender') == 'Male' ? 'selected' : '' }}>Male</option>
+                                                            <option value="Female" {{ request('gender') == 'Female' ? 'selected' : '' }}>Female</option>
+                                                            <option value="Other" {{ request('gender') == 'Other' ? 'selected' : '' }}>Other</option>
+                                                        </select>
+                                                    </div>
 
-                            <div class="col-md-12 text-end">
-                                <button type="button" class="btn btn-primary btn-sm mt-4">Search</button>
-                            </div>
+                                                    {{-- Search --}}
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Search</label>
+                                                        <input
+                                                            type="text"
+                                                            name="search"
+                                                            class="form-control"
+                                                            placeholder="IPD No / Patient Name / Mobile"
+                                                            value="{{ request('search') }}"
+                                                        >
+                                                    </div>
 
-                        </div>
-                    </form>
+                                                    {{-- Buttons --}}
+                                                    <div class="col-md-12 mt-3">
+                                                        <button type="submit" class="btn btn-primary btn-sm">
+                                                            Search
+                                                        </button>
 
-                </div>
-            </div>
-        </div>
-        <div class="col-md-11">
-            <div class="row pt-0">
-                <div class="col-12 d-flex">
-                    <div class="card shadow-sm flex-fill w-100">
+                                                        <a href="{{ route('ipd.ipd-discharge-reports') }}" class="btn btn-secondary btn-sm">
+                                                            Reset
+                                                        </a>
+                                                    </div>
 
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <div
-                                                class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
-                                                <div class="input-icon-start position-relative me-2">
-                                                    <span class="input-icon-addon">
-                                                        <i class="ti ti-search"></i>
-                                                    </span>
-                                                    <input type="text" class="form-control shadow-sm" placeholder="Search">
+                                                </div>                        
+                                            </form>
 
-                                                </div>
-                                            </div>
-
-
-                                            <!-- Table start -->
-                                            <div class="table-responsive table-nowrap">
-                                                <table class="table border">
-                                                    <thead class="thead-light">
-                                                        <tr>
-                                                            <th>Patient Name</th>
-                                                            <th>IPD No</th>
-                                                            <th>Case ID </th>
-                                                            <th>Gender</th>
-                                                            <th>Phone</th>
-                                                            <th>Antenatal</th>
-                                                            <th>Consultant Doctor</th>
-                                                            <th>Bed</th>
-                                                            <th>Admission Date</th>
-                                                            <th>Discharged Date	</th>
-                                                            <th>Discharge Status </th>
-                                                            <th>Total Admit Days</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                            <!-- Table end -->
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                                <div class="col-md-11">
+                                    <div class="row pt-0">
+                                        <div class="col-12 d-flex">
+                                            <div class="card shadow-sm flex-fill w-100">
 
-    </div>
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-lg-12">
+                                                            <div class="card">
+                                                                <div class="card-body">
+                                                                    
+                                                                    </div>
+
+
+                                                                    <!-- Table start -->
+                                                                    <div class="table-responsive table-nowrap">
+                                                                        <table class="table border">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th>Discharge No</th>
+                                                                                    <th>Admission No</th>
+                                                                                    <th>Patient Name</th>
+                                                                                    <th>Age</th>
+                                                                                    <th>Gender</th>
+                                                                                    <th>Mobile</th>
+                                                                                    <th>Guardian</th>
+                                                                                    <th>Bed</th>
+                                                                                    <th>Doctor</th>
+                                                                                    <th>Discharge Date</th>
+                                                                                    <th>Discharge Time</th>
+                                                                                </tr>
+                                                                                </thead>
+                                                                            <tbody>
+                                                                                @forelse($discharges as $report)
+                                                                                <tr>
+                                                                                    <td>{{ $report->discharge_number ?? '-' }}</td>
+                                                                                    <td>{{ $report->admission_no ?? '-' }}</td>
+                                                                                    <td>{{ $report->patient_name ?? '-' }}</td>
+                                                                                    <td>{{ $report->age ?? '-' }}</td>
+                                                                                    <td>{{ $report->gender ?? '-' }}</td>
+                                                                                    <td>{{ $report->phone ?? '-' }}</td>
+                                                                                    <td>{{ $report->guardian ?? '-' }}</td>
+                                                                                    <td>{{ $report->bed ?? '-' }}</td>
+                                                                                    <td>{{ $report->under_care_dr ?? '-' }}</td>
+                                                                                    <td>{{ $report->discharge_date ?? '-' }}</td>
+                                                                                    <td>{{ $report->discharge_time ?? '-' }}</td>
+                                                                                </tr>
+                                                                                @empty
+                                                                                <tr>
+                                                                                    <td colspan="11" class="text-center">
+                                                                                        No IPD Discharged Patients Found
+                                                                                    </td>
+                                                                                </tr>
+                                                                                @endforelse
+                                                                            </tbody>
+
+                                                                        </table>
+                                                                    </div>
+                                                                    <!-- Table end -->
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
 
 
 

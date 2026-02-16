@@ -119,4 +119,18 @@ class IpdDetail extends Model
     {
         return $this->hasOne(IpdPatient::class, 'ipd_id', 'id');
     }
+    public function visits()
+{
+    return $this->hasMany(VisitDetail::class, 'checkup_id');
+}
+
+public function charge()
+    {
+        return $this->hasMany(IpdCharges::class, 'ipd_id');
+    }
+
+public function transactions()
+{
+    return $this->hasMany(Transaction::class, 'ipd_id');
+}
 }

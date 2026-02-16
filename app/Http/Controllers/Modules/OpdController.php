@@ -43,6 +43,7 @@ use App\Models\Finding;
 use App\Models\FindingCategory;
 use Illuminate\Support\Facades\Storage;
 
+
 class OpdController extends Controller
 {
     public function index(Request $request)
@@ -959,22 +960,43 @@ class OpdController extends Controller
     }
     public function opdBalanceReport(Request $request)
 {
-    $opdReports = OpdDetail::with(['patient'])
+    $opdReports = OpdDetail::query()
+
+        ->with(['patient', 'visits'])
+
+        ->withSum('charge as amount_charged', 'standard_charge')
+        ->withSum('transactions as amount_paid', 'amount')
+
         ->when($request->date_from && $request->date_to, function ($q) use ($request) {
-            $q->whereBetween('appointment_date', [
-                $request->date_from,
-                $request->date_to
-            ]);
+            $q->whereHas('visits', function ($sub) use ($request) {
+                $sub->whereBetween('appointment_date', [
+                    $request->date_from,
+                    $request->date_to
+                ]);
+            });
         })
+
+        ->when($request->gender, function ($q) use ($request) {
+            $q->whereHas('patient', function ($sub) use ($request) {
+                $sub->where('gender', $request->gender);
+            });
+        })
+
         ->when($request->search, function ($q) use ($request) {
             $q->where('opd_no', 'like', '%' . $request->search . '%');
         })
-        ->orderBy('appointment_date', 'desc')
-        ->get();
+
+        ->orderByDesc('id')
+        ->get()
+        ->map(function ($opd) {
+            $opd->amount_charged = $opd->amount_charged ?? 0;
+            $opd->amount_paid = $opd->amount_paid ?? 0;
+            $opd->balance = $opd->amount_charged - $opd->amount_paid;
+            return $opd;
+        });
 
     return view('admin.reports.opd.opd_balance_reports', compact('opdReports'));
 }
-
 
 
 

@@ -28,7 +28,7 @@
                 <div class="card-body">
                     <div class="row align-items-center gy-4">
                         <div class="col-md-4">
-                            <a href="ipdReports">
+                            <a href="{{ route('ipd.ipd_reports') }}">
                                 <div class="module_billing">
                                     <i class="fa-solid fa-calendar-check"></i>
                                     <p>IPD Report</p>
@@ -36,7 +36,7 @@
                             </a>
                         </div>
                         <div class="col-md-4">
-                            <a href="ipdBalanceReports">
+                            <a href="{{ route('ipd.ipd_balance_reports') }}">
                                 <div class="module_billing">
                                     <i class="fa-solid fa-calendar-check"></i>
                                     <p>IPD Balance Report</p>
@@ -44,7 +44,7 @@
                             </a>
                         </div>
                         <div class="col-md-4">
-                            <a href="ipdDischargePatient">
+                            <a href="{{ route('ipd.ipd-discharge-reports') }}">
                                 <div class="module_billing">
                                     <i class="fa-solid fa-calendar-check"></i>
                                     <p>IPD Discharge Patient</p>

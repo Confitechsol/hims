@@ -240,7 +240,19 @@ class HrController extends Controller
     // Specialist
     public function indexSpecialist(Request $request)
     {
-        $specialists = Specialist::all();
+        $specialists = Specialist::query();
+         $perPage   = intval($request->input('perPage', 10));
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
+
+         if ($request->has('search')) {
+            $search_term = $request->search;
+            $specialists = $specialists->where('specialist_name', 'like', "%{$search_term}%");
+            $specialists = $specialists->paginate($perPage);
+            return ["result" => $specialists];
+        }
+         $specialists = $specialists->paginate($perPage);
         return view("admin.setup.specialist", compact("specialists"));
     }
 
