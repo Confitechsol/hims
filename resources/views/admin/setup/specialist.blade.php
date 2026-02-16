@@ -22,22 +22,22 @@
                                     <div
                                         class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
 
-                                        <div class="input-icon-start position-relative me-2">
+                                        {{-- <div class="input-icon-start position-relative me-2">
                                             <span class="input-icon-addon">
                                                 <i class="ti ti-search"></i>
                                             </span>
                                             <input type="text" class="form-control shadow-sm" placeholder="Search">
 
-                                        </div>
-                                        <div class="page_btn d-flex">
+                                        </div> --}}
+                                        {{-- <div class="page_btn d-flex">
                                             <div class="text-end d-flex">
                                                 <a href="javascript:void(0);"
                                                     class="btn btn-primary text-white ms-2 fs-13 btn-md"
                                                     data-bs-toggle="modal" data-bs-target="#add_specialist"><i
                                                         class="ti ti-plus me-1"></i>Add Specialist</a>
-                                            </div>
+                                            </div> --}}
                                             <!-- Modal -->
-                                            <div class="modal fade" id="add_specialist" tabindex="-1" aria-hidden="true">
+                                            <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered">
                                                     <div class="modal-content">
                                                         <div class="modal-header rounded-0"
@@ -73,6 +73,7 @@
                                     </div>
 
                                     <div class="table-responsive">
+                                     <x-table-actions.actions id="specialist" name="Specialist" />
                                         <table class="table mb-0">
                                             <thead>
                                                 <tr>
@@ -129,6 +130,46 @@
 
                                             </tbody>
                                         </table>
+                                    </div>
+
+                                      {{-- Pagination Links --}}
+                                    <div class="mt-3" id="pagination-wrapper">
+                                        @php
+                                            $currentPage = $specialists->currentPage();
+                                            $lastPage = $specialists->lastPage();
+                                        @endphp
+
+                                        {{-- Previous --}}
+                                        @if ($specialists->onFirstPage())
+                                            <button class="btn btn-outline-secondary btn-sm me-1" disabled>« Prev</button>
+                                        @else
+                                            <a href="{{ $specialists->previousPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                                                class="btn btn-outline-secondary btn-sm me-1">
+                                                « Prev
+                                            </a>
+                                        @endif
+
+                                        {{-- Page numbers --}}
+                                        @for ($page = 1; $page <= $lastPage; $page++)
+                                            @if ($page == $currentPage)
+                                                <button class="btn btn-primary btn-sm me-1">{{ $page }}</button>
+                                            @else
+                                                <a href="{{ $specialists->url($page) }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                                                    class="btn btn-outline-secondary btn-sm me-1">
+                                                    {{ $page }}
+                                                </a>
+                                            @endif
+                                        @endfor
+
+                                        {{-- Next --}}
+                                        @if ($specialists->hasMorePages())
+                                            <a href="{{ $specialists->nextPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                                                class="btn btn-outline-secondary btn-sm">
+                                                Next »
+                                            </a>
+                                        @else
+                                            <button class="btn btn-outline-secondary btn-sm" disabled>Next »</button>
+                                        @endif
                                     </div>
 
                                     <!--Edit Modal -->
