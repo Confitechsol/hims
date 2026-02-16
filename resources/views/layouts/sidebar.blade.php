@@ -455,13 +455,16 @@
                                      <li><a href="{{ route('finance') }}" class="{{ request()->routeIs('finance') ? 'active' : '' }}">Finance Report
                                             </a></li>
                                     <li class="submenu">
-                                        <a href="javascript:void(0);" class="{{ request()->routeIs('reports.money-receipt-register*') || request()->routeIs('reports.cash-register*') ? 'active subdrop' : '' }}">
+                                        <a href="javascript:void(0);" class="{{ request()->routeIs('reports.money-receipt-register*') || request()->routeIs('reports.cash-register*') || request()->routeIs('reports.expense-register*') || request()->routeIs('reports.ipd-final-bill-register*') || request()->routeIs('reports.daily-collection*') ? 'active subdrop' : '' }}">
                                             <i class="ti ti-report-money"></i><span>Accounting Report</span>
                                             <span class="menu-arrow"></span>
                                         </a>
                                         <ul>
                                             <li><a href="{{ route('reports.money-receipt-register') }}" class="{{ request()->routeIs('reports.money-receipt-register') ? 'active' : '' }}">Money Receipt Register</a></li>
                                             <li><a href="{{ route('reports.cash-register') }}" class="{{ request()->routeIs('reports.cash-register') ? 'active' : '' }}">Cash Register</a></li>
+                                            <li><a href="{{ route('reports.expense-register') }}" class="{{ request()->routeIs('reports.expense-register') ? 'active' : '' }}">Expense Register</a></li>
+                                            <li><a href="{{ route('reports.ipd-final-bill-register') }}" class="{{ request()->routeIs('reports.ipd-final-bill-register') ? 'active' : '' }}">IPD Final Bill Register</a></li>
+                                            <li><a href="{{ route('reports.daily-collection') }}" class="{{ request()->routeIs('reports.daily-collection') ? 'active' : '' }}">Daily Collection Report</a></li>
                                         </ul>
                                     </li>
                                     <li><a href="{{ route('opd.reports') }}" class="{{ request()->routeIs('opd.reports') ? 'active' : '' }}">OPD
