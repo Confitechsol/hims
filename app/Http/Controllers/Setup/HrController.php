@@ -99,7 +99,7 @@ class HrController extends Controller
              $departments = $departments->paginate($perPage);
             return ["result" => $departments];
         }
-         $departments = $departments->paginate($perPage);
+        $departments = $departments->paginate($perPage);
         return view("admin.setup.department", compact("departments"));
     }
     public function storeDepartment(Request $request)
@@ -161,7 +161,20 @@ class HrController extends Controller
     // Designation
     public function indexDesignation(Request $request)
     {
-        $designations = StaffDesignation::all();
+        $designations = StaffDesignation::query();
+        $perPage   = intval($request->input('perPage', 10));
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
+
+         if ($request->has('search')) {
+            $search_term = $request->search;
+            $designations = $designations->where('designation', 'like', "%{$search_term}%");
+            $designations = $designations->paginate($perPage);
+            return ["result" => $designations];
+        }
+         $designations = $designations->paginate($perPage);
+
         return view("admin.setup.designation", compact("designations"));
     }
 
