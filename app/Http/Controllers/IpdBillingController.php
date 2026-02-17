@@ -619,6 +619,142 @@ class IpdBillingController extends Controller
     }
 
     /**
+     * Get final bill register rows for one IPD (charge lines + GST + discount + due).
+     * Used by IPD Final Bill Register report. Each row: charge_category_head, charge_details, amount.
+     *
+     * @param int $ipdId
+     * @param string $dischargeDate Y-m-d
+     * @return array List of ['charge_category_head' => string, 'charge_details' => string, 'amount' => float]
+     */
+    public function getFinalBillRegisterRows($ipdId, $dischargeDate)
+    {
+        $ipd = IpdDetail::with(['patient', 'duePatientPartyDoctor'])->find($ipdId);
+        if (!$ipd) {
+            return [];
+        }
+
+        $rows = [];
+        $admissionDate = $ipd->date ?? null;
+        $patientId = $ipd->patient_id;
+        $caseReferenceId = $ipd->case_reference_id ?? null;
+
+        // Bed charges (up to discharge date)
+        $bedChargesData = $this->calculateBedChargesFromHistory($ipdId, $dischargeDate);
+        $bedChargesDetails = collect($bedChargesData['details']);
+        foreach ($bedChargesDetails as $d) {
+            $rows[] = [
+                'charge_category_head' => 'Bed',
+                'charge_details' => ($d->bedGroup->name ?? 'N/A') . ' - ' . ($d->bed->name ?? 'N/A') . ' (' . ($d->charge_date ?? '') . ')',
+                'amount' => (float) ($d->bed_charge ?? 0),
+            ];
+        }
+
+        // IPD charges (from ipd_charges, date <= discharge)
+        $ipdCharges = IpdCharges::where('ipd_id', $ipdId)
+            ->where('date', '<=', $dischargeDate)
+            ->with(['charge', 'chargeCategory'])
+            ->orderBy('date')
+            ->get();
+        foreach ($ipdCharges as $c) {
+            $rows[] = [
+                'charge_category_head' => $c->chargeCategory->name ?? 'IPD Charges',
+                'charge_details' => ($c->charge->name ?? 'N/A') . ' x ' . ($c->qty ?? 1),
+                'amount' => (float) ($c->net_amount ?? 0),
+            ];
+        }
+
+        // Pathology (patient + date range up to discharge)
+        $pathologyBills = PathologyBilling::where('patient_id', $patientId)
+            ->where('date', '>=', $admissionDate)
+            ->where('date', '<=', $dischargeDate)
+            ->orderBy('date');
+        foreach ($pathologyBills->get() as $bill) {
+            $rows[] = [
+                'charge_category_head' => 'Pathology',
+                'charge_details' => 'Pathology Bill #' . $bill->id . ' (' . ($bill->date ?? '') . ')',
+                'amount' => (float) ($bill->net_amount ?? 0),
+            ];
+        }
+
+        // Radiology (patient + date range up to discharge)
+        $radiologyBills = RadiologyBilling::where('patient_id', $patientId)
+            ->where('date', '>=', $admissionDate)
+            ->where('date', '<=', $dischargeDate)
+            ->orderBy('date');
+        foreach ($radiologyBills->get() as $bill) {
+            $rows[] = [
+                'charge_category_head' => 'Radiology',
+                'charge_details' => 'Radiology Bill #' . $bill->id . ' (' . ($bill->date ?? '') . ')',
+                'amount' => (float) ($bill->net_amount ?? 0),
+            ];
+        }
+
+        // Doctor visits
+        $doctorVisits = DoctorVisit::where('patient_id', $patientId)
+            ->where('visit_date', '>=', $admissionDate)
+            ->where('visit_date', '<=', $dischargeDate)
+            ->with(['doctor', 'charge'])
+            ->get();
+        foreach ($doctorVisits as $v) {
+            $rows[] = [
+                'charge_category_head' => 'Doctor Visit',
+                'charge_details' => ($v->charge->name ?? 'N/A') . ' - ' . (($v->doctor->name ?? '') . ' ' . ($v->doctor->surname ?? '')),
+                'amount' => (float) ($v->amount ?? 0),
+            ];
+        }
+
+        // GST breakups (from bed charges)
+        $gstCharges = $this->prepareGstCharges($bedChargesDetails);
+        foreach ($gstCharges['cgst'] as $g) {
+            $rows[] = [
+                'charge_category_head' => 'CGST',
+                'charge_details' => $g['description'] ?? '',
+                'amount' => (float) ($g['amount'] ?? 0),
+            ];
+        }
+        foreach ($gstCharges['sgst'] as $g) {
+            $rows[] = [
+                'charge_category_head' => 'SGST',
+                'charge_details' => $g['description'] ?? '',
+                'amount' => (float) ($g['amount'] ?? 0),
+            ];
+        }
+
+        // Discount details
+        $mouDiscount = (float) ($ipd->mou_discount ?? 0);
+        $specialDiscount = (float) ($ipd->special_discount ?? 0);
+        if ($mouDiscount > 0) {
+            $rows[] = [
+                'charge_category_head' => 'Discount',
+                'charge_details' => 'MOU Discount',
+                'amount' => -$mouDiscount,
+            ];
+        }
+        if ($specialDiscount > 0) {
+            $rows[] = [
+                'charge_category_head' => 'Discount',
+                'charge_details' => 'Special / Hospital Discount',
+                'amount' => -$specialDiscount,
+            ];
+        }
+
+        // Due on account of patient party
+        $dueAmount = (float) ($ipd->due_patient_party_amount ?? 0);
+        if ($dueAmount > 0) {
+            $doctorName = $ipd->duePatientPartyDoctor
+                ? trim(($ipd->duePatientPartyDoctor->name ?? '') . ' ' . ($ipd->duePatientPartyDoctor->surname ?? ''))
+                : '';
+            $rows[] = [
+                'charge_category_head' => 'Due (Patient Party)',
+                'charge_details' => $doctorName ?: 'Under Doctor',
+                'amount' => -$dueAmount,
+            ];
+        }
+
+        return $rows;
+    }
+
+    /**
      * Export Estimate/Breakup Bill PDF
      */
     public function exportEstimate($ipdId)
