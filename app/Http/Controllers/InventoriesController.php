@@ -561,6 +561,11 @@ class InventoriesController extends Controller
         $dateTo   = $request->date_to;
         $search   = $request->search;
 
+          $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
+
         $stockReport = ItemStock::with([
                 'item',
                 'itemCategory',
@@ -598,15 +603,28 @@ class InventoriesController extends Controller
             })
 
             ->where('is_active', 'yes')
-            ->get()
-            ->map(function ($stock) {
-                $stock->total_quantity     = $stock->quantity;
-                $stock->total_issued       = $stock->total_issued ?? 0;
-                $stock->available_quantity =
-                    $stock->total_quantity - $stock->total_issued;
+             ->paginate($perPage)
+        ->withQueryString();
 
-                return $stock;
-            });
+    // ✅ Replace map() with transform()
+    $stockReport->getCollection()->transform(function ($stock) {
+        $stock->total_quantity     = $stock->quantity;
+        $stock->total_issued       = $stock->total_issued ?? 0;
+        $stock->available_quantity =
+            $stock->total_quantity - $stock->total_issued;
+
+        return $stock;
+    });
+            // // ->get()
+            
+            // ->map(function ($stock) {
+            //     $stock->total_quantity     = $stock->quantity;
+            //     $stock->total_issued       = $stock->total_issued ?? 0;
+            //     $stock->available_quantity =
+            //         $stock->total_quantity - $stock->total_issued;
+
+            //     return $stock;
+            // });
 
         return view(
             'admin.reports.inventory.inventory-stock-report',
@@ -619,6 +637,8 @@ class InventoriesController extends Controller
         $dateFrom = $request->date_from;
         $dateTo   = $request->date_to;
         $search   = $request->search;
+
+        
 
         $items = Item::with('category')
 
