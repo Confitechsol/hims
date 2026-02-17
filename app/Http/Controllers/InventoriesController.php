@@ -637,8 +637,11 @@ class InventoriesController extends Controller
         $dateFrom = $request->date_from;
         $dateTo   = $request->date_to;
         $search   = $request->search;
-
-        
+       
+            $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
 
         $items = Item::with('category')
 
@@ -661,8 +664,9 @@ class InventoriesController extends Controller
             })
 
             ->orderBy('name')
-            ->get();
-
+            //->get();
+            ->paginate($perPage)
+    ->withQueryString();
         return view(
             'admin.reports.inventory.inventory-item-report',
             compact('items', 'dateFrom', 'dateTo', 'search')
