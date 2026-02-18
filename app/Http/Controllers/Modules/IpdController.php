@@ -1533,6 +1533,12 @@ class IpdController extends Controller
     }
     public function ipdDischargeReport(Request $request)
     {
+
+          $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
+        
         $discharges = DischargeCard::query()
 
             ->with('ipdDetails') // optional if you need IPD info
@@ -1556,7 +1562,9 @@ class IpdController extends Controller
             })
 
             ->orderByDesc('discharge_date')
-            ->get();
+            // ->get();
+        ->paginate($perPage)
+        ->withQueryString();
 
         return view('admin.reports.ipd.ipd_discharge_patient', compact('discharges'));
     }
