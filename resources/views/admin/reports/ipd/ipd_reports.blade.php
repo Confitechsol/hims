@@ -191,6 +191,39 @@
                                                     </tbody>
                                                 </table>
                                             </div>
+
+                                                         {{-- Pagination Links --}}
+                                <div class="mt-3" id="pagination-wrapper">
+                                    @php
+                                        $currentPage = $ipdReports->currentPage();
+                                        $lastPage = $ipdReports->lastPage();
+                                    @endphp
+
+                                    @if ($ipdReports->onFirstPage())
+                                        <button class="btn btn-outline-secondary btn-sm me-1" disabled>« Prev</button>
+                                    @else
+                                        <a href="{{ $ipdReports->previousPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                                            class="btn btn-outline-secondary btn-sm me-1">« Prev</a>
+                                    @endif
+
+                                    @for ($page = 1; $page <= $lastPage; $page++)
+                                        @if ($page == $currentPage)
+                                            <button class="btn btn-primary btn-sm me-1">{{ $page }}</button>
+                                        @else
+                                            <a href="{{ $ipdReports->url($page) }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                                                class="btn btn-outline-secondary btn-sm me-1">{{ $page }}</a>
+                                        @endif
+                                    @endfor
+
+                                    @if ($ipdReports->hasMorePages())
+                                        <a href="{{ $ipdReports->nextPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}"
+                                            class="btn btn-outline-secondary btn-sm">Next »</a>
+                                    @else
+                                        <button class="btn btn-outline-secondary btn-sm" disabled>Next »</button>
+                                    @endif
+
+                                </div>
+
                                             <!-- Table end -->
                                         </div>
                                     </div>

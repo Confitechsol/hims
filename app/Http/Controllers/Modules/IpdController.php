@@ -1446,6 +1446,10 @@ class IpdController extends Controller
     }
     public function ipdReport(Request $request)
 {
+    $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
     $ipdReports = IpdDetail::query()
 
         ->with(['patient', 'doctor'])
@@ -1467,9 +1471,9 @@ class IpdController extends Controller
             $q->where('ipd_no', 'like', '%' . $request->search . '%');
         })
 
-        ->orderByDesc('date') // or id
-        ->get();
-
+        ->orderByDesc('id')
+        ->paginate($perPage)
+        ->appends($request->all()); 
         //dd($ipdReports);
 
     return view('admin.reports.ipd.ipd_reports', compact('ipdReports'));
