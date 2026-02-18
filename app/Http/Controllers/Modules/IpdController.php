@@ -1446,6 +1446,10 @@ class IpdController extends Controller
     }
     public function ipdReport(Request $request)
 {
+    $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
     $ipdReports = IpdDetail::query()
 
         ->with(['patient', 'doctor'])
@@ -1467,15 +1471,19 @@ class IpdController extends Controller
             $q->where('ipd_no', 'like', '%' . $request->search . '%');
         })
 
-        ->orderByDesc('date') // or id
-        ->get();
-
+        ->orderByDesc('id')
+        ->paginate($perPage)
+        ->appends($request->all()); 
         //dd($ipdReports);
 
     return view('admin.reports.ipd.ipd_reports', compact('ipdReports'));
 }
     public function ipdBalanceReport(Request $request)
     {
+         $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
         $ipdReports = IpdDetail::query()
 
             ->with(['patient', 'visits'])
@@ -1503,18 +1511,34 @@ class IpdController extends Controller
             })
 
             ->orderByDesc('id')
-            ->get()
-            ->map(function ($ipd) {
-                $ipd->amount_charged = $ipd->amount_charged ?? 0;
-                $ipd->amount_paid = $ipd->amount_paid ?? 0;
-                $ipd->balance = $ipd->amount_charged - $ipd->amount_paid;
-                return $ipd;
-            });
+               ->paginate($perPage)
+        ->withQueryString();
+
+    // ✅ Replace map() with transform()
+    $ipdReports->getCollection()->transform(function ($ipd) {
+        $ipd->amount_charged = $ipd->amount_charged ?? 0;
+        $ipd->amount_paid = $ipd->amount_paid ?? 0;
+        $ipd->balance = $ipd->amount_charged - $ipd->amount_paid;
+        return $ipd;
+    });
+            // ->get()
+            // ->map(function ($ipd) {
+            //     $ipd->amount_charged = $ipd->amount_charged ?? 0;
+            //     $ipd->amount_paid = $ipd->amount_paid ?? 0;
+            //     $ipd->balance = $ipd->amount_charged - $ipd->amount_paid;
+            //     return $ipd;
+            // });
 
         return view('admin.reports.ipd.ipd_balance_reports', compact('ipdReports'));
     }
     public function ipdDischargeReport(Request $request)
     {
+
+          $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
+        
         $discharges = DischargeCard::query()
 
             ->with('ipdDetails') // optional if you need IPD info
@@ -1538,7 +1562,9 @@ class IpdController extends Controller
             })
 
             ->orderByDesc('discharge_date')
-            ->get();
+            // ->get();
+        ->paginate($perPage)
+        ->withQueryString();
 
         return view('admin.reports.ipd.ipd_discharge_patient', compact('discharges'));
     }

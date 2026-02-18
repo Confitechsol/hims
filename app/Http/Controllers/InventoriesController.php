@@ -561,6 +561,11 @@ class InventoriesController extends Controller
         $dateTo   = $request->date_to;
         $search   = $request->search;
 
+          $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
+
         $stockReport = ItemStock::with([
                 'item',
                 'itemCategory',
@@ -598,15 +603,28 @@ class InventoriesController extends Controller
             })
 
             ->where('is_active', 'yes')
-            ->get()
-            ->map(function ($stock) {
-                $stock->total_quantity     = $stock->quantity;
-                $stock->total_issued       = $stock->total_issued ?? 0;
-                $stock->available_quantity =
-                    $stock->total_quantity - $stock->total_issued;
+             ->paginate($perPage)
+        ->withQueryString();
 
-                return $stock;
-            });
+    // ✅ Replace map() with transform()
+    $stockReport->getCollection()->transform(function ($stock) {
+        $stock->total_quantity     = $stock->quantity;
+        $stock->total_issued       = $stock->total_issued ?? 0;
+        $stock->available_quantity =
+            $stock->total_quantity - $stock->total_issued;
+
+        return $stock;
+    });
+            // // ->get()
+            
+            // ->map(function ($stock) {
+            //     $stock->total_quantity     = $stock->quantity;
+            //     $stock->total_issued       = $stock->total_issued ?? 0;
+            //     $stock->available_quantity =
+            //         $stock->total_quantity - $stock->total_issued;
+
+            //     return $stock;
+            // });
 
         return view(
             'admin.reports.inventory.inventory-stock-report',
@@ -619,6 +637,11 @@ class InventoriesController extends Controller
         $dateFrom = $request->date_from;
         $dateTo   = $request->date_to;
         $search   = $request->search;
+       
+            $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
 
         $items = Item::with('category')
 
@@ -641,8 +664,9 @@ class InventoriesController extends Controller
             })
 
             ->orderBy('name')
-            ->get();
-
+            //->get();
+            ->paginate($perPage)
+    ->withQueryString();
         return view(
             'admin.reports.inventory.inventory-item-report',
             compact('items', 'dateFrom', 'dateTo', 'search')
@@ -653,6 +677,11 @@ class InventoriesController extends Controller
         $dateFrom = $request->date_from;
         $dateTo   = $request->date_to;
         $search   = $request->search;
+
+         $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
 
         $assets = ItemStock::with([
                 'item',
@@ -682,30 +711,55 @@ class InventoriesController extends Controller
             })
             ->where('is_active', 'yes')
             ->orderBy('date', 'desc')
-            ->get()
-            ->map(function ($asset) {
+             ->paginate($perPage)
+        ->withQueryString();
 
-                // 🔹 Batch aggregations
-                $asset->salvage_value = $asset->batches->sum('salvage_value');
-                $asset->annual_depreciation = $asset->batches->sum('annual_depreciation');
-                $asset->useful_life = $asset->batches->avg('useful_life');
-                $asset->expiry_date = $asset->batches->min('expiry_date');
+    // ✅ Replace map() with transform()
+    $assets->getCollection()->transform(function ($asset) {
 
-                // 🔹 Cost calculations
-                $asset->total_cost = $asset->batches->whereNotNull('purchase_price')->sum('purchase_price');
+        $asset->salvage_value = $asset->batches->sum('salvage_value');
+        $asset->annual_depreciation = $asset->batches->sum('annual_depreciation');
+        $asset->useful_life = $asset->batches->avg('useful_life');
+        $asset->expiry_date = $asset->batches->min('expiry_date');
 
-                // 🔹 Net Book Value
-                $asset->net_book_value =
-                    $asset->total_cost - $asset->salvage_value;
+        $asset->total_cost = $asset->batches
+            ->whereNotNull('purchase_price')
+            ->sum('purchase_price');
 
-                // 🔹 Asset age
-                $asset->asset_age =
-                    $asset->date
-                        ? Carbon::parse($asset->date)->diffInYears(now())
-                        : null;
+        $asset->net_book_value =
+            $asset->total_cost - $asset->salvage_value;
 
-                return $asset;
-            });
+        $asset->asset_age =
+            $asset->date
+                ? \Carbon\Carbon::parse($asset->date)->diffInYears(now())
+                : null;
+
+        return $asset;
+    });
+            // ->get()
+            // ->map(function ($asset) {
+
+            //     // 🔹 Batch aggregations
+            //     $asset->salvage_value = $asset->batches->sum('salvage_value');
+            //     $asset->annual_depreciation = $asset->batches->sum('annual_depreciation');
+            //     $asset->useful_life = $asset->batches->avg('useful_life');
+            //     $asset->expiry_date = $asset->batches->min('expiry_date');
+
+            //     // 🔹 Cost calculations
+            //     $asset->total_cost = $asset->batches->whereNotNull('purchase_price')->sum('purchase_price');
+
+            //     // 🔹 Net Book Value
+            //     $asset->net_book_value =
+            //         $asset->total_cost - $asset->salvage_value;
+
+            //     // 🔹 Asset age
+            //     $asset->asset_age =
+            //         $asset->date
+            //             ? Carbon::parse($asset->date)->diffInYears(now())
+            //             : null;
+
+            //     return $asset;
+            // });
 
         return view(
             'admin.reports.inventory.inventory-asset-report',
