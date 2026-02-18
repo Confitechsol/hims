@@ -589,7 +589,11 @@ function initPrescriptionAutocomplete() {
 }
 
 function loadPatientPrescriptions(patientId) {
-    const url = `{{ url('/radiology/billing/api/patient-prescriptions') }}/${patientId}`;
+    const showCaseRefId = '{{ $bill->case_reference_id ?? '' }}';
+    let url = `{{ url('/radiology/billing/api/patient-prescriptions') }}/${patientId}`;
+    if (showCaseRefId) {
+        url += '?show_case_ref_id=' + encodeURIComponent(showCaseRefId);
+    }
     fetch(url)
         .then(response => response.json())
         .then(data => {

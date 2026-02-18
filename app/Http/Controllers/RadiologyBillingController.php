@@ -52,7 +52,8 @@ class RadiologyBillingController extends Controller
     }
 
     /**
-     * Show the form for creating a new radiology bill
+     * Show the form for creating a new radiology bill.
+     * OPD and non-discharged IPD patients are allowed.
      */
     public function create()
     {
@@ -350,11 +351,32 @@ class RadiologyBillingController extends Controller
     {
         try {
             \Log::info('Getting prescriptions for patient ID: ' . $patientId);
+
+            // Case/prescription IDs already billed for this patient (do not show again)
+            $billedCaseRefIds = RadiologyBilling::where('patient_id', $patientId)
+                ->whereNotNull('case_reference_id')
+                ->pluck('case_reference_id')
+                ->map(function ($id) {
+                    return (int) $id;
+                })
+                ->unique()
+                ->values()
+                ->all();
+            // When editing, allow current bill's case to still appear in the list
+            $showCaseRefId = request()->get('show_case_ref_id');
+            if ($showCaseRefId !== null && $showCaseRefId !== '') {
+                $showCaseRefId = (int) $showCaseRefId;
+                $billedCaseRefIds = array_values(array_diff($billedCaseRefIds, [$showCaseRefId]));
+            }
             
             $prescriptions = collect();
             
-            // Get OPD Visits
-            $opdVisits = OpdDetail::where('patient_id', $patientId)
+            // Get OPD Visits (exclude already billed)
+            $opdQuery = OpdDetail::where('patient_id', $patientId);
+            if (!empty($billedCaseRefIds)) {
+                $opdQuery->whereNotIn('id', $billedCaseRefIds);
+            }
+            $opdVisits = $opdQuery
                 ->with('doctor')
                 ->orderBy('appointment_date', 'desc')
                 ->get()
@@ -372,9 +394,13 @@ class RadiologyBillingController extends Controller
             $prescriptions = $prescriptions->merge($opdVisits);
             \Log::info('OPD Visits found: ' . $opdVisits->count());
             
-            // Get IPD Prescriptions
-            $ipdPrescriptions = IpdPrescription::join('ipd_details', 'ipd_prescription.ipd_id', '=', 'ipd_details.id')
-                ->where('ipd_details.patient_id', $patientId)
+            // Get IPD Prescriptions (exclude already billed)
+            $ipdQuery = IpdPrescription::join('ipd_details', 'ipd_prescription.ipd_id', '=', 'ipd_details.id')
+                ->where('ipd_details.patient_id', $patientId);
+            if (!empty($billedCaseRefIds)) {
+                $ipdQuery->whereNotIn('ipd_prescription.id', $billedCaseRefIds);
+            }
+            $ipdPrescriptions = $ipdQuery
                 ->select('ipd_prescription.*')
                 ->with(['ipd', 'prescribedBy'])
                 ->orderBy('ipd_prescription.date', 'desc')
