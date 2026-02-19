@@ -18,8 +18,9 @@
 
     .first_logo,
     .second_logo,.about_info {
-        width: 22%;
+        width: 27%;
     }
+    
 
     .about_info {
         font-size: 12px;
@@ -330,7 +331,7 @@
                     </div>
                     :
                     <div class="patient_data">
-                        {{ $IpdPatient->patient['mobileno'] ?? '' }}
+                        {{ $IpdPatient->patient['emergency_contact_no'] ?? '' }}
                     </div>
                 </div>
                 <div class="patient_items">
@@ -416,9 +417,11 @@
                         <div class="patient_data">
                             {{ $IpdPatient->ipd['bedDetail']['name'] ?? '' }}
                         </div>
-                    </div>
+                    </div>                    
 
-                    <div class="patient_items">
+                </div>
+
+                    <!-- <div class="patient_items">
                         <div class="patient_head">
                             BED Rate.
                         </div>
@@ -426,9 +429,7 @@
                         <div class="patient_data">
                             {{ $IpdPatient->ipd['bedDetail']['bedGroup']['bed_cost'] ?? '' }}
                         </div>
-                    </div>
-
-                </div>
+                    </div> -->
 
                 <div class="patient_items">
                     <div class="patient_head">
@@ -493,6 +494,15 @@
 
                 <div class="patient_items">
                     <div class="patient_head">
+                        BED Rate.
+                    </div>
+                    :
+                    <div class="patient_data">
+                        {{ $IpdPatient->ipd['bedDetail']['bedGroup']['bed_cost'] ?? '' }}
+                    </div>
+                </div>
+                <div class="patient_items">
+                    <div class="patient_head">
                         DEPARTMENT
                     </div>
                     :
@@ -502,6 +512,7 @@
                 </div>
 
             </div>
+            
 
         </div>
 
@@ -587,14 +598,14 @@
                     does
                     not exceeds Rs.10,000</li>
                 <li>Shifting from ICU to Ward depends on bed availiabilty.</li>
-                <li>PATIENT / PARTIES ID DOCUMENT IS MANDATARY . PLEASE PROVIDE US AT
+                <li>PATIENT / PARTIES ID DOCUMENT IS MANDATORY . PLEASE PROVIDE US AT
                     THE EARLIEST.</li>
                 <li>Whether any reimbusement for claim will be availed against any
                     insurance policy or health scheme in connection with the treatment
                     of the
-                    patient. Yes [ ] No. [ ] If you don t disclose in the consent form
+                    patient. Yes [ &nbsp&nbsp ] No. [ &nbsp&nbsp ] If you don t disclose in the consent form
                     by ticking Yes/No, then Samaritan Clinic Pvt. Ltd. will not be
-                    liable for any reimbursement insu</li>
+                    liable for any reimbursement insuarance</li>
                 <li>In the event of a delay in body release due to unavoidable reasons, the deceased will be
                     respectfully transferred to the mortuary freezer after four hours (4 hours), subject to consent from
                     the next of kin.</li>
