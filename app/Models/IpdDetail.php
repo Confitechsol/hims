@@ -10,6 +10,22 @@ class IpdDetail extends Model
 
     protected $table = 'ipd_details';
 
+    /**
+     * Patient IDs whose latest IPD record has discharged = 'yes'.
+     * Used to exclude discharged patients from radiology, pathology, pharmacy billing.
+     */
+    public static function getDischargedPatientIds(): array
+    {
+        return self::from('ipd_details as i1')
+            ->select('i1.patient_id')
+            ->where('i1.discharged', 'yes')
+            ->whereRaw('i1.id = (SELECT MAX(i2.id) FROM ipd_details i2 WHERE i2.patient_id = i1.patient_id)')
+            ->pluck('patient_id')
+            ->unique()
+            ->values()
+            ->all();
+    }
+
     protected $fillable = [
         'hospital_id',
         'branch_id',

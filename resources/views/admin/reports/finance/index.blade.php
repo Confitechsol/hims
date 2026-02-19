@@ -99,6 +99,30 @@
                                 </div>
                             </a>
                         </div>
+                        <div class="col-md-3">
+                            <a href="{{ route('reports.expense-register') }}">
+                                <div class="module_billing">
+                                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                                    <p>Expense Register</p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{{ route('reports.ipd-final-bill-register') }}">
+                                <div class="module_billing">
+                                    <i class="fa-solid fa-file-invoice"></i>
+                                    <p>IPD Final Bill Register</p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{{ route('reports.daily-collection') }}">
+                                <div class="module_billing">
+                                    <i class="fa-solid fa-calendar-day"></i>
+                                    <p>Daily Collection Report</p>
+                                </div>
+                            </a>
+                        </div>
 
                     </div>
                 </div>

@@ -15,6 +15,7 @@ use App\Models\Patient;
 use App\Models\Doctor;
 use App\Models\CaseReference;
 use App\Models\OpdDetail;
+use App\Models\IpdDetail;
 use App\Models\IpdPrescription;
 use App\Models\IpdMedicine;
 use Illuminate\Support\Facades\DB;
@@ -57,13 +58,19 @@ class PharmacyBillingController extends Controller
     /**
      * Show the form for creating a new pharmacy bill
      */
+    /**
+     * Discharged IPD patients are excluded from the patient list.
+     */
     public function create()
     {
         $categories = MedicineCategory::all();
         $companies = MedicineCompany::all();
         $groups = MedicineGroup::all();
         $units = MedicineUnit::all();
-        $patients = Patient::select('id', 'patient_name', 'mobileno')->get();
+        $dischargedIds = IpdDetail::getDischargedPatientIds();
+        $patients = Patient::select('id', 'patient_name', 'mobileno')
+            ->whereNotIn('id', $dischargedIds)
+            ->get();
         $doctors = Doctor::select('id', 'name', 'surname', 'doctor_id')
             ->where(function($query) {
                 $query->where('is_active', true)
@@ -84,7 +91,15 @@ class PharmacyBillingController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'patient_id' => 'required|exists:patients,id',
+            'patient_id' => [
+                'required',
+                'exists:patients,id',
+                function ($attribute, $value, $fail) {
+                    if (in_array((int) $value, IpdDetail::getDischargedPatientIds(), true)) {
+                        $fail('Pharmacy billing is not allowed for discharged patients.');
+                    }
+                },
+            ],
             'case_reference_id' => 'nullable|exists:case_references,id',
             'doctor_name' => 'nullable|string|max:50',
             'customer_name' => 'nullable|string|max:50',
@@ -172,7 +187,12 @@ class PharmacyBillingController extends Controller
         $companies = MedicineCompany::all();
         $groups = MedicineGroup::all();
         $units = MedicineUnit::all();
-        $patients = Patient::select('id', 'patient_name', 'mobileno')->get();
+        $dischargedIds = IpdDetail::getDischargedPatientIds();
+        $patients = Patient::select('id', 'patient_name', 'mobileno')
+            ->where(function ($q) use ($dischargedIds, $bill) {
+                $q->whereNotIn('id', $dischargedIds)->orWhere('id', $bill->patient_id);
+            })
+            ->get();
         $doctors = Doctor::select('id', 'name', 'surname', 'doctor_id')
             ->where(function($query) {
                 $query->where('is_active', true)
@@ -195,7 +215,15 @@ class PharmacyBillingController extends Controller
         $bill = PharmacyBillBasic::findOrFail($id);
 
         $validated = $request->validate([
-            'patient_id' => 'required|exists:patients,id',
+            'patient_id' => [
+                'required',
+                'exists:patients,id',
+                function ($attribute, $value, $fail) {
+                    if (in_array((int) $value, IpdDetail::getDischargedPatientIds(), true)) {
+                        $fail('Pharmacy billing is not allowed for discharged patients.');
+                    }
+                },
+            ],
             'case_reference_id' => 'nullable|exists:case_references,id',
             'doctor_name' => 'nullable|string|max:50',
             'customer_name' => 'nullable|string|max:50',
@@ -396,15 +424,37 @@ class PharmacyBillingController extends Controller
     }
 
     /**
-     * Get patient prescriptions/case references (AJAX)
+     * Get patient prescriptions/case references (AJAX).
+     * Case/prescription numbers already billed for this patient are excluded.
      */
     public function getPatientPrescriptions($patientId)
     {
         try {
+            // Case/prescription IDs already billed for this patient (do not show again)
+            $billedCaseRefIds = PharmacyBillBasic::where('patient_id', $patientId)
+                ->whereNotNull('case_reference_id')
+                ->pluck('case_reference_id')
+                ->map(function ($id) {
+                    return (int) $id;
+                })
+                ->unique()
+                ->values()
+                ->all();
+            // When editing, allow current bill's case to still appear in the list
+            $showCaseRefId = request()->get('show_case_ref_id');
+            if ($showCaseRefId !== null && $showCaseRefId !== '') {
+                $showCaseRefId = (int) $showCaseRefId;
+                $billedCaseRefIds = array_values(array_diff($billedCaseRefIds, [$showCaseRefId]));
+            }
+
             $prescriptions = collect();
-            
-            // Get OPD Visits (instead of case_references which doesn't have the needed fields)
-            $opdVisits = OpdDetail::where('patient_id', $patientId)
+
+            // Get OPD Visits (exclude already billed)
+            $opdQuery = OpdDetail::where('patient_id', $patientId);
+            if (!empty($billedCaseRefIds)) {
+                $opdQuery->whereNotIn('id', $billedCaseRefIds);
+            }
+            $opdVisits = $opdQuery
                 ->with('doctor')
                 ->orderBy('appointment_date', 'desc')
                 ->get()
@@ -418,12 +468,16 @@ class PharmacyBillingController extends Controller
                         'type' => 'opd',
                     ];
                 });
-            
+
             $prescriptions = $prescriptions->merge($opdVisits);
-            
-            // Get IPD Prescriptions
-            $ipdPrescriptions = IpdPrescription::join('ipd_details', 'ipd_prescription.ipd_id', '=', 'ipd_details.id')
-                ->where('ipd_details.patient_id', $patientId)
+
+            // Get IPD Prescriptions (exclude already billed)
+            $ipdQuery = IpdPrescription::join('ipd_details', 'ipd_prescription.ipd_id', '=', 'ipd_details.id')
+                ->where('ipd_details.patient_id', $patientId);
+            if (!empty($billedCaseRefIds)) {
+                $ipdQuery->whereNotIn('ipd_prescription.id', $billedCaseRefIds);
+            }
+            $ipdPrescriptions = $ipdQuery
                 ->select('ipd_prescription.*')
                 ->with(['ipd', 'prescribedBy'])
                 ->orderBy('ipd_prescription.date', 'desc')
@@ -439,9 +493,9 @@ class PharmacyBillingController extends Controller
                         'prescription_id' => $prescription->id,
                     ];
                 });
-            
+
             $prescriptions = $prescriptions->merge($ipdPrescriptions);
-            
+
             return response()->json($prescriptions->values());
         } catch (\Exception $e) {
             \Log::error('Error getting patient prescriptions: ' . $e->getMessage());
