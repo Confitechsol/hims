@@ -552,9 +552,13 @@ function initPrescriptionAutocomplete() {
 
 function loadPatientPrescriptions(patientId) {
     console.log('Loading prescriptions for patient ID:', patientId);
-    const url = `{{ url('/pathology/billing/api/patient-prescriptions') }}/${patientId}`;
+    const showCaseRefId = '{{ $bill->case_reference_id ?? '' }}';
+    let url = `{{ url('/pathology/billing/api/patient-prescriptions') }}/${patientId}`;
+    if (showCaseRefId) {
+        url += '?show_case_ref_id=' + encodeURIComponent(showCaseRefId);
+    }
     console.log('Fetching from URL:', url);
-    
+
     fetch(url)
         .then(response => {
             console.log('Response status:', response.status);
