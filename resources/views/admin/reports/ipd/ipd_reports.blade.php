@@ -111,21 +111,17 @@
                                 <div class="col-lg-12">
                                     <div class="card">
                                         <div class="card-body">
-                                            <div
-                                                class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
-                                                <div class="input-icon-start position-relative me-2">
-                                                    <span class="input-icon-addon">
-                                                        <i class="ti ti-search"></i>
-                                                    </span>
-                                                    <input type="text" class="form-control shadow-sm" placeholder="Search">
+                                              <div class="mb-3">
 
-                                                </div>
-                                            </div>
+                                            <button class="btn btn-success" onclick="exportToExcel('ipd-reports-table')">Export to Excel</button>
+                                            <button class="btn btn-danger" onclick="exportToPDF('ipd-reports-table')">Export to PDF</button>
+        
+                                          </div>
 
 
                                             <!-- Table start -->
                                             <div class="table-responsive table-nowrap">
-                                                <table class="table border">
+                                                <table class="table border" id="ipd-reports-table">
                                                     <thead class="thead-light">
                                                         <tr>
 

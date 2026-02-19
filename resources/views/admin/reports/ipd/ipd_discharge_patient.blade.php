@@ -113,13 +113,18 @@
                                                         <div class="col-lg-12">
                                                             <div class="card">
                                                                 <div class="card-body">
-                                                                    
+                                                                     <div class="mb-3">
+
+                                            <button class="btn btn-success" onclick="exportToExcel('ipd-discharge-patient-table')">Export to Excel</button>
+                                            <button class="btn btn-danger" onclick="exportToPDF('ipd-discharge-patient-table')">Export to PDF</button>
+        
+                                          </div>
                                                                     </div>
 
 
                                                                     <!-- Table start -->
                                                                     <div class="table-responsive table-nowrap">
-                                                                        <table class="table border">
+                                                                        <table class="table border" id="ipd-discharge-patient-table">
                                                                             <thead>
                                                                                 <tr>
                                                                                     <th>Discharge No</th>

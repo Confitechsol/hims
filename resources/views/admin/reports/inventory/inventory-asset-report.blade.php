@@ -97,13 +97,18 @@
                                 <div class="col-lg-12">
                                     <div class="card">
                                         <div class="card-body">
-                                            
+                                             <div class="mb-3">
+
+                                                <button class="btn btn-success" onclick="exportToExcel('inventory-asset-report-table')">Export to Excel</button>
+                                                 <button class="btn btn-danger" onclick="exportToPDF('inventory-asset-report-table')">Export to PDF</button>
+        
+                                             </div>  
 
 
                                             <!-- Table start -->
                                             <div class="table-responsive table-nowrap">
                                                 
-                                                <table class="table border">
+                                                <table class="table border" id="inventory-asset-report-table">
                                                     <thead class="thead-light">
                                                         <tr>
                                                             <th>#</th>
