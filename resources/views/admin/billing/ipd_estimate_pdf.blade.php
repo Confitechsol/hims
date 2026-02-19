@@ -7,7 +7,7 @@
     <style>        
         @page {
                 size: A4;
-                margin-top: 420px;   /* ✅ bigger than actual header */
+                margin-top: 300px;   /* reserve space for compact header on all pages */
                 margin-bottom: 80px;
                 margin-left: 20px;
                 margin-right: 20px;
@@ -26,11 +26,11 @@
         /* Fixed header - repeats on all pages */
         header {
                 position: fixed;
-                top: -400px;         /* margin-top - 20px safety */
+                top: -240px;
                 left: 20px;
                 right: 20px;
-                height: auto;        /* 🔥 IMPORTANT */                
-                padding: 8px 0;
+                height: auto;
+                padding: 0;
             }
 
 
@@ -62,7 +62,17 @@
             position: relative;
         }
         
-        /* Ensure content on subsequent pages respects header */
+        /* Small gap between header and body on all pages */
+        .header-body-spacer {
+            height: 18px;
+            margin: 0;
+            padding: 0;
+            border: none;
+            font-size: 0;
+            line-height: 0;
+            display: block;
+        }
+        
         main > *:first-child {
             margin-top: 0;
         }
@@ -75,72 +85,19 @@
             box-sizing: border-box;
         }
 
-        /* Ensure header content doesn't overflow */
-        header .top_head {
-            margin-bottom: 8px;
-        }
-
         header .patient_info {
-            margin-bottom: 3px;
-        }
-
-        .top_head {
-            width: 100%;
-            margin-bottom: 8px;
-            margin-left: 0;
-            margin-right: 0;
-        }
-
-        .top_head table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-            margin: 0;
-            padding: 0;
-            max-width: 100%;
-        }
-
-        .top_head td {
-            vertical-align: top;
-            padding: 0 5px;
-            margin: 0;
-        }
-
-        .first_logo {
-            font-size: 9px;
-            width: 35%;
-            text-align: left;
-            vertical-align: top;
-        }
-
-        .second_logo {
-            font-size: 9px;
-            width: 30%;
-            text-align: center;
-            vertical-align: middle;
-        }
-
-        .about_info {
-            text-align: right;
-            font-size: 9px;
-            line-height: 1.1;
-            width: 35%;
-            vertical-align: top;
-        }
-
-        .about_info p {
-            margin: 1px 0;
+            margin-bottom: 0;
         }
 
         .heading {
             text-align: center;
-            margin: 5px 0;
+            margin: 0 0 1px 0;
         }
 
         .heading h4 {
             text-transform: uppercase;
-            margin: 5px 0;
-            font-size: 16px;
+            margin: 0;
+            font-size: 14px;
         }
 
         .red {
@@ -155,8 +112,8 @@
 
         .patient_info {
             border: 2px solid #282828;
-            padding: 6px;
-            margin-bottom: 5px;
+            padding: 4px;
+            margin-bottom: 0;
             font-size: 10px;
         }
 
@@ -327,59 +284,25 @@
     <!-- Fixed Header - repeats on all pages -->
     <header>
         <div class="header-content">
-        <!-- Header with Logo and Hospital Info -->
-        <div class="top_head">
-            <table style="width: 100%; table-layout: fixed; border-collapse: collapse; margin: 0; padding: 0;">
-                <tr>
-                    <td class="first_logo" style="width: 35%; padding: 0 5px; margin: 0; vertical-align: top;">
-                        @if (file_exists(public_path('assets/images/logo.webp')))
-                            <img src="{{ public_path('assets/images/logo.webp') }}" alt="LOGO" style="height: 50px; display: block; margin-bottom: 3px;">
-                        @endif
-                    </td>
-                    <td class="second_logo" style="width: 30%; padding: 0 5px; margin: 0; vertical-align: middle; text-align: center;">
-                        @if (file_exists(public_path('assets/images/nabh-logo.png')))
-                            <div style="text-align: center;">
-                                <img src="{{ public_path('assets/images/nabh-logo.png') }}" alt="NABH" style="height: 70px; width:auto; display: inline-block;">
-                            </div>
-                        @endif
-                        <p style="margin: 0; font-size: 10px;">NABH/PESHCO-2018-3150/L-03</p>
-                    </td>
-                    <td class="about_info" style="width: 35%; padding: 0 5px; margin: 0; vertical-align: top; text-align: right;">
-                        <p style="margin: 1px 0;"><strong>{{ $hospital->name ?? 'Hospital Name' }}</strong></p>
-                        <p style="margin: 1px 0;">{{ $hospital->address ?? 'Hospital Address' }}</p>
-                        <p style="margin: 1px 0;">Phone - {{ $hospital->phone ?? 'Phone Number' }}</p>
-                        @if(!empty($hospital->hospital_landline_1) || !empty($hospital->hospital_landline_2))
-                        <p style="margin: 1px 0;">Landline - 
-                            @if(!empty($hospital->hospital_landline_1)){{ $hospital->hospital_landline_1 }}@endif
-                            @if(!empty($hospital->hospital_landline_1) && !empty($hospital->hospital_landline_2)), @endif
-                            @if(!empty($hospital->hospital_landline_2)){{ $hospital->hospital_landline_2 }}@endif
-                        </p>
-                        @endif
-                        <p style="margin: 1px 0;">E-mail: {{ $hospital->email ?? 'Email' }}</p>
-                    </td>
-                </tr>
-            </table>
-        </div>
-
         <!-- Title -->
-        <div class="heading" style="margin: 5px 0;">
-            <h4 class="red" style="margin: 0; font-size: 14px;">ESTIMATE COPY</h4>
+        <div class="heading">
+            <h4 class="red">ESTIMATE COPY</h4>
         </div>
 
         <!-- Thick Horizontal Line -->
-        <div style="border-top: 2px solid #282828; margin: 5px 0;"></div>
+        <div style="border-top: 2px solid #282828; margin: 1px 0;"></div>
 
         <!-- Estimate/Admission Reference Section -->
-        <div class="patient_info" style="margin-bottom: 5px;">
+        <div class="patient_info" style="margin-bottom: 0;">
             <table style="width: 100%; table-layout: fixed; border-collapse: collapse;">
                 <tr>
-                    <td style="text-align: left; width: 33.33%; padding: 4px 5px;">
+                    <td style="text-align: left; width: 33.33%; padding: 3px 4px;">
                         <strong>ADM No.</strong> : <span class="red">{{ $ipd->ipd_no }}</span>
                     </td>
-                    <td style="text-align: center; width: 33.33%; padding: 4px 5px;">
+                    <td style="text-align: center; width: 33.33%; padding: 3px 4px;">
                         <strong>Estimate Date</strong> : {{ \Carbon\Carbon::now()->format('d/m/Y') }}
                     </td>
-                    <td style="text-align: right; width: 33.34%; padding: 4px 5px;">
+                    <td style="text-align: right; width: 33.34%; padding: 3px 4px;">
                         <strong>Estimate Time</strong> : {{ \Carbon\Carbon::now()->format('H:i:s') }}
                     </td>
                 </tr>
@@ -387,7 +310,7 @@
         </div>
 
         <!-- Thick Horizontal Line -->
-        <div style="border-top: 2px solid #282828; margin: 5px 0;"></div>
+        <div style="border-top: 2px solid #282828; margin: 1px 0;"></div>
 
         <!-- Patient Information -->
         <div class="patient_info">
@@ -496,6 +419,7 @@
 
     <!-- Main Content Area -->
     <main>
+        <div class="header-body-spacer" aria-hidden="true"></div>
         <!-- Charges Breakdown -->
         <div class="section-title">Charges Breakdown</div>
 
@@ -609,19 +533,35 @@
         </table>
         @endif
 
-        <!-- Investigation Section -->
-        @if((isset($pathologyTestNames) && count($pathologyTestNames) > 0) || (isset($radiologyTestNames) && count($radiologyTestNames) > 0))
-        <div class="section-title">Investigation</div>
-        
-        <!-- Pathology Tests -->
-        @if(isset($pathologyTestNames) && count($pathologyTestNames) > 0)
+        <!-- Pathology Section (Date wise details) -->
+        @if(isset($investigationDatewise) && $investigationDatewise->where('type', 'pathology')->count() > 0)
+        <div class="section-title">Pathology (Date wise)</div>
         <table class="charges-table">
             <thead>
                 <tr>
-                    <th>Pathology</th>
-                    <th class="text-right">Amount</th>
+                    <th>Date</th>
+                    <th>Test Name</th>
+                    <th class="text-right">Amount (Rs.)</th>
                 </tr>
             </thead>
+            <tbody>
+                @foreach($investigationDatewise->where('type', 'pathology') as $row)
+                <tr>
+                    <td>{{ \Carbon\Carbon::parse($row['date'])->format('d-m-Y') }}</td>
+                    <td>{{ $row['test_name'] ?? '-' }}</td>
+                    <td class="text-right">{{ number_format($row['amount'] ?? 0, 2) }}</td>
+                </tr>
+                @endforeach
+                <tr style="font-weight: bold;">
+                    <td colspan="2" class="text-right">Pathology Total:</td>
+                    <td class="text-right">Rs. {{ number_format(isset($pathologyTotal) && $pathologyTotal > 0 ? $pathologyTotal : ($breakup['pathology_charges'] ?? 0), 2) }}</td>
+                </tr>
+            </tbody>
+        </table>
+        @elseif(isset($pathologyTestNames) && count($pathologyTestNames) > 0)
+        <div class="section-title">Pathology</div>
+        <table class="charges-table">
+            <thead><tr><th>Pathology</th><th class="text-right">Amount</th></tr></thead>
             <tbody>
                 <tr>
                     <td>{{ implode(', ', $pathologyTestNames) }}</td>
@@ -631,15 +571,35 @@
         </table>
         @endif
 
-        <!-- Radiology Tests -->
-        @if(isset($radiologyTestNames) && count($radiologyTestNames) > 0)
+        <!-- Radiology Section (Date wise details) -->
+        @if(isset($investigationDatewise) && $investigationDatewise->where('type', 'radiology')->count() > 0)
+        <div class="section-title">Radiology (Date wise)</div>
         <table class="charges-table">
             <thead>
                 <tr>
-                    <th>Radiology</th>
-                    <th class="text-right">Amount</th>
+                    <th>Date</th>
+                    <th>Test Name</th>
+                    <th class="text-right">Amount (Rs.)</th>
                 </tr>
             </thead>
+            <tbody>
+                @foreach($investigationDatewise->where('type', 'radiology') as $row)
+                <tr>
+                    <td>{{ \Carbon\Carbon::parse($row['date'])->format('d-m-Y') }}</td>
+                    <td>{{ $row['test_name'] ?? '-' }}</td>
+                    <td class="text-right">{{ number_format($row['amount'] ?? 0, 2) }}</td>
+                </tr>
+                @endforeach
+                <tr style="font-weight: bold;">
+                    <td colspan="2" class="text-right">Radiology Total:</td>
+                    <td class="text-right">Rs. {{ number_format(isset($radiologyTotal) && $radiologyTotal > 0 ? $radiologyTotal : ($breakup['radiology_charges'] ?? 0), 2) }}</td>
+                </tr>
+            </tbody>
+        </table>
+        @elseif(isset($radiologyTestNames) && count($radiologyTestNames) > 0)
+        <div class="section-title">Radiology</div>
+        <table class="charges-table">
+            <thead><tr><th>Radiology</th><th class="text-right">Amount</th></tr></thead>
             <tbody>
                 <tr>
                     <td>{{ implode(', ', $radiologyTestNames) }}</td>
@@ -647,7 +607,6 @@
                 </tr>
             </tbody>
         </table>
-        @endif
         @endif
 
         <!-- Doctor Visit Charges -->

@@ -141,10 +141,10 @@ class IpdController extends Controller
             $ipdPrefix  = Prefix::where("type", 'ipd_no')->firstOrFail();
             $nextNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
             $ipdNo      = $ipdPrefix->prefix . $nextNumber;
-            // 🔹 Create OPD record
+            // 🔹 Create IPD record
             $ipd        = new IpdDetail();
             $ipdPatient = new IpdPatient();
-            $bedDetail  = Bed::where('id', $request->bed_number)->firstOrFail();
+            $hasBed     = !empty($request->bed_group) && !empty($request->bed_number);
             $bedHistory = new PatientBedHistory();
             // dd($opd);
             $ipd->hospital_id = $user->hospital_id;
@@ -189,20 +189,26 @@ class IpdController extends Controller
 
             $ipdPatient->save();
 
-            //patienthistory
-            $bedHistory->bed_group_id = $request->bed_group;
-            $bedHistory->ipd_id       = $ipd->id ?? null;
-            $bedHistory->bed_group_id = $request->bed_group;
-            $bedHistory->bed_id       = $request->bed_number;
-            $bedHistory->from_date    = $request->admission_date;
-            $bedHistory->is_active    = 'yes';
-            $bedHistory->save();
+            // Patient bed history and bed occupancy (only when bed is selected; required for bed charges in billing)
+            if ($hasBed) {
+                $bedDetail = Bed::where('id', $request->bed_number)->first();
+                if ($bedDetail) {
+                    $bedHistory->hospital_id   = $ipd->hospital_id ?? $user->hospital_id ?? null;
+                    $bedHistory->branch_id     = $ipd->branch_id ?? $user->branch_id ?? null;
+                    $bedHistory->bed_group_id  = $request->bed_group;
+                    $bedHistory->ipd_id        = $ipd->id ?? null;
+                    $bedHistory->bed_id        = $request->bed_number;
+                    $bedHistory->from_date     = $request->admission_date;
+                    $bedHistory->is_active     = 'yes';
+                    $bedHistory->save();
 
-            $bedDetail->is_active = 'no';
-            $bedDetail->save();
+                    $bedDetail->is_active = 'no';
+                    $bedDetail->save();
+                }
+            }
 
-            // Create initial bed charge entry for admission date
-            if ($request->bed_group && $request->admission_date) {
+            // Create initial bed charge entry for admission date (used as fallback by billing)
+            if ($hasBed && $request->admission_date) {
                 $bedGroup      = BedGroup::find($request->bed_group);
                 $bedChargeRate = $bedGroup->bed_cost ?? 0.00;
 
@@ -1069,8 +1075,10 @@ class IpdController extends Controller
             Bed::where('id', $ipd->bed)->update(['is_active' => 'yes']);
         }
 
-        // --- Assign new bed ---
+        // --- Assign new bed (hospital_id/branch_id required for billing consistency) ---
         PatientBedHistory::create([
+            'hospital_id'  => $ipd->hospital_id ?? null,
+            'branch_id'    => $ipd->branch_id ?? null,
             'ipd_id'       => $ipd->id,
             'bed_id'       => $request->new_bed,
             'bed_group_id' => $request->bed_group,

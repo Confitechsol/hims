@@ -647,19 +647,35 @@
         </table>
         @endif
 
-        <!-- Investigation Section -->
-        @if((isset($pathologyTestNames) && count($pathologyTestNames) > 0) || (isset($radiologyTestNames) && count($radiologyTestNames) > 0))
-        <div class="section-title">Investigation</div>
-        
-        <!-- Pathology Tests -->
-        @if(isset($pathologyTestNames) && count($pathologyTestNames) > 0)
+        <!-- Pathology Section (Date wise details) -->
+        @if(isset($investigationDatewise) && $investigationDatewise->where('type', 'pathology')->count() > 0)
+        <div class="section-title">Pathology (Date wise)</div>
         <table class="charges-table">
             <thead>
                 <tr>
-                    <th>Pathology</th>
-                    <th class="text-right">Amount</th>
+                    <th>Date</th>
+                    <th>Test Name</th>
+                    <th class="text-right">Amount (Rs.)</th>
                 </tr>
             </thead>
+            <tbody>
+                @foreach($investigationDatewise->where('type', 'pathology') as $row)
+                <tr>
+                    <td>{{ \Carbon\Carbon::parse($row['date'])->format('d-m-Y') }}</td>
+                    <td>{{ $row['test_name'] ?? '-' }}</td>
+                    <td class="text-right">{{ number_format($row['amount'] ?? 0, 2) }}</td>
+                </tr>
+                @endforeach
+                <tr style="font-weight: bold;">
+                    <td colspan="2" class="text-right">Pathology Total:</td>
+                    <td class="text-right">Rs. {{ number_format(isset($pathologyTotal) && $pathologyTotal > 0 ? $pathologyTotal : ($breakup['pathology_charges'] ?? 0), 2) }}</td>
+                </tr>
+            </tbody>
+        </table>
+        @elseif(isset($pathologyTestNames) && count($pathologyTestNames) > 0)
+        <div class="section-title">Pathology</div>
+        <table class="charges-table">
+            <thead><tr><th>Pathology</th><th class="text-right">Amount</th></tr></thead>
             <tbody>
                 <tr>
                     <td>{{ implode(', ', $pathologyTestNames) }}</td>
@@ -669,15 +685,35 @@
         </table>
         @endif
 
-        <!-- Radiology Tests -->
-        @if(isset($radiologyTestNames) && count($radiologyTestNames) > 0)
+        <!-- Radiology Section (Date wise details) -->
+        @if(isset($investigationDatewise) && $investigationDatewise->where('type', 'radiology')->count() > 0)
+        <div class="section-title">Radiology (Date wise)</div>
         <table class="charges-table">
             <thead>
                 <tr>
-                    <th>Radiology</th>
-                    <th class="text-right">Amount</th>
+                    <th>Date</th>
+                    <th>Test Name</th>
+                    <th class="text-right">Amount (Rs.)</th>
                 </tr>
             </thead>
+            <tbody>
+                @foreach($investigationDatewise->where('type', 'radiology') as $row)
+                <tr>
+                    <td>{{ \Carbon\Carbon::parse($row['date'])->format('d-m-Y') }}</td>
+                    <td>{{ $row['test_name'] ?? '-' }}</td>
+                    <td class="text-right">{{ number_format($row['amount'] ?? 0, 2) }}</td>
+                </tr>
+                @endforeach
+                <tr style="font-weight: bold;">
+                    <td colspan="2" class="text-right">Radiology Total:</td>
+                    <td class="text-right">Rs. {{ number_format(isset($radiologyTotal) && $radiologyTotal > 0 ? $radiologyTotal : ($breakup['radiology_charges'] ?? 0), 2) }}</td>
+                </tr>
+            </tbody>
+        </table>
+        @elseif(isset($radiologyTestNames) && count($radiologyTestNames) > 0)
+        <div class="section-title">Radiology</div>
+        <table class="charges-table">
+            <thead><tr><th>Radiology</th><th class="text-right">Amount</th></tr></thead>
             <tbody>
                 <tr>
                     <td>{{ implode(', ', $radiologyTestNames) }}</td>
@@ -685,7 +721,6 @@
                 </tr>
             </tbody>
         </table>
-        @endif
         @endif
 
         <!-- Doctor Visit Charges -->

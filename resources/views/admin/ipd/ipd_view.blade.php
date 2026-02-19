@@ -1286,15 +1286,14 @@
                                         <tbody>
                                             @foreach ($ipdCharges as $charge)
                                                 @php
-                                                    $taxAmount =
-                                                        ($charge->charge->standard_charge *
-                                                            $charge->charge->taxCategory->percentage) /
-                                                        100;
-                                                    $amount = $charge->standard_charge + $taxAmount;
+                                                    $standardCharge = $charge->charge?->standard_charge ?? $charge->standard_charge ?? 0;
+                                                    $taxPct = $charge->charge?->taxCategory?->percentage ?? 0;
+                                                    $taxAmount = ($standardCharge * $taxPct) / 100;
+                                                    $amount = ($charge->standard_charge ?? $standardCharge) + $taxAmount;
                                                 @endphp
                                                 <tr>
                                                     <td>
-                                                        {{ $charge->charge->name ?? '-'}}
+                                                        {{ $charge->charge?->name ?? '-'}}
                                                     </td>
                                                     <td style="text-transform: capitalize;">
                                                         {{ $charge->chargeCategory?->chargeType?->charge_type ?? '-' }}
@@ -3439,25 +3438,18 @@
                                                         <tbody>
                                                             @foreach ($ipdCharges as $charge)
                                                                 @php
-                                                                    $taxAmount =
-                                                                        ($charge->charge->standard_charge *
-                                                                            $charge->charge->taxCategory->percentage) /
-                                                                        100;
-                                                                    $discountAmount =
-                                                                        ($charge->charge->standard_charge *
-                                                                            $charge->discount) /
-                                                                        100;
-                                                                    $amount =
-                                                                        $charge->charge->standard_charge -
-                                                                        $discountAmount +
-                                                                        $taxAmount;
+                                                                    $standardCharge = $charge->charge?->standard_charge ?? $charge->standard_charge ?? 0;
+                                                                    $taxPct = $charge->charge?->taxCategory?->percentage ?? 0;
+                                                                    $taxAmount = ($standardCharge * $taxPct) / 100;
+                                                                    $discountAmount = ($standardCharge * ($charge->discount ?? 0)) / 100;
+                                                                    $amount = $standardCharge - $discountAmount + $taxAmount;
                                                                 @endphp
                                                                 <tr>
                                                                     <td>
                                                                         {{ \Carbon\Carbon::parse($charge->date)->format('d-m-Y') }}
                                                                     </td>
                                                                     <td>
-                                                                        {{ $charge->charge->name ?? '-' }}
+                                                                        {{ $charge->charge?->name ?? '-' }}
                                                                     </td>
                                                                     <td style="text-transform: capitalize;">
                                                                         {{ $charge->chargeCategory?->chargeType?->charge_type ?? '-' }}
@@ -3473,7 +3465,7 @@
                                                                     <td class="text-right">0.00</td>
                                                                     <td>{{ $discountAmount }}&nbsp;({{ $charge->discount }}%)
                                                                     </td>
-                                                                    <!-- <td>{{ $taxAmount }}&nbsp;({{ $charge->charge->taxCategory->percentage }}%)
+                                                                    <!-- <td>{{ $taxAmount }}&nbsp;({{ $charge->charge?->taxCategory?->percentage ?? '-' }}%)
                                                                     </td> -->
                                                                     <td>{{ $amount }}</td>
                                                                     <!-- <td>
