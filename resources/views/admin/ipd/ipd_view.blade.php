@@ -573,13 +573,13 @@
                         <span>Charges</span>
                     </a>
                 </li>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a href="#payments" data-bs-toggle="tab" aria-expanded="true"
                         class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
                             class="fa-solid fa-hand-holding-dollar text-primary pe-1"></i>
                         <span>Payments</span>
                     </a>
-                </li>
+                </li> -->
                 <li class="nav-item">
                     <a href="#live_consultation" data-bs-toggle="tab" aria-expanded="true"
                         class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
@@ -3512,8 +3512,8 @@
                     </div>
                 </div>
             </div>
-            <div class="tab-pane" id="payments">
-                <!-- row start -->
+            <!-- <div class="tab-pane" id="payments">
+                
                 <div class="row">
                     <div class="col-12 d-flex">
                         <div class="card shadow-sm flex-fill w-100">
@@ -3546,7 +3546,7 @@
                                                                         class="ti ti-plus me-1"></i>Add Payment</a>
                                                             </div>
                                                         @endif
-                                                        <!-- First Modal -->
+                                                        
                                                         <div class="modal fade" id="add_payment" tabindex="-1"
                                                             aria-hidden="true">
                                                             <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -3630,12 +3630,7 @@
                                                                                         <input type="date" name="cheque_date" id="cheque_date" class="form-control">
                                                                                     </div>
 
-                                                                                    <!-- <div class="col-md-4">
-                                                                                        <label for="cheque_attachment" class="form-label">
-                                                                                            Attachment
-                                                                                        </label>
-                                                                                        <input type="file" name="cheque_attachment" id="cheque_attachment" class="form-control">
-                                                                                    </div> -->
+                                                                                    
                                                                                 </div>
 
                                                                                 <div class="col-md-6">
@@ -3657,7 +3652,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <!-- Table start -->
+
                                                 <div class="table-responsive table-nowrap">
                                                     <table class="table border">
                                                         <thead class="thead-light">
@@ -3716,7 +3711,7 @@
                                                         </tbody>
                                                     </table>
                                                 </div>
-                                                <!-- Table end -->
+                                                
                                             </div>
                                         </div>
                                     </div>
@@ -3725,7 +3720,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
             <div class="tab-pane" id="live_consultation">
                 <!-- row start -->
                 <div class="row">
