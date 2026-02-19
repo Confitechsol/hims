@@ -451,9 +451,9 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                     <li><a href="{{ route('inventory-reports') }}"  class="{{ request()->routeIs('inventory-reports') ? 'active' : '' }}">Inventory Reports
+                                     <li><a href="{{ route('inventory-reports') }}"  class="{{ request()->routeIs('inventory-reports') ? 'active' : '' }}">Inventory Reports</i>
                                      <li><a href="{{ route('finance') }}" class="{{ request()->routeIs('finance') ? 'active' : '' }}">Finance Report
-                                            </a></li>
+                                            </a></li> 
                                     <li class="submenu">
                                         <a href="javascript:void(0);" class="{{ request()->routeIs('reports.money-receipt-register*') || request()->routeIs('reports.cash-register*') || request()->routeIs('reports.expense-register*') || request()->routeIs('reports.ipd-final-bill-register*') || request()->routeIs('reports.daily-collection*') ? 'active subdrop' : '' }}">
                                             <i class="ti ti-report-money"></i><span>Accounting Report</span>
@@ -471,42 +471,9 @@
                                             Report</a></li>
                                     <li><a href="{{ route('ipd.reports') }}"  class="{{ request()->routeIs('death') ? 'active' : '' }}">IPD
                                             Report</a></li>
-                                    <li><a href="{{ route('finance') }}"  class="{{ request()->routeIs('death') ? 'active' : '' }}">Appointment
-                                            Report</a></li>
-                                    <!-- <li><a href="patient-report.html">Patient
-                                            Report</a></li>
-                                            <li><a href="patient-report.html">Finance
-                                            Report</a></li>
-                                            <li><a href="patient-report.html">Appointment
-                                            Report</a></li>
-                                            <li><a href="patient-report.html">OPD
-                                            Report</a></li>
-                                            <li><a href="patient-report.html">IPD
-                                            Report</a></li>
-                                            <li><a href="patient-report.html">Pharmacy
-                                            Report</a></li>
-                                            <li><a href="patient-report.html">Pathology
-                                            Report</a></li>
-                                            <li><a href="patient-report.html">Radiology
-                                            Report</a></li>
-                                            <li><a href="patient-report.html">Blood Bank
-                                            Report</a></li>
-                                            <li><a href="patient-report.html">Ambulance
-                                            Report</a></li>
-                                            <li><a href="patient-report.html">Birth & Death
-                                            Report</a></li>
-                                            <li><a href="patient-report.html">Human Resource
+                                    <!-- <li><a href="{{ route('finance') }}"  class="{{ request()->routeIs('death') ? 'active' : '' }}">Appointment
                                             Report</a></li> -->
-                                            <!-- <li><a href="patient-report.html">TPA
-                                            Report</a></li>
-                                            <li><a href="patient-report.html">Inventory
-                                            Report</a></li>
-                                            <li><a href="patient-report.html">Live Consultation
-                                            Report</a></li>
-                                            <li><a href="patient-report.html">Log
-                                            Report</a></li>
-                                            <li><a href="patient-report.html">OT
-                                            Report</a></li> -->
+                                    
                                             
                                     </ul>
                                 </li>
