@@ -99,10 +99,10 @@
                                         <div class="card-body">
                                             <div class="mb-3">
 
-        <button class="btn btn-success" onclick="exportToExcel('inventory-stock-report-table')">Export to Excel</button>
-        <button class="btn btn-danger" onclick="exportToPDF('inventory-stock-report-table')">Export to PDF</button>
+                                            <button class="btn btn-success" onclick="exportToExcel('inventory-stock-report-table')">Export to Excel</button>
+                                            <button class="btn btn-danger" onclick="exportToPDF('inventory-stock-report-table')">Export to PDF</button>
         
-    </div>  
+                                          </div>  
 
 
                                             <!-- Table start -->
