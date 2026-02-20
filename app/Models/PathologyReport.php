@@ -18,6 +18,8 @@ class PathologyReport extends Model
         'branch_id',
         'pathology_bill_id',
         'pathology_id',
+        'ipd_prescription_test_id',
+        'instance_number',
         'customer_type',
         'patient_id',
         'reporting_date',
@@ -67,5 +69,13 @@ class PathologyReport extends Model
     public function parameterDetails()
     {
         return $this->hasMany(PathologyReportParameterDetail::class, 'pathology_report_id');
+    }
+
+    /**
+     * Relationship with IpdPrescriptionTest (prescription test instance)
+     */
+    public function prescriptionTestInstance()
+    {
+        return $this->belongsTo(IpdPrescriptionTest::class, 'ipd_prescription_test_id');
     }
 }

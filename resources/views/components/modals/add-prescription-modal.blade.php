@@ -7,7 +7,66 @@
         border: none;
         border-radius: 12px;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-        overflow: hidden;
+        overflow: visible;
+    }
+    /* Ensure Select2 dropdown is visible inside prescription modal */
+    #addPrescriptionModal .select2-container { z-index: 1060 !important; }
+    #addPrescriptionModal .select2-dropdown { z-index: 1061 !important; }
+    #addPrescriptionModal .select2-container--open { z-index: 1061 !important; }
+    #addPrescriptionModal .modal-body { overflow-x: visible; overflow-y: auto; }
+    .pathology-selected-list .selected-test-row,
+    .radiology-selected-list .selected-test-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 8px;
+        margin-bottom: 6px;
+        background: #f8f9fa;
+        border-radius: 6px;
+        border: 1px solid #e9ecef;
+        flex-wrap: wrap;
+    }
+    .pathology-selected-list .selected-test-row .test-name-badge { font-weight: 600; color: #333; }
+    .pathology-selected-list .selected-test-row .instance-badge,
+    .radiology-selected-list .selected-test-row .instance-badge {
+        font-size: 0.75rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        background: #75009633;
+        color: #750096;
+    }
+    .pathology-selected-list .selected-test-row .instance-badge.instance-2 { background: #ffc10733; color: #856404; }
+    .pathology-selected-list .selected-test-row .instance-badge.instance-3plus { background: #fd7e1433; color: #a13b00; }
+    .radiology-selected-list .selected-test-row .instance-badge.instance-2 { background: #ffc10733; color: #856404; }
+    .radiology-selected-list .selected-test-row .instance-badge.instance-3plus { background: #fd7e1433; color: #a13b00; }
+    .pathology-selected-list .selected-test-row input.notes-input,
+    .radiology-selected-list .selected-test-row input.notes-input {
+        flex: 1;
+        min-width: 100px;
+        padding: 4px 8px;
+        font-size: 0.875rem;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+    }
+    .pathology-selected-list .selected-test-row .btn-add-again,
+    .radiology-selected-list .selected-test-row .btn-add-again {
+        padding: 2px 8px;
+        font-size: 0.75rem;
+        background: #750096;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .pathology-selected-list .selected-test-row .btn-remove-test,
+    .radiology-selected-list .selected-test-row .btn-remove-test {
+        padding: 2px 8px;
+        font-size: 0.75rem;
+        background: #dc3545;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
     }
 
     .modal-header {
@@ -345,13 +404,13 @@
     }
 </style>
 <div class="modal fade" id="addPrescriptionModal" tabindex="-1" aria-labelledby="addPrescriptionModalLabel"
-    aria-hidden="true">
+    aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
     <div class="modal-dialog modal-xl ">
         <!-- inline overflow override so .modal-content {overflow: hidden;} in global CSS doesn't block scrolling -->
         <div class="modal-content" style="overflow: visible;">
             <!-- Modal Header -->
             <div class="modal-header">
-                <h5 class="modal-title" id="addPrescriptionModal">
+                <h5 class="modal-title" id="addPrescriptionModalLabel">
                     <div class="section-icon">
                         <i class="bi bi-person-badge"></i>
                     </div>
@@ -361,7 +420,7 @@
             </div>
 
             <!-- Modal Body (scrollable area provided by modal-dialog-scrollable) -->
-            <form action="{{ route('ipd.addPrescription') }}" id="prescriptionForm" method="post" enctype="multipart/form-data">@csrf
+            <form action="{{ route('ipd.addPrescription') }}" id="ipdAddPrescriptionForm" method="post" enctype="multipart/form-data">@csrf
                 <div class="modal-body" style="max-height: calc(100vh - 160px); overflow-x:hiden;">
                     <div class="row p-4 mx-1">
                         <div class="col-sm-9">
@@ -571,7 +630,7 @@
                                 <div class="col-sm-12">
                                     <div class="form-group">
                                         <label class="form-label">Pathology Tests</label>
-                                        <select class="form-control multiselect2 pathology-test-select" name="pathology[]" id="pathologyOpt" multiple style="width: 100%;">
+                                        <select class="form-control multiselect2 pathology-test-select" id="pathologyOpt" multiple style="width: 100%;" data-name="pathology_select">
                                             <option value="">Select Tests</option>
                                             @if(isset($pathologies) && count($pathologies) > 0)
                                                 @foreach($pathologies as $pathology)
@@ -581,12 +640,14 @@
                                                 @endforeach
                                             @endif
                                         </select>
+                                        <small class="text-muted d-block mt-1">Select tests below; use &quot;Add Again&quot; for same test multiple times today.</small>
+                                        <div id="pathologySelectedList" class="mt-2 pathology-selected-list" style="min-height: 24px;"></div>
                                     </div>
                                 </div>
                                 <div class="col-sm-12">
                                     <div class="form-group">
                                         <label class="form-label">Radiology Tests</label>
-                                        <select class="form-control multiselect2 radiology-test-select" name="radiology[]" id="radiologyOpt" multiple style="width: 100%;">
+                                        <select class="form-control multiselect2 radiology-test-select" id="radiologyOpt" multiple style="width: 100%;" data-name="radiology_select">
                                             <option value="">Select Tests</option>
                                             @if(isset($radiologies) && count($radiologies) > 0)
                                                 @foreach($radiologies as $radiology)
@@ -596,6 +657,8 @@
                                                 @endforeach
                                             @endif
                                         </select>
+                                        <small class="text-muted d-block mt-1">Select tests below; use &quot;Add Again&quot; for same test multiple times today.</small>
+                                        <div id="radiologySelectedList" class="mt-2 radiology-selected-list" style="min-height: 24px;"></div>
                                     </div>
                                 </div>
                                 <div class="col-sm-12">
@@ -696,6 +759,520 @@
     </div>
 </div>
 <script>
+(function() {
+    // CRITICAL: Register submit handler IMMEDIATELY to prevent native form submission
+    var opdRoute = "{{ route('opd.addPrescription') }}";
+    var ipdRoute = "{{ route('ipd.addPrescription') }}";
+    
+    // Define delegator immediately (outside DOMContentLoaded) so it's always available
+    window.__prescriptionSubmitContinue = function(e, form, opdRoute, ipdRoute) {
+        console.log('🔴 __prescriptionSubmitContinue called');
+        if (typeof window.__prescriptionSubmitHandlerReal === 'function') {
+            console.log('🔴 Calling __prescriptionSubmitHandlerReal');
+            window.__prescriptionSubmitHandlerReal(e, form, opdRoute, ipdRoute);
+            return;
+        }
+        console.error('🔴 Prescription submit: full handler not loaded yet');
+        alert('Form is loading. Please try again in a moment.');
+    };
+    
+    // Full submit handler: defined OUTSIDE DOMContentLoaded so it's always available
+    function prescriptionSubmitHandlerReal(e, form, opdRoute, ipdRoute) {
+        console.log('🔴 prescriptionSubmitHandlerReal STARTED');
+        console.log('🔴 Form:', form ? form.id : 'NO FORM');
+        console.log('🔴 Form action:', form ? form.action : 'NO ACTION');
+        
+        // Sync selected pathology/radiology lists to form (hidden inputs)
+        if (typeof window.syncPrescriptionTestListsToForm === 'function') {
+            console.log('🔴 Calling syncPrescriptionTestListsToForm');
+            window.syncPrescriptionTestListsToForm(form);
+        } else {
+            console.warn('🔴 syncPrescriptionTestListsToForm not found');
+        }
+        
+        // CRITICAL: Read pathology/radiology from selects BEFORE destroying Select2
+        var pathOpt = document.getElementById('pathologyOpt');
+        var radOpt = document.getElementById('radiologyOpt');
+        var pathologyIdsFromSelect = [];
+        var radiologyIdsFromSelect = [];
+        
+        // Read from Select2 if active, otherwise from native select
+        if (pathOpt) {
+            if (window.jQuery && $(pathOpt).hasClass('select2-hidden-accessible')) {
+                var v = $(pathOpt).val();
+                if (v) pathologyIdsFromSelect = Array.isArray(v) ? v : [v];
+                console.log('🔴 Pathology Select2 value:', v, '-> IDs:', pathologyIdsFromSelect);
+            } else if (pathOpt.selectedOptions && pathOpt.selectedOptions.length) {
+                pathologyIdsFromSelect = Array.from(pathOpt.selectedOptions).map(function(o) { return o.value; }).filter(Boolean);
+                console.log('🔴 Pathology native selectedOptions:', pathOpt.selectedOptions.length, '-> IDs:', pathologyIdsFromSelect);
+            }
+        }
+        
+        if (radOpt) {
+            if (window.jQuery && $(radOpt).hasClass('select2-hidden-accessible')) {
+                var v = $(radOpt).val();
+                if (v) radiologyIdsFromSelect = Array.isArray(v) ? v : [v];
+                console.log('🔴 Radiology Select2 value:', v, '-> IDs:', radiologyIdsFromSelect);
+            } else if (radOpt.selectedOptions && radOpt.selectedOptions.length) {
+                radiologyIdsFromSelect = Array.from(radOpt.selectedOptions).map(function(o) { return o.value; }).filter(Boolean);
+                console.log('🔴 Radiology native selectedOptions:', radOpt.selectedOptions.length, '-> IDs:', radiologyIdsFromSelect);
+            }
+        }
+        
+        // Ensure lists are populated (from selects if empty)
+        if (!window.selectedPathologyList || window.selectedPathologyList.length === 0) {
+            window.selectedPathologyList = [];
+            pathologyIdsFromSelect.forEach(function(id) {
+                var name = 'ID ' + id;
+                if (pathOpt) pathOpt.querySelectorAll('option').forEach(function(o) { if (String(o.value) == String(id)) name = (o.text || '').trim() || name; });
+                window.selectedPathologyList.push({ id: String(id), name: name, notes: '' });
+            });
+            console.log('🔴 Populated selectedPathologyList from select:', window.selectedPathologyList);
+        }
+        
+        if (!window.selectedRadiologyList || window.selectedRadiologyList.length === 0) {
+            window.selectedRadiologyList = [];
+            radiologyIdsFromSelect.forEach(function(id) {
+                var name = 'ID ' + id;
+                if (radOpt) radOpt.querySelectorAll('option').forEach(function(o) { if (String(o.value) == String(id)) name = (o.text || '').trim() || name; });
+                window.selectedRadiologyList.push({ id: String(id), name: name, notes: '' });
+            });
+            console.log('🔴 Populated selectedRadiologyList from select:', window.selectedRadiologyList);
+        }
+        
+        console.log('🔴 Final selectedPathologyList:', window.selectedPathologyList);
+        console.log('🔴 Final selectedRadiologyList:', window.selectedRadiologyList);
+        
+        // Sync Select2 values to native selects before reading form data
+        if (window.jQuery && $.fn.select2) {
+            const allSelect2Selects = document.querySelectorAll('select.select2, select.multiselect2, select.medicine_category, select.medicine_name, select.medicine_dosage, select.interval_dosage, select.duration_dosage, select[name="finding_type[]"], select[name="findings[]"]');
+            allSelect2Selects.forEach(select => {
+                if ($(select).hasClass('select2-hidden-accessible')) {
+                    try {
+                        const select2Value = $(select).val();
+                        if (select2Value !== null && select2Value !== undefined) {
+                            if (Array.isArray(select2Value)) {
+                                // For multi-select, set all selected values
+                                $(select).val(select2Value);
+                            } else {
+                                // For single select
+                                select.value = String(select2Value);
+                            }
+                        }
+                    } catch(e) {
+                        console.warn('Error syncing Select2:', e);
+                    }
+                }
+            });
+        }
+        
+        // Now build FormData manually
+        const formData = new FormData();
+        
+        // Add CSRF token first
+        const csrfToken = document.querySelector('input[name="_token"]')?.value ||
+                         document.querySelector('meta[name="csrf-token"]')?.content;
+        if (csrfToken) {
+            formData.append('_token', String(csrfToken));
+        }
+        
+        // Add pathology and radiology from lists to FormData
+        (window.selectedPathologyList || []).forEach(function(item) {
+            formData.append('pathology[]', String(item.id));
+            formData.append('pathology_notes[]', String(item.notes || ''));
+            console.log('🔴 FormData.append pathology[]:', item.id, 'notes:', item.notes);
+        });
+        (window.selectedRadiologyList || []).forEach(function(item) {
+            formData.append('radiology[]', String(item.id));
+            formData.append('radiology_notes[]', String(item.notes || ''));
+            console.log('🔴 FormData.append radiology[]:', item.id, 'notes:', item.notes);
+        });
+        
+        console.log('🔴 Total pathology items added to FormData:', (window.selectedPathologyList || []).length);
+        console.log('🔴 Total radiology items added to FormData:', (window.selectedRadiologyList || []).length);
+        
+        // Add all other form fields
+        const formElements = form.elements;
+        for (let i = 0; i < formElements.length; i++) {
+            const element = formElements[i];
+            const name = element.name;
+            
+            if (!name) continue;
+            if (element.type === 'submit' || element.type === 'button') continue;
+            if (name === '_token') continue;
+            if (name === 'pathology[]' || name === 'pathology_notes[]' || name === 'radiology[]' || name === 'radiology_notes[]') continue;
+            
+            // Handle multi-select fields (finding_type[], findings[], etc.)
+            if (element.tagName === 'SELECT' && element.hasAttribute('multiple')) {
+                let selectedValues = [];
+                
+                // Check if Select2 is active and get values from it
+                if (window.jQuery && $(element).hasClass('select2-hidden-accessible')) {
+                    const select2Val = $(element).val();
+                    if (select2Val !== null && select2Val !== undefined) {
+                        selectedValues = Array.isArray(select2Val) ? select2Val : [select2Val];
+                        // Also sync to native select
+                        $(element).val(selectedValues);
+                    }
+                } else {
+                    // Get from native select
+                    const selectedOptions = Array.from(element.selectedOptions);
+                    selectedValues = selectedOptions.map(opt => opt.value).filter(val => val !== null && val !== undefined && val !== '');
+                }
+                
+                // Append each selected value (filter out empty/null values and ensure strings)
+                selectedValues.forEach(val => {
+                    const stringVal = String(val || '').trim();
+                    if (stringVal !== '' && stringVal !== 'null' && stringVal !== 'undefined') {
+                        // Use the name as-is (e.g., "finding_type[]") - Laravel will parse it correctly
+                        formData.append(name, stringVal);
+                        console.log('🔴 Added multi-select value:', name, '=', stringVal);
+                    }
+                });
+            } else if (element.type === 'checkbox' || element.type === 'radio') {
+                if (element.checked) {
+                    formData.append(name, String(element.value || '1'));
+                }
+            } else if (element.type === 'file') {
+                if (element.files && element.files.length > 0) {
+                    for (let j = 0; j < element.files.length; j++) {
+                        formData.append(name, element.files[j]);
+                    }
+                }
+            } else {
+                const val = element.value;
+                if (val !== null && val !== undefined && val !== '') {
+                    formData.append(name, String(val));
+                }
+            }
+        }
+        
+        // Submit via fetch
+        console.log('🔴 About to fetch to:', form.action);
+        fetch(form.action, {
+            method: form.method || 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+            },
+            credentials: 'same-origin'
+        })
+        .then(async response => {
+            console.log('🔴 Response status:', response.status);
+            console.log('🔴 Response Content-Type:', response.headers.get('Content-Type'));
+            
+            const contentType = response.headers.get('Content-Type') || '';
+            let data;
+            
+            if (contentType.includes('application/json')) {
+                try {
+                    data = await response.json();
+                    console.log('🔴 Response data:', data);
+                } catch (e) {
+                    console.error('🔴 Failed to parse JSON:', e);
+                    const text = await response.text();
+                    console.error('🔴 Response text:', text.substring(0, 500));
+                    throw new Error('Server returned invalid JSON. Please check the console for details.');
+                }
+            } else {
+                const text = await response.text();
+                console.error('🔴 Server returned non-JSON response:', text.substring(0, 500));
+                throw new Error('Server returned HTML instead of JSON. This usually means a validation error or server error occurred.');
+            }
+            
+            if (!response.ok) {
+                if (data.errors) {
+                    console.error('🔴 Validation errors:', data.errors);
+                    const errorMessages = Object.values(data.errors).flat().join(', ');
+                    throw new Error(errorMessages);
+                }
+                throw new Error(data.message || 'Server error');
+            }
+            return data;
+        })
+        .then(data => {
+            console.log('🔴 Success:', data);
+            if (window.jQuery && $('#addPrescriptionModal').length) {
+                $('#addPrescriptionModal').modal('hide');
+            }
+            // Show success notification
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: data.message || 'Prescription created successfully.',
+                    confirmButtonColor: '#7c3aed',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    location.reload();
+                });
+            } else {
+                // Fallback if SweetAlert2 is not available
+                alert(data.message || 'Prescription created successfully!');
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('🔴 Error:', error);
+            alert('Something went wrong: ' + error.message);
+        });
+    }
+    
+    // Assign handler immediately so it's available when capture-phase listener runs
+    window.__prescriptionSubmitHandlerReal = prescriptionSubmitHandlerReal;
+    
+    function registerPrescriptionSubmitHandler() {
+        document.addEventListener('submit', function prescriptionSubmitHandler(e) {
+            var form = e.target;
+            console.log('🔴 SUBMIT EVENT CAPTURED - Form ID:', form ? form.id : 'NO FORM', 'Tag:', form ? form.tagName : 'N/A');
+            if (!form || form.id !== 'ipdAddPrescriptionForm') {
+                console.log('🔴 Not our form, ignoring. Form ID:', form ? form.id : 'NO FORM');
+                return;
+            }
+            console.log('🔴 OUR FORM DETECTED - Preventing default and calling handler');
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('🔴 Add prescription form submit intercepted (JS handler running)');
+            window.__prescriptionSubmitContinue(e, form, opdRoute, ipdRoute);
+        }, true);
+        console.log('🔴 Prescription form submit listener registered (capture phase)');
+    }
+    
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', registerPrescriptionSubmitHandler);
+    } else {
+        registerPrescriptionSubmitHandler();
+    }
+    
+    // Selected pathology/radiology lists for "Add Again" and per-instance notes (Phase 2 multiple test instances)
+    window.selectedPathologyList = window.selectedPathologyList || [];
+    window.selectedRadiologyList = window.selectedRadiologyList || [];
+
+    function instanceLabel(indexOneBased) {
+        if (indexOneBased === 1) return '1st time today';
+        if (indexOneBased === 2) return '2nd time today';
+        if (indexOneBased === 3) return '3rd time today';
+        return indexOneBased + 'th time today';
+    }
+
+    function instanceBadgeClass(indexOneBased) {
+        if (indexOneBased === 1) return 'instance-badge';
+        if (indexOneBased === 2) return 'instance-badge instance-2';
+        return 'instance-badge instance-3plus';
+    }
+
+    function renderPathologyList() {
+        var container = document.getElementById('pathologySelectedList');
+        if (!container) return;
+        container.innerHTML = '';
+        var byId = {};
+        window.selectedPathologyList.forEach(function(item) {
+            byId[item.id] = (byId[item.id] || 0) + 1;
+        });
+        var currentCount = {};
+        window.selectedPathologyList.forEach(function(item, idx) {
+            currentCount[item.id] = (currentCount[item.id] || 0) + 1;
+            var row = document.createElement('div');
+            row.className = 'selected-test-row';
+            row.setAttribute('data-idx', idx);
+            var badge = document.createElement('span');
+            badge.className = 'test-name-badge';
+            badge.textContent = item.name;
+            var inst = document.createElement('span');
+            inst.className = instanceBadgeClass(currentCount[item.id]);
+            inst.textContent = instanceLabel(currentCount[item.id]);
+            var notes = document.createElement('input');
+            notes.type = 'text';
+            notes.className = 'notes-input';
+            notes.placeholder = 'Notes (optional)';
+            notes.value = item.notes || '';
+            notes.setAttribute('data-idx', idx);
+            notes.addEventListener('input', function() { window.selectedPathologyList[idx].notes = this.value; });
+            var addAgain = document.createElement('button');
+            addAgain.type = 'button';
+            addAgain.className = 'btn-add-again';
+            addAgain.textContent = 'Add Again';
+            addAgain.setAttribute('data-idx', idx);
+            var remove = document.createElement('button');
+            remove.type = 'button';
+            remove.className = 'btn-remove-test';
+            remove.textContent = 'Remove';
+            remove.setAttribute('data-idx', idx);
+            row.appendChild(badge);
+            row.appendChild(inst);
+            row.appendChild(notes);
+            row.appendChild(addAgain);
+            row.appendChild(remove);
+            container.appendChild(row);
+        });
+    }
+
+    function renderRadiologyList() {
+        var container = document.getElementById('radiologySelectedList');
+        if (!container) return;
+        container.innerHTML = '';
+        var currentCount = {};
+        window.selectedRadiologyList.forEach(function(item, idx) {
+            currentCount[item.id] = (currentCount[item.id] || 0) + 1;
+            var row = document.createElement('div');
+            row.className = 'selected-test-row';
+            row.setAttribute('data-idx', idx);
+            var badge = document.createElement('span');
+            badge.className = 'test-name-badge';
+            badge.textContent = item.name;
+            var inst = document.createElement('span');
+            inst.className = instanceBadgeClass(currentCount[item.id]);
+            inst.textContent = instanceLabel(currentCount[item.id]);
+            var notes = document.createElement('input');
+            notes.type = 'text';
+            notes.className = 'notes-input';
+            notes.placeholder = 'Notes (optional)';
+            notes.value = item.notes || '';
+            notes.setAttribute('data-idx', idx);
+            notes.addEventListener('input', function() { window.selectedRadiologyList[idx].notes = this.value; });
+            var addAgain = document.createElement('button');
+            addAgain.type = 'button';
+            addAgain.className = 'btn-add-again';
+            addAgain.textContent = 'Add Again';
+            addAgain.setAttribute('data-idx', idx);
+            var remove = document.createElement('button');
+            remove.type = 'button';
+            remove.className = 'btn-remove-test';
+            remove.textContent = 'Remove';
+            remove.setAttribute('data-idx', idx);
+            row.appendChild(badge);
+            row.appendChild(inst);
+            row.appendChild(notes);
+            row.appendChild(addAgain);
+            row.appendChild(remove);
+            container.appendChild(row);
+        });
+    }
+
+    window.syncPrescriptionTestListsToForm = function(form) {
+        if (!form) form = document.getElementById('ipdAddPrescriptionForm');
+        if (!form) return;
+        var existing = form.querySelectorAll('input[name="pathology[]"], input[name="pathology_notes[]"], input[name="radiology[]"], input[name="radiology_notes[]"]');
+        existing.forEach(function(el) { el.remove(); });
+        window.selectedPathologyList.forEach(function(item) {
+            var i = document.createElement('input');
+            i.type = 'hidden';
+            i.name = 'pathology[]';
+            i.value = item.id;
+            form.appendChild(i);
+            var n = document.createElement('input');
+            n.type = 'hidden';
+            n.name = 'pathology_notes[]';
+            n.value = item.notes || '';
+            form.appendChild(n);
+        });
+        window.selectedRadiologyList.forEach(function(item) {
+            var i = document.createElement('input');
+            i.type = 'hidden';
+            i.name = 'radiology[]';
+            i.value = item.id;
+            form.appendChild(i);
+            var n = document.createElement('input');
+            n.type = 'hidden';
+            n.name = 'radiology_notes[]';
+            n.value = item.notes || '';
+            form.appendChild(n);
+        });
+    };
+
+    function wirePrescriptionTestLists() {
+        var $ = window.jQuery;
+        if (!$) return;
+        $(document).off('select2:select.prescriptionTests', '#pathologyOpt').on('select2:select.prescriptionTests', '#pathologyOpt', function(e) {
+            var data = e.params.data;
+            if (data && data.id) {
+                var count = window.selectedPathologyList.filter(function(x) { return x.id == data.id; }).length;
+                if (count >= 3 && !confirm('This test is already added 3 times today. Add again?')) {
+                    $(this).val(null).trigger('change');
+                    return;
+                }
+                window.selectedPathologyList.push({ id: data.id, name: data.text || ('ID ' + data.id), notes: '' });
+                renderPathologyList();
+                $(this).val(null).trigger('change');
+            }
+        });
+        $(document).off('select2:select.prescriptionTests', '#radiologyOpt').on('select2:select.prescriptionTests', '#radiologyOpt', function(e) {
+            var data = e.params.data;
+            if (data && data.id) {
+                var count = window.selectedRadiologyList.filter(function(x) { return x.id == data.id; }).length;
+                if (count >= 3 && !confirm('This test is already added 3 times today. Add again?')) {
+                    $(this).val(null).trigger('change');
+                    return;
+                }
+                window.selectedRadiologyList.push({ id: data.id, name: data.text || ('ID ' + data.id), notes: '' });
+                renderRadiologyList();
+                $(this).val(null).trigger('change');
+            }
+        });
+        $(document).off('click.prescriptionTests', '#pathologySelectedList').on('click.prescriptionTests', '#pathologySelectedList', function(e) {
+            var             btn = e.target.closest('.btn-add-again');
+            if (btn) {
+                var idx = parseInt(btn.getAttribute('data-idx'), 10);
+                var item = window.selectedPathologyList[idx];
+                if (item) {
+                    var count = window.selectedPathologyList.filter(function(x) { return x.id == item.id; }).length;
+                    if (count >= 3 && !confirm('This test is already added 3 times today. Add again?')) return;
+                    window.selectedPathologyList.push({ id: item.id, name: item.name, notes: '' });
+                    renderPathologyList();
+                }
+                e.preventDefault();
+                return false;
+            }
+            btn = e.target.closest('.btn-remove-test');
+            if (btn) {
+                var idx = parseInt(btn.getAttribute('data-idx'), 10);
+                window.selectedPathologyList.splice(idx, 1);
+                renderPathologyList();
+                e.preventDefault();
+                return false;
+            }
+        });
+        $(document).off('click.prescriptionTests', '#radiologySelectedList').on('click.prescriptionTests', '#radiologySelectedList', function(e) {
+            var btn = e.target.closest('.btn-add-again');
+            if (btn) {
+                var idx = parseInt(btn.getAttribute('data-idx'), 10);
+                var item = window.selectedRadiologyList[idx];
+                if (item) {
+                    var count = window.selectedRadiologyList.filter(function(x) { return x.id == item.id; }).length;
+                    if (count >= 3 && !confirm('This test is already added 3 times today. Add again?')) return;
+                    window.selectedRadiologyList.push({ id: item.id, name: item.name, notes: '' });
+                    renderRadiologyList();
+                }
+                e.preventDefault();
+                return false;
+            }
+            btn = e.target.closest('.btn-remove-test');
+            if (btn) {
+                var idx = parseInt(btn.getAttribute('data-idx'), 10);
+                window.selectedRadiologyList.splice(idx, 1);
+                renderRadiologyList();
+                e.preventDefault();
+                return false;
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        renderPathologyList();
+        renderRadiologyList();
+        setTimeout(wirePrescriptionTestLists, 500);
+    });
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        setTimeout(function() {
+            renderPathologyList();
+            renderRadiologyList();
+            wirePrescriptionTestLists();
+        }, 300);
+    }
+})();
+</script>
+<script>
     document.addEventListener('DOMContentLoaded', function() {
         console.log('DOMContentLoaded fired for prescription modal');
         const createPrescriptionModal = document.getElementById("addPrescriptionModal");
@@ -703,6 +1280,131 @@
         const findingsSelect = document.getElementById('finding');
         const pathologySelect = document.getElementById('pathologyOpt');
         const radiologySelect = document.getElementById('radiologyOpt');
+        
+        // Helper function to safely destroy Select2
+        window.safeDestroySelect2 = function(element) {
+            if (!element || !window.jQuery || !$.fn.select2) {
+                return;
+            }
+            try {
+                const $el = $(element);
+                if ($el.hasClass('select2-hidden-accessible') || $el.data('select2')) {
+                    $el.select2('destroy');
+                }
+            } catch (e) {
+                // Silently ignore errors - element might not have Select2 initialized
+                console.debug('Select2 destroy skipped:', e.message);
+            }
+        };
+        
+        // Override jQuery select2 destroy to be safe - prevent errors when destroying non-initialized Select2
+        // This MUST run before any Select2 initialization
+        if (window.jQuery && $.fn.select2) {
+            const originalSelect2 = $.fn.select2;
+            $.fn.select2 = function(method, options) {
+                if (method === 'destroy') {
+                    // Return early if element doesn't exist or isn't a jQuery object
+                    if (!this || this.length === 0) {
+                        return this || $();
+                    }
+                    
+                    // Process each element in the jQuery collection
+                    return this.each(function() {
+                        const $el = $(this);
+                        
+                        // Skip if element doesn't exist or isn't in DOM
+                        if (!$el.length || !$el[0] || !document.contains($el[0])) {
+                            return;
+                        }
+                        
+                        try {
+                            // Check if Select2 is actually initialized before destroying
+                            const isInitialized = $el.hasClass('select2-hidden-accessible') || $el.data('select2');
+                            if (isInitialized) {
+                                try {
+                                    // Call original destroy on just this element
+                                    originalSelect2.call($el, method);
+                                } catch (e) {
+                                    // If destroy fails, just remove the classes/data manually
+                                    try {
+                                        $el.removeClass('select2-hidden-accessible');
+                                        $el.removeData('select2');
+                                        // Also remove Select2 container if it exists
+                                        const select2Container = $el.next('.select2-container');
+                                        if (select2Container.length) {
+                                            select2Container.remove();
+                                        }
+                                    } catch (cleanupError) {
+                                        // Ignore cleanup errors
+                                    }
+                                }
+                            }
+                        } catch (e) {
+                            // Silently ignore all errors - element might not have Select2 or might be invalid
+                        }
+                    });
+                }
+                // For all other methods, call original
+                return originalSelect2.apply(this, arguments);
+            };
+        }
+        
+        // Define placeholder functions early to prevent "function not found" errors
+        // These will be replaced by the actual implementations later
+        // Placeholder for loadMedicinesOnModalOpen - will be replaced by real function
+        if (!window.loadMedicinesOnModalOpen) {
+            window.loadMedicinesOnModalOpen = function() {
+                // Wait for real function to be defined
+                let attempts = 0;
+                const checkForRealFunction = setInterval(() => {
+                    attempts++;
+                    const currentFunc = window.loadMedicinesOnModalOpen;
+                    const funcStr = currentFunc ? currentFunc.toString() : '';
+                    // Check if real function is available (has medicineContainer and is longer)
+                    if (funcStr.includes('medicineContainer') && funcStr.length > 1000) {
+                        clearInterval(checkForRealFunction);
+                        currentFunc();
+                    } else if (attempts > 10) {
+                        clearInterval(checkForRealFunction);
+                        console.warn('loadMedicinesOnModalOpen real function not found after 10 attempts');
+                    }
+                }, 100);
+            };
+        }
+        
+        // Placeholder for initRow - will be replaced by real function
+        if (!window.initRow) {
+            window.initRow = function(row) {
+                if (!row) return;
+                // Wait for real function to be defined
+                let attempts = 0;
+                const checkForRealFunction = setInterval(() => {
+                    attempts++;
+                    const currentFunc = window.initRow;
+                    const funcStr = currentFunc ? currentFunc.toString() : '';
+                    // Check if real function is available (has "Row element not found" or is longer)
+                    if ((funcStr.includes('Row element not found') || funcStr.includes('categorySelect')) && funcStr.length > 1000) {
+                        clearInterval(checkForRealFunction);
+                        currentFunc(row);
+                    } else if (attempts > 10) {
+                        clearInterval(checkForRealFunction);
+                        // Fallback: populate category select manually
+                        if (window.medicineCategories && Array.isArray(window.medicineCategories)) {
+                            const categorySelect = row.querySelector('.medicine_category');
+                            if (categorySelect && categorySelect.options.length <= 1) {
+                                categorySelect.innerHTML = '<option value="">Select Category</option>';
+                                window.medicineCategories.forEach(cat => {
+                                    const opt = document.createElement('option');
+                                    opt.value = cat.id;
+                                    opt.textContent = cat.medicine_category || cat.name;
+                                    categorySelect.appendChild(opt);
+                                });
+                            }
+                        }
+                    }
+                }, 100);
+            };
+        }
 
         console.log('Elements found:', {
             modal: !!createPrescriptionModal,
@@ -721,23 +1423,27 @@
             findingsSelect.innerHTML = '<option value="">Loading...</option>';
         }
 
-        // Initialize pathology and radiology selects
+        // Do NOT clear pathology/radiology on page load - they will be loaded when modal opens (or keep server-rendered options)
         if (pathologySelect) {
-            pathologySelect.innerHTML = '<option value="">Loading...</option>';
-            console.log('pathologyOpt element found and initialized');
+            console.log('pathologyOpt element found, options:', pathologySelect.options.length);
         } else {
             console.error('pathologyOpt element NOT FOUND on page load!');
         }
         if (radiologySelect) {
-            radiologySelect.innerHTML = '<option value="">Loading...</option>';
-            console.log('radiologyOpt element found and initialized');
+            console.log('radiologyOpt element found, options:', radiologySelect.options.length);
         } else {
             console.error('radiologyOpt element NOT FOUND on page load!');
         }
         const opdRoute = "{{ route('opd.addPrescription') }}";
         const ipdRoute = "{{ route('ipd.addPrescription') }}";
+        
+        if (!createPrescriptionModal) {
+            console.error('createPrescriptionModal element not found, cannot attach event listeners');
+            return;
+        }
+        
         createPrescriptionModal.addEventListener('show.bs.modal', function(event) {
-            let form = document.getElementById("prescriptionForm");
+            let form = document.getElementById("ipdAddPrescriptionForm");
             const opdIdField = document.getElementById('opd_id');
             const ipdIdField = document.getElementById('ipd_id');
 
@@ -856,133 +1562,12 @@
             }, 200);
         });
 
-        // Add form submit validation to ensure fields are set
-        const prescriptionForm = document.getElementById("prescriptionForm");
-        if (prescriptionForm) {
-            prescriptionForm.addEventListener('submit', function(e) {
-                const opdIdField = document.getElementById('opd_id');
-                const ipdIdField = document.getElementById('ipd_id');
-                const prescribeByField = document.getElementById('prescribe_by');
+        // OLD SUBMIT HANDLER REMOVED - Now handled by document-level capture-phase listener
+        // The capture-phase listener (registered earlier) handles all submit events for ipdAddPrescriptionForm
 
-                // Check if either OPD or IPD ID is set
-                let opdId = opdIdField ? opdIdField.value.trim() : '';
-                let ipdId = ipdIdField ? ipdIdField.value.trim() : '';
-                const prescribeBy = prescribeByField ? prescribeByField.value.trim() : '';
-
-                // If values are empty, try to get from button attributes as fallback
-                if (!opdId && !ipdId) {
-                    const button = document.querySelector('[data-bs-target="#addPrescriptionModal"][data-ipd-id], [data-bs-target="#addPrescriptionModal"][data-id]');
-                    if (button) {
-                        opdId = button.getAttribute('data-id') || button.getAttribute('data-opd-id') || '';
-                        ipdId = button.getAttribute('data-ipd-id') || '';
-                        if (opdId) opdId = opdId.trim();
-                        if (ipdId) ipdId = ipdId.trim();
-
-                        // Set the values in the hidden fields
-                        if (opdId && opdIdField) opdIdField.value = opdId;
-                        if (ipdId && ipdIdField) ipdIdField.value = ipdId;
-                    }
-
-                    // Additional fallback: try to get from URL if on IPD view page
-                    if (!ipdId && window.location.pathname.includes('/ipd_view/')) {
-                        const urlMatch = window.location.pathname.match(/\/ipd_view\/(\d+)/);
-                        if (urlMatch && urlMatch[1]) {
-                            ipdId = urlMatch[1].trim();
-                            if (ipdIdField) {
-                                ipdIdField.value = ipdId;
-                                console.log('IPD ID set from URL in submit handler:', ipdId);
-                            }
-                        }
-                    }
-                }
-
-                // Final check
-                if (!opdId && !ipdId) {
-                    e.preventDefault();
-                    alert('Error: Please ensure the form is opened from a valid patient record. IPD/OPD ID is missing.');
-                    console.error('Form submission blocked: Neither OPD ID nor IPD ID is set');
-                    console.log('OPD Field value:', opdIdField ? opdIdField.value : 'field not found');
-                    console.log('IPD Field value:', ipdIdField ? ipdIdField.value : 'field not found');
-                    return false;
-                }
-
-                if (!prescribeBy) {
-                    e.preventDefault();
-                    alert('Please select a doctor for "Prescribe By" field.');
-                    if (prescribeByField) prescribeByField.focus();
-                    return false;
-                }
-
-                // Ensure form action is set correctly
-                if (ipdId) {
-                    this.action = ipdRoute;
-                    // Ensure ipd_id is set and opd_id is cleared
-                    if (ipdIdField) ipdIdField.value = ipdId;
-                    if (opdIdField) opdIdField.value = '';
-                } else if (opdId) {
-                    this.action = opdRoute;
-                    // Ensure opd_id is set and ipd_id is cleared
-                    if (opdIdField) opdIdField.value = opdId;
-                    if (ipdIdField) ipdIdField.value = '';
-                } else {
-                    // If neither is set, prevent submission
-                    e.preventDefault();
-                    alert('Error: Please ensure the form is opened from a valid patient record.');
-                    console.error('Form submission blocked: Neither OPD ID nor IPD ID is set');
-                    return false;
-                }
-
-                // Double-check action is set
-                if (!this.action || this.action === '' || this.action.includes('ipd_view') || this.action.includes('opd_view')) {
-                    e.preventDefault();
-                    alert('Error: Form action not set correctly. Please refresh the page and try again.');
-                    console.error('Form action invalid:', this.action);
-                    return false;
-                }
-
-                // Final verification of hidden field values - re-read after all fallbacks
-                let finalOpdId = opdIdField ? opdIdField.value.trim() : '';
-                let finalIpdId = ipdIdField ? ipdIdField.value.trim() : '';
-
-                // Last resort: get from URL if still empty and we're on IPD view page
-                if (!finalIpdId && window.location.pathname.includes('/ipd_view/')) {
-                    const urlMatch = window.location.pathname.match(/\/ipd_view\/(\d+)/);
-                    if (urlMatch && urlMatch[1]) {
-                        finalIpdId = urlMatch[1].trim();
-                        if (ipdIdField) {
-                            ipdIdField.value = finalIpdId;
-                            console.log('IPD ID set from URL as last resort:', finalIpdId);
-                        }
-                    }
-                }
-
-                // Also try to get from any button with data-ipd-id attribute
-                if (!finalIpdId) {
-                    const allButtons = document.querySelectorAll('[data-ipd-id]');
-                    if (allButtons.length > 0) {
-                        const firstButton = allButtons[0];
-                        const buttonIpdId = firstButton.getAttribute('data-ipd-id');
-                        if (buttonIpdId && buttonIpdId.trim()) {
-                            finalIpdId = buttonIpdId.trim();
-                            if (ipdIdField) {
-                                ipdIdField.value = finalIpdId;
-                                console.log('IPD ID set from button attribute as last resort:', finalIpdId);
-                            }
-                        }
-                    }
-                }
-
-                console.log('Form submitting with - OPD ID:', finalOpdId, 'IPD ID:', finalIpdId);
-                console.log('Hidden field values - OPD:', opdIdField ? opdIdField.value : 'N/A', 'IPD:', ipdIdField ? ipdIdField.value : 'N/A');
-
-                // Clean up empty medicine rows before submission and ensure all values are strings
-                const medicineRows = document.querySelectorAll('.medicine-row');
-                const rowsToRemove = [];
-                const medicineValues = [];
-
-                medicineRows.forEach((row, index) => {
-                    const medicineSelect = row.querySelector('select[name="medicines[]"]');
-                    const dosageSelect = row.querySelector('select[name="dosages[]"]');
+        const container = document.getElementById("medicineContainer");
+        const addButton = document.getElementById("addMedicineBtn");
+        const addButtonContainer = document.getElementById("addMedicineContainer");
                     const intervalSelect = row.querySelector('select[name="interval_dosages[]"]');
                     const durationSelect = row.querySelector('select[name="duration_dosages[]"]');
 
@@ -1284,8 +1869,15 @@
                                 if (currentVal !== null && currentVal !== undefined) {
                                     stringVal = Array.isArray(currentVal) ? String(currentVal[0]) : String(currentVal);
                                 }
-                                // Destroy Select2
-                                $(select).select2('destroy');
+                                // Destroy Select2 (safely - override handles this)
+                                try {
+                                    const $selectEl = $(select);
+                                    if ($selectEl.hasClass('select2-hidden-accessible') || $selectEl.data('select2')) {
+                                        $selectEl.select2('destroy');
+                                    }
+                                } catch(e) {
+                                    // Ignore - Select2 not initialized
+                                }
                                 // Set the native value
                                 if (stringVal && stringVal !== '' && stringVal !== 'null' && stringVal !== 'undefined') {
                                     select.value = stringVal.trim();
@@ -1340,6 +1932,59 @@
                 // CRITICAL: Intercept form submission and manually build FormData with string values
                 e.preventDefault();
 
+                // CRITICAL: Read pathology/radiology from selects BEFORE destroying Select2
+                var pathOpt = document.getElementById('pathologyOpt');
+                var radOpt = document.getElementById('radiologyOpt');
+                var pathologyIdsFromSelect = [];
+                var radiologyIdsFromSelect = [];
+                
+                // Read from Select2 if active, otherwise from native select
+                if (pathOpt) {
+                    if (window.jQuery && $(pathOpt).hasClass('select2-hidden-accessible')) {
+                        var v = $(pathOpt).val();
+                        if (v) pathologyIdsFromSelect = Array.isArray(v) ? v : [v];
+                        console.log('🔴 Pathology Select2 value:', v, '-> IDs:', pathologyIdsFromSelect);
+                    } else if (pathOpt.selectedOptions && pathOpt.selectedOptions.length) {
+                        pathologyIdsFromSelect = Array.from(pathOpt.selectedOptions).map(function(o) { return o.value; }).filter(Boolean);
+                        console.log('🔴 Pathology native selectedOptions:', pathOpt.selectedOptions.length, '-> IDs:', pathologyIdsFromSelect);
+                    }
+                }
+                
+                if (radOpt) {
+                    if (window.jQuery && $(radOpt).hasClass('select2-hidden-accessible')) {
+                        var v = $(radOpt).val();
+                        if (v) radiologyIdsFromSelect = Array.isArray(v) ? v : [v];
+                        console.log('🔴 Radiology Select2 value:', v, '-> IDs:', radiologyIdsFromSelect);
+                    } else if (radOpt.selectedOptions && radOpt.selectedOptions.length) {
+                        radiologyIdsFromSelect = Array.from(radOpt.selectedOptions).map(function(o) { return o.value; }).filter(Boolean);
+                        console.log('🔴 Radiology native selectedOptions:', radOpt.selectedOptions.length, '-> IDs:', radiologyIdsFromSelect);
+                    }
+                }
+                
+                // Ensure lists are populated (from selects if empty)
+                if (!window.selectedPathologyList || window.selectedPathologyList.length === 0) {
+                    window.selectedPathologyList = [];
+                    pathologyIdsFromSelect.forEach(function(id) {
+                        var name = 'ID ' + id;
+                        if (pathOpt) pathOpt.querySelectorAll('option').forEach(function(o) { if (String(o.value) == String(id)) name = (o.text || '').trim() || name; });
+                        window.selectedPathologyList.push({ id: String(id), name: name, notes: '' });
+                    });
+                    console.log('🔴 Populated selectedPathologyList from select:', window.selectedPathologyList);
+                }
+                
+                if (!window.selectedRadiologyList || window.selectedRadiologyList.length === 0) {
+                    window.selectedRadiologyList = [];
+                    radiologyIdsFromSelect.forEach(function(id) {
+                        var name = 'ID ' + id;
+                        if (radOpt) radOpt.querySelectorAll('option').forEach(function(o) { if (String(o.value) == String(id)) name = (o.text || '').trim() || name; });
+                        window.selectedRadiologyList.push({ id: String(id), name: name, notes: '' });
+                    });
+                    console.log('🔴 Populated selectedRadiologyList from select:', window.selectedRadiologyList);
+                }
+                
+                console.log('🔴 Final selectedPathologyList:', window.selectedPathologyList);
+                console.log('🔴 Final selectedRadiologyList:', window.selectedRadiologyList);
+
                 // First, sync Select2 values to native selects, then destroy Select2 instances
                 const allSelect2Selects = document.querySelectorAll('select.select2, select.multiselect2, select.medicine_category, select.medicine_name, select.medicine_dosage, select.interval_dosage, select.duration_dosage, select[name="pathology[]"], select[name="radiology[]"]');
                 allSelect2Selects.forEach(select => {
@@ -1359,8 +2004,15 @@
                                 }
                             }
 
-                            // Now destroy Select2
-                            $(select).select2('destroy');
+                            // Now destroy Select2 (safely)
+                            try {
+                                const $selectEl = $(select);
+                                if ($selectEl.hasClass('select2-hidden-accessible') || $selectEl.data('select2')) {
+                                    $selectEl.select2('destroy');
+                                }
+                            } catch(e) {
+                                // Ignore - Select2 not initialized
+                            }
                             console.log('Synced and destroyed Select2 for:', select.name, 'value:', select.value || $(select).val());
                         } catch(e) {
                             console.warn('Error syncing/destroying Select2:', e);
@@ -1378,13 +2030,28 @@
                     formData.append('_token', String(csrfToken));
                 }
 
+                // Add pathology and radiology from lists to FormData
+                (window.selectedPathologyList || []).forEach(function(item) {
+                    formData.append('pathology[]', String(item.id));
+                    formData.append('pathology_notes[]', String(item.notes || ''));
+                    console.log('🔴 FormData.append pathology[]:', item.id, 'notes:', item.notes);
+                });
+                (window.selectedRadiologyList || []).forEach(function(item) {
+                    formData.append('radiology[]', String(item.id));
+                    formData.append('radiology_notes[]', String(item.notes || ''));
+                    console.log('🔴 FormData.append radiology[]:', item.id, 'notes:', item.notes);
+                });
+                
+                console.log('🔴 Total pathology items added to FormData:', (window.selectedPathologyList || []).length);
+                console.log('🔴 Total radiology items added to FormData:', (window.selectedRadiologyList || []).length);
+
                 // Process medicine rows first - collect all medicine-related data
-                const medicineRows = document.querySelectorAll('.medicine-row');
+                const validMedicineRows = document.querySelectorAll('.medicine-row');
                 const validMedicineData = [];
 
-                console.log('Processing', medicineRows.length, 'medicine rows');
+                console.log('Processing', validMedicineRows.length, 'medicine rows');
 
-                medicineRows.forEach((row, index) => {
+                validMedicineRows.forEach((row, index) => {
                     const medicineSelect = row.querySelector('select[name="medicines[]"]');
                     const dosageSelect = row.querySelector('select[name="dosages[]"]');
                     const intervalSelect = row.querySelector('select[name="interval_dosages[]"]');
@@ -1579,6 +2246,10 @@
                         name === 'instructions[]') {
                         continue;
                     }
+                    // Skip pathology/radiology (already added from selectedPathologyList/selectedRadiologyList above)
+                    if (name === 'pathology[]' || name === 'pathology_notes[]' || name === 'radiology[]' || name === 'radiology_notes[]') {
+                        continue;
+                    }
 
                     // Handle other array fields (pathology, radiology, etc.)
                     if (name.endsWith('[]')) {
@@ -1749,15 +2420,24 @@
                 })
                 .then(data => {
                     console.log('Success:', data);
-                    // Close modal and reload or show success message
+                    // Close modal
                     if (window.jQuery && $('#addPrescriptionModal').length) {
                         $('#addPrescriptionModal').modal('hide');
                     }
-                    // Reload page or show success
-                    if (data.success || data.message) {
-                        alert(data.message || 'Prescription added successfully!');
-                        location.reload();
+                    // Show success notification
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: data.message || 'Prescription created successfully.',
+                            confirmButtonColor: '#7c3aed',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            location.reload();
+                        });
                     } else {
+                        // Fallback if SweetAlert2 is not available
+                        alert(data.message || 'Prescription created successfully!');
                         location.reload();
                     }
                 })
@@ -1785,11 +2465,14 @@
                 if (window.jQuery && typeof $.fn.select2 !== 'undefined' && $(selectElement).hasClass('select2-hidden-accessible')) {
                     currentValue = $(selectElement).val();
                     isSelect2Initialized = true;
-                    // Destroy Select2 temporarily to update options
+                    // Destroy Select2 temporarily to update options (safely)
                     try {
-                        $(selectElement).select2('destroy');
+                        const $selectEl = $(selectElement);
+                        if ($selectEl.hasClass('select2-hidden-accessible') || $selectEl.data('select2')) {
+                            $selectEl.select2('destroy');
+                        }
                     } catch(e) {
-                        console.warn('Error destroying Select2 before filling:', e);
+                        // Ignore - Select2 not initialized
                     }
                 }
 
@@ -1985,11 +2668,14 @@
                         // Destroy Select2 FIRST before modifying options
                         if (window.jQuery && typeof $.fn.select2 !== 'undefined') {
                             if ($(selectElement).hasClass('select2-hidden-accessible')) {
-                                try {
-                                    $(selectElement).select2('destroy');
-                                    console.log('Destroyed existing Select2 before filling options');
-                                } catch(e) {
-                                    console.warn('Error destroying Select2:', e);
+                                const $selectEl = $(selectElement);
+                                if ($selectEl.length && ($selectEl.hasClass('select2-hidden-accessible') || $selectEl.data('select2'))) {
+                                    try {
+                                        $selectEl.select2('destroy');
+                                        console.log('Destroyed existing Select2 before filling options');
+                                    } catch(e) {
+                                        // Ignore - Select2 not properly initialized
+                                    }
                                 }
                             }
                         }
@@ -2082,54 +2768,8 @@
                     });
             }
 
-            // 🔹 Fetch base dropdown data once
-            Promise.all([
-                fetch("{{ route('getMedicineCategories') }}").then(res => {
-                    if (!res.ok) throw new Error('Failed to fetch categories');
-                    return res.json();
-                }),
-                fetch("{{ route('getDoseIntervals') }}").then(res => {
-                    if (!res.ok) throw new Error('Failed to fetch intervals');
-                    return res.json();
-                }),
-                fetch("{{ route('getDoseDurations') }}").then(res => {
-                    if (!res.ok) throw new Error('Failed to fetch durations');
-                    return res.json();
-                })
-            ]).then(([categories, intervals, durations]) => {
-                console.log('Categories loaded:', categories);
-                console.log('Intervals loaded:', intervals);
-                console.log('Durations loaded:', durations);
-
-                window.medicineCategories = categories;
-                window.doseIntervals = intervals;
-                window.doseDurations = durations;
-
-                // Check if container exists before initializing
-                if (container && container.querySelector(".medicine-row")) {
-                    // Initialize first row
-                    if (typeof window.initRow === 'function') {
-                        window.initRow(container.querySelector(".medicine-row"));
-                    }
-                } else {
-                    console.warn('Medicine container or row not found, will initialize when modal opens');
-                }
-
-                if (addButton) {
-                    addButton.addEventListener("click", function(e) {
-                        e.preventDefault();
-                        if (typeof window.addNewRow === 'function') {
-                            window.addNewRow();
-                        } else {
-                            console.error('addNewRow function not found');
-                        }
-                    });
-                }
-            }).catch(error => {
-                console.error('Error loading base dropdown data:', error);
-            });
-
-            // Make initRow globally accessible
+            // Define initRow function IMMEDIATELY (before Promise) so it's available when called
+            // Make initRow globally accessible (overwrite placeholder)
             window.initRow = function(row) {
                 if (!row) {
                     console.error('Row element not found');
@@ -2154,11 +2794,14 @@
                 // Destroy Select2 for category BEFORE filling if it exists
                 if (window.jQuery && typeof $.fn.select2 !== 'undefined') {
                     if ($(categorySelect).hasClass('select2-hidden-accessible')) {
-                        try {
-                            $(categorySelect).select2('destroy');
-                            console.log('Destroyed existing Select2 for category');
-                        } catch(e) {
-                            console.warn('Error destroying category Select2:', e);
+                        const $catSelect = $(categorySelect);
+                        if ($catSelect.length && ($catSelect.hasClass('select2-hidden-accessible') || $catSelect.data('select2'))) {
+                            try {
+                                $catSelect.select2('destroy');
+                                console.log('Destroyed existing Select2 for category');
+                            } catch(e) {
+                                // Ignore - Select2 not properly initialized
+                            }
                         }
                     }
                 }
@@ -2229,8 +2872,11 @@
                 // Fill interval and duration selects
                 if (window.doseIntervals && typeof window.fillSelect === 'function') {
                     // Destroy Select2 first if exists
-                    if (window.jQuery && $(intervalSelect).hasClass('select2-hidden-accessible')) {
-                        $(intervalSelect).select2('destroy');
+                    if (window.jQuery) {
+                        const $intervalEl = $(intervalSelect);
+                        if ($intervalEl.length && ($intervalEl.hasClass('select2-hidden-accessible') || $intervalEl.data('select2'))) {
+                            $intervalEl.select2('destroy');
+                        }
                     }
                     window.fillSelect(intervalSelect, window.doseIntervals, "name");
                     // Initialize Select2 after filling
@@ -2249,8 +2895,11 @@
 
                 if (window.doseDurations && typeof window.fillSelect === 'function') {
                     // Destroy Select2 first if exists
-                    if (window.jQuery && $(durationSelect).hasClass('select2-hidden-accessible')) {
-                        $(durationSelect).select2('destroy');
+                    if (window.jQuery) {
+                        const $durationEl = $(durationSelect);
+                        if ($durationEl.length && ($durationEl.hasClass('select2-hidden-accessible') || $durationEl.data('select2'))) {
+                            $durationEl.select2('destroy');
+                        }
                     }
                     window.fillSelect(durationSelect, window.doseDurations, "name");
                     // Initialize Select2 after filling
@@ -2271,8 +2920,9 @@
                 medicineSelect.innerHTML = '<option value="">Select Medicine (Choose Category First)</option>';
                 if (window.jQuery && typeof $.fn.select2 !== 'undefined') {
                     // Destroy existing Select2 if any
-                    if ($(medicineSelect).hasClass('select2-hidden-accessible')) {
-                        $(medicineSelect).select2('destroy');
+                    const $medSelect = $(medicineSelect);
+                    if ($medSelect.length && ($medSelect.hasClass('select2-hidden-accessible') || $medSelect.data('select2'))) {
+                        $medSelect.select2('destroy');
                     }
                     // Initialize Select2 for medicine (will be populated when category changes)
                     setTimeout(() => {
@@ -2291,8 +2941,9 @@
                 doseSelect.innerHTML = '<option value="">Select Dose (Choose Medicine First)</option>';
                 if (window.jQuery && typeof $.fn.select2 !== 'undefined') {
                     // Destroy existing Select2 if any
-                    if ($(doseSelect).hasClass('select2-hidden-accessible')) {
-                        $(doseSelect).select2('destroy');
+                    const $doseEl = $(doseSelect);
+                    if ($doseEl.length && ($doseEl.hasClass('select2-hidden-accessible') || $doseEl.data('select2'))) {
+                        $doseEl.select2('destroy');
                     }
                     // Initialize Select2 for dose (will be populated when medicine changes)
                     setTimeout(() => {
@@ -2333,9 +2984,12 @@
                             .then(data => {
                                 console.log('Medicines loaded for category:', data);
 
-                                // Destroy Select2 before filling
-                                if (window.jQuery && $(medicineSelect).hasClass('select2-hidden-accessible')) {
-                                    $(medicineSelect).select2('destroy');
+                                // Destroy Select2 before filling (safely)
+                                if (window.jQuery) {
+                                    const $medSelect = $(medicineSelect);
+                                    if ($medSelect.length && ($medSelect.hasClass('select2-hidden-accessible') || $medSelect.data('select2'))) {
+                                        $medSelect.select2('destroy');
+                                    }
                                 }
 
                                 // Fill medicines
@@ -2381,29 +3035,40 @@
                             .catch(error => {
                                 console.error('Error loading medicines:', error);
                                 if (window.jQuery && $.fn.select2) {
-                                    if ($(medicineSelect).hasClass('select2-hidden-accessible')) {
-                                        $(medicineSelect).select2('destroy');
+                                    const $medSelect = $(medicineSelect);
+                                    if ($medSelect.length && ($medSelect.hasClass('select2-hidden-accessible') || $medSelect.data('select2'))) {
+                                        $medSelect.select2('destroy');
                                     }
-                                    $(medicineSelect).html('<option value="">Error loading medicines</option>');
-                                    $(medicineSelect).prop('disabled', false);
+                                    $medSelect.html('<option value="">Error loading medicines</option>');
+                                    $medSelect.prop('disabled', false);
                                 }
                             });
                 };
 
-                // Attach native change event
-                categorySelect.addEventListener("change", handleCategoryChange);
-
-                // Also attach Select2 change event if jQuery is available
-                if (window.jQuery && $.fn.select2) {
-                    $(categorySelect).off('select2:select select2:clear').on('select2:select select2:clear', function() {
-                        console.log('Category changed via Select2 event');
-                        handleCategoryChange.call(this);
-                    });
+                // Attach native change event (safely)
+                if (categorySelect) {
+                    categorySelect.addEventListener("change", handleCategoryChange);
                 }
 
-                        // Clear medicine and dose selects when category changes
-                        if (window.jQuery && $(doseSelect).hasClass('select2-hidden-accessible')) {
-                            $(doseSelect).select2('destroy');
+                // Also attach Select2 change event if jQuery is available
+                if (window.jQuery && $.fn.select2 && categorySelect) {
+                    const $catSelect = $(categorySelect);
+                    if ($catSelect.length) {
+                        $catSelect.off('select2:select select2:clear').on('select2:select select2:clear', function() {
+                            console.log('Category changed via Select2 event');
+                            if (typeof handleCategoryChange === 'function') {
+                                handleCategoryChange.call(this);
+                            }
+                        });
+                    }
+                }
+
+                        // Clear medicine and dose selects when category changes (safely)
+                        if (window.jQuery) {
+                            const $doseEl = $(doseSelect);
+                            if ($doseEl.length && ($doseEl.hasClass('select2-hidden-accessible') || $doseEl.data('select2'))) {
+                                $doseEl.select2('destroy');
+                            }
                         }
                         doseSelect.innerHTML = '<option value="">Select Dose (Choose Medicine First)</option>';
                         if (window.jQuery && $.fn.select2) {
@@ -2419,9 +3084,12 @@
                             }, 100);
                         }
                     } else {
-                        // If no category selected, clear medicines and doses
-                        if (window.jQuery && $(medicineSelect).hasClass('select2-hidden-accessible')) {
-                            $(medicineSelect).select2('destroy');
+                        // If no category selected, clear medicines and doses (safely)
+                        if (window.jQuery) {
+                            const $medSelect = $(medicineSelect);
+                            if ($medSelect.length && ($medSelect.hasClass('select2-hidden-accessible') || $medSelect.data('select2'))) {
+                                $medSelect.select2('destroy');
+                            }
                         }
                         medicineSelect.innerHTML = '<option value="">Select Medicine (Choose Category First)</option>';
                         if (window.jQuery && $.fn.select2) {
@@ -2437,8 +3105,11 @@
                             }, 100);
                         }
 
-                        if (window.jQuery && $(doseSelect).hasClass('select2-hidden-accessible')) {
-                            $(doseSelect).select2('destroy');
+                        if (window.jQuery) {
+                            const $doseEl = $(doseSelect);
+                            if ($doseEl.length && ($doseEl.hasClass('select2-hidden-accessible') || $doseEl.data('select2'))) {
+                                $doseEl.select2('destroy');
+                            }
                         }
                         doseSelect.innerHTML = '<option value="">Select Dose (Choose Medicine First)</option>';
                         if (window.jQuery && $.fn.select2) {
@@ -2456,9 +3127,10 @@
                     }
                 });
 
-                // Medicine change → fetch doses for the selected medicine
-                medicineSelect.addEventListener("change", function() {
-                    const medicineId = this.value;
+                // Medicine change → fetch doses for the selected medicine (safely)
+                if (medicineSelect) {
+                    medicineSelect.addEventListener("change", function() {
+                        const medicineId = this.value;
 
                     if (medicineId && medicineId !== '') {
                         console.log('Medicine selected:', medicineId, 'Fetching doses...');
@@ -2487,9 +3159,12 @@
                                 .then(data => {
                                     console.log('Doses loaded for category:', data);
 
-                                    // Destroy Select2 before filling
-                                    if (window.jQuery && $(doseSelect).hasClass('select2-hidden-accessible')) {
-                                        $(doseSelect).select2('destroy');
+                                    // Destroy Select2 before filling (safely)
+                                    if (window.jQuery) {
+                                        const $doseEl = $(doseSelect);
+                                        if ($doseEl.length && ($doseEl.hasClass('select2-hidden-accessible') || $doseEl.data('select2'))) {
+                                            $doseEl.select2('destroy');
+                                        }
                                     }
 
                                     // Fill doses
@@ -2539,9 +3214,12 @@
                             }
                         }
                     } else {
-                        // Clear doses if no medicine selected
-                        if (window.jQuery && $(doseSelect).hasClass('select2-hidden-accessible')) {
-                            $(doseSelect).select2('destroy');
+                        // Clear doses if no medicine selected (safely)
+                        if (window.jQuery) {
+                            const $doseEl = $(doseSelect);
+                            if ($doseEl.length && ($doseEl.hasClass('select2-hidden-accessible') || $doseEl.data('select2'))) {
+                                $doseEl.select2('destroy');
+                            }
                         }
                         doseSelect.innerHTML = '<option value="">Select Dose (Choose Medicine First)</option>';
                         if (window.jQuery && $.fn.select2) {
@@ -2557,7 +3235,8 @@
                             }, 100);
                         }
                     }
-                });
+                    });
+                }
 
                 // // Medicine change → fetch doses
                 // row.querySelector(".medicine_name").addEventListener("change", function() {
@@ -2568,18 +3247,20 @@
                 //         .then(data => fillSelect(doseSelect, data, "dose"));
                 // });
 
-                // Delete button
+                // Delete button (safely)
                 const deleteBtn = row.querySelector(".delete_row");
-                deleteBtn.addEventListener("click", function() {
-                    const allRows = container.querySelectorAll(".medicine-row");
-                    if (allRows.length > 1) row.remove();
-                    else alert("At least one medicine must remain.");
-                });
+                if (deleteBtn) {
+                    deleteBtn.addEventListener("click", function() {
+                        const allRows = container.querySelectorAll(".medicine-row");
+                        if (allRows.length > 1) row.remove();
+                        else alert("At least one medicine must remain.");
+                    });
+                }
 
                 // Note: Select2 initialization is handled in initRow function above
                 // Medicine Select2 is initialized in loadAllMedicines after data is loaded
                 // This prevents duplicate initialization conflicts
-            }
+            };
 
             // fillSelect is now defined globally above, this duplicate is removed
 
@@ -2600,12 +3281,76 @@
                 // Insert before button
                 container.insertBefore(newRow, addButtonContainer);
                 // container.appendChild(newRow);
-                initRow(newRow);
+                if (typeof window.initRow === 'function') {
+                    window.initRow(newRow);
+                } else {
+                    console.error('initRow function not available');
+                }
+            }
+            
+            // Make addNewRow globally accessible
+            window.addNewRow = addNewRow;
+        });
+
+        // 🔹 Fetch base dropdown data once (OUTSIDE DOMContentLoaded so functions are available)
+        // Use absolute URLs so fetch works from any page path (e.g. /ipd/28)
+        var medicineCategoriesUrl = "{{ url(route('getMedicineCategories')) }}";
+        var doseIntervalsUrl = "{{ url(route('getDoseIntervals')) }}";
+        var doseDurationsUrl = "{{ url(route('getDoseDurations')) }}";
+        Promise.all([
+            fetch(medicineCategoriesUrl).then(res => {
+                if (!res.ok) return res.json().catch(() => []).then(() => []);
+                return res.json().then(data => Array.isArray(data) ? data : (data && data.data) || []);
+            }),
+            fetch(doseIntervalsUrl).then(res => {
+                if (!res.ok) return res.json().catch(() => []).then(() => []);
+                return res.json().then(data => Array.isArray(data) ? data : (data && data.data) || []);
+            }),
+            fetch(doseDurationsUrl).then(res => {
+                if (!res.ok) return res.json().catch(() => []).then(() => []);
+                return res.json().then(data => Array.isArray(data) ? data : (data && data.data) || []);
+            })
+        ]).then(([categories, intervals, durations]) => {
+            window.medicineCategories = Array.isArray(categories) ? categories : [];
+            window.doseIntervals = Array.isArray(intervals) ? intervals : [];
+            window.doseDurations = Array.isArray(durations) ? durations : [];
+            console.log('Categories loaded:', window.medicineCategories.length, 'Intervals:', window.doseIntervals.length, 'Durations:', window.doseDurations.length);
+
+            // Check if container exists before initializing
+            const container = document.getElementById("medicineContainer");
+            if (container && container.querySelector(".medicine-row")) {
+                // Initialize first row
+                if (typeof window.initRow === 'function') {
+                    window.initRow(container.querySelector(".medicine-row"));
+                }
+            } else {
+                console.warn('Medicine container or row not found, will initialize when modal opens');
             }
 
-        })
+            const addButton = document.getElementById("addMedicineRowBtn");
+            if (addButton) {
+                // Remove existing listener if any by cloning
+                const newAddButton = addButton.cloneNode(true);
+                addButton.parentNode.replaceChild(newAddButton, addButton);
+                if (newAddButton) {
+                    newAddButton.addEventListener("click", function(e) {
+                        e.preventDefault();
+                        if (typeof window.addNewRow === 'function') {
+                            window.addNewRow();
+                        } else {
+                            console.error('addNewRow function not found');
+                        }
+                    });
+                }
+            }
+        }).catch(error => {
+            console.error('Error loading base dropdown data:', error);
+            window.medicineCategories = window.medicineCategories || [];
+            window.doseIntervals = window.doseIntervals || [];
+            window.doseDurations = window.doseDurations || [];
+        });
 
-        // Function to load medicines when modal opens (made global)
+        // Function to load medicines when modal opens (made global) - Define OUTSIDE Promise
         window.loadMedicinesOnModalOpen = function() {
             console.log('loadMedicinesOnModalOpen called');
             const medicineContainer = document.getElementById("medicineContainer");
@@ -2700,15 +3445,16 @@
                                 return;
                             }
 
-                            // Destroy Select2 FIRST before modifying options
+                            // Destroy Select2 FIRST before modifying options (safely)
                             if (window.jQuery && typeof $.fn.select2 !== 'undefined') {
-                                if ($(medicineSelect).hasClass('select2-hidden-accessible')) {
-                                    try {
-                                        $(medicineSelect).select2('destroy');
+                                try {
+                                    const $select = $(medicineSelect);
+                                    if ($select.hasClass('select2-hidden-accessible') || $select.data('select2')) {
+                                        $select.select2('destroy');
                                         console.log('Destroyed existing Select2 before adding options');
-                                    } catch(e) {
-                                        console.warn('Error destroying Select2:', e);
                                     }
+                                } catch(e) {
+                                    console.debug('Select2 destroy skipped (not initialized):', e.message);
                                 }
                             }
 
@@ -2808,6 +3554,9 @@
             .then(response => response.json())
             .then(data => {
                 window.findingCategoryData = data;
+                if (window.jQuery && $(findingCategorySelect).hasClass('select2-hidden-accessible')) {
+                    try { $(findingCategorySelect).select2('destroy'); } catch(e) {}
+                }
                 findingCategorySelect.innerHTML = '<option value="">Select</option>';
                 data.forEach(category => {
                     const option = document.createElement('option');
@@ -2818,14 +3567,29 @@
                     }
                     findingCategorySelect.appendChild(option);
                 });
+                if (window.jQuery && $.fn.select2 && findingCategorySelect) {
+                    $(findingCategorySelect).select2({
+                        placeholder: 'Select',
+                        allowClear: true,
+                        width: '100%',
+                        dropdownParent: $('#addPrescriptionModal'),
+                        multiple: true
+                    });
+                }
             })
             .catch(error => {
                 console.error('Error fetching finding categories:', error);
-                findingCategorySelect.innerHTML = '<option value="">Error loading options</option>';
+                if (findingCategorySelect) {
+                    findingCategorySelect.innerHTML = '<option value="">Error loading options</option>';
+                }
             });
 
-        findingCategorySelect.addEventListener('change', function() {
-            // ✅ Collect all selected IDs
+        // Note: findingCategorySelect is already defined above (line 702) as 'finding_type'
+        // If we need 'finding_category', use a different variable name
+        const findingCategorySelectForChange = document.getElementById('finding_category') || document.getElementById('finding_type');
+        if (findingCategorySelectForChange) {
+            findingCategorySelectForChange.addEventListener('change', function() {
+                // ✅ Collect all selected IDs
             const selectedIds = Array.from(this.selectedOptions).map(opt => opt.value);
 
             // ✅ Clear current findings
@@ -2863,16 +3627,16 @@
 
                     // Initialize Select2 after populating findings
                     if (window.jQuery && $.fn.select2 && findingsSelect) {
-                        // Destroy existing Select2 if any
-                        if ($(findingsSelect).hasClass('select2-hidden-accessible')) {
-                            $(findingsSelect).select2('destroy');
+                        const $findingsEl = $(findingsSelect);
+                        if ($findingsEl.length && ($findingsEl.hasClass('select2-hidden-accessible') || $findingsEl.data('select2'))) {
+                            try { $findingsEl.select2('destroy'); } catch(e) {}
                         }
-                        // Initialize Select2
                         $(findingsSelect).select2({
                             placeholder: 'Select Findings',
                             allowClear: true,
                             width: '100%',
-                            dropdownParent: $('#addPrescriptionModal')
+                            dropdownParent: $('#addPrescriptionModal'),
+                            multiple: true
                         });
                         console.log('Select2 initialized for findings select');
                     }
@@ -2881,7 +3645,8 @@
                     console.error('Error fetching Findings:', error);
                     findingsSelect.innerHTML = '<option value="">Error loading options</option>';
                 });
-        });
+            });
+        }
 
         // Fetch pathologies on page load (matching working version)
         // Always fetch, even if element not found (it might be in modal)
@@ -2905,12 +3670,12 @@
                 // Try to find element again (might be in modal)
                 const pathologySelectEl = document.getElementById('pathologyOpt') || pathologySelect;
                 if (pathologySelectEl) {
-                    pathologySelectEl.innerHTML = '<option value="">Select</option>';
+                    pathologySelectEl.innerHTML = ''; // Clear for multiselect
                     if (data && Array.isArray(data) && data.length > 0) {
                         data.forEach(patho => {
                             const option = document.createElement('option');
                             option.value = patho.id;
-                            option.textContent = patho.test_name + "(" + patho.short_name + ")";
+                            option.textContent = (patho.test_name || 'Unknown') + (patho.short_name ? "(" + patho.short_name + ")" : "");
                             if ("{{ old('pathology[]') }}" == patho.id) {
                                 option.selected = true;
                             }
@@ -2970,12 +3735,12 @@
                 // Try to find element again (might be in modal)
                 const radiologySelectEl = document.getElementById('radiologyOpt') || radiologySelect;
                 if (radiologySelectEl) {
-                    radiologySelectEl.innerHTML = '<option value="">Select</option>';
+                    radiologySelectEl.innerHTML = ''; // Clear for multiselect
                     if (data && Array.isArray(data) && data.length > 0) {
                         data.forEach(radio => {
                             const option = document.createElement('option');
                             option.value = radio.id;
-                            option.textContent = radio.test_name + "(" + radio.short_name + ")";
+                            option.textContent = (radio.test_name || 'Unknown') + (radio.short_name ? "(" + radio.short_name + ")" : "");
                             if ("{{ old('radiology[]') }}" == radio.id) {
                                 option.selected = true;
                             }
@@ -3056,12 +3821,12 @@
             .then(response => response.json())
             .then(data => {
                 if (data && data.length > 0) {
-                    // Clear existing options except the first one
-                    pathologySelect.innerHTML = '<option value="">Select</option>';
+                    // Clear existing options (for multiselect, don't include empty option)
+                    pathologySelect.innerHTML = '';
                     data.forEach(patho => {
                         const option = document.createElement('option');
                         option.value = patho.id;
-                        option.textContent = patho.test_name + "(" + patho.short_name + ")";
+                        option.textContent = (patho.test_name || 'Unknown') + (patho.short_name ? "(" + patho.short_name + ")" : "");
                         pathologySelect.appendChild(option);
                     });
                 }
@@ -3077,28 +3842,46 @@
         }
 
         function initializeSelect2ForPathology() {
+            if (!pathologySelect) {
+                console.error('Pathology select element not found in initializeSelect2ForPathology');
+                return;
+            }
+            
             // Check if Select2 is already initialized
             const isSelect2Initialized = $(pathologySelect).hasClass('select2-hidden-accessible');
 
             if (!isSelect2Initialized) {
-                console.log('Initializing Select2 for pathology');
-                $(pathologySelect).select2({
-                    placeholder: 'Search and select pathology tests...',
-                    allowClear: true,
-                    width: '100%',
-                    dropdownParent: $('#addPrescriptionModal'),
-                    minimumResultsForSearch: 0, // Always show search box
-                    language: {
-                        noResults: function() {
-                            return "No results found";
-                        },
-                        searching: function() {
-                            return "Searching...";
+                console.log('Initializing Select2 for pathology with', pathologySelect.options.length, 'options');
+                try {
+                    $(pathologySelect).select2({
+                        placeholder: 'Search and select pathology tests...',
+                        allowClear: true,
+                        width: '100%',
+                        dropdownParent: $('#addPrescriptionModal'),
+                        minimumResultsForSearch: 0, // Always show search box
+                        multiple: true, // Enable multiselect
+                        closeOnSelect: false, // Keep dropdown open for multiple selections
+                        language: {
+                            noResults: function() {
+                                return "No results found";
+                            },
+                            searching: function() {
+                                return "Searching...";
+                            }
                         }
-                    }
-                });
+                    });
+                    console.log('Pathology Select2 initialized successfully');
+                } catch(e) {
+                    console.error('Error initializing pathology Select2:', e);
+                }
             } else {
-                console.log('Select2 already initialized for pathology');
+                console.log('Select2 already initialized for pathology, refreshing options...');
+                // Refresh Select2 to show new options
+                try {
+                    $(pathologySelect).trigger('change.select2');
+                } catch(e) {
+                    console.error('Error refreshing pathology Select2:', e);
+                }
             }
         }
     }
@@ -3131,7 +3914,7 @@
         // If no options, fetch via AJAX (fallback if page load fetch didn't work)
         if (!hasOptions) {
             console.log('No radiology options found, fetching via AJAX...');
-            const radiologyUrl = "{{ route('getRadiologies') }}";
+            const radiologyUrl = "{{ url(route('getRadiologies')) }}";
             fetch(radiologyUrl, {
                 method: 'GET',
                 headers: {
@@ -3143,12 +3926,12 @@
             .then(response => response.json())
             .then(data => {
                 if (data && data.length > 0) {
-                    // Clear existing options except the first one
-                    radiologySelect.innerHTML = '<option value="">Select</option>';
+                    // Clear existing options (for multiselect, don't include empty option)
+                    radiologySelect.innerHTML = '';
                     data.forEach(radio => {
                         const option = document.createElement('option');
                         option.value = radio.id;
-                        option.textContent = radio.test_name + "(" + radio.short_name + ")";
+                        option.textContent = (radio.test_name || 'Unknown') + (radio.short_name ? "(" + radio.short_name + ")" : "");
                         radiologySelect.appendChild(option);
                     });
                 }
@@ -3164,49 +3947,46 @@
         }
 
         function initializeSelect2ForRadiology() {
+            if (!radiologySelect) {
+                console.error('Radiology select element not found in initializeSelect2ForRadiology');
+                return;
+            }
+            
             // Check if Select2 is already initialized
             const isSelect2Initialized = $(radiologySelect).hasClass('select2-hidden-accessible');
 
             if (!isSelect2Initialized) {
                 console.log('Initializing Select2 for radiology with', radiologySelect.options.length, 'options');
-                $(radiologySelect).select2({
-                    placeholder: 'Search and select radiology tests...',
-                    allowClear: true,
-                    width: '100%',
-                    dropdownParent: $('#addPrescriptionModal'),
-                    minimumResultsForSearch: 0, // Always show search box
-                    language: {
-                        noResults: function() {
-                            return "No results found";
-                        },
-                        searching: function() {
-                            return "Searching...";
-                        }
-                    }
-                });
-            } else {
-                console.log('Select2 already initialized for radiology, refreshing...');
-                // Destroy and reinitialize to refresh options
                 try {
-                    $(radiologySelect).select2('destroy');
-                } catch(e) {
-                    console.log('Select2 destroy failed, continuing...');
-                }
-                $(radiologySelect).select2({
-                    placeholder: 'Search and select radiology tests...',
-                    allowClear: true,
-                    width: '100%',
-                    dropdownParent: $('#addPrescriptionModal'),
-                    minimumResultsForSearch: 0,
-                    language: {
-                        noResults: function() {
-                            return "No results found";
-                        },
-                        searching: function() {
-                            return "Searching...";
+                    $(radiologySelect).select2({
+                        placeholder: 'Search and select radiology tests...',
+                        allowClear: true,
+                        width: '100%',
+                        dropdownParent: $('#addPrescriptionModal'),
+                        minimumResultsForSearch: 0, // Always show search box
+                        multiple: true, // Enable multiselect
+                        closeOnSelect: false, // Keep dropdown open for multiple selections
+                        language: {
+                            noResults: function() {
+                                return "No results found";
+                            },
+                            searching: function() {
+                                return "Searching...";
+                            }
                         }
-                    }
-                });
+                    });
+                    console.log('Radiology Select2 initialized successfully');
+                } catch(e) {
+                    console.error('Error initializing radiology Select2:', e);
+                }
+            } else {
+                console.log('Select2 already initialized for radiology, refreshing options...');
+                // Refresh Select2 to show new options
+                try {
+                    $(radiologySelect).trigger('change.select2');
+                } catch(e) {
+                    console.error('Error refreshing radiology Select2:', e);
+                }
             }
         }
     }
@@ -3232,85 +4012,331 @@
     // Modal initialization code (needs to be in DOMContentLoaded to access createPrescriptionModal)
     document.addEventListener('DOMContentLoaded', function() {
         const createPrescriptionModal = document.getElementById("addPrescriptionModal");
+        if (!createPrescriptionModal) {
+            console.error('addPrescriptionModal element not found');
+            return;
+        }
 
         // Test: Try to initialize immediately if modal is already visible (for debugging)
         console.log('Pathology and radiology initialization functions defined');
         console.log('Modal element:', createPrescriptionModal ? 'Found' : 'Not found');
 
         // Also initialize when modal is fully shown
-        if (createPrescriptionModal) {
-            createPrescriptionModal.addEventListener('shown.bs.modal', function(event) {
-                console.log('Modal fully shown, checking pathology and radiology data...');
+        if (!createPrescriptionModal) {
+            console.warn('addPrescriptionModal element not found, skipping event listener setup');
+            return;
+        }
+        
+        // Intercept button clicks BEFORE Bootstrap handles them
+        document.addEventListener('click', function(e) {
+            const trigger = e.target.closest('[data-bs-target="#addPrescriptionModal"]');
+            if (trigger) {
+                console.log('🔴 Intercepted Add Prescription button click');
+                // Trigger data fetch immediately
+                setTimeout(() => {
+                    console.log('🔴 Calling loadPathologyRadiologyData from click interceptor');
+                    if (typeof window.loadPathologyRadiologyData === 'function') {
+                        window.loadPathologyRadiologyData();
+                    } else {
+                        console.error('❌ loadPathologyRadiologyData not available in interceptor');
+                    }
+                }, 100);
+            }
+        }, true); // Use capture phase to intercept BEFORE Bootstrap
+        
+        // Suppress browser extension errors
+        window.addEventListener('error', function(e) {
+            if (e.message && (e.message.includes('message channel closed') || e.message.includes('asynchronous response'))) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+        }, true);
+        
+        // Function to load pathology and radiology data - DEFINE GLOBALLY FIRST
+        window.loadPathologyRadiologyData = function() {
+            console.log('🔵 loadPathologyRadiologyData() called');
+            const pathologySelectModal = document.getElementById('pathologyOpt');
+            const radiologySelectModal = document.getElementById('radiologyOpt');
+            
+            console.log('Pathology select found:', !!pathologySelectModal);
+            console.log('Radiology select found:', !!radiologySelectModal);
+            if (pathologySelectModal) {
+                console.log('Pathology select options:', pathologySelectModal.options.length);
+            }
+            if (radiologySelectModal) {
+                console.log('Radiology select options:', radiologySelectModal.options.length);
+            }
 
-                // Check if data was loaded, if not fetch now
-                const pathologySelectModal = document.getElementById('pathologyOpt');
-                const radiologySelectModal = document.getElementById('radiologyOpt');
-
-                // Fetch pathologies if not already loaded
-                if (pathologySelectModal && (!window.pathologyData || pathologySelectModal.options.length <= 1)) {
-                    console.log('Pathology data not loaded, fetching now...');
-                    fetch("{{ route('getPathologies') }}")
-                        .then(response => response.json())
+            // If already populated (e.g. by ipd_view fetch), only init Select2 - do NOT clear
+            const pathHasData = pathologySelectModal && pathologySelectModal.options.length > 1;
+            const radHasData = radiologySelectModal && radiologySelectModal.options.length > 1;
+            if (pathHasData && radHasData) {
+                console.log('🔵 Pathology/radiology already have data, only initializing Select2');
+                if (window.jQuery && $.fn.select2) {
+                    try {
+                        if ($(pathologySelectModal).hasClass('select2-hidden-accessible')) $(pathologySelectModal).select2('destroy');
+                        $(pathologySelectModal).select2({
+                            placeholder: 'Select Tests', allowClear: true, width: '100%',
+                            dropdownParent: $('#addPrescriptionModal'), multiple: true, closeOnSelect: false
+                        });
+                        if ($(radiologySelectModal).hasClass('select2-hidden-accessible')) $(radiologySelectModal).select2('destroy');
+                        $(radiologySelectModal).select2({
+                            placeholder: 'Select Tests', allowClear: true, width: '100%',
+                            dropdownParent: $('#addPrescriptionModal'), multiple: true, closeOnSelect: false
+                        });
+                    } catch(e) { console.error('Select2 init:', e); }
+                }
+                return;
+            }
+            
+            // Fetch pathologies
+            if (pathologySelectModal) {
+                const pathologyUrl = "{{ url(route('getPathologies')) }}";
+                console.log('📡 Fetching pathology data from:', pathologyUrl);
+                if (pathologySelectModal.options.length <= 1) {
+                    pathologySelectModal.innerHTML = '<option value="">Loading...</option>';
+                }
+                
+                fetch(pathologyUrl)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('HTTP error! status: ' + response.status);
+                            }
+                            return response.json();
+                        })
                         .then(data => {
                             console.log('Pathologies fetched on modal open:', data);
+                            console.log('Pathology data count:', data ? data.length : 0);
                             window.pathologyData = data;
-                            pathologySelectModal.innerHTML = '<option value="">Select</option>';
-                            data.forEach(patho => {
-                                const option = document.createElement('option');
-                                option.value = patho.id;
-                                option.textContent = patho.test_name + "(" + patho.short_name + ")";
-                                pathologySelectModal.appendChild(option);
-                            });
-                            // Initialize Select2
-                            if (window.jQuery && $.fn.select2) {
-                                if ($(pathologySelectModal).hasClass('select2-hidden-accessible')) {
-                                    $(pathologySelectModal).select2('destroy');
-                                }
-                                $(pathologySelectModal).select2({
-                                    placeholder: 'Select Tests',
-                                    allowClear: true,
-                                    width: '100%',
-                                    dropdownParent: $('#addPrescriptionModal')
+                            
+                            if (!pathologySelectModal) {
+                                console.error('pathologySelectModal element disappeared');
+                                return;
+                            }
+                            
+                            // Clear and populate options (for multiselect, don't include empty option)
+                            pathologySelectModal.innerHTML = '';
+                            if (data && Array.isArray(data) && data.length > 0) {
+                                data.forEach(patho => {
+                                    const option = document.createElement('option');
+                                    option.value = patho.id;
+                                    option.textContent = (patho.test_name || 'Unknown') + (patho.short_name ? "(" + patho.short_name + ")" : "");
+                                    pathologySelectModal.appendChild(option);
                                 });
+                                console.log('Pathology options added:', pathologySelectModal.options.length);
+                            
+                            // Initialize Select2 after data is loaded
+                            setTimeout(() => {
+                                if (window.jQuery && $.fn.select2 && pathologySelectModal) {
+                                    try {
+                                        // Destroy existing Select2 if any
+                                        if ($(pathologySelectModal).hasClass('select2-hidden-accessible')) {
+                                            $(pathologySelectModal).select2('destroy');
+                                        }
+                                        
+                                        // Initialize Select2 for multiselect
+                                        $(pathologySelectModal).select2({
+                                            placeholder: 'Select Tests',
+                                            allowClear: true,
+                                            width: '100%',
+                                            dropdownParent: $('#addPrescriptionModal'),
+                                            minimumResultsForSearch: 0,
+                                            multiple: true, // Enable multiselect
+                                            closeOnSelect: false // Keep dropdown open for multiple selections
+                                        });
+                                        console.log('✅ Pathology Select2 initialized with', pathologySelectModal.options.length, 'options');
+                                        
+                                        // Verify Select2 is working
+                                        if ($(pathologySelectModal).hasClass('select2-hidden-accessible')) {
+                                            console.log('✅ Pathology Select2 is active and ready');
+                                        } else {
+                                            console.warn('⚠️ Pathology Select2 initialization may have failed');
+                                        }
+                                    } catch(e) {
+                                        console.error('❌ Error initializing pathology Select2:', e);
+                                    }
+                                } else {
+                                    console.error('❌ jQuery or Select2 not available for pathology');
+                                }
+                            }, 200);
+                            } else {
+                                console.warn('⚠️ No pathology data received or empty array');
+                                const noDataOption = document.createElement('option');
+                                noDataOption.value = '';
+                                noDataOption.textContent = 'No tests available';
+                                pathologySelectModal.appendChild(noDataOption);
+                                
+                                // Still try to initialize Select2 even with no data
+                                setTimeout(() => {
+                                    if (window.jQuery && $.fn.select2 && pathologySelectModal) {
+                                        try {
+                                            $(pathologySelectModal).select2({
+                                                placeholder: 'No tests available',
+                                                allowClear: true,
+                                                width: '100%',
+                                                dropdownParent: $('#addPrescriptionModal'),
+                                                minimumResultsForSearch: 0,
+                                                multiple: true,
+                                                disabled: true
+                                            });
+                                        } catch(e) {
+                                            console.error('Error initializing empty pathology Select2:', e);
+                                        }
+                                    }
+                                }, 200);
                             }
                         })
-                        .catch(error => console.error('Error fetching pathologies:', error));
+                        .catch(error => {
+                            console.error('Error fetching pathologies:', error);
+                            if (pathologySelectModal) {
+                                pathologySelectModal.innerHTML = '<option value="">Error loading tests</option>';
+                            }
+                        });
+                } else {
+                    console.error('pathologySelectModal element not found');
                 }
 
-                // Fetch radiologies if not already loaded
-                if (radiologySelectModal && (!window.radiologyData || radiologySelectModal.options.length <= 1)) {
-                    console.log('Radiology data not loaded, fetching now...');
-                    fetch("{{ route('getRadiologies') }}")
-                        .then(response => response.json())
+            // Fetch radiologies
+            if (radiologySelectModal) {
+                const radiologyUrl = "{{ url(route('getRadiologies')) }}";
+                console.log('📡 Fetching radiology data from:', radiologyUrl);
+                if (radiologySelectModal.options.length <= 1) {
+                    radiologySelectModal.innerHTML = '<option value="">Loading...</option>';
+                }
+                
+                fetch(radiologyUrl)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('HTTP error! status: ' + response.status);
+                            }
+                            return response.json();
+                        })
                         .then(data => {
                             console.log('Radiologies fetched on modal open:', data);
+                            console.log('Radiology data count:', data ? data.length : 0);
                             window.radiologyData = data;
-                            radiologySelectModal.innerHTML = '<option value="">Select</option>';
-                            data.forEach(radio => {
-                                const option = document.createElement('option');
-                                option.value = radio.id;
-                                option.textContent = radio.test_name + "(" + radio.short_name + ")";
-                                radiologySelectModal.appendChild(option);
-                            });
-                            // Initialize Select2
-                            if (window.jQuery && $.fn.select2) {
-                                if ($(radiologySelectModal).hasClass('select2-hidden-accessible')) {
-                                    $(radiologySelectModal).select2('destroy');
-                                }
-                                $(radiologySelectModal).select2({
-                                    placeholder: 'Select Tests',
-                                    allowClear: true,
-                                    width: '100%',
-                                    dropdownParent: $('#addPrescriptionModal')
+                            
+                            if (!radiologySelectModal) {
+                                console.error('radiologySelectModal element disappeared');
+                                return;
+                            }
+                            
+                            // Clear and populate options (for multiselect, don't include empty option)
+                            radiologySelectModal.innerHTML = '';
+                            if (data && Array.isArray(data) && data.length > 0) {
+                                data.forEach(radio => {
+                                    const option = document.createElement('option');
+                                    option.value = radio.id;
+                                    option.textContent = (radio.test_name || 'Unknown') + (radio.short_name ? "(" + radio.short_name + ")" : "");
+                                    radiologySelectModal.appendChild(option);
                                 });
+                                console.log('Radiology options added:', radiologySelectModal.options.length);
+                                
+                                // Initialize Select2 after data is loaded
+                                setTimeout(() => {
+                                    if (window.jQuery && $.fn.select2 && radiologySelectModal) {
+                                        try {
+                                            // Destroy existing Select2 if any
+                                            if ($(radiologySelectModal).hasClass('select2-hidden-accessible')) {
+                                                $(radiologySelectModal).select2('destroy');
+                                            }
+                                            
+                                            // Initialize Select2 for multiselect
+                                            $(radiologySelectModal).select2({
+                                                placeholder: 'Select Tests',
+                                                allowClear: true,
+                                                width: '100%',
+                                                dropdownParent: $('#addPrescriptionModal'),
+                                                minimumResultsForSearch: 0,
+                                                multiple: true, // Enable multiselect
+                                                closeOnSelect: false // Keep dropdown open for multiple selections
+                                            });
+                                            console.log('✅ Radiology Select2 initialized with', radiologySelectModal.options.length, 'options');
+                                            
+                                            // Verify Select2 is working
+                                            if ($(radiologySelectModal).hasClass('select2-hidden-accessible')) {
+                                                console.log('✅ Radiology Select2 is active and ready');
+                                            } else {
+                                                console.warn('⚠️ Radiology Select2 initialization may have failed');
+                                            }
+                                        } catch(e) {
+                                            console.error('❌ Error initializing radiology Select2:', e);
+                                        }
+                                    } else {
+                                        console.error('❌ jQuery or Select2 not available for radiology');
+                                    }
+                                }, 200);
+                            } else {
+                                console.warn('⚠️ No radiology data received or empty array');
+                                const noDataOption = document.createElement('option');
+                                noDataOption.value = '';
+                                noDataOption.textContent = 'No tests available';
+                                radiologySelectModal.appendChild(noDataOption);
+                                
+                                // Still try to initialize Select2 even with no data
+                                setTimeout(() => {
+                                    if (window.jQuery && $.fn.select2 && radiologySelectModal) {
+                                        try {
+                                            $(radiologySelectModal).select2({
+                                                placeholder: 'No tests available',
+                                                allowClear: true,
+                                                width: '100%',
+                                                dropdownParent: $('#addPrescriptionModal'),
+                                                minimumResultsForSearch: 0,
+                                                multiple: true,
+                                                disabled: true
+                                            });
+                                        } catch(e) {
+                                            console.error('Error initializing empty radiology Select2:', e);
+                                        }
+                                    }
+                                }, 200);
                             }
                         })
-                        .catch(error => console.error('Error fetching radiologies:', error));
+                        .catch(error => {
+                            console.error('Error fetching radiologies:', error);
+                            if (radiologySelectModal) {
+                                radiologySelectModal.innerHTML = '<option value="">Error loading tests</option>';
+                            }
+                        });
+                } else {
+                    console.error('radiologySelectModal element not found');
                 }
 
-                setTimeout(() => {
-                    initializePathologyMultiselect();
-                    initializeRadiologyMultiselect();
+            // Ensure multiselect functions are called after data loads
+            setTimeout(() => {
+                // Double-check initialization after a delay
+                const pathEl = document.getElementById('pathologyOpt');
+                const radEl = document.getElementById('radiologyOpt');
+                
+                if (pathEl) {
+                    console.log('Pathology select status:', {
+                        options: pathEl.options.length,
+                        hasSelect2: $(pathEl).hasClass('select2-hidden-accessible'),
+                        elementExists: !!pathEl
+                    });
+                    if (pathEl.options.length > 1 && !$(pathEl).hasClass('select2-hidden-accessible')) {
+                        console.log('Re-initializing pathology Select2...');
+                        if (typeof initializePathologyMultiselect === 'function') {
+                            initializePathologyMultiselect();
+                        }
+                    }
+                }
+                
+                if (radEl) {
+                    console.log('Radiology select status:', {
+                        options: radEl.options.length,
+                        hasSelect2: $(radEl).hasClass('select2-hidden-accessible'),
+                        elementExists: !!radEl
+                    });
+                    if (radEl.options.length > 1 && !$(radEl).hasClass('select2-hidden-accessible')) {
+                        console.log('Re-initializing radiology Select2...');
+                        if (typeof initializeRadiologyMultiselect === 'function') {
+                            initializeRadiologyMultiselect();
+                        }
+                    }
+                }
 
                     // Ensure categories, intervals, and durations are loaded, fetch if not
                     const needsCategories = !window.medicineCategories || !Array.isArray(window.medicineCategories) || window.medicineCategories.length === 0;
@@ -3318,38 +4344,31 @@
                     const needsDurations = !window.doseDurations || !Array.isArray(window.doseDurations) || window.doseDurations.length === 0;
 
                     if (needsCategories || needsIntervals || needsDurations) {
-                        console.log('Fetching missing data...', {
+                        console.log('Fetching missing medicine data...', {
                             categories: needsCategories,
                             intervals: needsIntervals,
                             durations: needsDurations
                         });
-
+                        var catUrl = "{{ url(route('getMedicineCategories')) }}";
+                        var intUrl = "{{ url(route('getDoseIntervals')) }}";
+                        var durUrl = "{{ url(route('getDoseDurations')) }}";
                         Promise.all([
-                            needsCategories ? fetch("{{ route('getMedicineCategories') }}").then(res => {
-                                if (!res.ok) throw new Error('Failed to fetch categories');
-                                return res.json();
-                            }) : Promise.resolve(window.medicineCategories || []),
-                            needsIntervals ? fetch("{{ route('getDoseIntervals') }}").then(res => {
-                                if (!res.ok) throw new Error('Failed to fetch intervals');
-                                return res.json();
-                            }) : Promise.resolve(window.doseIntervals || []),
-                            needsDurations ? fetch("{{ route('getDoseDurations') }}").then(res => {
-                                if (!res.ok) throw new Error('Failed to fetch durations');
-                                return res.json();
-                            }) : Promise.resolve(window.doseDurations || [])
+                            needsCategories ? fetch(catUrl).then(res => res.json().then(data => Array.isArray(data) ? data : []).catch(() => [])) : Promise.resolve(window.medicineCategories || []),
+                            needsIntervals ? fetch(intUrl).then(res => res.json().then(data => Array.isArray(data) ? data : []).catch(() => [])) : Promise.resolve(window.doseIntervals || []),
+                            needsDurations ? fetch(durUrl).then(res => res.json().then(data => Array.isArray(data) ? data : []).catch(() => [])) : Promise.resolve(window.doseDurations || [])
                         ]).then(([categories, intervals, durations]) => {
-                            console.log('Data fetched on modal open:', {
-                                categories: categories.length,
-                                intervals: intervals.length,
-                                durations: durations.length
-                            });
-                            window.medicineCategories = categories;
-                            window.doseIntervals = intervals;
-                            window.doseDurations = durations;
+                            window.medicineCategories = Array.isArray(categories) ? categories : [];
+                            window.doseIntervals = Array.isArray(intervals) ? intervals : [];
+                            window.doseDurations = Array.isArray(durations) ? durations : [];
+                            console.log('Medicine data fetched on modal open:', window.medicineCategories.length, 'categories', window.doseIntervals.length, 'intervals', window.doseDurations.length, 'durations');
                             initializeMedicineRows();
                         })
                         .catch(error => {
-                            console.error('Error fetching data:', error);
+                            console.error('Error fetching medicine data:', error);
+                            window.medicineCategories = window.medicineCategories || [];
+                            window.doseIntervals = window.doseIntervals || [];
+                            window.doseDurations = window.doseDurations || [];
+                            initializeMedicineRows();
                         });
                     } else {
                         console.log('All data already loaded:', {
@@ -3360,16 +4379,115 @@
                         initializeMedicineRows();
                     }
 
-                    // Load medicines when modal is fully shown
-                    if (typeof window.loadMedicinesOnModalOpen === 'function') {
-                        window.loadMedicinesOnModalOpen();
-                    } else {
-                        console.error('loadMedicinesOnModalOpen function not found');
+                // Load medicines when modal is fully shown
+                if (typeof window.loadMedicinesOnModalOpen === 'function') {
+                    window.loadMedicinesOnModalOpen();
+                } else {
+                    console.error('loadMedicinesOnModalOpen function not found');
+                }
+            }, 200);
+        };
+        
+        // Function is already global (defined as window.loadPathologyRadiologyData)
+        console.log('✅ loadPathologyRadiologyData function defined globally');
+        
+        if (createPrescriptionModal) {
+            // Listen for Bootstrap modal shown event
+            createPrescriptionModal.addEventListener('shown.bs.modal', function(event) {
+                console.log('✅ Bootstrap shown.bs.modal event fired');
+                loadPathologyRadiologyData();
+                // Load medicine category, dose interval, dose duration if missing and init rows
+                (function ensureMedicineData() {
+                    var needsCat = !window.medicineCategories || !Array.isArray(window.medicineCategories) || window.medicineCategories.length === 0;
+                    var needsInt = !window.doseIntervals || !Array.isArray(window.doseIntervals) || window.doseIntervals.length === 0;
+                    var needsDur = !window.doseDurations || !Array.isArray(window.doseDurations) || window.doseDurations.length === 0;
+                    if (needsCat || needsInt || needsDur) {
+                        var catUrl = "{{ url(route('getMedicineCategories')) }}", intUrl = "{{ url(route('getDoseIntervals')) }}", durUrl = "{{ url(route('getDoseDurations')) }}";
+                        Promise.all([
+                            needsCat ? fetch(catUrl).then(function(r){ return r.json().then(function(d){ return Array.isArray(d) ? d : []; }).catch(function(){ return []; }); }) : Promise.resolve(window.medicineCategories || []),
+                            needsInt ? fetch(intUrl).then(function(r){ return r.json().then(function(d){ return Array.isArray(d) ? d : []; }).catch(function(){ return []; }); }) : Promise.resolve(window.doseIntervals || []),
+                            needsDur ? fetch(durUrl).then(function(r){ return r.json().then(function(d){ return Array.isArray(d) ? d : []; }).catch(function(){ return []; }); }) : Promise.resolve(window.doseDurations || [])
+                        ]).then(function(arr) {
+                            window.medicineCategories = arr[0] || [];
+                            window.doseIntervals = arr[1] || [];
+                            window.doseDurations = arr[2] || [];
+                            if (typeof window.initializeMedicineRows === 'function') window.initializeMedicineRows();
+                        }).catch(function(){ if (typeof window.initializeMedicineRows === 'function') window.initializeMedicineRows(); });
+                    } else if (typeof window.initializeMedicineRows === 'function') {
+                        window.initializeMedicineRows();
                     }
-                }, 200);
+                })();
+                // Re-init Select2 on pathology/radiology when modal is visible (so dropdown renders correctly)
+                setTimeout(function() {
+                    if (typeof window.initPathologyRadiologySelect2 === 'function') {
+                        window.initPathologyRadiologySelect2();
+                    } else if (window.jQuery && $.fn.select2) {
+                        var $p = $('#pathologyOpt'), $r = $('#radiologyOpt');
+                        if ($p.length && $p[0].options.length > 0) {
+                            try { if ($p.hasClass('select2-hidden-accessible')) $p.select2('destroy'); $p.select2({ placeholder: 'Select Tests', allowClear: true, width: '100%', dropdownParent: $('#addPrescriptionModal'), multiple: true, closeOnSelect: false }); } catch(e) {}
+                        }
+                        if ($r.length && $r[0].options.length > 0) {
+                            try { if ($r.hasClass('select2-hidden-accessible')) $r.select2('destroy'); $r.select2({ placeholder: 'Select Tests', allowClear: true, width: '100%', dropdownParent: $('#addPrescriptionModal'), multiple: true, closeOnSelect: false }); } catch(e) {}
+                        }
+                    }
+                }, 300);
+            });
+            
+            // Also listen for manual modal show (when modal becomes visible)
+            const modalObserver = new MutationObserver(function(mutations) {
+                const modal = document.getElementById('addPrescriptionModal');
+                if (modal && modal.classList.contains('show') && modal.style.display !== 'none') {
+                    console.log('✅ Modal detected as visible via MutationObserver');
+                    // Debounce: only trigger once
+                    if (!modal.dataset.dataLoaded) {
+                        modal.dataset.dataLoaded = 'true';
+                        setTimeout(() => {
+                            loadPathologyRadiologyData();
+                        }, 100);
+                    }
+                } else {
+                    // Reset flag when modal is hidden
+                    if (modal) {
+                        modal.dataset.dataLoaded = '';
+                    }
+                }
+            });
+            
+            // Observe modal for class/style changes
+            if (createPrescriptionModal) {
+                modalObserver.observe(createPrescriptionModal, {
+                    attributes: true,
+                    attributeFilter: ['class', 'style', 'aria-hidden']
+                });
+            }
+            
+            // Fallback: Check periodically if modal is visible and data not loaded
+            setInterval(function() {
+                const modal = document.getElementById('addPrescriptionModal');
+                const pathSelect = document.getElementById('pathologyOpt');
+                const radSelect = document.getElementById('radiologyOpt');
+                
+                if (modal && modal.classList.contains('show') && modal.style.display !== 'none') {
+                    // Check if data needs loading
+                    const needsPathology = pathSelect && (pathSelect.options.length <= 1 || pathSelect.options[0].value === '');
+                    const needsRadiology = radSelect && (radSelect.options.length <= 1 || radSelect.options[0].value === '');
+                    
+                    if ((needsPathology || needsRadiology) && !modal.dataset.dataLoaded) {
+                        console.log('🔄 Fallback: Modal visible but data missing, loading now...');
+                        modal.dataset.dataLoaded = 'true';
+                        loadPathologyRadiologyData();
+                    }
+                } else {
+                    // Reset flag when modal is hidden
+                    if (modal) {
+                        modal.dataset.dataLoaded = '';
+                    }
+                }
+            }, 500);
+        }
 
-                // Helper function to initialize medicine rows
-                function initializeMedicineRows() {
+        // Helper function to initialize medicine rows (expose globally for fallback)
+        function initializeMedicineRows() {
                     const container = document.getElementById("medicineContainer");
                     if (container && window.medicineCategories && Array.isArray(window.medicineCategories)) {
                         const medicineRows = container.querySelectorAll(".medicine-row");
@@ -3614,26 +4732,42 @@
                         });
                     }
                 }
+        window.initializeMedicineRows = initializeMedicineRows;
             });
 
-            // Clear selects when modal is hidden
-            createPrescriptionModal.addEventListener('hide.bs.modal', function(event) {
+            // Clear selects when modal is hidden (safely)
+            if (createPrescriptionModal) {
+                createPrescriptionModal.addEventListener('hide.bs.modal', function(event) {
+                // Clear selected test lists so next open starts fresh
+                if (window.selectedPathologyList) window.selectedPathologyList.length = 0;
+                if (window.selectedRadiologyList) window.selectedRadiologyList.length = 0;
+                var pathList = document.getElementById('pathologySelectedList');
+                var radList = document.getElementById('radiologySelectedList');
+                if (pathList) pathList.innerHTML = '';
+                if (radList) radList.innerHTML = '';
+
                 const pathologySelect = document.getElementById('pathologyOpt');
                 const radiologySelect = document.getElementById('radiologyOpt');
 
-                // Destroy Select2 instances to allow re-initialization
-                if (pathologySelect && window.jQuery && $(pathologySelect).hasClass('select2-hidden-accessible')) {
-                    try {
-                        $(pathologySelect).select2('destroy');
-                    } catch(e) {
-                        console.warn('Error destroying pathology Select2:', e);
+                // Destroy Select2 instances to allow re-initialization (safely)
+                if (pathologySelect && window.jQuery) {
+                    const $pathEl = $(pathologySelect);
+                    if ($pathEl.length && ($pathEl.hasClass('select2-hidden-accessible') || $pathEl.data('select2'))) {
+                        try {
+                            $pathEl.select2('destroy');
+                        } catch(e) {
+                            // Ignore - Select2 not properly initialized
+                        }
                     }
                 }
-                if (radiologySelect && window.jQuery && $(radiologySelect).hasClass('select2-hidden-accessible')) {
-                    try {
-                        $(radiologySelect).select2('destroy');
-                    } catch(e) {
-                        console.warn('Error destroying radiology Select2:', e);
+                if (radiologySelect && window.jQuery) {
+                    const $radEl = $(radiologySelect);
+                    if ($radEl.length && ($radEl.hasClass('select2-hidden-accessible') || $radEl.data('select2'))) {
+                        try {
+                            $radEl.select2('destroy');
+                        } catch(e) {
+                            // Ignore - Select2 not properly initialized
+                        }
                     }
                 }
             });
@@ -3646,47 +4780,71 @@
     $(function() {
         // Initialize all multiselect2 elements at once (including finding_type and finding)
         // This matches the working version pattern
-        $('#finding_type, .multiselect2').each(function() {
-            // Destroy existing Select2 if any (in case it was initialized before)
-            if ($(this).hasClass('select2-hidden-accessible')) {
+        // Only process elements that exist
+        const findingTypeEl = document.getElementById('finding_type');
+        const multiselect2Elements = document.querySelectorAll('.multiselect2');
+        
+        // Process finding_type if it exists
+        if (findingTypeEl && window.jQuery) {
+            const $findingType = $(findingTypeEl);
+            if ($findingType.length && ($findingType.hasClass('select2-hidden-accessible') || $findingType.data('select2'))) {
                 try {
-                    $(this).select2('destroy');
+                    $findingType.select2('destroy');
                 } catch(e) {
-                    console.warn('Error destroying Select2:', e);
+                    // Ignore - Select2 not properly initialized
                 }
             }
-        });
+        }
+        
+        // Process multiselect2 elements if they exist
+        if (multiselect2Elements.length && window.jQuery) {
+            multiselect2Elements.forEach(function(el) {
+                const $el = $(el);
+                if ($el.length && ($el.hasClass('select2-hidden-accessible') || $el.data('select2'))) {
+                    try {
+                        $el.select2('destroy');
+                    } catch(e) {
+                        // Ignore - Select2 not properly initialized
+                    }
+                }
+            });
+        }
 
-        // Initialize finding category and findings selects
+        // Initialize finding category and findings selects (multiselect)
         $('#finding_type, #finding').select2({
             placeholder: 'Select',
             allowClear: true,
             width: '100%',
-            dropdownParent: $('#addPrescriptionModal')
+            dropdownParent: $('#addPrescriptionModal'),
+            multiple: true
         });
 
         console.log('Select2 initialized for finding_type and finding selects');
 
-        // Initialize pathology and radiology Select2 if data is already loaded
+        // Initialize pathology and radiology Select2 if data is already loaded (multiselect with filter)
         setTimeout(function() {
             const pathologySelect = document.getElementById('pathologyOpt');
             const radiologySelect = document.getElementById('radiologyOpt');
 
-            if (pathologySelect && pathologySelect.options.length > 1 && !$(pathologySelect).hasClass('select2-hidden-accessible')) {
+            if (pathologySelect && pathologySelect.options.length > 0 && !$(pathologySelect).hasClass('select2-hidden-accessible')) {
                 $(pathologySelect).select2({
                     placeholder: 'Select Tests',
                     allowClear: true,
                     width: '100%',
-                    dropdownParent: $('#addPrescriptionModal')
+                    dropdownParent: $('#addPrescriptionModal'),
+                    multiple: true,
+                    closeOnSelect: false
                 });
             }
 
-            if (radiologySelect && radiologySelect.options.length > 1 && !$(radiologySelect).hasClass('select2-hidden-accessible')) {
+            if (radiologySelect && radiologySelect.options.length > 0 && !$(radiologySelect).hasClass('select2-hidden-accessible')) {
                 $(radiologySelect).select2({
                     placeholder: 'Select Tests',
                     allowClear: true,
                     width: '100%',
-                    dropdownParent: $('#addPrescriptionModal')
+                    dropdownParent: $('#addPrescriptionModal'),
+                    multiple: true,
+                    closeOnSelect: false
                 });
             }
         }, 500);

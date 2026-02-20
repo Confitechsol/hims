@@ -92,6 +92,7 @@ class RadiologyBillingController extends Controller
             'activate_tpa' => 'nullable',
             'tests' => 'required|array|min:1',
             'tests.*.radiology_id' => 'required|exists:radio,id',
+            'tests.*.prescription_test_id' => 'nullable|exists:ipd_prescription_test,id',
             'tests.*.report_days' => 'required|integer|min:0',
             'tests.*.report_date' => 'required|date',
             'tests.*.tax_percentage' => 'nullable|numeric|min:0',
@@ -136,16 +137,31 @@ class RadiologyBillingController extends Controller
                 'generated_by' => Auth::id(),
             ]);
 
-            // Create radiology reports
+            // Create radiology reports with instance tracking
             foreach ($validated['tests'] as $test) {
+                $prescriptionTestInstance = null;
+                $instanceNumber = null;
+                $customerType = 'OPD';
+                
+                // If prescription_test_id is provided, link to it
+                if (!empty($test['prescription_test_id'])) {
+                    $prescriptionTestInstance = \App\Models\IpdPrescriptionTest::find($test['prescription_test_id']);
+                    if ($prescriptionTestInstance) {
+                        $instanceNumber = $prescriptionTestInstance->instance_number;
+                        $customerType = 'IPD'; // If linked to prescription, it's IPD
+                    }
+                }
+                
                 RadiologyReport::create([
                     'radiology_bill_id' => $bill->id,
                     'radiology_id' => $test['radiology_id'],
+                    'ipd_prescription_test_id' => $prescriptionTestInstance?->id,
+                    'instance_number' => $instanceNumber,
                     'patient_id' => $validated['patient_id'],
                     'reporting_date' => $test['report_date'],
                     'tax_percentage' => $test['tax_percentage'] ?? 0,
                     'apply_charge' => $test['amount'],
-                    'customer_type' => 'OPD',
+                    'customer_type' => $customerType,
                     'consultant_doctor' => $truncatedDoctorName,
                     'radiology_center' => '', // Required field, set to empty string
                 ]);
@@ -232,6 +248,7 @@ class RadiologyBillingController extends Controller
             'activate_tpa' => 'nullable',
             'tests' => 'required|array|min:1',
             'tests.*.radiology_id' => 'required|exists:radio,id',
+            'tests.*.prescription_test_id' => 'nullable|exists:ipd_prescription_test,id',
             'tests.*.report_days' => 'required|integer|min:0',
             'tests.*.report_date' => 'required|date',
             'tests.*.tax_percentage' => 'nullable|numeric|min:0',
@@ -280,14 +297,29 @@ class RadiologyBillingController extends Controller
 
             // Create new radiology reports
             foreach ($validated['tests'] as $test) {
+                $prescriptionTestInstance = null;
+                $instanceNumber = null;
+                $customerType = 'OPD';
+                
+                // If prescription_test_id is provided, link to it
+                if (!empty($test['prescription_test_id'])) {
+                    $prescriptionTestInstance = IpdPrescriptionTest::find($test['prescription_test_id']);
+                    if ($prescriptionTestInstance) {
+                        $instanceNumber = $prescriptionTestInstance->instance_number;
+                        $customerType = 'IPD'; // If linked to prescription, it's IPD
+                    }
+                }
+                
                 RadiologyReport::create([
                     'radiology_bill_id' => $bill->id,
                     'radiology_id' => $test['radiology_id'],
+                    'ipd_prescription_test_id' => $prescriptionTestInstance?->id,
+                    'instance_number' => $instanceNumber,
                     'patient_id' => $validated['patient_id'],
                     'reporting_date' => $test['report_date'],
                     'tax_percentage' => $test['tax_percentage'] ?? 0,
                     'apply_charge' => $test['amount'],
-                    'customer_type' => 'OPD',
+                    'customer_type' => $customerType,
                     'consultant_doctor' => $truncatedDoctorName,
                     'radiology_center' => '', // Required field, set to empty string
                 ]);
@@ -629,14 +661,24 @@ class RadiologyBillingController extends Controller
                 $standardCharge = $isIpd ? ($radiology->standard_charge_ipd ?? 0) : ($radiology->standard_charge_opd ?? 0);
                 $amount = $test->amount ?? $standardCharge;
                 
+                // Get instance number and format display
+                $instanceNumber = $test->instance_number ?? 1;
+                $instanceSuffix = $instanceNumber > 1 
+                    ? ($instanceNumber == 2 ? ' (2nd time)' : ($instanceNumber == 3 ? ' (3rd time)' : " ({$instanceNumber}th time)"))
+                    : '';
+                
                 return [
                     'id' => $radiology->id,
-                    'test_name' => $radiology->test_name,
+                    'prescription_test_id' => $test->id, // Include prescription test instance ID
+                    'instance_number' => $instanceNumber,
+                    'test_name' => $radiology->test_name . $instanceSuffix,
+                    'test_name_base' => $radiology->test_name, // Base name without instance suffix
                     'report_days' => $radiology->report_days ?? 0,
                     'tax_percentage' => 0, // Tax is handled separately in billing
                     'amount' => $amount,
                     'standard_charge_ipd' => $radiology->standard_charge_ipd ?? 0,
                     'standard_charge_opd' => $radiology->standard_charge_opd ?? 0,
+                    'notes' => $test->notes ?? null,
                 ];
             });
         

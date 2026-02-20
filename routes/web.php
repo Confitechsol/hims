@@ -1024,6 +1024,7 @@ Route::prefix('setup')->group(function () {
     Route::get('/packages/{id}/charges', [PackageController::class, 'getPackageCharges'])->name('packages.charges');
 });
 
+Route::get('/test-medicine-controller', [MedicineController::class, 'test'])->name('testMedicineController');
 Route::get('/getMedicineCategories', [MedicineController::class, 'getCategories'])->name('getMedicineCategories');
 Route::get('/getMedicines/{categoryId}', [MedicineController::class, 'getMedicines'])->name('getMedicines');
 Route::get('/getDoses/{categoryId}', [MedicineController::class, 'getDoses'])->name('getDoses');

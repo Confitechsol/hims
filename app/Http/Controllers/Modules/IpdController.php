@@ -397,8 +397,16 @@ class IpdController extends Controller
 
     public function getBedGroups(Request $request)
     {
-        $bedGroups = BedGroup::with('floorDetail')->get();
-        return response()->json($bedGroups, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
+        try {
+            $bedGroups = BedGroup::with('floorDetail')->get();
+            return response()->json($bedGroups, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
+        } catch (\Exception $e) {
+            \Log::error('Error fetching bed groups: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
     public function getBedNumbers(Request $request, $id)
     {
@@ -616,6 +624,44 @@ class IpdController extends Controller
             return $val !== null && $val !== '' ? (string) $val : '';
         }, $radiology);
 
+        // Pre-process finding_type and findings arrays to ensure all values are strings
+        $findingType = $request->input('finding_type', []);
+        $findings = $request->input('findings', []);
+        
+        // Ensure they're arrays
+        if (!is_array($findingType)) {
+            $findingType = $findingType ? [$findingType] : [];
+        }
+        if (!is_array($findings)) {
+            $findings = $findings ? [$findings] : [];
+        }
+
+        // Convert all values to strings and filter out empty values
+        $findingType = array_filter(
+            array_map(function ($val) {
+                if ($val === null || $val === '') {
+                    return null;
+                }
+                return (string) $val;
+            }, $findingType),
+            fn($val) => $val !== null && $val !== ''
+        );
+
+        $findings = array_filter(
+            array_map(function ($val) {
+                if ($val === null || $val === '') {
+                    return null;
+                }
+                return (string) $val;
+            }, $findings),
+            fn($val) => $val !== null && $val !== ''
+        );
+
+        \Log::info('Pahtology Ids:', $pathology);
+        \Log::info('Radiology Ids:', $radiology);
+        \Log::info('Finding Types:', $findingType);
+        \Log::info('Findings:', $findings);
+
         // Merge back into request
         $request->merge([
             'medicines'        => $medicines,
@@ -625,6 +671,8 @@ class IpdController extends Controller
             'instructions'     => $instructions,
             'pathology'        => $pathology,
             'radiology'        => $radiology,
+            'finding_type'     => array_values($findingType), // Re-index array
+            'findings'          => array_values($findings), // Re-index array
         ]);
 
         \Log::info('After conversion - Medicines:', $medicines);
@@ -662,8 +710,26 @@ class IpdController extends Controller
             $findingTypes = array_filter($request->input('finding_type', []), fn($type) => $type !== null && $type !== '');
             // $findings             = array_filter($request->findings, fn($title) => $title !== null && $title !== '');
             $findings        = array_filter($request->input('findings', []), fn($title) => $title !== null && $title !== '');
-            $pathology_ids   = array_filter($request->input('pathology', []), fn($pathology) => $pathology !== null && $pathology !== '');
-            $radiology_ids   = array_filter($request->input('radiology', []), fn($radio) => $radio !== null && $radio !== '');
+            // Get pathology and radiology IDs - handle both 'pathology' and 'pathology[]' formats
+            $pathologyInput = $request->input('pathology', []);
+            $radiologyInput = $request->input('radiology', []);
+            
+            // If empty, try alternative key names
+            if (empty($pathologyInput)) {
+                $pathologyInput = $request->input('pathology[]', []);
+            }
+            if (empty($radiologyInput)) {
+                $radiologyInput = $request->input('radiology[]', []);
+            }
+            
+            \Log::info('🔴 Pathology input received:', ['pathology' => $pathologyInput, 'pathology[]' => $request->input('pathology[]', [])]);
+            \Log::info('🔴 Radiology input received:', ['radiology' => $radiologyInput, 'radiology[]' => $request->input('radiology[]', [])]);
+            
+            $pathology_ids   = array_filter($pathologyInput, fn($pathology) => $pathology !== null && $pathology !== '');
+            $radiology_ids   = array_filter($radiologyInput, fn($radio) => $radio !== null && $radio !== '');
+            
+            \Log::info('🔴 Pathology IDs after filter:', $pathology_ids);
+            \Log::info('🔴 Radiology IDs after filter:', $radiology_ids);
             $notification_to = array_filter($request->input('visible', []), fn($notify) => $notify !== null && $notify !== '');
             // $pathology_ids        = array_filter($request->pathology, fn($pathology) => $pathology !== null && $pathology !== '');
             // $radiology_ids        = array_filter($request->radiology, fn($radio) => $radio !== null && $radio !== '');
@@ -697,6 +763,8 @@ class IpdController extends Controller
 
             DB::beginTransaction();
 
+            
+
             try {
                 // Create prescription
                 $prescription = IpdPrescription::create([
@@ -718,13 +786,35 @@ class IpdController extends Controller
                     'attachment_name'     => $attachmentName, // NEW
                 ]);
 
-                // Store tests in normalized table
+                // Store tests in normalized table with instance tracking
+                $prescriptionDate = $prescription->date ?? Carbon::now()->toDateString();
+                $prescriptionTime = Carbon::now()->format('H:i:s');
+                
                 if (! empty($pathology_ids)) {
-                    foreach ($pathology_ids as $pathologyId) {
+                    $pathologyNotes = $request->input('pathology_notes');
+                    if (! is_array($pathologyNotes)) {
+                        $pathologyNotes = [];
+                    }
+                    foreach ($pathology_ids as $index => $pathologyId) {
+                        // Get instance number for this test on this date
+                        $instanceNumber = IpdPrescriptionTest::getNextInstanceNumber(
+                            (int) $pathologyId,
+                            $prescriptionDate,
+                            'pathology',
+                            $prescription->id
+                        );
+                        
+                        // Notes: by index (per instance) or fallback to legacy per-id
+                        $notes = $pathologyNotes[$index] ?? $request->input("pathology_notes_{$pathologyId}") ?? null;
+                        
                         IpdPrescriptionTest::create([
                             'ipd_prescription_id' => $prescription->id,
                             'pathology_id'        => (int) $pathologyId,
                             'radiology_id'        => null,
+                            'instance_number'    => $instanceNumber,
+                            'test_date'          => $prescriptionDate,
+                            'prescription_time'  => $prescriptionTime,
+                            'notes'              => $notes,
                             'hospital_id'         => $user->hospital_id ?? '00000001',
                             'branch_id'           => $user->branch_id ?? '00000001',
                         ]);
@@ -732,11 +822,30 @@ class IpdController extends Controller
                 }
 
                 if (! empty($radiology_ids)) {
-                    foreach ($radiology_ids as $radiologyId) {
+                    $radiologyNotes = $request->input('radiology_notes');
+                    if (! is_array($radiologyNotes)) {
+                        $radiologyNotes = [];
+                    }
+                    foreach ($radiology_ids as $index => $radiologyId) {
+                        // Get instance number for this test on this date
+                        $instanceNumber = IpdPrescriptionTest::getNextInstanceNumber(
+                            (int) $radiologyId,
+                            $prescriptionDate,
+                            'radiology',
+                            $prescription->id
+                        );
+                        
+                        // Notes: by index (per instance) or fallback to legacy per-id
+                        $notes = $radiologyNotes[$index] ?? $request->input("radiology_notes_{$radiologyId}") ?? null;
+                        
                         IpdPrescriptionTest::create([
                             'ipd_prescription_id' => $prescription->id,
                             'pathology_id'        => null,
                             'radiology_id'        => (int) $radiologyId,
+                            'instance_number'    => $instanceNumber,
+                            'test_date'          => $prescriptionDate,
+                            'prescription_time'  => $prescriptionTime,
+                            'notes'              => $notes,
                             'hospital_id'         => $user->hospital_id ?? '00000001',
                             'branch_id'           => $user->branch_id ?? '00000001',
                         ]);
@@ -758,17 +867,38 @@ class IpdController extends Controller
                 }
 
                 DB::commit();
-                return redirect()->back()->with('success', 'Prescription created successfully.');
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Prescription created successfully.',
+                    'prescription_id' => $prescription->id
+                ], 200);
             } catch (Exception $e) {
                 DB::rollBack();
                 // Delete uploaded file if prescription creation failed
                 if ($attachment) {
                     Storage::disk('public')->delete($attachment);
                 }
-                return back()->with('error', 'Something went wrong: ' . $e->getMessage());
-            }} catch (Exception $e) {
-            // dd($e);
-            return back()->with('error', 'Something went wrong: ' . $e->getMessage());
+                \Log::error('Prescription creation error: ' . $e->getMessage());
+                \Log::error('Stack trace: ' . $e->getTraceAsString());
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Something went wrong: ' . $e->getMessage()
+                ], 500);
+            }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Prescription validation error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (Exception $e) {
+            \Log::error('Prescription error: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong: ' . $e->getMessage()
+            ], 500);
         }
     }
 
@@ -797,7 +927,11 @@ class IpdController extends Controller
     public function editPrescription($id)
     {
         $prescription = IpdPrescription::with([
-            'tests',
+            'tests' => function ($q) {
+                $q->orderBy('id');
+            },
+            'tests.pathology',
+            'tests.radiology',
             'medicines.pharmacy.medicineCategory',
             'medicines.medicineDosage.unit',
             'medicines.doseInterval',
@@ -806,12 +940,66 @@ class IpdController extends Controller
 
         $doctors     = Doctor::all();
         $findings    = Finding::all();
-        $pathologies = DB::table('pathology')->get();
-        $radiologies = DB::table('radio')->get();
+        // Use Eloquent so all tests (including newly added) are available; no extra scope
+        $pathologies = Pathology::orderBy('test_name')->get();
+        $radiologies = Radio::orderBy('test_name')->get();
 
-        // Get selected test IDs
-        $selectedPathologyIds = $prescription->tests->whereNotNull('pathology_id')->pluck('pathology_id')->toArray();
-        $selectedRadiologyIds = $prescription->tests->whereNotNull('radiology_id')->pluck('radiology_id')->toArray();
+        // Get selected test IDs in order (with notes) for selected-list UI
+        $pathologyTestsForList = [];
+        $radiologyTestsForList = [];
+        foreach ($prescription->tests as $t) {
+            if ($t->pathology_id) {
+                $path = $t->pathology ?? \App\Models\Pathology::find($t->pathology_id);
+                $pathologyTestsForList[] = [
+                    'id'    => $t->pathology_id,
+                    'name'  => $path ? ($path->test_name . ($path->short_name ? ' (' . $path->short_name . ')' : '')) : 'ID ' . $t->pathology_id,
+                    'notes' => $t->notes ?? '',
+                ];
+            }
+            if ($t->radiology_id) {
+                $rad = $t->radiology ?? \App\Models\Radio::find($t->radiology_id);
+                $radiologyTestsForList[] = [
+                    'id'    => $t->radiology_id,
+                    'name'  => $rad ? ($rad->test_name . ($rad->short_name ? ' (' . $rad->short_name . ')' : '')) : 'ID ' . $t->radiology_id,
+                    'notes' => $t->notes ?? '',
+                ];
+            }
+        }
+        // Fallback: if no normalized tests but prescription has old comma-separated pathology_id/radiology_id
+        if (empty($pathologyTestsForList) && ! empty($prescription->pathology_id)) {
+            $ids = array_filter(array_map('trim', explode(',', $prescription->pathology_id)));
+            foreach ($ids as $pathId) {
+                $path = \App\Models\Pathology::find($pathId);
+                $pathologyTestsForList[] = [
+                    'id'    => (int) $pathId,
+                    'name'  => $path ? ($path->test_name . ($path->short_name ? ' (' . $path->short_name . ')' : '')) : 'ID ' . $pathId,
+                    'notes' => '',
+                ];
+            }
+        }
+        if (empty($radiologyTestsForList) && ! empty($prescription->radiology_id)) {
+            $ids = array_filter(array_map('trim', explode(',', $prescription->radiology_id)));
+            foreach ($ids as $radId) {
+                $rad = \App\Models\Radio::find($radId);
+                $radiologyTestsForList[] = [
+                    'id'    => (int) $radId,
+                    'name'  => $rad ? ($rad->test_name . ($rad->short_name ? ' (' . $rad->short_name . ')' : '')) : 'ID ' . $radId,
+                    'notes' => '',
+                ];
+            }
+        }
+        $selectedPathologyIds = array_column($pathologyTestsForList, 'id');
+        $selectedRadiologyIds = array_column($radiologyTestsForList, 'id');
+
+        $prescriptionDate = $prescription->date ?? Carbon::now()->toDateString();
+        $pathologyInstanceCounts = [];
+        $radiologyInstanceCounts = [];
+        foreach (array_count_values($selectedPathologyIds) as $pathId => $count) {
+            $pathologyInstanceCounts[$pathId] = $count;
+        }
+        foreach (array_count_values($selectedRadiologyIds) as $radId => $count) {
+            $radiologyInstanceCounts[$radId] = $count;
+        }
 
         return view('admin.ipd.prescription.edit', compact(
             'prescription',
@@ -820,7 +1008,12 @@ class IpdController extends Controller
             'pathologies',
             'radiologies',
             'selectedPathologyIds',
-            'selectedRadiologyIds'
+            'selectedRadiologyIds',
+            'pathologyInstanceCounts',
+            'radiologyInstanceCounts',
+            'prescriptionDate',
+            'pathologyTestsForList',
+            'radiologyTestsForList'
         ));
     }
 
@@ -910,16 +1103,45 @@ class IpdController extends Controller
                     'attachment_name'     => $attachmentName,
                 ]);
 
-                // Delete existing tests
-                IpdPrescriptionTest::where('ipd_prescription_id', $prescription->id)->delete();
+                // Delete existing tests (but preserve billing links - only delete if not billed)
+                // Check which tests are already billed before deleting
+                $billedTestIds = \App\Models\PathologyReport::whereNotNull('ipd_prescription_test_id')
+                    ->pluck('ipd_prescription_test_id')
+                    ->merge(
+                        \App\Models\RadiologyReport::whereNotNull('ipd_prescription_test_id')
+                            ->pluck('ipd_prescription_test_id')
+                    );
+                
+                // Only delete tests that haven't been billed
+                IpdPrescriptionTest::where('ipd_prescription_id', $prescription->id)
+                    ->whereNotIn('id', $billedTestIds)
+                    ->delete();
 
-                // Store new tests
+                // Store new tests with instance tracking
+                $prescriptionDate = $prescription->date ?? Carbon::now()->toDateString();
+                $prescriptionTime = Carbon::now()->format('H:i:s');
+                
                 if (! empty($pathology_ids)) {
-                    foreach ($pathology_ids as $pathologyId) {
+                    $pathologyNotes = $request->input('pathology_notes');
+                    if (! is_array($pathologyNotes)) {
+                        $pathologyNotes = [];
+                    }
+                    foreach ($pathology_ids as $index => $pathologyId) {
+                        $instanceNumber = IpdPrescriptionTest::getNextInstanceNumber(
+                            (int) $pathologyId,
+                            $prescriptionDate,
+                            'pathology',
+                            $prescription->id
+                        );
+                        $notes = $pathologyNotes[$index] ?? $request->input("pathology_notes_{$pathologyId}") ?? null;
                         IpdPrescriptionTest::create([
                             'ipd_prescription_id' => $prescription->id,
                             'pathology_id'        => (int) $pathologyId,
                             'radiology_id'        => null,
+                            'instance_number'    => $instanceNumber,
+                            'test_date'          => $prescriptionDate,
+                            'prescription_time'  => $prescriptionTime,
+                            'notes'              => $notes,
                             'hospital_id'         => $user->hospital_id ?? '00000001',
                             'branch_id'           => $user->branch_id ?? '00000001',
                         ]);
@@ -927,11 +1149,26 @@ class IpdController extends Controller
                 }
 
                 if (! empty($radiology_ids)) {
-                    foreach ($radiology_ids as $radiologyId) {
+                    $radiologyNotes = $request->input('radiology_notes');
+                    if (! is_array($radiologyNotes)) {
+                        $radiologyNotes = [];
+                    }
+                    foreach ($radiology_ids as $index => $radiologyId) {
+                        $instanceNumber = IpdPrescriptionTest::getNextInstanceNumber(
+                            (int) $radiologyId,
+                            $prescriptionDate,
+                            'radiology',
+                            $prescription->id
+                        );
+                        $notes = $radiologyNotes[$index] ?? $request->input("radiology_notes_{$radiologyId}") ?? null;
                         IpdPrescriptionTest::create([
                             'ipd_prescription_id' => $prescription->id,
                             'pathology_id'        => null,
                             'radiology_id'        => (int) $radiologyId,
+                            'instance_number'    => $instanceNumber,
+                            'test_date'          => $prescriptionDate,
+                            'prescription_time'  => $prescriptionTime,
+                            'notes'              => $notes,
                             'hospital_id'         => $user->hospital_id ?? '00000001',
                             'branch_id'           => $user->branch_id ?? '00000001',
                         ]);
@@ -956,13 +1193,34 @@ class IpdController extends Controller
                 }
 
                 DB::commit();
-                return redirect()->route('ipd.show', $prescription->ipd_id)
-                    ->with('success', 'Prescription updated successfully.');
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Prescription updated successfully.',
+                    'prescription_id' => $prescription->id
+                ], 200);
             } catch (Exception $e) {
                 DB::rollBack();
-                return back()->with('error', 'Something went wrong: ' . $e->getMessage());
+                \Log::error('Prescription update error: ' . $e->getMessage());
+                \Log::error('Stack trace: ' . $e->getTraceAsString());
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Something went wrong: ' . $e->getMessage()
+                ], 500);
             }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Prescription validation error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
         } catch (Exception $e) {
+            \Log::error('Prescription update error: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong: ' . $e->getMessage()
+            ], 500);
             return back()->with('error', 'Something went wrong: ' . $e->getMessage());
         }
     }

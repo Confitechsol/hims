@@ -468,22 +468,37 @@ class IpdBillingController extends Controller
         ->orderBy('date', 'asc')
         ->get();
         
-        // Get pathology test details from reports
+        // Get pathology test details from reports with instance information
         $pathologyDetailsWithTests = $pathologyDetails->map(function($bill) {
             $reports = DB::table('pathology_report')
                 ->where('pathology_bill_id', $bill->id)
+                ->leftJoin('ipd_prescription_test', 'pathology_report.ipd_prescription_test_id', '=', 'ipd_prescription_test.id')
                 ->join('pathology', 'pathology_report.pathology_id', '=', 'pathology.id')
-                ->select('pathology.test_name', 'pathology_report.apply_charge')
+                ->select(
+                    'pathology.test_name',
+                    'pathology_report.apply_charge',
+                    'pathology_report.instance_number',
+                    'ipd_prescription_test.instance_number as prescription_instance_number'
+                )
                 ->get();
             
             if ($reports->count() > 0) {
                 return $reports->map(function($report) use ($bill) {
+                    // Format test name with instance number if available
+                    $instanceNumber = $report->prescription_instance_number ?? $report->instance_number ?? null;
+                    $testName = $report->test_name;
+                    if ($instanceNumber && $instanceNumber > 1) {
+                        $instanceSuffix = $instanceNumber == 2 ? ' (2nd time)' : 
+                                         ($instanceNumber == 3 ? ' (3rd time)' : " ({$instanceNumber}th time)");
+                        $testName = $report->test_name . $instanceSuffix;
+                    }
+                    
                     return [
                         'date' => $bill->date,
-                        'test_name' => $report->test_name,
+                        'test_name' => $testName,
                         'amount' => $report->apply_charge ?? 0,
                         'type' => 'pathology',
-                        'description' => $report->test_name,
+                        'description' => $testName,
                         'bill_id' => $bill->id,
                     ];
                 });
@@ -512,22 +527,37 @@ class IpdBillingController extends Controller
         ->orderBy('date', 'asc')
         ->get();
         
-        // Get radiology test details from reports
+        // Get radiology test details from reports with instance information
         $radiologyDetailsWithTests = $radiologyDetails->map(function($bill) {
             $reports = DB::table('radiology_report')
                 ->where('radiology_bill_id', $bill->id)
+                ->leftJoin('ipd_prescription_test', 'radiology_report.ipd_prescription_test_id', '=', 'ipd_prescription_test.id')
                 ->join('radio', 'radiology_report.radiology_id', '=', 'radio.id')
-                ->select('radio.test_name', 'radiology_report.apply_charge')
+                ->select(
+                    'radio.test_name',
+                    'radiology_report.apply_charge',
+                    'radiology_report.instance_number',
+                    'ipd_prescription_test.instance_number as prescription_instance_number'
+                )
                 ->get();
             
             if ($reports->count() > 0) {
                 return $reports->map(function($report) use ($bill) {
+                    // Format test name with instance number if available
+                    $instanceNumber = $report->prescription_instance_number ?? $report->instance_number ?? null;
+                    $testName = $report->test_name;
+                    if ($instanceNumber && $instanceNumber > 1) {
+                        $instanceSuffix = $instanceNumber == 2 ? ' (2nd time)' : 
+                                         ($instanceNumber == 3 ? ' (3rd time)' : " ({$instanceNumber}th time)");
+                        $testName = $report->test_name . $instanceSuffix;
+                    }
+                    
                     return [
                         'date' => $bill->date,
-                        'test_name' => $report->test_name,
+                        'test_name' => $testName,
                         'amount' => $report->apply_charge ?? 0,
                         'type' => 'radiology',
-                        'description' => $report->test_name,
+                        'description' => $testName,
                         'bill_id' => $bill->id,
                     ];
                 });
@@ -818,12 +848,26 @@ class IpdBillingController extends Controller
         $pathologyRows = $pathologyBills->map(function ($bill) {
             $reports = DB::table('pathology_report')
                 ->where('pathology_bill_id', $bill->id)
+                ->leftJoin('ipd_prescription_test', 'pathology_report.ipd_prescription_test_id', '=', 'ipd_prescription_test.id')
                 ->join('pathology', 'pathology_report.pathology_id', '=', 'pathology.id')
-                ->select('pathology.test_name', 'pathology_report.apply_charge')
+                ->select(
+                    'pathology.test_name',
+                    'pathology_report.apply_charge',
+                    'pathology_report.instance_number',
+                    'ipd_prescription_test.instance_number as prescription_instance_number'
+                )
                 ->get();
             if ($reports->count() > 0) {
                 return $reports->map(function ($r) use ($bill) {
-                    return ['date' => $bill->date, 'type' => 'pathology', 'test_name' => $r->test_name ?? 'N/A', 'amount' => (float)($r->apply_charge ?? 0)];
+                    // Format test name with instance number if available
+                    $instanceNumber = $r->prescription_instance_number ?? $r->instance_number ?? null;
+                    $testName = $r->test_name ?? 'N/A';
+                    if ($instanceNumber && $instanceNumber > 1 && $testName !== 'N/A') {
+                        $instanceSuffix = $instanceNumber == 2 ? ' (2nd time)' : 
+                                         ($instanceNumber == 3 ? ' (3rd time)' : " ({$instanceNumber}th time)");
+                        $testName = $r->test_name . $instanceSuffix;
+                    }
+                    return ['date' => $bill->date, 'type' => 'pathology', 'test_name' => $testName, 'amount' => (float)($r->apply_charge ?? 0)];
                 });
             }
             return [['date' => $bill->date, 'type' => 'pathology', 'test_name' => 'Pathology Bill #' . $bill->id, 'amount' => (float)($bill->net_amount ?? 0)]];
@@ -839,12 +883,26 @@ class IpdBillingController extends Controller
         $radiologyRows = $radiologyBills->map(function ($bill) {
             $reports = DB::table('radiology_report')
                 ->where('radiology_bill_id', $bill->id)
+                ->leftJoin('ipd_prescription_test', 'radiology_report.ipd_prescription_test_id', '=', 'ipd_prescription_test.id')
                 ->join('radio', 'radiology_report.radiology_id', '=', 'radio.id')
-                ->select('radio.test_name', 'radiology_report.apply_charge')
+                ->select(
+                    'radio.test_name',
+                    'radiology_report.apply_charge',
+                    'radiology_report.instance_number',
+                    'ipd_prescription_test.instance_number as prescription_instance_number'
+                )
                 ->get();
             if ($reports->count() > 0) {
                 return $reports->map(function ($r) use ($bill) {
-                    return ['date' => $bill->date, 'type' => 'radiology', 'test_name' => $r->test_name ?? 'N/A', 'amount' => (float)($r->apply_charge ?? 0)];
+                    // Format test name with instance number if available
+                    $instanceNumber = $r->prescription_instance_number ?? $r->instance_number ?? null;
+                    $testName = $r->test_name ?? 'N/A';
+                    if ($instanceNumber && $instanceNumber > 1 && $testName !== 'N/A') {
+                        $instanceSuffix = $instanceNumber == 2 ? ' (2nd time)' : 
+                                         ($instanceNumber == 3 ? ' (3rd time)' : " ({$instanceNumber}th time)");
+                        $testName = $r->test_name . $instanceSuffix;
+                    }
+                    return ['date' => $bill->date, 'type' => 'radiology', 'test_name' => $testName, 'amount' => (float)($r->apply_charge ?? 0)];
                 });
             }
             return [['date' => $bill->date, 'type' => 'radiology', 'test_name' => 'Radiology Bill #' . $bill->id, 'amount' => (float)($bill->net_amount ?? 0)]];
@@ -898,17 +956,31 @@ class IpdBillingController extends Controller
             
             \Log::info('Pathology bills found', ['count' => $pathologyDetails->count()]);
             
-            // Get all pathology test names
+            // Get all pathology test names with instance information
             foreach ($pathologyDetails as $bill) {
                 $reports = DB::table('pathology_report')
                     ->where('pathology_bill_id', $bill->id)
+                    ->leftJoin('ipd_prescription_test', 'pathology_report.ipd_prescription_test_id', '=', 'ipd_prescription_test.id')
                     ->join('pathology', 'pathology_report.pathology_id', '=', 'pathology.id')
-                    ->select('pathology.test_name', 'pathology_report.apply_charge')
+                    ->select(
+                        'pathology.test_name',
+                        'pathology_report.apply_charge',
+                        'pathology_report.instance_number',
+                        'ipd_prescription_test.instance_number as prescription_instance_number'
+                    )
                     ->get();
                 
                 foreach ($reports as $report) {
                     if ($report->test_name) {
-                        $pathologyTestNames[] = $report->test_name;
+                        // Format test name with instance number if available
+                        $instanceNumber = $report->prescription_instance_number ?? $report->instance_number ?? null;
+                        $testName = $report->test_name;
+                        if ($instanceNumber && $instanceNumber > 1) {
+                            $instanceSuffix = $instanceNumber == 2 ? ' (2nd time)' : 
+                                             ($instanceNumber == 3 ? ' (3rd time)' : " ({$instanceNumber}th time)");
+                            $testName = $report->test_name . $instanceSuffix;
+                        }
+                        $pathologyTestNames[] = $testName;
                         $pathologyTotal += $report->apply_charge ?? 0;
                     }
                 }
@@ -943,7 +1015,15 @@ class IpdBillingController extends Controller
                 
                 foreach ($reports as $report) {
                     if ($report->test_name) {
-                        $radiologyTestNames[] = $report->test_name;
+                        // Format test name with instance number if available
+                        $instanceNumber = $report->prescription_instance_number ?? $report->instance_number ?? null;
+                        $testName = $report->test_name;
+                        if ($instanceNumber && $instanceNumber > 1) {
+                            $instanceSuffix = $instanceNumber == 2 ? ' (2nd time)' : 
+                                             ($instanceNumber == 3 ? ' (3rd time)' : " ({$instanceNumber}th time)");
+                            $testName = $report->test_name . $instanceSuffix;
+                        }
+                        $radiologyTestNames[] = $testName;
                         $radiologyTotal += $report->apply_charge ?? 0;
                     }
                 }
@@ -1355,13 +1435,27 @@ class IpdBillingController extends Controller
                 try {
                     $reports = DB::table('pathology_report')
                         ->where('pathology_bill_id', $bill->id)
+                        ->leftJoin('ipd_prescription_test', 'pathology_report.ipd_prescription_test_id', '=', 'ipd_prescription_test.id')
                         ->join('pathology', 'pathology_report.pathology_id', '=', 'pathology.id')
-                        ->select('pathology.test_name', 'pathology_report.apply_charge')
+                        ->select(
+                            'pathology.test_name',
+                            'pathology_report.apply_charge',
+                            'pathology_report.instance_number',
+                            'ipd_prescription_test.instance_number as prescription_instance_number'
+                        )
                         ->get();
                     
                     foreach ($reports as $report) {
                         if ($report->test_name) {
-                            $pathologyTestNames[] = $report->test_name;
+                            // Format test name with instance number if available
+                            $instanceNumber = $report->prescription_instance_number ?? $report->instance_number ?? null;
+                            $testName = $report->test_name;
+                            if ($instanceNumber && $instanceNumber > 1) {
+                                $instanceSuffix = $instanceNumber == 2 ? ' (2nd time)' : 
+                                                 ($instanceNumber == 3 ? ' (3rd time)' : " ({$instanceNumber}th time)");
+                                $testName = $report->test_name . $instanceSuffix;
+                            }
+                            $pathologyTestNames[] = $testName;
                             $pathologyTotal += $report->apply_charge ?? 0;
                         }
                     }
@@ -1384,13 +1478,27 @@ class IpdBillingController extends Controller
                 try {
                     $reports = DB::table('radiology_report')
                         ->where('radiology_bill_id', $bill->id)
+                        ->leftJoin('ipd_prescription_test', 'radiology_report.ipd_prescription_test_id', '=', 'ipd_prescription_test.id')
                         ->join('radio', 'radiology_report.radiology_id', '=', 'radio.id')
-                        ->select('radio.test_name', 'radiology_report.apply_charge')
+                        ->select(
+                            'radio.test_name',
+                            'radiology_report.apply_charge',
+                            'radiology_report.instance_number',
+                            'ipd_prescription_test.instance_number as prescription_instance_number'
+                        )
                         ->get();
                     
                     foreach ($reports as $report) {
                         if ($report->test_name) {
-                            $radiologyTestNames[] = $report->test_name;
+                            // Format test name with instance number if available
+                            $instanceNumber = $report->prescription_instance_number ?? $report->instance_number ?? null;
+                            $testName = $report->test_name;
+                            if ($instanceNumber && $instanceNumber > 1) {
+                                $instanceSuffix = $instanceNumber == 2 ? ' (2nd time)' : 
+                                                 ($instanceNumber == 3 ? ' (3rd time)' : " ({$instanceNumber}th time)");
+                                $testName = $report->test_name . $instanceSuffix;
+                            }
+                            $radiologyTestNames[] = $testName;
                             $radiologyTotal += $report->apply_charge ?? 0;
                         }
                     }

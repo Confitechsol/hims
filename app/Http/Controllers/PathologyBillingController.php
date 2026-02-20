@@ -145,16 +145,31 @@ class PathologyBillingController extends Controller
                 'generated_by' => Auth::id(),
             ]);
             
-            // Create pathology reports
+            // Create pathology reports with instance tracking
             foreach ($validated['tests'] as $test) {
+                $prescriptionTestInstance = null;
+                $instanceNumber = null;
+                $customerType = 'OPD';
+                
+                // If prescription_test_id is provided, link to it
+                if (!empty($test['prescription_test_id'])) {
+                    $prescriptionTestInstance = IpdPrescriptionTest::find($test['prescription_test_id']);
+                    if ($prescriptionTestInstance) {
+                        $instanceNumber = $prescriptionTestInstance->instance_number;
+                        $customerType = 'IPD'; // If linked to prescription, it's IPD
+                    }
+                }
+                
                 PathologyReport::create([
                     'pathology_bill_id' => $bill->id,
                     'pathology_id' => $test['pathology_id'],
+                    'ipd_prescription_test_id' => $prescriptionTestInstance?->id,
+                    'instance_number' => $instanceNumber,
                     'patient_id' => $validated['patient_id'],
                     'reporting_date' => $test['report_date'],
                     'tax_percentage' => $test['tax_percentage'] ?? 0,
                     'apply_charge' => $test['amount'],
-                    'customer_type' => 'OPD',
+                    'customer_type' => $customerType,
                 ]);
             }
 
@@ -239,6 +254,7 @@ class PathologyBillingController extends Controller
             'activate_tpa' => 'nullable',
             'tests' => 'required|array|min:1',
             'tests.*.pathology_id' => 'required|exists:pathology,id',
+            'tests.*.prescription_test_id' => 'nullable|exists:ipd_prescription_test,id',
             'tests.*.report_days' => 'required|integer|min:0',
             'tests.*.report_date' => 'required|date',
             'tests.*.tax_percentage' => 'nullable|numeric|min:0',
@@ -281,14 +297,29 @@ class PathologyBillingController extends Controller
 
             // Create new pathology reports
             foreach ($validated['tests'] as $test) {
+                $prescriptionTestInstance = null;
+                $instanceNumber = null;
+                $customerType = 'OPD';
+                
+                // If prescription_test_id is provided, link to it
+                if (!empty($test['prescription_test_id'])) {
+                    $prescriptionTestInstance = IpdPrescriptionTest::find($test['prescription_test_id']);
+                    if ($prescriptionTestInstance) {
+                        $instanceNumber = $prescriptionTestInstance->instance_number;
+                        $customerType = 'IPD'; // If linked to prescription, it's IPD
+                    }
+                }
+                
                 PathologyReport::create([
                     'pathology_bill_id' => $bill->id,
                     'pathology_id' => $test['pathology_id'],
+                    'ipd_prescription_test_id' => $prescriptionTestInstance?->id,
+                    'instance_number' => $instanceNumber,
                     'patient_id' => $validated['patient_id'],
                     'reporting_date' => $test['report_date'],
                     'tax_percentage' => $test['tax_percentage'] ?? 0,
                     'apply_charge' => $test['amount'],
-                    'customer_type' => 'OPD',
+                    'customer_type' => $customerType,
                 ]);
             }
 
@@ -566,13 +597,24 @@ class PathologyBillingController extends Controller
                 $pathology = $test->pathology;
                 // Use IPD charge since this is from IPD prescription
                 $standardCharge = $pathology->standard_charge_ipd ?? 0;
+                
+                // Get instance number and format display
+                $instanceNumber = $test->instance_number ?? 1;
+                $instanceSuffix = $instanceNumber > 1 
+                    ? ($instanceNumber == 2 ? ' (2nd time)' : ($instanceNumber == 3 ? ' (3rd time)' : " ({$instanceNumber}th time)"))
+                    : '';
+                
                 return [
                     'id' => $pathology->id,
-                    'test_name' => $pathology->test_name,
+                    'prescription_test_id' => $test->id, // Include prescription test instance ID
+                    'instance_number' => $instanceNumber,
+                    'test_name' => $pathology->test_name . $instanceSuffix,
+                    'test_name_base' => $pathology->test_name, // Base name without instance suffix
                     'report_days' => $pathology->report_days ?? 0,
                     'standard_charge_ipd' => $pathology->standard_charge_ipd ?? 0,
                     'standard_charge_opd' => $pathology->standard_charge_opd ?? 0,
                     'amount' => $standardCharge,
+                    'notes' => $test->notes ?? null,
                 ];
             });
         
