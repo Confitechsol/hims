@@ -3,7 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pathology;
 use App\Models\PathologyCategory;
-use App\Models\pathologyParameter;
+use App\Models\PathologyParameter;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 
