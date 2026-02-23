@@ -176,18 +176,25 @@ class IpdBillingController extends Controller
             return ['total' => 0, 'details' => []];
         }
 
-        $admissionDate = Carbon::parse($ipd->date);
+        $admissionDate = Carbon::parse($ipd->date)->startOfDay();
         $endDate = $endDate ? Carbon::parse($endDate) : Carbon::now();
-        
-        // Get all bed history records for this IPD patient (including inactive ones for historical calculation)
+        $endDate = $endDate->endOfDay();
+
+        // Get all bed history records for this IPD (primary source)
         $bedHistories = PatientBedHistory::where('ipd_id', $ipdId)
             ->with(['bedGroup', 'bed'])
             ->orderBy('from_date', 'asc')
             ->get();
 
-        if ($bedHistories->isEmpty()) {
-            return ['total' => 0, 'details' => []];
-        }
+        // Fallback: daywise bed charges (created on admission/transfer) if no history or to fill gaps
+        $daywiseCharges = IpdDaywiseBedCharge::where('ipd_id', $ipdId)
+            ->with(['bedGroup', 'bed'])
+            ->orderBy('charge_date', 'asc')
+            ->get()
+            ->keyBy(function ($row) {
+                $d = $row->charge_date;
+                return $d instanceof \DateTimeInterface ? $d->format('Y-m-d') : (\Carbon\Carbon::parse($d)->format('Y-m-d'));
+            });
 
         $totalCharges = 0;
         $totalCgst = 0;
@@ -198,69 +205,98 @@ class IpdBillingController extends Controller
         // Calculate charges for each day from admission to end date
         while ($currentDate->lte($endDate)) {
             $chargeDate = $currentDate->format('Y-m-d');
-            
-            // Calculate period: 10 AM previous day to 10 AM current day
+            $chargeDateCarbon = $currentDate->copy();
+
+            // Period: 10 AM previous day to 10 AM current day (for "which bed was active")
             $periodStart = $currentDate->copy()->subDay()->setTime(10, 0, 0);
             $periodEnd = $currentDate->copy()->setTime(10, 0, 0);
-            
-            // Find which bed was assigned during this period
+
+            // Find which bed was assigned during this period (use date-only so admission time doesn't exclude same day)
             $activeBed = null;
             foreach ($bedHistories as $history) {
-                $fromDate = Carbon::parse($history->from_date);
-                $toDate = $history->to_date ? Carbon::parse($history->to_date) : null;
-                
-                // Check if this bed history was active during the period
+                $fromDate = Carbon::parse($history->from_date)->startOfDay();
+                $toDate = $history->to_date ? Carbon::parse($history->to_date)->endOfDay() : null;
+
                 if ($fromDate->lte($periodEnd) && (!$toDate || $toDate->gte($periodStart))) {
-                    // If multiple beds, use the most recent one
-                    if (!$activeBed || $fromDate->gt(Carbon::parse($activeBed->from_date))) {
+                    if (!$activeBed || $fromDate->gt(Carbon::parse($activeBed->from_date)->startOfDay())) {
                         $activeBed = $history;
                     }
                 }
             }
-            
+
+            $bedCost = 0;
+            $detail = null;
+            $gstRate = 0;
+            $cgstAmount = 0;
+            $sgstAmount = 0;
+            $sacHsnCode = null;
+
             if ($activeBed && $activeBed->bedGroup) {
-                $bedCost = $activeBed->bedGroup->bed_cost ?? 0;
-                $totalCharges += $bedCost;
-                
-                // Calculate GST if bed charge > 5000
-                $gstRate = 0;
-                $cgstAmount = 0;
-                $sgstAmount = 0;
-                $sacHsnCode = null;
-                
+                $bedCost = (float) ($activeBed->bedGroup->bed_cost ?? 0);
                 if ($bedCost > 5000 && $activeBed->bedGroup->gst_rate) {
-                    $gstRate = $activeBed->bedGroup->gst_rate;
+                    $gstRate = (float) $activeBed->bedGroup->gst_rate;
                     $sacHsnCode = $activeBed->bedGroup->sac_hsn_code;
-                    
-                    // Calculate GST: CGST and SGST are each half of the total GST rate
                     $totalGstAmount = ($bedCost * $gstRate) / 100;
-                    $cgstAmount = $totalGstAmount / 2; // CGST is half
-                    $sgstAmount = $totalGstAmount / 2; // SGST is half
-                    
-                    $totalCgst += $cgstAmount;
-                    $totalSgst += $sgstAmount;
+                    $cgstAmount = $totalGstAmount / 2;
+                    $sgstAmount = $totalGstAmount / 2;
                 }
-                
-                // Create object compatible with IpdDaywiseBedCharge structure
-                $detail = new \stdClass();
-                $detail->charge_date = $chargeDate;
-                $detail->period_start_date = $periodStart->format('Y-m-d');
-                $detail->period_end_date = $periodEnd->format('Y-m-d');
-                $detail->bed_group_id = $activeBed->bed_group_id;
-                $detail->bed_id = $activeBed->bed_id;
-                $detail->bed_charge = $bedCost;
-                $detail->bed_charge_rate = $bedCost;
-                $detail->no_of_days = 1;
-                $detail->bedGroup = $activeBed->bedGroup;
-                $detail->bed = $activeBed->bed;
-                $detail->gst_rate = $gstRate;
-                $detail->cgst_amount = $cgstAmount;
-                $detail->sgst_amount = $sgstAmount;
-                $detail->sac_hsn_code = $sacHsnCode;
-                
+                $detail = (object) [
+                    'charge_date' => $chargeDate,
+                    'period_start_date' => $periodStart->format('Y-m-d'),
+                    'period_end_date' => $periodEnd->format('Y-m-d'),
+                    'bed_group_id' => $activeBed->bed_group_id,
+                    'bed_id' => $activeBed->bed_id,
+                    'bed_charge' => $bedCost,
+                    'bed_charge_rate' => $bedCost,
+                    'no_of_days' => 1,
+                    'bedGroup' => $activeBed->bedGroup,
+                    'bed' => $activeBed->bed,
+                    'gst_rate' => $gstRate,
+                    'cgst_amount' => $cgstAmount,
+                    'sgst_amount' => $sgstAmount,
+                    'sac_hsn_code' => $sacHsnCode,
+                ];
+            }
+
+            // Fallback: use IpdDaywiseBedCharge for this date if no charge from history
+            if ($bedCost <= 0 && $daywiseCharges->has($chargeDate)) {
+                $daywise = $daywiseCharges->get($chargeDate);
+                $bedCost = (float) ($daywise->bed_charge ?? 0);
+                if ($bedCost > 0) {
+                    $bedGroup = $daywise->bedGroup;
+                    if ($bedGroup && $bedCost > 5000 && $bedGroup->gst_rate) {
+                        $gstRate = (float) $bedGroup->gst_rate;
+                        $sacHsnCode = $bedGroup->sac_hsn_code ?? null;
+                        $totalGstAmount = ($bedCost * $gstRate) / 100;
+                        $cgstAmount = $totalGstAmount / 2;
+                        $sgstAmount = $totalGstAmount / 2;
+                    }
+                    $detail = (object) [
+                        'charge_date' => $chargeDate,
+                        'period_start_date' => $daywise->period_start_date ?? $chargeDate,
+                        'period_end_date' => $daywise->period_end_date ?? $chargeDate,
+                        'bed_group_id' => $daywise->bed_group_id,
+                        'bed_id' => $daywise->bed_id,
+                        'bed_charge' => $bedCost,
+                        'bed_charge_rate' => (float) ($daywise->bed_charge_rate ?? $bedCost),
+                        'no_of_days' => (int) ($daywise->no_of_days ?? 1),
+                        'bedGroup' => $daywise->bedGroup,
+                        'bed' => $daywise->bed,
+                        'gst_rate' => $gstRate,
+                        'cgst_amount' => $cgstAmount,
+                        'sgst_amount' => $sgstAmount,
+                        'sac_hsn_code' => $sacHsnCode,
+                    ];
+                }
+            }
+
+            if ($bedCost > 0 && $detail) {
+                $totalCharges += $bedCost;
+                $totalCgst += $cgstAmount;
+                $totalSgst += $sgstAmount;
                 $details[] = $detail;
             }
-            
+
             $currentDate->addDay();
         }
 
@@ -327,11 +363,11 @@ class IpdBillingController extends Controller
             }
         })->sum('net_amount');
 
-        // Get IPD patient_id and admission date
+        // Get IPD patient_id and admission date (use date-only so same-day visits are included)
         $patientId = $ipd->patient_id ?? null;
-        $admissionDate = $ipd->date ?? null;
+        $admissionDate = $ipd->date ? Carbon::parse($ipd->date)->format('Y-m-d') : null;
 
-        // Doctor Visit Charges (for this patient after admission)
+        // Doctor Visit Charges (for this patient on or after admission date)
         $doctorVisitCharges = 0;
         if ($patientId && $admissionDate) {
             $doctorVisitCharges = DoctorVisit::where('patient_id', $patientId)
@@ -381,7 +417,8 @@ class IpdBillingController extends Controller
      */
     private function getDetailedBreakup($ipdId, $ipd)
     {
-        $admissionDate = $ipd->date;
+        $admissionDate = $ipd->date; // datetime for pathology/radiology
+        $admissionDateOnly = $ipd->date ? Carbon::parse($ipd->date)->format('Y-m-d') : null; // date-only for doctor visits
         $patientId = $ipd->patient_id;
         $caseReferenceId = $ipd->case_reference_id;
         
@@ -431,22 +468,37 @@ class IpdBillingController extends Controller
         ->orderBy('date', 'asc')
         ->get();
         
-        // Get pathology test details from reports
+        // Get pathology test details from reports with instance information
         $pathologyDetailsWithTests = $pathologyDetails->map(function($bill) {
             $reports = DB::table('pathology_report')
                 ->where('pathology_bill_id', $bill->id)
+                ->leftJoin('ipd_prescription_test', 'pathology_report.ipd_prescription_test_id', '=', 'ipd_prescription_test.id')
                 ->join('pathology', 'pathology_report.pathology_id', '=', 'pathology.id')
-                ->select('pathology.test_name', 'pathology_report.apply_charge')
+                ->select(
+                    'pathology.test_name',
+                    'pathology_report.apply_charge',
+                    'pathology_report.instance_number',
+                    'ipd_prescription_test.instance_number as prescription_instance_number'
+                )
                 ->get();
             
             if ($reports->count() > 0) {
                 return $reports->map(function($report) use ($bill) {
+                    // Format test name with instance number if available
+                    $instanceNumber = $report->prescription_instance_number ?? $report->instance_number ?? null;
+                    $testName = $report->test_name;
+                    if ($instanceNumber && $instanceNumber > 1) {
+                        $instanceSuffix = $instanceNumber == 2 ? ' (2nd time)' : 
+                                         ($instanceNumber == 3 ? ' (3rd time)' : " ({$instanceNumber}th time)");
+                        $testName = $report->test_name . $instanceSuffix;
+                    }
+                    
                     return [
                         'date' => $bill->date,
-                        'test_name' => $report->test_name,
+                        'test_name' => $testName,
                         'amount' => $report->apply_charge ?? 0,
                         'type' => 'pathology',
-                        'description' => $report->test_name,
+                        'description' => $testName,
                         'bill_id' => $bill->id,
                     ];
                 });
@@ -475,22 +527,37 @@ class IpdBillingController extends Controller
         ->orderBy('date', 'asc')
         ->get();
         
-        // Get radiology test details from reports
+        // Get radiology test details from reports with instance information
         $radiologyDetailsWithTests = $radiologyDetails->map(function($bill) {
             $reports = DB::table('radiology_report')
                 ->where('radiology_bill_id', $bill->id)
+                ->leftJoin('ipd_prescription_test', 'radiology_report.ipd_prescription_test_id', '=', 'ipd_prescription_test.id')
                 ->join('radio', 'radiology_report.radiology_id', '=', 'radio.id')
-                ->select('radio.test_name', 'radiology_report.apply_charge')
+                ->select(
+                    'radio.test_name',
+                    'radiology_report.apply_charge',
+                    'radiology_report.instance_number',
+                    'ipd_prescription_test.instance_number as prescription_instance_number'
+                )
                 ->get();
             
             if ($reports->count() > 0) {
                 return $reports->map(function($report) use ($bill) {
+                    // Format test name with instance number if available
+                    $instanceNumber = $report->prescription_instance_number ?? $report->instance_number ?? null;
+                    $testName = $report->test_name;
+                    if ($instanceNumber && $instanceNumber > 1) {
+                        $instanceSuffix = $instanceNumber == 2 ? ' (2nd time)' : 
+                                         ($instanceNumber == 3 ? ' (3rd time)' : " ({$instanceNumber}th time)");
+                        $testName = $report->test_name . $instanceSuffix;
+                    }
+                    
                     return [
                         'date' => $bill->date,
-                        'test_name' => $report->test_name,
+                        'test_name' => $testName,
                         'amount' => $report->apply_charge ?? 0,
                         'type' => 'radiology',
-                        'description' => $report->test_name,
+                        'description' => $testName,
                         'bill_id' => $bill->id,
                     ];
                 });
@@ -507,22 +574,25 @@ class IpdBillingController extends Controller
             }
         })->flatten(1);
 
-        // Doctor Visit Charges Details
-        $doctorVisitDetails = DoctorVisit::where('patient_id', $patientId)
-            ->where('visit_date', '>=', $admissionDate)
-            ->with(['doctor', 'charge'])
-            ->orderBy('visit_date', 'asc')
-            ->get()
-            ->map(function($visit) {
-                return [
-                    'date' => $visit->visit_date,
-                    'doctor' => ($visit->doctor->name ?? 'N/A') . ' ' . ($visit->doctor->surname ?? ''),
-                    'charge_name' => $visit->charge->name ?? 'N/A',
-                    'amount' => $visit->amount ?? 0,
-                    'type' => 'doctor_visit',
-                    'description' => 'Doctor Visit - ' . ($visit->doctor->name ?? 'N/A') . ' ' . ($visit->doctor->surname ?? '') . ' - ' . ($visit->charge->name ?? 'N/A'),
-                ];
-            });
+        // Doctor Visit Charges Details (use date-only so same-day visits are included)
+        $doctorVisitDetails = collect();
+        if ($admissionDateOnly) {
+            $doctorVisitDetails = DoctorVisit::where('patient_id', $patientId)
+                ->where('visit_date', '>=', $admissionDateOnly)
+                ->with(['doctor', 'charge'])
+                ->orderBy('visit_date', 'asc')
+                ->get()
+                ->map(function($visit) {
+                    return [
+                        'date' => $visit->visit_date,
+                        'doctor' => ($visit->doctor->name ?? 'N/A') . ' ' . ($visit->doctor->surname ?? ''),
+                        'charge_name' => $visit->charge->name ?? 'N/A',
+                        'amount' => $visit->amount ?? 0,
+                        'type' => 'doctor_visit',
+                        'description' => 'Doctor Visit - ' . ($visit->doctor->name ?? 'N/A') . ' ' . ($visit->doctor->surname ?? '') . ' - ' . ($visit->charge->name ?? 'N/A'),
+                    ];
+                });
+        }
 
         // Combine all charges and sort by date
         $allCharges = collect()
@@ -635,6 +705,7 @@ class IpdBillingController extends Controller
 
         $rows = [];
         $admissionDate = $ipd->date ?? null;
+        $admissionDateOnly = $admissionDate ? Carbon::parse($admissionDate)->format('Y-m-d') : null;
         $patientId = $ipd->patient_id;
         $caseReferenceId = $ipd->case_reference_id ?? null;
 
@@ -689,12 +760,15 @@ class IpdBillingController extends Controller
             ];
         }
 
-        // Doctor visits
-        $doctorVisits = DoctorVisit::where('patient_id', $patientId)
-            ->where('visit_date', '>=', $admissionDate)
-            ->where('visit_date', '<=', $dischargeDate)
-            ->with(['doctor', 'charge'])
-            ->get();
+        // Doctor visits (use date-only so same-day visits are included)
+        $doctorVisits = collect();
+        if ($admissionDateOnly) {
+            $doctorVisits = DoctorVisit::where('patient_id', $patientId)
+                ->where('visit_date', '>=', $admissionDateOnly)
+                ->where('visit_date', '<=', $dischargeDate)
+                ->with(['doctor', 'charge'])
+                ->get();
+        }
         foreach ($doctorVisits as $v) {
             $rows[] = [
                 'charge_category_head' => 'Doctor Visit',
@@ -755,6 +829,89 @@ class IpdBillingController extends Controller
     }
 
     /**
+     * Build pathology and radiology line items date-wise for PDF (estimate/final).
+     * Returns collection of ['date' => ..., 'type' => 'pathology'|'radiology', 'test_name' => ..., 'amount' => ...] sorted by date.
+     */
+    private function getPathologyRadiologyDatewise($ipd)
+    {
+        $patientId = $ipd->patient_id;
+        $admissionDate = $ipd->date;
+        $caseReferenceId = $ipd->case_reference_id ?? null;
+
+        $pathologyBills = PathologyBilling::where(function ($query) use ($patientId, $admissionDate, $caseReferenceId) {
+            $query->where('patient_id', $patientId)->where('date', '>=', $admissionDate);
+            if ($caseReferenceId) {
+                $query->orWhere('case_reference_id', $caseReferenceId);
+            }
+        })->orderBy('date', 'asc')->get();
+
+        $pathologyRows = $pathologyBills->map(function ($bill) {
+            $reports = DB::table('pathology_report')
+                ->where('pathology_bill_id', $bill->id)
+                ->leftJoin('ipd_prescription_test', 'pathology_report.ipd_prescription_test_id', '=', 'ipd_prescription_test.id')
+                ->join('pathology', 'pathology_report.pathology_id', '=', 'pathology.id')
+                ->select(
+                    'pathology.test_name',
+                    'pathology_report.apply_charge',
+                    'pathology_report.instance_number',
+                    'ipd_prescription_test.instance_number as prescription_instance_number'
+                )
+                ->get();
+            if ($reports->count() > 0) {
+                return $reports->map(function ($r) use ($bill) {
+                    // Format test name with instance number if available
+                    $instanceNumber = $r->prescription_instance_number ?? $r->instance_number ?? null;
+                    $testName = $r->test_name ?? 'N/A';
+                    if ($instanceNumber && $instanceNumber > 1 && $testName !== 'N/A') {
+                        $instanceSuffix = $instanceNumber == 2 ? ' (2nd time)' : 
+                                         ($instanceNumber == 3 ? ' (3rd time)' : " ({$instanceNumber}th time)");
+                        $testName = $r->test_name . $instanceSuffix;
+                    }
+                    return ['date' => $bill->date, 'type' => 'pathology', 'test_name' => $testName, 'amount' => (float)($r->apply_charge ?? 0)];
+                });
+            }
+            return [['date' => $bill->date, 'type' => 'pathology', 'test_name' => 'Pathology Bill #' . $bill->id, 'amount' => (float)($bill->net_amount ?? 0)]];
+        })->flatten(1);
+
+        $radiologyBills = RadiologyBilling::where(function ($query) use ($patientId, $admissionDate, $caseReferenceId) {
+            $query->where('patient_id', $patientId)->where('date', '>=', $admissionDate);
+            if ($caseReferenceId) {
+                $query->orWhere('case_reference_id', $caseReferenceId);
+            }
+        })->orderBy('date', 'asc')->get();
+
+        $radiologyRows = $radiologyBills->map(function ($bill) {
+            $reports = DB::table('radiology_report')
+                ->where('radiology_bill_id', $bill->id)
+                ->leftJoin('ipd_prescription_test', 'radiology_report.ipd_prescription_test_id', '=', 'ipd_prescription_test.id')
+                ->join('radio', 'radiology_report.radiology_id', '=', 'radio.id')
+                ->select(
+                    'radio.test_name',
+                    'radiology_report.apply_charge',
+                    'radiology_report.instance_number',
+                    'ipd_prescription_test.instance_number as prescription_instance_number'
+                )
+                ->get();
+            if ($reports->count() > 0) {
+                return $reports->map(function ($r) use ($bill) {
+                    // Format test name with instance number if available
+                    $instanceNumber = $r->prescription_instance_number ?? $r->instance_number ?? null;
+                    $testName = $r->test_name ?? 'N/A';
+                    if ($instanceNumber && $instanceNumber > 1 && $testName !== 'N/A') {
+                        $instanceSuffix = $instanceNumber == 2 ? ' (2nd time)' : 
+                                         ($instanceNumber == 3 ? ' (3rd time)' : " ({$instanceNumber}th time)");
+                        $testName = $r->test_name . $instanceSuffix;
+                    }
+                    return ['date' => $bill->date, 'type' => 'radiology', 'test_name' => $testName, 'amount' => (float)($r->apply_charge ?? 0)];
+                });
+            }
+            return [['date' => $bill->date, 'type' => 'radiology', 'test_name' => 'Radiology Bill #' . $bill->id, 'amount' => (float)($bill->net_amount ?? 0)]];
+        })->flatten(1);
+
+        return $pathologyRows->merge($radiologyRows)->sortBy('date')->values();
+    }
+
+    /**
      * Export Estimate/Breakup Bill PDF
      */
     public function exportEstimate($ipdId)
@@ -799,17 +956,31 @@ class IpdBillingController extends Controller
             
             \Log::info('Pathology bills found', ['count' => $pathologyDetails->count()]);
             
-            // Get all pathology test names
+            // Get all pathology test names with instance information
             foreach ($pathologyDetails as $bill) {
                 $reports = DB::table('pathology_report')
                     ->where('pathology_bill_id', $bill->id)
+                    ->leftJoin('ipd_prescription_test', 'pathology_report.ipd_prescription_test_id', '=', 'ipd_prescription_test.id')
                     ->join('pathology', 'pathology_report.pathology_id', '=', 'pathology.id')
-                    ->select('pathology.test_name', 'pathology_report.apply_charge')
+                    ->select(
+                        'pathology.test_name',
+                        'pathology_report.apply_charge',
+                        'pathology_report.instance_number',
+                        'ipd_prescription_test.instance_number as prescription_instance_number'
+                    )
                     ->get();
                 
                 foreach ($reports as $report) {
                     if ($report->test_name) {
-                        $pathologyTestNames[] = $report->test_name;
+                        // Format test name with instance number if available
+                        $instanceNumber = $report->prescription_instance_number ?? $report->instance_number ?? null;
+                        $testName = $report->test_name;
+                        if ($instanceNumber && $instanceNumber > 1) {
+                            $instanceSuffix = $instanceNumber == 2 ? ' (2nd time)' : 
+                                             ($instanceNumber == 3 ? ' (3rd time)' : " ({$instanceNumber}th time)");
+                            $testName = $report->test_name . $instanceSuffix;
+                        }
+                        $pathologyTestNames[] = $testName;
                         $pathologyTotal += $report->apply_charge ?? 0;
                     }
                 }
@@ -844,7 +1015,15 @@ class IpdBillingController extends Controller
                 
                 foreach ($reports as $report) {
                     if ($report->test_name) {
-                        $radiologyTestNames[] = $report->test_name;
+                        // Format test name with instance number if available
+                        $instanceNumber = $report->prescription_instance_number ?? $report->instance_number ?? null;
+                        $testName = $report->test_name;
+                        if ($instanceNumber && $instanceNumber > 1) {
+                            $instanceSuffix = $instanceNumber == 2 ? ' (2nd time)' : 
+                                             ($instanceNumber == 3 ? ' (3rd time)' : " ({$instanceNumber}th time)");
+                            $testName = $report->test_name . $instanceSuffix;
+                        }
+                        $radiologyTestNames[] = $testName;
                         $radiologyTotal += $report->apply_charge ?? 0;
                     }
                 }
@@ -948,6 +1127,9 @@ class IpdBillingController extends Controller
                 $radiologyTotal = $breakup['radiology_charges'];
             }
 
+            // Date-wise pathology and radiology for detail table
+            $investigationDatewise = $this->getPathologyRadiologyDatewise($ipd);
+
             \Log::info('Loading PDF view', [
                 'pathology_tests' => count($pathologyTestNames),
                 'radiology_tests' => count($radiologyTestNames)
@@ -961,6 +1143,7 @@ class IpdBillingController extends Controller
                 'ipd', 'breakup', 'bedChargesDetails', 'ipdChargesDetails',
                 'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'payments',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
+                'investigationDatewise',
                 'totalChargesInWords', 'totalPaymentsInWords', 'outstandingInWords', 'netBalanceInWords',
                 'hospital'
             ));
@@ -1001,6 +1184,7 @@ class IpdBillingController extends Controller
                 'ipd', 'breakup', 'bedChargesDetails', 'ipdChargesDetails',
                 'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'payments',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
+                'investigationDatewise',
                 'totalChargesInWords', 'totalPaymentsInWords', 'outstandingInWords', 'netBalanceInWords',
                 'hospital', 'totalPages', 'gstChargesGrouped'
             ));
@@ -1251,13 +1435,27 @@ class IpdBillingController extends Controller
                 try {
                     $reports = DB::table('pathology_report')
                         ->where('pathology_bill_id', $bill->id)
+                        ->leftJoin('ipd_prescription_test', 'pathology_report.ipd_prescription_test_id', '=', 'ipd_prescription_test.id')
                         ->join('pathology', 'pathology_report.pathology_id', '=', 'pathology.id')
-                        ->select('pathology.test_name', 'pathology_report.apply_charge')
+                        ->select(
+                            'pathology.test_name',
+                            'pathology_report.apply_charge',
+                            'pathology_report.instance_number',
+                            'ipd_prescription_test.instance_number as prescription_instance_number'
+                        )
                         ->get();
                     
                     foreach ($reports as $report) {
                         if ($report->test_name) {
-                            $pathologyTestNames[] = $report->test_name;
+                            // Format test name with instance number if available
+                            $instanceNumber = $report->prescription_instance_number ?? $report->instance_number ?? null;
+                            $testName = $report->test_name;
+                            if ($instanceNumber && $instanceNumber > 1) {
+                                $instanceSuffix = $instanceNumber == 2 ? ' (2nd time)' : 
+                                                 ($instanceNumber == 3 ? ' (3rd time)' : " ({$instanceNumber}th time)");
+                                $testName = $report->test_name . $instanceSuffix;
+                            }
+                            $pathologyTestNames[] = $testName;
                             $pathologyTotal += $report->apply_charge ?? 0;
                         }
                     }
@@ -1280,13 +1478,27 @@ class IpdBillingController extends Controller
                 try {
                     $reports = DB::table('radiology_report')
                         ->where('radiology_bill_id', $bill->id)
+                        ->leftJoin('ipd_prescription_test', 'radiology_report.ipd_prescription_test_id', '=', 'ipd_prescription_test.id')
                         ->join('radio', 'radiology_report.radiology_id', '=', 'radio.id')
-                        ->select('radio.test_name', 'radiology_report.apply_charge')
+                        ->select(
+                            'radio.test_name',
+                            'radiology_report.apply_charge',
+                            'radiology_report.instance_number',
+                            'ipd_prescription_test.instance_number as prescription_instance_number'
+                        )
                         ->get();
                     
                     foreach ($reports as $report) {
                         if ($report->test_name) {
-                            $radiologyTestNames[] = $report->test_name;
+                            // Format test name with instance number if available
+                            $instanceNumber = $report->prescription_instance_number ?? $report->instance_number ?? null;
+                            $testName = $report->test_name;
+                            if ($instanceNumber && $instanceNumber > 1) {
+                                $instanceSuffix = $instanceNumber == 2 ? ' (2nd time)' : 
+                                                 ($instanceNumber == 3 ? ' (3rd time)' : " ({$instanceNumber}th time)");
+                                $testName = $report->test_name . $instanceSuffix;
+                            }
+                            $radiologyTestNames[] = $testName;
                             $radiologyTotal += $report->apply_charge ?? 0;
                         }
                     }
@@ -1311,6 +1523,9 @@ class IpdBillingController extends Controller
                 $radiologyTestNames = [];
             }
 
+            // Date-wise pathology and radiology for detail table
+            $investigationDatewise = $this->getPathologyRadiologyDatewise($ipd);
+
             \Log::info('Starting PDF generation', [
                 'pathology_tests' => count($pathologyTestNames),
                 'radiology_tests' => count($radiologyTestNames)
@@ -1330,6 +1545,7 @@ class IpdBillingController extends Controller
                 'totalAdvanceInWords', 'balanceInWords', 'otCharges', 'medicineCharges',
                 'surgeonCharges', 'anesthesiaCharges', 'investigationCharges', 'totalPages',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
+                'investigationDatewise',
                 'gstChargesGrouped'
             ));
             

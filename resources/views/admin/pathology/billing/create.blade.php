@@ -854,8 +854,30 @@ document.addEventListener('DOMContentLoaded', function() {
                         
                         // Set test values
                         const testSelect = row.querySelector('.test_name');
+                        const rowIndex = index; // Define rowIndex for this scope
                         if (testSelect) {
                             testSelect.value = test.id;
+                            
+                            // Update option text to show instance number if available
+                            if (test.instance_number && test.instance_number > 1) {
+                                const option = testSelect.querySelector(`option[value="${test.id}"]`);
+                                if (option) {
+                                    const baseText = test.test_name_base || test.test_name;
+                                    const instanceSuffix = test.instance_number == 2 ? ' (2nd time)' : 
+                                                          test.instance_number == 3 ? ' (3rd time)' : 
+                                                          ` (${test.instance_number}th time)`;
+                                    option.textContent = baseText + instanceSuffix;
+                                }
+                            }
+                            
+                            // Add hidden input for prescription_test_id if available
+                            if (test.prescription_test_id) {
+                                const hiddenInput = document.createElement('input');
+                                hiddenInput.type = 'hidden';
+                                hiddenInput.name = `tests[${rowIndex}][prescription_test_id]`;
+                                hiddenInput.value = test.prescription_test_id;
+                                row.appendChild(hiddenInput);
+                            }
                             
                             // Trigger change event to populate other fields
                             if (window.jQuery && $.fn.select2) {
@@ -865,6 +887,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                 testSelect.dispatchEvent(event);
                             }
                         }
+                        
+                        // Set other fields
+                        row.querySelector('.report_days').value = test.report_days || 0;
+                        row.querySelector('.report_date').value = data.prescription.date || new Date().toISOString().split('T')[0];
+                        row.querySelector('.tax_percentage').value = test.tax_percentage || 0;
+                        row.querySelector('.test_amount').value = test.amount || 0;
                     });
                     
                     // Update doctor if available

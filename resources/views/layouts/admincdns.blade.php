@@ -13,8 +13,282 @@
 
 {{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> --}}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- jQuery (load before Bootstrap to prevent conflicts) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- CRITICAL: Fix for Bootstrap selector-engine "Illegal invocation" error - MUST run BEFORE Bootstrap -->
+<script>
+    // Fix Bootstrap selector-engine "Illegal invocation" error
+    // This MUST run before Bootstrap loads to prevent it from caching broken method references
+    (function() {
+        'use strict';
+        
+        // Patch Element.prototype methods FIRST (before document methods)
+        // Bootstrap's selector engine uses Element.querySelector which loses context
+        // When Bootstrap does: const qs = element.querySelector; qs(selector), 'this' is lost
+        if (typeof Element !== 'undefined' && Element.prototype) {
+            const origElQS = Element.prototype.querySelector;
+            const origElQSA = Element.prototype.querySelectorAll;
+            
+            // CRITICAL: Use defineProperty to create methods that maintain context
+            // This prevents Bootstrap from extracting methods and losing 'this'
+            Object.defineProperty(Element.prototype, 'querySelector', {
+                value: function(selector) {
+                    // Always use call to ensure 'this' context is maintained
+                    // Handle case where 'this' is undefined/null (when method is extracted)
+                    try {
+                        if (!this || this.nodeType === undefined) {
+                            // Fallback to document if context is invalid
+                            return document.querySelector(selector);
+                        }
+                        return origElQS.call(this, selector);
+                    } catch (e) {
+                        // If call fails, fallback to document
+                        if (e.message && e.message.includes('Illegal invocation')) {
+                            return document.querySelector(selector);
+                        }
+                        throw e;
+                    }
+                },
+                writable: true,
+                configurable: true,
+                enumerable: false
+            });
+            
+            Object.defineProperty(Element.prototype, 'querySelectorAll', {
+                value: function(selector) {
+                    try {
+                        if (!this || this.nodeType === undefined) {
+                            return document.querySelectorAll(selector);
+                        }
+                        return origElQSA.call(this, selector);
+                    } catch (e) {
+                        if (e.message && e.message.includes('Illegal invocation')) {
+                            return document.querySelectorAll(selector);
+                        }
+                        throw e;
+                    }
+                },
+                writable: true,
+                configurable: true,
+                enumerable: false
+            });
+            
+            // Also patch getElementsByClassName
+            if (Element.prototype.getElementsByClassName) {
+                const origGetElementsByClassName = Element.prototype.getElementsByClassName;
+                Object.defineProperty(Element.prototype, 'getElementsByClassName', {
+                    value: function(className) {
+                        if (!this || this.nodeType === undefined) {
+                            return document.getElementsByClassName(className);
+                        }
+                        return origGetElementsByClassName.call(this, className);
+                    },
+                    writable: true,
+                    configurable: true,
+                    enumerable: false
+                });
+            }
+        }
+        
+        // Patch document methods
+        const doc = document;
+        const originalQuerySelector = doc.querySelector;
+        const originalQuerySelectorAll = doc.querySelectorAll;
+        const originalGetElementById = doc.getElementById;
+        
+        doc.querySelector = function(selector) {
+            return originalQuerySelector.call(doc, selector);
+        };
+        
+        doc.querySelectorAll = function(selector) {
+            return originalQuerySelectorAll.call(doc, selector);
+        };
+        
+        doc.getElementById = function(id) {
+            return originalGetElementById.call(doc, id);
+        };
+        
+        // Also patch Node.prototype if it exists (some browsers)
+        if (typeof Node !== 'undefined' && Node.prototype) {
+            if (Node.prototype.querySelector && Node.prototype !== Element.prototype) {
+                const origNodeQS = Node.prototype.querySelector;
+                const origNodeQSA = Node.prototype.querySelectorAll;
+                
+                Node.prototype.querySelector = function(selector) {
+                    if (!this || !this.nodeType) {
+                        return document.querySelector(selector);
+                    }
+                    return origNodeQS.call(this, selector);
+                };
+                
+                Node.prototype.querySelectorAll = function(selector) {
+                    if (!this || !this.nodeType) {
+                        return document.querySelectorAll(selector);
+                    }
+                    return origNodeQSA.call(this, selector);
+                };
+            }
+        }
+    })();
+</script>
+<!-- Bootstrap 5 JS (load after jQuery and fix) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous">
+</script>
+<!-- Additional Bootstrap fixes after load -->
+<script>
+    // Patch Bootstrap's selector engine directly to fix "Illegal invocation" error
+    (function() {
+        'use strict';
+        
+        function patchBootstrapSelectorEngine() {
+            if (typeof window.bootstrap === 'undefined') {
+                setTimeout(patchBootstrapSelectorEngine, 50);
+                return;
+            }
+            
+            try {
+                // Try to access Bootstrap's internal SelectorEngine
+                // Bootstrap 5 stores it in different places depending on build
+                let SelectorEngine = null;
+                
+                // Try to find SelectorEngine in bootstrap object
+                if (window.bootstrap.SelectorEngine) {
+                    SelectorEngine = window.bootstrap.SelectorEngine;
+                } else if (window.bootstrap.Modal && window.bootstrap.Modal.constructor) {
+                    SelectorEngine = window.bootstrap.Modal.constructor.SelectorEngine;
+                }
+                
+                // If we found SelectorEngine, patch its findOne method
+                if (SelectorEngine && SelectorEngine.findOne) {
+                    const originalFindOne = SelectorEngine.findOne;
+                    SelectorEngine.findOne = function(selector, element) {
+                        try {
+                            return originalFindOne.call(this, selector, element);
+                        } catch (e) {
+                            if (e.message && e.message.includes('Illegal invocation')) {
+                                // Fallback: use document.querySelector if element context is lost
+                                if (element && typeof element.querySelector === 'function') {
+                                    try {
+                                        return element.querySelector(selector);
+                                    } catch (e2) {
+                                        // If element.querySelector fails, try document
+                                        return document.querySelector(selector);
+                                    }
+                                } else {
+                                    return document.querySelector(selector);
+                                }
+                            }
+                            throw e;
+                        }
+                    };
+                }
+                
+                // Also patch querySelector methods again after Bootstrap loads
+                // Bootstrap might have cached references before our initial patch
+                if (Element.prototype.querySelector) {
+                    const origElQS = Element.prototype.querySelector;
+                    const origElQSA = Element.prototype.querySelectorAll;
+                    
+                    Element.prototype.querySelector = function(selector) {
+                        if (!this) {
+                            return document.querySelector(selector);
+                        }
+                        try {
+                            return origElQS.call(this, selector);
+                        } catch (e) {
+                            if (e.message && e.message.includes('Illegal invocation')) {
+                                return document.querySelector(selector);
+                            }
+                            throw e;
+                        }
+                    };
+                    
+                    Element.prototype.querySelectorAll = function(selector) {
+                        if (!this) {
+                            return document.querySelectorAll(selector);
+                        }
+                        try {
+                            return origElQSA.call(this, selector);
+                        } catch (e) {
+                            if (e.message && e.message.includes('Illegal invocation')) {
+                                return document.querySelectorAll(selector);
+                            }
+                            throw e;
+                        }
+                    };
+                }
+                
+            } catch (e) {
+                console.warn('Bootstrap selector engine patch error:', e);
+            }
+        }
+        
+        // Patch immediately and retry
+        setTimeout(patchBootstrapSelectorEngine, 100);
+        setTimeout(patchBootstrapSelectorEngine, 300);
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', patchBootstrapSelectorEngine);
+        }
+        
+        // Direct workaround: Intercept modal triggers and use jQuery fallback if Bootstrap fails
+        function setupModalFallback() {
+            // Intercept clicks on modal triggers BEFORE Bootstrap handles them
+            document.addEventListener('click', function(e) {
+                const trigger = e.target.closest('[data-bs-toggle="modal"]');
+                if (trigger) {
+                    const targetId = trigger.getAttribute('data-bs-target');
+                    if (targetId && targetId.startsWith('#')) {
+                        // Check if modal element exists
+                        const modalEl = document.querySelector(targetId);
+                        if (!modalEl) {
+                            console.warn('Modal element not found:', targetId);
+                            return; // Let Bootstrap handle the error
+                        }
+                        
+                        // Set up error handler for Bootstrap modal
+                        const showModal = function() {
+                            try {
+                                if (window.bootstrap && window.bootstrap.Modal) {
+                                    const modal = new window.bootstrap.Modal(modalEl);
+                                    modal.show();
+                                } else if (typeof jQuery !== 'undefined' && jQuery.fn.modal) {
+                                    // Fallback to jQuery modal
+                                    jQuery(targetId).modal('show');
+                                }
+                            } catch (err) {
+                                console.error('Bootstrap modal error, using jQuery fallback:', err);
+                                // Use jQuery modal as fallback
+                                if (typeof jQuery !== 'undefined' && jQuery.fn.modal) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    jQuery(targetId).modal('show');
+                                }
+                            }
+                        };
+                        
+                        // Delay to let Bootstrap try first, then fallback if needed
+                        setTimeout(function() {
+                            // Check if modal was shown (has 'show' class)
+                            if (!modalEl.classList.contains('show')) {
+                                // Bootstrap didn't show it, use jQuery
+                                if (typeof jQuery !== 'undefined' && jQuery.fn.modal) {
+                                    jQuery(targetId).modal('show');
+                                }
+                            }
+                        }, 100);
+                    }
+                }
+            }, true); // Use capture phase
+        }
+        
+        // Setup fallback after DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setupModalFallback);
+        } else {
+            setupModalFallback();
+        }
+    })();
 </script>
 {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" /> --}}
 
@@ -22,8 +296,6 @@
         href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" /> --}}
 <!-- Or for RTL support -->
 <!-- Datetimepicker CSS -->
-<!-- jQuery (if not already included) -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <!-- Select2 JS (loaded globally so initializer can run reliably) -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>

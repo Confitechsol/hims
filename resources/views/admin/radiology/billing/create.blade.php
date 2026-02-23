@@ -865,19 +865,47 @@ document.addEventListener('DOMContentLoaded', function() {
                         
                         // Set test values
                         const testSelect = row.querySelector('.test_name');
+                        const rowIndex = index; // Define rowIndex for this scope
                         if (testSelect) {
                             // Check if test option exists in dropdown, if not add it
                             let testOption = Array.from(testSelect.options).find(opt => opt.value == test.id);
                             if (!testOption) {
-                                // Add the test as a new option
+                                // Add the test as a new option with instance suffix if available
+                                const baseName = test.test_name_base || test.test_name;
+                                const instanceSuffix = (test.instance_number && test.instance_number > 1) 
+                                    ? (test.instance_number == 2 ? ' (2nd time)' : 
+                                       test.instance_number == 3 ? ' (3rd time)' : 
+                                       ` (${test.instance_number}th time)`)
+                                    : '';
+                                const displayName = baseName + instanceSuffix;
+                                
                                 testOption = document.createElement('option');
                                 testOption.value = test.id;
-                                testOption.textContent = test.test_name + ' - IPD: ₹' + parseFloat(test.standard_charge_ipd || 0).toFixed(2) + ' / OPD: ₹' + parseFloat(test.standard_charge_opd || 0).toFixed(2);
+                                testOption.textContent = displayName + ' - IPD: ₹' + parseFloat(test.standard_charge_ipd || 0).toFixed(2) + ' / OPD: ₹' + parseFloat(test.standard_charge_opd || 0).toFixed(2);
                                 testOption.setAttribute('data-report-days', test.report_days || 0);
                                 testOption.setAttribute('data-tax', test.tax_percentage || 0);
                                 testOption.setAttribute('data-amount-ipd', test.standard_charge_ipd || 0);
                                 testOption.setAttribute('data-amount-opd', test.standard_charge_opd || 0);
                                 testSelect.appendChild(testOption);
+                            } else {
+                                // Update existing option text to show instance if available
+                                if (test.instance_number && test.instance_number > 1) {
+                                    const baseName = test.test_name_base || test.test_name;
+                                    const instanceSuffix = test.instance_number == 2 ? ' (2nd time)' : 
+                                                          test.instance_number == 3 ? ' (3rd time)' : 
+                                                          ` (${test.instance_number}th time)`;
+                                    const displayName = baseName + instanceSuffix;
+                                    testOption.textContent = displayName + ' - IPD: ₹' + parseFloat(test.standard_charge_ipd || 0).toFixed(2) + ' / OPD: ₹' + parseFloat(test.standard_charge_opd || 0).toFixed(2);
+                                }
+                            }
+                            
+                            // Add hidden input for prescription_test_id if available
+                            if (test.prescription_test_id) {
+                                const hiddenInput = document.createElement('input');
+                                hiddenInput.type = 'hidden';
+                                hiddenInput.name = `tests[${rowIndex}][prescription_test_id]`;
+                                hiddenInput.value = test.prescription_test_id;
+                                row.appendChild(hiddenInput);
                             }
                             
                             // Set the value

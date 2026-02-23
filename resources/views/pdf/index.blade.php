@@ -17,10 +17,11 @@
     }
 
     .first_logo,
-    .second_logo,.about_info {
+    .second_logo,
+    .about_info {
         width: 27%;
     }
-    
+
 
     .about_info {
         font-size: 12px;
@@ -181,9 +182,28 @@
             break-inside: avoid !important;
         }
     }
+
+    .btn-primary {
+        /* color: #fff; */
+        /* background-color: #cb6ce6; */
+        /* border-color: #cb6ce6; */
+        font-size: 14px;
+        font-weight: 600;
+        padding: 8px 25px;
+        border-radius: 5px;
+        box-shadow: none;
+    }
+
+    .print_btn {
+        margin: 40px 0;
+        padding-bottom: 30px;
+        text-align: center;
+    }
 </style>
 
 <body>
+
+
 
     <div class="main_box" id="pdf-content">
 
@@ -417,11 +437,11 @@
                         <div class="patient_data">
                             {{ $IpdPatient->ipd['bedDetail']['name'] ?? '' }}
                         </div>
-                    </div>                    
+                    </div>
 
                 </div>
 
-                    <!-- <div class="patient_items">
+                <!-- <div class="patient_items">
                         <div class="patient_head">
                             BED Rate.
                         </div>
@@ -512,7 +532,7 @@
                 </div>
 
             </div>
-            
+
 
         </div>
 
@@ -750,6 +770,11 @@
             <p><b>DATE : </b></p>
             <p><b>{{ \Carbon\Carbon::parse($IpdPatient->created_at)->format('d-m-Y') ?? '' }}</b></p>
         </div>
+
+        <div class="print_btn">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createIpdModal">Print</button>
+        </div>
+
     </div>
 </body>
 

@@ -89,7 +89,7 @@ class MoneyReceiptController extends Controller
     {
         $request->validate([
             'payment_date' => 'required|date',
-            'receipt_type' => 'required|in:Current,Patient Due,Corporate Due,In Admissible,Booking,Refund',
+            'receipt_type' => 'required|in:Current,Patient Due,Corporate Due,In Admissible,Booking,Refund,OPD Doctor Consultation,OPD Pathology,OPD Radiology,IPD Pathology,IPD Radiology',
             'amount' => 'required|numeric|min:0.01',
             'payment_mode' => 'required|string',
             'patient_id' => 'nullable|integer|exists:patients,id',
@@ -249,7 +249,7 @@ class MoneyReceiptController extends Controller
 
         $request->validate([
             'payment_date' => 'required|date',
-            'receipt_type' => 'required|in:Current,Patient Due,Corporate Due,In Admissible,Booking,Refund',
+            'receipt_type' => 'required|in:Current,Patient Due,Corporate Due,In Admissible,Booking,Refund,OPD Doctor Consultation,OPD Pathology,OPD Radiology,IPD Pathology,IPD Radiology',
             'amount' => 'required|numeric|min:0.01',
             'payment_mode' => 'required|string',
             'patient_id' => 'nullable|integer|exists:patients,id',

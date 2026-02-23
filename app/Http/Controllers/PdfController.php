@@ -22,4 +22,5 @@ class PdfController extends Controller
        'ipd.organisation'])->findOrFail($id);
         return view('pdf.index',compact('IpdPatient','hospital'));
     }
+    
 }

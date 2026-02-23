@@ -345,12 +345,12 @@
     }
 </style>
 
-<div class="modal fade" id="addPathLabModal" tabindex="-1" aria-labelledby="addPrescriptionModalLabel" aria-hidden="true">
+<div class="modal fade" id="addPathLabModal" tabindex="-1" aria-labelledby="addPathLabModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl ">
         <div class="modal-content" style="overflow: visible;">
             <!-- Modal Header -->
             <div class="modal-header">
-                <h5 class="modal-title" id="addPrescriptionModal">
+                <h5 class="modal-title" id="addPathLabModalLabel">
                     <div class="section-icon">
                         <i class="bi bi-person-badge"></i>
                     </div>

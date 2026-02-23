@@ -1,5 +1,62 @@
 @extends('layouts.adminLayout')
 @section('content')
+<style>
+    .pathology-selected-list .selected-test-row,
+    .radiology-selected-list .selected-test-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 8px;
+        margin-bottom: 6px;
+        background: #f8f9fa;
+        border-radius: 6px;
+        border: 1px solid #e9ecef;
+        flex-wrap: wrap;
+    }
+    .pathology-selected-list .selected-test-row .test-name-badge,
+    .radiology-selected-list .selected-test-row .test-name-badge { font-weight: 600; color: #333; }
+    .pathology-selected-list .selected-test-row .instance-badge,
+    .radiology-selected-list .selected-test-row .instance-badge {
+        font-size: 0.75rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        background: #75009633;
+        color: #750096;
+    }
+    .pathology-selected-list .selected-test-row .instance-badge.instance-2,
+    .radiology-selected-list .selected-test-row .instance-badge.instance-2 { background: #ffc10733; color: #856404; }
+    .pathology-selected-list .selected-test-row .instance-badge.instance-3plus,
+    .radiology-selected-list .selected-test-row .instance-badge.instance-3plus { background: #fd7e1433; color: #a13b00; }
+    .pathology-selected-list .selected-test-row .notes-input,
+    .radiology-selected-list .selected-test-row .notes-input {
+        flex: 1;
+        min-width: 100px;
+        padding: 4px 8px;
+        font-size: 0.875rem;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+    }
+    .pathology-selected-list .selected-test-row .btn-add-again,
+    .radiology-selected-list .selected-test-row .btn-add-again {
+        padding: 2px 8px;
+        font-size: 0.75rem;
+        background: #750096;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .pathology-selected-list .selected-test-row .btn-remove-test,
+    .radiology-selected-list .selected-test-row .btn-remove-test {
+        padding: 2px 8px;
+        font-size: 0.75rem;
+        background: #dc3545;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+</style>
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
@@ -99,23 +156,23 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label">Pathology Tests</label>
-                                <select class="form-control pathology-test-select" name="pathology[]" id="pathologyOpt" multiple style="width: 100%;">
+                                <select class="form-control pathology-test-select" id="pathologyOpt" multiple style="width: 100%;" data-name="pathology_select">
                                     @foreach($pathologies as $pathology)
-                                        <option value="{{ $pathology->id }}" {{ in_array($pathology->id, $selectedPathologyIds) ? 'selected' : '' }}>
-                                            {{ $pathology->test_name ?? $pathology->name }} ({{ $pathology->short_name ?? '' }})
-                                        </option>
+                                        <option value="{{ $pathology->id }}">{{ $pathology->test_name ?? $pathology->name }}{{ isset($pathology->short_name) && $pathology->short_name ? ' (' . $pathology->short_name . ')' : '' }}</option>
                                     @endforeach
                                 </select>
+                                <small class="text-muted d-block mt-1">Select tests; use &quot;Add Again&quot; for same test multiple times today.</small>
+                                <div id="pathologySelectedList" class="mt-2 pathology-selected-list" style="min-height: 24px;"></div>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Radiology Tests</label>
-                                <select class="form-control radiology-test-select" name="radiology[]" id="radiologyOpt" multiple style="width: 100%;">
+                                <select class="form-control radiology-test-select" id="radiologyOpt" multiple style="width: 100%;" data-name="radiology_select">
                                     @foreach($radiologies as $radiology)
-                                        <option value="{{ $radiology->id }}" {{ in_array($radiology->id, $selectedRadiologyIds) ? 'selected' : '' }}>
-                                            {{ $radiology->test_name ?? $radiology->name }} ({{ $radiology->short_name ?? '' }})
-                                        </option>
+                                        <option value="{{ $radiology->id }}">{{ $radiology->test_name ?? $radiology->name }}{{ isset($radiology->short_name) && $radiology->short_name ? ' (' . $radiology->short_name . ')' : '' }}</option>
                                     @endforeach
                                 </select>
+                                <small class="text-muted d-block mt-1">Select tests; use &quot;Add Again&quot; for same test multiple times today.</small>
+                                <div id="radiologySelectedList" class="mt-2 radiology-selected-list" style="min-height: 24px;"></div>
                             </div>
                         </div>
 
@@ -317,18 +374,271 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Selected pathology/radiology lists (Add Again, instance badge, notes per instance)
+    window.selectedPathologyList = @json($pathologyTestsForList ?? []);
+    window.selectedRadiologyList = @json($radiologyTestsForList ?? []);
+    function instanceLabelEdit(i) {
+        if (i === 1) return '1st time today';
+        if (i === 2) return '2nd time today';
+        if (i === 3) return '3rd time today';
+        return i + 'th time today';
+    }
+    function instanceBadgeClassEdit(i) {
+        if (i === 1) return 'instance-badge';
+        if (i === 2) return 'instance-badge instance-2';
+        return 'instance-badge instance-3plus';
+    }
+    function renderPathologyListEdit() {
+        var container = document.getElementById('pathologySelectedList');
+        if (!container) return;
+        container.innerHTML = '';
+        var currentCount = {};
+        window.selectedPathologyList.forEach(function(item, idx) {
+            currentCount[item.id] = (currentCount[item.id] || 0) + 1;
+            var row = document.createElement('div');
+            row.className = 'selected-test-row';
+            row.setAttribute('data-idx', idx);
+            row.innerHTML = '<span class="test-name-badge">' + (item.name || '') + '</span>' +
+                '<span class="' + instanceBadgeClassEdit(currentCount[item.id]) + '">' + instanceLabelEdit(currentCount[item.id]) + '</span>' +
+                '<input type="text" class="notes-input" placeholder="Notes (optional)" data-idx="' + idx + '" value="' + (item.notes || '').replace(/"/g, '&quot;') + '">' +
+                '<button type="button" class="btn-add-again" data-idx="' + idx + '">Add Again</button>' +
+                '<button type="button" class="btn-remove-test" data-idx="' + idx + '">Remove</button>';
+            container.appendChild(row);
+        });
+        container.querySelectorAll('input.notes-input').forEach(function(inp) {
+            var idx = parseInt(inp.getAttribute('data-idx'), 10);
+            inp.addEventListener('input', function() { window.selectedPathologyList[idx].notes = this.value; });
+        });
+        container.querySelectorAll('.btn-add-again').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var idx = parseInt(this.getAttribute('data-idx'), 10);
+                var item = window.selectedPathologyList[idx];
+                if (item) {
+                    var count = window.selectedPathologyList.filter(function(x) { return x.id == item.id; }).length;
+                    if (count >= 3 && !confirm('This test is already added 3 times today. Add again?')) return;
+                    window.selectedPathologyList.push({ id: item.id, name: item.name, notes: '' });
+                    renderPathologyListEdit();
+                }
+            });
+        });
+        container.querySelectorAll('.btn-remove-test').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var idx = parseInt(this.getAttribute('data-idx'), 10);
+                window.selectedPathologyList.splice(idx, 1);
+                renderPathologyListEdit();
+            });
+        });
+    }
+    function renderRadiologyListEdit() {
+        var container = document.getElementById('radiologySelectedList');
+        if (!container) return;
+        container.innerHTML = '';
+        var currentCount = {};
+        window.selectedRadiologyList.forEach(function(item, idx) {
+            currentCount[item.id] = (currentCount[item.id] || 0) + 1;
+            var row = document.createElement('div');
+            row.className = 'selected-test-row';
+            row.setAttribute('data-idx', idx);
+            row.innerHTML = '<span class="test-name-badge">' + (item.name || '') + '</span>' +
+                '<span class="' + instanceBadgeClassEdit(currentCount[item.id]) + '">' + instanceLabelEdit(currentCount[item.id]) + '</span>' +
+                '<input type="text" class="notes-input" placeholder="Notes (optional)" data-idx="' + idx + '" value="' + (item.notes || '').replace(/"/g, '&quot;') + '">' +
+                '<button type="button" class="btn-add-again" data-idx="' + idx + '">Add Again</button>' +
+                '<button type="button" class="btn-remove-test" data-idx="' + idx + '">Remove</button>';
+            container.appendChild(row);
+        });
+        container.querySelectorAll('input.notes-input').forEach(function(inp) {
+            var idx = parseInt(inp.getAttribute('data-idx'), 10);
+            inp.addEventListener('input', function() { window.selectedRadiologyList[idx].notes = this.value; });
+        });
+        container.querySelectorAll('.btn-add-again').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var idx = parseInt(this.getAttribute('data-idx'), 10);
+                var item = window.selectedRadiologyList[idx];
+                if (item) {
+                    var count = window.selectedRadiologyList.filter(function(x) { return x.id == item.id; }).length;
+                    if (count >= 3 && !confirm('This test is already added 3 times today. Add again?')) return;
+                    window.selectedRadiologyList.push({ id: item.id, name: item.name, notes: '' });
+                    renderRadiologyListEdit();
+                }
+            });
+        });
+        container.querySelectorAll('.btn-remove-test').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var idx = parseInt(this.getAttribute('data-idx'), 10);
+                window.selectedRadiologyList.splice(idx, 1);
+                renderRadiologyListEdit();
+            });
+        });
+    }
+    window.syncPrescriptionTestListsToForm = function(f) {
+        var form = f || document.getElementById('editPrescriptionForm');
+        if (!form) return;
+        form.querySelectorAll('input[name="pathology[]"], input[name="pathology_notes[]"], input[name="radiology[]"], input[name="radiology_notes[]"]').forEach(function(el) { el.remove(); });
+        (window.selectedPathologyList || []).forEach(function(item) {
+            var i = document.createElement('input'); i.type = 'hidden'; i.name = 'pathology[]'; i.value = item.id; form.appendChild(i);
+            var n = document.createElement('input'); n.type = 'hidden'; n.name = 'pathology_notes[]'; n.value = item.notes || ''; form.appendChild(n);
+        });
+        (window.selectedRadiologyList || []).forEach(function(item) {
+            var i = document.createElement('input'); i.type = 'hidden'; i.name = 'radiology[]'; i.value = item.id; form.appendChild(i);
+            var n = document.createElement('input'); n.type = 'hidden'; n.name = 'radiology_notes[]'; n.value = item.notes || ''; form.appendChild(n);
+        });
+    };
+    renderPathologyListEdit();
+    renderRadiologyListEdit();
+    if (window.jQuery) {
+        $(document).on('select2:select.prescriptionTests', '#pathologyOpt', function(e) {
+            var data = e.params.data;
+            if (data && data.id) {
+                var count = (window.selectedPathologyList || []).filter(function(x) { return x.id == data.id; }).length;
+                if (count >= 3 && !confirm('This test is already added 3 times today. Add again?')) { $(this).val(null).trigger('change'); return; }
+                window.selectedPathologyList.push({ id: data.id, name: data.text || ('ID ' + data.id), notes: '' });
+                renderPathologyListEdit();
+                $(this).val(null).trigger('change');
+            }
+        });
+        $(document).on('select2:select.prescriptionTests', '#radiologyOpt', function(e) {
+            var data = e.params.data;
+            if (data && data.id) {
+                var count = (window.selectedRadiologyList || []).filter(function(x) { return x.id == data.id; }).length;
+                if (count >= 3 && !confirm('This test is already added 3 times today. Add again?')) { $(this).val(null).trigger('change'); return; }
+                window.selectedRadiologyList.push({ id: data.id, name: data.text || ('ID ' + data.id), notes: '' });
+                renderRadiologyListEdit();
+                $(this).val(null).trigger('change');
+            }
+        });
+        // Removed fallback change handlers - they were causing duplicate additions
+        // The select2:select event handler above handles adding tests one at a time
+    }
+
     // Ensure form submission includes Select2 values
     const form = document.getElementById('editPrescriptionForm');
     if (form) {
         form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('🔴 Edit prescription form submit intercepted');
+            
+            // Sync test lists to form
+            if (typeof window.syncPrescriptionTestListsToForm === 'function') {
+                window.syncPrescriptionTestListsToForm(this);
+            }
+            
             // Ensure Select2 values are synced to the original select
             if (window.jQuery && $.fn.select2) {
                 $('#prescribe_by').trigger('change');
+                
+                // Sync all Select2 values to native selects
+                const allSelect2Selects = document.querySelectorAll('select.select2, select.multiselect2, select.medicine_category, select.medicine_name, select.medicine_dosage, select.interval_dosage, select.duration_dosage, select[name="finding_type[]"], select[name="findings[]"]');
+                allSelect2Selects.forEach(select => {
+                    if ($(select).hasClass('select2-hidden-accessible')) {
+                        try {
+                            const select2Value = $(select).val();
+                            if (select2Value !== null && select2Value !== undefined) {
+                                if (Array.isArray(select2Value)) {
+                                    $(select).val(select2Value);
+                                } else {
+                                    select.value = String(select2Value);
+                                }
+                            }
+                        } catch(e) {
+                            console.warn('Error syncing Select2:', e);
+                        }
+                    }
+                });
             }
             
-            // Debug: Log form data
+            // Build FormData
             const formData = new FormData(form);
-            console.log('Form submitting with - Prescribe By:', formData.get('prescribe_by'));
+            
+            // Debug: Log form data
+            console.log('🔴 Form submitting with - Prescribe By:', formData.get('prescribe_by'));
+            
+            // Submit via fetch
+            fetch(form.action, {
+                method: form.method || 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                },
+                credentials: 'same-origin'
+            })
+            .then(async response => {
+                console.log('🔴 Response status:', response.status);
+                console.log('🔴 Response Content-Type:', response.headers.get('Content-Type'));
+                
+                const contentType = response.headers.get('Content-Type') || '';
+                let data;
+                
+                if (contentType.includes('application/json')) {
+                    try {
+                        data = await response.json();
+                        console.log('🔴 Response data:', data);
+                    } catch (e) {
+                        console.error('🔴 Failed to parse JSON:', e);
+                        const text = await response.text();
+                        console.error('🔴 Response text:', text.substring(0, 500));
+                        throw new Error('Server returned invalid JSON. Please check the console for details.');
+                    }
+                } else {
+                    const text = await response.text();
+                    console.error('🔴 Server returned non-JSON response:', text.substring(0, 500));
+                    throw new Error('Server returned HTML instead of JSON. This usually means a validation error or server error occurred.');
+                }
+                
+                if (!response.ok) {
+                    if (data.errors) {
+                        console.error('🔴 Validation errors:', data.errors);
+                        const errorMessages = Object.values(data.errors).flat().join(', ');
+                        throw new Error(errorMessages);
+                    }
+                    throw new Error(data.message || 'Server error');
+                }
+                return data;
+            })
+            .then(data => {
+                console.log('🔴 Success:', data);
+                // Show success notification
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: data.message || 'Prescription updated successfully.',
+                        confirmButtonColor: '#7c3aed',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        // Redirect back to IPD view page
+                        @if($prescription->ipd_id)
+                            window.location.href = "{{ route('ipd.show', $prescription->ipd_id) }}";
+                        @else
+                            location.reload();
+                        @endif
+                    });
+                } else {
+                    // Fallback if SweetAlert2 is not available
+                    alert(data.message || 'Prescription updated successfully!');
+                    @if($prescription->ipd_id)
+                        window.location.href = "{{ route('ipd.show', $prescription->ipd_id) }}";
+                    @else
+                        location.reload();
+                    @endif
+                }
+            })
+            .catch(error => {
+                console.error('🔴 Error:', error);
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: error.message || 'Something went wrong while updating the prescription.',
+                        confirmButtonColor: '#7c3aed',
+                        confirmButtonText: 'OK'
+                    });
+                } else {
+                    alert('Something went wrong: ' + error.message);
+                }
+            });
         });
     }
     
@@ -348,6 +658,53 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
+        
+        // Track instance counts for selected tests
+        const prescriptionDate = '{{ $prescriptionDate ?? date("Y-m-d") }}';
+        const ipdId = {{ $prescription->ipd_id ?? 'null' }};
+        
+        // Function to update instance count display
+        function updateInstanceDisplay(selectId, testType) {
+            const $select = $(selectId);
+            const selectedValues = $select.val() || [];
+            const instanceCounts = {};
+            
+            // Count occurrences of each test in selection
+            selectedValues.forEach(testId => {
+                instanceCounts[testId] = (instanceCounts[testId] || 0) + 1;
+            });
+            
+            // Update option text with instance counts
+            $select.find('option').each(function() {
+                const $option = $(this);
+                const testId = $option.val();
+                const baseText = $option.text().replace(/\s*\(×\d+\)\s*$/, ''); // Remove existing instance badge
+                
+                if (selectedValues.includes(testId)) {
+                    const count = instanceCounts[testId];
+                    $option.text(baseText + (count > 1 ? ` (×${count})` : ''));
+                } else {
+                    // Restore original text without instance badge if not selected
+                    $option.text(baseText);
+                }
+            });
+            
+            // Trigger Select2 update
+            $select.trigger('change.select2');
+        }
+        
+        // Update instance display on selection change
+        $('#pathologyOpt').on('select2:select select2:unselect', function() {
+            updateInstanceDisplay('#pathologyOpt', 'pathology');
+        });
+        
+        $('#radiologyOpt').on('select2:select select2:unselect', function() {
+            updateInstanceDisplay('#radiologyOpt', 'radiology');
+        });
+        
+        // Initialize display on page load
+        updateInstanceDisplay('#pathologyOpt', 'pathology');
+        updateInstanceDisplay('#radiologyOpt', 'radiology');
     }
 
     // Medicine management
@@ -537,23 +894,114 @@ document.addEventListener('DOMContentLoaded', function() {
             initializeSelect2ForRow(row);
         }
 
-        // Category change → fetch medicines
-        row.querySelector(".medicine_category").addEventListener("change", function() {
-            const categoryId = this.value;
-            const medicineSelect = row.querySelector(".medicine_name");
-            const doseSelect = row.querySelector(".medicine_dosage");
+        // Category change → fetch medicines (using jQuery for Select2 compatibility)
+        const $row = $(row);
+        const categorySelectEl = row.querySelector(".medicine_category");
+        const medicineSelectEl = row.querySelector(".medicine_name");
+        const doseSelectEl = row.querySelector(".medicine_dosage");
+        
+        // Remove any existing handlers to prevent duplicates
+        $row.off('change.medicineCategory select2:select.medicineCategory select2:clear.medicineCategory');
+        
+        // Handle both regular change and Select2 events
+        $row.on('change.medicineCategory', '.medicine_category', function() {
+            const categoryId = $(this).val();
+            console.log('🔴 Medicine category changed:', categoryId);
+            loadMedicinesForCategory(categoryId, medicineSelectEl, doseSelectEl);
+        });
+        
+        // Also handle Select2 specific events
+        $(categorySelectEl).on('select2:select.medicineCategory select2:clear.medicineCategory', function() {
+            const categoryId = $(this).val();
+            console.log('🔴 Medicine category changed via Select2:', categoryId);
+            loadMedicinesForCategory(categoryId, medicineSelectEl, doseSelectEl);
+        });
+        
+        // Helper function to load medicines and dosages
+        function loadMedicinesForCategory(categoryId, medicineSelectEl, doseSelectEl) {
+            if (!categoryId || categoryId === '') {
+                // Clear medicines and dosages if no category selected
+                if (medicineSelectEl) {
+                    medicineSelectEl.innerHTML = '<option value="">Select Medicine</option>';
+                    if (window.jQuery && $(medicineSelectEl).hasClass('select2-hidden-accessible')) {
+                        $(medicineSelectEl).val(null).trigger('change');
+                    }
+                }
+                if (doseSelectEl) {
+                    doseSelectEl.innerHTML = '<option value="">Select Dosage</option>';
+                    if (window.jQuery && $(doseSelectEl).hasClass('select2-hidden-accessible')) {
+                        $(doseSelectEl).val(null).trigger('change');
+                    }
+                }
+                return;
+            }
+            
             const baseUrl = "{{ route('getMedicines', ['categoryId' => 'ID']) }}";
             const finalUrl = baseUrl.replace('ID', categoryId);
+            
+            console.log('🔴 Fetching medicines from:', finalUrl);
             fetch(finalUrl)
-                .then(res => res.json())
-                .then(data => fillSelect(medicineSelect, data, "medicine_name"));
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error('Failed to fetch medicines: ' + res.status);
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    console.log('🔴 Medicines received:', data);
+                    if (!data || !Array.isArray(data)) {
+                        console.error('🔴 Invalid medicines data:', data);
+                        if (medicineSelectEl) {
+                            medicineSelectEl.innerHTML = '<option value="">No medicines found</option>';
+                        }
+                        return;
+                    }
+                    fillSelect(medicineSelectEl, data, "medicine_name");
+                    // Reinitialize Select2 after filling
+                    if (window.jQuery && $(medicineSelectEl).hasClass('select2-hidden-accessible')) {
+                        $(medicineSelectEl).trigger('change');
+                    }
+                })
+                .catch(error => {
+                    console.error('🔴 Error loading medicines:', error);
+                    if (medicineSelectEl) {
+                        medicineSelectEl.innerHTML = '<option value="">Error loading medicines</option>';
+                    }
+                });
 
             const baseUrlDose = "{{ route('getDoses', ['categoryId' => 'ID']) }}";
             const finalUrlDose = baseUrlDose.replace('ID', categoryId);
+            
+            console.log('🔴 Fetching dosages from:', finalUrlDose);
             fetch(finalUrlDose)
-                .then(res => res.json())
-                .then(data => fillSelect(doseSelect, data, "dosage"));
-        });
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error('Failed to fetch dosages: ' + res.status);
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    console.log('🔴 Dosages received:', data);
+                    if (!data || !Array.isArray(data)) {
+                        console.error('🔴 Invalid dosages data:', data);
+                        if (doseSelectEl) {
+                            doseSelectEl.innerHTML = '<option value="">No dosages found</option>';
+                        }
+                        return;
+                    }
+                    fillSelect(doseSelectEl, data, "dosage");
+                    // Reinitialize Select2 after filling
+                    if (window.jQuery && $(doseSelectEl).hasClass('select2-hidden-accessible')) {
+                        $(doseSelectEl).trigger('change');
+                    }
+                })
+                .catch(error => {
+                    console.error('🔴 Error loading dosages:', error);
+                    if (doseSelectEl) {
+                        doseSelectEl.innerHTML = '<option value="">Error loading dosages</option>';
+                    }
+                });
+        }
 
         // Delete button
         const deleteBtn = row.querySelector(".delete_row");
@@ -613,14 +1061,74 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function fillSelect(selectElement, data, textKey) {
-        if (!selectElement) return;
+        if (!selectElement) {
+            console.error('🔴 fillSelect: selectElement is null');
+            return;
+        }
+        if (!data || !Array.isArray(data)) {
+            console.error('🔴 fillSelect: data is not an array:', data);
+            selectElement.innerHTML = `<option value="">No data available</option>`;
+            return;
+        }
+        
+        // Store current Select2 state
+        let isSelect2Initialized = false;
+        let currentValue = null;
+        if (window.jQuery && $(selectElement).hasClass('select2-hidden-accessible')) {
+            isSelect2Initialized = true;
+            currentValue = $(selectElement).val();
+            // Destroy Select2 temporarily to update options
+            try {
+                $(selectElement).select2('destroy');
+            } catch(e) {
+                console.warn('🔴 Error destroying Select2:', e);
+            }
+        }
+        
+        // Clear and fill options
         selectElement.innerHTML = `<option value="">Select</option>`;
         data.forEach(item => {
+            if (!item || !item.id) {
+                console.warn('🔴 fillSelect: Invalid item:', item);
+                return;
+            }
             const opt = document.createElement("option");
             opt.value = item.id;
-            opt.textContent = textKey == 'dosage' ? item[textKey] + " " + (item['unit'] ? item['unit']['unit_name'] : '') : item[textKey];
+            
+            // Handle different textKey values
+            if (textKey === 'dosage') {
+                opt.textContent = item[textKey] + " " + (item['unit'] ? item['unit']['unit_name'] : '');
+            } else if (textKey === 'medicine_name') {
+                opt.textContent = item.medicine_name || item.name || ('ID ' + item.id);
+            } else {
+                opt.textContent = item[textKey] || item.name || ('ID ' + item.id);
+            }
             selectElement.appendChild(opt);
         });
+        
+        console.log('🔴 fillSelect: Filled', selectElement.options.length, 'options for', textKey);
+        
+        // Reinitialize Select2 if it was initialized before
+        if (isSelect2Initialized && window.jQuery && $.fn.select2) {
+            setTimeout(() => {
+                try {
+                    $(selectElement).select2({
+                        width: "100%",
+                        placeholder: textKey === 'medicine_name' ? "Select Medicine" : 
+                                    textKey === 'dosage' ? "Select Dosage" : "Select",
+                        allowClear: true,
+                        minimumResultsForSearch: 0
+                    });
+                    // Restore previous value if it still exists
+                    if (currentValue && Array.from(selectElement.options).some(opt => opt.value == currentValue)) {
+                        $(selectElement).val(currentValue).trigger('change');
+                    }
+                    console.log('🔴 Select2 reinitialized for', textKey, 'with', selectElement.options.length, 'options');
+                } catch(e) {
+                    console.error('🔴 Error reinitializing Select2:', e);
+                }
+            }, 50);
+        }
     }
 
     function addNewRow() {

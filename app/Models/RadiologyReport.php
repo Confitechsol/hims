@@ -24,6 +24,8 @@ class RadiologyReport extends Model
         'branch_id',
         'radiology_bill_id',
         'radiology_id',
+        'ipd_prescription_test_id',
+        'instance_number',
         'patient_id',
         'customer_type',
         'patient_name',
@@ -54,5 +56,13 @@ class RadiologyReport extends Model
     public function radiology()
     {
         return $this->belongsTo(Radio::class, 'radiology_id');
+    }
+
+    /**
+     * Relationship with IpdPrescriptionTest (prescription test instance)
+     */
+    public function prescriptionTestInstance()
+    {
+        return $this->belongsTo(IpdPrescriptionTest::class, 'ipd_prescription_test_id');
     }
 }

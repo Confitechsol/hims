@@ -1286,15 +1286,14 @@
                                         <tbody>
                                             @foreach ($ipdCharges as $charge)
                                                 @php
-                                                    $taxAmount =
-                                                        ($charge->charge->standard_charge *
-                                                            $charge->charge->taxCategory->percentage) /
-                                                        100;
-                                                    $amount = $charge->standard_charge + $taxAmount;
+                                                    $standardCharge = $charge->charge?->standard_charge ?? $charge->standard_charge ?? 0;
+                                                    $taxPct = $charge->charge?->taxCategory?->percentage ?? 0;
+                                                    $taxAmount = ($standardCharge * $taxPct) / 100;
+                                                    $amount = ($charge->standard_charge ?? $standardCharge) + $taxAmount;
                                                 @endphp
                                                 <tr>
                                                     <td>
-                                                        {{ $charge->charge->name ?? '-'}}
+                                                        {{ $charge->charge?->name ?? '-'}}
                                                     </td>
                                                     <td style="text-transform: capitalize;">
                                                         {{ $charge->chargeCategory?->chargeType?->charge_type ?? '-' }}
@@ -3439,25 +3438,18 @@
                                                         <tbody>
                                                             @foreach ($ipdCharges as $charge)
                                                                 @php
-                                                                    $taxAmount =
-                                                                        ($charge->charge->standard_charge *
-                                                                            $charge->charge->taxCategory->percentage) /
-                                                                        100;
-                                                                    $discountAmount =
-                                                                        ($charge->charge->standard_charge *
-                                                                            $charge->discount) /
-                                                                        100;
-                                                                    $amount =
-                                                                        $charge->charge->standard_charge -
-                                                                        $discountAmount +
-                                                                        $taxAmount;
+                                                                    $standardCharge = $charge->charge?->standard_charge ?? $charge->standard_charge ?? 0;
+                                                                    $taxPct = $charge->charge?->taxCategory?->percentage ?? 0;
+                                                                    $taxAmount = ($standardCharge * $taxPct) / 100;
+                                                                    $discountAmount = ($standardCharge * ($charge->discount ?? 0)) / 100;
+                                                                    $amount = $standardCharge - $discountAmount + $taxAmount;
                                                                 @endphp
                                                                 <tr>
                                                                     <td>
                                                                         {{ \Carbon\Carbon::parse($charge->date)->format('d-m-Y') }}
                                                                     </td>
                                                                     <td>
-                                                                        {{ $charge->charge->name ?? '-' }}
+                                                                        {{ $charge->charge?->name ?? '-' }}
                                                                     </td>
                                                                     <td style="text-transform: capitalize;">
                                                                         {{ $charge->chargeCategory?->chargeType?->charge_type ?? '-' }}
@@ -3473,7 +3465,7 @@
                                                                     <td class="text-right">0.00</td>
                                                                     <td>{{ $discountAmount }}&nbsp;({{ $charge->discount }}%)
                                                                     </td>
-                                                                    <!-- <td>{{ $taxAmount }}&nbsp;({{ $charge->charge->taxCategory->percentage }}%)
+                                                                    <!-- <td>{{ $taxAmount }}&nbsp;({{ $charge->charge?->taxCategory?->percentage ?? '-' }}%)
                                                                     </td> -->
                                                                     <td>{{ $amount }}</td>
                                                                     <!-- <td>
@@ -4096,6 +4088,7 @@
                                                             <div class="text-end d-flex">
                                                                 <a href="javascript:void(0);"
                                                                     class="btn btn-primary text-white ms-2 btn-md"
+                                                                    id="addPrescriptionBtn_{{ $ipd->id }}"
                                                                     data-bs-toggle="modal"
                                                                     data-bs-target="#addPrescriptionModal"
                                                                     data-ipd-id="{{ $ipd->id }}"><i
@@ -4616,6 +4609,925 @@
     {{-- modal ends --}}
     @include('components.modals.discharge-modal')
     @include('components.modals.discharge-details-modal')
+    
+    <script>
+    console.log('🔵 IPD View Script Block 1 Loading...');
+    
+    // Test: Verify script is executing
+    try {
+        console.log('✅ Script execution test passed');
+    } catch(e) {
+        console.error('❌ Script execution test failed:', e);
+        alert('Script error: ' + e.message);
+    }
+    
+    // Suppress browser extension errors (they're harmless but noisy)
+    window.addEventListener('error', function(e) {
+        if (e.message && e.message.includes('message channel closed')) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+    }, true);
+    
+    console.log('🔵 IPD View Script Block 1 Loaded');
+    
+    // Direct function to open prescription modal - bypasses Bootstrap issues
+    // Define function to fetch pathology/radiology data DIRECTLY (not dependent on modal)
+    // Make sure this is defined BEFORE any button click handlers
+    if (typeof window.fetchPathologyRadiologyData === 'undefined') {
+        window.fetchPathologyRadiologyData = function() {
+            console.log('🔴 fetchPathologyRadiologyData called directly');
+            var pathSelect = document.getElementById('pathologyOpt');
+            var radSelect = document.getElementById('radiologyOpt');
+            var pathologyUrl = "{{ url(route('getPathologies')) }}";
+            var radiologyUrl = "{{ url(route('getRadiologies')) }}";
+
+            function initAfterBothLoaded() {
+                if (typeof window.initPathologyRadiologySelect2 === 'function') {
+                    window.initPathologyRadiologySelect2();
+                }
+            }
+
+            if (pathSelect && pathSelect.options.length > 1 && radSelect && radSelect.options.length > 1) {
+                console.log('📡 Pathology/Radiology already have options, initializing Select2 only');
+                initAfterBothLoaded();
+                return;
+            }
+
+            var pathDone = false, radDone = false;
+            function maybeInit() {
+                if (pathDone && radDone) {
+                    console.log('✅ Both pathology and radiology loaded, initializing Select2');
+                    initAfterBothLoaded();
+                }
+            }
+
+            if (pathSelect) {
+                if (pathSelect.options.length <= 1) {
+                    if (window.jQuery && window.jQuery(pathSelect).hasClass('select2-hidden-accessible')) {
+                        try { window.jQuery(pathSelect).select2('destroy'); } catch(e) {}
+                    }
+                    pathSelect.innerHTML = '<option value="">Loading...</option>';
+                    fetch(pathologyUrl)
+                        .then(function(r) {
+                            if (!r.ok) throw new Error('HTTP ' + r.status);
+                            return r.json();
+                        })
+                        .then(function(data) {
+                            pathSelect.innerHTML = '';
+                            if (data && Array.isArray(data) && data.length > 0) {
+                                data.forEach(function(p) {
+                                    var opt = document.createElement('option');
+                                    opt.value = p.id;
+                                    opt.textContent = (p.test_name || 'Unknown') + (p.short_name ? ' (' + p.short_name + ')' : '');
+                                    pathSelect.appendChild(opt);
+                                });
+                                console.log('✅ Pathology options added:', pathSelect.options.length);
+                            }
+                            pathDone = true;
+                            maybeInit();
+                        })
+                        .catch(function(err) {
+                            console.error('❌ Pathology fetch error:', err);
+                            pathSelect.innerHTML = '<option value="">Error loading</option>';
+                            pathDone = true;
+                            maybeInit();
+                        });
+                } else {
+                    pathDone = true;
+                    maybeInit();
+                }
+            } else {
+                pathDone = true;
+                maybeInit();
+            }
+
+            if (radSelect) {
+                if (radSelect.options.length <= 1) {
+                    if (window.jQuery && window.jQuery(radSelect).hasClass('select2-hidden-accessible')) {
+                        try { window.jQuery(radSelect).select2('destroy'); } catch(e) {}
+                    }
+                    radSelect.innerHTML = '<option value="">Loading...</option>';
+                    fetch(radiologyUrl)
+                        .then(function(r) {
+                            if (!r.ok) throw new Error('HTTP ' + r.status);
+                            return r.json();
+                        })
+                        .then(function(data) {
+                            radSelect.innerHTML = '';
+                            if (data && Array.isArray(data) && data.length > 0) {
+                                data.forEach(function(r) {
+                                    var opt = document.createElement('option');
+                                    opt.value = r.id;
+                                    opt.textContent = (r.test_name || 'Unknown') + (r.short_name ? ' (' + r.short_name + ')' : '');
+                                    radSelect.appendChild(opt);
+                                });
+                                console.log('✅ Radiology options added:', radSelect.options.length);
+                            }
+                            radDone = true;
+                            maybeInit();
+                        })
+                        .catch(function(err) {
+                            console.error('❌ Radiology fetch error:', err);
+                            radSelect.innerHTML = '<option value="">Error loading</option>';
+                            radDone = true;
+                            maybeInit();
+                        });
+                } else {
+                    radDone = true;
+                    maybeInit();
+                }
+            } else {
+                radDone = true;
+                maybeInit();
+            }
+        };
+    }
+    
+    // Initialize Select2 on pathology and radiology with multiselect + filter (called after data is populated and modal is visible)
+    window.initPathologyRadiologySelect2 = function() {
+        if (typeof window.jQuery === 'undefined' || !window.jQuery.fn.select2) return;
+        var $ = window.jQuery;
+        var pathEl = document.getElementById('pathologyOpt');
+        var radEl = document.getElementById('radiologyOpt');
+        if (!pathEl && !radEl) return;
+        function doInit() {
+            var modal = document.getElementById('addPrescriptionModal');
+            if (!modal || !modal.classList.contains('show')) return;
+            if (pathEl && pathEl.options.length > 0) {
+                try {
+                    if ($(pathEl).hasClass('select2-hidden-accessible')) $(pathEl).select2('destroy');
+                    $(pathEl).select2({
+                        placeholder: 'Select Tests',
+                        allowClear: true,
+                        width: '100%',
+                        dropdownParent: $('#addPrescriptionModal'),
+                        multiple: true,
+                        closeOnSelect: false
+                    });
+                } catch (e) { console.debug('Pathology Select2 init:', e); }
+            }
+            if (radEl && radEl.options.length > 0) {
+                try {
+                    if ($(radEl).hasClass('select2-hidden-accessible')) $(radEl).select2('destroy');
+                    $(radEl).select2({
+                        placeholder: 'Select Tests',
+                        allowClear: true,
+                        width: '100%',
+                        dropdownParent: $('#addPrescriptionModal'),
+                        multiple: true,
+                        closeOnSelect: false
+                    });
+                } catch (e) { console.debug('Radiology Select2 init:', e); }
+            }
+        }
+        setTimeout(doInit, 150);
+        setTimeout(doInit, 500);
+        setTimeout(doInit, 1000);
+    };
+    
+    // Ensure function is available
+    console.log('fetchPathologyRadiologyData defined:', typeof window.fetchPathologyRadiologyData === 'function');
+    
+    // Directly populate medicine category, dose interval, dose duration in the prescription modal (no dependency on modal script)
+    window.populateMedicineDropdownsInModal = function() {
+        var modal = document.getElementById('addPrescriptionModal');
+        if (!modal) return;
+        var container = modal.querySelector('#medicineContainer') || document.getElementById('medicineContainer');
+        if (!container) return;
+        var rows = container.querySelectorAll('.medicine-row');
+        var cats = window.medicineCategories || [];
+        var intervals = window.doseIntervals || [];
+        var durations = window.doseDurations || [];
+        var $ = window.jQuery;
+        var hasSelect2 = $ && $.fn.select2;
+        function fillSelect(sel, list, textKey) {
+            if (!sel) return;
+            if (hasSelect2 && $(sel).hasClass('select2-hidden-accessible')) {
+                try { $(sel).select2('destroy'); } catch(e) {}
+            }
+            sel.innerHTML = '';
+            var opt0 = document.createElement('option');
+            opt0.value = '';
+            opt0.textContent = textKey === 'cat' ? 'Select Category' : (textKey === 'int' ? 'Select Interval' : 'Select Duration');
+            sel.appendChild(opt0);
+            if (Array.isArray(list) && list.length > 0) {
+                list.forEach(function(item) {
+                    if (!item || item.id == null) return;
+                    var o = document.createElement('option');
+                    o.value = item.id;
+                    o.textContent = textKey === 'cat' ? (item.medicine_category || item.name || item.category || '') : (item.name || '');
+                    sel.appendChild(o);
+                });
+            }
+            if (hasSelect2) {
+                try {
+                    $(sel).select2({
+                        width: '100%',
+                        placeholder: textKey === 'cat' ? 'Select Category' : (textKey === 'int' ? 'Select Interval' : 'Select Duration'),
+                        allowClear: true,
+                        dropdownParent: $('#addPrescriptionModal')
+                    });
+                } catch(e) {}
+            }
+        }
+        rows.forEach(function(row) {
+            var catSel = row.querySelector('.medicine_category');
+            var intSel = row.querySelector('.interval_dosage');
+            var durSel = row.querySelector('.duration_dosage');
+            fillSelect(catSel, cats, 'cat');
+            fillSelect(intSel, intervals, 'int');
+            fillSelect(durSel, durations, 'dur');
+        });
+        if (typeof window.attachMedicineCategoryChangeInModal === 'function') {
+            window.attachMedicineCategoryChangeInModal();
+        }
+        if (typeof window.attachMedicineChangeForDosesInModal === 'function') {
+            window.attachMedicineChangeForDosesInModal();
+        }
+        console.log('✅ Medicine dropdowns populated in modal:', rows.length, 'rows');
+    };
+
+    // When user selects a medicine category, fetch medicines and fill the medicine dropdown (works with our populated category select)
+    window.attachMedicineCategoryChangeInModal = function() {
+        var modal = document.getElementById('addPrescriptionModal');
+        if (!modal) return;
+        var $ = window.jQuery;
+        if (!$ || !$.fn.select2) return;
+        var baseUrl = "{{ url(route('getMedicines', ['categoryId' => 'ID'])) }}";
+        $(modal).off('change.medcat select2:select.medcat select2:clear.medcat', '.medicine_category').on('change.medcat select2:select.medcat select2:clear.medcat', '.medicine_category', function() {
+            var categoryId = $(this).val();
+            var row = $(this).closest('.medicine-row')[0];
+            if (!row) return;
+            var medicineSelect = row.querySelector('.medicine_name');
+            if (!medicineSelect) return;
+            if (!categoryId || categoryId === '') {
+                medicineSelect.innerHTML = '<option value="">Select Medicine</option>';
+                try { $(medicineSelect).select2('destroy'); } catch(e) {}
+                $(medicineSelect).select2({ width: '100%', placeholder: 'Select Medicine', allowClear: true, dropdownParent: $('#addPrescriptionModal') });
+                return;
+            }
+            var url = baseUrl.replace('ID', categoryId);
+            $(medicineSelect).prop('disabled', true).html('<option value="">Loading...</option>');
+            try { $(medicineSelect).select2('destroy'); } catch(e) {}
+            fetch(url)
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    var list = Array.isArray(data) ? data : (data && data.data) || [];
+                    medicineSelect.innerHTML = '';
+                    var o0 = document.createElement('option');
+                    o0.value = '';
+                    o0.textContent = 'Select Medicine';
+                    medicineSelect.appendChild(o0);
+                    list.forEach(function(item) {
+                        if (!item || item.id == null) return;
+                        var o = document.createElement('option');
+                        o.value = item.id;
+                        o.textContent = item.medicine_name || item.name || 'Unknown';
+                        medicineSelect.appendChild(o);
+                    });
+                    $(medicineSelect).prop('disabled', false);
+                    $(medicineSelect).select2({
+                        width: '100%',
+                        placeholder: 'Select Medicine',
+                        allowClear: true,
+                        dropdownParent: $('#addPrescriptionModal')
+                    });
+                    console.log('✅ Medicines filled in dropdown:', list.length);
+                })
+                .catch(function(e) {
+                    console.warn('Medicine fetch error:', e);
+                    medicineSelect.innerHTML = '<option value="">Error loading</option>';
+                    $(medicineSelect).prop('disabled', false);
+                    $(medicineSelect).select2({ width: '100%', placeholder: 'Select Medicine', allowClear: true, dropdownParent: $('#addPrescriptionModal') });
+                });
+        });
+        console.log('✅ Medicine category change handler attached');
+    };
+
+    // When user selects a medicine, fetch doses for that category and fill the dose dropdown
+    window.attachMedicineChangeForDosesInModal = function() {
+        var modal = document.getElementById('addPrescriptionModal');
+        if (!modal) return;
+        var $ = window.jQuery;
+        if (!$ || !$.fn.select2) return;
+        var baseUrl = "{{ url(route('getDoses', ['categoryId' => 'ID'])) }}";
+        $(modal).off('change.meddose select2:select.meddose select2:clear.meddose', '.medicine_name').on('change.meddose select2:select.meddose select2:clear.meddose', '.medicine_name', function() {
+            var row = $(this).closest('.medicine-row')[0];
+            if (!row) return;
+            var categorySelect = row.querySelector('.medicine_category');
+            var doseSelect = row.querySelector('.medicine_dosage');
+            if (!categorySelect || !doseSelect) return;
+            var categoryId = $(categorySelect).val();
+            if (!categoryId || categoryId === '') {
+                doseSelect.innerHTML = '<option value="">Select Category First</option>';
+                try { $(doseSelect).select2('destroy'); } catch(e) {}
+                $(doseSelect).select2({ width: '100%', placeholder: 'Select Dose', allowClear: true, dropdownParent: $('#addPrescriptionModal') });
+                return;
+            }
+            var url = baseUrl.replace('ID', categoryId);
+            $(doseSelect).prop('disabled', true);
+            doseSelect.innerHTML = '<option value="">Loading doses...</option>';
+            try { $(doseSelect).select2('destroy'); } catch(e) {}
+            fetch(url)
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    var list = Array.isArray(data) ? data : (data && data.data) || [];
+                    doseSelect.innerHTML = '';
+                    var o0 = document.createElement('option');
+                    o0.value = '';
+                    o0.textContent = 'Select Dose';
+                    doseSelect.appendChild(o0);
+                    list.forEach(function(item) {
+                        if (!item || item.id == null) return;
+                        var o = document.createElement('option');
+                        o.value = item.id;
+                        var label = item.dosage || item.name || 'Unknown';
+                        if (item.unit && item.unit.unit_name) label += ' ' + item.unit.unit_name;
+                        o.textContent = label;
+                        doseSelect.appendChild(o);
+                    });
+                    $(doseSelect).prop('disabled', false);
+                    $(doseSelect).select2({
+                        width: '100%',
+                        placeholder: 'Select Dose',
+                        allowClear: true,
+                        dropdownParent: $('#addPrescriptionModal')
+                    });
+                    console.log('✅ Doses filled in dropdown:', list.length);
+                })
+                .catch(function(e) {
+                    console.warn('Doses fetch error:', e);
+                    doseSelect.innerHTML = '<option value="">Error loading doses</option>';
+                    $(doseSelect).prop('disabled', false);
+                    $(doseSelect).select2({ width: '100%', placeholder: 'Select Dose', allowClear: true, dropdownParent: $('#addPrescriptionModal') });
+                });
+        });
+        console.log('✅ Medicine change → doses handler attached');
+    };
+
+    // Fetch medicine category, dose interval, dose duration - call this when Add Prescription is clicked so APIs always run
+    window.fetchMedicineDropdownData = function() {
+        var catUrl = "{{ url(route('getMedicineCategories')) }}";
+        var intUrl = "{{ url(route('getDoseIntervals')) }}";
+        var durUrl = "{{ url(route('getDoseDurations')) }}";
+        console.log('📡 Fetching medicine dropdowns:', catUrl, intUrl, durUrl);
+        Promise.all([
+            fetch(catUrl).then(function(r) { return r.json().then(function(d) { return Array.isArray(d) ? d : []; }).catch(function() { return []; }); }),
+            fetch(intUrl).then(function(r) { return r.json().then(function(d) { return Array.isArray(d) ? d : []; }).catch(function() { return []; }); }),
+            fetch(durUrl).then(function(r) { return r.json().then(function(d) { return Array.isArray(d) ? d : []; }).catch(function() { return []; }); })
+        ]).then(function(arr) {
+            window.medicineCategories = arr[0] || [];
+            window.doseIntervals = arr[1] || [];
+            window.doseDurations = arr[2] || [];
+            console.log('✅ Medicine dropdowns loaded:', window.medicineCategories.length, 'categories', window.doseIntervals.length, 'intervals', window.doseDurations.length, 'durations');
+            // Populate modal dropdowns directly so data always shows (then run modal init if present)
+            setTimeout(function() {
+                if (typeof window.populateMedicineDropdownsInModal === 'function') {
+                    window.populateMedicineDropdownsInModal();
+                }
+                if (typeof window.initializeMedicineRows === 'function') {
+                    window.initializeMedicineRows();
+                }
+            }, 300);
+        }).catch(function(e) {
+            console.warn('Medicine dropdown fetch error:', e);
+            window.medicineCategories = window.medicineCategories || [];
+            window.doseIntervals = window.doseIntervals || [];
+            window.doseDurations = window.doseDurations || [];
+            setTimeout(function() {
+                if (typeof window.populateMedicineDropdownsInModal === 'function') window.populateMedicineDropdownsInModal();
+                if (typeof window.initializeMedicineRows === 'function') window.initializeMedicineRows();
+            }, 300);
+        });
+    };
+    
+    function openAddPrescriptionModal(ipdId) {
+        console.log('openAddPrescriptionModal called with IPD ID:', ipdId);
+        const modalEl = document.getElementById('addPrescriptionModal');
+        if (!modalEl) {
+            console.error('addPrescriptionModal element not found');
+            alert('Error: Prescription modal not found. Please refresh the page.');
+            return false;
+        }
+        
+        // Set IPD ID in hidden field
+        const ipdIdField = document.getElementById('ipd_id');
+        if (ipdIdField) {
+            ipdIdField.value = ipdId;
+            console.log('IPD ID set to:', ipdId);
+        }
+        
+        // IMMEDIATELY fetch data - don't wait for modal
+        if (typeof window.fetchPathologyRadiologyData === 'function') {
+            window.fetchPathologyRadiologyData();
+        }
+        if (typeof window.fetchMedicineDropdownData === 'function') {
+            window.fetchMedicineDropdownData();
+        }
+        
+        // Try Bootstrap modal first
+        try {
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                console.log('✅ Bootstrap and Modal are available');
+                
+                // Check if modal already has an instance
+                let modalInstance = bootstrap.Modal.getInstance(modalEl);
+                if (!modalInstance) {
+                    console.log('Creating new Bootstrap Modal instance');
+                    modalInstance = new bootstrap.Modal(modalEl, {
+                        backdrop: true,
+                        keyboard: true,
+                        focus: true
+                    });
+                } else {
+                    console.log('Using existing Bootstrap Modal instance');
+                }
+                
+                // Show the modal
+                console.log('Calling modalInstance.show()...');
+                modalInstance.show();
+                console.log('✅ Bootstrap modal.show() called');
+                
+                // Verify modal is showing after a short delay
+                setTimeout(() => {
+                    // Check visibility - aria-hidden must be explicitly 'false' (not null)
+                    const ariaHidden = modalEl.getAttribute('aria-hidden');
+                    const computedStyle = window.getComputedStyle(modalEl);
+                    const isVisible = modalEl.classList.contains('show') && 
+                                     (ariaHidden === 'false' || ariaHidden === null) && // Accept null as visible too
+                                     computedStyle.display !== 'none' &&
+                                     computedStyle.visibility !== 'hidden' &&
+                                     parseFloat(computedStyle.opacity) > 0;
+                    
+                    console.log('Modal visibility check after Bootstrap show:', {
+                        isVisible: isVisible,
+                        hasShowClass: modalEl.classList.contains('show'),
+                        ariaHidden: ariaHidden,
+                        display: computedStyle.display,
+                        visibility: computedStyle.visibility,
+                        opacity: computedStyle.opacity,
+                        zIndex: computedStyle.zIndex,
+                        position: computedStyle.position
+                    });
+                    
+                    if (!isVisible) {
+                        console.warn('⚠️ Bootstrap modal.show() did not make modal visible, using manual fallback');
+                        // Don't return, fall through to manual fallback
+                    } else {
+                        console.log('✅ Modal is visible via Bootstrap');
+                    }
+                    
+                    // Ensure medicine categories, dose intervals, dose durations and medicine rows are loaded
+                    setTimeout(function() {
+                        if (typeof window.loadPathologyRadiologyData === 'function') {
+                            window.loadPathologyRadiologyData();
+                        }
+                        var needsCat = !window.medicineCategories || !window.medicineCategories.length;
+                        var needsInt = !window.doseIntervals || !window.doseIntervals.length;
+                        var needsDur = !window.doseDurations || !window.doseDurations.length;
+                        if (needsCat || needsInt || needsDur) {
+                            var catUrl = "{{ url(route('getMedicineCategories')) }}", intUrl = "{{ url(route('getDoseIntervals')) }}", durUrl = "{{ url(route('getDoseDurations')) }}";
+                            Promise.all([
+                                needsCat ? fetch(catUrl).then(function(r){ return r.json().then(function(d){ return Array.isArray(d) ? d : []; }).catch(function(){ return []; }); }) : Promise.resolve(window.medicineCategories || []),
+                                needsInt ? fetch(intUrl).then(function(r){ return r.json().then(function(d){ return Array.isArray(d) ? d : []; }).catch(function(){ return []; }); }) : Promise.resolve(window.doseIntervals || []),
+                                needsDur ? fetch(durUrl).then(function(r){ return r.json().then(function(d){ return Array.isArray(d) ? d : []; }).catch(function(){ return []; }); }) : Promise.resolve(window.doseDurations || [])
+                            ]).then(function(arr) {
+                                window.medicineCategories = arr[0] || [];
+                                window.doseIntervals = arr[1] || [];
+                                window.doseDurations = arr[2] || [];
+                                if (typeof window.initializeMedicineRows === 'function') {
+                                    window.initializeMedicineRows();
+                                }
+                            }).catch(function(e){ console.warn('Medicine data fallback:', e); if (typeof window.initializeMedicineRows === 'function') window.initializeMedicineRows(); });
+                        } else if (typeof window.initializeMedicineRows === 'function') {
+                            window.initializeMedicineRows();
+                        }
+                    }, 400);
+                }, 300);
+                
+                // Also call the other function if available
+                setTimeout(() => {
+                    if (typeof window.loadPathologyRadiologyData === 'function') {
+                        window.loadPathologyRadiologyData();
+                    }
+                }, 500);
+                
+                // Don't return immediately - let fallback run if Bootstrap fails
+                // return true;
+            } else {
+                console.error('❌ Bootstrap or Modal not available:', {
+                    bootstrap: typeof bootstrap,
+                    Modal: typeof bootstrap !== 'undefined' ? typeof bootstrap.Modal : 'N/A'
+                });
+            }
+        } catch (bootstrapError) {
+            console.error('❌ Bootstrap modal error:', bootstrapError);
+            console.error('Error stack:', bootstrapError.stack);
+        }
+        
+        // Fallback: Manual modal display
+        console.warn('⚠️ Using manual modal fallback');
+        console.log('Modal element before manual show:', {
+            exists: !!modalEl,
+            currentClasses: modalEl ? Array.from(modalEl.classList) : [],
+            currentDisplay: modalEl ? modalEl.style.display : 'N/A',
+            currentAriaHidden: modalEl ? modalEl.getAttribute('aria-hidden') : 'N/A'
+        });
+        
+        // Do NOT force other modals to display - duplicate ID was causing wrong modal to be targeted (now fixed in add-pathlab-report).
+        // CRITICAL: Set aria-hidden to 'false' (not null, not remove attribute)
+        modalEl.setAttribute('aria-hidden', 'false');
+        modalEl.setAttribute('aria-modal', 'true');
+        
+        // Remove fade class temporarily to show immediately
+        modalEl.classList.remove('fade');
+        modalEl.classList.add('show');
+        
+        // Set inline styles with !important to override any CSS
+        modalEl.style.cssText += 'display: block !important; visibility: visible !important; opacity: 1 !important; position: fixed !important; z-index: 1055 !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; overflow-x: hidden !important; overflow-y: auto !important;';
+        
+        // Also ensure modal-dialog has proper positioning
+        const modalDialog = modalEl.querySelector('.modal-dialog');
+        if (modalDialog) {
+            modalDialog.style.cssText += 'position: relative !important; margin: 1.75rem auto !important; z-index: 1056 !important;';
+            console.log('✅ Modal dialog styled');
+        }
+        
+        // Ensure modal is visible
+        const computedStyle = window.getComputedStyle(modalEl);
+        console.log('Modal computed styles after manual show:', {
+            display: computedStyle.display,
+            visibility: computedStyle.visibility,
+            opacity: computedStyle.opacity,
+            zIndex: computedStyle.zIndex,
+            position: computedStyle.position,
+            ariaHidden: modalEl.getAttribute('aria-hidden')
+        });
+        
+        document.body.classList.add('modal-open');
+        document.body.style.paddingRight = '0px';
+        document.body.style.overflow = 'hidden';
+        
+        // Create backdrop FIRST (before modal z-index)
+        let backdrop = document.querySelector('.modal-backdrop');
+        if (!backdrop) {
+            backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            backdrop.id = 'manualModalBackdrop';
+            backdrop.setAttribute('aria-hidden', 'true');
+            backdrop.style.cssText = 'position: fixed !important; top: 0 !important; left: 0 !important; z-index: 1040 !important; width: 100vw !important; height: 100vh !important; background-color: rgba(0, 0, 0, 0.5) !important;';
+            document.body.appendChild(backdrop);
+            console.log('✅ Backdrop created with z-index 1040');
+        } else {
+            backdrop.style.cssText = 'position: fixed !important; top: 0 !important; left: 0 !important; z-index: 1040 !important; width: 100vw !important; height: 100vh !important; background-color: rgba(0, 0, 0, 0.5) !important;';
+            backdrop.classList.add('show');
+            console.log('✅ Existing backdrop updated');
+        }
+        
+        // Trigger shown event manually
+        const shownEvent = new Event('shown.bs.modal', { bubbles: true });
+        modalEl.dispatchEvent(shownEvent);
+        
+        // Verify modal is actually visible
+        setTimeout(() => {
+            const isNowVisible = modalEl.classList.contains('show') && 
+                               window.getComputedStyle(modalEl).display !== 'none' &&
+                               window.getComputedStyle(modalEl).visibility !== 'hidden';
+            console.log('Modal visibility verification:', {
+                isVisible: isNowVisible,
+                hasShowClass: modalEl.classList.contains('show'),
+                display: window.getComputedStyle(modalEl).display,
+                visibility: window.getComputedStyle(modalEl).visibility,
+                opacity: window.getComputedStyle(modalEl).opacity
+            });
+            
+            if (!isNowVisible) {
+                console.error('❌ Modal still not visible after manual show attempt');
+                // Try even more aggressive approach
+                modalEl.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; z-index: 1055 !important; position: relative !important;';
+            }
+        }, 100);
+        
+        // Ensure data loads after modal opens
+        setTimeout(() => {
+            console.log('🔵 Triggering data load from manual fallback');
+            if (typeof window.loadPathologyRadiologyData === 'function') {
+                window.loadPathologyRadiologyData();
+            } else {
+                console.warn('⚠️ loadPathologyRadiologyData function not found, trying fallback');
+                const pathEl = document.getElementById('pathologyOpt');
+                const radEl = document.getElementById('radiologyOpt');
+                if (pathEl && pathEl.options.length <= 1) {
+                    console.log('Pathology data missing, triggering fetch...');
+                    if (typeof window.initializePathologyMultiselect === 'function') {
+                        window.initializePathologyMultiselect();
+                    }
+                }
+                if (radEl && radEl.options.length <= 1) {
+                    console.log('Radiology data missing, triggering fetch...');
+                    if (typeof window.initializeRadiologyMultiselect === 'function') {
+                        window.initializeRadiologyMultiselect();
+                    }
+                }
+            }
+        }, 500);
+        
+        console.log('✅ Modal manually shown');
+        return true;
+    }
+    
+    // Also handle Bootstrap data attributes as fallback for all prescription buttons
+    // Ensure functions are available before DOMContentLoaded
+    console.log('🔵 IPD View Script Block 2 Loading - checking functions:', {
+        fetchPathologyRadiologyData: typeof window.fetchPathologyRadiologyData,
+        openAddPrescriptionModal: typeof openAddPrescriptionModal
+    });
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🔵 DOMContentLoaded fired for IPD view');
+        
+        // Find all prescription buttons
+        const prescriptionButtons = document.querySelectorAll('[data-bs-target="#addPrescriptionModal"][data-ipd-id]');
+        console.log('Found prescription buttons:', prescriptionButtons.length);
+        
+        if (prescriptionButtons.length === 0) {
+            console.warn('⚠️ No prescription buttons found!');
+        }
+        
+        prescriptionButtons.forEach(function(btn) {
+            // Use capture phase to intercept BEFORE Bootstrap
+            btn.addEventListener('click', function(e) {
+                console.log('🔴 CLICK EVENT FIRED on button');
+                const ipdId = this.getAttribute('data-ipd-id');
+                console.log('🔴 Prescription button clicked, IPD ID:', ipdId);
+                
+                // Don't prevent default - let Bootstrap handle it, but also do our stuff
+                
+                if (ipdId) {
+                    // Set IPD ID immediately
+                    const ipdIdField = document.getElementById('ipd_id');
+                    if (ipdIdField) {
+                        ipdIdField.value = ipdId;
+                        console.log('✅ IPD ID set to:', ipdId);
+                    } else {
+                        console.error('❌ ipd_id field not found');
+                    }
+                    
+                    // IMMEDIATELY trigger data fetch - don't wait for modal to open
+                    console.log('🔴 Immediately calling fetchPathologyRadiologyData...');
+                    if (typeof window.fetchPathologyRadiologyData === 'function') {
+                        window.fetchPathologyRadiologyData();
+                    }
+                    console.log('🔴 Calling fetchMedicineDropdownData (categories, intervals, durations)...');
+                    if (typeof window.fetchMedicineDropdownData === 'function') {
+                        window.fetchMedicineDropdownData();
+                    } else {
+                        console.error('❌ fetchMedicineDropdownData NOT FOUND');
+                    }
+                    
+                    // Re-apply Select2 to pathology/radiology after modal is open and data may be loaded
+                    setTimeout(function() {
+                        if (typeof window.initPathologyRadiologySelect2 === 'function') {
+                            window.initPathologyRadiologySelect2();
+                        }
+                    }, 900);
+                    
+                    // Check if Bootstrap is available and modal element exists
+                    const modalEl = document.getElementById('addPrescriptionModal');
+                    console.log('Modal element found:', !!modalEl);
+                    console.log('Bootstrap available:', typeof bootstrap !== 'undefined');
+                    console.log('Bootstrap.Modal available:', typeof bootstrap !== 'undefined' && typeof bootstrap.Modal !== 'undefined');
+                    
+                    if (modalEl) {
+                        console.log('Modal current state:', {
+                            hasShowClass: modalEl.classList.contains('show'),
+                            display: modalEl.style.display,
+                            ariaHidden: modalEl.getAttribute('aria-hidden'),
+                            visibility: window.getComputedStyle(modalEl).visibility,
+                            opacity: window.getComputedStyle(modalEl).opacity,
+                            zIndex: window.getComputedStyle(modalEl).zIndex
+                        });
+                    }
+                    
+                    // Let Bootstrap handle the modal opening - DON'T prevent default
+                    // But also set up a fallback check
+                    setTimeout(() => {
+                        const modalEl = document.getElementById('addPrescriptionModal');
+                        if (modalEl) {
+                            const ariaHidden = modalEl.getAttribute('aria-hidden');
+                            const computedStyle = window.getComputedStyle(modalEl);
+                            const isVisible = modalEl.classList.contains('show') && 
+                                           (ariaHidden === 'false' || ariaHidden === null) &&
+                                           computedStyle.display !== 'none' &&
+                                           computedStyle.visibility !== 'hidden' &&
+                                           parseFloat(computedStyle.opacity) > 0;
+                            
+                            console.log('Modal visibility check after 200ms:', {
+                                isVisible: isVisible,
+                                hasShowClass: modalEl.classList.contains('show'),
+                                ariaHidden: ariaHidden,
+                                display: computedStyle.display,
+                                visibility: computedStyle.visibility,
+                                opacity: computedStyle.opacity,
+                                zIndex: computedStyle.zIndex
+                            });
+                            
+                            if (!isVisible) {
+                                console.warn('⚠️ Bootstrap modal not visible after 200ms, using fallback');
+                                openAddPrescriptionModal(ipdId);
+                            } else {
+                                console.log('✅ Modal is visible via Bootstrap');
+                                
+                                // CRITICAL: Even though Bootstrap says it's visible, ensure it's actually displayed
+                                // Set aria-hidden explicitly to 'false' (Bootstrap sometimes leaves it null)
+                                modalEl.setAttribute('aria-hidden', 'false');
+                                
+                                // Do NOT force other modals (e.g. addPathLabModal) to display - duplicate ID in add-pathlab-report was fixed so we now target the correct modal.
+                                // Check z-index and positioning
+                                const modalComputed = window.getComputedStyle(modalEl);
+                                const modalDialog = modalEl.querySelector('.modal-dialog');
+                                const dialogComputed = modalDialog ? window.getComputedStyle(modalDialog) : null;
+                                const backdrop = document.querySelector('.modal-backdrop');
+                                
+                                console.log('🔍 Modal detailed check:', {
+                                    modalZIndex: modalComputed.zIndex,
+                                    modalPosition: modalComputed.position,
+                                    modalTop: modalComputed.top,
+                                    modalLeft: modalComputed.left,
+                                    modalWidth: modalComputed.width,
+                                    modalHeight: modalComputed.height,
+                                    dialogZIndex: dialogComputed ? dialogComputed.zIndex : 'N/A',
+                                    dialogPosition: dialogComputed ? dialogComputed.position : 'N/A',
+                                    dialogMargin: dialogComputed ? dialogComputed.margin : 'N/A',
+                                    backdropExists: !!backdrop,
+                                    backdropZIndex: backdrop ? window.getComputedStyle(backdrop).zIndex : 'N/A',
+                                    bodyHasModalOpen: document.body.classList.contains('modal-open')
+                                });
+                                
+                                // Force proper z-index ALWAYS (Bootstrap might not set it correctly)
+                                console.log('🔧 Forcing modal z-index to 1055...');
+                                
+                                // CRITICAL: Set ALL positioning properties explicitly
+                                modalEl.style.cssText = `
+                                    display: block !important;
+                                    visibility: visible !important;
+                                    opacity: 1 !important;
+                                    position: fixed !important;
+                                    z-index: 1055 !important;
+                                    top: 0 !important;
+                                    left: 0 !important;
+                                    width: 100% !important;
+                                    height: 100% !important;
+                                    overflow-x: hidden !important;
+                                    overflow-y: auto !important;
+                                    padding: 0 !important;
+                                    margin: 0 !important;
+                                `;
+                                
+                                if (modalDialog) {
+                                    modalDialog.style.cssText = `
+                                        position: relative !important;
+                                        z-index: 1056 !important;
+                                        margin: 1.75rem auto !important;
+                                        max-width: 1140px !important;
+                                        width: 90% !important;
+                                    `;
+                                    console.log('✅ Modal dialog styled with full CSS');
+                                }
+                                
+                                // Also ensure modal-content is visible
+                                const modalContent = modalEl.querySelector('.modal-content');
+                                if (modalContent) {
+                                    modalContent.style.cssText = `
+                                        position: relative !important;
+                                        z-index: 1057 !important;
+                                        display: flex !important;
+                                        flex-direction: column !important;
+                                        width: 100% !important;
+                                        pointer-events: auto !important;
+                                        background-color: #fff !important;
+                                        border: 1px solid rgba(0,0,0,.2) !important;
+                                        border-radius: 0.3rem !important;
+                                    `;
+                                    console.log('✅ Modal content styled');
+                                }
+                                
+                                // Ensure backdrop exists and is below modal
+                                if (!backdrop) {
+                                    console.warn('⚠️ Backdrop missing, creating...');
+                                    const newBackdrop = document.createElement('div');
+                                    newBackdrop.className = 'modal-backdrop fade show';
+                                    newBackdrop.style.cssText = 'position: fixed !important; top: 0 !important; left: 0 !important; z-index: 1040 !important; width: 100vw !important; height: 100vh !important; background-color: rgba(0, 0, 0, 0.5) !important;';
+                                    document.body.appendChild(newBackdrop);
+                                    console.log('✅ Backdrop created');
+                                } else {
+                                    // Ensure backdrop z-index is below modal
+                                    const backdropZ = parseInt(window.getComputedStyle(backdrop).zIndex) || 1040;
+                                    if (backdropZ >= 1055) {
+                                        backdrop.style.zIndex = '1040';
+                                        console.log('✅ Backdrop z-index fixed to 1040');
+                                    }
+                                }
+                                
+                                // Ensure body has modal-open class
+                                if (!document.body.classList.contains('modal-open')) {
+                                    document.body.classList.add('modal-open');
+                                    console.log('✅ Added modal-open class to body');
+                                }
+                                
+                                // Final verification with detailed checks
+                                setTimeout(() => {
+                                    const finalCheck = window.getComputedStyle(modalEl);
+                                    const dialogCheck = modalDialog ? window.getComputedStyle(modalDialog) : null;
+                                    const contentCheck = modalContent ? window.getComputedStyle(modalContent) : null;
+                                    
+                                    // Check if modal is in viewport
+                                    const rect = modalEl.getBoundingClientRect();
+                                    const isInViewport = rect.top >= 0 && rect.left >= 0 && 
+                                                         rect.bottom <= window.innerHeight && 
+                                                         rect.right <= window.innerWidth;
+                                    
+                                    console.log('🔍 Final modal check:', {
+                                        display: finalCheck.display,
+                                        visibility: finalCheck.visibility,
+                                        opacity: finalCheck.opacity,
+                                        zIndex: finalCheck.zIndex,
+                                        position: finalCheck.position,
+                                        top: finalCheck.top,
+                                        left: finalCheck.left,
+                                        width: finalCheck.width,
+                                        height: finalCheck.height,
+                                        ariaHidden: modalEl.getAttribute('aria-hidden'),
+                                        dialogDisplay: dialogCheck ? dialogCheck.display : 'N/A',
+                                        dialogZIndex: dialogCheck ? dialogCheck.zIndex : 'N/A',
+                                        contentDisplay: contentCheck ? contentCheck.display : 'N/A',
+                                        boundingRect: {
+                                            top: rect.top,
+                                            left: rect.left,
+                                            width: rect.width,
+                                            height: rect.height
+                                        },
+                                        isInViewport: isInViewport,
+                                        windowSize: {
+                                            width: window.innerWidth,
+                                            height: window.innerHeight
+                                        }
+                                    });
+                                    
+                                    // Check parent containers for issues - only fix tab-panes etc., NEVER other modals (e.g. addPathLabModal)
+                                    let parent = modalEl.parentElement;
+                                    let parentLevel = 0;
+                                    while (parent && parentLevel < 5) {
+                                        const parentStyle = window.getComputedStyle(parent);
+                                        const isOtherModal = parent.classList.contains('modal') || parent.id === 'addPathLabModal';
+                                        if (!isOtherModal && (parentStyle.display === 'none' || parentStyle.visibility === 'hidden' || parentStyle.opacity === '0')) {
+                                            console.warn(`⚠️ Parent container issue at level ${parentLevel}:`, {
+                                                tag: parent.tagName,
+                                                id: parent.id,
+                                                class: parent.className,
+                                                display: parentStyle.display
+                                            });
+                                            parent.style.display = 'block';
+                                            parent.style.visibility = 'visible';
+                                            parent.style.opacity = '1';
+                                            console.log(`🔧 Fixed parent container ${parent.id || parent.className}`);
+                                        }
+                                        parent = parent.parentElement;
+                                        parentLevel++;
+                                    }
+                                    
+                                    // If still not visible, try manual fallback
+                                    if (finalCheck.display === 'none' || 
+                                        finalCheck.visibility === 'hidden' || 
+                                        parseFloat(finalCheck.opacity) === 0 ||
+                                        !isInViewport) {
+                                        console.error('❌ Modal still not visible after fixes, using manual fallback');
+                                        openAddPrescriptionModal(ipdId);
+                                    } else {
+                                        console.log('✅ Modal should be visible now - check browser viewport');
+                                    }
+                                }, 200);
+                                
+                                // Modal is open, ensure data is loaded
+                                if (typeof window.loadPathologyRadiologyData === 'function') {
+                                    window.loadPathologyRadiologyData();
+                                }
+                            }
+                        } else {
+                            console.error('❌ Modal element not found in timeout check');
+                        }
+                    }, 300);
+                }
+            });
+        });
+        
+        console.log('🔵 Button event listeners attached');
+    });
+    
+    console.log('🔵 IPD View Script Block 2 Loaded');
+    </script>
     <!-- Chart JS -->
     <script src="assets/plugins/chartjs/chart.min.js"></script>
     <script src="assets/plugins/chartjs/chart-data.js"></script>
