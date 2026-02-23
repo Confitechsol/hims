@@ -181,8 +181,21 @@
                                                 <td>{{ $issue->note ?? '-' }}</td>
 
                                                 <td>
-                                                    @if ($issue->is_returned === 'yes')
+                                                    @if ($issue->is_returned === 1)
                                                         <span class="badge bg-success">Returned</span>
+
+                                                    @elseif (!is_null($issue->return_date))
+                                                        <span class="badge bg-info text-dark return-btn"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#returnModal"
+                                                            data-id="{{ $issue->id }}"
+                                                            data-item="{{ $issue->item->name ?? '' }}"
+                                                            data-category="{{ $issue->item->category->name ?? '' }}"
+                                                            data-quantity="{{ $issue->quantity }}"
+                                                            style="cursor:pointer;">
+                                                            Click to return
+                                                        </span>
+
                                                     @else
                                                         <span class="badge bg-warning text-dark">Issued</span>
                                                     @endif
@@ -210,6 +223,45 @@
                                                     </form>
                                                 </td>
                                             </tr>
+                                           <!-- Return Item Modal -->
+                                            <div class="modal fade" id="returnModal" tabindex="-1" aria-labelledby="returnModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="returnModalLabel">Confirm Return</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                        </div>
+
+                                                        <div class="modal-body">
+    <form id="returnIssueForm" method="POST">
+        @csrf
+
+        <input type="hidden" id="item_issue_id" name="item_issue_id">
+
+        <p>Are you sure you want to return this item?</p>
+
+        <ul class="list-unstyled">
+            <li><strong>Item:</strong> <span id="modal_item"></span></li>
+            <li><strong>Category:</strong> <span id="modal_item_cat"></span></li>
+            <li><strong>Quantity:</strong> <span id="modal_item_quantity"></span></li>
+        </ul>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                Cancel
+            </button>
+
+            <button type="submit" class="btn btn-success">
+                Confirm Return
+            </button>
+        </div>
+    </form>
+</div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
                                         @empty
                                             <tr>
                                                 <td colspan="9" class="text-center text-muted">No item issues found.</td>
@@ -437,7 +489,32 @@ $(document).on('click', '.editIssueBtn', function () {
 </script>
 
 
+<script>
+    $(document).on('click', '.return-btn', function () {
 
+        console.log("Clicked");
+
+        let id = $(this).data('id');
+        console.log("ID:", id);
+
+        let item = $(this).data('item');
+        let category = $(this).data('category');
+        let quantity = $(this).data('quantity');
+
+        $('#item_issue_id').val(id);
+        $('#modal_item').text(item);
+        $('#modal_item_cat').text(category);
+        $('#modal_item_quantity').text(quantity);
+
+        let url = "{{ route('issue-items.return', ['id' => '__id__']) }}";
+        url = url.replace('__id__', id);
+
+        console.log("Final URL:", url);
+
+        // ✅ THIS is the correct line
+        $('#returnIssueForm').attr('action', url);
+    });
+</script>
 
 
 

@@ -689,6 +689,7 @@ Route::prefix('/inventory')->group(function () {
     Route::get('/get-items-by-category', [InventoriesController::class, 'getItemsByCategory'])->name('get-items-by-category');
     Route::get('/issue-update/{id}', [InventoriesController::class, 'updateIssuedItem'])->name('issue-items.update');
     Route::delete('/issue-destroy/{id}', [InventoriesController::class, 'destroyIssuedItem'])->name('issue-items.destroy');
+    Route::post('/issue-return/{id}', [InventoriesController::class, 'returnIssuedItem'])->name('issue-items.return');
 });
 
 Route::get('/opd-billing', function () {
