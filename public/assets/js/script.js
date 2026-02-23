@@ -43,17 +43,36 @@ Template Name: Preclinic - Bootstrap Admin Template
 			if($(this).parent().hasClass('submenu')) {
 				e.preventDefault();
 			}
-			if(!$(this).hasClass('subdrop')) {
-				$('ul', $(this).parents('ul:first')).slideUp(250);
-				$('a', $(this).parents('ul:first')).removeClass('subdrop');
-				$(this).next('ul').slideDown(350);
-				$(this).addClass('subdrop');
-			} else if($(this).hasClass('subdrop')) {
-				$(this).removeClass('subdrop');
-				$(this).next('ul').slideUp(350);
+			var $currentLink = $(this);
+			if(!$currentLink.hasClass('subdrop')) {
+				// Close ALL other open submenus throughout the entire sidebar
+				$('.sidebar-menu a.subdrop').each(function() {
+					if($(this)[0] !== $currentLink[0]) { // Check if not the same element
+						$(this).removeClass('subdrop');
+						$(this).next('ul').slideUp(250);
+					}
+				});
+				// Open this submenu
+				$currentLink.next('ul').slideDown(350);
+				$currentLink.addClass('subdrop');
+			} else if($currentLink.hasClass('subdrop')) {
+				$currentLink.removeClass('subdrop');
+				$currentLink.next('ul').slideUp(350);
 			}
 		});
-		$('.sidebar-menu ul li.submenu a.active').parents('li:last').children('a:first').addClass('active').trigger('click');
+		// Collapse all submenus initially
+		$('.sidebar-menu li.submenu').each(function() {
+			$(this).children('a').removeClass('subdrop');
+			$(this).children('ul').hide();
+		});
+
+		// Expand only the submenu(s) that contain a child link with the 'active' class
+		$('.sidebar-menu li.submenu').filter(function() {
+			return $(this).find('> ul a.active').length > 0;
+		}).each(function() {
+			$(this).children('a').addClass('subdrop');
+			$(this).children('ul').show();
+		});
 	}
 
 		//Trial Item
@@ -64,22 +83,25 @@ Template Name: Preclinic - Bootstrap Admin Template
 		}
 			
 	
-	// Sidebar Initiate
-	init();
-	$(document).on('mouseover', function(e) {
-        e.stopPropagation();
-        if ($('body').hasClass('mini-sidebar') && $('#toggle_btn').is(':visible')) {
-            var targ = $(e.target).closest('.sidebar, .header-left').length;
-            if (targ) {
-               $('body').addClass('expand-menu');
-                $('.subdrop + ul').slideDown();
-            } else {
-               $('body').removeClass('expand-menu');
-                $('.subdrop + ul').slideUp();
-            }
-            return false;
-        }
-    });
+	// Ensure handlers bind after DOM ready
+	$(document).ready(function(){
+		// Sidebar Initiate
+		init();
+		$(document).on('mouseover', function(e) {
+		    e.stopPropagation();
+		    if ($('body').hasClass('mini-sidebar') && $('#toggle_btn').is(':visible')) {
+		        var targ = $(e.target).closest('.sidebar, .header-left').length;
+		        if (targ) {
+		           $('body').addClass('expand-menu');
+		            $('.subdrop + ul').slideDown();
+		        } else {
+		           $('body').removeClass('expand-menu');
+		            $('.subdrop + ul').slideUp();
+		        }
+		        return false;
+		    }
+		});
+	});
 
 	var selectAllItems = "#select-all";
 	var checkboxItem = ".form-check.form-check-md :checkbox";
