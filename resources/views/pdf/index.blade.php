@@ -199,6 +199,23 @@
         padding-bottom: 30px;
         text-align: center;
     }
+    .btn-primary:hover {
+        /* background-color: #b14cc1; */
+        /* border-color: #b14cc1; */
+        color: #fff;
+    }
+    .btn-primary:focus {
+        /* background-color: #b14cc1; */
+        /* border-color: #b14cc1; */
+        color: #fff;
+        box-shadow: 0 0 0 0.2rem rgba(177, 76, 193, 0.5);
+    }
+    .btn-primary{
+        background-color: #cb6ce6;
+        border-color: #cb6ce6;
+        color: #fff;
+        border: none;
+    }
 </style>
 
 <body>
@@ -215,7 +232,8 @@
             </div>
             <div class="second_logo">
                 @if (file_exists(public_path('assets/images/nabh-logo.png')))
-                    <img src="{{ asset('assets/images/nabh-logo.png') }}" alt="LOGO2" style="height: auto; width:100%;">
+                    <img src="{{ asset('assets/images/nabh-logo.png') }}" alt="LOGO2"
+                        style="height: auto; width:100%;">
                 @endif
             </div>
             <div class="about_info">
@@ -771,11 +789,59 @@
             <p><b>{{ \Carbon\Carbon::parse($IpdPatient->created_at)->format('d-m-Y') ?? '' }}</b></p>
         </div>
 
-        <div class="print_btn">
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createIpdModal">Print</button>
-        </div>
 
     </div>
+    <div class="print_btn">
+        <button class="btn btn-primary" onclick="printPdf()">Print</button>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        function generatePdf() {
+            return new Promise((resolve) => {
+                const targetElement = document.getElementById("pdf-content");
+
+                html2canvas(targetElement, {
+                    scale: 2,
+                    useCORS: true
+                }).then(canvas => {
+                    const {
+                        jsPDF
+                    } = window.jspdf;
+
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+
+                    const imgData = canvas.toDataURL('image/png');
+
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
+
+                    const imgWidth = pdfWidth;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                    // Center vertically if smaller than A4
+                    const y = imgHeight < pdfHeight ? (pdfHeight - imgHeight) / 2 : 0;
+
+                    pdf.addImage(imgData, 'PNG', 0, y, imgWidth, imgHeight);
+
+                    resolve(pdf);
+                });
+            });
+        }
+
+        function printPdf() {
+            generatePdf().then(pdf => {
+                const blob = pdf.output('bloburl');
+
+                const printWindow = window.open(blob);
+                printWindow.onload = () => {
+                    printWindow.focus();
+                    printWindow.print();
+                };
+            });
+        }
+    </script>
 </body>
 
 </html>
