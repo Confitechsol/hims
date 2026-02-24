@@ -35,11 +35,11 @@
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2 justify-content-between">
                             <span class="avatar bg-primary rounded-circle"><i class="ti ti-calendar-heart fs-24"></i></span>
-                            <div class="text-end">
+                            {{-- <div class="text-end">
                                 <span class="badge px-2 py-1 fs-12 fw-medium d-inline-flex mb-1 bg-success">+95%</span>
                                 <p class="fs-13 mb-0">in last 7 Days
                                 </p>
-                            </div>
+                            </div> --}}
                         </div>
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
@@ -61,11 +61,11 @@
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2 justify-content-between">
                             <span class="avatar bg-danger rounded-circle"><i class="ti ti-calendar-heart fs-24"></i></span>
-                            <div class="text-end">
+                            {{-- <div class="text-end">
                                 <span class="badge px-2 py-1 fs-12 fw-medium d-inline-flex mb-1 bg-success">+25%</span>
                                 <p class="fs-13 mb-0">in last 7 Days
                                 </p>
-                            </div>
+                            </div> --}}
                         </div>
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
@@ -87,11 +87,11 @@
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2 justify-content-between">
                             <span class="avatar bg-info rounded-circle"><i class="ti ti-calendar-heart fs-24"></i></span>
-                            <div class="text-end">
+                            {{-- <div class="text-end">
                                 <span class="badge px-2 py-1 fs-12 fw-medium d-inline-flex mb-1 bg-danger">-15%</span>
                                 <p class="fs-13 mb-0">in last 7 Days
                                 </p>
-                            </div>
+                            </div> --}}
                         </div>
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
@@ -397,7 +397,7 @@
         <!-- end row -->
 
         <!-- start row -->
-        <div class="row">
+        {{-- <div class="row">
             <!-- col start -->
             <div class="col-xl-4 d-flex">
                 <div class="card shadow-sm flex-fill w-100">
@@ -638,7 +638,7 @@
                 </div>
             </div>
             <!-- col end -->
-        </div>
+        </div> --}}
         <!-- end row -->
 
         <!-- row start -->
@@ -873,7 +873,7 @@
         <!-- row start -->
         <div class="row">
             <!-- col start -->
-            <div class="col-xl-4 d-flex">
+            {{-- <div class="col-xl-4 d-flex">
                 <div class="card shadow-sm flex-fill w-100">
                     <div class="card-header d-flex align-items-center justify-content-between">
                         <h5 class="fw-bold mb-0">Top 5 Patients</h5>
@@ -968,11 +968,11 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
             <!-- col end -->
 
             <!-- col start -->
-            <div class="col-xl-4 col-lg-6 d-flex">
+            <div class="col-xl-6 col-lg-6 d-flex">
                 <div class="card shadow-sm flex-fill w-100">
                     <div class="card-header d-flex align-items-center justify-content-between">
                         <h5 class="fw-bold mb-0">Recent
@@ -1088,7 +1088,7 @@
             <!-- col end -->
 
             <!-- col start -->
-            <div class="col-xl-4 col-lg-6 d-flex">
+            {{-- <div class="col-xl-4 col-lg-6 d-flex">
                 <div class="card shadow-sm flex-fill w-100">
                     <div class="card-header d-flex align-items-center justify-content-between">
                         <h5 class="fw-bold mb-0">Leave Requests</h5>
@@ -1243,7 +1243,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
             <!-- col end -->
 
         </div>
