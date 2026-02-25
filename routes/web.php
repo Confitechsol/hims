@@ -7,6 +7,7 @@ use App\Http\Controllers\AppSwitchController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BedController;
 use App\Http\Controllers\BedGroupController;
+use App\Http\Controllers\BedChargeBackfillController;
 use App\Http\Controllers\BedTypeController;
 use App\Http\Controllers\BirthController;
 use App\Http\Controllers\BloodBankController;
@@ -214,6 +215,9 @@ Route::middleware(['admin'])->group(function () {
     Route::put('/beds/update', [BedController::class, 'update'])->name('beds.update');
     Route::post('/beds/store', [BedController::class, 'store'])->name('beds.store');
     Route::delete('/beds/destroy', [BedController::class, 'destroy'])->name('beds.destroy');
+
+    // Backfill daywise bed charges (admin only)
+    Route::post('/admin/bedcharges/backfill', [BedChargeBackfillController::class, 'backfill'])->name('admin.bedcharges.backfill');
 
     Route::get('/bed-groups', [BedGroupController::class, 'index'])->name('bed-groups.index');
     Route::post('/bed-groups/store', [BedGroupController::class, 'store'])->name('bed-groups.store');

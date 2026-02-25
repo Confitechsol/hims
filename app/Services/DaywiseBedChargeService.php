@@ -287,6 +287,55 @@ class DaywiseBedChargeService
     }
 
     /**
+     * Calculate daywise charges for an IPD over a date range (inclusive)
+     *
+     * @param int $ipdId
+     * @param string $startDate Y-m-d
+     * @param string $endDate Y-m-d
+     * @return array summary with counts and errors
+     */
+    public function calculateChargesForDateRange($ipdId, $startDate, $endDate)
+    {
+        $results = [
+            'success' => 0,
+            'failed' => 0,
+            'errors' => [],
+            'ipd_id' => $ipdId,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+        ];
+
+        try {
+            $start = Carbon::parse($startDate);
+            $end = Carbon::parse($endDate);
+            if ($end->lt($start)) {
+                throw new \Exception('End date must be after or equal to start date');
+            }
+
+            $current = $start->copy();
+            while ($current->lte($end)) {
+                $date = $current->format('Y-m-d');
+                $res = $this->calculateDaywiseCharges($ipdId, $date);
+                if (!empty($res['success'])) {
+                    $results['success']++;
+                } else {
+                    $results['failed']++;
+                    $results['errors'][] = [
+                        'date' => $date,
+                        'message' => $res['message'] ?? 'failed',
+                    ];
+                }
+                $current->addDay();
+            }
+        } catch (\Exception $e) {
+            $results['failed']++;
+            $results['errors'][] = ['message' => $e->getMessage()];
+        }
+
+        return $results;
+    }
+
+    /**
      * Get all active IPD patients
      *
      * @return \Illuminate\Database\Eloquent\Collection

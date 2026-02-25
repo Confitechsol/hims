@@ -257,7 +257,12 @@
                     </div>
                     <div class="col-md-3">
                         <label for="due_patient_party_amount" class="form-label">Amount (₹)</label>
-                        <input type="number" step="0.01" min="0" class="form-control" id="due_patient_party_amount" name="due_patient_party_amount" placeholder="0.00" value="{{ number_format((float)($ipd->due_patient_party_amount ?? 0), 2, '.', '') }}">
+                        @php
+                            $savedDue = (float) ($ipd->due_patient_party_amount ?? 0);
+                            $outstanding = (float) ($breakup['outstanding'] ?? 0);
+                            $initialDue = $savedDue > 0 ? $savedDue : $outstanding;
+                        @endphp
+                        <input type="number" step="0.01" min="0" class="form-control" id="due_patient_party_amount" name="due_patient_party_amount" placeholder="₹ {{ number_format($outstanding, 2) }}" value="{{ number_format($initialDue, 2, '.', '') }}">
                     </div>
                     <div class="col-md-2 d-flex align-items-end">
                         <button type="submit" class="btn btn-primary w-100" id="duePatientPartySaveBtn">
