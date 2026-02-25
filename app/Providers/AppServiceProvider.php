@@ -4,7 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
-
+use App\Models\Hospital;
 use Illuminate\Support\Facades\View;
 use App\Http\View\Composers\BloodGroupComposer;
 
@@ -34,5 +34,10 @@ class AppServiceProvider extends ServiceProvider
             'components.modals.add-patients-modal',
             BloodGroupComposer::class
         );
+        // ✅ Share Hospital Data Globally (for sidebar logo)
+        View::composer('*', function ($view) {
+            $hospital = Hospital::first(); // change if multi-hospital
+            $view->with('hospitalData', $hospital);
+        });
     }
 }

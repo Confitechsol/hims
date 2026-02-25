@@ -22,6 +22,7 @@ class ProfileController extends Controller
      */
     public function update(Request $request)
     {
+        dd($request->all());
         $hospital = Hospital::first();
         if (! $hospital) {
             $hospital = new Hospital();
