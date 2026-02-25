@@ -742,6 +742,10 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Prescription Date</label>
+                            <input type="date" name="date" id="prescription_date" class="form-control" value="{{ now()->format('Y-m-d') }}">
+                        </div>
                     </div>
                 </div>
 

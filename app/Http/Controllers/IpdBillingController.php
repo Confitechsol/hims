@@ -232,14 +232,36 @@ class IpdBillingController extends Controller
             $sacHsnCode = null;
 
             if ($activeBed && $activeBed->bedGroup) {
-                $bedCost = (float) ($activeBed->bedGroup->bed_cost ?? 0);
-                if ($bedCost > 5000 && $activeBed->bedGroup->gst_rate) {
-                    $gstRate = (float) $activeBed->bedGroup->gst_rate;
-                    $sacHsnCode = $activeBed->bedGroup->sac_hsn_code;
+                // Prefer a stored daywise charge (created at admission/transfer) if available
+                $bedCost = 0;
+                $bedChargeRate = 0;
+                $gstRate = 0;
+                $sacHsnCode = null;
+
+                if ($daywiseCharges->has($chargeDate)) {
+                    $daywise = $daywiseCharges->get($chargeDate);
+                    if ($daywise && isset($daywise->bed_charge) && (float)$daywise->bed_charge > 0) {
+                        $bedCost = (float) $daywise->bed_charge;
+                        $bedChargeRate = (float) ($daywise->bed_charge_rate ?? $activeBed->bedGroup->bed_cost ?? 0);
+                        $gstRate = $daywise->bedGroup->gst_rate ?? $activeBed->bedGroup->gst_rate ?? 0;
+                        $sacHsnCode = $daywise->bedGroup->sac_hsn_code ?? $activeBed->bedGroup->sac_hsn_code ?? null;
+                    }
+                }
+
+                // If no explicit daywise charge found, fall back to bed group master rate
+                if ($bedCost <= 0) {
+                    $bedCost = (float) ($activeBed->bedGroup->bed_cost ?? 0);
+                    $bedChargeRate = $bedCost;
+                    $gstRate = $activeBed->bedGroup->gst_rate ?? 0;
+                    $sacHsnCode = $activeBed->bedGroup->sac_hsn_code ?? null;
+                }
+
+                if ($bedCost > 5000 && $gstRate) {
                     $totalGstAmount = ($bedCost * $gstRate) / 100;
                     $cgstAmount = $totalGstAmount / 2;
                     $sgstAmount = $totalGstAmount / 2;
                 }
+
                 $detail = (object) [
                     'charge_date' => $chargeDate,
                     'period_start_date' => $periodStart->format('Y-m-d'),
@@ -247,7 +269,7 @@ class IpdBillingController extends Controller
                     'bed_group_id' => $activeBed->bed_group_id,
                     'bed_id' => $activeBed->bed_id,
                     'bed_charge' => $bedCost,
-                    'bed_charge_rate' => $bedCost,
+                    'bed_charge_rate' => $bedChargeRate,
                     'no_of_days' => 1,
                     'bedGroup' => $activeBed->bedGroup,
                     'bed' => $activeBed->bed,
@@ -917,6 +939,8 @@ class IpdBillingController extends Controller
     public function exportEstimate($ipdId)
     {
         try {
+             $logged_user = auth()->user()->username ?? '';  
+
             \Log::info('exportEstimate started', ['ipd_id' => $ipdId]);
             
             $ipd = IpdDetail::with(['patient.organisation', 'doctor', 'bedGroup', 'bedDetail'])
@@ -1137,6 +1161,7 @@ class IpdBillingController extends Controller
             
             // Get hospital information
             $hospital = Hospital::first();
+                    
             
             // First pass: Render to get accurate page count
             $tempPdf = Pdf::loadView('admin.billing.ipd_estimate_pdf', compact(
@@ -1145,7 +1170,7 @@ class IpdBillingController extends Controller
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
                 'investigationDatewise',
                 'totalChargesInWords', 'totalPaymentsInWords', 'outstandingInWords', 'netBalanceInWords',
-                'hospital'
+                'hospital', 'logged_user'
             ));
             
             $tempPdf->setOption('enable-php', false); // Disable PHP for first pass
@@ -1186,7 +1211,7 @@ class IpdBillingController extends Controller
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
                 'investigationDatewise',
                 'totalChargesInWords', 'totalPaymentsInWords', 'outstandingInWords', 'netBalanceInWords',
-                'hospital', 'totalPages', 'gstChargesGrouped'
+                'hospital', 'totalPages', 'gstChargesGrouped', 'logged_user'
             ));
             
             // Enable PHP scripts for page numbering
@@ -1254,6 +1279,8 @@ class IpdBillingController extends Controller
     public function exportFinal($ipdId)
     {
         try {
+                $logged_user = auth()->user()->username ?? ''; 
+
             \Log::info('exportFinal started', ['ipd_id' => $ipdId]);
             
             $ipd = IpdDetail::with(['patient.organisation', 'doctor', 'bedGroup', 'bedDetail', 'duePatientPartyDoctor'])
@@ -1546,7 +1573,7 @@ class IpdBillingController extends Controller
                 'surgeonCharges', 'anesthesiaCharges', 'investigationCharges', 'totalPages',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
                 'investigationDatewise',
-                'gstChargesGrouped'
+                'gstChargesGrouped', 'logged_user'
             ));
             
             \Log::info('PDF view loaded, setting options');

@@ -107,7 +107,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Date</label>
-                                <input type="date" class="form-control" value="{{ $prescription->date->format('Y-m-d') }}" disabled>
+                                <input type="date" name="date" class="form-control" value="{{ $prescription->date->format('Y-m-d') }}">
                             </div>
                         </div>
 

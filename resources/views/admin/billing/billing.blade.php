@@ -396,6 +396,7 @@
                 const netBalance = Math.max(0, outstanding - totalDiscount - dueParty);
                 if (totalDiscountEl) totalDiscountEl.textContent = '₹ ' + totalDiscount.toFixed(2);
                 if (duePartyEl) duePartyEl.textContent = '₹ ' + dueParty.toFixed(2);
+                if (duePartyInput) duePartyInput.placeholder = '₹ ' + outstanding.toFixed(2);
                 netBalanceEl.textContent = '₹ ' + netBalance.toFixed(2);
             }
 
@@ -451,7 +452,13 @@
                             const netBalanceEl = document.getElementById('summaryNetBalance');
                             if (totalDiscountEl) totalDiscountEl.textContent = '₹ ' + (data.total_discount || 0).toFixed(2);
                             const duePartyEl = document.getElementById('summaryDuePatientParty');
-                            if (duePartyEl && data.due_patient_party_amount != null) duePartyEl.textContent = '₹ ' + parseFloat(data.due_patient_party_amount).toFixed(2);
+                            if (duePartyEl && data.due_patient_party_amount != null) {
+                                duePartyEl.textContent = '₹ ' + parseFloat(data.due_patient_party_amount).toFixed(2);
+                                if (duePartyInput) duePartyInput.value = parseFloat(data.due_patient_party_amount).toFixed(2);
+                            }
+                            if (typeof data.outstanding !== 'undefined' && duePartyInput) {
+                                duePartyInput.placeholder = '₹ ' + parseFloat(data.outstanding).toFixed(2);
+                            }
                             if (netBalanceEl) netBalanceEl.textContent = '₹ ' + (data.net_balance != null ? data.net_balance.toFixed(2) : (data.outstanding - (data.total_discount || 0) - (data.due_patient_party_amount || 0)).toFixed(2));
                         } else {
                             msgEl.className = 'mt-2 small text-danger';
@@ -494,6 +501,9 @@
                                 const netBalanceEl = document.getElementById('summaryNetBalance');
                                 if (duePartyEl) duePartyEl.textContent = '₹ ' + (data.due_patient_party_amount || 0).toFixed(2);
                                 if (netBalanceEl) netBalanceEl.textContent = '₹ ' + (data.net_balance != null ? data.net_balance.toFixed(2) : '0.00');
+                                if (typeof data.outstanding !== 'undefined' && duePartyInput) {
+                                    duePartyInput.placeholder = '₹ ' + parseFloat(data.outstanding).toFixed(2);
+                                }
                             } else {
                                 dueMsgEl.className = 'mt-2 small text-danger';
                                 dueMsgEl.textContent = data.message || 'Failed to save.';

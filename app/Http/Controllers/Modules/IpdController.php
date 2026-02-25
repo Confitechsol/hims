@@ -303,34 +303,9 @@ class IpdController extends Controller
             'admission_date'       => 'required|date',
             'old_patient'          => 'required|string',
             'casualty'             => 'required|string',
-            'reference'            => 'nullable|string',
-            'consultant_doctor'    => 'required|exists:doctor,id',
-            'consultant_doctor2'   => 'nullable|exists:doctor,id',
-            'consultant_doctor3'   => 'nullable|exists:doctor,id',
-            'consultant_doctor4'   => 'nullable|exists:doctor,id',
-            'credit_limit'         => 'required|numeric|min:0',
-            'bed_group'            => 'required|exists:bed_group,id',
-            'bed_number'           => 'required|exists:bed,id',
-            'symptoms_type'        => 'required|array',
-            'symptoms_type.*'      => 'string',
-            'symptoms_title'       => 'required|array',
-            'symptoms_title.*'     => 'string',
-            'symptoms_description' => 'required|string',
-            'note'                 => 'nullable|string',
+            'date'                => 'nullable|date',
         ]);
-
-        if ($validator->fails()) {
-            dd($validator->errors()->all()); // 👈 will show validation errors
-        }
-
-        DB::beginTransaction();
-        $user = Auth::user();
-        // dd($user);
-        if (! $user || ! $user->hospital_id) {
-            return redirect()->back()->with('error', 'User not authenticated or hospital ID missing.');
-        }
         try {
-            $symptomType          = array_filter($request->symptoms_type, fn($type) => $type !== null && $type !== '');
             $symptomTitle         = array_filter($request->symptoms_title, fn($title) => $title !== null && $title !== '');
             $implodedSymptomType  = implode(", ", $symptomType);
             $implodedSymptomTitle = implode(", ", $symptomTitle);
@@ -367,7 +342,7 @@ class IpdController extends Controller
             $ipd->casualty     = $request->casualty;
             $ipd->refference   = $request->reference;
 
-            // Billing / Payment
+            $ipd->date         = $request->admission_date ?? $request->date;
             $ipd->credit_limit = $request->credit_limit ?? 0;
 
             // Misc
@@ -1035,6 +1010,7 @@ class IpdController extends Controller
                 'finding_type.*'      => 'nullable|string',
                 'findings'            => 'nullable|array',
                 'findings.*'          => 'nullable|string',
+                'date'                => 'nullable|date',
                 'pathology'           => 'nullable|array',
                 'pathology.*'         => 'nullable|exists:pathology,id',
                 'radiology'           => 'nullable|array',
@@ -1099,6 +1075,7 @@ class IpdController extends Controller
                     'pathology_id'        => ! empty($pathology_ids) ? implode(", ", $pathology_ids) : null,
                     'radiology_id'        => ! empty($radiology_ids) ? implode(", ", $radiology_ids) : null,
                     'notification_to'     => $implodedVisibles,
+                    'date'                => $request->date ?? $prescription->date,
                     'attachment'          => $attachment,
                     'attachment_name'     => $attachmentName,
                 ]);

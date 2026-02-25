@@ -4204,7 +4204,7 @@
                                                                                 data-is-ipd="true"
                                                                                 data-id="{{ $ipd->id }}"
                                                                                 data-pres-id = "{{ $prescription->id }}"
-                                                                                data-prescription-date="{{ \Carbon\Carbon::parse($prescription->created_at) }}">
+                                                                                data-prescription-date="{{ \Carbon\Carbon::parse($prescription->date)->format('Y-m-d') }}">
                                                                                 <i class="fa-solid fa-prescription"
                                                                                     data-bs-toggle="tooltip"
                                                                                     title="Show"></i>
