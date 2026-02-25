@@ -219,7 +219,8 @@
         <tr>
             <td class="label">Admission Date</td>
             <td class="colon">:</td>
-            <td class="value">{{ $data->admission_date }}</td>
+            <td class="value">{{ \Carbon\Carbon::parse($data->admission_date)->format('d-m-Y') }}</td>
+            
 
             <td class="label">Contact No.</td>
             <td class="colon">:</td>
@@ -232,7 +233,9 @@
 
             <td class="label">Discharge Date</td>
             <td class="colon">:</td>
-            <td class="value">{{ $data->discharge_date }}</td>
+            <td class="value">
+    {{ \Carbon\Carbon::parse($data->discharge_date)->format('d-m-Y') }}
+</td>
         </tr>
         <tr>
             <td class="label">OT Date</td>
@@ -307,7 +310,7 @@
         @endif
 
         @if ($data->discharge_advice != null || $data->discharge_advice != '')
-            <h4>Discharge Advice</h4>
+            <h4>Conditional at Discharge</h4>
             {!! $data->discharge_advice !!}
         @endif
     </div>

@@ -677,7 +677,7 @@
                     <!-- Medicines Section -->
                     <h5 class="section-title mt-4">
                         <i class="bi bi-capsule"></i>
-                        Discharge Medications
+                        Discharge Medications Advice
                     </h5>
 
 
@@ -821,7 +821,7 @@
                         <div class="col-md-12">
                             <label for="discharge_advice" class="form-label">
                                 <i class="bi bi-clipboard-data"></i>
-                                Discharge Advice
+                                Conditional at Discharge
                             </label>
                             <textarea class="form-control" id="discharge_advice_text" name="discharge_advice" rows="4"></textarea>
                         </div>

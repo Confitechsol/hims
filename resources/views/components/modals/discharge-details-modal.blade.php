@@ -518,7 +518,7 @@
               setText('dis_admission_date_text', formatDate(new Date(data.admission_date)));
               setText('dis_admission_time_text', data.admit_time);
 
-              setText('dis_discharge_date_text', data.discharge_date);
+              setText('dis_discharge_date_text', formatDate(new Date(data.discharge_date)));
               setText('dis_discharge_time_text', data.discharge_time);
 
               if (data.ot_date) {

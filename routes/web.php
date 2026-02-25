@@ -621,6 +621,7 @@ Route::post('/ipd_charge', [IpdController::class, 'addIpdCharge'])->name('ipd.ad
 Route::post('/assignNewBed', [IpdController::class, 'assignNewBed'])->name('assignNewBed');
 //
 Route::get('/ipd/{id}/pdf', [PdfController::class, 'generatePdf'])->name('ipd.pdf');
+
 Route::post('/discharge-card/store', [IpdController::class, 'storeDischarge'])
     ->name('discharge.store');
 
@@ -693,6 +694,7 @@ Route::prefix('/inventory')->group(function () {
     Route::get('/get-items-by-category', [InventoriesController::class, 'getItemsByCategory'])->name('get-items-by-category');
     Route::get('/issue-update/{id}', [InventoriesController::class, 'updateIssuedItem'])->name('issue-items.update');
     Route::delete('/issue-destroy/{id}', [InventoriesController::class, 'destroyIssuedItem'])->name('issue-items.destroy');
+    Route::post('/issue-return/{id}', [InventoriesController::class, 'returnIssuedItem'])->name('issue-items.return');
 });
 
 Route::get('/opd-billing', function () {

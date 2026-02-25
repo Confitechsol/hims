@@ -5,18 +5,21 @@
             <div>
                 <!-- Logo Normal -->
                 <a href="{{ route('dashboard') }}" class="logo logo-normal">
-                    <img src="assets/img/logo.png" alt="Logo">
+                    <!-- <img src="assets/img/logo.png" alt="Logo"> -->
+                     <img src="{{ asset('assets/images/logo.webp') }}" alt="Logo">
                 </a>
 
                 <!-- Logo Small -->
                 <a href="{{ route('dashboard') }}" class="logo-small">
-                    <img src="assets/img/logo-small.svg" alt="Logo">
+                    <!-- <img src="assets/img/logo-small.svg" alt="Logo"> -->
+                    <img src="{{ asset('assets/images/logo.webp') }}" alt="Logo">
                 </a>
 
                 <!-- Logo Dark -->
                 <a href="{{ route('dashboard') }}" class="dark-logo">
                     <!-- <img src="assets/img/logo-white.svg" alt="Logo"> -->
-                    <h2>LOGO</h2>
+                     <img src="{{ asset('assets/images/logo.webp') }}" alt="Logo">
+                    <!-- <h2>LOGO</h2> -->
                 </a>
             </div>
             <button class="sidenav-toggle-btn btn border-0 p-0 active" id="toggle_btn">
@@ -38,12 +41,13 @@
                         data-bs-auto-close="outside" data-bs-offset="0,22" aria-haspopup="false" aria-expanded="false">
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center">
-                                <span class="avatar rounded-circle flex-shrink-0 p-2"><img
-                                        src="{{asset('assets/img/icons/trustcare.svg')}}" alt="img"></span>
+                                <!-- <span class="avatar rounded-circle flex-shrink-0 p-2"></span> -->
                                 <div class="ms-2">
-                                    <h6 class="fs-14 fw-semibold mb-0">Trustcare
+                                    <img
+                                        src="{{ asset('assets/images/logo.webp') }}" alt="img">
+                                    <!-- <h6 class="fs-14 fw-semibold mb-0">Trustcare
                                         Clinic</h6>
-                                    <p class="fs-13 mb-0">Lasvegas</p>
+                                    <p class="fs-13 mb-0">Lasvegas</p> -->
                                 </div>
                             </div>
                             <i class="ti ti-arrows-transfer-up"></i>

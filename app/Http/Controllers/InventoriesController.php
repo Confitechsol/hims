@@ -833,7 +833,27 @@ class InventoriesController extends Controller
         compact('issues', 'dateFrom', 'dateTo', 'search', 'returned')
     );
 }
+    public function returnIssuedItem(Request $request, $id)
+    {
 
+        $issue = ItemIssue::findOrFail($id);
+        //dd($issue);
+
+    // Update return status
+    $issue->update([
+        'is_returned' => 1,
+        'active' => '0',
+        'return_date' => now(),
+    ]);
+
+    // Optional: Increase stock back
+    // $item = $issue->item;
+    // if ($item) {
+    //     $item->increment('quantity', $issue->quantity);
+    // }
+
+    return redirect()->back()->with('success', 'Item returned successfully.');
+    }
 
 
 

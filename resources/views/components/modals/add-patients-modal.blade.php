@@ -198,6 +198,9 @@
                                         <option value="">Select</option>
                                         <option value="Single"
                                             {{ old('marital_status') == 'Single' ? 'selected' : '' }}>Single</option>
+                                        <option value="unmarried"
+                                            {{ old('marital_status') == 'Unmarried' ? 'selected' : '' }}>Unmarried</option>
+                                            
                                         <option value="Married"
                                             {{ old('marital_status') == 'Married' ? 'selected' : '' }}>Married</option>
                                         <option value="Widowed"
