@@ -225,6 +225,10 @@
             left: 0;
             bottom: -17px;
         }
+        .modal .modal-body{
+            max-height: 75vh;
+            overflow-y:auto;
+        }
     </style>
     @yield('select2cdn')
 </head>
@@ -783,39 +787,87 @@
             }, 500);
         });
 
-        $(document).on('shown.bs.modal', '.use-select2', function() {
-            const $modal = $(this);
-            const $modalBody = $modal.find('.modal-body');
-            $modal.find('.select2-input').each(function() {
-                const $select = $(this);
+        // $(document).on('shown.bs.modal', '.use-select2', function() {
+        //     const $modal = $(this);
+        //     const $modalBody = $modal.find('.modal-body');
+        //     $modal.find('.select2-input').each(function() {
+        //         const $select = $(this);
 
-                // Prevent double initialization
-                if ($select.hasClass('select2-hidden-accessible')) {
-                    return;
-                }
-                const oldValue = $select.val();
+        //         // Prevent double initialization
+        //         if ($select.hasClass('select2-hidden-accessible')) {
+        //             return;
+        //         }
+        //         const oldValue = $select.val();
 
-                $select.select2({
-                    dropdownParent: $modalBody,
-                    width: '100%'
-                });
-                if (oldValue) {
-                    $select.val(oldValue).trigger('change');
-                }
-            });
+        //         $select.select2({
+        //             dropdownParent: $modalBody,
+        //             width: '100%'
+        //         });
+        //         if (oldValue) {
+        //             $select.val(oldValue).trigger('change');
+        //         }
+        //     });
+        // });
+
+        // $(document).on('hidden.bs.modal', '.use-select2', function() {
+        //     const $modal = $(this);
+
+        //     $modal.find('.select2-input').each(function() {
+        //         const $select = $(this);
+
+        //         if ($select.hasClass('select2-hidden-accessible')) {
+        //             $select.select2('destroy');
+        //         }
+        //     });
+        // });
+        $(document).on('shown.bs.modal', '.use-select2', function () {
+    const $modal = $(this);
+
+    $modal.find('.select2-input').each(function () {
+        const $select = $(this);
+
+        if ($select.hasClass('select2-hidden-accessible')) {
+            return;
+        }
+
+        const oldValue = $select.val();
+
+        $select.select2({
+            dropdownParent: $modal,
+            width: '100%'
         });
 
-        $(document).on('hidden.bs.modal', '.use-select2', function() {
-            const $modal = $(this);
+        // Find scrollable container (BS5 usually .modal-body)
+        const $scrollContainer = $select.closest('.modal-body');
 
-            $modal.find('.select2-input').each(function() {
-                const $select = $(this);
+        // Reposition while scrolling
+        $scrollContainer.on('scroll.select2fix', function () {
+            const instance = $select.data('select2');
 
-                if ($select.hasClass('select2-hidden-accessible')) {
-                    $select.select2('destroy');
-                }
-            });
+            if (instance && instance.isOpen()) {
+                instance.dropdown._positionDropdown();
+            }
         });
+
+        // Also reposition when opening (extra safety)
+        $select.on('select2:open', function () {
+            const instance = $select.data('select2');
+            if (instance) {
+                instance.dropdown._positionDropdown();
+            }
+        });
+
+        if (oldValue) {
+            $select.val(oldValue).trigger('change');
+        }
+    });
+});
+
+
+// Cleanup
+$(document).on('hidden.bs.modal', '.use-select2', function () {
+    $(this).find('.modal-body').off('scroll.select2fix');
+});        
         $(document).ready(function() {
             $('.add-select2').each(function() {
                 if (!$(this).hasClass('select2-hidden-accessible')) {
