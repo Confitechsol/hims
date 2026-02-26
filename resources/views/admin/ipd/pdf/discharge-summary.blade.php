@@ -149,6 +149,8 @@
         visibility: hidden;
     }
 
+
+
     /* .header,
     .footer {
         height: 120px;
@@ -240,7 +242,7 @@
         <tr>
             <td class="label">OT Date</td>
             <td class="colon">:</td>
-            <td class="value">{{ $data->ot_date }}</td>
+            <td class="value">{{ \Carbon\Carbon::parse($data->ot_date)->format('d-m-Y') }}</td>
 
             <td class="label">Discharge Time</td>
             <td class="colon">:</td>
@@ -290,7 +292,7 @@
         @endif
 
         @if ($data->discharge_medicines_html != null || $data->discharge_medicines_html != '')
-            <h4>Advised Medicines</h4>
+            <h4>Discharge Advised Medicines</h4>
             {!! $data->discharge_medicines_html !!}
         @endif
 
@@ -310,15 +312,21 @@
         @endif
 
         @if ($data->discharge_advice != null || $data->discharge_advice != '')
-            <h4>Conditional at Discharge</h4>
+            <h4>Condition at Discharge</h4>
             {!! $data->discharge_advice !!}
         @endif
+                                          
     </div>
+
+
+
+                                      
 
     {{-- FOOTER --}}
     {{-- <div class="footer {{ !$showHeaderFooter ? 'hidden' : '' }}">
         <img src="{{ public_path('assets/images/footer.webp') }}">
     </div> --}}
+
 
 </div>
 

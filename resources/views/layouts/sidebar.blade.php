@@ -5,7 +5,7 @@
             <div>
                 <!-- Logo Normal -->
                 <a href="{{ route('dashboard') }}" class="logo logo-normal">
-                    <img src="assets/img/logo.png" alt="Logo">
+                    <img src="{{ asset('assets/images/logo.webp') }}" alt="Logo">
                      <!-- @if(!empty($hospitalData?->image))
                                         <img src="{{ asset('storage/' . $hospitalData->image) }}" alt="Logo">
                                     @else

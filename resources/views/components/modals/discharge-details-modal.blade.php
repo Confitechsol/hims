@@ -522,7 +522,7 @@
               setText('dis_discharge_time_text', data.discharge_time);
 
               if (data.ot_date) {
-                  setText('dis_ot_date_text', data.ot_date);
+                  setText('dis_ot_date_text', formatDate(new Date(data.ot_date)));
               }
 
               if (medicines.length > 0) {
