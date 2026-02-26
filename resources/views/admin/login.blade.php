@@ -181,7 +181,12 @@
                                     <img src="{{ asset('assets/img/logo.png') }}" alt="Logo">
                                 </div>
                                 <div class="form-top-left pb-0">
-                                    <img src="{{ asset('assets/img/samaritan_logo.webp') }}" alt="Logo">
+                                    <!-- <img src="{{ asset('assets/img/samaritan_logo.webp') }}" alt="Logo"> -->
+                                    @if(!empty($hospitalData?->image))
+                                        <img src="{{ asset('storage/' . $hospitalData->image) }}" alt="Logo">
+                                    @else
+                                        <img src="{{ asset('assets/images/logo.webp') }}" alt="img">
+                                    @endif
                                 </div>
                             </div>
                             <div class="form-bottom">
@@ -235,11 +240,11 @@
 
                                     <div class="">
                                         <button type="submit" class="btn">LogIn</button>
-                                        <p class="forgot_box">
+                                        <!-- <p class="forgot_box">
                                             <a href="#" class="forgot fs-4">
                                                 <i class="fa fa-key"></i>Forgot Password?
                                             </a>
-                                        </p>
+                                        </p> -->
                                     </div>
                                 </form>
 
