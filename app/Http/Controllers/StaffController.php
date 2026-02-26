@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Staff;
 use App\Models\Role;
+use App\Models\User;
 use App\Models\Specialist;
 use App\Models\Department;
 use App\Models\StaffDesignation;
@@ -81,6 +82,8 @@ class StaffController extends Controller
         ]);
 
         //dd($request->all());
+
+        
 
         $staff = new Staff();
         $staff->hospital_id     = Auth::user()->hospital_id;

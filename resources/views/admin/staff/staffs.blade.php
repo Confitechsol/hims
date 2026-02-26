@@ -106,6 +106,17 @@
                                                                         <i class="ti ti-pencil"></i>
                                                                     </a>
 
+                                                                    <form action="{{ route('users.store.credentials', $staff->id) }}" 
+                                                                        method="POST" 
+                                                                        style="display:inline-block;">
+                                                                        @csrf
+                                                                        <button type="submit"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill"
+                                                                            onclick="return confirm('Create login credentials for this staff?')">
+                                                                            <i class="ti ti-key"></i>
+                                                                        </button>
+                                                                    </form>
+
                                                                     
                                                                 </div>
                                                             </td>

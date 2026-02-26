@@ -182,7 +182,13 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/users', [UsersController::class, 'index'])->name('users');
     Route::post('/users/updatedrstatus/{id}', [UsersController::class, 'updateDrStatus'])->name('users.updateDrStatus');
     Route::post('/users/updatestaffstatus/{id}', [UsersController::class, 'updateStaffStatus'])->name('users.updateStaffStatus');
+    Route::get('/change-password', [UsersController::class, 'showChangePassword'])
+        ->name('password.change');
 
+    Route::post('/change-password', [UsersController::class, 'updatePassword'])
+        ->name('password.update');
+    Route::post('/users/store', [UsersController::class, 'store'])->name('users.store');
+    Route::post('/users/create-credentials/{staff}',[UsersController::class, 'createCredentials'])->name('users.store.credentials');
     Route::get('/charges', [HospitalChargesController::class, 'index'])->name('charges');
     Route::post('/charges', [HospitalChargesController::class, 'store'])->name('charges.store');
     Route::put('/charges/update', [HospitalChargesController::class, 'update'])->name('charges.update');

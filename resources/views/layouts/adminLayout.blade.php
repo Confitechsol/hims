@@ -534,8 +534,7 @@
                                 <img src="{{ asset('assets/img/users/user-01.jpg') }}" class="rounded-circle"
                                     width="42" height="42" alt>
                                 <div class="ms-2">
-                                    <p class="fw-medium text-dark mb-0">Jimmy
-                                        Anderson</p>
+                                    <p class="fw-medium text-dark mb-0">{{ Auth::user()->username }}</p>
                                     <span class="d-block fs-13">Administrator</span>
                                 </div>
                             </div>
@@ -543,15 +542,15 @@
                             <!-- Item-->
                             <a href="{{ route('profile') }}" class="dropdown-item">
                                 <i class="ti ti-user-circle me-1 align-middle"></i>
-                                <span class="align-middle">Profile
+                                <span class="align-middle">General
                                     Settings</span>
                             </a>
 
                             <!-- Item-->
-                            <a href="account-settings.html" class="dropdown-item">
+                            <a href="{{ route('password.change') }}" class="dropdown-item">
                                 <i class="ti ti-settings me-1 align-middle"></i>
-                                <span class="align-middle">Account
-                                    Settings</span>
+                                <span class="align-middle">Change
+                                    Password</span>
                             </a>
 
                             <!-- item -->
