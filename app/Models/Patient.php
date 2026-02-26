@@ -41,6 +41,7 @@ class Patient extends Model
         'religion',
         'guardian_name',
         'guardian_phone',
+        'emergency_contact_no',
         'guardian_relation',
         'patient_type',
         'identification_number',

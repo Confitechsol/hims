@@ -7,7 +7,7 @@
                 <a href="{{ route('dashboard') }}" class="logo logo-normal">
                     <img src="{{ asset('assets/images/logo.webp') }}" alt="Logo">
                      <!-- @if(!empty($hospitalData?->image))
-                                        <img src="{{ asset('storage/' . $hospitalData->image) }}" alt="Logo">
+                                        <img src="{{ asset($hospitalData->image) }}" alt="Logo">
                                     @else
                                         <img src="{{ asset('assets/images/logo.webp') }}" alt="img">
                                     @endif -->
@@ -17,7 +17,7 @@
                 <a href="{{ route('dashboard') }}" class="logo-small">
                     <!-- <img src="assets/img/logo-small.svg" alt="Logo"> -->
                     @if(!empty($hospitalData?->image))
-                                        <img src="{{ asset('storage/' . $hospitalData->image) }}" alt="Logo">
+                                        <img src="{{ asset($hospitalData->image) }}" alt="Logo">
                                     @else
                                         <img src="{{ asset('assets/images/logo.webp') }}" alt="img">
                                     @endif
@@ -52,7 +52,7 @@
                                 <!-- <span class="avatar rounded-circle flex-shrink-0 p-2"></span> -->
                                 <div class="ms-2">
                                     @if(!empty($hospitalData?->image))
-                                        <img src="{{ asset('storage/' . $hospitalData->image) }}" alt="Logo">
+                                        <img src="{{ asset($hospitalData->image) }}" alt="Logo">
                                     @else
                                         <img src="{{ asset('assets/images/logo.webp') }}" alt="img">
                                     @endif
