@@ -81,7 +81,7 @@ class PatientController extends Controller
     // }
     public function store(Request $request)
     {
-        //dd($request->all());
+        
         $validated = Validator::make($request->all(), [
             'name'                  => 'required|string|max:255',
             'guardian_name'         => 'nullable|string|max:255',
@@ -93,7 +93,7 @@ class PatientController extends Controller
             'age.month'             => 'nullable|integer|min:0|max:11',
             'age.day'               => 'nullable|integer|min:0|max:31',
             'blood_group'           => 'nullable|in:1,2,3,4,5,6',
-            'marital_status'        => 'nullable|in:Single,Married,Widowed,Separated,Not Specified',
+            'marital_status'        => 'nullable',
             'file'                  => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'phone'                 => 'nullable|string|max:20',
             'email'                 => 'nullable|email|max:255',
@@ -127,6 +127,7 @@ class PatientController extends Controller
 
         // Convert validator result to array
         $data = $validated->validated();
+        //dd($data);
 
 
         // Handle file upload

@@ -183,7 +183,8 @@
                                 <div class="form-top-left pb-0">
                                     <!-- <img src="{{ asset('assets/img/samaritan_logo.webp') }}" alt="Logo"> -->
                                     @if(!empty($hospitalData?->image))
-                                        <img src="{{ asset('storage/' . $hospitalData->image) }}" alt="Logo">
+                                        <img src="{{ asset($hospitalData->image) }}" alt="Logo">
+                                     
                                     @else
                                         <img src="{{ asset('assets/images/logo.webp') }}" alt="img">
                                     @endif
