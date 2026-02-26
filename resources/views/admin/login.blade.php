@@ -180,6 +180,9 @@
                                 <div class="form-top-left">
                                     <img src="{{ asset('assets/img/logo.png') }}" alt="Logo">
                                 </div>
+                                <div class="form-top-left pb-0">
+                                    <img src="{{ asset('assets/img/samaritan_logo.webp') }}" alt="Logo">
+                                </div>
                             </div>
                             <div class="form-bottom">
                                 <h3 class="bolds fs-2 mb-3">Sign In</h3>
