@@ -74,7 +74,7 @@
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Hospital Logo</label><br>
                                 @if (isset($hospital) && $hospital->image)
-                                    <img src="{{ asset('storage/' . $hospital->image) }}" class="img-thumbnail me-2"
+                                    <img src="{{ asset($hospitalData->image) }}" class="img-thumbnail me-2"
                                         style="height:40px;">
                                 @else
                                     <img src="{{ asset('uploads/hospital_content/logo/images.png') }}"
