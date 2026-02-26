@@ -141,8 +141,14 @@
                                                         <td>{{ $ipdDetails->patient->gender ?? '-' }}</td>
                                                         <td>{{ $ipdDetails->doctor->name ?? '-' }}</td>
                                                         <td><span class="badge"
-                                                                style="background-color: {{ $ipdDetails->bedGroup->color }}">
-                                                                {{ $ipdDetails->bedDetail->name . ' - ' . $ipdDetails->bedGroup->name . '-' . $ipdDetails->bedGroup->floorDetail->name ?? '-' }}</span>
+                                                                style="background-color: {{ $ipdDetails->bedGroup?->color ?? '#6c757d' }}">
+                                                                
+                                                                {{ 
+                                                                    ($ipdDetails->bedDetail?->name ?? '-') . ' - ' . 
+                                                                    ($ipdDetails->bedGroup?->name ?? '-') . ' - ' . 
+                                                                    ($ipdDetails->bedGroup?->floorDetail?->name ?? '-') 
+                                                                }}
+                                                            </span>
                                                         </td>
                                                         <td>{{ $ipdDetails->credit_limit }}</td>
                                                         <td>
