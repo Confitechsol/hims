@@ -32,12 +32,15 @@
                                         </div>
                                         <div class="page_btn d-flex">
                                             <div class="text-end d-flex">
+                                                @if(canAdd(10))
                                                 <a href="javascript:void(0);"
                                                     class="btn btn-primary text-white ms-2 fs-13 btn-md"
                                                     data-bs-toggle="modal" data-bs-target="#add_income_head"><i
                                                         class="ti ti-plus me-1"></i>Add Income Head</a>
+                                                @endif
                                             </div>
                                             <!-- Modal -->
+                                            @if(canAdd(10))
                                             <div class="modal fade" id="add_income_head" tabindex="-1"
                                                 aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered">
@@ -94,6 +97,7 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            @endif
                                         </div>
 
                                     </div>
@@ -114,6 +118,7 @@
                                                             <small class="text-muted">{{ $incomeHead->description }}</small>
                                                         </td>
                                                         <td>
+                                                            @if(canEdit(10))
                                                             <a href="javascript:void(0);" 
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
                                                             data-id="{{ $incomeHead->id }}"
@@ -121,13 +126,14 @@
                                                             data-desc="{{ $incomeHead->description }}">
                                                                 <i class="ti ti-pencil"></i>
                                                             </a>
+                                                            @endif
+                                                            @if(canDelete(10))
                                                             <a href="javascript:void(0);"
                                                                 onclick="deleteIncomeHead({{ $incomeHead->id }})"
                                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
                                                                 <i class="ti ti-trash"></i>
                                                             </a>
-                                                            
-
+                                                            @endif
                                                         </td>
                                                         <form id="deleteIncomeHeadForm" method="POST" style="display:none;">
                                                             @csrf
@@ -156,6 +162,7 @@
         </div>
     </div>
     <!-- Edit Modal -->
+@if(canEdit(10))
 <div class="modal fade" id="edit_income_head" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -188,6 +195,7 @@
         </div>
     </div>
 </div>
+@endif
 <script>
     // Handle Edit button click
     document.querySelectorAll(".edit-btn").forEach(button => {
