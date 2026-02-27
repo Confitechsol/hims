@@ -6,7 +6,7 @@
                 <!-- Logo Normal -->
                 <a href="{{ route('dashboard') }}" class="logo logo-normal">
                     <img src="{{ asset('assets/images/logo.webp') }}" alt="Logo">
-                     <!-- @if(!empty($hospitalData?->image))
+                     <!-- @if(!empty($mo?->image))
                                         <img src="{{ asset($hospitalData->image) }}" alt="Logo">
                                     @else
                                         <img src="{{ asset('assets/images/logo.webp') }}" alt="img">
