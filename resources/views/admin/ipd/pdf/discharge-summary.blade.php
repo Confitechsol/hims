@@ -149,6 +149,58 @@
         visibility: hidden;
     }
 
+    .end {
+        border-top: 1px solid #9c9c9c;
+        text-align: center;
+        padding: 1rem 0;
+    }
+
+    .bottom_box {
+        /* border-bottom: 2px dashed #282828; */
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        font-size: 10px;
+        margin-top: 35px;
+    }
+
+    .contact_box {
+        width: 80%;
+    }
+
+    .grid-box {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        width: 100%;
+        align-items: stretch;
+    }
+
+    .left {
+        justify-self: start;
+        white-space: nowrap;
+        align-self: end;
+    }
+
+    .right {
+        justify-self: end;
+        text-align: right;
+        white-space: nowrap;
+        align-self: end;
+    }
+
+    .sig_box {
+        border-top: 1px solid #000;
+        /* Line only on top */
+        padding-top: 5px;
+        /* Space between line and text */
+        display: inline-block;
+        /* Line width matches content */
+    }
+
+    .sig_box p {
+        margin: 0;
+        white-space: nowrap;
+    }
 
 
     /* .header,
@@ -222,7 +274,7 @@
             <td class="label">Admission Date</td>
             <td class="colon">:</td>
             <td class="value">{{ \Carbon\Carbon::parse($data->admission_date)->format('d-m-Y') }}</td>
-            
+
 
             <td class="label">Contact No.</td>
             <td class="colon">:</td>
@@ -236,8 +288,8 @@
             <td class="label">Discharge Date</td>
             <td class="colon">:</td>
             <td class="value">
-    {{ \Carbon\Carbon::parse($data->discharge_date)->format('d-m-Y') }}
-</td>
+                {{ \Carbon\Carbon::parse($data->discharge_date)->format('d-m-Y') }}
+            </td>
         </tr>
         <tr>
             <td class="label">OT Date</td>
@@ -315,12 +367,26 @@
             <h4>Condition at Discharge</h4>
             {!! $data->discharge_advice !!}
         @endif
-                                          
+        <div class="end">
+        </div>
+
+        <div class="grid-box">
+            <div class="left">
+                DATE : {{ \Carbon\Carbon::now()->format('d-m-Y') }}
+            </div>
+
+            <div class="right">
+                <div class="sig_box">
+                    <p>Signature of Doctor / R.M.O</p>
+                    <p>Regn No. : {{ $data->registration_no }}</p>
+                </div>
+            </div>
+        </div>
     </div>
 
 
 
-                                      
+
 
     {{-- FOOTER --}}
     {{-- <div class="footer {{ !$showHeaderFooter ? 'hidden' : '' }}">
