@@ -1,7 +1,9 @@
 <div class="d-flex justify-content-between w-100">
     <div class="text-end d-flex mb-3sta">
+        @if(isset($canAdd) ? $canAdd : true)
         <a href="javascript:void(0);" class="btn btn-primary text-white fs-13 btn-md" data-bs-toggle="modal"
             data-bs-target="#createModal"><i class="ti ti-plus me-1"></i>Add {{$name}}</a>
+        @endif
             @if($name === 'Birth Record' || $name === 'Death Record')
         <a href="{{ route('importbirth') }}" class="btn btn-primary text-white fs-13 btn-md ms-2" data-bs-toggle="modal"
             data-bs-target="">Import {{$name}}</a>
