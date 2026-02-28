@@ -59,7 +59,7 @@
                                     </div>
 
                                 </div> --}}
-                                    <x-table-actions.actions id="income" name="Income" />
+                                    <x-table-actions.actions id="income" name="Income" :canAdd="canAdd(9)" />
                                     <!-- Table start -->
                                     <div class="table-responsive table-nowrap">
                                         <table class="table" id="income">
@@ -85,6 +85,7 @@
                                                         <td>{{ $income->amount }}</td>
                                                         <td>
                                                             <div class="d-flex">
+                                                                @if(canEdit(9))
                                                                 <button
                                                                     class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
                                                                     data-id="{{$income->id}}"
@@ -97,6 +98,8 @@
                                                                     >
                                                                     <i class="ti ti-pencil"></i>
                                                                 </button>
+                                                                @endif
+                                                                @if(canDelete(9))
                                                                 <form method="POST" action="{{route('income.destroy')}}" onsubmit="return confirm('Are you Sure?')">
                                                                     @csrf
                                                                     @method('DELETE')
@@ -106,6 +109,7 @@
                                                                         <i class="ti ti-trash"></i>
                                                                     </button>
                                                                 </form>
+                                                                @endif
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -170,6 +174,7 @@
         return [$item->id => $item->income_category];
     })->toArray();
     @endphp
+    @if(canAdd(9))
     <x-modals.form-modal type="add" id="createModal" title="Add Income" action="{{ route('income.create') }}"
         :fields="[
             [
@@ -216,7 +221,9 @@
             ],
             
         ]" :columns="2" />
-    <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Company Name"
+    @endif
+    @if(canEdit(9))
+    <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Income"
         action="{{ url('/income/update') }}" :fields="[
             ['name' => 'id', 'type' => 'hidden', 'required' => true],
             [
@@ -262,40 +269,67 @@
                 'size' => '12',
             ],
         ]" :columns="2" />
+    @endif
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-createAjaxTable({
-    apiUrl: "{{ route('income') }}",
-    tableSelector: "#income",
-    paginationSelector: "#pagination-wrapper",
-    searchInputSelector: "#search-input",
-    perPageSelector: "#perPage",
-    rowRenderer: function (item) {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${item.name}</td>
-            <td>${item.invoice_no}</td>
-            <td>${item.date}</td>
-            <td>${item.note}</td>
-            <td>${item.income_head.income_category}</td>
-            <td>${item.amount}</td>
-            <td>
-                <button class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill" data-bs-toggle="modal" data-bs-target="#editModal"
-                    data-id="${item.id}"
-                    data-name="${item.name}">
-                    <i class="ti ti-pencil"></i>
-                </button>
-                <button class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill" data-bs-toggle="modal"
-                data-bs-target="#deleteModal" data-id="${item.id}"
-                data-name="${item.name}">
-                <i class="ti ti-trash"></i>
-                </button>
-            </form>
-            </td>
-        `;
-        return row;
-    }
+    // Permission flags from PHP
+    const canEditIncome = {{ canEdit(9) ? 'true' : 'false' }};
+    const canDeleteIncome = {{ canDelete(9) ? 'true' : 'false' }};
+    const destroyRoute = "{{ route('income.destroy') }}";
+    const csrfToken = "{{ csrf_token() }}";
+    
+    createAjaxTable({
+        apiUrl: "{{ route('income') }}",
+        tableSelector: "#income",
+        paginationSelector: "#pagination-wrapper",
+        searchInputSelector: "#search-input",
+        perPageSelector: "#perPage",
+        rowRenderer: function (item) {
+            const row = document.createElement("tr");
+            
+            // Build action buttons based on permissions
+            let actionButtons = '';
+            if (canEditIncome) {
+                actionButtons += `
+                    <button class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn" 
+                        data-id="${item.id}"
+                        data-name="${item.name}"
+                        data-invoice_no="${item.invoice_no}"
+                        data-date="${item.date}"
+                        data-note="${item.note || ''}"
+                        data-income_head_id="${item.income_head_id || item.inc_head_id}"
+                        data-amount="${item.amount}">
+                        <i class="ti ti-pencil"></i>
+                    </button>`;
+            }
+            if (canDeleteIncome) {
+                actionButtons += `
+                    <form method="POST" action="${destroyRoute}" onsubmit="return confirm('Are you Sure?')" style="display:inline;">
+                        <input type="hidden" name="_token" value="${csrfToken}">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <input type="hidden" name="id" value="${item.id}">
+                        <button type="submit" class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                            <i class="ti ti-trash"></i>
+                        </button>
+                    </form>`;
+            }
+            
+            row.innerHTML = `
+                <td>${item.name}</td>
+                <td>${item.invoice_no}</td>
+                <td>${item.date}</td>
+                <td>${item.note || ''}</td>
+                <td>${item.income_head ? item.income_head.income_category : '-'}</td>
+                <td>${item.amount}</td>
+                <td>
+                    <div class="d-flex">
+                        ${actionButtons}
+                    </div>
+                </td>
+            `;
+            return row;
+        }
     });  
 }); 
 </script>

@@ -59,7 +59,7 @@
                                     </div>
 
                                 </div> --}}
-                                    <x-table-actions.actions id="expense" name="Expense" />
+                                    <x-table-actions.actions id="expense" name="Expense" :canAdd="canAdd(12)" />
                                     <!-- Table start -->
                                     <div class="table-responsive table-nowrap">
                                         <table class="table" id="expense">
@@ -97,6 +97,7 @@
                                                         </td>
                                                         <td>
                                                             <div class="d-flex">
+                                                                @if(canEdit(12))
                                                                 <button
                                                                     class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
                                                                     data-id="{{ $expense->id }}"
@@ -114,6 +115,8 @@
                                                                     data-attach_document="{{ $expense->attach_document ?? '' }}">
                                                                     <i class="ti ti-pencil"></i>
                                                                 </button>
+                                                                @endif
+                                                                @if(canDelete(12))
                                                                 <form method="POST" action="{{ route('expense.delete', $expense->id) }}" class="ms-2">
                                                                     @csrf
                                                                     @method('DELETE')
@@ -123,6 +126,7 @@
                                                                         <i class="ti ti-trash"></i>
                                                                     </button>
                                                                 </form>
+                                                                @endif
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -200,6 +204,7 @@
         ];
     @endphp
 
+    @if(canAdd(12))
     <x-modals.form-modal type="add" id="createModal" title="Add Expense" action="{{ route('expense.create') }}"
         :fields="[
             [
@@ -235,6 +240,8 @@
             ['name' => 'attach_document', 'label' => 'Attach Document', 'type' => 'file', 'required' => false, 'size' => '6'],
             ['name' => 'description', 'label' => 'Description', 'type' => 'text', 'required' => true, 'size' => '6'],
         ]" :columns="3" />
+    @endif
+    @if(canEdit(12))
     <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Expense"
         action="{{ url('/expense/update') }}" :fields="[
             ['name' => 'id', 'type' => 'hidden', 'required' => true],
@@ -271,6 +278,7 @@
             ['name' => 'attach_document', 'label' => 'Attach Document', 'type' => 'file', 'required' => false, 'size' => '6'],
             ['name' => 'description', 'label' => 'Description', 'type' => 'text', 'size' => '6'],
         ]" :columns="3" />
+    @endif
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

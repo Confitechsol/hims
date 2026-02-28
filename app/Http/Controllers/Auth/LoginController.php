@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\RolesPermission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 
 class LoginController extends Controller
 {
@@ -51,7 +53,28 @@ class LoginController extends Controller
             $request->session()->regenerate();
             $user = Auth::user();
             $role = Role::find($user->role);
-           // dd( $user);
+            
+            // Store role permissions in session
+            if ($role) {
+                $permissions = RolesPermission::where('role_id', $role->id)
+                    ->where('hospital_id', $user->hospital_id ?? null)
+                    ->get()
+                    ->keyBy('perm_cat_id')
+                    ->map(function ($permission) {
+                        return [
+                            'can_view' => (bool) $permission->can_view,
+                            'can_add' => (bool) $permission->can_add,
+                            'can_edit' => (bool) $permission->can_edit,
+                            'can_delete' => (bool) $permission->can_delete,
+                        ];
+                    })
+                    ->toArray();
+                
+                Session::put('user_permissions', $permissions);
+                Session::put('user_role_id', $role->id);
+                Session::put('user_role_name', $role->name);
+            }
+            
             return $role && $role->name === 'Admin'
                 ? redirect()->intended('/dashboard')
                 : redirect()->intended('/');
@@ -104,6 +127,11 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
+        // Clear permission session data
+        Session::forget('user_permissions');
+        Session::forget('user_role_id');
+        Session::forget('user_role_name');
+        
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
