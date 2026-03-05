@@ -99,8 +99,7 @@
                                                                                 data-due_to_b="{{ $report->due_to_b }}"
                                                                                 data-due_to_c="{{ $report->due_to_c }}"
                                                                                 data-manner_of_death="{{ $report->manner_of_death }}"
-                                                                                data-doctor_name="{{ $report->doctor->name ?? '' }}"
-                                                                                >
+                                                                                data-doctor_name="{{ $report->doctor->name ?? '' }}">
                                                                                 <i class="ti ti-pencil"></i>
                                                                             </button>
                                                                             <form action="{{ route('death.delete', $report->id) }}"
@@ -271,95 +270,139 @@
                                                                                                             {{ isset($report->birth_date) ? \Carbon\Carbon::parse($report->birth_date)->format('h:i A') : \Carbon\Carbon::parse($report->created_at)->format('h:i A') }}
                                                                                                         </div>
                                                                                                     </div>
+
+                                                                                                </div>
+                                                                                                <div class="row">
                                                                                                     <div class="col">
                                                                                                         <label>Guardian Name</label>
                                                                                                         <div class="line-data">
-                                                                                                        {{$report->patient->guardian_name ?? '-' }}
+                                                                                                            {{$report->patient->guardian_name ?? '-' }}
                                                                                                         </div>
                                                                                                     </div>
-
+                                                                                                    <div class="col">
+                                                                                                        <label>Relation</label>
+                                                                                                        <div class="line-data">
+                                                                                                        </div>
+                                                                                                    </div>
                                                                                                 </div>
                                                                                                 <label>Address</label>
                                                                                                 <div class="line-data">
                                                                                                     {{$report->patient->address ?? '-' }}
                                                                                                 </div>
                                                                                                 <div class="col-12 mt-3 mb-2">
-                                                                                                    <label class="fw-bold mb-2">Cause of Death</label>
+                                                                                                    <label class="fw-bold mb-2">Cause of
+                                                                                                        Death</label>
 
                                                                                                     <div class="table-responsive">
                                                                                                         <table class="table table-bordered">
                                                                                                             <thead>
                                                                                                                 <tr>
-                                                                                                                    <th width="30%">Type</th>
+                                                                                                                    <th width="30%">Type
+                                                                                                                    </th>
                                                                                                                     <th>Details</th>
+                                                                                                                    <th>ICD 10 Code</th>
                                                                                                                 </tr>
                                                                                                             </thead>
                                                                                                             <tbody>
                                                                                                                 <tr>
-                                                                                                                    <td><strong>Immediate Cause</strong></td>
+                                                                                                                    <td><strong>Immediate
+                                                                                                                            Cause</strong>
+                                                                                                                    </td>
                                                                                                                     <td>
                                                                                                                         {{ $report->due_to_a }}
                                                                                                                     </td>
+                                                                                                                    <td></td>
                                                                                                                 </tr>
                                                                                                                 <tr>
-                                                                                                                    <td><strong>Antecedent Cause</strong></td>
+                                                                                                                    <td><strong>Antecedent
+                                                                                                                            Cause</strong>
+                                                                                                                    </td>
                                                                                                                     <td>
                                                                                                                         {{ $report->due_to_b }}
                                                                                                                     </td>
+                                                                                                                    <td></td>
                                                                                                                 </tr>
                                                                                                                 <tr>
-                                                                                                                    <td><strong>Underlying Cause</strong></td>
+                                                                                                                    <td><strong>Underlying
+                                                                                                                            Cause</strong>
+                                                                                                                    </td>
                                                                                                                     <td>
                                                                                                                         {{ $report->due_to_c }}
                                                                                                                     </td>
+                                                                                                                    <td></td>
                                                                                                                 </tr>
                                                                                                                 <tr>
-                                                                                                                    <td><strong>Manner Of Death</strong></td>
+                                                                                                                    <td><strong>Manner Of
+                                                                                                                            Death</strong>
+                                                                                                                    </td>
                                                                                                                     <td>
                                                                                                                         {{ $report->manner_of_death }}
                                                                                                                     </td>
+                                                                                                                    <td></td>
                                                                                                                 </tr>
                                                                                                                 <tr>
-                                                                                                                    <td><strong>How did the injury occured?</strong></td>
+                                                                                                                    <td><strong>How did the
+                                                                                                                            injury
+                                                                                                                            occured?</strong>
+                                                                                                                    </td>
                                                                                                                     <td>
                                                                                                                         {{  '-' }}
                                                                                                                     </td>
+                                                                                                                    <td></td>
                                                                                                                 </tr>
                                                                                                                 <tr>
-                                                                                                                    <td><strong>If deasesed was a female, was pregnancy associated with it?</strong></td>
+                                                                                                                    <td><strong>If deasesed
+                                                                                                                            was a female,
+                                                                                                                            was pregnancy
+                                                                                                                            associated with
+                                                                                                                            it?</strong>
+                                                                                                                    </td>
                                                                                                                     <td>
                                                                                                                         {{  '-' }}
                                                                                                                     </td>
+                                                                                                                    <td></td>
                                                                                                                 </tr>
                                                                                                                 <tr>
-                                                                                                                    <td><strong>If Yes,was there a delivery?</strong></td>
+                                                                                                                    <td><strong>If Yes,was
+                                                                                                                            there a
+                                                                                                                            delivery?</strong>
+                                                                                                                    </td>
                                                                                                                     <td>
                                                                                                                         {{  '-' }}
                                                                                                                     </td>
+                                                                                                                    <td></td>
                                                                                                                 </tr>
-                                                                                                                
+
                                                                                                             </tbody>
                                                                                                         </table>
                                                                                                     </div>
 
                                                                                                     <div class="row mt-5">
-                                                                                                    <div class="col-6 text-start">
-                                                                                                        <div style="border-top: 1px solid #000; width: 250px; margin-top: 60px;">
-                                                                                                            <p class="mb-0 mt-2">Date of Verification</p>
-                                                                                                            <small>See Reverse For Instruction</small>
+                                                                                                        <div class="col-6 text-start">
+                                                                                                            <div
+                                                                                                                style="border-top: 1px solid #000; width: 250px; margin-top: 60px;">
+                                                                                                                <p class="mb-0 mt-2">Date of
+                                                                                                                    Verification</p>
+                                                                                                                <small>See Reverse For
+                                                                                                                    Instruction</small>
+                                                                                                            </div>
+                                                                                                        </div>
+
+                                                                                                        <div class="col-6 text-end">
+                                                                                                            <div
+                                                                                                                style="border-top: 1px solid #000; width: 250px; margin-top: 60px; float: right;">
+                                                                                                                <p class="mb-0 mt-2">
+                                                                                                                    Authorized Signature</p>
+                                                                                                                <small>Full
+                                                                                                                    Signature,Registration
+                                                                                                                    No. of Medical
+                                                                                                                    Attendant</small>
+                                                                                                            </div>
                                                                                                         </div>
                                                                                                     </div>
 
-                                                                                                    <div class="col-6 text-end">
-                                                                                                        <div style="border-top: 1px solid #000; width: 250px; margin-top: 60px; float: right;">
-                                                                                                            <p class="mb-0 mt-2">Authorized Signature</p>
-                                                                                                            <small>Full Signature,Registration No. of Medical Attendant</small>
-                                                                                                        </div>
-                                                                                                    </div>
                                                                                                 </div>
-                                                                                                
-                                                                                                </div>
-                                                                                                
+
 
                                                                                                 <div class="cut_list"></div>
 
@@ -372,7 +415,7 @@
                                                                                                     <div class="col">
                                                                                                         <label>Name of Hospital :</label>
                                                                                                         <div class="line-data">
-                                                                                                           {{$report->hospital->name ?? '-' }} 
+                                                                                                            {{$report->hospital->name ?? '-' }}
                                                                                                         </div>
                                                                                                     </div>
                                                                                                     <div class="col">
@@ -384,7 +427,7 @@
                                                                                                     <div class="col">
                                                                                                         <label>Date :</label>
                                                                                                         <div class="line-data">
-                                                                                                             {{ $report->death_date ? \Carbon\Carbon::parse($report->death_date)->format('d F Y') : '-' }}
+                                                                                                            {{ $report->death_date ? \Carbon\Carbon::parse($report->death_date)->format('d F Y') : '-' }}
                                                                                                         </div>
                                                                                                     </div>
                                                                                                 </div>
@@ -401,7 +444,7 @@
                                                                                                         <label>Certified that Shri/Smt/Kum
                                                                                                             :</label>
                                                                                                         <div class="line-data">
-                                                                                                           {{ $report->patient_name }}
+                                                                                                            {{ $report->patient_name }}
                                                                                                         </div>
                                                                                                     </div>
                                                                                                     <div class="col">
@@ -429,22 +472,34 @@
                                                                                                                 id="">
                                                                                                         </div> --}}
                                                                                                         <div class="line-data">
-                                                                                                           {{$report->patient->gender ?? '-' }}
+                                                                                                            {{$report->patient->gender ?? '-' }}
                                                                                                         </div>
-                                                                                                       
-                                                                                
+
+
                                                                                                     </div>
                                                                                                     <div class="col">
                                                                                                         <label>Religion :</label>
                                                                                                         <div class="line-data">
-                                                                                                             {{$report->patient->religion ?? '-' }}
+                                                                                                            {{$report->patient->religion ?? '-' }}
                                                                                                         </div>
                                                                                                     </div>
                                                                                                     <div class="col">
                                                                                                         <label>Occupation :</label>
                                                                                                         <div class="line-data">
-                                                                                                        {{$report->patient->occupation ?? '-' }}
+                                                                                                            {{$report->patient->occupation ?? '-' }}
 
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div class="row">
+                                                                                                    <div class="col">
+                                                                                                        <label>Guardian Name :</label>
+                                                                                                        <div class="line-data">
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                    <div class="col">
+                                                                                                        <label>Relation :</label>
+                                                                                                        <div class="line-data">
                                                                                                         </div>
                                                                                                     </div>
                                                                                                 </div>
@@ -452,7 +507,7 @@
                                                                                                     <div class="col">
                                                                                                         <label>Address :</label>
                                                                                                         <div class="line-data">
-                                                                                                        {{$report->patient->address ?? '-' }}
+                                                                                                            {{$report->patient->address ?? '-' }}
 
                                                                                                         </div>
                                                                                                     </div>
@@ -470,7 +525,7 @@
                                                                                                         <label>Admitted on this hospital
                                                                                                             :</label>
                                                                                                         <div class="line-data">
-                                                                                                          {{$report->patient->created_at ? \Carbon\Carbon::parse($report->patient->created_at)->format('d F Y') : '-' }}  
+                                                                                                            {{$report->patient->created_at ? \Carbon\Carbon::parse($report->patient->created_at)->format('d F Y') : '-' }}
                                                                                                         </div>
                                                                                                     </div>
                                                                                                     <div class="col">
@@ -510,21 +565,21 @@
                                                                                                     <div class="col">
                                                                                                         <label>Due to (a) :</label>
                                                                                                         <div class="line-data">
-                                                                                                        {{$report->due_to_a ?? '-' }}
+                                                                                                            {{$report->due_to_a ?? '-' }}
 
                                                                                                         </div>
                                                                                                     </div>
                                                                                                     <div class="col">
                                                                                                         <label>Due to (b) :</label>
                                                                                                         <div class="line-data">
-                                                                                                        {{$report->due_to_b ?? '-' }}
+                                                                                                            {{$report->due_to_b ?? '-' }}
 
                                                                                                         </div>
                                                                                                     </div>
                                                                                                     <div class="col">
                                                                                                         <label>Due to (c) :</label>
                                                                                                         <div class="line-data">
-                                                                                                        {{$report->due_to_c ?? '-' }}
+                                                                                                            {{$report->due_to_c ?? '-' }}
 
                                                                                                         </div>
                                                                                                     </div>
@@ -542,7 +597,7 @@
                                                                                                         <label>Full Name (IN BLOCK LETTER)
                                                                                                             :</label>
                                                                                                         <div class="line-data">
-                                                                                                        {{ strtoupper($report->patient->patient_name ?? '-') }}
+                                                                                                            {{ strtoupper($report->patient->patient_name ?? '-') }}
 
                                                                                                         </div>
                                                                                                     </div>
@@ -681,14 +736,14 @@
                 'type' => 'text',
                 'readonly' => true,
             ],
-            [ 'name' => 'doctor_name', 'label' => 'Doctors',  'type' => 'select', 'required' => true, 'options' => $doctors->pluck('name','name')->toArray(),  'size' => '5'],
+            ['name' => 'doctor_name', 'label' => 'Doctors', 'type' => 'select', 'required' => true, 'options' => $doctors->pluck('name', 'name')->toArray(), 'size' => '5'],
             ['name' => 'death_date', 'label' => 'Death Date', 'type' => 'date', 'required' => true, 'size' => '6'],
 
             ['name' => 'guardian_name', 'label' => 'Guardian Name ', 'type' => 'text', 'required' => true, 'size' => '12'],
             ['name' => 'due_to_a', 'label' => 'Due to (a)', 'type' => 'text', 'required' => false, 'size' => '5'],
             ['name' => 'due_to_b', 'label' => 'Due to (b)', 'type' => 'text', 'required' => false, 'size' => '5'],
             ['name' => 'due_to_c', 'label' => 'Due to (c)', 'type' => 'text', 'required' => false, 'size' => '5'],
-           
+
             [
                 'name' => 'attachment_name',
                 'label' => 'Report',
@@ -697,21 +752,23 @@
                 'size' => '6',
             ],
             ['name' => 'attachment', 'label' => 'Attachment', 'type' => 'file', 'required' => false, 'size' => '6',],
-             [
+            [
                 'name' => 'manner_of_death',
                 'label' => 'Manner Of Death',
                 'type' => 'select',
                 'required' => false,
                 'size' => '5',
                 'options' => [
-                'Accident' => 'Accident',
-                'Natural Death' => 'Natural Death',
-                'Suicide' => 'Suicide',
-                'Homicide' => 'Homicide',
-                'Pending Investigation' => 'Pending Investigation',
-           ],],
+                    'Accident' => 'Accident',
+                    'Natural Death' => 'Natural Death',
+                    'Suicide' => 'Suicide',
+                    'Homicide' => 'Homicide',
+                    'Pending Investigation' => 'Pending Investigation',
+                ],
+            ],
 
-        ]" :columns="3" />
+        ]"
+        :columns="3" />
     <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Death Name"
         action="{{ url('/death/update') }}" :fields="[
             ['name' => 'id', 'type' => 'hidden', 'required' => true],
@@ -737,7 +794,7 @@
                 'type' => 'text',
                 'readonly' => true,
             ],
-            [ 'name' => 'doctor_name', 'label' => 'Doctors',  'type' => 'select', 'required' => true, 'options' => $doctors->pluck('name','name')->toArray(),  'size' => '5'],
+            ['name' => 'doctor_name', 'label' => 'Doctors', 'type' => 'select', 'required' => true, 'options' => $doctors->pluck('name', 'name')->toArray(), 'size' => '5'],
 
             ['name' => 'death_date', 'label' => 'Death Date', 'type' => 'date', 'required' => true, 'size' => '4'],
             ['name' => 'guardian_name', 'label' => 'Guardian Name ', 'type' => 'text', 'required' => true, 'size' => '12'],
@@ -749,24 +806,25 @@
                 'size' => '6',
             ],
             ['name' => 'attachment', 'label' => 'Attachment', 'type' => 'file', 'required' => false, 'size' => '6',],
-             ['name' => 'due_to_a', 'label' => 'Due to (a)', 'type' => 'text', 'required' => false, 'size' => '5'],
+            ['name' => 'due_to_a', 'label' => 'Due to (a)', 'type' => 'text', 'required' => false, 'size' => '5'],
             ['name' => 'due_to_b', 'label' => 'Due to (b)', 'type' => 'text', 'required' => false, 'size' => '5'],
             ['name' => 'due_to_c', 'label' => 'Due to (c)', 'type' => 'text', 'required' => false, 'size' => '5'],
-           
-            
-             [
+
+
+            [
                 'name' => 'manner_of_death',
                 'label' => 'Manner Of Death',
                 'type' => 'select',
                 'required' => false,
                 'size' => '5',
                 'options' => [
-                'Accident' => 'Accident',
-                'Natural Death' => 'Natural Death',
-                'Suicide' => 'Suicide',
-                'Homicide' => 'Homicide',
-                'Pending Investigation' => 'Pending Investigation',
-           ],],
+                    'Accident' => 'Accident',
+                    'Natural Death' => 'Natural Death',
+                    'Suicide' => 'Suicide',
+                    'Homicide' => 'Homicide',
+                    'Pending Investigation' => 'Pending Investigation',
+                ],
+            ],
         ]" :columns="3" />
 
     <script>
