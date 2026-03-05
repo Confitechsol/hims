@@ -213,11 +213,14 @@ class IpdController extends Controller
 
             // Create initial bed charge entry for admission date (used as fallback by billing)
             if ($hasBed && $request->admission_date) {
-                $bedGroup      = BedGroup::find($request->bed_group);
-                $bedChargeRate = $bedGroup->bed_cost ?? 0.00;
+                $bedGroup = BedGroup::find($request->bed_group);
+                // Use on-the-fly bed charge if provided, otherwise fall back to bed group master
+                $bedChargeRate = $request->bed_charge !== null && $request->bed_charge !== ''
+                    ? (float) $request->bed_charge
+                    : (float) ($bedGroup->bed_cost ?? 0.00);
 
-                // Get bed charge from request or use bed_group.bed_cost
-                $bedCharge = $request->bed_charge ?? $bedChargeRate;
+                // For a single-day entry, the daily rate and charge are the same
+                $bedCharge = $bedChargeRate;
 
                 if ($bedCharge > 0) {
                     // Calculate admission date period (10 AM to next 10 AM)
@@ -1352,9 +1355,11 @@ class IpdController extends Controller
         $transferDate = Carbon::parse($request->released_date);
         $chargeDate   = $transferDate->format('Y-m-d');
 
-        // Get bed group to fetch bed_cost for bed_charge_rate
-        $bedGroup      = BedGroup::find($request->bed_group);
-        $bedChargeRate = $bedGroup ? ($bedGroup->bed_cost ?? 0) : 0;
+        // Use on-the-fly bed charge if provided, otherwise fall back to bed group master
+        $bedGroup = BedGroup::find($request->bed_group);
+        $bedChargeRate = $request->bed_charge !== null && $request->bed_charge !== ''
+            ? (float) $request->bed_charge
+            : (float) ($bedGroup->bed_cost ?? 0);
 
         // Calculate period (10 AM to next 10 AM)
         // Start: Previous day 10:00 AM
@@ -1380,7 +1385,8 @@ class IpdController extends Controller
                 'period_end_date'   => $periodEndDate,
                 'bed_group_id'      => $request->bed_group,
                 'bed_id'            => $request->new_bed,
-                'bed_charge'        => $request->bed_charge,
+                // Store the effective daily bed charge (custom or master) in both fields
+                'bed_charge'        => $bedChargeRate,
                 'bed_charge_rate'   => $bedChargeRate,
                 'no_of_days'        => 1,
                 'is_active'         => 'yes',
