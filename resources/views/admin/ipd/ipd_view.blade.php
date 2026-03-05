@@ -3073,7 +3073,7 @@
                                                             <div class="text-end d-flex">
                                                                 <a href="javascript:void(0);"
                                                                     class="btn btn-primary text-white ms-2 btn-md"
-                                                                    data-bs-toggle="modal" data-bs-target="#add_charges"><i
+                                                                    data-bs-toggle="modal" data-bs-target="#add_charges" id="open_add_charges_btn"><i
                                                                         class="ti ti-plus me-1"></i>Add Charges</a>
                                                             </div>
                                                         @endif
@@ -3344,7 +3344,7 @@
                                                                                                 </div>
                                                                                             </div>
                                                                                         </div><!--./col-sm-6-->
-                                                                                        <div class="col-sm-3">
+                                                                                        <div class="col-sm-3" id="charge_add_button_col">
                                                                                             <div class="form-group mb-2">
                                                                                                 <label for=""
                                                                                                     class="form-label">Date
@@ -3368,7 +3368,8 @@
                                                                                     <hr>
                                                                                 </div>
                                                                                 <div
-                                                                                    class="col-lg-12 col-md-12 col-sm-12">
+                                                                                    class="col-lg-12 col-md-12 col-sm-12"
+                                                                                    id="charge_preview_wrapper">
                                                                                     <table
                                                                                         class="table table-striped table-bordered table-hover">
                                                                                         <tbody>
@@ -3439,7 +3440,7 @@
                                                                 <th>Discount</th>
                                                                 <!-- <th>Tax</th> -->
                                                                 <th>Amount (INR)</th>
-                                                                <!-- <th>Action</th> -->
+                                                                <th>Action</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -3475,26 +3476,17 @@
                                                                     <!-- <td>{{ $taxAmount }}&nbsp;({{ $charge->charge?->taxCategory?->percentage ?? '-' }}%)
                                                                     </td> -->
                                                                     <td>{{ $amount }}</td>
-                                                                    <!-- <td>
-                                                                                <div class="d-flex gap-2">
-                                                                                    <a href="javascript: void(0);"
-                                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill">
-                                                                                        <i class="fa-solid fa-print"
-                                                                                            data-bs-toggle="tooltip"
-                                                                                            title="Print"></i></a>
-                                                                                    <a href="javascript: void(0);"
-                                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
-                                                                                        <i class="ti ti-pencil"
-                                                                                            data-bs-toggle="tooltip"
-                                                                                            title="Edit"></i></a>
-
-                                                                                    <a href="javascript: void(0);"
-                                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill">
-                                                                                        <i class="ti ti-trash"
-                                                                                            data-bs-toggle="tooltip"
-                                                                                            title="Delete"></i></a>
-                                                                                </div>
-                                                                            </td> -->
+                                                                    <td>
+                                                                        <div class="d-flex gap-2">
+                                                                            <a href="javascript:void(0);"
+                                                                               class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-ipd-charge-btn"
+                                                                               data-charge-id="{{ $charge->id }}"
+                                                                               data-bs-toggle="tooltip"
+                                                                               title="Edit">
+                                                                                <i class="ti ti-pencil"></i>
+                                                                            </a>
+                                                                        </div>
+                                                                    </td>
                                                                 </tr>
                                                             @endforeach
 
@@ -5720,6 +5712,31 @@
             const previewBody = document.getElementById("preview_charges");
             const addBtn = document.querySelector("button[name='charge_data']");
 
+            const addBtnCol = document.getElementById("charge_add_button_col");
+            const previewWrapper = document.getElementById("charge_preview_wrapper");
+            const modalFooterBtn = document.querySelector("#add_charges .modal-footer button[type='submit']");
+            const openAddChargesBtn = document.getElementById("open_add_charges_btn");
+
+            function enterAddMode() {
+                window.editIpdChargeId = null;
+
+                if (addBtnCol) addBtnCol.classList.remove('d-none');
+                if (previewWrapper) previewWrapper.classList.remove('d-none');
+                if (modalFooterBtn) modalFooterBtn.textContent = 'Save';
+
+                // Reset form action back to create route and remove PUT override
+                const form = document.getElementById('addChargeForm');
+                if (form) {
+                    form.action = "{{ route('ipd.addIpdCharge') }}";
+                    const methodInput = form.querySelector('input[name=\"_method\"]');
+                    if (methodInput) methodInput.remove();
+                }
+            }
+
+            if (openAddChargesBtn) {
+                openAddChargesBtn.addEventListener('click', enterAddMode);
+            }
+
             /*--------------------------------------------------
              | FETCH CHARGE TYPES
              --------------------------------------------------*/
@@ -5884,6 +5901,191 @@
                 if (e.target.classList.contains("delete-charge-row")) {
                     e.target.closest("tr").remove();
                 }
+            });
+
+            /*--------------------------------------------------
+             | RESET CHARGE MODAL ON CLOSE
+             --------------------------------------------------*/
+            const addChargesModalEl = document.getElementById('add_charges');
+            function resetChargeModal() {
+                const form = document.getElementById('addChargeForm');
+                if (form) {
+                    form.reset();
+                    const methodInput = form.querySelector('input[name="_method"]');
+                    if (methodInput) methodInput.remove();
+                    form.action = "{{ route('ipd.addIpdCharge') }}";
+                }
+
+                // Clear dynamic preview rows
+                if (previewBody) previewBody.innerHTML = '';
+
+                // Reset calculated fields
+                totalInp.value       = '0.00';
+                discountPercInp.value = '0';
+                discountAmtInp.value  = '0.00';
+                taxPercInp.value      = '0';
+                taxAmtInp.value       = '0.00';
+                netAmountInp.value    = '0.00';
+
+                // Return to Add mode layout (button + table visible, footer Save)
+                enterAddMode();
+            }
+
+            if (addChargesModalEl) {
+                if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                    addChargesModalEl.addEventListener('hidden.bs.modal', resetChargeModal);
+                } else {
+                    // Fallback: if closed via custom logic
+                    addChargesModalEl.addEventListener('click', function (e) {
+                        if (e.target.classList.contains('btn-close')) {
+                            resetChargeModal();
+                        }
+                    });
+                }
+            }
+
+            /*--------------------------------------------------
+             | EDIT EXISTING IPD CHARGE (Charges tab)
+             | - Reuse Add Charges modal
+             | - Uses delegated click handler for robustness
+             --------------------------------------------------*/
+            document.addEventListener('click', function (event) {
+                const btn = event.target.closest('.edit-ipd-charge-btn');
+                if (!btn) {
+                    return;
+                }
+
+                const chargeId = btn.getAttribute('data-charge-id');
+                if (!chargeId) {
+                    return;
+                }
+
+                fetch("{{ url('/ipd_charge') }}/" + chargeId)
+                    .then(response => response.json())
+                    .then(payload => {
+                        if (!payload.success || !payload.data) {
+                            alert('Unable to load charge details.');
+                            return;
+                        }
+
+                        const charge = payload.data;
+
+                        window.editIpdChargeId = charge.id;
+
+                        const modalEl = document.getElementById('add_charges');
+
+                        // Open modal safely even if Bootstrap is not available
+                        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                            let bsModal = bootstrap.Modal.getInstance(modalEl);
+                            if (!bsModal) {
+                                bsModal = new bootstrap.Modal(modalEl);
+                            }
+                            bsModal.show();
+                        } else {
+                            modalEl.classList.add('show');
+                            modalEl.style.display = 'block';
+                            modalEl.removeAttribute('aria-hidden');
+                        }
+
+                        document.querySelector('#add_charges .modal-title').textContent = 'Edit Charges';
+                        const form = document.getElementById('addChargeForm');
+                        form.action = "{{ url('/ipd_charge') }}/" + charge.id;
+
+                        let methodInput = form.querySelector('input[name="_method"]');
+                        if (!methodInput) {
+                            methodInput = document.createElement('input');
+                            methodInput.type = 'hidden';
+                            methodInput.name = '_method';
+                            form.appendChild(methodInput);
+                        }
+                        methodInput.value = 'PUT';
+
+                        // In edit mode, hide the Add-row section and preview table,
+                        // and change footer button text to "Update"
+                        if (addBtnCol) addBtnCol.classList.add('d-none');
+                        if (previewWrapper) {
+                            previewWrapper.classList.add('d-none');
+                            if (previewBody) previewBody.innerHTML = '';
+                        }
+                        if (modalFooterBtn) modalFooterBtn.textContent = 'Update';
+
+                        document.getElementById('ipd_id').value = charge.ipd_id;
+
+                        const chargeTypeSelect = document.getElementById('add_charge_type');
+                        const chargeCategorySelect = document.getElementById('charge_category2');
+                        const chargeSelect = document.getElementById('charge_id');
+
+                        // 1) Set charge type and load categories
+                        if (chargeTypeSelect) {
+                            chargeTypeSelect.value = charge.charge_type_id;
+                        }
+
+                        if (chargeTypeSelect && chargeCategorySelect && chargeSelect) {
+                            // Load categories for this type
+                            chargeCategorySelect.innerHTML = '<option value=\"\">Select</option>';
+                            chargeSelect.innerHTML = '<option value=\"\">Select</option>';
+
+                            fetch("{{ route('getChargeCategoriesByTypeId', ['id' => 'ID']) }}".replace('ID', charge.charge_type_id))
+                                .then(res => res.json())
+                                .then(categoryData => {
+                                    categoryData.forEach(cat => {
+                                        chargeCategorySelect.innerHTML += `<option value=\"${cat.id}\">${cat.name}</option>`;
+                                    });
+                                    chargeCategorySelect.value = charge.charge_category_id;
+
+                                    // 2) Load charges for this category
+                                    return fetch("{{ route('getCharges', ['id' => 'ID']) }}".replace('ID', charge.charge_category_id));
+                                })
+                                .then(res => res.json())
+                                .then(chargesData => {
+                                    chargeSelect.innerHTML = '<option value=\"\">Select</option>';
+                                    chargesData.forEach(ch => {
+                                        chargeSelect.innerHTML += `<option value=\"${ch.id}\">${ch.name}</option>`;
+                                    });
+                                    chargeSelect.value = charge.charge_id;
+                                })
+                                .catch(() => {
+                                    // Fallback: ignore select population errors, user can re-select manually
+                                });
+                        }
+
+                        const standardInp  = document.getElementById('addstandard_charge');
+                        const tpaInp       = document.getElementById('addscd_charge');
+                        const qtyInp       = document.getElementById('qty');
+                        const totalInp     = document.getElementById('apply_charge');
+                        const discPercInp  = document.getElementById('discount_percentage_add_charge');
+                        const discAmtInp   = document.getElementById('discount_percentage_amount');
+                        const taxPercInp   = document.getElementById('charge_tax');
+                        const taxAmtInp    = document.getElementById('tax_amt');
+                        const netAmtInp    = document.getElementById('final_amount');
+
+                        const appliedCharge   = parseFloat(charge.total ?? 0) || 0;
+                        const discountAmount  = parseFloat(charge.discount_percentage ?? 0) || 0; // stored as amount
+                        const taxAmount       = parseFloat(charge.tax ?? 0) || 0;
+                        const discountPercent = appliedCharge > 0 ? (discountAmount / appliedCharge) * 100 : 0;
+                        const taxPercent      = appliedCharge > 0 ? (taxAmount / appliedCharge) * 100 : 0;
+
+                        standardInp.value = charge.standard_charge ?? 0;
+                        tpaInp.value      = charge.tpa_charge ?? 0;
+                        qtyInp.value      = charge.qty ?? 1;
+                        totalInp.value    = appliedCharge.toFixed(2);
+
+                        // UI shows "Discount Percentage (INR)" – amount field + % label
+                        discPercInp.value = discountPercent.toFixed(2);
+                        discAmtInp.value  = discountAmount.toFixed(2);
+
+                        taxPercInp.value = taxPercent.toFixed(2);
+                        taxAmtInp.value  = taxAmount.toFixed(2);
+
+                        netAmtInp.value  = (parseFloat(charge.net_amount ?? 0) || 0).toFixed(2);
+                        document.getElementById('edit_note').value = charge.charge_note ?? '';
+                        document.getElementById('charge_date').value = charge.date
+                            ? String(charge.date).substring(0, 10)
+                            : '';
+                    })
+                    .catch(() => {
+                        alert('Error loading charge details.');
+                    });
             });
 
         });

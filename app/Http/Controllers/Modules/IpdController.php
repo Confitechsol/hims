@@ -1289,6 +1289,62 @@ class IpdController extends Controller
         return redirect()->back()->with('success', 'Charges saved successfully!');
     }
 
+    /**
+     * Fetch a single IPD charge for editing.
+     */
+    public function getIpdCharge(IpdCharges $charge)
+    {
+        $charge->load(['charge.taxCategory', 'chargeCategory.chargeType']);
+
+        return response()->json([
+            'success' => true,
+            'data'    => $charge,
+        ]);
+    }
+
+    /**
+     * Update a single IPD charge row (used by the IPD view "Edit Charges" modal).
+     */
+    public function updateIpdCharge(Request $request, IpdCharges $charge)
+    {
+        // Map existing form field names from the Add Charges modal
+        $validated = $request->validate([
+            'charge_type'                 => 'required|integer|exists:charge_type_master,id',
+            'charge_category2'            => 'required|integer|exists:charge_categories,id',
+            'charge_id'                   => 'required|integer|exists:charges,id',
+            'standard_charge'             => 'required|numeric',
+            'schedule_charge'             => 'nullable|numeric',
+            'qty'                         => 'required|numeric|min:1',
+            'apply_charge'                => 'required|numeric',
+            'discount_percentage_amount'  => 'nullable|numeric|min:0',
+            'tax'                         => 'nullable|numeric|min:0',
+            'amount'                      => 'required|numeric',
+            'note'                        => 'nullable|string',
+            'date'                        => 'required|date',
+        ]);
+
+        $charge->update([
+            'charge_type_id'      => $validated['charge_type'],
+            'charge_category_id'  => $validated['charge_category2'],
+            'charge_id'           => $validated['charge_id'],
+            'standard_charge'     => $validated['standard_charge'],
+            'tpa_charge'          => $validated['schedule_charge'] ?? 0,
+            'qty'                 => $validated['qty'],
+            'total'               => $validated['apply_charge'],
+            // discount_percentage column stores discount amount in INR
+            'discount_percentage' => $validated['discount_percentage_amount'] ?? 0,
+            'tax'                 => $validated['tax'] ?? 0,
+            'net_amount'          => $validated['amount'],
+            'charge_note'         => $validated['note'] ?? null,
+            'date'                => $validated['date'],
+        ]);
+
+        // Behaviour same as Add Charges: go back with flash message
+        return redirect()
+            ->back()
+            ->with('success', 'Charge updated successfully!');
+    }
+
     public function getAvailableBeds(Request $request)
     {
         $bedGroupId = $request->bed_group_id;
