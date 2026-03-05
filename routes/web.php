@@ -7,6 +7,7 @@ use App\Http\Controllers\AppSwitchController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BedController;
 use App\Http\Controllers\BedGroupController;
+use App\Http\Controllers\AreaController;
 use App\Http\Controllers\BedChargeBackfillController;
 use App\Http\Controllers\BedTypeController;
 use App\Http\Controllers\BirthController;
@@ -132,6 +133,11 @@ Route::middleware(['admin'])->group(function () {
     // Route::post('/database/restore', [DatabaseController::class, 'restore'])->name('database.restore');
     // Route::get('/database/backup', [DatabaseController::class, 'backup'])->name('database.backup'); // optional link
     Route::get('/patients', [PatientController::class, 'index'])->name('patients');
+    
+    Route::get('/get-district-by-area/{id}', [AreaController::class, 'getDistrict'])
+    ->name('get.district');
+    Route::get('/get-state-by-district/{id}', [AreaController::class, 'getState'])
+    ->name('get.state');
     Route::get('/getPatients', [PatientController::class, 'getPatients'])->name('getPatients');
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::post('/profile/store', [ProfileController::class, 'store'])->name('profile.store');

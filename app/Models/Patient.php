@@ -38,6 +38,8 @@ class Patient extends Model
         'blood_bank_product_id',
         'address',
         'area',
+        'state',
+        'district',
         'religion',
         'guardian_name',
         'guardian_phone',

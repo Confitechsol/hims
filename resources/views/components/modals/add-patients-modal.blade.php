@@ -26,17 +26,7 @@
             <div class="modal-body">
                 <form id="ipdForm" action="{{ route('patient-store') }}" method="POST">
                     @csrf
-                    <!-- @if ($errors->any())
-<div class="alert alert-danger">
-                            <strong>There were some problems with your
-                                input:</strong>
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-<li>{{ $error }}</li>
-@endforeach
-                            </ul>
-                        </div>
-@endif -->
+
 
                     <div class="row p-4 mx-1 gy-3">
 
@@ -275,13 +265,47 @@
                         {{-- Area --}}
                         <div class="col-md-3">
                             <label for="area" class="form-label">Area</label>
-                            <input type="text" id="area" name="area"
-                                class="form-control @error('area') is-invalid @enderror"
-                                value="{{ old('area') }}" />
+                            <div class="input-group">
+                                <select id="area" name="area" class="form-select @error('area') is-invalid @enderror">
+                                    <option value="">Select Area</option>
+                                    @foreach ($areas ?? [] as $area)
+                                        <option value="{{ $area->id }}" {{ old('area') == $area->id ? 'selected' : '' }}>
+                                            {{ $area->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
                             @error('area')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+                        
+                        
+    
+                        {{-- District --}}
+                        <div class="col-md-3">
+                            <label for="district" class="form-label">District</label>
+                            <input type="text" id="district" name="district_name"
+                                class="form-control @error('district') is-invalid @enderror"
+                                value="{{ old('district') }}" readonly />
+                                <input type="hidden"
+                            id="district_id"
+                            name="district">
+                            @error('district')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        {{-- State --}}
+                        <div class="col-md-3">
+                            <label class="form-label">State</label>
+                            <input type="text" id="state" name="state_name"
+                                class="form-control"
+                                readonly>
+                        </div>
+                        <input type="hidden"
+                            id="state_id"
+                            name="state">
+                        
                         {{-- religion --}}
                         <div class="col-md-3">
                             <label for="religion" class="form-label">Religion</label>
@@ -515,17 +539,41 @@
 
                     </div>
 
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save Patient</button>
+                    </div>
+                </form>
             </div>
-            <div class="modal-footer">
-                <button type="submit" class="btn btn-primary">Save Patient</button>
-            </div>
-            </form>
-        </div>
     </div>
 </div>
 <!-- Include jQuery and Select2 JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+
+const baseUrl = "{{ route('get.district', ':id') }}";
+
+document.getElementById('area').addEventListener('change', function () {
+
+    let url = baseUrl.replace(':id', this.value);
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('district').value = data.district ?? '';
+            document.getElementById('district_id').value = data.district_id ?? '';
+            document.getElementById('state_id').value = data.state_id ?? '';
+            document.getElementById('state').value = data.state ?? '';
+        })
+        .catch(error => console.error(error));
+
+});
+
+</script>
+
+
 <script>
     document.addEventListener("DOMContentLoaded", function() {
 
