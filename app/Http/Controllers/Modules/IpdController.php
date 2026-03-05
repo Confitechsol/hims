@@ -211,7 +211,8 @@ class IpdController extends Controller
                 }
             }
 
-            // Create initial bed charge entry for admission date (used as fallback by billing)
+            // Create initial bed charge entry for admission date (used by billing for estimate/final bill).
+            // Bed charges are always created when a bed is selected, regardless of package selection.
             if ($hasBed && $request->admission_date) {
                 $bedGroup = BedGroup::find($request->bed_group);
                 // Use on-the-fly bed charge if provided, otherwise fall back to bed group master
@@ -222,41 +223,38 @@ class IpdController extends Controller
                 // For a single-day entry, the daily rate and charge are the same
                 $bedCharge = $bedChargeRate;
 
-                if ($bedCharge > 0) {
-                    // Calculate admission date period (10 AM to next 10 AM)
-                    $admissionDate = Carbon::parse($request->admission_date);
-                    $chargeDate    = $admissionDate->format('Y-m-d');
+                // Always create daywise bed charge when a bed is selected (so estimate/final bill include bed charges)
+                $admissionDate = Carbon::parse($request->admission_date);
+                $chargeDate    = $admissionDate->format('Y-m-d');
 
-                    // Start: Previous day 10:00 AM
-                    $periodStart = $admissionDate->copy()->subDay()->setTime(10, 0, 0);
-                    // End: Current day 10:00 AM
-                    $periodEnd = $admissionDate->copy()->setTime(10, 0, 0);
+                // Start: Previous day 10:00 AM
+                $periodStart = $admissionDate->copy()->subDay()->setTime(10, 0, 0);
+                // End: Current day 10:00 AM
+                $periodEnd = $admissionDate->copy()->setTime(10, 0, 0);
 
-                    $periodStartDate = $periodStart->format('Y-m-d');
-                    $periodEndDate   = $periodEnd->format('Y-m-d');
+                $periodStartDate = $periodStart->format('Y-m-d');
+                $periodEndDate   = $periodEnd->format('Y-m-d');
 
-                    // Create bed charge entry
-                    IpdDaywiseBedCharge::updateOrCreate(
-                        [
-                            'ipd_id'      => $ipd->id,
-                            'charge_date' => $chargeDate,
-                        ],
-                        [
-                            'hospital_id'       => $ipd->hospital_id,
-                            'branch_id'         => $ipd->branch_id ?? null,
-                            'case_reference_id' => $ipd->case_reference_id ?? null,
-                            'patient_id'        => $ipd->patient_id,
-                            'period_start_date' => $periodStartDate,
-                            'period_end_date'   => $periodEndDate,
-                            'bed_group_id'      => $request->bed_group,
-                            'bed_id'            => $request->bed_number,
-                            'bed_charge'        => $bedCharge,
-                            'bed_charge_rate'   => $bedChargeRate,
-                            'no_of_days'        => 1,
-                            'is_active'         => 'yes',
-                        ]
-                    );
-                }
+                IpdDaywiseBedCharge::updateOrCreate(
+                    [
+                        'ipd_id'      => $ipd->id,
+                        'charge_date' => $chargeDate,
+                    ],
+                    [
+                        'hospital_id'       => $ipd->hospital_id,
+                        'branch_id'         => $ipd->branch_id ?? null,
+                        'case_reference_id' => $ipd->case_reference_id ?? null,
+                        'patient_id'        => $ipd->patient_id,
+                        'period_start_date' => $periodStartDate,
+                        'period_end_date'   => $periodEndDate,
+                        'bed_group_id'      => $request->bed_group,
+                        'bed_id'            => $request->bed_number,
+                        'bed_charge'        => $bedCharge,
+                        'bed_charge_rate'   => $bedChargeRate,
+                        'no_of_days'        => 1,
+                        'is_active'         => 'yes',
+                    ]
+                );
             }
 
             // Apply package if selected during admission

@@ -829,6 +829,35 @@ header {
         </table>
         @endif
 
+        <!-- Package Charges -->
+        @if(isset($packageDetails) && $packageDetails->count() > 0)
+        <table class="charges-table">
+            <thead>
+                <tr>
+                    <th colspan="3">Package Charges</th>
+                </tr>
+                <tr>
+                    <th>Applied Date</th>
+                    <th>Package Name</th>
+                    <th class="text-right">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($packageDetails as $pkg)
+                <tr>
+                    <td>{{ \Carbon\Carbon::parse($pkg['date'])->format('d/m/Y') }}</td>
+                    <td>{{ $pkg['package_name'] ?? 'N/A' }}</td>
+                    <td class="text-right">Rs. {{ number_format($pkg['amount'] ?? 0, 2) }}</td>
+                </tr>
+                @endforeach
+                <tr style="font-weight: bold;">
+                    <td colspan="2" class="text-right">Subtotal:</td>
+                    <td class="text-right">Rs. {{ number_format($breakup['package_charges'] ?? 0, 2) }}</td>
+                </tr>
+            </tbody>
+        </table>
+        @endif
+
         <!-- Payment Details -->
         @if(isset($payments) && $payments->count() > 0)
         <div class="section-title">Payment Details</div>
@@ -888,10 +917,12 @@ header {
         <!-- Summary Section -->
         <div class="summary-section">
             <div class="section-title" style="margin-top: 0; margin-bottom: 8px;">Payment Summary</div>
+            @if(($breakup['bed_charges'] ?? 0) > 0)
             <div class="summary-row">
                 <span class="summary-label">Bed Charges:</span>
                 <span class="summary-value">Rs. {{ number_format($breakup['bed_charges'] ?? 0, 2) }}</span>
             </div>
+            @endif
             <div class="summary-row">
                 <span class="summary-label">IPD Charges:</span>
                 <span class="summary-value">Rs. {{ number_format($breakup['ipd_charges'] ?? 0, 2) }}</span>
@@ -907,6 +938,10 @@ header {
             <div class="summary-row">
                 <span class="summary-label">Doctor Visit Charges:</span>
                 <span class="summary-value">Rs. {{ number_format($breakup['doctor_visit_charges'] ?? 0, 2) }}</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">Package Charges:</span>
+                <span class="summary-value">Rs. {{ number_format($breakup['package_charges'] ?? 0, 2) }}</span>
             </div>
             <div class="summary-row">
                 <span class="summary-label">Total Charges:</span>

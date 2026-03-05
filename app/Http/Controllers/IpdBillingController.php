@@ -419,7 +419,7 @@ class IpdBillingController extends Controller
             ];
         }
 
-        // Bed Charges - Calculate dynamically from PatientBedHistory
+        // Bed Charges - from PatientBedHistory / IpdDaywiseBedCharge (excluded when a package is applied; package covers bed)
         $bedChargesData = $this->calculateBedChargesFromHistory($ipdId, $endDate);
         $bedCharges = $bedChargesData['total'];
         $cgstCharges = $bedChargesData['total_cgst'] ?? 0;
@@ -466,6 +466,13 @@ class IpdBillingController extends Controller
         $packageCharges = IpdPackage::where('ipd_id', $ipdId)
             ->where('status', 'applied')
             ->sum('final_amount');
+
+        // When a package is applied, exclude bed charges (and their GST) from the bill
+        if ($packageCharges > 0) {
+            $bedCharges = 0;
+            $cgstCharges = 0;
+            $sgstCharges = 0;
+        }
 
         // Total Charges (including GST and package charges)
         $totalCharges = $bedCharges + $ipdCharges + $pathologyCharges + $radiologyCharges + $doctorVisitCharges + $packageCharges + $cgstCharges + $sgstCharges;
@@ -1243,14 +1250,16 @@ class IpdBillingController extends Controller
             $breakup = $this->calculateBreakup($ipdId);
             \Log::info('Breakup calculated', ['total_charges' => $breakup['total_charges']]);
 
-            // Get detailed breakdown - Calculate dynamically from PatientBedHistory
+            // Get detailed breakdown - Calculate dynamically from PatientBedHistory (omit from display when package applied)
             $bedChargesData = $this->calculateBedChargesFromHistory($ipdId);
             $bedChargesDetails = collect($bedChargesData['details']);
-            // Bed charges grouped by bed and date range for PDF display (one row per bed stay)
             $bedChargesGroupedForDisplay = $this->groupBedChargesByBedForDisplay($bedChargesDetails);
-            
-            // Prepare GST charges grouped by bed group
             $gstChargesGrouped = $this->prepareGstCharges($bedChargesDetails);
+            if (($breakup['package_charges'] ?? 0) > 0) {
+                $bedChargesDetails = collect();
+                $bedChargesGroupedForDisplay = $this->groupBedChargesByBedForDisplay($bedChargesDetails);
+                $gstChargesGrouped = $this->prepareGstCharges($bedChargesDetails);
+            }
 
             $ipdChargesDetails = IpdCharges::where('ipd_id', $ipdId)
                 ->with(['charge', 'chargeCategory'])
@@ -1356,6 +1365,20 @@ class IpdBillingController extends Controller
                 ->get() ?? collect();
             // Group doctor visits by doctor and contiguous date ranges for PDF display
             $doctorVisitGroupedForDisplay = $this->groupDoctorVisitsForDisplay($doctorVisitDetails);
+
+            // Package details (applied packages) for estimate PDF
+            $packageDetails = IpdPackage::where('ipd_id', $ipdId)
+                ->where('status', 'applied')
+                ->with('package')
+                ->orderBy('applied_date', 'asc')
+                ->get()
+                ->map(function ($ipdPackage) {
+                    return [
+                        'date' => $ipdPackage->applied_date,
+                        'package_name' => $ipdPackage->package->name ?? 'N/A',
+                        'amount' => $ipdPackage->final_amount ?? 0,
+                    ];
+                });
             
             // Get payment details
             \Log::info('Getting payment details');
@@ -1462,7 +1485,7 @@ class IpdBillingController extends Controller
             // First pass: Render to get accurate page count
             $tempPdf = Pdf::loadView('admin.billing.ipd_estimate_pdf', compact(
                 'ipd', 'breakup', 'bedChargesDetails', 'bedChargesGroupedForDisplay', 'ipdChargesDetails',
-                'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'doctorVisitGroupedForDisplay', 'payments',
+                'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'doctorVisitGroupedForDisplay', 'packageDetails', 'payments',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
                 'investigationDatewise',
                 'totalChargesInWords', 'totalPaymentsInWords', 'outstandingInWords', 'netBalanceInWords',
@@ -1503,7 +1526,7 @@ class IpdBillingController extends Controller
             // Second pass: Render with accurate page count stored in view
             $pdf = Pdf::loadView('admin.billing.ipd_estimate_pdf', compact(
                 'ipd', 'breakup', 'bedChargesDetails', 'bedChargesGroupedForDisplay', 'ipdChargesDetails',
-                'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'doctorVisitGroupedForDisplay', 'payments',
+                'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'doctorVisitGroupedForDisplay', 'packageDetails', 'payments',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
                 'investigationDatewise',
                 'totalChargesInWords', 'totalPaymentsInWords', 'outstandingInWords', 'netBalanceInWords',
@@ -1622,15 +1645,17 @@ class IpdBillingController extends Controller
                 ->orderBy('payment_date', 'asc')
                 ->get() ?? collect();
 
-            // Get detailed breakdown - Calculate dynamically from PatientBedHistory up to discharge date
+            // Get detailed breakdown - Calculate dynamically from PatientBedHistory up to discharge date (omit from display when package applied)
             \Log::info('Getting bed charges details');
             $bedChargesData = $this->calculateBedChargesFromHistory($ipdId, $dischargeDate);
             $bedChargesDetails = collect($bedChargesData['details']);
-            // Bed charges grouped by bed and date range for PDF display (one row per bed stay)
             $bedChargesGroupedForDisplay = $this->groupBedChargesByBedForDisplay($bedChargesDetails);
-            
-            // Prepare GST charges grouped by bed group
             $gstChargesGrouped = $this->prepareGstCharges($bedChargesDetails);
+            if (($breakup['package_charges'] ?? 0) > 0) {
+                $bedChargesDetails = collect();
+                $bedChargesGroupedForDisplay = $this->groupBedChargesByBedForDisplay($bedChargesDetails);
+                $gstChargesGrouped = $this->prepareGstCharges($bedChargesDetails);
+            }
 
             \Log::info('Getting IPD charges details');
             $ipdChargesDetails = IpdCharges::where('ipd_id', $ipdId)
@@ -1670,6 +1695,20 @@ class IpdBillingController extends Controller
                 ->get() ?? collect();
             // Group doctor visits by doctor and contiguous date ranges for PDF display
             $doctorVisitGroupedForDisplay = $this->groupDoctorVisitsForDisplay($doctorVisitDetails);
+
+            // Package details (applied packages) for final bill PDF
+            $packageDetails = IpdPackage::where('ipd_id', $ipdId)
+                ->where('status', 'applied')
+                ->with('package')
+                ->orderBy('applied_date', 'asc')
+                ->get()
+                ->map(function ($ipdPackage) {
+                    return [
+                        'date' => $ipdPackage->applied_date,
+                        'package_name' => $ipdPackage->package->name ?? 'N/A',
+                        'amount' => $ipdPackage->final_amount ?? 0,
+                    ];
+                });
 
             // Get hospital information
             $hospital = Hospital::first();
@@ -1865,10 +1904,10 @@ class IpdBillingController extends Controller
             \Log::info('Loading PDF view');
             $pdf = Pdf::loadView('admin.billing.ipd_final_pdf', compact(
                 'ipd', 'breakup', 'bedChargesDetails', 'bedChargesGrouped', 'bedChargesGroupedForDisplay', 'ipdChargesDetails',
-                'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'payments',
+                'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'packageDetails', 'payments',
                 'hospital', 'billNumber', 'billDate', 'dischargeDate', 'dischargeTime',
                 'discount', 'mouDiscount', 'specialDiscount', 'duePatientPartyAmount',
-                'grandTotal', 'totalAdvance', 'balance', 'grandTotalInWords', 
+                'grandTotal', 'totalAdvance', 'balance', 'grandTotalInWords',
                 'totalAdvanceInWords', 'balanceInWords', 'otCharges', 'medicineCharges',
                 'surgeonCharges', 'anesthesiaCharges', 'investigationCharges', 'totalPages',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
