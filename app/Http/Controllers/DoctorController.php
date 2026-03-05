@@ -120,6 +120,13 @@ class DoctorController extends Controller
             $doctor->photo = $filename;
         }
 
+        if($request->signature) {
+            $signatureFile = $request->file('signature');
+            $signatureFilename = 'signature_' . time() . '.' . $signatureFile->getClientOriginalExtension();
+            $signatureFile->move(public_path('uploads/Doctor/signatures'), $signatureFilename);
+            $doctor->signature = $signatureFilename;
+        }
+
         $doctor->save();
 
         return redirect()->route('doctors.index')->with('success', 'Doctor details added successfully!');
@@ -161,7 +168,7 @@ class DoctorController extends Controller
         $Doctor->note = $request->note;
         $Doctor->pan_number = $request->pan_number;
         $Doctor->identification_number = $request->identification_number;
-        $Doctor->local_identification_number = $request->local_identification_number;
+        // $Doctor->local_identification_number = $request->local_identification_number; // Removed: column does not exist
         // Do not change password or user_id during update unless required
         $Doctor->is_active = $request->is_active ?? $Doctor->is_active;
 
@@ -176,6 +183,19 @@ class DoctorController extends Controller
             $filename = time() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/Doctor'), $filename);
             $Doctor->photo = $filename;
+        }
+
+        // Handle signature upload
+        if ($request->file('signature')) {
+            // Delete old signature
+            if ($Doctor->signature && file_exists(public_path('uploads/Doctor/signatures/' . $Doctor->signature))) {
+                unlink(public_path('uploads/Doctor/signatures/' . $Doctor->signature));
+            }
+
+            $signatureFile = $request->file('signature');
+            $signatureFilename = 'signature_' . time() . '.' . $signatureFile->getClientOriginalExtension();
+            $signatureFile->move(public_path('uploads/Doctor/signatures'), $signatureFilename);
+            $Doctor->signature = $signatureFilename;
         }
 
         $Doctor->save();

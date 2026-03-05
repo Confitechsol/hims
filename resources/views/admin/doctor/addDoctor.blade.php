@@ -884,9 +884,23 @@
                                         </div>
                                     </div>
 
+                                     <!-- signature -->
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">Signature</label>
+                                            <input type="file" class="form-control" name="signature">
+                                            @if($isEdit && $doctor->signature)
+                                                <small>Current: <img src="{{ asset('uploads/doctor/'.$doctor->signature) }}"
+                                                                    width="40"></small>
+                                            @endif
+                                        </div>
+                                    </div>
+
                                 </div>
                                 
                             </div>
+
+
 
                             <div class="section-card">
                                 <div class="section-header">
