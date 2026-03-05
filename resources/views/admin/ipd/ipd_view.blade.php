@@ -573,6 +573,13 @@
                         <span>Charges</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="#packages" data-bs-toggle="tab" aria-expanded="true"
+                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                            class="fa-solid fa-gift text-primary pe-1"></i>
+                        <span>Packages</span>
+                    </a>
+                </li>
                 <!-- <li class="nav-item">
                     <a href="#payments" data-bs-toggle="tab" aria-expanded="true"
                         class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
@@ -3504,6 +3511,79 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Packages Tab -->
+            <div class="tab-pane" id="packages">
+                <div class="row">
+                    <div class="col-12 d-flex">
+                        <div class="card shadow-sm flex-fill w-100">
+                            <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0" style="color: #750096">
+                                        <i class="fa-solid fa-gift me-2"></i>Applied Packages
+                                    </h5>
+                                    @if ($ipd->discharged != 'yes')
+                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#apply_package_modal">
+                                            <i class="ti ti-plus me-1"></i>Apply Package
+                                        </button>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div id="applied-packages-list">
+                                    <div class="alert alert-info">
+                                        <i class="ti ti-info-circle me-2"></i>Loading packages...
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Apply Package Modal -->
+            <div class="modal fade" id="apply_package_modal" tabindex="-1" aria-labelledby="apply_package_label" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="apply_package_label">Apply Package</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form id="apply_package_form">
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="package_select" class="form-label">Select Package <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="package_select" name="package_id" required>
+                                        <option value="">-- Select Package --</option>
+                                    </select>
+                                    <div id="package_details" class="mt-3 p-3 bg-light rounded" style="display: none;">
+                                        <h6>Package Details</h6>
+                                        <p><strong>Rate:</strong> <span id="pkg_rate">0</span></p>
+                                        <p><strong>GST:</strong> <span id="pkg_gst">0</span>%</p>
+                                        <p><strong>Description:</strong> <span id="pkg_desc">-</span></p>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="applied_date" class="form-label">Applied Date</label>
+                                    <input type="date" class="form-control" id="applied_date" name="applied_date" value="{{ date('Y-m-d') }}">
+                                    <small class="text-muted">Default: Today. Leave blank for today's date</small>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="notes" class="form-label">Notes</label>
+                                    <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Optional notes..."></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary" id="apply_package_btn">
+                                    <i class="ti ti-check me-1"></i>Apply Package
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
             <!-- <div class="tab-pane" id="payments">
                 
                 <div class="row">
@@ -6003,6 +6083,186 @@
                 }
             });
         }
+    </script>
+
+    <!-- Package Management Script -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ipdId = "{{ $ipd->id }}";
+        const packageSelectEl = document.getElementById('package_select');
+        const applyPackageForm = document.getElementById('apply_package_form');
+        const appliedPackagesList = document.getElementById('applied-packages-list');
+
+        // Load available packages on modal open
+        document.getElementById('apply_package_modal').addEventListener('shown.bs.modal', function() {
+            loadAvailablePackages();
+        });
+
+        // Load applied packages on tab activation
+        document.querySelector('a[href="#packages"]').addEventListener('shown.bs.tab', function() {
+            loadAppliedPackages();
+        });
+
+        // Load applied packages on page load
+        loadAppliedPackages();
+
+        function loadAvailablePackages() {
+            if (!packageSelectEl) return;
+            
+            fetch(`/ipd/${ipdId}/packages`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.available_packages) {
+                        const currentOptions = packageSelectEl.value;
+                        packageSelectEl.innerHTML = '<option value="">-- Select Package --</option>';
+                        
+                        data.available_packages.forEach(pkg => {
+                            const option = document.createElement('option');
+                            option.value = pkg.id;
+                            option.textContent = `${pkg.name} - ₹${pkg.package_rate}`;
+                            option.dataset.rate = pkg.package_rate;
+                            option.dataset.gst = pkg.gst_amount;
+                            option.dataset.desc = pkg.description;
+                            packageSelectEl.appendChild(option);
+                        });
+                        
+                        if (currentOptions) {
+                            packageSelectEl.value = currentOptions;
+                        }
+                    }
+                })
+                .catch(error => console.error('Error loading packages:', error));
+        }
+
+        function loadAppliedPackages() {
+            if (!appliedPackagesList) return;
+            
+            fetch(`/ipd/${ipdId}/packages`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.applied_packages) {
+                        if (data.applied_packages.length === 0) {
+                            appliedPackagesList.innerHTML = '<div class="alert alert-info"><i class="ti ti-info-circle me-2"></i>No packages applied yet.</div>';
+                        } else {
+                            let html = '<div class="table-responsive"><table class="table table-hover"><thead><tr><th>Package</th><th>Applied Date</th><th>Amount</th><th>Action</th></tr></thead><tbody>';
+                            
+                            data.applied_packages.forEach(pkg => {
+                                html += `<tr>
+                                    <td><strong>${pkg.package.name}</strong></td>
+                                    <td>${new Date(pkg.applied_date).toLocaleDateString()}</td>
+                                    <td>₹${parseFloat(pkg.final_amount).toFixed(2)}</td>
+                                    <td>
+                                        ${pkg.status === 'applied' ? `<button class="btn btn-sm btn-danger remove-pkg-btn" data-ipd-pkg-id="${pkg.id}"><i class="ti ti-trash me-1"></i>Remove</button>` : `<span class="badge bg-secondary">${pkg.status}</span>`}
+                                    </td>
+                                </tr>`;
+                            });
+                            
+                            html += '</tbody></table></div>';
+                            appliedPackagesList.innerHTML = html;
+                            
+                            // Attach remove event handlers
+                            document.querySelectorAll('.remove-pkg-btn').forEach(btn => {
+                                btn.addEventListener('click', function() {
+                                    if (confirm('Are you sure you want to remove this package?')) {
+                                        removePackage(this.dataset.ipdPkgId);
+                                    }
+                                });
+                            });
+                        }
+                    }
+                })
+                .catch(error => console.error('Error loading applied packages:', error));
+        }
+
+        // Handle package selection change - show details
+        if (packageSelectEl) {
+            packageSelectEl.addEventListener('change', function() {
+                const detailsDiv = document.getElementById('package_details');
+                if (this.value) {
+                    const selected = this.options[this.selectedIndex];
+                    document.getElementById('pkg_rate').textContent = selected.dataset.rate;
+                    document.getElementById('pkg_gst').textContent = selected.dataset.gst || '0';
+                    document.getElementById('pkg_desc').textContent = selected.dataset.desc || '-';
+                    detailsDiv.style.display = 'block';
+                } else {
+                    detailsDiv.style.display = 'none';
+                }
+            });
+        }
+
+        // Handle form submission
+        if (applyPackageForm) {
+            applyPackageForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const packageId = document.getElementById('package_select').value;
+                const appliedDate = document.getElementById('applied_date').value;
+                const notes = document.getElementById('notes').value;
+                
+                if (!packageId) {
+                    alert('Please select a package');
+                    return;
+                }
+                
+                fetch(`/ipd/${ipdId}/apply-package`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        package_id: packageId,
+                        applied_date: appliedDate,
+                        notes: notes
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Package applied successfully!');
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('apply_package_modal'));
+                        modal.hide();
+                        applyPackageForm.reset();
+                        loadAppliedPackages();
+                        loadAvailablePackages();
+                    } else {
+                        alert('Error: ' + (data.message || 'Failed to apply package'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error applying package: ' + error.message);
+                });
+            });
+        }
+
+        function removePackage(ipdPackageId) {
+            fetch(`/ipd/${ipdId}/remove-package`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({
+                    ipd_package_id: ipdPackageId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Package removed successfully!');
+                    loadAppliedPackages();
+                    loadAvailablePackages();
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to remove package'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error removing package: ' + error.message);
+            });
+        }
+    });
     </script>
 
 @endsection

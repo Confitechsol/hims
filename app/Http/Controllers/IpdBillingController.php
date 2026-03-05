@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\IpdDetail;
 use App\Models\IpdDaywiseBedCharge;
 use App\Models\IpdCharges;
+use App\Models\IpdPackage;
 use App\Models\PathologyBilling;
 use App\Models\RadiologyBilling;
 use App\Models\Transaction;
@@ -14,6 +15,7 @@ use App\Models\DischargeCard;
 use App\Models\PatientBedHistory;
 use App\Models\BedGroup;
 use App\Models\Doctor;
+use App\Services\IpdPackageService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -202,6 +204,35 @@ class IpdBillingController extends Controller
         $details = [];
         $currentDate = $admissionDate->copy();
 
+        // Pre-compute the most recent custom bed charge for each bed group during its history periods
+        // This ensures a custom charge set on admission/transfer applies to all subsequent days in that period
+        $bedGroupCustomCharges = []; // Format: ['bed_group_id|history_index' => daywise_charge_object]
+        foreach ($bedHistories as $historyIndex => $history) {
+            $bedHistoryFromDate = Carbon::parse($history->from_date)->startOfDay();
+            $bedHistoryToDate = $history->to_date ? Carbon::parse($history->to_date)->endOfDay() : Carbon::now()->endOfDay();
+            
+            // Find the most recent custom bed charge for this bed group within this history period
+            $mostRecentDaywise = null;
+            $mostRecentDate = null;
+            
+            foreach ($daywiseCharges as $date => $daywise) {
+                if ((int)$daywise->bed_group_id === (int)$history->bed_group_id) {
+                    $daywiseDateCarbon = Carbon::parse($daywise->charge_date)->startOfDay();
+                    
+                    if ($daywiseDateCarbon->gte($bedHistoryFromDate) && $daywiseDateCarbon->lte($bedHistoryToDate)) {
+                        if ($mostRecentDate === null || $daywiseDateCarbon->gt($mostRecentDate)) {
+                            $mostRecentDate = $daywiseDateCarbon;
+                            $mostRecentDaywise = $daywise;
+                        }
+                    }
+                }
+            }
+            
+            if ($mostRecentDaywise && isset($mostRecentDaywise->bed_charge) && (float)$mostRecentDaywise->bed_charge > 0) {
+                $bedGroupCustomCharges[$history->bed_group_id . '|' . $historyIndex] = $mostRecentDaywise;
+            }
+        }
+
         // Calculate charges for each day from admission to end date
         while ($currentDate->lte($endDate)) {
             $chargeDate = $currentDate->format('Y-m-d');
@@ -213,13 +244,15 @@ class IpdBillingController extends Controller
 
             // Find which bed was assigned during this period (use date-only so admission time doesn't exclude same day)
             $activeBed = null;
-            foreach ($bedHistories as $history) {
+            $activeBedHistoryIndex = null;
+            foreach ($bedHistories as $historyIndex => $history) {
                 $fromDate = Carbon::parse($history->from_date)->startOfDay();
                 $toDate = $history->to_date ? Carbon::parse($history->to_date)->endOfDay() : null;
 
                 if ($fromDate->lte($periodEnd) && (!$toDate || $toDate->gte($periodStart))) {
                     if (!$activeBed || $fromDate->gt(Carbon::parse($activeBed->from_date)->startOfDay())) {
                         $activeBed = $history;
+                        $activeBedHistoryIndex = $historyIndex;
                     }
                 }
             }
@@ -238,6 +271,7 @@ class IpdBillingController extends Controller
                 $gstRate = 0;
                 $sacHsnCode = null;
 
+                // First, try exact date match for daywise charge
                 if ($daywiseCharges->has($chargeDate)) {
                     $daywise = $daywiseCharges->get($chargeDate);
                     if ($daywise && isset($daywise->bed_charge) && (float)$daywise->bed_charge > 0) {
@@ -245,6 +279,19 @@ class IpdBillingController extends Controller
                         $bedChargeRate = (float) ($daywise->bed_charge_rate ?? $activeBed->bedGroup->bed_cost ?? 0);
                         $gstRate = $daywise->bedGroup->gst_rate ?? $activeBed->bedGroup->gst_rate ?? 0;
                         $sacHsnCode = $daywise->bedGroup->sac_hsn_code ?? $activeBed->bedGroup->sac_hsn_code ?? null;
+                    }
+                } else {
+                    // If no exact date match, use the pre-computed most recent custom bed charge
+                    // This ensures a custom charge set during admission/transfer applies to all subsequent days
+                    $customChargeKey = $activeBed->bed_group_id . '|' . $activeBedHistoryIndex;
+                    if (isset($bedGroupCustomCharges[$customChargeKey])) {
+                        $daywise = $bedGroupCustomCharges[$customChargeKey];
+                        if ($daywise && isset($daywise->bed_charge) && (float)$daywise->bed_charge > 0) {
+                            $bedCost = (float) $daywise->bed_charge;
+                            $bedChargeRate = (float) ($daywise->bed_charge_rate ?? $activeBed->bedGroup->bed_cost ?? 0);
+                            $gstRate = $daywise->bedGroup->gst_rate ?? $activeBed->bedGroup->gst_rate ?? 0;
+                            $sacHsnCode = $daywise->bedGroup->sac_hsn_code ?? $activeBed->bedGroup->sac_hsn_code ?? null;
+                        }
                     }
                 }
 
@@ -348,6 +395,9 @@ class IpdBillingController extends Controller
                 'pathology_charges' => 0,
                 'radiology_charges' => 0,
                 'doctor_visit_charges' => 0,
+                'package_charges' => 0,
+                'cgst_charges' => 0,
+                'sgst_charges' => 0,
                 'total_charges' => 0,
                 'total_payments' => 0,
                 'outstanding' => 0,
@@ -397,8 +447,13 @@ class IpdBillingController extends Controller
                 ->sum('amount');
         }
 
-        // Total Charges (including GST)
-        $totalCharges = $bedCharges + $ipdCharges + $pathologyCharges + $radiologyCharges + $doctorVisitCharges + $cgstCharges + $sgstCharges;
+        // Package Charges (applied packages only)
+        $packageCharges = IpdPackage::where('ipd_id', $ipdId)
+            ->where('status', 'applied')
+            ->sum('final_amount');
+
+        // Total Charges (including GST and package charges)
+        $totalCharges = $bedCharges + $ipdCharges + $pathologyCharges + $radiologyCharges + $doctorVisitCharges + $packageCharges + $cgstCharges + $sgstCharges;
 
         // Total Payments
         // Note: Refund receipts should reduce the net payment,
@@ -426,6 +481,7 @@ class IpdBillingController extends Controller
             'pathology_charges' => $pathologyCharges,
             'radiology_charges' => $radiologyCharges,
             'doctor_visit_charges' => $doctorVisitCharges,
+            'package_charges' => $packageCharges,
             'cgst_charges' => $cgstCharges,
             'sgst_charges' => $sgstCharges,
             'total_charges' => $totalCharges,
@@ -616,6 +672,22 @@ class IpdBillingController extends Controller
                 });
         }
 
+        // Package Charges Details
+        $packageDetails = IpdPackage::where('ipd_id', $ipdId)
+            ->where('status', 'applied')
+            ->with('package')
+            ->orderBy('applied_date', 'asc')
+            ->get()
+            ->map(function($ipdPackage) {
+                return [
+                    'date' => $ipdPackage->applied_date,
+                    'package_name' => $ipdPackage->package->name ?? 'N/A',
+                    'amount' => $ipdPackage->final_amount ?? 0,
+                    'type' => 'package',
+                    'description' => 'Package - ' . ($ipdPackage->package->name ?? 'N/A'),
+                ];
+            });
+
         // Combine all charges and sort by date
         $allCharges = collect()
             ->merge($bedChargesDetails)
@@ -623,6 +695,7 @@ class IpdBillingController extends Controller
             ->merge($pathologyDetailsWithTests)
             ->merge($radiologyDetailsWithTests)
             ->merge($doctorVisitDetails)
+            ->merge($packageDetails)
             ->sortBy('date')
             ->values();
 
@@ -639,6 +712,7 @@ class IpdBillingController extends Controller
             'pathology_charges' => $pathologyDetailsWithTests,
             'radiology_charges' => $radiologyDetailsWithTests,
             'doctor_visit_charges' => $doctorVisitDetails,
+            'package_charges' => $packageDetails,
         ];
     }
 
@@ -708,6 +782,98 @@ class IpdBillingController extends Controller
             'cgst' => $cgstGrouped,
             'sgst' => $sgstGrouped,
         ];
+    }
+
+    /**
+     * Group day-wise bed charges by bed and contiguous date ranges for display.
+     * Returns one row per (bed + contiguous date range): e.g. "SINGLE - 5 SINGLE @5000 | 5 Days | 17/01/2026 To 21/01/2026".
+     *
+     * @param \Illuminate\Support\Collection $bedChargesDetails Day-wise details from calculateBedChargesFromHistory
+     * @return \Illuminate\Support\Collection
+     */
+    private function groupBedChargesByBedForDisplay($bedChargesDetails)
+    {
+        if ($bedChargesDetails->isEmpty()) {
+            return collect();
+        }
+
+        // Group by (bed_group_id, bed_id)
+        $byBed = $bedChargesDetails->groupBy(function ($item) {
+            return ($item->bed_group_id ?? '') . '|' . ($item->bed_id ?? '');
+        });
+
+        $result = collect();
+        foreach ($byBed as $key => $items) {
+            $sorted = $items->sortBy('charge_date')->values();
+            $prevDate = null;
+            $rangeStart = null;
+            $rangeDays = 0;
+            $rangeAmount = 0;
+            $rangeRate = null;
+            $bedGroup = null;
+            $bed = null;
+
+            foreach ($sorted as $d) {
+                $dDate = $d->charge_date instanceof \DateTimeInterface
+                    ? $d->charge_date->format('Y-m-d')
+                    : Carbon::parse($d->charge_date)->format('Y-m-d');
+
+                $isConsecutive = $prevDate !== null && Carbon::parse($prevDate)->addDay()->format('Y-m-d') === $dDate;
+
+                if ($rangeStart === null || !$isConsecutive) {
+                    // Flush previous range if any
+                    if ($rangeStart !== null && $rangeDays > 0) {
+                        $result->push((object) [
+                            'from_date' => $rangeStart,
+                            'to_date' => $prevDate,
+                            'no_of_days' => $rangeDays,
+                            'bed_charge' => $rangeAmount,
+                            'bed_charge_rate' => $rangeRate,
+                            'bedGroup' => $bedGroup,
+                            'bed' => $bed,
+                            'bed_label' => $this->formatBedChargeLabel($bedGroup, $bed, $rangeRate),
+                        ]);
+                    }
+                    $rangeStart = $dDate;
+                    $rangeDays = 1;
+                    $rangeAmount = (float) ($d->bed_charge ?? 0);
+                    $rangeRate = (float) ($d->bed_charge_rate ?? 0);
+                    $bedGroup = $d->bedGroup ?? null;
+                    $bed = $d->bed ?? null;
+                } else {
+                    $rangeDays++;
+                    $rangeAmount += (float) ($d->bed_charge ?? 0);
+                }
+                $prevDate = $dDate;
+            }
+
+            if ($rangeStart !== null && $rangeDays > 0) {
+                $result->push((object) [
+                    'from_date' => $rangeStart,
+                    'to_date' => $prevDate,
+                    'no_of_days' => $rangeDays,
+                    'bed_charge' => $rangeAmount,
+                    'bed_charge_rate' => $rangeRate,
+                    'bedGroup' => $bedGroup,
+                    'bed' => $bed,
+                    'bed_label' => $this->formatBedChargeLabel($bedGroup, $bed, $rangeRate),
+                ]);
+            }
+        }
+
+        // Sort by from_date so order is chronological
+        return $result->sortBy('from_date')->values();
+    }
+
+    /**
+     * Format bed charge row label: "BEDGROUP - BEDNAME @ RATE"
+     */
+    private function formatBedChargeLabel($bedGroup, $bed, $rate)
+    {
+        $groupName = ($bedGroup && isset($bedGroup->name)) ? $bedGroup->name : 'N/A';
+        $bedName = ($bed && isset($bed->name)) ? $bed->name : 'N/A';
+        $rateNum = (float) ($rate ?? 0);
+        return $groupName . ' - ' . $bedName . ' @' . number_format($rateNum, 0);
     }
 
     /**
@@ -954,6 +1120,8 @@ class IpdBillingController extends Controller
             // Get detailed breakdown - Calculate dynamically from PatientBedHistory
             $bedChargesData = $this->calculateBedChargesFromHistory($ipdId);
             $bedChargesDetails = collect($bedChargesData['details']);
+            // Bed charges grouped by bed and date range for PDF display (one row per bed stay)
+            $bedChargesGroupedForDisplay = $this->groupBedChargesByBedForDisplay($bedChargesDetails);
             
             // Prepare GST charges grouped by bed group
             $gstChargesGrouped = $this->prepareGstCharges($bedChargesDetails);
@@ -1165,7 +1333,7 @@ class IpdBillingController extends Controller
             
             // First pass: Render to get accurate page count
             $tempPdf = Pdf::loadView('admin.billing.ipd_estimate_pdf', compact(
-                'ipd', 'breakup', 'bedChargesDetails', 'ipdChargesDetails',
+                'ipd', 'breakup', 'bedChargesDetails', 'bedChargesGroupedForDisplay', 'ipdChargesDetails',
                 'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'payments',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
                 'investigationDatewise',
@@ -1206,7 +1374,7 @@ class IpdBillingController extends Controller
             // ));
             // Second pass: Render with accurate page count stored in view
             $pdf = Pdf::loadView('admin.billing.ipd_estimate_pdf', compact(
-                'ipd', 'breakup', 'bedChargesDetails', 'ipdChargesDetails',
+                'ipd', 'breakup', 'bedChargesDetails', 'bedChargesGroupedForDisplay', 'ipdChargesDetails',
                 'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'payments',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
                 'investigationDatewise',
@@ -1330,6 +1498,8 @@ class IpdBillingController extends Controller
             \Log::info('Getting bed charges details');
             $bedChargesData = $this->calculateBedChargesFromHistory($ipdId, $dischargeDate);
             $bedChargesDetails = collect($bedChargesData['details']);
+            // Bed charges grouped by bed and date range for PDF display (one row per bed stay)
+            $bedChargesGroupedForDisplay = $this->groupBedChargesByBedForDisplay($bedChargesDetails);
             
             // Prepare GST charges grouped by bed group
             $gstChargesGrouped = $this->prepareGstCharges($bedChargesDetails);
@@ -1564,7 +1734,7 @@ class IpdBillingController extends Controller
             // Generate PDF
             \Log::info('Loading PDF view');
             $pdf = Pdf::loadView('admin.billing.ipd_final_pdf', compact(
-                'ipd', 'breakup', 'bedChargesDetails', 'bedChargesGrouped', 'ipdChargesDetails',
+                'ipd', 'breakup', 'bedChargesDetails', 'bedChargesGrouped', 'bedChargesGroupedForDisplay', 'ipdChargesDetails',
                 'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'payments',
                 'hospital', 'billNumber', 'billDate', 'dischargeDate', 'dischargeTime',
                 'discount', 'mouDiscount', 'specialDiscount', 'duePatientPartyAmount',

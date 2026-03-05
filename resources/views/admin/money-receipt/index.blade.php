@@ -7,7 +7,7 @@
             <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                 <div class="d-flex justify-content-between align-items-center">
                     <h5 class="mb-0" style="color: #750096">
-                        <i class="fas fa-receipt me-2"></i>Money Receipt List
+                        <i class="fas fa-receipt me-2"></i>Money/Refund Receipt List
                     </h5>
                     <a href="{{ route('money-receipt.create') }}" class="btn btn-primary btn-sm">
                         <i class="ti ti-plus me-1"></i>New Receipt

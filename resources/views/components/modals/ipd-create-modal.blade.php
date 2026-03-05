@@ -907,6 +907,13 @@
                                     step="0.01" min="0" placeholder="0.00">
                                 <small class="text-muted">Auto-filled from bed group (editable)</small>
                             </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Package (Optional)</label>
+                                <select class="form-select" name="package_id" id="package_select_admission">
+                                    <option value="">-- Select Package --</option>
+                                </select>
+                                <small class="text-muted">Select a package to include it from day 1</small>
+                            </div>
                             {{-- <div class="col-md-6">
                                 <label class="form-label">Charge Category</label>
                                 <select class="form-select" name="charge_category" id="charge_category_select">
@@ -1557,7 +1564,33 @@
                             .trigger('change.select2');
                     });
             });
-        })
+
+            // Load available packages (fully dynamic URL via named route)
+            const packageSelect = $modal.find('#package_select_admission');
+            if (packageSelect.length) {
+                fetch("{{ route('packages.api.active') }}")
+                    .then(response => response.json())
+                    .then(data => {
+                        packageSelect.empty().append('<option value="">-- Select Package --</option>');
+                        
+                        if (data.success && data.packages) {
+                            data.packages.forEach(pkg => {
+                                const option = new Option(
+                                    `${pkg.name} - ₹${pkg.package_rate}`,
+                                    pkg.id,
+                                    false,
+                                    false
+                                );
+                                packageSelect.append(option);
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading packages:', error);
+                        packageSelect.empty().append('<option value="">Error loading packages</option>');
+                    });
+            }
+        });
     </script>
 @endsection
 
