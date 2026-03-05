@@ -5,14 +5,22 @@
             <div>
                 <!-- Logo Normal -->
                 <a href="{{ route('dashboard') }}" class="logo logo-normal">
-                    <!-- <img src="assets/img/logo.png" alt="Logo"> -->
-                     <img src="{{ asset('assets/images/logo.webp') }}" alt="Logo">
+                    <img src="{{ asset('assets/images/logo.webp') }}" alt="Logo">
+                     <!-- @if(!empty($mo?->image))
+                                        <img src="{{ asset($hospitalData->image) }}" alt="Logo">
+                                    @else
+                                        <img src="{{ asset('assets/images/logo.webp') }}" alt="img">
+                                    @endif -->
                 </a>
 
                 <!-- Logo Small -->
                 <a href="{{ route('dashboard') }}" class="logo-small">
                     <!-- <img src="assets/img/logo-small.svg" alt="Logo"> -->
-                    <img src="{{ asset('assets/images/logo.webp') }}" alt="Logo">
+                    @if(!empty($hospitalData?->image))
+                                        <img src="{{ asset($hospitalData->image) }}" alt="Logo">
+                                    @else
+                                        <img src="{{ asset('assets/images/logo.webp') }}" alt="img">
+                                    @endif
                 </a>
 
                 <!-- Logo Dark -->
@@ -43,8 +51,12 @@
                             <div class="d-flex align-items-center">
                                 <!-- <span class="avatar rounded-circle flex-shrink-0 p-2"></span> -->
                                 <div class="ms-2">
-                                    <img
-                                        src="{{ asset('assets/images/logo.webp') }}" alt="img">
+                                    @if(!empty($hospitalData?->image))
+                                        <img src="{{ asset($hospitalData->image) }}" alt="Logo">
+                                    @else
+                                        <img src="{{ asset('assets/images/logo.webp') }}" alt="img">
+                                    @endif
+                                    
                                     <!-- <h6 class="fs-14 fw-semibold mb-0">Trustcare
                                         Clinic</h6>
                                     <p class="fs-13 mb-0">Lasvegas</p> -->

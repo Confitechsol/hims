@@ -417,7 +417,7 @@
                                       <br />
 
 
-                                      <h6 id="discharge_medicine_label">Advised Medicines:</h6>
+                                      <h6 id="discharge_medicine_label">Discharge Advised Medicines:</h6>
                                       <div class="general_list" id="discharge_medicine_list"></div>
                                       <br />
                                       <h6 id="dis_investigation_label">Investigations:</h6>
@@ -430,7 +430,7 @@
                                       <div class="general_list" id="dis_diet_advice_html"></div>
                                       <br />
 
-                                      <h6 id="dis_discharge_advice_label">Discharge Advice:</h6>
+                                      <h6 id="dis_discharge_advice_label">Condition at Discharge:</h6>
                                       <div class="general_list" id="dis_discharge_advice_html"></div>
 
                                       <div class="end">
@@ -522,7 +522,7 @@
               setText('dis_discharge_time_text', data.discharge_time);
 
               if (data.ot_date) {
-                  setText('dis_ot_date_text', data.ot_date);
+                  setText('dis_ot_date_text', formatDate(new Date(data.ot_date)));
               }
 
               if (medicines.length > 0) {

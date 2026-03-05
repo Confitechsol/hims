@@ -22,6 +22,7 @@ class ProfileController extends Controller
      */
     public function update(Request $request)
     {
+        //dd($request->all());
         $hospital = Hospital::first();
         if (! $hospital) {
             $hospital = new Hospital();
@@ -44,10 +45,26 @@ class ProfileController extends Controller
         $hospital->currency_symbol = $request->currency_symbol;
         $hospital->credit_limit = $request->credit_limit;
 
-        $hospital->image = $request->hasFile('hospital_logo') ? $request->file('hospital_logo')->store('hospital_content/logo', 'public') : '';
-        $hospital->mini_logo = $request->hasFile('small_logo') ? $request->file('small_logo')->store('hospital_content/logo', 'public') : '';
-        $hospital->mobile_app_logo = $request->hasFile('mobile_app_logo') ? $request->file('mobile_app_logo')->store('hospital_content/logo', 'public') : '';
-
+       
+       
+        if ($request->hasFile('hospital_logo')) {
+            $file = $request->file('hospital_logo');
+            $filename = time().'_'.$file->getClientOriginalName();
+            $file->move(public_path('assets/hospital_content/logo'), $filename);
+            $hospital->image = 'assets/hospital_content/logo/' . $filename;
+        }
+        if ($request->hasFile('small_logo')) {
+            $file = $request->file('small_logo');
+            $filename = time().'_'.$file->getClientOriginalName();
+            $file->move(public_path('assets/hospital_content/logo'), $filename);
+            $hospital->image = 'assets/hospital_content/logo/' . $filename;
+        }
+        if ($request->hasFile('mobile_app_logo')) {
+            $file = $request->file('mobile_app_logo');
+            $filename = time().'_'.$file->getClientOriginalName();
+            $file->move(public_path('assets/hospital_content/logo'), $filename);
+            $hospital->image = 'assets/hospital_content/logo/' . $filename;
+        }
         $hospital->save();
 
         // Add new branches
@@ -96,11 +113,25 @@ class ProfileController extends Controller
         $hospital->currency = $request->currency;
         $hospital->currency_symbol = $request->currency_symbol;
         $hospital->credit_limit = $request->credit_limit;
-
-        $hospital->image = $request->hasFile('hospital_logo') ? $request->file('hospital_logo')->store('hospital_content/logo', 'public') : '';
-        $hospital->mini_logo = $request->hasFile('small_logo') ? $request->file('small_logo')->store('hospital_content/logo', 'public') : '';
-        //$hospital->mobile_app_logo = $request->hasFile('mobile_app_logo') ? $request->file('mobile_app_logo')->store('hospital_content/logo', 'public') : '';
-
+if ($request->hasFile('hospital_logo')) {
+            $file = $request->file('hospital_logo');
+            $filename = time().'_'.$file->getClientOriginalName();
+            $file->move(public_path('assets/hospital_content/logo'), $filename);
+            $hospital->image = 'assets/hospital_content/logo/' . $filename;
+        }
+        if ($request->hasFile('small_logo')) {
+            $file = $request->file('small_logo');
+            $filename = time().'_'.$file->getClientOriginalName();
+            $file->move(public_path('assets/hospital_content/logo'), $filename);
+            $hospital->image = 'assets/hospital_content/logo/' . $filename;
+        }
+        if ($request->hasFile('mobile_app_logo')) {
+            $file = $request->file('mobile_app_logo');
+            $filename = time().'_'.$file->getClientOriginalName();
+            $file->move(public_path('assets/hospital_content/logo'), $filename);
+            $hospital->image = 'assets/hospital_content/logo/' . $filename;
+        }
+        
         $hospital->save();
 
         // Save branches

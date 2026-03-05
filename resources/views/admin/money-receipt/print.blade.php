@@ -192,7 +192,7 @@
         }
 
         .payment_section {
-            border: 2px solid #282828;
+            /* border: 2px solid #282828; */
             padding: 10px;
             margin-top: 15px;
             font-size: 10px;
