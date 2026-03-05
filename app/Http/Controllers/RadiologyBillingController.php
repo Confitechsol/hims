@@ -77,7 +77,8 @@ class RadiologyBillingController extends Controller
     {
         $validated = $request->validate([
             'patient_id' => 'required|exists:patients,id',
-            'case_reference_id' => 'nullable',
+            // Case reference must be selected (generic case / prescription ID)
+            'case_reference_id' => 'required',
             'doctor_id' => 'nullable|exists:doctor,id',
             'doctor_name' => 'nullable|string|max:100',
             'date' => 'required|date',
@@ -233,7 +234,8 @@ class RadiologyBillingController extends Controller
     {
         $validated = $request->validate([
             'patient_id' => 'required|exists:patients,id',
-            'case_reference_id' => 'nullable',
+            // Case reference must be selected (generic case / prescription ID)
+            'case_reference_id' => 'required',
             'doctor_id' => 'nullable|exists:doctor,id',
             'doctor_name' => 'nullable|string|max:100',
             'date' => 'required|date',

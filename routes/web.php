@@ -28,6 +28,7 @@ use App\Http\Controllers\FloorController;
 use App\Http\Controllers\FrontOfficeController;
 use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\InventoriesController;
+use App\Http\Controllers\IpdBillingController;
 use App\Http\Controllers\MedicineCategoryController;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\MedicineGroupController;
@@ -643,13 +644,13 @@ Route::get('/billing', function () {
 
 // IPD Billing Routes
 Route::prefix('ipd/billing')->group(function () {
-    Route::get('/search', [App\Http\Controllers\IpdBillingController::class, 'search'])->name('ipd.billing.search');
-    Route::get('/{ipdId}/breakup', [App\Http\Controllers\IpdBillingController::class, 'breakup'])->name('ipd.billing.breakup');
-    Route::post('/{ipdId}/discount', [App\Http\Controllers\IpdBillingController::class, 'updateDiscount'])->name('ipd.billing.discount.update');
-    Route::post('/{ipdId}/due-patient-party', [App\Http\Controllers\IpdBillingController::class, 'updateDuePatientParty'])->name('ipd.billing.due.patient.party.update');
-    Route::get('/{ipdId}/check-discharged', [App\Http\Controllers\IpdBillingController::class, 'checkDischarged'])->name('ipd.billing.check.discharged');
-    Route::get('/{ipdId}/export-estimate', [App\Http\Controllers\IpdBillingController::class, 'exportEstimate'])->name('ipd.billing.export.estimate');
-    Route::get('/{ipdId}/export-final', [App\Http\Controllers\IpdBillingController::class, 'exportFinal'])->name('ipd.billing.export.final');
+    Route::get('/search', [IpdBillingController::class, 'search'])->name('ipd.billing.search');
+    Route::get('/{ipdId}/breakup', [IpdBillingController::class, 'breakup'])->name('ipd.billing.breakup');
+    Route::post('/{ipdId}/discount', [IpdBillingController::class, 'updateDiscount'])->name('ipd.billing.discount.update');
+    Route::post('/{ipdId}/due-patient-party', [IpdBillingController::class, 'updateDuePatientParty'])->name('ipd.billing.due.patient.party.update');
+    Route::get('/{ipdId}/check-discharged', [IpdBillingController::class, 'checkDischarged'])->name('ipd.billing.check.discharged');
+    Route::get('/{ipdId}/export-estimate', [IpdBillingController::class, 'exportEstimate'])->name('ipd.billing.export.estimate');
+    Route::get('/{ipdId}/export-final', [IpdBillingController::class, 'exportFinal'])->name('ipd.billing.export.final');
 });
 Route::get('/patient_profile', function () {
     return view('admin.patient_profile');

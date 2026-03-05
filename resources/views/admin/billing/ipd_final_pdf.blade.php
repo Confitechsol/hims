@@ -786,27 +786,39 @@ header {
         </table>
         @endif
 
-        <!-- Doctor Visit Charges -->
-        @if(isset($doctorVisitDetails) && $doctorVisitDetails->count() > 0)
+        <!-- Doctor Visit Charges (grouped by doctor and date range) -->
+        @if(isset($doctorVisitGroupedForDisplay) && $doctorVisitGroupedForDisplay->count() > 0)
         <table class="charges-table">
             <thead>
                 <tr>
                     <th colspan="4">Doctor Visit Charges</th>
                 </tr>
                 <tr>
-                    <th>Visit Date</th>
-                    <th>Doctor</th>
-                    <th>Visit Type</th>
+                    <th>Doctor / Visit Type</th>
+                    <th>Visits</th>
+                    <th>Date Range</th>
                     <th class="text-right">Amount</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($doctorVisitDetails as $visit)
+                @foreach($doctorVisitGroupedForDisplay as $row)
                 <tr>
-                    <td>{{ \Carbon\Carbon::parse($visit->visit_date)->format('d-m-Y') }}</td>
-                    <td>{{ $visit->doctor->name ?? 'N/A' }} {{ $visit->doctor->surname ?? '' }}</td>
-                    <td>{{ $visit->charge->name ?? 'N/A' }}</td>
-                    <td class="text-right">Rs. {{ number_format($visit->amount, 2) }}</td>
+                    <td>
+                        {{ $row->doctor_label ?? 'N/A' }}
+                        @if(isset($row->rate_per_visit))
+                            @ {{ number_format($row->rate_per_visit, 2) }}
+                        @endif
+                        @if(!empty($row->visit_type_label))
+                            - {{ $row->visit_type_label }}
+                        @endif
+                    </td>
+                    <td>{{ $row->visit_count ?? 0 }} {{ ($row->visit_count ?? 0) === 1 ? 'Visit' : 'Visits' }}</td>
+                    <td>
+                        {{ $row->from_date ? \Carbon\Carbon::parse($row->from_date)->format('d/m/Y') : 'N/A' }}
+                        To
+                        {{ $row->to_date ? \Carbon\Carbon::parse($row->to_date)->format('d/m/Y') : 'N/A' }}
+                    </td>
+                    <td class="text-right">Rs. {{ number_format($row->total_amount ?? 0, 2) }}</td>
                 </tr>
                 @endforeach
                 <tr style="font-weight: bold;">

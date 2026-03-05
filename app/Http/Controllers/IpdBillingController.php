@@ -29,44 +29,59 @@ class IpdBillingController extends Controller
      */
     public function search(Request $request)
     {
-        $search = $request->get('search', '');
-        
-        // Include all IPD patients (both discharged and non-discharged) for billing purposes
-        $query = IpdDetail::with(['patient', 'doctor']);
-
-        // Apply search filter if provided
-        if (!empty($search)) {
-            $query->where(function($q) use ($search) {
-                $q->where('ipd_no', 'LIKE', "%{$search}%")
-                    ->orWhereHas('patient', function($subQ) use ($search) {
-                        $subQ->where('patient_name', 'LIKE', "%{$search}%")
-                             ->orWhere('mobileno', 'LIKE', "%{$search}%");
-                    });
-            });
-        }
-
-        $ipdPatients = $query->orderBy('date', 'desc')->limit(100)->get();
-
-        $data = $ipdPatients->map(function($ipd) {
-            $patient = $ipd->patient;
-            $isDischarged = $ipd->discharged == 'yes';
-            $dischargeStatus = $isDischarged ? ' (Discharged)' : '';
+        try {
+            $search = trim($request->get('search', ''));
             
-            return [
-                'id' => $ipd->id,
-                'ipd_no' => $ipd->ipd_no ?? 'N/A',
-                'patient_name' => $patient->patient_name ?? 'N/A',
-                'phone' => $patient->mobileno ?? '',
-                'discharged' => $isDischarged,
-                'discharged_date' => $ipd->discharged_date,
-                'display_text' => ($ipd->ipd_no ?? 'N/A') . ' - ' . ($patient->patient_name ?? 'N/A') . $dischargeStatus,
-            ];
-        });
+            // Include all IPD patients (both discharged and non-discharged) for billing purposes
+            $query = IpdDetail::with(['patient', 'doctor']);
 
-        return response()->json([
-            'data' => $data,
-            'success' => true
-        ]);
+            // Apply search filter if provided
+            if ($search !== '') {
+                $query->where(function($q) use ($search) {
+                    $q->where('ipd_no', 'LIKE', "%{$search}%")
+                        ->orWhereHas('patient', function($subQ) use ($search) {
+                            $subQ->where('patient_name', 'LIKE', "%{$search}%")
+                                 ->orWhere('mobileno', 'LIKE', "%{$search}%");
+                        });
+                });
+            }
+
+            $ipdPatients = $query->orderBy('date', 'desc')->limit(100)->get();
+
+            $data = $ipdPatients->map(function($ipd) {
+                $patient = $ipd->patient;
+                $isDischarged = $ipd->discharged == 'yes';
+                $dischargeStatus = $isDischarged ? ' (Discharged)' : '';
+
+                $patientName = $patient ? ($patient->patient_name ?? 'N/A') : 'N/A';
+                $phone = $patient ? ($patient->mobileno ?? '') : '';
+                
+                return [
+                    'id' => $ipd->id,
+                    'ipd_no' => $ipd->ipd_no ?? 'N/A',
+                    'patient_name' => $patientName,
+                    'phone' => $phone,
+                    'discharged' => $isDischarged,
+                    'discharged_date' => $ipd->discharged_date,
+                    'display_text' => ($ipd->ipd_no ?? 'N/A') . ' - ' . $patientName . $dischargeStatus,
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('IPD billing search failed', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error while searching IPD patients.',
+            ], 500);
+        }
     }
 
     /**
@@ -785,6 +800,117 @@ class IpdBillingController extends Controller
     }
 
     /**
+     * Group doctor visits by doctor + charge name and contiguous date ranges for display.
+     * Returns one row per (doctor + visit type + continuous dates).
+     *
+     * @param \Illuminate\Support\Collection $doctorVisitDetails
+     * @return \Illuminate\Support\Collection
+     */
+    private function groupDoctorVisitsForDisplay($doctorVisitDetails)
+    {
+        if (!$doctorVisitDetails || $doctorVisitDetails->isEmpty()) {
+            return collect();
+        }
+
+        // Group by doctor + charge (visit type)
+        $grouped = $doctorVisitDetails->groupBy(function ($visit) {
+            $doctorId = $visit->doctor->id ?? $visit->doctor_id ?? '0';
+            $chargeId = $visit->charge->id ?? $visit->charge_id ?? '0';
+            return $doctorId . '|' . $chargeId;
+        });
+
+        $result = collect();
+
+        foreach ($grouped as $key => $visits) {
+            $sorted = $visits->sortBy('visit_date')->values();
+
+            $prevDate = null;
+            $rangeStart = null;
+            $visitCount = 0;
+            $totalAmount = 0;
+            $doctor = null;
+            $charge = null;
+
+            foreach ($sorted as $v) {
+                $dateStr = $v->visit_date instanceof \DateTimeInterface
+                    ? $v->visit_date->format('Y-m-d')
+                    : \Carbon\Carbon::parse($v->visit_date)->format('Y-m-d');
+
+                $isConsecutive = $prevDate !== null &&
+                    \Carbon\Carbon::parse($prevDate)->addDay()->format('Y-m-d') === $dateStr;
+
+                if ($rangeStart === null || !$isConsecutive) {
+                    // Flush previous range
+                    if ($rangeStart !== null && $visitCount > 0) {
+                        $result->push((object) [
+                            'from_date' => $rangeStart,
+                            'to_date' => $prevDate,
+                            'visit_count' => $visitCount,
+                            'total_amount' => $totalAmount,
+                            'rate_per_visit' => $visitCount > 0 ? ($totalAmount / $visitCount) : 0,
+                            'doctor' => $doctor,
+                            'charge' => $charge,
+                            'doctor_label' => $this->formatDoctorName($doctor),
+                            'visit_type_label' => $this->formatVisitTypeLabel($charge),
+                        ]);
+                    }
+
+                    $rangeStart = $dateStr;
+                    $visitCount = 1;
+                    $totalAmount = (float) ($v->amount ?? 0);
+                    $doctor = $v->doctor ?? null;
+                    $charge = $v->charge ?? null;
+                } else {
+                    $visitCount++;
+                    $totalAmount += (float) ($v->amount ?? 0);
+                }
+
+                $prevDate = $dateStr;
+            }
+
+            if ($rangeStart !== null && $visitCount > 0) {
+                $result->push((object) [
+                    'from_date' => $rangeStart,
+                    'to_date' => $prevDate,
+                    'visit_count' => $visitCount,
+                    'total_amount' => $totalAmount,
+                    'rate_per_visit' => $visitCount > 0 ? ($totalAmount / $visitCount) : 0,
+                    'doctor' => $doctor,
+                    'charge' => $charge,
+                    'doctor_label' => $this->formatDoctorName($doctor),
+                    'visit_type_label' => $this->formatVisitTypeLabel($charge),
+                ]);
+            }
+        }
+
+        return $result->sortBy('from_date')->values();
+    }
+
+    /**
+     * Get formatted doctor name.
+     */
+    private function formatDoctorName($doctor)
+    {
+        $doctorName = 'N/A';
+        if ($doctor) {
+            $first = $doctor->name ?? '';
+            $last = $doctor->surname ?? '';
+            $full = trim($first . ' ' . $last);
+            $doctorName = $full !== '' ? $full : 'N/A';
+        }
+
+        return $doctorName;
+    }
+
+    /**
+     * Get formatted visit type label (charge name).
+     */
+    private function formatVisitTypeLabel($charge)
+    {
+        return $charge->name ?? 'N/A';
+    }
+
+    /**
      * Group day-wise bed charges by bed and contiguous date ranges for display.
      * Returns one row per (bed + contiguous date range): e.g. "SINGLE - 5 SINGLE @5000 | 5 Days | 17/01/2026 To 21/01/2026".
      *
@@ -1228,6 +1354,8 @@ class IpdBillingController extends Controller
                 ->with(['doctor', 'charge'])
                 ->orderBy('visit_date', 'asc')
                 ->get() ?? collect();
+            // Group doctor visits by doctor and contiguous date ranges for PDF display
+            $doctorVisitGroupedForDisplay = $this->groupDoctorVisitsForDisplay($doctorVisitDetails);
             
             // Get payment details
             \Log::info('Getting payment details');
@@ -1334,7 +1462,7 @@ class IpdBillingController extends Controller
             // First pass: Render to get accurate page count
             $tempPdf = Pdf::loadView('admin.billing.ipd_estimate_pdf', compact(
                 'ipd', 'breakup', 'bedChargesDetails', 'bedChargesGroupedForDisplay', 'ipdChargesDetails',
-                'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'payments',
+                'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'doctorVisitGroupedForDisplay', 'payments',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
                 'investigationDatewise',
                 'totalChargesInWords', 'totalPaymentsInWords', 'outstandingInWords', 'netBalanceInWords',
@@ -1375,7 +1503,7 @@ class IpdBillingController extends Controller
             // Second pass: Render with accurate page count stored in view
             $pdf = Pdf::loadView('admin.billing.ipd_estimate_pdf', compact(
                 'ipd', 'breakup', 'bedChargesDetails', 'bedChargesGroupedForDisplay', 'ipdChargesDetails',
-                'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'payments',
+                'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'doctorVisitGroupedForDisplay', 'payments',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
                 'investigationDatewise',
                 'totalChargesInWords', 'totalPaymentsInWords', 'outstandingInWords', 'netBalanceInWords',
@@ -1540,6 +1668,8 @@ class IpdBillingController extends Controller
                 ->with(['doctor', 'charge'])
                 ->orderBy('visit_date', 'asc')
                 ->get() ?? collect();
+            // Group doctor visits by doctor and contiguous date ranges for PDF display
+            $doctorVisitGroupedForDisplay = $this->groupDoctorVisitsForDisplay($doctorVisitDetails);
 
             // Get hospital information
             $hospital = Hospital::first();
@@ -1742,7 +1872,7 @@ class IpdBillingController extends Controller
                 'totalAdvanceInWords', 'balanceInWords', 'otCharges', 'medicineCharges',
                 'surgeonCharges', 'anesthesiaCharges', 'investigationCharges', 'totalPages',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
-                'investigationDatewise',
+                'investigationDatewise', 'doctorVisitGroupedForDisplay',
                 'gstChargesGrouped', 'logged_user'
             ));
             

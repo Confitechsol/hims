@@ -42,7 +42,7 @@
                             <small class="text-muted">Start typing to see suggestions</small>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Case Reference</label>
+                            <label class="form-label">Case Reference <span class="text-danger">*</span></label>
                             <div class="autocomplete-container">
                                 <input type="text" id="prescription_search" class="form-control" placeholder="Search prescriptions" autocomplete="off">
                                 <input type="hidden" name="case_reference_id" id="case_reference_id">
