@@ -7,7 +7,7 @@
             <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                 <div class="d-flex justify-content-between align-items-center">
                     <h5 class="mb-0" style="color: #750096">
-                        <i class="fas fa-receipt me-2"></i>Money Receipt - {{ $receipt->receipt_no }}
+                        <i class="fas fa-receipt me-2"></i>Money/Refund Receipt - {{ $receipt->receipt_no }}
                     </h5>
                     <div>
                         <a href="{{ route('money-receipt.print', $receipt->id) }}" class="btn btn-primary btn-sm" target="_blank">

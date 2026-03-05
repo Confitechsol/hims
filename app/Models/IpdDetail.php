@@ -149,4 +149,9 @@ public function transactions()
 {
     return $this->hasMany(Transaction::class, 'ipd_id');
 }
+
+public function ipdPackages()
+{
+    return $this->hasMany(\App\Models\IpdPackage::class, 'ipd_id');
+}
 }

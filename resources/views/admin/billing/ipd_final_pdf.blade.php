@@ -600,27 +600,27 @@ header {
             </table>
         </div>
 
-        <!-- Bed Charges -->
-        @if(isset($bedChargesDetails) && $bedChargesDetails->count() > 0)
+        <!-- Bed Charges (grouped by bed and date range) -->
+        @if(isset($bedChargesGroupedForDisplay) && $bedChargesGroupedForDisplay->count() > 0)
         <table class="charges-table">
             <thead>
                 <tr>
                     <th colspan="4">Bed Charges</th>
                 </tr>
                 <tr>
-                    <th>Date</th>
-                    <th>Bed Group</th>
-                    <th>Rate/Day</th>
+                    <th>Bed / Rate</th>
+                    <th>Duration</th>
+                    <th>Date Range</th>
                     <th class="text-right">Amount</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($bedChargesDetails as $bedCharge)
+                @foreach($bedChargesGroupedForDisplay as $row)
                 <tr>
-                    <td>{{ $bedCharge->charge_date ? \Carbon\Carbon::parse($bedCharge->charge_date)->format('d-m-Y') : 'N/A' }}</td>
-                    <td>{{ ($bedCharge->bedGroup && $bedCharge->bedGroup->name) ? $bedCharge->bedGroup->name : 'N/A' }}</td>
-                    <td>{{ number_format($bedCharge->bed_charge_rate ?? 0, 2) }}</td>
-                    <td class="text-right">Rs. {{ number_format($bedCharge->bed_charge ?? 0, 2) }}</td>
+                    <td>{{ $row->bed_label ?? 'N/A' }}</td>
+                    <td>{{ $row->no_of_days ?? 0 }} {{ ($row->no_of_days ?? 0) === 1 ? 'Day' : 'Days' }}</td>
+                    <td>{{ $row->from_date ? \Carbon\Carbon::parse($row->from_date)->format('d/m/Y') : 'N/A' }} To {{ $row->to_date ? \Carbon\Carbon::parse($row->to_date)->format('d/m/Y') : 'N/A' }}</td>
+                    <td class="text-right">Rs. {{ number_format($row->bed_charge ?? 0, 2) }}</td>
                 </tr>
                 @endforeach
                 <tr style="font-weight: bold;">
@@ -904,6 +904,10 @@ header {
                 <span class="summary-label">Total Payments:</span>
                 <span class="summary-value">Rs. {{ number_format($breakup['total_payments'] ?? 0, 2) }}</span>
             </div>
+            <div class="summary-row">
+                <span class="summary-label">Outstanding Amount:</span>
+                <span class="summary-value">Rs. {{ number_format($breakup['outstanding'] ?? 0, 2) }}</span>
+            </div>
             @if(isset($mouDiscount) && $mouDiscount > 0)
             <div class="summary-row">
                 <span class="summary-label">MOU Discount (TPA/Insurance):</span>
@@ -935,10 +939,6 @@ header {
                 <span class="summary-value">Rs. {{ number_format($duePatientPartyAmount, 2) }}</span>
             </div>
             @endif
-            <div class="summary-row">
-                <span class="summary-label">Outstanding Amount:</span>
-                <span class="summary-value">Rs. {{ number_format($breakup['outstanding'] ?? 0, 2) }}</span>
-            </div>
             <div class="summary-row">
                 <span class="summary-label"><span class="red">Net Balance:</span></span>
                 <span class="summary-value"><span class="red">Rs. {{ number_format($balance ?? ($breakup['outstanding'] ?? 0), 2) }}</span></span>

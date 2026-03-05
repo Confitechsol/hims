@@ -356,8 +356,12 @@ class MoneyReceiptController extends Controller
 
         $pdf = Pdf::loadView('admin.money-receipt.print', compact('receipt', 'hospital'));
         $pdf->setPaper('a4', 'portrait');
-        
-        return $pdf->download('Money_Receipt_' . $receipt->receipt_no . '.pdf');
+
+        $isRefund = strcasecmp($receipt->receipt_type ?? '', 'Refund') === 0;
+        $baseName = $isRefund ? 'Refund_Receipt_' : 'Money_Receipt_';
+        $fileName = $baseName . $receipt->receipt_no . '.pdf';
+
+        return $pdf->download($fileName);
     }
 
     /**

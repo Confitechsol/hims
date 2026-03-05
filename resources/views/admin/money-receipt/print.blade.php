@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Money Receipt - {{ $receipt->receipt_no }}</title>
+    <title>{{ strcasecmp($receipt->receipt_type ?? '', 'Refund') === 0 ? 'Refund Receipt' : 'Money Receipt' }} - {{ $receipt->receipt_no }}</title>
     <style>        
         @page {
             size: A4;
@@ -276,7 +276,7 @@
 
         <!-- Title -->
         <div class="heading" style="margin: 5px 0;">
-            <h4 class="red" style="margin: 0; font-size: 14px;">MONEY RECEIPT</h4>
+            <h4 class="red" style="margin: 0; font-size: 14px;">{{ strcasecmp($receipt->receipt_type ?? '', 'Refund') === 0 ? 'REFUND RECEIPT' : 'MONEY RECEIPT' }}</h4>
         </div>
 
         <!-- Thick Horizontal Line -->
@@ -400,16 +400,36 @@
                             $amountInWords = '';
                         }
                     }
+                    $isRefund = strcasecmp($receipt->receipt_type ?? '', 'Refund') === 0;
+                    $paymentModeDisplay = strtoupper($receipt->payment_mode ?? 'CASH');
+                    // Map common payment_mode values to display format (e.g. "Bank Transfer" -> "TRANSFER TO BANK ACCOUNT")
+                    if (stripos($paymentModeDisplay, 'transfer') !== false || stripos($paymentModeDisplay, 'bank') !== false) {
+                        $paymentModeDisplay = 'TRANSFER TO BANK ACCOUNT';
+                    } elseif (stripos($paymentModeDisplay, 'cash') !== false) {
+                        $paymentModeDisplay = 'CASH';
+                    } elseif (stripos($paymentModeDisplay, 'cheque') !== false) {
+                        $paymentModeDisplay = 'CHEQUE';
+                    } elseif (stripos($paymentModeDisplay, 'card') !== false) {
+                        $paymentModeDisplay = 'CARD';
+                    }
                 @endphp
                 <div class="payment_amount">
-                    Received With Thanks The Amount of Rs. {{ number_format($amount, 2) }} 
-                    @if($amountInWords)
-                        ({{ strtolower($amountInWords) }}) 
+                    @if($isRefund)
+                        Refunded Amount of Rs. {{ number_format($amount, 2) }}
+                        @if($amountInWords)
+                            ({{ $amountInWords }})
+                        @endif
+                        For Patient {{ strtoupper($receipt->patient->patient_name ?? '-') }}
+                    @else
+                        Received With Thanks The Amount of Rs. {{ number_format($amount, 2) }}
+                        @if($amountInWords)
+                            ({{ strtolower($amountInWords) }})
+                        @endif
+                        For Patient {{ $receipt->patient->patient_name ?? '-' }}
                     @endif
-                    For Patient {{ $receipt->patient->patient_name ?? '-' }}
                 </div>
                 <div class="payment_nature">
-                    <strong>Payment Nature:</strong> Payment Vide {{ strtoupper($receipt->payment_mode ?? 'CASH') }}
+                    <strong>Payment Nature:</strong> Payment Vide {{ $paymentModeDisplay }}
                 </div>
             </div>
 

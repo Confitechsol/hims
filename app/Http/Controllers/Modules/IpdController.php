@@ -28,6 +28,9 @@ use App\Models\Radio;
 use App\Models\Staff;
 use App\Models\Symptom;
 use App\Models\SymptomsClassification;
+use App\Models\Package;
+use App\Models\IpdPackage;
+use App\Services\IpdPackageService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -101,6 +104,7 @@ class IpdController extends Controller
             'bed_group'            => 'nullable|exists:bed_group,id',
             'bed_number'           => 'nullable|exists:bed,id',
             'bed_charge'           => 'nullable|numeric|min:0',
+            'package_id'           => 'nullable|exists:packages,id',
             'symptoms_type'        => 'nullable|array',
             'symptoms_type.*'      => 'string',
             'symptoms_title'       => 'array',
@@ -249,6 +253,21 @@ class IpdController extends Controller
                             'is_active'         => 'yes',
                         ]
                     );
+                }
+            }
+
+            // Apply package if selected during admission
+            if ($request->package_id) {
+                $packageService = new IpdPackageService();
+                $packageResult = $packageService->applyPackage(
+                    $ipd->id,
+                    $request->package_id,
+                    $request->admission_date, // Apply package from admission date
+                    'Applied during IPD admission'
+                );
+
+                if (!$packageResult['success']) {
+                    throw new \Exception('Failed to apply package: ' . $packageResult['message']);
                 }
             }
 
@@ -1812,4 +1831,111 @@ class IpdController extends Controller
         return view('admin.reports.ipd.ipd_discharge_patient', compact('discharges'));
     }
 
+    /**
+     * Apply a package to an IPD patient
+     * POST /ipd/{id}/apply-package
+     */
+    public function applyPackage(Request $request, $id)
+    {
+        $request->validate([
+            'package_id' => 'required|exists:packages,id',
+            'applied_date' => 'nullable|date_format:Y-m-d',
+            'notes' => 'nullable|string|max:500',
+        ]);
+
+        try {
+            $packageService = new IpdPackageService();
+            
+            $result = $packageService->applyPackage(
+                $id,
+                $request->package_id,
+                $request->applied_date,
+                $request->notes
+            );
+
+            if ($result['success']) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $result['message'],
+                    'data' => $result['data'],
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => $result['message'],
+                ], 422);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error applying package: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Remove a package from an IPD patient
+     * DELETE /ipd/{id}/remove-package
+     */
+    public function removePackage(Request $request, $id)
+    {
+        $request->validate([
+            'ipd_package_id' => 'required|exists:ipd_packages,id',
+        ]);
+
+        try {
+            $packageService = new IpdPackageService();
+            
+            $result = $packageService->removePackage($id, $request->ipd_package_id);
+
+            if ($result['success']) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $result['message'],
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => $result['message'],
+                ], 422);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error removing package: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Get available packages and applied packages for an IPD patient
+     * GET /ipd/{id}/packages
+     */
+    public function getIpdPackages(Request $request, $id)
+    {
+        try {
+            $ipd = IpdDetail::findOrFail($id);
+            
+            // Get all active packages
+            $availablePackages = Package::where('is_active', true)
+                ->get(['id', 'name', 'package_rate', 'gst_amount', 'description']);
+
+            // Get applied packages
+            $packageService = new IpdPackageService();
+            $appliedPackages = $packageService->getAppliedPackages($id, 'applied');
+
+            return response()->json([
+                'success' => true,
+                'available_packages' => $availablePackages,
+                'applied_packages' => $appliedPackages,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching packages: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
 }
+

@@ -1030,6 +1030,9 @@ Route::prefix('setup')->group(function () {
     Route::get('/packages/{id}/charges', [PackageController::class, 'getPackageCharges'])->name('packages.charges');
 });
 
+// Package API Routes (for admission form population)
+Route::get('/packages/api/active', [PackageController::class, 'getActivePackagesApi'])->name('packages.api.active');
+
 Route::get('/test-medicine-controller', [MedicineController::class, 'test'])->name('testMedicineController');
 Route::get('/getMedicineCategories', [MedicineController::class, 'getCategories'])->name('getMedicineCategories');
 Route::get('/getMedicines/{categoryId}', [MedicineController::class, 'getMedicines'])->name('getMedicines');

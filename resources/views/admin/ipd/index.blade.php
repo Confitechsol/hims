@@ -140,9 +140,24 @@
                                                         <td>{{ $ipdDetails->patient->email ?? '-' }}</td>
                                                         <td>{{ $ipdDetails->patient->gender ?? '-' }}</td>
                                                         <td>{{ $ipdDetails->doctor->name ?? '-' }}</td>
-                                                        <td><span class="badge"
-                                                                style="background-color: {{ $ipdDetails->bedGroup->color }}">
-                                                                {{ $ipdDetails->bedDetail->name . ' - ' . $ipdDetails->bedGroup->name . '-' . $ipdDetails->bedGroup->floorDetail->name ?? '-' }}</span>
+                                                        <td>
+                                                            @php
+                                                                $bedGroup = $ipdDetails->bedGroup ?? null;
+                                                                $bedDetail = $ipdDetails->bedDetail ?? null;
+                                                                $floorName = $bedGroup->floorDetail->name ?? null;
+                                                            @endphp
+                                                            @if ($bedGroup && $bedDetail)
+                                                                <span class="badge"
+                                                                      style="background-color: {{ $bedGroup->color ?? '#6c757d' }}">
+                                                                    {{ $bedDetail->name }}
+                                                                    - {{ $bedGroup->name }}
+                                                                    @if ($floorName)
+                                                                        - {{ $floorName }}
+                                                                    @endif
+                                                                </span>
+                                                            @else
+                                                                -
+                                                            @endif
                                                         </td>
                                                         <td>{{ $ipdDetails->credit_limit }}</td>
                                                         <td>

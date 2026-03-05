@@ -264,4 +264,29 @@ class PackageController extends Controller
             'charges' => $package->charges,
         ]);
     }
+
+    /**
+     * Get all active packages for API (used in admission form)
+     */
+    public function getActivePackagesApi()
+    {
+        // Backward-compatible: treat legacy rows without is_active/status as active
+        $packages = Package::query()
+            ->where(function ($q) {
+                $q->where('is_active', true)
+                  ->orWhereNull('is_active');
+            })
+            ->where(function ($q) {
+                $q->where('status', 'active')
+                  ->orWhereNull('status');
+            })
+            ->select('id', 'name', 'package_rate', 'gst_amount', 'description')
+            ->orderBy('name', 'asc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'packages' => $packages,
+        ]);
+    }
 }
