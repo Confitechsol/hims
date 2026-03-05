@@ -1,6 +1,18 @@
 @extends('layouts.adminLayout')
 
 @section('content')
+@php
+    $itemPermCatId      = permCatId('Item');
+    $canAddItem         = $itemPermCatId ? canAdd($itemPermCatId) : false;
+    $canEditItem        = $itemPermCatId ? canEdit($itemPermCatId) : false;
+    $canDeleteItem      = $itemPermCatId ? canDelete($itemPermCatId) : false;
+
+    $itemStockPermCatId = permCatId('Item Stock');
+    $canViewItemStock   = $itemStockPermCatId ? canView($itemStockPermCatId) : false;
+
+    $issueItemPermCatId = permCatId('Issue Item');
+    $canViewIssueItem   = $issueItemPermCatId ? canView($issueItemPermCatId) : false;
+@endphp
 <style>
     .modal-backdrop.show:nth-of-type(2) { z-index: 1060; }
     #new_patient { z-index: 1070; }
@@ -14,19 +26,26 @@
                     <div class="d-flex align-items-sm-center justify-content-between flex-wrap gap-2 w-100">
                         <div><h4 class="fw-bold mb-0">Inventory Details</h4></div>
                         <div class="d-flex align-items-center flex-wrap gap-2">
-                            <div class="text-end d-flex">
-                                <a href="javascript:void(0);" class="btn btn-primary text-white ms-2 btn-md"
-                                   data-bs-toggle="modal" data-bs-target="#add_item">
-                                   <i class="ti ti-plus me-1"></i>Add Item 
-                                </a>
-                            </div>
+                            @if ($canAddItem)
+                                <div class="text-end d-flex">
+                                    <a href="javascript:void(0);" class="btn btn-primary text-white ms-2 btn-md"
+                                       data-bs-toggle="modal" data-bs-target="#add_item">
+                                       <i class="ti ti-plus me-1"></i>Add Item 
+                                    </a>
+                                </div>
+                            @endif
 
-                            <a href="{{ route('issue-items')}}" class="btn btn-outline-primary d-inline-flex align-items-center">
-                                <i class="ti ti-menu me-1"></i>Issue Item
-                            </a>
-                            <a href="{{ route('inventory-details')}}" class="btn btn-outline-primary d-inline-flex align-items-center">
-                                <i class="ti ti-menu me-1"></i>Inventory
-                            </a>
+                            @if ($canViewIssueItem)
+                                <a href="{{ route('issue-items')}}" class="btn btn-outline-primary d-inline-flex align-items-center">
+                                    <i class="ti ti-menu me-1"></i>Issue Item
+                                </a>
+                            @endif
+
+                            @if ($canViewItemStock)
+                                <a href="{{ route('inventory-details')}}" class="btn btn-outline-primary d-inline-flex align-items-center">
+                                    <i class="ti ti-menu me-1"></i>Inventory
+                                </a>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -146,19 +165,26 @@
                                                 </td>
                                                 <td>{{ $item->description }}</td>
                                                 <td>
-                                                    <a href="javascript:void(0);" 
-                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill editItemBtn"
-                                                    data-id="{{ $item->id }}" data-bs-toggle="tooltip" title="Edit">
-                                                        <i class="ti ti-pencil"></i>
-                                                    </a>
-                                                    <a href="javascript:void(0);" class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
-                                                        onclick="if(confirm('Are you sure you want to delete this item?')) { document.getElementById('delete-item-{{ $item->id }}').submit(); }"
-                                                        data-bs-toggle="tooltip" title="Delete">
-                                                            <i class="ti ti-trash"></i>
-                                                    </a>
-                                                    <form id="delete-item-{{ $item->id }}" action="{{ route('items.destroy', $item->id) }}" method="POST" style="display: none;">
-                                                        @csrf @method('DELETE')
-                                                    </form>
+                                                    @if ($canEditItem || $canDeleteItem)
+                                                        @if ($canEditItem)
+                                                            <a href="javascript:void(0);" 
+                                                               class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill editItemBtn"
+                                                               data-id="{{ $item->id }}" data-bs-toggle="tooltip" title="Edit">
+                                                                <i class="ti ti-pencil"></i>
+                                                            </a>
+                                                        @endif
+
+                                                        @if ($canDeleteItem)
+                                                            <a href="javascript:void(0);" class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
+                                                               onclick="if(confirm('Are you sure you want to delete this item?')) { document.getElementById('delete-item-{{ $item->id }}').submit(); }"
+                                                               data-bs-toggle="tooltip" title="Delete">
+                                                                <i class="ti ti-trash"></i>
+                                                            </a>
+                                                            <form id="delete-item-{{ $item->id }}" action="{{ route('items.destroy', $item->id) }}" method="POST" style="display: none;">
+                                                                @csrf @method('DELETE')
+                                                            </form>
+                                                        @endif
+                                                    @endif
                                                 </td>
                                             </tr>
                                         @empty
