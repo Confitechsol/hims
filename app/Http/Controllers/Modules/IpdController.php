@@ -20,11 +20,14 @@ use App\Models\MedicationReport;
 use App\Models\NurseNote;
 use App\Models\OperationTheatre;
 use App\Models\Pathology;
+use App\Models\PathologyBilling;
 use App\Models\PathologyReport;
 use App\Models\Patient;
+use App\Models\Radio;
+use App\Models\RadiologyBilling;
+use App\Models\RadiologyReport;
 use App\Models\PatientBedHistory;
 use App\Models\Prefix;
-use App\Models\Radio;
 use App\Models\Staff;
 use App\Models\Symptom;
 use App\Models\SymptomsClassification;
@@ -1108,72 +1111,116 @@ class IpdController extends Controller
                     'attachment_name'     => $attachmentName,
                 ]);
 
-                // Delete existing tests (but preserve billing links - only delete if not billed)
-                // Check which tests are already billed before deleting
-                $billedTestIds = \App\Models\PathologyReport::whereNotNull('ipd_prescription_test_id')
-                    ->pluck('ipd_prescription_test_id')
-                    ->merge(
-                        \App\Models\RadiologyReport::whereNotNull('ipd_prescription_test_id')
-                            ->pluck('ipd_prescription_test_id')
-                    );
-                
-                // Only delete tests that haven't been billed
-                IpdPrescriptionTest::where('ipd_prescription_id', $prescription->id)
-                    ->whereNotIn('id', $billedTestIds)
-                    ->delete();
+                // Diff: only remove from billing and delete tests that are NO LONGER in the prescription.
+                // Tests that remain in the request are kept (preserving billing linkage).
+                $newPathologyCounts = array_count_values(array_map('intval', $pathology_ids));
+                $newRadiologyCounts  = array_count_values(array_map('intval', $radiology_ids));
 
-                // Store new tests with instance tracking
+                $existingPathology = IpdPrescriptionTest::where('ipd_prescription_id', $prescription->id)
+                    ->whereNotNull('pathology_id')
+                    ->orderBy('id')
+                    ->get();
+                $existingRadiology = IpdPrescriptionTest::where('ipd_prescription_id', $prescription->id)
+                    ->whereNotNull('radiology_id')
+                    ->orderBy('id')
+                    ->get();
+
+                $pathologyKept = [];
+                foreach ($existingPathology as $test) {
+                    $pid     = (int) $test->pathology_id;
+                    $maxKeep = $newPathologyCounts[$pid] ?? 0;
+                    $keptNow = $pathologyKept[$pid] ?? 0;
+                    if ($keptNow < $maxKeep) {
+                        $pathologyKept[$pid] = $keptNow + 1;
+                    } else {
+                        $this->removePrescriptionTestFromBilling($test);
+                        $test->delete();
+                    }
+                }
+
+                $radiologyKept = [];
+                foreach ($existingRadiology as $test) {
+                    $rid     = (int) $test->radiology_id;
+                    $maxKeep = $newRadiologyCounts[$rid] ?? 0;
+                    $keptNow = $radiologyKept[$rid] ?? 0;
+                    if ($keptNow < $maxKeep) {
+                        $radiologyKept[$rid] = $keptNow + 1;
+                    } else {
+                        $this->removePrescriptionTestFromBilling($test);
+                        $test->delete();
+                    }
+                }
+
+                // Count how many of each test we already have (kept from existing)
+                $pathologyToAdd = [];
+                foreach ($pathology_ids as $pid) {
+                    $pid = (int) $pid;
+                    $pathologyToAdd[$pid] = ($pathologyToAdd[$pid] ?? 0) + 1;
+                }
+                foreach ($pathologyKept as $pid => $count) {
+                    $pathologyToAdd[$pid] = ($pathologyToAdd[$pid] ?? 0) - $count;
+                }
+                $radiologyToAdd = [];
+                foreach ($radiology_ids as $rid) {
+                    $rid = (int) $rid;
+                    $radiologyToAdd[$rid] = ($radiologyToAdd[$rid] ?? 0) + 1;
+                }
+                foreach ($radiologyKept as $rid => $count) {
+                    $radiologyToAdd[$rid] = ($radiologyToAdd[$rid] ?? 0) - $count;
+                }
+
+                // Store NEW tests (only those not already kept from existing)
                 $prescriptionDate = $prescription->date ?? Carbon::now()->toDateString();
                 $prescriptionTime = Carbon::now()->format('H:i:s');
-                
-                if (! empty($pathology_ids)) {
-                    $pathologyNotes = $request->input('pathology_notes');
-                    if (! is_array($pathologyNotes)) {
-                        $pathologyNotes = [];
-                    }
-                    foreach ($pathology_ids as $index => $pathologyId) {
+                $pathologyNotes   = is_array($request->input('pathology_notes')) ? $request->input('pathology_notes') : [];
+                $radiologyNotes   = is_array($request->input('radiology_notes')) ? $request->input('radiology_notes') : [];
+                $pathologyIdsList = array_values(array_map('intval', $pathology_ids));
+                $radiologyIdsList = array_values(array_map('intval', $radiology_ids));
+
+                foreach ($pathologyToAdd as $pathologyId => $count) {
+                    if ($count <= 0) continue;
+                    for ($i = 0; $i < $count; $i++) {
                         $instanceNumber = IpdPrescriptionTest::getNextInstanceNumber(
-                            (int) $pathologyId,
+                            $pathologyId,
                             $prescriptionDate,
                             'pathology',
                             $prescription->id
                         );
-                        $notes = $pathologyNotes[$index] ?? $request->input("pathology_notes_{$pathologyId}") ?? null;
+                        $notesIdx = array_search($pathologyId, $pathologyIdsList);
+                        $notes    = ($notesIdx !== false && isset($pathologyNotes[$notesIdx])) ? $pathologyNotes[$notesIdx] : null;
                         IpdPrescriptionTest::create([
                             'ipd_prescription_id' => $prescription->id,
-                            'pathology_id'        => (int) $pathologyId,
+                            'pathology_id'        => $pathologyId,
                             'radiology_id'        => null,
-                            'instance_number'    => $instanceNumber,
-                            'test_date'          => $prescriptionDate,
-                            'prescription_time'  => $prescriptionTime,
-                            'notes'              => $notes,
+                            'instance_number'     => $instanceNumber,
+                            'test_date'           => $prescriptionDate,
+                            'prescription_time'   => $prescriptionTime,
+                            'notes'               => $notes,
                             'hospital_id'         => $user->hospital_id ?? '00000001',
                             'branch_id'           => $user->branch_id ?? '00000001',
                         ]);
                     }
                 }
 
-                if (! empty($radiology_ids)) {
-                    $radiologyNotes = $request->input('radiology_notes');
-                    if (! is_array($radiologyNotes)) {
-                        $radiologyNotes = [];
-                    }
-                    foreach ($radiology_ids as $index => $radiologyId) {
+                foreach ($radiologyToAdd as $radiologyId => $count) {
+                    if ($count <= 0) continue;
+                    for ($i = 0; $i < $count; $i++) {
                         $instanceNumber = IpdPrescriptionTest::getNextInstanceNumber(
-                            (int) $radiologyId,
+                            $radiologyId,
                             $prescriptionDate,
                             'radiology',
                             $prescription->id
                         );
-                        $notes = $radiologyNotes[$index] ?? $request->input("radiology_notes_{$radiologyId}") ?? null;
+                        $notesIdx = array_search($radiologyId, $radiologyIdsList);
+                        $notes    = ($notesIdx !== false && isset($radiologyNotes[$notesIdx])) ? $radiologyNotes[$notesIdx] : null;
                         IpdPrescriptionTest::create([
                             'ipd_prescription_id' => $prescription->id,
                             'pathology_id'        => null,
-                            'radiology_id'        => (int) $radiologyId,
-                            'instance_number'    => $instanceNumber,
-                            'test_date'          => $prescriptionDate,
-                            'prescription_time'  => $prescriptionTime,
-                            'notes'              => $notes,
+                            'radiology_id'        => $radiologyId,
+                            'instance_number'     => $instanceNumber,
+                            'test_date'           => $prescriptionDate,
+                            'prescription_time'   => $prescriptionTime,
+                            'notes'               => $notes,
                             'hospital_id'         => $user->hospital_id ?? '00000001',
                             'branch_id'           => $user->branch_id ?? '00000001',
                         ]);
@@ -1231,6 +1278,107 @@ class IpdController extends Controller
     }
 
     /**
+     * Remove a prescription test from pathology/radiology billing when test is removed from prescription.
+     * Deletes linked PathologyReport/RadiologyReport and recalculates parent bill net_amount.
+     * Includes fallback for reports without ipd_prescription_test_id (legacy or manually created bills).
+     *
+     * @param IpdPrescriptionTest $test
+     */
+    private function removePrescriptionTestFromBilling(IpdPrescriptionTest $test)
+    {
+        $prescription = $test->prescription;
+        $ipd         = $prescription ? IpdDetail::find($prescription->ipd_id) : null;
+        $patientId   = $ipd ? $ipd->patient_id : null;
+        $admissionDate = $ipd && $ipd->date ? Carbon::parse($ipd->date)->format('Y-m-d') : null;
+
+        // Pathology: remove report(s) linked to this prescription test
+        $pathologyReports = PathologyReport::where('ipd_prescription_test_id', $test->id)->get();
+        $pathologyBillIdsToRecalc = [];
+        foreach ($pathologyReports as $report) {
+            $pathologyBillIdsToRecalc[$report->pathology_bill_id] = true;
+            $report->delete();
+        }
+        // Fallback: reports without prescription_test link (legacy/manual bills)
+        if ($pathologyReports->isEmpty() && $test->pathology_id && $patientId && $admissionDate) {
+            $fallbackReport = PathologyReport::where('pathology_id', $test->pathology_id)
+                ->where('patient_id', $patientId)
+                ->whereNull('ipd_prescription_test_id')
+                ->whereIn('pathology_bill_id', PathologyBilling::where('patient_id', $patientId)
+                    ->whereRaw('DATE(date) >= ?', [$admissionDate])
+                    ->pluck('id'))
+                ->orderBy('id')
+                ->first();
+            if ($fallbackReport) {
+                $pathologyBillIdsToRecalc[$fallbackReport->pathology_bill_id] = true;
+                $fallbackReport->delete();
+            }
+        }
+        foreach (array_keys($pathologyBillIdsToRecalc) as $billId) {
+            $this->recalculatePathologyBilling($billId);
+        }
+
+        // Radiology: remove report(s) linked to this prescription test
+        $radiologyReports = RadiologyReport::where('ipd_prescription_test_id', $test->id)->get();
+        $radiologyBillIdsToRecalc = [];
+        foreach ($radiologyReports as $report) {
+            $radiologyBillIdsToRecalc[$report->radiology_bill_id] = true;
+            $report->delete();
+        }
+        // Fallback: reports without prescription_test link (legacy/manual bills)
+        if ($radiologyReports->isEmpty() && $test->radiology_id && $patientId && $admissionDate) {
+            $fallbackReport = RadiologyReport::where('radiology_id', $test->radiology_id)
+                ->where('patient_id', $patientId)
+                ->whereNull('ipd_prescription_test_id')
+                ->whereIn('radiology_bill_id', RadiologyBilling::where('patient_id', $patientId)
+                    ->whereRaw('DATE(date) >= ?', [$admissionDate])
+                    ->pluck('id'))
+                ->orderBy('id')
+                ->first();
+            if ($fallbackReport) {
+                $radiologyBillIdsToRecalc[$fallbackReport->radiology_bill_id] = true;
+                $fallbackReport->delete();
+            }
+        }
+        foreach (array_keys($radiologyBillIdsToRecalc) as $billId) {
+            $this->recalculateRadiologyBilling($billId);
+        }
+    }
+
+    /**
+     * Recalculate pathology bill net_amount from remaining reports. Delete bill if empty.
+     */
+    private function recalculatePathologyBilling($billId)
+    {
+        $bill = PathologyBilling::find($billId);
+        if (!$bill) return;
+
+        $remainingTotal = PathologyReport::where('pathology_bill_id', $billId)->sum('apply_charge');
+        if ($remainingTotal <= 0) {
+            PathologyReport::where('pathology_bill_id', $billId)->delete();
+            $bill->delete();
+        } else {
+            $bill->update(['net_amount' => $remainingTotal, 'total' => $remainingTotal]);
+        }
+    }
+
+    /**
+     * Recalculate radiology bill net_amount from remaining reports. Delete bill if empty.
+     */
+    private function recalculateRadiologyBilling($billId)
+    {
+        $bill = RadiologyBilling::find($billId);
+        if (!$bill) return;
+
+        $remainingTotal = RadiologyReport::where('radiology_bill_id', $billId)->sum('apply_charge');
+        if ($remainingTotal <= 0) {
+            RadiologyReport::where('radiology_bill_id', $billId)->delete();
+            $bill->delete();
+        } else {
+            $bill->update(['net_amount' => $remainingTotal, 'total' => $remainingTotal]);
+        }
+    }
+
+    /**
      * Delete prescription
      */
     public function deletePrescription($id)
@@ -1243,8 +1391,12 @@ class IpdController extends Controller
                 Storage::disk('public')->delete($prescription->attachment);
             }
 
-            // Delete associated tests and medicines (cascade should handle this, but being explicit)
-            IpdPrescriptionTest::where('ipd_prescription_id', $prescription->id)->delete();
+            // Remove prescription tests from pathology/radiology billing before deleting tests
+            $existingTests = IpdPrescriptionTest::where('ipd_prescription_id', $prescription->id)->get();
+            foreach ($existingTests as $test) {
+                $this->removePrescriptionTestFromBilling($test);
+                $test->delete();
+            }
             IpdMedicine::where('prescription_id', $prescription->id)->delete();
 
             $ipdId = $prescription->ipd_id;
