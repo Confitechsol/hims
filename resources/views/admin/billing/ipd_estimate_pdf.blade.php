@@ -108,6 +108,11 @@
             margin-bottom: 0;
         }
 
+        /* Reduce gap between admission info (header) and patient info */
+        main > .patient_info:first-child {
+            margin-top: -12px;
+        }
+
         .heading {
             text-align: center;
             margin: 0 0 1px 0;
