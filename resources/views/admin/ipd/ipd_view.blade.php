@@ -1,7 +1,8 @@
 {{-- resources/views/settings.blade.php --}}
 @extends('layouts.adminLayout')
 @section('content')
-
+    {{-- Hidden element for back-dated prescription: admission date used when Add Prescription modal opens --}}
+    <div id="ipdViewContext" data-admission-date="{{ $ipd->date ? \Carbon\Carbon::parse($ipd->date)->format('Y-m-d') : '' }}" data-ipd-id="{{ $ipd->id ?? '' }}" style="display:none"></div>
     <style>
         .module_billing {
             border-radius: 8px;
@@ -4163,7 +4164,8 @@
                                                                     id="addPrescriptionBtn_{{ $ipd->id }}"
                                                                     data-bs-toggle="modal"
                                                                     data-bs-target="#addPrescriptionModal"
-                                                                    data-ipd-id="{{ $ipd->id }}"><i
+                                                                    data-ipd-id="{{ $ipd->id }}"
+                                                                    data-admission-date="{{ $ipd->date ? \Carbon\Carbon::parse($ipd->date)->format('Y-m-d') : date('Y-m-d') }}"><i
                                                                         class="ti ti-plus me-1"></i>Add Prescription</a>
                                                             </div>
                                                         @endif
@@ -5091,6 +5093,23 @@
             console.log('IPD ID set to:', ipdId);
         }
         
+        // Set prescription date for back-dated support
+        const btn = document.querySelector('[data-bs-target="#addPrescriptionModal"][data-ipd-id="' + ipdId + '"]');
+        const prescriptionDateEl = document.getElementById('prescription_date');
+        const today = new Date().toISOString().split('T')[0];
+        if (prescriptionDateEl) {
+            prescriptionDateEl.max = today;
+            const admissionDate = btn ? btn.getAttribute('data-admission-date') : null;
+            if (admissionDate) {
+                prescriptionDateEl.value = admissionDate;
+                prescriptionDateEl.min = admissionDate;
+                console.log('Prescription date set to admission date:', admissionDate);
+            } else {
+                prescriptionDateEl.value = today;
+                prescriptionDateEl.removeAttribute('min');
+            }
+        }
+        
         // IMMEDIATELY fetch data - don't wait for modal
         if (typeof window.fetchPathologyRadiologyData === 'function') {
             window.fetchPathologyRadiologyData();
@@ -5345,6 +5364,13 @@
                         console.log('✅ IPD ID set to:', ipdId);
                     } else {
                         console.error('❌ ipd_id field not found');
+                    }
+                    // Set prescription date to admission date for back-dated support
+                    const admissionDate = this.getAttribute('data-admission-date');
+                    const prescriptionDateEl = document.getElementById('prescription_date');
+                    if (admissionDate && prescriptionDateEl) {
+                        prescriptionDateEl.value = admissionDate;
+                        console.log('✅ Prescription date set to admission date:', admissionDate);
                     }
                     
                     // IMMEDIATELY trigger data fetch - don't wait for modal to open

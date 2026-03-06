@@ -744,7 +744,7 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Prescription Date</label>
-                            <input type="date" name="date" id="prescription_date" class="form-control" value="{{ now()->format('Y-m-d') }}">
+                            <input type="date" name="date" id="prescription_date" class="form-control" value="">
                         </div>
                     </div>
                 </div>
@@ -895,6 +895,32 @@
         console.log('🔴 Total pathology items added to FormData:', (window.selectedPathologyList || []).length);
         console.log('🔴 Total radiology items added to FormData:', (window.selectedRadiologyList || []).length);
         
+        // CRITICAL: Always include prescription date for back-dated support
+        // Read from form's date input (use #prescription_date to avoid picking wrong 'date' input elsewhere)
+        const prescriptionDateEl = form.querySelector('#prescription_date') || form.querySelector('input[name="date"]');
+        let dateToSend = prescriptionDateEl ? (prescriptionDateEl.value || '').trim() : '';
+        if (!dateToSend && form.querySelector('[name="ipd_id"]')) {
+            const ipdIdVal = ((form.querySelector('[name="ipd_id"]') || {}).value || '').trim();
+            if (ipdIdVal) {
+                const btn = document.querySelector('[data-bs-target="#addPrescriptionModal"][data-ipd-id="' + ipdIdVal + '"]');
+                if (btn && btn.getAttribute('data-admission-date')) {
+                    dateToSend = btn.getAttribute('data-admission-date');
+                    console.log('🔴 Using admission date from button for empty date field:', dateToSend);
+                } else {
+                    const ctx = document.getElementById('ipdViewContext');
+                    if (ctx && ctx.getAttribute('data-ipd-id') === ipdIdVal && ctx.getAttribute('data-admission-date')) {
+                        dateToSend = ctx.getAttribute('data-admission-date');
+                        console.log('🔴 Using admission date from ipdViewContext for empty date field:', dateToSend);
+                    }
+                }
+            }
+        }
+        if (!dateToSend) {
+            dateToSend = new Date().toISOString().split('T')[0];
+        }
+        formData.append('date', dateToSend);
+        console.log('🔴 Prescription date appended to FormData:', dateToSend);
+        
         // Add all other form fields
         const formElements = form.elements;
         for (let i = 0; i < formElements.length; i++) {
@@ -904,6 +930,7 @@
             if (!name) continue;
             if (element.type === 'submit' || element.type === 'button') continue;
             if (name === '_token') continue;
+            if (name === 'date') continue; // Handled explicitly above for back-dated support
             if (name === 'pathology[]' || name === 'pathology_notes[]' || name === 'radiology[]' || name === 'radiology_notes[]') continue;
             
             // Handle multi-select fields (finding_type[], findings[], etc.)
@@ -1455,8 +1482,14 @@
 
             // Fallback: if relatedTarget is not available, try to find the button
             if (!button) {
-                // Try to find button with data-ipd-id or data-id attribute
-                button = document.querySelector('[data-bs-target="#addPrescriptionModal"][data-ipd-id], [data-bs-target="#addPrescriptionModal"][data-id]');
+                // Prefer button matching ipd_id from form/URL (for programmatic open or when relatedTarget is null)
+                const ipdIdVal = (ipdIdField ? ipdIdField.value : '').trim();
+                if (ipdIdVal) {
+                    button = document.querySelector('[data-bs-target="#addPrescriptionModal"][data-ipd-id="' + ipdIdVal + '"]');
+                }
+                if (!button) {
+                    button = document.querySelector('[data-bs-target="#addPrescriptionModal"][data-ipd-id], [data-bs-target="#addPrescriptionModal"][data-id]');
+                }
             }
 
             // Additional fallback: try to get from URL if on IPD view page
@@ -1490,6 +1523,34 @@
                 ipd_id = ipd_id_from_url;
                 if (ipdIdField) ipdIdField.value = ipd_id;
                 console.log('Using IPD ID from URL:', ipd_id);
+            }
+
+            // Set prescription date from trigger button or page context (for back-dated IPD prescriptions)
+            // IMPORTANT: Only set when empty to avoid overwriting user's back-dated selection
+            const prescriptionDateEl = document.getElementById('prescription_date');
+            let admissionDate = button ? button.getAttribute('data-admission-date') : null;
+            // Fallback: use ipdViewContext when on IPD view page (e.g. programmatic modal open)
+            if (!admissionDate && ipd_id) {
+                const ctx = document.getElementById('ipdViewContext');
+                if (ctx && ctx.getAttribute('data-ipd-id') === String(ipd_id)) {
+                    admissionDate = ctx.getAttribute('data-admission-date');
+                }
+            }
+            if (prescriptionDateEl) {
+                const today = new Date().toISOString().split('T')[0];
+                prescriptionDateEl.max = today; // Prevent future dates; allow back-dating up to today
+                if (admissionDate) {
+                    prescriptionDateEl.min = admissionDate; // Allow dates from admission to today
+                    if (!prescriptionDateEl.value || prescriptionDateEl.value.trim() === '') {
+                        prescriptionDateEl.value = admissionDate;
+                        console.log('Prescription date set to admission date:', admissionDate);
+                    }
+                } else {
+                    prescriptionDateEl.removeAttribute('min');
+                    if (!prescriptionDateEl.value || prescriptionDateEl.value.trim() === '') {
+                        prescriptionDateEl.value = today;
+                    }
+                }
             }
 
             // Set values only if they exist and are not empty
@@ -1564,6 +1625,22 @@
                     }
                 }, 300);
             }, 200);
+        });
+
+        // Reset form when modal is closed so next open gets fresh state and user's date selection is preserved
+        createPrescriptionModal.addEventListener('hidden.bs.modal', function() {
+            const form = document.getElementById('ipdAddPrescriptionForm');
+            if (form) {
+                form.reset();
+                const prescriptionDateEl = document.getElementById('prescription_date');
+                if (prescriptionDateEl) prescriptionDateEl.value = '';
+            }
+            window.selectedPathologyList = [];
+            window.selectedRadiologyList = [];
+            const pathContainer = document.getElementById('pathologySelectedList');
+            const radContainer = document.getElementById('radiologySelectedList');
+            if (pathContainer) pathContainer.innerHTML = '';
+            if (radContainer) radContainer.innerHTML = '';
         });
 
         // OLD SUBMIT HANDLER REMOVED - Now handled by document-level capture-phase listener

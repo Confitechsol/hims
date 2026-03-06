@@ -687,6 +687,7 @@ class IpdController extends Controller
         // dd($request->all());
         try { $request->validate([
             'ipd_id'              => 'nullable|string',
+            'date'                => 'nullable|date',
             'header_note'         => 'nullable|string',
             'footer_note'         => 'nullable|string',
             'advice'              => 'nullable|string',
@@ -772,7 +773,26 @@ class IpdController extends Controller
             
 
             try {
-                // Create prescription
+                // Create prescription - use request date when provided (for back-dated prescriptions)
+                $dateInput = $request->input('date') ?? $request->input('prescription_date') ?? $request->get('date');
+                if (is_array($dateInput)) {
+                    $dateInput = $dateInput[0] ?? null;
+                }
+                $dateInput = $dateInput !== null ? trim((string) $dateInput) : '';
+                if ($dateInput !== '') {
+                    try {
+                        $prescriptionDate = Carbon::parse($dateInput)->toDateString();
+                    } catch (\Exception $e) {
+                        $prescriptionDate = Carbon::now()->toDateString();
+                    }
+                } else {
+                    // Fallback: use IPD admission date when request date is empty, else today
+                    $ipd = $request->ipd_id ? IpdDetail::find($request->ipd_id) : null;
+                    $prescriptionDate = ($ipd && $ipd->date)
+                        ? Carbon::parse($ipd->date)->toDateString()
+                        : Carbon::now()->toDateString();
+                }
+
                 $prescription = IpdPrescription::create([
                     'prescription_number' => $prescriptionNo,
                     'ipd_id'              => $request->ipd_id,
@@ -782,7 +802,7 @@ class IpdController extends Controller
                     'advice'              => $request->advice ?? null,
                     'finding_description' => $request->finding_description ?? null,
                     'is_finding_print'    => $request->finding_print ?? 'no',
-                    'date'                => Carbon::now()->toDateString(),
+                    'date'                => $prescriptionDate,
                     'finding_categories'  => $implodedFindingTypes,
                     'findings'            => $implodedFindings,
                     'pathology_id'        => ! empty($pathology_ids) ? implode(", ", $pathology_ids) : null, // Keep for backward compatibility
@@ -793,7 +813,6 @@ class IpdController extends Controller
                 ]);
 
                 // Store tests in normalized table with instance tracking
-                $prescriptionDate = $prescription->date ?? Carbon::now()->toDateString();
                 $prescriptionTime = Carbon::now()->format('H:i:s');
                 
                 if (! empty($pathology_ids)) {
@@ -997,7 +1016,12 @@ class IpdController extends Controller
         $selectedPathologyIds = array_column($pathologyTestsForList, 'id');
         $selectedRadiologyIds = array_column($radiologyTestsForList, 'id');
 
-        $prescriptionDate = $prescription->date ?? Carbon::now()->toDateString();
+        $prescriptionDate = $prescription->date ? $prescription->date->format('Y-m-d') : Carbon::now()->toDateString();
+        $admissionDate = null;
+        if ($prescription->ipd_id) {
+            $ipd = IpdDetail::find($prescription->ipd_id);
+            $admissionDate = $ipd && $ipd->date ? Carbon::parse($ipd->date)->format('Y-m-d') : null;
+        }
         $pathologyInstanceCounts = [];
         $radiologyInstanceCounts = [];
         foreach (array_count_values($selectedPathologyIds) as $pathId => $count) {
@@ -1018,6 +1042,7 @@ class IpdController extends Controller
             'pathologyInstanceCounts',
             'radiologyInstanceCounts',
             'prescriptionDate',
+            'admissionDate',
             'pathologyTestsForList',
             'radiologyTestsForList'
         ));
@@ -1093,6 +1118,26 @@ class IpdController extends Controller
                 // Update prescription - ensure prescribe_by is properly set
                 $prescribeBy = $request->prescribe_by ?? $prescription->prescribed_by;
 
+                // Resolve prescription date: request date > existing prescription date > today (for back-dated support)
+                $dateInput = $request->input('date') ?? $request->input('prescription_date') ?? $request->get('date');
+                if (is_array($dateInput)) {
+                    $dateInput = $dateInput[0] ?? null;
+                }
+                $dateInput = $dateInput !== null ? trim((string) $dateInput) : '';
+                if ($dateInput !== '') {
+                    try {
+                        $prescriptionDateForUpdate = Carbon::parse($dateInput)->toDateString();
+                    } catch (\Exception $e) {
+                        $prescriptionDateForUpdate = $prescription->date
+                            ? Carbon::parse($prescription->date)->toDateString()
+                            : Carbon::now()->toDateString();
+                    }
+                } else {
+                    $prescriptionDateForUpdate = $prescription->date
+                        ? Carbon::parse($prescription->date)->toDateString()
+                        : Carbon::now()->toDateString();
+                }
+
                 $prescription->update([
                     'ipd_id'              => $request->ipd_id,
                     'prescribed_by'       => $prescribeBy,
@@ -1106,7 +1151,7 @@ class IpdController extends Controller
                     'pathology_id'        => ! empty($pathology_ids) ? implode(", ", $pathology_ids) : null,
                     'radiology_id'        => ! empty($radiology_ids) ? implode(", ", $radiology_ids) : null,
                     'notification_to'     => $implodedVisibles,
-                    'date'                => $request->date ?? $prescription->date,
+                    'date'                => $prescriptionDateForUpdate,
                     'attachment'          => $attachment,
                     'attachment_name'     => $attachmentName,
                 ]);
@@ -1169,8 +1214,8 @@ class IpdController extends Controller
                     $radiologyToAdd[$rid] = ($radiologyToAdd[$rid] ?? 0) - $count;
                 }
 
-                // Store NEW tests (only those not already kept from existing)
-                $prescriptionDate = $prescription->date ?? Carbon::now()->toDateString();
+                // Store NEW tests (only those not already kept from existing) - use same date as prescription update
+                $prescriptionDate = $prescriptionDateForUpdate;
                 $prescriptionTime = Carbon::now()->format('H:i:s');
                 $pathologyNotes   = is_array($request->input('pathology_notes')) ? $request->input('pathology_notes') : [];
                 $radiologyNotes   = is_array($request->input('radiology_notes')) ? $request->input('radiology_notes') : [];
