@@ -972,7 +972,7 @@
             <!-- col end -->
 
             <!-- col start -->
-            <div class="col-xl-6 col-lg-6 d-flex">
+            {{-- <div class="col-xl-6 col-lg-6 d-flex">
                 <div class="card shadow-sm flex-fill w-100">
                     <div class="card-header d-flex align-items-center justify-content-between">
                         <h5 class="fw-bold mb-0">Recent
@@ -1084,7 +1084,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
             <!-- col end -->
 
             <!-- col start -->

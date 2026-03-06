@@ -140,11 +140,17 @@
 
             </div>
             <div class="modal-footer">
+                @php
+                    $currentUrl = urlencode(request()->fullUrl());
+                    $title = urlencode(config('app.name'));
+                @endphp
                 <div class="text-center w-100 d-flex align-items-center justify-content-center">
-                    <a href="#" class="btn btn-md btn-dark me-2 d-flex align-items-center"> <i
+                    <a href="https://wa.me/?text={{ $title }}%20{{ $currentUrl }}" target="_blank"
+                        class="btn btn-md btn-dark me-2 d-flex align-items-center"> <i
                             class="fa-brands fa-whatsapp"></i> Whatsapp</a>
-                    <a href="#" class="btn btn-md btn-primary me-2 d-flex align-items-center"> <i
-                            class="fa-solid fa-at"></i> Email</a>
+                    <a href="mailto:?subject={{ $title }}&body=Check%20this%20page:%20{{ $currentUrl }}"
+                        class="btn btn-md btn-primary me-2 d-flex align-items-center"> <i class="fa-solid fa-at"></i>
+                        Email</a>
                     <a href="#" onclick="printPdf()" class="btn btn-md btn-warning d-flex align-items-center"> <i
                             class="fa-solid fa-print"></i> Print</a>
                 </div>
@@ -339,24 +345,24 @@
 
                 setTimeout(() => {
                     generatePdf().then(pdf => {
-                Swal.close();
-                const blob = pdf.output('bloburl');
+                            Swal.close();
+                            const blob = pdf.output('bloburl');
 
-                const printWindow = window.open(blob);
-                printWindow.onload = () => {
-                    printWindow.focus();
-                    printWindow.print();
-                };
-            })
-            .catch(error => {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops!',
-                    text: 'Failed to generate PDF'
-                });
-                console.error(error);
-            });
-                },0);
+                            const printWindow = window.open(blob);
+                            printWindow.onload = () => {
+                                printWindow.focus();
+                                printWindow.print();
+                            };
+                        })
+                        .catch(error => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops!',
+                                text: 'Failed to generate PDF'
+                            });
+                            console.error(error);
+                        });
+                }, 0);
             }
         });
 

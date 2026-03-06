@@ -661,7 +661,7 @@
                                                     </label>
                                                     <input type="datetime-local" name="admission_date" id="admission_date"
                                                         class="form-control"
-                                                        value="{{ old('admission_date', $ipd->date) }}" required >
+                                                        value="{{ old('admission_date', $ipd->date) }}" required max="{{ now()->format('Y-m-d\TH:i') }}">
                                                 </div>
 
                                                 <div class="field-group">
