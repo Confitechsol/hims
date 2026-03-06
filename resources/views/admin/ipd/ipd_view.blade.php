@@ -4428,7 +4428,7 @@
                                                     <label for="released_date" class="form-label">Select Released Date
                                                         <span class="text-danger">*</span></label>
                                                     <input type="datetime-local" name="released_date"
-                                                        id="released_date" class="form-control">
+                                                        id="released_date" class="form-control" max="{{ now()->format('Y-m-d\TH:i') }}">
                                                 </div>
                                                 <div class="col-md-4">
                                                     <label for="bed_group" class="form-label">Select Bed Group <span
