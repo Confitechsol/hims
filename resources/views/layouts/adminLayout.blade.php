@@ -21,7 +21,7 @@
     <meta name="keywords"
         content="Creative, modern, clean, bootstrap responsive, html5, css3, portfolio, blog, studio, templates, multipurpose, one page, corporate, start-up, studio, branding, designer, freelancer, carousel, parallax, photography, studio, masonry, grid, faq">
     <!-- Favicon -->
-    <link rel="shortcut icon" href="assets/images/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}" type="image/x-icon">
 
     <!-- Styles -->
 
@@ -372,7 +372,7 @@
                                         id="notification-1">
                                         <div class="d-flex">
                                             <div class="me-2 position-relative flex-shrink-0">
-                                                <img src="assets/img/doctors/doctor-01.jpg"
+                                                <img src="{{ asset('assets/img/doctors/doctor-01.jpg') }}"
                                                     class="avatar-md rounded-circle" alt>
                                             </div>
                                             <div class="flex-grow-1">
@@ -407,7 +407,7 @@
                                         id="notification-2">
                                         <div class="d-flex">
                                             <div class="me-2 position-relative flex-shrink-0">
-                                                <img src="assets/img/doctors/doctor-06.jpg"
+                                                <img src="{{ asset('assets/img/doctors/doctor-06.jpg') }}"
                                                     class="avatar-md rounded-circle" alt>
                                             </div>
                                             <div class="flex-grow-1">
@@ -442,7 +442,7 @@
                                         id="notification-3">
                                         <div class="d-flex">
                                             <div class="me-2 position-relative flex-shrink-0">
-                                                <img src="assets/img/doctors/doctor-02.jpg"
+                                                <img src="{{ asset('assets/img/doctors/doctor-02.jpg') }}"
                                                     class="avatar-md rounded-circle" alt>
                                             </div>
                                             <div class="flex-grow-1">
@@ -478,7 +478,7 @@
                                     <div class="dropdown-item notification-item py-3 text-wrap" id="notification-4">
                                         <div class="d-flex">
                                             <div class="me-2 position-relative flex-shrink-0">
-                                                <img src="assets/img/doctors/doctor-07.jpg"
+                                                <img src="{{ asset('assets/img/doctors/doctor-07.jpg') }}"
                                                     class="avatar-md rounded-circle" alt>
                                             </div>
                                             <div class="flex-grow-1">
@@ -867,6 +867,19 @@
 // Cleanup
 $(document).on('hidden.bs.modal', '.use-select2', function () {
     $(this).find('.modal-body').off('scroll.select2fix');
+});
+
+// Global: Remove lingering modal backdrops when any modal hides (fixes stuck overlay)
+document.addEventListener('hidden.bs.modal', function() {
+    setTimeout(function() {
+        var openModals = document.querySelectorAll('.modal.show');
+        if (openModals.length === 0) {
+            document.querySelectorAll('.modal-backdrop').forEach(function(b) { b.remove(); });
+            document.body.classList.remove('modal-open');
+            document.body.style.paddingRight = '';
+            document.body.style.overflow = '';
+        }
+    }, 50);
 });        
         $(document).ready(function() {
             $('.add-select2').each(function() {
