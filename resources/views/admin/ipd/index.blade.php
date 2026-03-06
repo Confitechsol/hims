@@ -120,10 +120,10 @@
                                                     <th>IPD No.</th>
                                                     <th>Patient Name</th>
                                                     <th>Phone</th>
-                                                    <th>Email</th>
-                                                    <th>Gender</th>
                                                     <th>Consultant</th>
                                                     <th>Bed</th>
+                                                    <th>Total Payment (INR)</th>
+                                                    <th>Total Outstanding (INR)</th>
                                                     <th>Credit Limit (INR)</th>
                                                     <th>Actions</th>
                                                 </tr>
@@ -137,8 +137,6 @@
                                                         </td>
                                                         <td>{{ $ipdDetails->patient->patient_name ?? '-' }}</td>
                                                         <td>{{ $ipdDetails->patient->mobileno ?? '-' }}</td>
-                                                        <td>{{ $ipdDetails->patient->email ?? '-' }}</td>
-                                                        <td>{{ $ipdDetails->patient->gender ?? '-' }}</td>
                                                         <td>{{ $ipdDetails->doctor->name ?? '-' }}</td>
                                                         <td><span class="badge"
                                                                 style="background-color: {{ $ipdDetails->bedGroup?->color ?? '#6c757d' }}">
@@ -150,6 +148,8 @@
                                                                 }}
                                                             </span>
                                                         </td>
+                                                        <td>{{ number_format($ipdDetails->total_payments ?? 0, 2) }}</td>
+                                                        <td>{{ number_format($ipdDetails->outstanding ?? 0, 2) }}</td>
                                                         <td>{{ $ipdDetails->credit_limit }}</td>
                                                         <td>
                                                             <a href="{{ route('ipd.edit', [$ipdDetails->id]) }}"

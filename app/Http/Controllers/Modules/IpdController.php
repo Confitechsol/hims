@@ -68,6 +68,14 @@ class IpdController extends Controller
                         //     });
                     });
                 })->get();
+
+            // Attach billing summary (total payments, outstanding) for each IPD
+            $billingController = app(\App\Http\Controllers\IpdBillingController::class);
+            foreach ($ipd as $ipdDetails) {
+                $summary = $billingController->getBillingSummaryForIpd($ipdDetails->id);
+                $ipdDetails->total_payments = $summary['total_payments'];
+                $ipdDetails->outstanding = $summary['outstanding'];
+            }
         } else {
             // $patients = Patient::with(['ipds.doctor'])->get();
             $patients = IpdDetail::with('patient', 'ipdPatients', 'doctor')->where('discharged', 'yes')

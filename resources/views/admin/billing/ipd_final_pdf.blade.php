@@ -600,6 +600,35 @@ header {
             </table>
         </div>
 
+        <!-- Package Charges (first when present) -->
+        @if(isset($packageDetails) && $packageDetails->count() > 0)
+        <table class="charges-table">
+            <thead>
+                <tr>
+                    <th colspan="3">Package Charges</th>
+                </tr>
+                <tr>
+                    <th>Applied Date</th>
+                    <th>Package Name</th>
+                    <th class="text-right">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($packageDetails as $pkg)
+                <tr>
+                    <td>{{ \Carbon\Carbon::parse($pkg['date'])->format('d/m/Y') }}</td>
+                    <td>{{ $pkg['package_name'] ?? 'N/A' }}</td>
+                    <td class="text-right">Rs. {{ number_format($pkg['amount'] ?? 0, 2) }}</td>
+                </tr>
+                @endforeach
+                <tr style="font-weight: bold;">
+                    <td colspan="2" class="text-right">Subtotal:</td>
+                    <td class="text-right">Rs. {{ number_format($breakup['package_charges'] ?? 0, 2) }}</td>
+                </tr>
+            </tbody>
+        </table>
+        @endif
+
         <!-- Bed Charges (grouped by bed and date range) -->
         @if(isset($bedChargesGroupedForDisplay) && $bedChargesGroupedForDisplay->count() > 0)
         <table class="charges-table">
@@ -786,30 +815,31 @@ header {
         </table>
         @endif
 
-        <!-- Doctor Visit Charges (grouped by doctor and date range) -->
-        @if(isset($doctorVisitGroupedForDisplay) && $doctorVisitGroupedForDisplay->count() > 0)
+        <!-- Doctor Visit Charges (grouped by visit type, then by doctor) -->
+        @if(isset($doctorVisitGroupedByVisitType) && $doctorVisitGroupedByVisitType->count() > 0)
         <table class="charges-table">
             <thead>
                 <tr>
                     <th colspan="4">Doctor Visit Charges</th>
                 </tr>
                 <tr>
-                    <th>Doctor / Visit Type</th>
+                    <th>Doctor</th>
                     <th>Visits</th>
                     <th>Date Range</th>
                     <th class="text-right">Amount</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($doctorVisitGroupedForDisplay as $row)
+                @foreach($doctorVisitGroupedByVisitType as $visitTypeGroup)
+                <tr style="background-color: #f0f0f0; font-weight: bold;">
+                    <td colspan="4">{{ $visitTypeGroup->visit_type_label ?? 'Other' }}</td>
+                </tr>
+                @foreach($visitTypeGroup->rows as $row)
                 <tr>
                     <td>
                         {{ $row->doctor_label ?? 'N/A' }}
                         @if(isset($row->rate_per_visit))
                             @ {{ number_format($row->rate_per_visit, 2) }}
-                        @endif
-                        @if(!empty($row->visit_type_label))
-                            - {{ $row->visit_type_label }}
                         @endif
                     </td>
                     <td>{{ $row->visit_count ?? 0 }} {{ ($row->visit_count ?? 0) === 1 ? 'Visit' : 'Visits' }}</td>
@@ -821,38 +851,10 @@ header {
                     <td class="text-right">Rs. {{ number_format($row->total_amount ?? 0, 2) }}</td>
                 </tr>
                 @endforeach
+                @endforeach
                 <tr style="font-weight: bold;">
                     <td colspan="3" class="text-right">Subtotal:</td>
                     <td class="text-right">Rs. {{ number_format($breakup['doctor_visit_charges'] ?? 0, 2) }}</td>
-                </tr>
-            </tbody>
-        </table>
-        @endif
-
-        <!-- Package Charges -->
-        @if(isset($packageDetails) && $packageDetails->count() > 0)
-        <table class="charges-table">
-            <thead>
-                <tr>
-                    <th colspan="3">Package Charges</th>
-                </tr>
-                <tr>
-                    <th>Applied Date</th>
-                    <th>Package Name</th>
-                    <th class="text-right">Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($packageDetails as $pkg)
-                <tr>
-                    <td>{{ \Carbon\Carbon::parse($pkg['date'])->format('d/m/Y') }}</td>
-                    <td>{{ $pkg['package_name'] ?? 'N/A' }}</td>
-                    <td class="text-right">Rs. {{ number_format($pkg['amount'] ?? 0, 2) }}</td>
-                </tr>
-                @endforeach
-                <tr style="font-weight: bold;">
-                    <td colspan="2" class="text-right">Subtotal:</td>
-                    <td class="text-right">Rs. {{ number_format($breakup['package_charges'] ?? 0, 2) }}</td>
                 </tr>
             </tbody>
         </table>
@@ -917,6 +919,12 @@ header {
         <!-- Summary Section -->
         <div class="summary-section">
             <div class="section-title" style="margin-top: 0; margin-bottom: 8px;">Payment Summary</div>
+            @if(($breakup['package_charges'] ?? 0) > 0)
+            <div class="summary-row">
+                <span class="summary-label">Package Charges:</span>
+                <span class="summary-value">Rs. {{ number_format($breakup['package_charges'] ?? 0, 2) }}</span>
+            </div>
+            @endif
             @if(($breakup['bed_charges'] ?? 0) > 0)
             <div class="summary-row">
                 <span class="summary-label">Bed Charges:</span>
@@ -938,10 +946,6 @@ header {
             <div class="summary-row">
                 <span class="summary-label">Doctor Visit Charges:</span>
                 <span class="summary-value">Rs. {{ number_format($breakup['doctor_visit_charges'] ?? 0, 2) }}</span>
-            </div>
-            <div class="summary-row">
-                <span class="summary-label">Package Charges:</span>
-                <span class="summary-value">Rs. {{ number_format($breakup['package_charges'] ?? 0, 2) }}</span>
             </div>
             <div class="summary-row">
                 <span class="summary-label">Total Charges:</span>

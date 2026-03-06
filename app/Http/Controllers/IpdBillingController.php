@@ -513,6 +513,21 @@ class IpdBillingController extends Controller
     }
 
     /**
+     * Get billing summary (total payments and outstanding) for an IPD - used in IPD listing.
+     *
+     * @param int $ipdId
+     * @return array ['total_payments' => float, 'outstanding' => float]
+     */
+    public function getBillingSummaryForIpd($ipdId)
+    {
+        $breakup = $this->calculateBreakup($ipdId);
+        return [
+            'total_payments' => $breakup['total_payments'] ?? 0,
+            'outstanding' => $breakup['outstanding'] ?? 0,
+        ];
+    }
+
+    /**
      * Get detailed date-wise breakdown
      */
     private function getDetailedBreakup($ipdId, $ipd)
@@ -891,6 +906,32 @@ class IpdBillingController extends Controller
         }
 
         return $result->sortBy('from_date')->values();
+    }
+
+    /**
+     * Group doctor visit rows by visit type for PDF display.
+     * Returns array of [ 'visit_type_label' => string, 'rows' => Collection ] for each visit type.
+     *
+     * @param \Illuminate\Support\Collection $doctorVisitGroupedRows Output from groupDoctorVisitsForDisplay
+     * @return \Illuminate\Support\Collection
+     */
+    private function groupDoctorVisitsByVisitTypeForDisplay($doctorVisitGroupedRows)
+    {
+        if (!$doctorVisitGroupedRows || $doctorVisitGroupedRows->isEmpty()) {
+            return collect();
+        }
+
+        $byType = $doctorVisitGroupedRows->groupBy(function ($row) {
+            $label = $row->visit_type_label ?? '';
+            return $label !== '' ? $label : 'Other';
+        });
+
+        return $byType->map(function ($rows, $visitTypeLabel) {
+            return (object) [
+                'visit_type_label' => $visitTypeLabel,
+                'rows' => $rows->sortBy('from_date')->values(),
+            ];
+        })->sortBy('visit_type_label')->values();
     }
 
     /**
@@ -1363,8 +1404,9 @@ class IpdBillingController extends Controller
                 ->with(['doctor', 'charge'])
                 ->orderBy('visit_date', 'asc')
                 ->get() ?? collect();
-            // Group doctor visits by doctor and contiguous date ranges for PDF display
+            // Group doctor visits by doctor + visit type, then by visit type for PDF display
             $doctorVisitGroupedForDisplay = $this->groupDoctorVisitsForDisplay($doctorVisitDetails);
+            $doctorVisitGroupedByVisitType = $this->groupDoctorVisitsByVisitTypeForDisplay($doctorVisitGroupedForDisplay);
 
             // Package details (applied packages) for estimate PDF
             $packageDetails = IpdPackage::where('ipd_id', $ipdId)
@@ -1485,7 +1527,7 @@ class IpdBillingController extends Controller
             // First pass: Render to get accurate page count
             $tempPdf = Pdf::loadView('admin.billing.ipd_estimate_pdf', compact(
                 'ipd', 'breakup', 'bedChargesDetails', 'bedChargesGroupedForDisplay', 'ipdChargesDetails',
-                'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'doctorVisitGroupedForDisplay', 'packageDetails', 'payments',
+                'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'doctorVisitGroupedForDisplay', 'doctorVisitGroupedByVisitType', 'packageDetails', 'payments',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
                 'investigationDatewise',
                 'totalChargesInWords', 'totalPaymentsInWords', 'outstandingInWords', 'netBalanceInWords',
@@ -1526,7 +1568,7 @@ class IpdBillingController extends Controller
             // Second pass: Render with accurate page count stored in view
             $pdf = Pdf::loadView('admin.billing.ipd_estimate_pdf', compact(
                 'ipd', 'breakup', 'bedChargesDetails', 'bedChargesGroupedForDisplay', 'ipdChargesDetails',
-                'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'doctorVisitGroupedForDisplay', 'packageDetails', 'payments',
+                'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'doctorVisitGroupedForDisplay', 'doctorVisitGroupedByVisitType', 'packageDetails', 'payments',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
                 'investigationDatewise',
                 'totalChargesInWords', 'totalPaymentsInWords', 'outstandingInWords', 'netBalanceInWords',
@@ -1693,8 +1735,9 @@ class IpdBillingController extends Controller
                 ->with(['doctor', 'charge'])
                 ->orderBy('visit_date', 'asc')
                 ->get() ?? collect();
-            // Group doctor visits by doctor and contiguous date ranges for PDF display
+            // Group doctor visits by doctor + visit type, then by visit type for PDF display
             $doctorVisitGroupedForDisplay = $this->groupDoctorVisitsForDisplay($doctorVisitDetails);
+            $doctorVisitGroupedByVisitType = $this->groupDoctorVisitsByVisitTypeForDisplay($doctorVisitGroupedForDisplay);
 
             // Package details (applied packages) for final bill PDF
             $packageDetails = IpdPackage::where('ipd_id', $ipdId)
@@ -1911,7 +1954,7 @@ class IpdBillingController extends Controller
                 'totalAdvanceInWords', 'balanceInWords', 'otCharges', 'medicineCharges',
                 'surgeonCharges', 'anesthesiaCharges', 'investigationCharges', 'totalPages',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
-                'investigationDatewise', 'doctorVisitGroupedForDisplay',
+                'investigationDatewise', 'doctorVisitGroupedForDisplay', 'doctorVisitGroupedByVisitType',
                 'gstChargesGrouped', 'logged_user'
             ));
             
