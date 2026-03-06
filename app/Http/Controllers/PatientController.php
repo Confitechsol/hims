@@ -81,6 +81,7 @@ class PatientController extends Controller
     // }
     public function store(Request $request)
     {
+        // dd($request->all());
         
         $validated = Validator::make($request->all(), [
             'name'                  => 'required|string|max:255',
@@ -118,6 +119,7 @@ class PatientController extends Controller
             'tpa_validity'          => 'nullable|string|max:100',
             'national_id_number'    => 'nullable|string|max:50',
             'occupation'            => 'nullable|string|max:255',
+            'police_station'        => 'nullable|string|max:255',
         ]);
 
         //dd($validated);
@@ -178,6 +180,7 @@ class PatientController extends Controller
             'insurance_validity'    => $data['tpa_validity'] ?? null,
             'identification_number' => $data['national_id_number'] ?? null,
             'occupation'            => $data['occupation'] ?? null,
+            'police_station'        => $data['police_station'] ?? null,
         ]);
 
         return redirect()->back()->with('success', 'Patient saved successfully!');
