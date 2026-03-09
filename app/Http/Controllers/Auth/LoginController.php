@@ -32,7 +32,7 @@ class LoginController extends Controller
     {
         //dd($request->all());
         $validator = Validator::make($request->all(), [
-            'email' => 'required|string',
+            'username' => 'required|string',
             'password' => 'required|string',
         ]);
 
@@ -44,7 +44,7 @@ class LoginController extends Controller
         
         // ✅ Attempt login
         $credentials = [
-            'email'    => $request->username,
+            'username'    => $request->username,
             'password' => $request->password,
         ];
         //dd( $credentials);
