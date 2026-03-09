@@ -77,7 +77,7 @@ class StaffController extends Controller
         $request->validate([
             'employee_id' => 'required',
             'name' => 'required',
-            'email' => 'required|email',
+            'email' => 'nullable|email',
            
         ]);
 
