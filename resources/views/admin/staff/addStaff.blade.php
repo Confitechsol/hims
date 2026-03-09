@@ -811,7 +811,7 @@
                                             <select class="form-select" name="blood_group">
                                                 <option value="">Select</option>
                                                 @foreach ($bloodgroups as $bg)
-                                                    <option value="{{ $bg }}"
+                                                    <option value="{{ $bg->name }}"
                                                         {{ old('blood_group', $staff->blood_group ?? '') == $bg->id ? 'selected' : '' }}>
                                                         {{ $bg->name }}
                                                     </option>
@@ -933,7 +933,7 @@
                                     <!-- EMAIL -->
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label class="form-label">Email</label><small class="req"> *</small>
+                                            <label class="form-label">Email</label>
                                             <input id="email" name="email" type="email" class="form-control"
                                                 value="{{ old('email', $staff->email ?? '') }}">
                                         </div>

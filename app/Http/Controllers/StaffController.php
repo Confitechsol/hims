@@ -99,7 +99,7 @@ class StaffController extends Controller
         $staff->mother_name = $request->mother_name;
         $staff->gender = $request->gender;
         $staff->marital_status = $request->marital_status;
-        $staff->blood_group = $request->blood_group;
+        $staff->blood_group = $request->blood_group['name'] ?? $request->blood_group;
         $staff->dob = $request->dob;
         $staff->date_of_joining = $request->date_of_joining;
         $staff->contact_no = $request->contactno;
@@ -127,7 +127,7 @@ class StaffController extends Controller
 
         $staff->save();
 
-        return back()->with('success', 'Staff details added successfully!');
+        return redirect()->route('staffs.index')->with('success', 'Staff details added successfully!');
     }
     public function update(Request $request, $id)
     {
