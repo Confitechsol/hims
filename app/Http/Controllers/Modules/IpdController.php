@@ -337,7 +337,9 @@ class IpdController extends Controller
             'date'                => 'nullable|date',
         ]);
         try {
-            $symptomTitle         = array_filter($request->symptoms_title, fn($title) => $title !== null && $title !== '');
+            // $symptomTitle         = array_filter($request->symptoms_title, fn($title) => $title !== null && $title !== '');
+            $symptomTitle         = array_filter($request->symptoms_title ?? [], fn($title) => $title !== null && $title !== '');
+            $symptomType          = array_filter($request->symptoms_type ?? [], fn($type) => $type !== null && $type !== '');
             $implodedSymptomType  = implode(", ", $symptomType);
             $implodedSymptomTitle = implode(", ", $symptomTitle);
             // 🔹 Update OPD record
