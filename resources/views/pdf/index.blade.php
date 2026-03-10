@@ -309,7 +309,7 @@
                     </div>
                     :
                     <div class="patient_data">
-                        .
+                        
                     </div>
                 </div>
                 <div class="patient_items">
@@ -318,9 +318,20 @@
                     </div>
                     :
                     <div class="patient_data">
-                        .
+                        {{ $IpdPatient->patient['occupation'] ?? '' }}
                     </div>
                 </div>
+
+                 <div class="patient_items">
+                        <div class="patient_head">
+                            GENDER
+                        </div>
+                        :
+                        <div class="patient_data">
+                            {{ $IpdPatient->patient['gender'] }}
+                        </div>
+                 </div>
+                    
 
             </div>
 
@@ -335,15 +346,8 @@
                             {{ $IpdPatient->patient['age'] }} y
                         </div>
                     </div>
-                    <div class="patient_items">
-                        <div class="patient_head">
-                            GENDER
-                        </div>
-                        :
-                        <div class="patient_data">
-                            {{ $IpdPatient->patient['gender'] }}
-                        </div>
-                    </div>
+                   
+                    
                 </div>
                 <div class="patient_items">
                     <div class="patient_head">
@@ -351,7 +355,7 @@
                     </div>
                     :
                     <div class="patient_data">
-                        {{ $IpdPatient->patient['address'] }}
+                        {{ $IpdPatient->patient['area'] }}
                     </div>
                 </div>
                 <div class="patient_items">
@@ -381,6 +385,17 @@
                         {{ $IpdPatient->patient['nationality'] ?? '' }}
                     </div>
                 </div>
+
+                <div class="patient_items">
+                        <div class="patient_head">
+                            Police Station
+                        </div>
+                        :
+                        <div class="patient_data">
+                            {{ $IpdPatient->patient['police_station'] }}
+                        </div>
+                    </div>
+
             </div>
 
         </div>
