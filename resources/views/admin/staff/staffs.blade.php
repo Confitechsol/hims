@@ -55,15 +55,15 @@
                                         </div>
 
                                     </div>
-                                    <form action="{{ route('staffs.bulkDelete') }}" method="POST" id="bulk-delete-form">
+                                    <!-- <form action="{{ route('staffs.bulkDelete') }}" method="POST" id="bulk-delete-form">
                                         @csrf
-                                        @method('DELETE') <!-- Laravel RESTful delete -->
+                                        @method('DELETE') 
                                         <div class="text-end mb-2">
                                             <button type="submit" class="btn btn-danger text-white ms-2 fs-13 btn-md"
                                                 onclick="return confirm('Are you sure you want to delete the selected Staffs?')">
                                                 <i class="ti ti-trash me-1"></i>Delete Selected
                                             </button>
-                                        </div>
+                                        </div> -->
                                         @if (session('success'))
                                             <div class="alert alert-success">{{ session('success') }}</div>
                                         @endif
@@ -171,7 +171,7 @@
                                             <button class="btn btn-outline-secondary btn-sm" disabled>Next »</button>
                                         @endif
                                     </div>
-                                    </form>
+                                    <!-- </form> -->
                                 </div> <!-- end card-body -->
                             </div> <!-- end card -->
                         </div> <!-- end col -->

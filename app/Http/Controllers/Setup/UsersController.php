@@ -110,52 +110,52 @@ class UsersController extends Controller
     {
         $staff = Staff::findOrFail($staffId);
 
-        // Check if already has user
+        // Check if credentials already exist
+        $existingUser = User::where('user_id', $staff->id)->first();
 
+        if ($existingUser) {
+            return back()->with('error', 'Credentials already exist for this staff.');
+        }
 
         $password = '123456';
 
         $user = new User();
-        $user->hospital_id = Auth::user()->hospital_id;
-        $user->branch_id   = Auth::user()->branch_id ?? null;
         $user->hospital_id = $staff->hospital_id;
         $user->branch_id   = $staff->branch_id;
-        $user->username    = $user->username = $staff->name . ' ' . $staff->surname;
-        $user->email       = $staff->email;
+        $user->username    = $staff->name . ' ' . $staff->surname;
+        $user->email       = $staff->email ?? ($staff->name . '.' . $staff->surname . '@temp.com');
         $user->password    = Hash::make($password);
         $user->role        = $staff->role_id;
         $user->user_id     = $staff->id;
         $user->is_active   = 1;
         $user->save();
 
-       
-
         return back()->with('success', 'Credentials created! Password: ' . $password);
     }
     public function showChangePassword()
-{
-    return view('admin.setup.change-password');
-}
-
-public function updatePassword(Request $request)
-{
-    $request->validate([
-        'current_password' => 'required',
-        'new_password' => 'required|min:6|confirmed',
-    ]);
-
-    $user = Auth::user();
-
-    // Check current password
-    if (!Hash::check($request->current_password, $user->password)) {
-        return back()->with('error', 'Current password is incorrect.');
+    {
+        return view('admin.setup.change-password');
     }
 
-    // Update password
-    $user->password = Hash::make($request->new_password);
-    $user->save();
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|min:6|confirmed',
+        ]);
 
-    return back()->with('success', 'Password changed successfully.');
-}
+        $user = Auth::user();
+
+        // Check current password
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->with('error', 'Current password is incorrect.');
+        }
+
+        // Update password
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return back()->with('success', 'Password changed successfully.');
+    }
 
 }
