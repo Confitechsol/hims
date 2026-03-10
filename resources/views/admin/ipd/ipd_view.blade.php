@@ -4336,7 +4336,8 @@
                                                                 <th>Bed</th>
                                                                 <th>From Date</th>
                                                                 <th>To Date</th>
-                                                                <th>Active Bed</th>
+                                                                <th>Active</th>
+                                                                <th>Action</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -4346,13 +4347,30 @@
                                                                         <h6 class="fs-14 mb-1">
                                                                             {{ $history->bedGroup->name ?? '-' }}</h6>
                                                                     </td>
-                                                                    <td>{{ $history->bed->name }}</td>
+                                                                    <td>{{ $history->bed->name ?? '-' }}</td>
                                                                     <td>{{ \Carbon\Carbon::parse($history->from_date)->format('d/m/Y h:i A') }}
                                                                     </td>
                                                                     <td>{{ $history->to_date ? \Carbon\Carbon::parse($history->to_date)->format('d/m/Y h:i A') : '--' }}
                                                                     </td>
-                                                                    <td>{{ $history->bed->is_active }}</td>
-
+                                                                    <td>{{ $history->is_active === 'yes' ? 'Yes' : 'No' }}</td>
+                                                                    <td>
+                                                                        @php
+                                                                            $daywiseCharge = \App\Models\IpdDaywiseBedCharge::where('ipd_id', $ipd->id)->whereDate('charge_date', \Carbon\Carbon::parse($history->from_date)->format('Y-m-d'))->where('bed_group_id', $history->bed_group_id)->first();
+                                                                            $existingCharge = $daywiseCharge && $daywiseCharge->bed_charge ? $daywiseCharge->bed_charge : ($history->bedGroup->bed_cost ?? '');
+                                                                        @endphp
+                                                                        <button type="button" class="btn btn-sm btn-soft-warning edit-bed-history-btn"
+                                                                            data-history-id="{{ $history->id }}"
+                                                                            data-ipd-id="{{ $ipd->id }}"
+                                                                            data-bed-group-id="{{ $history->bed_group_id }}"
+                                                                            data-bed-id="{{ $history->bed_id }}"
+                                                                            data-from-date="{{ $history->from_date ? \Carbon\Carbon::parse($history->from_date)->format('Y-m-d\TH:i') : '' }}"
+                                                                            data-to-date="{{ $history->to_date ? \Carbon\Carbon::parse($history->to_date)->format('Y-m-d\TH:i') : '' }}"
+                                                                            data-bed-charge="{{ $existingCharge }}"
+                                                                            data-is-active="{{ $history->is_active }}"
+                                                                            title="Edit">
+                                                                            <i class="ti ti-edit"></i>
+                                                                        </button>
+                                                                    </td>
                                                                 </tr>
                                                             @endforeach
 
@@ -4363,13 +4381,63 @@
                                             </div>
                                         </div>
                                     </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="tab-pane" id="bed_issue">
+                            {{-- Edit Bed History Modal --}}
+                            <div class="modal fade" id="editBedHistoryModal" tabindex="-1" aria-labelledby="editBedHistoryModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%);">
+                                            <h5 class="modal-title text-white" id="editBedHistoryModalLabel"><i class="ti ti-edit me-2"></i>Edit Bed History</h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <form id="editBedHistoryForm" method="POST" action="{{ route('ipd.bedHistory.update') }}">
+                                            @csrf
+                                            <input type="hidden" name="bed_history_id" id="edit_bed_history_id">
+                                            <input type="hidden" name="ipd_id" id="edit_ipd_id" value="{{ $ipd->id }}">
+                                            <div class="modal-body">
+                                                <div id="editBedHistoryError" class="alert alert-danger d-none"></div>
+                                                <div class="row gy-3">
+                                                    <div class="col-md-6">
+                                                        <label for="edit_bed_group" class="form-label">Bed Group <span class="text-danger">*</span></label>
+                                                        <select name="bed_group" id="edit_bed_group" class="form-select" required>
+                                                            <option value="">Select Bed Group</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label for="edit_bed" class="form-label">Bed <span class="text-danger">*</span></label>
+                                                        <select name="bed" id="edit_bed" class="form-select" required>
+                                                            <option value="">Select Bed</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label for="edit_from_date" class="form-label">From Date <span class="text-danger">*</span></label>
+                                                        <input type="datetime-local" name="from_date" id="edit_from_date" class="form-control" required>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label for="edit_to_date" class="form-label">To Date <span class="text-muted">(leave empty for active)</span></label>
+                                                        <input type="datetime-local" name="to_date" id="edit_to_date" class="form-control">
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <label for="edit_bed_charge" class="form-label">Bed Charge (INR)</label>
+                                                        <input type="number" name="bed_charge" id="edit_bed_charge" class="form-control" step="0.01" min="0" placeholder="0.00">
+                                                        <small class="text-muted">Auto-filled from bed group (editable)</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-primary">Update</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="bed_issue">
                 <!-- row start -->
                 <div class="row">
                     <div class="col-12 d-flex">
@@ -6015,6 +6083,79 @@
                 }
             });
 
+            // Edit Bed History modal - load groups and beds before showing
+            $(document).on('click', '.edit-bed-history-btn', function() {
+                var btn = $(this);
+                var bedId = btn.data('bed-id');
+                var groupId = btn.data('bed-group-id');
+                $('#edit_bed_history_id').val(btn.data('history-id'));
+                $('#edit_ipd_id').val(btn.data('ipd-id'));
+                $('#edit_from_date').val(btn.data('from-date'));
+                $('#edit_to_date').val(btn.data('to-date') || '');
+                $('#editBedHistoryError').addClass('d-none').text('');
+                $('#edit_bed_group').html('<option value="">Loading...</option>');
+                $('#edit_bed').html('<option value="">Loading...</option>');
+
+                function showModal() {
+                    new bootstrap.Modal(document.getElementById('editBedHistoryModal')).show();
+                }
+
+                if (!groupId) {
+                    $('#edit_bed_group').html('<option value="">Select Bed Group</option>');
+                    $('#edit_bed').html('<option value="">Select Bed</option>');
+                    showModal();
+                    return;
+                }
+
+                $.get("{{ route('getBedGroups') }}", function(data) {
+                    var opts = '<option value="">Select Bed Group</option>';
+                    data.forEach(function(g) {
+                        opts += '<option value="' + g.id + '">' + (g.name || '') + ' - ' + (g.floor_detail?.name || '-') + '</option>';
+                    });
+                    $('#edit_bed_group').html(opts).val(groupId);
+
+                    $.get("{{ route('get.available.beds') }}", { bed_group_id: groupId, include_bed_id: bedId }, function(beds) {
+                        var options = '<option value="">Select Bed</option>';
+                        beds.forEach(function(bed) {
+                            var sel = (bed.id == bedId) ? ' selected' : '';
+                            options += '<option value="' + bed.id + '"' + sel + '>' + bed.name + '</option>';
+                        });
+                        $('#edit_bed').html(options);
+                    });
+
+                    var existingCharge = btn.data('bed-charge');
+                    if (existingCharge !== undefined && existingCharge !== null && existingCharge !== '') {
+                        $('#edit_bed_charge').val(existingCharge);
+                    } else {
+                        $.get("{{ url('/getBedGroupCharge') }}/" + groupId, function(data) {
+                            $('#edit_bed_charge').val(data && data.bed_cost ? data.bed_cost : '');
+                        });
+                    }
+
+                    showModal();
+                });
+            });
+            $('#edit_bed_group').on('change', function() {
+                var groupId = $(this).val();
+                var curBedId = $('#edit_bed').val();
+                $('#edit_bed').html('<option value="">Loading...</option>');
+                if (groupId) {
+                    $.get("{{ url('/getBedGroupCharge') }}/" + groupId, function(data) {
+                        if (data && data.bed_cost) $('#edit_bed_charge').val(data.bed_cost);
+                        else $('#edit_bed_charge').val('');
+                    });
+                    $.get("{{ route('get.available.beds') }}", { bed_group_id: groupId, include_bed_id: curBedId }, function(data) {
+                        var options = '<option value="">Select Bed</option>';
+                        data.forEach(function(bed) {
+                            var sel = (bed.id == curBedId) ? ' selected' : '';
+                            options += '<option value="' + bed.id + '"' + sel + '>' + bed.name + '</option>';
+                        });
+                        $('#edit_bed').html(options);
+                    });
+                } else {
+                    $('#edit_bed').html('<option value="">Select Bed</option>');
+                }
+            });
         });
     </script>
     <script>
