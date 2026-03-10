@@ -350,14 +350,14 @@
                     
                 </div>
                 <div class="patient_items">
-                    <div class="patient_head">
-                        AREA
-                    </div>
-                    :
-                    <div class="patient_data">
-                        {{ $IpdPatient->patient['area'] }}
-                    </div>
-                </div>
+    <div class="patient_head">
+        AREA
+    </div>
+    :
+    <div class="patient_data">
+        {{ $IpdPatient->patient->areaName->name ?? '' }}
+    </div>
+</div>
                 <div class="patient_items">
                     <div class="patient_head">
                         STATUS
