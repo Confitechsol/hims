@@ -77,7 +77,7 @@ class LoginController extends Controller
             
             return $role && $role->name === 'Admin'
                 ? redirect()->intended('/dashboard')
-                : redirect()->intended('/');
+                : redirect()->intended('/dashboard');
             // ✅ Load settings
             // $settings = Setting::first();
             // $lang = $user->language_id
