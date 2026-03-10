@@ -163,7 +163,7 @@
 
                         <div class="col-md-3">
                             <label class="form-label">Visit Time</label>
-                            <input type="time" name="visit_time" class="form-control @error('visit_time') is-invalid @enderror" value="{{ old('visit_time') }}" required>
+                            <input type="time" name="visit_time" class="form-control @error('visit_time') is-invalid @enderror" value="{{ old('visit_time') }}">
                             @error('visit_time')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
@@ -370,6 +370,7 @@ function initPatientAutocomplete() {
         if (!searchTerm) {
             suggestionsDiv.style.display = 'none';
             hiddenInput.value = '';
+            resetForm();
             return;
         }
 
@@ -501,10 +502,10 @@ function loadPatientVisits(patientId) {
                         <td>${entryDate}</td>
                         <td>${visitType}</td>
                         <td>
-                            <button class="btn btn-sm btn-info" onclick="editVisit(${visit.id})" title="Edit">
+                            <button type="button" class="btn btn-sm btn-info" onclick="editVisit(${visit.id})" title="Edit">
                                 <i class="ti ti-pencil"></i>
                             </button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteVisit(${visit.id})" title="Delete">
+                            <button type="button" class="btn btn-sm btn-danger" onclick="deleteVisit(${visit.id})" title="Delete">
                                 <i class="ti ti-trash"></i>
                             </button>
                         </td>

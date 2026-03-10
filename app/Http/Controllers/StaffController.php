@@ -23,39 +23,39 @@ class StaffController extends Controller
     public function index(Request $request)
     {
     
-    $perPage = (int) $request->input('perPage', 10);
-    if ($perPage <= 0) {
-        $perPage = 10;
-    }
-        $search = $request->input('search');
-       
-        $staffs = Staff::with('department');
-        if ($search) {
-            $staffs = $staffs->where(function($query) use ($search) {
-                $query->where('name', 'like', "%{$search}%")
-                      ->orWhere('employee_id', 'like', "%{$search}%")
-                      ->orWhere('contact_no', 'like', "%{$search}%")
-                       ->orWhere('specialization', 'like', "%{$search}%");
-            });
+        $perPage = (int) $request->input('perPage', 10);
+        if ($perPage <= 0) {
+            $perPage = 10;
         }
+            $search = $request->input('search');
+        
+            $staffs = Staff::with('department');
+            if ($search) {
+                $staffs = $staffs->where(function($query) use ($search) {
+                    $query->where('name', 'like', "%{$search}%")
+                        ->orWhere('employee_id', 'like', "%{$search}%")
+                        ->orWhere('contact_no', 'like', "%{$search}%")
+                        ->orWhere('specialization', 'like', "%{$search}%");
+                });
+            }
 
-        $staffs = $staffs->paginate($perPage);
+            $staffs = $staffs->paginate($perPage);
 
-    //     return response()->json([
-    //     'status' => true,
-    //     'message' => 'Staff list fetched successfully',
-    //     'data' => $staffs
-    // ]);
-       return view('admin.staff.staffs', compact('staffs','perPage', 'search'));
-    }
-    public function create()
-    {
-        $roles = Role::all();
-        $designations = StaffDesignation::all();
-        $departments = Department::all();
-        $specialists = Specialist::all();    
-        $bloodgroups = BloodBankProduct::all(); 
-        return view('admin.staff.addStaff', compact('roles', 'designations', 'departments', 'specialists','bloodgroups'));
+        //     return response()->json([
+        //     'status' => true,
+        //     'message' => 'Staff list fetched successfully',
+        //     'data' => $staffs
+        // ]);
+        return view('admin.staff.staffs', compact('staffs','perPage', 'search'));
+        }
+        public function create()
+        {
+            $roles = Role::all();
+            $designations = StaffDesignation::all();
+            $departments = Department::all();
+            $specialists = Specialist::all();    
+            $bloodgroups = BloodBankProduct::all(); 
+            return view('admin.staff.addStaff', compact('roles', 'designations', 'departments', 'specialists','bloodgroups'));
     }
     public function getSpecialists($id)
     {
@@ -77,7 +77,7 @@ class StaffController extends Controller
         $request->validate([
             'employee_id' => 'required',
             'name' => 'required',
-            'email' => 'required|email',
+            'email' => 'nullable|email',
            
         ]);
 
@@ -99,7 +99,7 @@ class StaffController extends Controller
         $staff->mother_name = $request->mother_name;
         $staff->gender = $request->gender;
         $staff->marital_status = $request->marital_status;
-        $staff->blood_group = $request->blood_group;
+        $staff->blood_group = $request->blood_group['name'] ?? $request->blood_group;
         $staff->dob = $request->dob;
         $staff->date_of_joining = $request->date_of_joining;
         $staff->contact_no = $request->contactno;
@@ -127,7 +127,7 @@ class StaffController extends Controller
 
         $staff->save();
 
-        return back()->with('success', 'Staff details added successfully!');
+        return redirect()->route('staffs.index')->with('success', 'Staff details added successfully!');
     }
     public function update(Request $request, $id)
     {

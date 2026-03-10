@@ -811,7 +811,7 @@
                                             <select class="form-select" name="blood_group">
                                                 <option value="">Select</option>
                                                 @foreach ($bloodgroups as $bg)
-                                                    <option value="{{ $bg }}"
+                                                    <option value="{{ $bg->name }}"
                                                         {{ old('blood_group', $staff->blood_group ?? '') == $bg->id ? 'selected' : '' }}>
                                                         {{ $bg->name }}
                                                     </option>
@@ -824,7 +824,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label class="form-label">Date Of Birth</label><small class="req"> *</small>
-                                            <input id="dob" name="dob" type="text" class="form-control date"
+                                            <input id="dob" name="dob" type="date" class="form-control date"
                                                 value="{{ old('dob', $staff->dob ?? '') }}">
                                         </div>
                                     </div>
@@ -833,7 +833,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label class="form-label">Date Of Joining</label>
-                                            <input id="date_of_joining" name="date_of_joining" type="text" class="form-control date"
+                                            <input id="date_of_joining" name="date_of_joining" type="date" class="form-control date"
                                                 value="{{ old('date_of_joining', $staff->date_of_joining ?? '') }}">
                                         </div>
                                     </div>
@@ -933,7 +933,7 @@
                                     <!-- EMAIL -->
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label class="form-label">Email</label><small class="req"> *</small>
+                                            <label class="form-label">Email</label>
                                             <input id="email" name="email" type="email" class="form-control"
                                                 value="{{ old('email', $staff->email ?? '') }}">
                                         </div>

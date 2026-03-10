@@ -119,7 +119,7 @@
                                                     <th>#</th>
                                                     <th>IPD No.</th>
                                                     <th>Patient Name</th>
-                                                    <th>Phone</th>
+                                                    <th>Guardian Phone</th>
                                                     <th>Consultant</th>
                                                     <th>Bed</th>
                                                     <th>Total Payment (INR)</th>
@@ -136,7 +136,7 @@
                                                                 class="text-primary">{{ $ipdDetails->ipd_no }}</a>
                                                         </td>
                                                         <td>{{ $ipdDetails->patient->patient_name ?? '-' }}</td>
-                                                        <td>{{ $ipdDetails->patient->mobileno ?? '-' }}</td>
+                                                        <td>{{ $ipdDetails->patient->guardian_phone ?? '-' }}</td>
                                                         <td>{{ $ipdDetails->doctor->name ?? '-' }}</td>
                                                         <td><span class="badge"
                                                                 style="background-color: {{ $ipdDetails->bedGroup?->color ?? '#6c757d' }}">
