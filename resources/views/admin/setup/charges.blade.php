@@ -545,7 +545,7 @@
             <td class="name">${item.category.name}</td>
             <td class="name">${item.category.charge_type.charge_type}</td>
             <td class="name">${item.unit.unit}</td>
-            <td class="name">${item.tax_category.percentage}</td>
+            <td class="name">${item.tax_category?.percentage}</td>
             <td class="name">${item.standard_charge}</td>
             <td>
                 <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
@@ -554,7 +554,7 @@
                     data-name="${item.category.name}"
                     data-chargeType="${item.category.chargeType}"
                     data-unit="${item.unit.unit}" 
-                    data-percentage="${item.tax_category.percentage}"
+                    data-percentage="${item.tax_category?.percentage}"
                     data-standard_charge="${item.standard_charge}">
                     Edit
                 </button>
