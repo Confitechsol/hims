@@ -104,6 +104,10 @@
                                                                         <i class="ti ti-pencil"></i>
                                                                     </a>
 
+                                                                    
+
+                                                                    {{-- Enable / Disable Button --}}
+                                                                    @if($staff->is_active == '1')
                                                                     <form action="{{ route('users.store.credentials', $staff->id) }}" 
                                                                         method="POST" 
                                                                         style="display:inline-block;">
@@ -114,9 +118,6 @@
                                                                             <i class="ti ti-key"></i>
                                                                         </button>
                                                                     </form>
-
-                                                                    {{-- Enable / Disable Button --}}
-                                                                    @if($staff->is_active == '1')
                                                                         <form action="{{ route('staff.disable', $staff->id) }}" method="POST" style="display:inline-block;">
                                                                             @csrf
                                                                             @method('PATCH')

@@ -454,6 +454,8 @@ public function disable($id)
     $staff->is_active = 0;
     $staff->save();
 
+    User::where('staff_id', $staff->id)->delete();
+
     return back()->with('success', 'Staff disabled successfully.');
 }
     
