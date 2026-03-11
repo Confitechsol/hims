@@ -56,30 +56,30 @@ class UsersController extends Controller
         }
 
         if ($request->filled('search')) {
-    $searchTerm = $request->search;
+        $searchTerm = $request->search;
 
-    $query->where(function ($q) use ($searchTerm, $isDoctorTab) {
+        $query->where(function ($q) use ($searchTerm, $isDoctorTab) {
 
-        if ($isDoctorTab) {
-            // 🔹 Doctor search
-            $q->where('doctor.name', 'LIKE', "%{$searchTerm}%")
-              ->orWhere('doctor.surname', 'LIKE', "%{$searchTerm}%")
-              ->orWhere('doctor.email', 'LIKE', "%{$searchTerm}%")
-              ->orWhere('department.department_name', 'LIKE', "%{$searchTerm}%")
-              ->orWhere('doctor.designation', 'LIKE', "%{$searchTerm}%")
-              ->orWhere('roles.name', 'LIKE', "%{$searchTerm}%");
-        } else {
-            // 🔹 Staff search
-            $q->where('staff.name', 'LIKE', "%{$searchTerm}%")
-              ->orWhere('staff.surname', 'LIKE', "%{$searchTerm}%")
-              ->orWhere('staff.email', 'LIKE', "%{$searchTerm}%")
-              ->orWhere('department.department_name', 'LIKE', "%{$searchTerm}%")
-              ->orWhere('staff_designation.designation', 'LIKE', "%{$searchTerm}%")
-              ->orWhere('roles.name', 'LIKE', "%{$searchTerm}%");
-        }
+            if ($isDoctorTab) {
+                // 🔹 Doctor search
+                $q->where('doctor.name', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('doctor.surname', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('doctor.email', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('department.department_name', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('doctor.designation', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('roles.name', 'LIKE', "%{$searchTerm}%");
+            } else {
+                // 🔹 Staff search
+                $q->where('staff.name', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('staff.surname', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('staff.email', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('department.department_name', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('staff_designation.designation', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('roles.name', 'LIKE', "%{$searchTerm}%");
+            }
 
-    });
-}
+        });
+    }
 
         $users = $query->get();
 
