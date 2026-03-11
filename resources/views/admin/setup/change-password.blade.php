@@ -2,9 +2,20 @@
 @extends('layouts.adminLayout')
 @section('content')
 
+<style>
+    .cng_pass_box {
+        height: 80vh;
+    }
+
+    .password_row {
+        height: 100%;
+        align-items: center;
+    }
+</style>
+
 <div class="container">
     <div class="cng_pass_box">
-        <div class="row justify-content-center">
+        <div class="row justify-content-center password_row">
             <div class="col-md-6">
     
                 <div class="card">
@@ -30,7 +41,7 @@
                             @csrf
     
                             <div class="mb-3">
-                                <label>Current Password</label>
+                                <label class="mb-2">Current Password</label>
                                 <input type="password"
                                        name="current_password"
                                        class="form-control"
@@ -38,7 +49,7 @@
                             </div>
     
                             <div class="mb-3">
-                                <label>New Password</label>
+                                <label class="mb-2">New Password</label>
                                 <input type="password"
                                        name="new_password"
                                        class="form-control"
@@ -46,7 +57,7 @@
                             </div>
     
                             <div class="mb-3">
-                                <label>Confirm New Password</label>
+                                <label class="mb-2">Confirm New Password</label>
                                 <input type="password"
                                        name="new_password_confirmation"
                                        class="form-control"
