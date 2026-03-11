@@ -89,8 +89,7 @@
                                                 <tbody>
                                                     @foreach ($staffs as $staff)
                                                         <tr>
-                                                            <td><input type="checkbox" name="selected_staffs[]"
-                                                                    value="{{ $staff->id }}" class="select_item"></td>
+                                                            
                                                             <td>{{ $staff->name }} {{ $staff->surname }}</td>
                                                             <td>{{ $staff->employee_id }}</td>
                                                             <td>{{ $staff->gender }}</td>
