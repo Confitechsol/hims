@@ -76,8 +76,7 @@
                                             <table class="table mb-0">
                                                 <thead>
                                                     <tr>
-                                                        <th><input type="checkbox" name="checkbox" id="select_all">
-                                                            #</th>
+                                                        
                                                         <th>Staff Name</th>
                                                         <th>Employee Id</th>
                                                         <th>Gender</th>
@@ -100,9 +99,9 @@
                                                             <td>{{ $staff->is_active == '1' ? 'Yes' : 'No' }}</td>
                                                             <td>
                                                                 <div class="d-flex">
-                                                                    <a href="{{ route('staff.edit', $staff->id) }}" 
-                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
-                                                                        >
+
+                                                                    <a href="{{ route('staff.edit', $staff->id) }}"
+                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
                                                                         <i class="ti ti-pencil"></i>
                                                                     </a>
 
@@ -117,7 +116,29 @@
                                                                         </button>
                                                                     </form>
 
-                                                                    
+                                                                    {{-- Enable / Disable Button --}}
+                                                                    @if($staff->is_active == '1')
+                                                                        <form action="{{ route('staff.disable', $staff->id) }}" method="POST" style="display:inline-block;">
+                                                                            @csrf
+                                                                            @method('PATCH')
+                                                                            <button type="submit"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
+                                                                                onclick="return confirm('Disable this staff?')">
+                                                                                <i class="ti ti-user-off"></i>
+                                                                            </button>
+                                                                        </form>
+                                                                    @else
+                                                                        <form action="{{ route('staff.enable', $staff->id) }}" method="POST" style="display:inline-block;">
+                                                                            @csrf
+                                                                            @method('PATCH')
+                                                                            <button type="submit"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                                                onclick="return confirm('Enable this staff?')">
+                                                                                <i class="ti ti-user-check"></i>
+                                                                            </button>
+                                                                        </form>
+                                                                    @endif
+
                                                                 </div>
                                                             </td>
                                                         </tr>
