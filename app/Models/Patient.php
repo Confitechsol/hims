@@ -127,4 +127,9 @@ class Patient extends Model
         return $this->hasMany(Appointment::class, 'patient_id');
     }
 
+    public function areaName()
+    {
+        return $this->belongsTo(Area::class, 'area');
+    }
+
 }

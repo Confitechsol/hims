@@ -635,6 +635,7 @@ Route::post('/ipd_charge', [IpdController::class, 'addIpdCharge'])->name('ipd.ad
 Route::get('/ipd_charge/{charge}', [IpdController::class, 'getIpdCharge'])->name('ipd.charge.show');
 Route::put('/ipd_charge/{charge}', [IpdController::class, 'updateIpdCharge'])->name('ipd.charge.update');
 Route::post('/assignNewBed', [IpdController::class, 'assignNewBed'])->name('assignNewBed');
+Route::post('/ipd/bed-history/update', [IpdController::class, 'updateBedHistory'])->name('ipd.bedHistory.update');
 //
 Route::get('/ipd/{id}/pdf', [PdfController::class, 'generatePdf'])->name('ipd.pdf');
 

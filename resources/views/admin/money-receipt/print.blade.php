@@ -370,6 +370,13 @@
                                     <td class="receipt_colon">:</td>
                                     <td class="receipt_value">{{ $receipt->patient->address ?? '-' }}</td>
                                 </tr>
+                                @if($receipt->ipd)
+                                <tr>
+                                    <td class="receipt_label"><strong>Police Station</strong></td>
+                                    <td class="receipt_colon">:</td>
+                                    <td class="receipt_value">{{ $receipt->patient->police_station ?? '-' }}</td>
+                                </tr>
+                                @endif
                                 @if($receipt->ipd && $receipt->ipd->doctor)
                                 <tr>
                                     <td class="receipt_label"><strong>Under Doctor</strong></td>
@@ -441,7 +448,7 @@
                             <strong>Print Date & Time:</strong> {{ now()->format('d/m/Y H:i:s') }}
                         </td>
                         <td style="width: 50%; text-align: right;">
-                            <strong>Received By:</strong> {{ $receipt->receiver->name ?? Auth::user()->name ?? '-' }}
+                            <strong>Received By:</strong> {{ $receipt->receiver->username ?? Auth::user()->username ?? '-' }}
                         </td>
                     </tr>
                 </table>
