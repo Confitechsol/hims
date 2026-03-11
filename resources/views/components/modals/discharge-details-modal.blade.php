@@ -152,16 +152,23 @@
           align-items: end;
           justify-content: space-between;
           font-size: 10px;
-          margin-top: 35px;
+          margin-top: 1rem;
       }
 
       .contact_box {
           width: 80%;
       }
 
+
+      .d-signature {
+          height: 40px;
+          max-height: 50px;
+          width: 200px;
+      }
+
       .sig_box {
           border-top: 2px solid #9c9c9c;
-          width: 20%;
+          width: 100%;
       }
 
       .blue {
@@ -370,10 +377,16 @@
                                               <div class="patient_data" id="discharge_type_text"></div>
                                           </div> --}}
                                           <div class="patient_items">
+                                              <div class="patient_head">Discharge Contact No.</div>
+                                              <div class="colon">:</div>
+                                              <div class="patient_data" id="dis_contact_no_text"></div>
+                                          </div>
+                                          <div class="patient_items">
                                               <div class="patient_head">BED</div>
                                               <div class="colon">:</div>
                                               <div class="patient_data" id="dis_bed_text"></div>
                                           </div>
+
                                       </div>
                                   </div>
 
@@ -441,9 +454,32 @@
                                           <div class="contact_box">
                                               <p>DATE : {{ \Carbon\Carbon::now()->format('d-m-Y') }}</p>
                                           </div>
-                                          <div class="sig_box">
-                                              <p>Signature of Doctor / R.M.O</p>
-                                              <p>Regn No. :</p>
+                                          <div class="d-flex flex-column align-items-center">
+
+                                              @php
+                                                  $signature = $ipd->doctor->signature ?? null;
+                                                  $signaturePath = public_path(
+                                                      'uploads/Doctor/signatures/' . $signature,
+                                                  );
+                                              @endphp
+
+                                              @if (!empty($signature) && file_exists($signaturePath))
+                                                  <img class="d-signature"
+                                                      src="{{ asset('uploads/Doctor/signatures/' . $signature) }}"
+                                                      alt="Doctor Signature">
+                                              @else
+                                                  <p class="fw-bold mb-2" style="font-size: small;">
+                                                      {{ $ipd->doctor->name }}</p>
+                                              @endif
+
+                                              <div class="sig_box text-center">
+                                                  <p>Signature of Doctor / R.M.O</p>
+                                                  @if (!empty($signature) && file_exists($signaturePath))
+                                                      <p class="mb-2 fw-bold">Doctor : {{ $ipd->doctor->name }}</p>
+                                                  @endif
+                                                  <p>Regn No : {{ $ipd->doctor->registration_no ?? '' }}</p>
+                                              </div>
+
                                           </div>
                                       </div>
                                   </div>
@@ -508,6 +544,7 @@
               setText('dis_age_text', data.age);
               setText('dis_mobile_text', data.phone);
               setText('dis_bed_text', data.bed);
+              setText('dis_contact_no_text', data.discharge_contact);
               setText('dis_under_care_text', data.under_care_dr);
               setText('dis_registration_no_text', data.registration_no);
               //   setText('discharge_type_text', data.reason_discharge);

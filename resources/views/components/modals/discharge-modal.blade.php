@@ -432,7 +432,7 @@
 
                     <div class="row g-3">
 
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="patient_name" class="form-label">
                                 <i class="bi bi-person"></i>
                                 Patient Name <span class="required">*</span>
@@ -442,12 +442,20 @@
                             <input type="hidden" class="form-control" id="patient_id_text" name="patient_id" required>
                         </div>
 
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="admission_no" class="form-label">
                                 <i class="bi bi-credit-card"></i>
                                 Admission No.
                             </label>
                             <input type="text" class="form-control" id="admission_no_text" name="admission_no">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="discharge_contact" class="form-label">
+                                <i class="bi bi-credit-card"></i>
+                                Discharge Contact No.
+                            </label>
+                            <input type="text" class="form-control" id="discharge_contact_text"
+                                name="discharge_contact" required>
                         </div>
                         <div class="col-md-3">
                             <label for="bed" class="form-label">
@@ -497,7 +505,8 @@
                                 <i class="bi bi-calendar3"></i>
                                 Age
                             </label>
-                            <input type="text" class="form-control" id="age_text" name="age" step="0.01">
+                            <input type="text" class="form-control" id="age_text" name="age"
+                                step="0.01">
                         </div>
 
                         <div class="col-md-2">
@@ -692,26 +701,33 @@
                             </div>
 
                             <div class="row g-3 mt-2">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <label class="form-label">Medicine Name</label>
                                     <select class="med-medicine" name="meds[]">
                                         <option value="">Select Medicine</option>
                                     </select>
                                 </div>
 
-                                {{-- <div class="col-md-3">
-                                    <label class="form-label">Dose</label>
-                                    <select class="form-select med-dose" name="med_doses[]">
-                                        <option value="">Select Dose</option>
+                                <div class="col-md-3">
+                                    <label class="form-label">Medicine Types</label>
+                                    <select class="form-select med-types" name="med_types[]">
+                                        <option value="">Select Medicine Type</option>
+                                        <option value="Tablet">Tablet</option>
+                                        <option value="Capsule">Capsule</option>
+                                        <option value="Syrup">Syrup</option>
+                                        <option value="Injection">Injection</option>
+                                        <option value="Ointment">Ointment</option>
+                                        <option value="Powder">Powder</option>
+                                        <option value="Drop">Drop</option>
                                     </select>
-                                </div> --}}
+                                </div>
 
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <label class="form-label">Interval</label>
                                     <select class="med-interval" name="med_interval[]"></select>
                                 </div>
 
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <label class="form-label">Duration</label>
                                     <select class="med-duration" name="med_duration[]"></select>
                                 </div>
@@ -733,7 +749,7 @@
                             </div>
 
                             <div class="row g-3">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <label class="form-label">Medicine Name</label>
                                     <select class="med-medicine" name="meds[]" id="meds">
                                         <option value="">Select Medicine</option>
@@ -743,17 +759,24 @@
                                     </select>
                                 </div>
 
-                                {{-- <div class="col-md-3">
-                                    <label class="form-label">Dose</label>
-                                    <select class="form-select med-dose" name="med_doses[]" id="med-doses" required>
-                                        <option value="">Select Dose</option> --}}
-                                {{-- @foreach ($doses as $dose)
-                                            <option value="{{ $dose->id }}">{{ $dose->name }}</option>
+                                <div class="col-md-3">
+                                    <label class="form-label">Medicine Type</label>
+                                    <select class="form-select med-types" name="med_types[]" id="med-types" required>
+                                        <option value="">Select Medicine Type</option>
+                                        <option value="Tablet">Tablet</option>
+                                        <option value="Capsule">Capsule</option>
+                                        <option value="Syrup">Syrup</option>
+                                        <option value="Injection">Injection</option>
+                                        <option value="Ointment">Ointment</option>
+                                        <option value="Powder">Powder</option>
+                                        <option value="Drop">Drop</option>
+                                        {{-- @foreach ($medicineTypes as $type)
+                                            <option value="{{ $type->id }}">{{ $type->name }}</option>
                                         @endforeach --}}
-                                {{-- </select>
-                                </div> --}}
+                                    </select>
+                                </div>
 
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <label class="form-label">Interval</label>
                                     <select class="med-interval" name="med_interval[]">
                                         <option value="">Select</option>
@@ -761,7 +784,7 @@
                                     </select>
                                 </div>
 
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <label class="form-label">Duration</label>
                                     <select class="med-duration" name="med_duration[]">
                                         <option value="">Select Duration</option>
@@ -875,7 +898,8 @@
                     </div>
                     <!-- Action Buttons -->
                     <div class="action-buttons mt-4">
-                        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal" aria-label="Close">
+                        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal"
+                            aria-label="Close">
                             <i class="bi bi-x-circle"></i>
                             Cancel
                         </button>
