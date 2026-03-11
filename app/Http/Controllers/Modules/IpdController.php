@@ -19,17 +19,19 @@ use App\Models\IpdPrescriptionTest;
 use App\Models\MedicationReport;
 use App\Models\NurseNote;
 use App\Models\OperationTheatre;
+use App\Models\Package;
 use App\Models\Pathology;
+use App\Models\PathologyBilling;
 use App\Models\PathologyReport;
 use App\Models\Patient;
 use App\Models\PatientBedHistory;
 use App\Models\Prefix;
 use App\Models\Radio;
+use App\Models\RadiologyBilling;
+use App\Models\RadiologyReport;
 use App\Models\Staff;
 use App\Models\Symptom;
 use App\Models\SymptomsClassification;
-use App\Models\Package;
-use App\Models\IpdPackage;
 use App\Services\IpdPackageService;
 use Carbon\Carbon;
 use Exception;
@@ -69,12 +71,13 @@ class IpdController extends Controller
                     });
                 })->get();
 
-            // Attach billing summary (total payments, outstanding) for each IPD
+            // Attach billing summary (total billing, total payments, outstanding) for each IPD
             $billingController = app(\App\Http\Controllers\IpdBillingController::class);
             foreach ($ipd as $ipdDetails) {
-                $summary = $billingController->getBillingSummaryForIpd($ipdDetails->id);
+                $summary                    = $billingController->getBillingSummaryForIpd($ipdDetails->id);
                 $ipdDetails->total_payments = $summary['total_payments'];
-                $ipdDetails->outstanding = $summary['outstanding'];
+                $ipdDetails->outstanding    = $summary['outstanding'];
+                $ipdDetails->total_billing = $summary['total_charges'];
             }
         } else {
             // $patients = Patient::with(['ipds.doctor'])->get();
@@ -156,7 +159,7 @@ class IpdController extends Controller
             // 🔹 Create IPD record
             $ipd        = new IpdDetail();
             $ipdPatient = new IpdPatient();
-            $hasBed     = !empty($request->bed_group) && !empty($request->bed_number);
+            $hasBed     = ! empty($request->bed_group) && ! empty($request->bed_number);
             $bedHistory = new PatientBedHistory();
             // dd($opd);
             $ipd->hospital_id = $user->hospital_id;
@@ -205,13 +208,13 @@ class IpdController extends Controller
             if ($hasBed) {
                 $bedDetail = Bed::where('id', $request->bed_number)->first();
                 if ($bedDetail) {
-                    $bedHistory->hospital_id   = $ipd->hospital_id ?? $user->hospital_id ?? null;
-                    $bedHistory->branch_id     = $ipd->branch_id ?? $user->branch_id ?? null;
-                    $bedHistory->bed_group_id  = $request->bed_group;
-                    $bedHistory->ipd_id        = $ipd->id ?? null;
-                    $bedHistory->bed_id        = $request->bed_number;
-                    $bedHistory->from_date     = $request->admission_date;
-                    $bedHistory->is_active     = 'yes';
+                    $bedHistory->hospital_id  = $ipd->hospital_id ?? $user->hospital_id ?? null;
+                    $bedHistory->branch_id    = $ipd->branch_id ?? $user->branch_id ?? null;
+                    $bedHistory->bed_group_id = $request->bed_group;
+                    $bedHistory->ipd_id       = $ipd->id ?? null;
+                    $bedHistory->bed_id       = $request->bed_number;
+                    $bedHistory->from_date    = $request->admission_date;
+                    $bedHistory->is_active    = 'yes';
                     $bedHistory->save();
 
                     $bedDetail->is_active = 'no';
@@ -268,14 +271,14 @@ class IpdController extends Controller
             // Apply package if selected during admission
             if ($request->package_id) {
                 $packageService = new IpdPackageService();
-                $packageResult = $packageService->applyPackage(
+                $packageResult  = $packageService->applyPackage(
                     $ipd->id,
                     $request->package_id,
                     $request->admission_date, // Apply package from admission date
                     'Applied during IPD admission'
                 );
 
-                if (!$packageResult['success']) {
+                if (! $packageResult['success']) {
                     throw new \Exception('Failed to apply package: ' . $packageResult['message']);
                 }
             }
@@ -327,14 +330,16 @@ class IpdController extends Controller
     {
         //dd($request->all());
         $validator = Validator::make($request->all(), [
-            'patient_id'           => 'required|exists:patients,id',
-            'admission_date'       => 'required|date',
-            'old_patient'          => 'required|string',
-            'casualty'             => 'required|string',
-            'date'                => 'nullable|date',
+            'patient_id'     => 'required|exists:patients,id',
+            'admission_date' => 'required|date',
+            'old_patient'    => 'required|string',
+            'casualty'       => 'required|string',
+            'date'           => 'nullable|date',
         ]);
         try {
-            $symptomTitle         = array_filter($request->symptoms_title, fn($title) => $title !== null && $title !== '');
+            // $symptomTitle         = array_filter($request->symptoms_title, fn($title) => $title !== null && $title !== '');
+            $symptomTitle         = array_filter($request->symptoms_title ?? [], fn($title) => $title !== null && $title !== '');
+            $symptomType          = array_filter($request->symptoms_type ?? [], fn($type) => $type !== null && $type !== '');
             $implodedSymptomType  = implode(", ", $symptomType);
             $implodedSymptomTitle = implode(", ", $symptomTitle);
             // 🔹 Update OPD record
@@ -402,13 +407,22 @@ class IpdController extends Controller
     {
         try {
             $bedGroups = BedGroup::with('floorDetail')->get();
-            return response()->json($bedGroups, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
-        } catch (\Exception $e) {
-            \Log::error('Error fetching bed groups: ' . $e->getMessage());
+            // Build a plain array to avoid JSON encoding issues (e.g. invalid UTF-8, circular refs)
+            $data = $bedGroups->map(function ($g) {
+                $floor = $g->relationLoaded('floorDetail') ? $g->floorDetail : null;
+                return [
+                    'id' => $g->id,
+                    'name' => $g->name ?? '',
+                    'floor_detail' => $floor ? ['name' => $floor->name ?? ''] : null,
+                ];
+            })->values()->all();
+            return response()->json($data, 200, [], JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR);
+        } catch (\Throwable $e) {
+            \Log::error('Error fetching bed groups: ' . $e->getMessage(), ['exception' => $e]);
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
+                'message' => $e->getMessage(),
+            ], 500, [], JSON_UNESCAPED_UNICODE);
         }
     }
     public function getBedNumbers(Request $request, $id)
@@ -629,13 +643,13 @@ class IpdController extends Controller
 
         // Pre-process finding_type and findings arrays to ensure all values are strings
         $findingType = $request->input('finding_type', []);
-        $findings = $request->input('findings', []);
-        
+        $findings    = $request->input('findings', []);
+
         // Ensure they're arrays
-        if (!is_array($findingType)) {
+        if (! is_array($findingType)) {
             $findingType = $findingType ? [$findingType] : [];
         }
-        if (!is_array($findings)) {
+        if (! is_array($findings)) {
             $findings = $findings ? [$findings] : [];
         }
 
@@ -675,7 +689,7 @@ class IpdController extends Controller
             'pathology'        => $pathology,
             'radiology'        => $radiology,
             'finding_type'     => array_values($findingType), // Re-index array
-            'findings'          => array_values($findings), // Re-index array
+            'findings'         => array_values($findings),    // Re-index array
         ]);
 
         \Log::info('After conversion - Medicines:', $medicines);
@@ -684,6 +698,7 @@ class IpdController extends Controller
         // dd($request->all());
         try { $request->validate([
             'ipd_id'              => 'nullable|string',
+            'date'                => 'nullable|date',
             'header_note'         => 'nullable|string',
             'footer_note'         => 'nullable|string',
             'advice'              => 'nullable|string',
@@ -712,11 +727,11 @@ class IpdController extends Controller
         ]);
             $findingTypes = array_filter($request->input('finding_type', []), fn($type) => $type !== null && $type !== '');
             // $findings             = array_filter($request->findings, fn($title) => $title !== null && $title !== '');
-            $findings        = array_filter($request->input('findings', []), fn($title) => $title !== null && $title !== '');
+            $findings = array_filter($request->input('findings', []), fn($title) => $title !== null && $title !== '');
             // Get pathology and radiology IDs - handle both 'pathology' and 'pathology[]' formats
             $pathologyInput = $request->input('pathology', []);
             $radiologyInput = $request->input('radiology', []);
-            
+
             // If empty, try alternative key names
             if (empty($pathologyInput)) {
                 $pathologyInput = $request->input('pathology[]', []);
@@ -724,13 +739,13 @@ class IpdController extends Controller
             if (empty($radiologyInput)) {
                 $radiologyInput = $request->input('radiology[]', []);
             }
-            
+
             \Log::info('🔴 Pathology input received:', ['pathology' => $pathologyInput, 'pathology[]' => $request->input('pathology[]', [])]);
             \Log::info('🔴 Radiology input received:', ['radiology' => $radiologyInput, 'radiology[]' => $request->input('radiology[]', [])]);
-            
-            $pathology_ids   = array_filter($pathologyInput, fn($pathology) => $pathology !== null && $pathology !== '');
-            $radiology_ids   = array_filter($radiologyInput, fn($radio) => $radio !== null && $radio !== '');
-            
+
+            $pathology_ids = array_filter($pathologyInput, fn($pathology) => $pathology !== null && $pathology !== '');
+            $radiology_ids = array_filter($radiologyInput, fn($radio) => $radio !== null && $radio !== '');
+
             \Log::info('🔴 Pathology IDs after filter:', $pathology_ids);
             \Log::info('🔴 Radiology IDs after filter:', $radiology_ids);
             $notification_to = array_filter($request->input('visible', []), fn($notify) => $notify !== null && $notify !== '');
@@ -766,10 +781,27 @@ class IpdController extends Controller
 
             DB::beginTransaction();
 
-            
-
             try {
-                // Create prescription
+                // Create prescription - use request date when provided (for back-dated prescriptions)
+                $dateInput = $request->input('date') ?? $request->input('prescription_date') ?? $request->get('date');
+                if (is_array($dateInput)) {
+                    $dateInput = $dateInput[0] ?? null;
+                }
+                $dateInput = $dateInput !== null ? trim((string) $dateInput) : '';
+                if ($dateInput !== '') {
+                    try {
+                        $prescriptionDate = Carbon::parse($dateInput)->toDateString();
+                    } catch (\Exception $e) {
+                        $prescriptionDate = Carbon::now()->toDateString();
+                    }
+                } else {
+                    // Fallback: use IPD admission date when request date is empty, else today
+                    $ipd              = $request->ipd_id ? IpdDetail::find($request->ipd_id) : null;
+                    $prescriptionDate = ($ipd && $ipd->date)
+                        ? Carbon::parse($ipd->date)->toDateString()
+                        : Carbon::now()->toDateString();
+                }
+
                 $prescription = IpdPrescription::create([
                     'prescription_number' => $prescriptionNo,
                     'ipd_id'              => $request->ipd_id,
@@ -779,7 +811,7 @@ class IpdController extends Controller
                     'advice'              => $request->advice ?? null,
                     'finding_description' => $request->finding_description ?? null,
                     'is_finding_print'    => $request->finding_print ?? 'no',
-                    'date'                => Carbon::now()->toDateString(),
+                    'date'                => $prescriptionDate,
                     'finding_categories'  => $implodedFindingTypes,
                     'findings'            => $implodedFindings,
                     'pathology_id'        => ! empty($pathology_ids) ? implode(", ", $pathology_ids) : null, // Keep for backward compatibility
@@ -790,9 +822,8 @@ class IpdController extends Controller
                 ]);
 
                 // Store tests in normalized table with instance tracking
-                $prescriptionDate = $prescription->date ?? Carbon::now()->toDateString();
                 $prescriptionTime = Carbon::now()->format('H:i:s');
-                
+
                 if (! empty($pathology_ids)) {
                     $pathologyNotes = $request->input('pathology_notes');
                     if (! is_array($pathologyNotes)) {
@@ -806,18 +837,18 @@ class IpdController extends Controller
                             'pathology',
                             $prescription->id
                         );
-                        
+
                         // Notes: by index (per instance) or fallback to legacy per-id
                         $notes = $pathologyNotes[$index] ?? $request->input("pathology_notes_{$pathologyId}") ?? null;
-                        
+
                         IpdPrescriptionTest::create([
                             'ipd_prescription_id' => $prescription->id,
                             'pathology_id'        => (int) $pathologyId,
                             'radiology_id'        => null,
-                            'instance_number'    => $instanceNumber,
-                            'test_date'          => $prescriptionDate,
-                            'prescription_time'  => $prescriptionTime,
-                            'notes'              => $notes,
+                            'instance_number'     => $instanceNumber,
+                            'test_date'           => $prescriptionDate,
+                            'prescription_time'   => $prescriptionTime,
+                            'notes'               => $notes,
                             'hospital_id'         => $user->hospital_id ?? '00000001',
                             'branch_id'           => $user->branch_id ?? '00000001',
                         ]);
@@ -837,18 +868,18 @@ class IpdController extends Controller
                             'radiology',
                             $prescription->id
                         );
-                        
+
                         // Notes: by index (per instance) or fallback to legacy per-id
                         $notes = $radiologyNotes[$index] ?? $request->input("radiology_notes_{$radiologyId}") ?? null;
-                        
+
                         IpdPrescriptionTest::create([
                             'ipd_prescription_id' => $prescription->id,
                             'pathology_id'        => null,
                             'radiology_id'        => (int) $radiologyId,
-                            'instance_number'    => $instanceNumber,
-                            'test_date'          => $prescriptionDate,
-                            'prescription_time'  => $prescriptionTime,
-                            'notes'              => $notes,
+                            'instance_number'     => $instanceNumber,
+                            'test_date'           => $prescriptionDate,
+                            'prescription_time'   => $prescriptionTime,
+                            'notes'               => $notes,
                             'hospital_id'         => $user->hospital_id ?? '00000001',
                             'branch_id'           => $user->branch_id ?? '00000001',
                         ]);
@@ -871,9 +902,9 @@ class IpdController extends Controller
 
                 DB::commit();
                 return response()->json([
-                    'success' => true,
-                    'message' => 'Prescription created successfully.',
-                    'prescription_id' => $prescription->id
+                    'success'         => true,
+                    'message'         => 'Prescription created successfully.',
+                    'prescription_id' => $prescription->id,
                 ], 200);
             } catch (Exception $e) {
                 DB::rollBack();
@@ -885,22 +916,21 @@ class IpdController extends Controller
                 \Log::error('Stack trace: ' . $e->getTraceAsString());
                 return response()->json([
                     'success' => false,
-                    'message' => 'Something went wrong: ' . $e->getMessage()
+                    'message' => 'Something went wrong: ' . $e->getMessage(),
                 ], 500);
-            }
-        } catch (\Illuminate\Validation\ValidationException $e) {
+            }} catch (\Illuminate\Validation\ValidationException $e) {
             \Log::error('Prescription validation error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed',
-                'errors' => $e->errors()
+                'errors'  => $e->errors(),
             ], 422);
         } catch (Exception $e) {
             \Log::error('Prescription error: ' . $e->getMessage());
             \Log::error('Stack trace: ' . $e->getTraceAsString());
             return response()->json([
                 'success' => false,
-                'message' => 'Something went wrong: ' . $e->getMessage()
+                'message' => 'Something went wrong: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -941,8 +971,8 @@ class IpdController extends Controller
             'medicines.doseDuration',
         ])->findOrFail($id);
 
-        $doctors     = Doctor::all();
-        $findings    = Finding::all();
+        $doctors  = Doctor::all();
+        $findings = Finding::all();
         // Use Eloquent so all tests (including newly added) are available; no extra scope
         $pathologies = Pathology::orderBy('test_name')->get();
         $radiologies = Radio::orderBy('test_name')->get();
@@ -952,7 +982,7 @@ class IpdController extends Controller
         $radiologyTestsForList = [];
         foreach ($prescription->tests as $t) {
             if ($t->pathology_id) {
-                $path = $t->pathology ?? \App\Models\Pathology::find($t->pathology_id);
+                $path                    = $t->pathology ?? \App\Models\Pathology::find($t->pathology_id);
                 $pathologyTestsForList[] = [
                     'id'    => $t->pathology_id,
                     'name'  => $path ? ($path->test_name . ($path->short_name ? ' (' . $path->short_name . ')' : '')) : 'ID ' . $t->pathology_id,
@@ -960,7 +990,7 @@ class IpdController extends Controller
                 ];
             }
             if ($t->radiology_id) {
-                $rad = $t->radiology ?? \App\Models\Radio::find($t->radiology_id);
+                $rad                     = $t->radiology ?? \App\Models\Radio::find($t->radiology_id);
                 $radiologyTestsForList[] = [
                     'id'    => $t->radiology_id,
                     'name'  => $rad ? ($rad->test_name . ($rad->short_name ? ' (' . $rad->short_name . ')' : '')) : 'ID ' . $t->radiology_id,
@@ -972,7 +1002,7 @@ class IpdController extends Controller
         if (empty($pathologyTestsForList) && ! empty($prescription->pathology_id)) {
             $ids = array_filter(array_map('trim', explode(',', $prescription->pathology_id)));
             foreach ($ids as $pathId) {
-                $path = \App\Models\Pathology::find($pathId);
+                $path                    = \App\Models\Pathology::find($pathId);
                 $pathologyTestsForList[] = [
                     'id'    => (int) $pathId,
                     'name'  => $path ? ($path->test_name . ($path->short_name ? ' (' . $path->short_name . ')' : '')) : 'ID ' . $pathId,
@@ -983,7 +1013,7 @@ class IpdController extends Controller
         if (empty($radiologyTestsForList) && ! empty($prescription->radiology_id)) {
             $ids = array_filter(array_map('trim', explode(',', $prescription->radiology_id)));
             foreach ($ids as $radId) {
-                $rad = \App\Models\Radio::find($radId);
+                $rad                     = \App\Models\Radio::find($radId);
                 $radiologyTestsForList[] = [
                     'id'    => (int) $radId,
                     'name'  => $rad ? ($rad->test_name . ($rad->short_name ? ' (' . $rad->short_name . ')' : '')) : 'ID ' . $radId,
@@ -994,7 +1024,12 @@ class IpdController extends Controller
         $selectedPathologyIds = array_column($pathologyTestsForList, 'id');
         $selectedRadiologyIds = array_column($radiologyTestsForList, 'id');
 
-        $prescriptionDate = $prescription->date ?? Carbon::now()->toDateString();
+        $prescriptionDate = $prescription->date ? $prescription->date->format('Y-m-d') : Carbon::now()->toDateString();
+        $admissionDate    = null;
+        if ($prescription->ipd_id) {
+            $ipd           = IpdDetail::find($prescription->ipd_id);
+            $admissionDate = $ipd && $ipd->date ? Carbon::parse($ipd->date)->format('Y-m-d') : null;
+        }
         $pathologyInstanceCounts = [];
         $radiologyInstanceCounts = [];
         foreach (array_count_values($selectedPathologyIds) as $pathId => $count) {
@@ -1015,6 +1050,7 @@ class IpdController extends Controller
             'pathologyInstanceCounts',
             'radiologyInstanceCounts',
             'prescriptionDate',
+            'admissionDate',
             'pathologyTestsForList',
             'radiologyTestsForList'
         ));
@@ -1090,6 +1126,26 @@ class IpdController extends Controller
                 // Update prescription - ensure prescribe_by is properly set
                 $prescribeBy = $request->prescribe_by ?? $prescription->prescribed_by;
 
+                // Resolve prescription date: request date > existing prescription date > today (for back-dated support)
+                $dateInput = $request->input('date') ?? $request->input('prescription_date') ?? $request->get('date');
+                if (is_array($dateInput)) {
+                    $dateInput = $dateInput[0] ?? null;
+                }
+                $dateInput = $dateInput !== null ? trim((string) $dateInput) : '';
+                if ($dateInput !== '') {
+                    try {
+                        $prescriptionDateForUpdate = Carbon::parse($dateInput)->toDateString();
+                    } catch (\Exception $e) {
+                        $prescriptionDateForUpdate = $prescription->date
+                            ? Carbon::parse($prescription->date)->toDateString()
+                            : Carbon::now()->toDateString();
+                    }
+                } else {
+                    $prescriptionDateForUpdate = $prescription->date
+                        ? Carbon::parse($prescription->date)->toDateString()
+                        : Carbon::now()->toDateString();
+                }
+
                 $prescription->update([
                     'ipd_id'              => $request->ipd_id,
                     'prescribed_by'       => $prescribeBy,
@@ -1103,77 +1159,127 @@ class IpdController extends Controller
                     'pathology_id'        => ! empty($pathology_ids) ? implode(", ", $pathology_ids) : null,
                     'radiology_id'        => ! empty($radiology_ids) ? implode(", ", $radiology_ids) : null,
                     'notification_to'     => $implodedVisibles,
-                    'date'                => $request->date ?? $prescription->date,
+                    'date'                => $prescriptionDateForUpdate,
                     'attachment'          => $attachment,
                     'attachment_name'     => $attachmentName,
                 ]);
 
-                // Delete existing tests (but preserve billing links - only delete if not billed)
-                // Check which tests are already billed before deleting
-                $billedTestIds = \App\Models\PathologyReport::whereNotNull('ipd_prescription_test_id')
-                    ->pluck('ipd_prescription_test_id')
-                    ->merge(
-                        \App\Models\RadiologyReport::whereNotNull('ipd_prescription_test_id')
-                            ->pluck('ipd_prescription_test_id')
-                    );
-                
-                // Only delete tests that haven't been billed
-                IpdPrescriptionTest::where('ipd_prescription_id', $prescription->id)
-                    ->whereNotIn('id', $billedTestIds)
-                    ->delete();
+                // Diff: only remove from billing and delete tests that are NO LONGER in the prescription.
+                // Tests that remain in the request are kept (preserving billing linkage).
+                $newPathologyCounts = array_count_values(array_map('intval', $pathology_ids));
+                $newRadiologyCounts = array_count_values(array_map('intval', $radiology_ids));
 
-                // Store new tests with instance tracking
-                $prescriptionDate = $prescription->date ?? Carbon::now()->toDateString();
-                $prescriptionTime = Carbon::now()->format('H:i:s');
-                
-                if (! empty($pathology_ids)) {
-                    $pathologyNotes = $request->input('pathology_notes');
-                    if (! is_array($pathologyNotes)) {
-                        $pathologyNotes = [];
+                $existingPathology = IpdPrescriptionTest::where('ipd_prescription_id', $prescription->id)
+                    ->whereNotNull('pathology_id')
+                    ->orderBy('id')
+                    ->get();
+                $existingRadiology = IpdPrescriptionTest::where('ipd_prescription_id', $prescription->id)
+                    ->whereNotNull('radiology_id')
+                    ->orderBy('id')
+                    ->get();
+
+                $pathologyKept = [];
+                foreach ($existingPathology as $test) {
+                    $pid     = (int) $test->pathology_id;
+                    $maxKeep = $newPathologyCounts[$pid] ?? 0;
+                    $keptNow = $pathologyKept[$pid] ?? 0;
+                    if ($keptNow < $maxKeep) {
+                        $pathologyKept[$pid] = $keptNow + 1;
+                    } else {
+                        $this->removePrescriptionTestFromBilling($test);
+                        $test->delete();
                     }
-                    foreach ($pathology_ids as $index => $pathologyId) {
+                }
+
+                $radiologyKept = [];
+                foreach ($existingRadiology as $test) {
+                    $rid     = (int) $test->radiology_id;
+                    $maxKeep = $newRadiologyCounts[$rid] ?? 0;
+                    $keptNow = $radiologyKept[$rid] ?? 0;
+                    if ($keptNow < $maxKeep) {
+                        $radiologyKept[$rid] = $keptNow + 1;
+                    } else {
+                        $this->removePrescriptionTestFromBilling($test);
+                        $test->delete();
+                    }
+                }
+
+                // Count how many of each test we already have (kept from existing)
+                $pathologyToAdd = [];
+                foreach ($pathology_ids as $pid) {
+                    $pid                  = (int) $pid;
+                    $pathologyToAdd[$pid] = ($pathologyToAdd[$pid] ?? 0) + 1;
+                }
+                foreach ($pathologyKept as $pid => $count) {
+                    $pathologyToAdd[$pid] = ($pathologyToAdd[$pid] ?? 0) - $count;
+                }
+                $radiologyToAdd = [];
+                foreach ($radiology_ids as $rid) {
+                    $rid                  = (int) $rid;
+                    $radiologyToAdd[$rid] = ($radiologyToAdd[$rid] ?? 0) + 1;
+                }
+                foreach ($radiologyKept as $rid => $count) {
+                    $radiologyToAdd[$rid] = ($radiologyToAdd[$rid] ?? 0) - $count;
+                }
+
+                // Store NEW tests (only those not already kept from existing) - use same date as prescription update
+                $prescriptionDate = $prescriptionDateForUpdate;
+                $prescriptionTime = Carbon::now()->format('H:i:s');
+                $pathologyNotes   = is_array($request->input('pathology_notes')) ? $request->input('pathology_notes') : [];
+                $radiologyNotes   = is_array($request->input('radiology_notes')) ? $request->input('radiology_notes') : [];
+                $pathologyIdsList = array_values(array_map('intval', $pathology_ids));
+                $radiologyIdsList = array_values(array_map('intval', $radiology_ids));
+
+                foreach ($pathologyToAdd as $pathologyId => $count) {
+                    if ($count <= 0) {
+                        continue;
+                    }
+
+                    for ($i = 0; $i < $count; $i++) {
                         $instanceNumber = IpdPrescriptionTest::getNextInstanceNumber(
-                            (int) $pathologyId,
+                            $pathologyId,
                             $prescriptionDate,
                             'pathology',
                             $prescription->id
                         );
-                        $notes = $pathologyNotes[$index] ?? $request->input("pathology_notes_{$pathologyId}") ?? null;
+                        $notesIdx = array_search($pathologyId, $pathologyIdsList);
+                        $notes    = ($notesIdx !== false && isset($pathologyNotes[$notesIdx])) ? $pathologyNotes[$notesIdx] : null;
                         IpdPrescriptionTest::create([
                             'ipd_prescription_id' => $prescription->id,
-                            'pathology_id'        => (int) $pathologyId,
+                            'pathology_id'        => $pathologyId,
                             'radiology_id'        => null,
-                            'instance_number'    => $instanceNumber,
-                            'test_date'          => $prescriptionDate,
-                            'prescription_time'  => $prescriptionTime,
-                            'notes'              => $notes,
+                            'instance_number'     => $instanceNumber,
+                            'test_date'           => $prescriptionDate,
+                            'prescription_time'   => $prescriptionTime,
+                            'notes'               => $notes,
                             'hospital_id'         => $user->hospital_id ?? '00000001',
                             'branch_id'           => $user->branch_id ?? '00000001',
                         ]);
                     }
                 }
 
-                if (! empty($radiology_ids)) {
-                    $radiologyNotes = $request->input('radiology_notes');
-                    if (! is_array($radiologyNotes)) {
-                        $radiologyNotes = [];
+                foreach ($radiologyToAdd as $radiologyId => $count) {
+                    if ($count <= 0) {
+                        continue;
                     }
-                    foreach ($radiology_ids as $index => $radiologyId) {
+
+                    for ($i = 0; $i < $count; $i++) {
                         $instanceNumber = IpdPrescriptionTest::getNextInstanceNumber(
-                            (int) $radiologyId,
+                            $radiologyId,
                             $prescriptionDate,
                             'radiology',
                             $prescription->id
                         );
-                        $notes = $radiologyNotes[$index] ?? $request->input("radiology_notes_{$radiologyId}") ?? null;
+                        $notesIdx = array_search($radiologyId, $radiologyIdsList);
+                        $notes    = ($notesIdx !== false && isset($radiologyNotes[$notesIdx])) ? $radiologyNotes[$notesIdx] : null;
                         IpdPrescriptionTest::create([
                             'ipd_prescription_id' => $prescription->id,
                             'pathology_id'        => null,
-                            'radiology_id'        => (int) $radiologyId,
-                            'instance_number'    => $instanceNumber,
-                            'test_date'          => $prescriptionDate,
-                            'prescription_time'  => $prescriptionTime,
-                            'notes'              => $notes,
+                            'radiology_id'        => $radiologyId,
+                            'instance_number'     => $instanceNumber,
+                            'test_date'           => $prescriptionDate,
+                            'prescription_time'   => $prescriptionTime,
+                            'notes'               => $notes,
                             'hospital_id'         => $user->hospital_id ?? '00000001',
                             'branch_id'           => $user->branch_id ?? '00000001',
                         ]);
@@ -1199,9 +1305,9 @@ class IpdController extends Controller
 
                 DB::commit();
                 return response()->json([
-                    'success' => true,
-                    'message' => 'Prescription updated successfully.',
-                    'prescription_id' => $prescription->id
+                    'success'         => true,
+                    'message'         => 'Prescription updated successfully.',
+                    'prescription_id' => $prescription->id,
                 ], 200);
             } catch (Exception $e) {
                 DB::rollBack();
@@ -1209,7 +1315,7 @@ class IpdController extends Controller
                 \Log::error('Stack trace: ' . $e->getTraceAsString());
                 return response()->json([
                     'success' => false,
-                    'message' => 'Something went wrong: ' . $e->getMessage()
+                    'message' => 'Something went wrong: ' . $e->getMessage(),
                 ], 500);
             }
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -1217,16 +1323,121 @@ class IpdController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed',
-                'errors' => $e->errors()
+                'errors'  => $e->errors(),
             ], 422);
         } catch (Exception $e) {
             \Log::error('Prescription update error: ' . $e->getMessage());
             \Log::error('Stack trace: ' . $e->getTraceAsString());
             return response()->json([
                 'success' => false,
-                'message' => 'Something went wrong: ' . $e->getMessage()
+                'message' => 'Something went wrong: ' . $e->getMessage(),
             ], 500);
             return back()->with('error', 'Something went wrong: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Remove a prescription test from pathology/radiology billing when test is removed from prescription.
+     * Deletes linked PathologyReport/RadiologyReport and recalculates parent bill net_amount.
+     * Includes fallback for reports without ipd_prescription_test_id (legacy or manually created bills).
+     *
+     * @param IpdPrescriptionTest $test
+     */
+    private function removePrescriptionTestFromBilling(IpdPrescriptionTest $test)
+    {
+        $prescription  = $test->prescription;
+        $ipd           = $prescription ? IpdDetail::find($prescription->ipd_id) : null;
+        $patientId     = $ipd ? $ipd->patient_id : null;
+        $admissionDate = $ipd && $ipd->date ? Carbon::parse($ipd->date)->format('Y-m-d') : null;
+
+        // Pathology: remove report(s) linked to this prescription test
+        $pathologyReports         = PathologyReport::where('ipd_prescription_test_id', $test->id)->get();
+        $pathologyBillIdsToRecalc = [];
+        foreach ($pathologyReports as $report) {
+            $pathologyBillIdsToRecalc[$report->pathology_bill_id] = true;
+            $report->delete();
+        }
+        // Fallback: reports without prescription_test link (legacy/manual bills)
+        if ($pathologyReports->isEmpty() && $test->pathology_id && $patientId && $admissionDate) {
+            $fallbackReport = PathologyReport::where('pathology_id', $test->pathology_id)
+                ->where('patient_id', $patientId)
+                ->whereNull('ipd_prescription_test_id')
+                ->whereIn('pathology_bill_id', PathologyBilling::where('patient_id', $patientId)
+                        ->whereRaw('DATE(date) >= ?', [$admissionDate])
+                        ->pluck('id'))
+                ->orderBy('id')
+                ->first();
+            if ($fallbackReport) {
+                $pathologyBillIdsToRecalc[$fallbackReport->pathology_bill_id] = true;
+                $fallbackReport->delete();
+            }
+        }
+        foreach (array_keys($pathologyBillIdsToRecalc) as $billId) {
+            $this->recalculatePathologyBilling($billId);
+        }
+
+        // Radiology: remove report(s) linked to this prescription test
+        $radiologyReports         = RadiologyReport::where('ipd_prescription_test_id', $test->id)->get();
+        $radiologyBillIdsToRecalc = [];
+        foreach ($radiologyReports as $report) {
+            $radiologyBillIdsToRecalc[$report->radiology_bill_id] = true;
+            $report->delete();
+        }
+        // Fallback: reports without prescription_test link (legacy/manual bills)
+        if ($radiologyReports->isEmpty() && $test->radiology_id && $patientId && $admissionDate) {
+            $fallbackReport = RadiologyReport::where('radiology_id', $test->radiology_id)
+                ->where('patient_id', $patientId)
+                ->whereNull('ipd_prescription_test_id')
+                ->whereIn('radiology_bill_id', RadiologyBilling::where('patient_id', $patientId)
+                        ->whereRaw('DATE(date) >= ?', [$admissionDate])
+                        ->pluck('id'))
+                ->orderBy('id')
+                ->first();
+            if ($fallbackReport) {
+                $radiologyBillIdsToRecalc[$fallbackReport->radiology_bill_id] = true;
+                $fallbackReport->delete();
+            }
+        }
+        foreach (array_keys($radiologyBillIdsToRecalc) as $billId) {
+            $this->recalculateRadiologyBilling($billId);
+        }
+    }
+
+    /**
+     * Recalculate pathology bill net_amount from remaining reports. Delete bill if empty.
+     */
+    private function recalculatePathologyBilling($billId)
+    {
+        $bill = PathologyBilling::find($billId);
+        if (! $bill) {
+            return;
+        }
+
+        $remainingTotal = PathologyReport::where('pathology_bill_id', $billId)->sum('apply_charge');
+        if ($remainingTotal <= 0) {
+            PathologyReport::where('pathology_bill_id', $billId)->delete();
+            $bill->delete();
+        } else {
+            $bill->update(['net_amount' => $remainingTotal, 'total' => $remainingTotal]);
+        }
+    }
+
+    /**
+     * Recalculate radiology bill net_amount from remaining reports. Delete bill if empty.
+     */
+    private function recalculateRadiologyBilling($billId)
+    {
+        $bill = RadiologyBilling::find($billId);
+        if (! $bill) {
+            return;
+        }
+
+        $remainingTotal = RadiologyReport::where('radiology_bill_id', $billId)->sum('apply_charge');
+        if ($remainingTotal <= 0) {
+            RadiologyReport::where('radiology_bill_id', $billId)->delete();
+            $bill->delete();
+        } else {
+            $bill->update(['net_amount' => $remainingTotal, 'total' => $remainingTotal]);
         }
     }
 
@@ -1243,8 +1454,12 @@ class IpdController extends Controller
                 Storage::disk('public')->delete($prescription->attachment);
             }
 
-            // Delete associated tests and medicines (cascade should handle this, but being explicit)
-            IpdPrescriptionTest::where('ipd_prescription_id', $prescription->id)->delete();
+            // Remove prescription tests from pathology/radiology billing before deleting tests
+            $existingTests = IpdPrescriptionTest::where('ipd_prescription_id', $prescription->id)->get();
+            foreach ($existingTests as $test) {
+                $this->removePrescriptionTestFromBilling($test);
+                $test->delete();
+            }
             IpdMedicine::where('prescription_id', $prescription->id)->delete();
 
             $ipdId = $prescription->ipd_id;
@@ -1315,18 +1530,18 @@ class IpdController extends Controller
     {
         // Map existing form field names from the Add Charges modal
         $validated = $request->validate([
-            'charge_type'                 => 'required|integer|exists:charge_type_master,id',
-            'charge_category2'            => 'required|integer|exists:charge_categories,id',
-            'charge_id'                   => 'required|integer|exists:charges,id',
-            'standard_charge'             => 'required|numeric',
-            'schedule_charge'             => 'nullable|numeric',
-            'qty'                         => 'required|numeric|min:1',
-            'apply_charge'                => 'required|numeric',
-            'discount_percentage_amount'  => 'nullable|numeric|min:0',
-            'tax'                         => 'nullable|numeric|min:0',
-            'amount'                      => 'required|numeric',
-            'note'                        => 'nullable|string',
-            'date'                        => 'required|date',
+            'charge_type'                => 'required|integer|exists:charge_type_master,id',
+            'charge_category2'           => 'required|integer|exists:charge_categories,id',
+            'charge_id'                  => 'required|integer|exists:charges,id',
+            'standard_charge'            => 'required|numeric',
+            'schedule_charge'            => 'nullable|numeric',
+            'qty'                        => 'required|numeric|min:1',
+            'apply_charge'               => 'required|numeric',
+            'discount_percentage_amount' => 'nullable|numeric|min:0',
+            'tax'                        => 'nullable|numeric|min:0',
+            'amount'                     => 'required|numeric',
+            'note'                       => 'nullable|string',
+            'date'                       => 'required|date',
         ]);
 
         $charge->update([
@@ -1354,19 +1569,22 @@ class IpdController extends Controller
     public function getAvailableBeds(Request $request)
     {
         $bedGroupId = $request->bed_group_id;
+        $includeBedId = $request->include_bed_id; // For edit: include current bed even if occupied
 
-        // Beds currently assigned (is_active = 1)
         $occupiedBeds = PatientBedHistory::where('is_active', 'yes')
             ->pluck('bed_id')
             ->toArray();
 
-        // Fetch beds excluding occupied ones
-        $availableBeds = Bed::where('bed_group_id', $bedGroupId)
-            ->where('is_active', 'yes')
-            ->whereNotIn('id', $occupiedBeds)
-            ->get();
-
-        return response()->json($availableBeds);
+        $query = Bed::where('bed_group_id', $bedGroupId)->where('is_active', 'yes');
+        if ($includeBedId) {
+            $query->where(function ($q) use ($occupiedBeds, $includeBedId) {
+                $q->whereNotIn('id', $occupiedBeds)->orWhere('id', $includeBedId);
+            });
+        } else {
+            $query->whereNotIn('id', $occupiedBeds);
+        }
+        $beds = $query->get();
+        return response()->json($beds);
     }
     public function assignNewBed(Request $request)
     {
@@ -1418,7 +1636,7 @@ class IpdController extends Controller
         $chargeDate   = $transferDate->format('Y-m-d');
 
         // Use on-the-fly bed charge if provided, otherwise fall back to bed group master
-        $bedGroup = BedGroup::find($request->bed_group);
+        $bedGroup      = BedGroup::find($request->bed_group);
         $bedChargeRate = $request->bed_charge !== null && $request->bed_charge !== ''
             ? (float) $request->bed_charge
             : (float) ($bedGroup->bed_cost ?? 0);
@@ -1458,6 +1676,117 @@ class IpdController extends Controller
         return redirect()->back()->with('success', 'Bed assigned successfully.');
     }
 
+    /**
+     * Update a bed history record (edit from Bed History table).
+     * Affects: patient_bed_history, bed occupancy, ipd_details (if active), ipd_daywise_bed_charges.
+     */
+    public function updateBedHistory(Request $request)
+    {
+        $request->validate([
+            'bed_history_id' => 'required|exists:patient_bed_history,id',
+            'ipd_id'         => 'required|exists:ipd_details,id',
+            'bed_group'      => 'required|exists:bed_group,id',
+            'bed'            => 'required|exists:bed,id',
+            'from_date'      => 'required|date',
+            'to_date'        => 'nullable|date|after_or_equal:from_date',
+            'bed_charge'     => 'nullable|numeric|min:0',
+        ]);
+
+        $history = PatientBedHistory::with(['bedGroup', 'bed'])->findOrFail($request->bed_history_id);
+        if ((int) $history->ipd_id !== (int) $request->ipd_id) {
+            return redirect()->back()->with('error', 'Invalid bed history for this IPD.');
+        }
+
+        $ipd = IpdDetail::findOrFail($request->ipd_id);
+        $oldBedId = $history->bed_id;
+        $newBedId = (int) $request->bed;
+        $isActive = $history->is_active === 'yes';
+
+        // Check bed belongs to selected bed group
+        $bed = Bed::findOrFail($newBedId);
+        if ((int) $bed->bed_group_id !== (int) $request->bed_group) {
+            return redirect()->back()->with('error', 'Selected bed must belong to the selected bed group.');
+        }
+
+        // Check for date overlaps with adjacent history records
+        $fromDate = Carbon::parse($request->from_date);
+        $toDate = $request->to_date ? Carbon::parse($request->to_date) : null;
+
+        $adjacent = PatientBedHistory::where('ipd_id', $ipd->id)
+            ->where('id', '!=', $history->id)
+            ->orderBy('from_date')
+            ->get();
+
+        foreach ($adjacent as $adj) {
+            $adjFrom = Carbon::parse($adj->from_date);
+            $adjTo = $adj->to_date ? Carbon::parse($adj->to_date) : Carbon::now()->endOfDay();
+            $myTo = $toDate ?? Carbon::now()->endOfDay();
+
+            if ($fromDate->lt($adjTo) && $myTo->gt($adjFrom)) {
+                return redirect()->back()->with('error', 'Date overlap detected with another bed history record (From: ' . $adjFrom->format('d/m/Y') . ', To: ' . $adjTo->format('d/m/Y') . '). Please adjust dates to avoid overlap.');
+            }
+        }
+
+        DB::beginTransaction();
+        try {
+            // 1. Update bed occupancy if bed changed
+            if ((int) $oldBedId !== (int) $newBedId) {
+                Bed::where('id', $oldBedId)->update(['is_active' => 'yes']); // Old bed available
+                Bed::where('id', $newBedId)->update(['is_active' => 'no']);   // New bed occupied
+            }
+
+            // 2. Update patient_bed_history
+            $history->bed_group_id = $request->bed_group;
+            $history->bed_id = $newBedId;
+            $history->from_date = $fromDate;
+            $history->to_date = $request->to_date ? $toDate : null;
+            $history->save();
+
+            // 3. If active record, update ipd_details
+            if ($isActive) {
+                $ipd->bed = $newBedId;
+                $ipd->bed_group_id = $request->bed_group;
+                $ipd->save();
+            }
+
+            // 4. Update ipd_daywise_bed_charges for from_date (billing uses this)
+            $bedChargeRate = $request->bed_charge !== null && $request->bed_charge !== ''
+                ? (float) $request->bed_charge
+                : (float) ($history->bedGroup->bed_cost ?? 0);
+
+            $chargeDate = $fromDate->format('Y-m-d');
+            $periodStart = $fromDate->copy()->subDay()->setTime(10, 0, 0);
+            $periodEnd = $fromDate->copy()->setTime(10, 0, 0);
+
+            IpdDaywiseBedCharge::updateOrCreate(
+                [
+                    'ipd_id'      => $ipd->id,
+                    'charge_date' => $chargeDate,
+                ],
+                [
+                    'hospital_id'        => $ipd->hospital_id,
+                    'branch_id'          => $ipd->branch_id ?? null,
+                    'case_reference_id'  => $ipd->case_reference_id ?? null,
+                    'patient_id'         => $ipd->patient_id,
+                    'period_start_date'  => $periodStart->format('Y-m-d'),
+                    'period_end_date'    => $periodEnd->format('Y-m-d'),
+                    'bed_group_id'       => $request->bed_group,
+                    'bed_id'             => $newBedId,
+                    'bed_charge'         => $bedChargeRate,
+                    'bed_charge_rate'    => $bedChargeRate,
+                    'no_of_days'         => 1,
+                    'is_active'          => 'yes',
+                ]
+            );
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Bed history updated successfully. Estimate and final bill will reflect the changes.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to update: ' . $e->getMessage());
+        }
+    }
+
     public function storeDischarge(Request $request)
     {
         // -------------------------------
@@ -1469,6 +1798,7 @@ class IpdController extends Controller
             'patient_name'       => ['required', 'string', 'max:255'],
             'patient_id'         => ['nullable', 'integer'],
             'admission_no'       => ['nullable', 'string'],
+            'discharge_contact'  => ['required', 'string'],
             'discharge_date'     => ['required', 'date'],
             'discharge_time'     => ['nullable'],
             'admission_date'     => ['nullable', 'date'],
@@ -1504,6 +1834,8 @@ class IpdController extends Controller
             'remarks'            => ['nullable', 'string'],
             'meds'               => ['nullable', 'array'],
             'meds.*'             => ['string'],
+            'med_types'          => ['nullable', 'array'],
+            'med_types.*'        => ['string'],
             'med_interval'       => ['nullable', 'array'],
             'med_interval.*'     => ['string'],
             'med_duration'       => ['nullable', 'array'],
@@ -1529,9 +1861,11 @@ class IpdController extends Controller
             $dischargeNo = 'D-' . $nextNumber;
 
             $meds              = array_filter($request->meds, fn($med) => $med !== null && $med !== '');
+            $medTypes          = array_filter($request->med_types, fn($type) => $type !== null && $type !== '');
             $intervals         = array_filter($request->med_interval, fn($interval) => $interval !== null && $interval !== '');
             $durations         = array_filter($request->med_duration, fn($duration) => $duration !== null && $duration !== '');
             $implodedMeds      = implode(", ", $meds);
+            $implodedMedTypes  = implode(", ", $medTypes);
             $implodedIntervals = implode(", ", $intervals);
             $implodedDurations = implode(", ", $durations);
 
@@ -1542,6 +1876,7 @@ class IpdController extends Controller
                 'patient_name'       => $validated['patient_name'],
                 'patient_id'         => $validated['patient_id'],
                 'admission_no'       => $validated['admission_no'] ?? null,
+                'discharge_contact'  => $validated['discharge_contact'] ?? null,
                 'admission_date'     => $validated['admission_date'] ?? null,
                 'admit_time'         => $validated['admit_time'] ?? null,
                 'discharge_date'     => $validated['discharge_date'],
@@ -1596,6 +1931,7 @@ class IpdController extends Controller
                 'patient_name'       => $validated['patient_name'],
                 'patient_id'         => $validated['patient_id'],
                 'admission_no'       => $validated['admission_no'] ?? null,
+                'discharge_contact'  => $validated['discharge_contact'] ?? null,
                 'barcode'            => $barcodeBinary,
 
                 'discharge_date'     => $validated['discharge_date'],
@@ -1640,6 +1976,7 @@ class IpdController extends Controller
                 'remarks'            => $validated['remarks'] ?? null,
 
                 'medicines'          => $implodedMeds ?? null,
+                'medicine_types'     => $implodedMedTypes ?? null,
                 'intervals'          => $implodedIntervals ?? null,
                 'durations'          => $implodedDurations ?? null,
 
@@ -1772,48 +2109,48 @@ class IpdController extends Controller
 // }
     public function reports()
     {
-       return view('admin.reports.ipd.index');
+        return view('admin.reports.ipd.index');
     }
     public function ipdReport(Request $request)
-{
-    $perPage = (int) $request->input('perPage', 10);
-    if ($perPage <= 0) {
-        $perPage = 10;
-    }
-    $ipdReports = IpdDetail::query()
+    {
+        $perPage = (int) $request->input('perPage', 10);
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
+        $ipdReports = IpdDetail::query()
 
-        ->with(['patient', 'doctor'])
+            ->with(['patient', 'doctor'])
 
-        ->when($request->date_from && $request->date_to, function ($q) use ($request) {
-            $q->whereBetween('admission_date', [
-                $request->date_from,
-                $request->date_to,
-            ]);
-        })
+            ->when($request->date_from && $request->date_to, function ($q) use ($request) {
+                $q->whereBetween('admission_date', [
+                    $request->date_from,
+                    $request->date_to,
+                ]);
+            })
 
-        ->when($request->gender, function ($q) use ($request) {
-            $q->whereHas('patient', function ($sub) use ($request) {
-                $sub->where('gender', $request->gender);
-            });
-        })
+            ->when($request->gender, function ($q) use ($request) {
+                $q->whereHas('patient', function ($sub) use ($request) {
+                    $sub->where('gender', $request->gender);
+                });
+            })
 
-        ->when($request->search, function ($q) use ($request) {
-            $q->where('ipd_no', 'like', '%' . $request->search . '%');
-        })
+            ->when($request->search, function ($q) use ($request) {
+                $q->where('ipd_no', 'like', '%' . $request->search . '%');
+            })
 
-        ->orderByDesc('id')
-        ->paginate($perPage)
-        ->appends($request->all()); 
+            ->orderByDesc('id')
+            ->paginate($perPage)
+            ->appends($request->all());
         //dd($ipdReports);
 
-    return view('admin.reports.ipd.ipd_reports', compact('ipdReports'));
-}
+        return view('admin.reports.ipd.ipd_reports', compact('ipdReports'));
+    }
     public function ipdBalanceReport(Request $request)
     {
-         $perPage = (int) $request->input('perPage', 10);
-    if ($perPage <= 0) {
-        $perPage = 10;
-    }
+        $perPage = (int) $request->input('perPage', 10);
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
         $ipdReports = IpdDetail::query()
 
             ->with(['patient', 'visits'])
@@ -1825,7 +2162,7 @@ class IpdController extends Controller
                 $q->whereHas('visits', function ($sub) use ($request) {
                     $sub->whereBetween('admission_date', [
                         $request->date_from,
-                        $request->date_to
+                        $request->date_to,
                     ]);
                 });
             })
@@ -1841,34 +2178,34 @@ class IpdController extends Controller
             })
 
             ->orderByDesc('id')
-               ->paginate($perPage)
-        ->withQueryString();
+            ->paginate($perPage)
+            ->withQueryString();
 
-    // ✅ Replace map() with transform()
-    $ipdReports->getCollection()->transform(function ($ipd) {
-        $ipd->amount_charged = $ipd->amount_charged ?? 0;
-        $ipd->amount_paid = $ipd->amount_paid ?? 0;
-        $ipd->balance = $ipd->amount_charged - $ipd->amount_paid;
-        return $ipd;
-    });
-            // ->get()
-            // ->map(function ($ipd) {
-            //     $ipd->amount_charged = $ipd->amount_charged ?? 0;
-            //     $ipd->amount_paid = $ipd->amount_paid ?? 0;
-            //     $ipd->balance = $ipd->amount_charged - $ipd->amount_paid;
-            //     return $ipd;
-            // });
+        // ✅ Replace map() with transform()
+        $ipdReports->getCollection()->transform(function ($ipd) {
+            $ipd->amount_charged = $ipd->amount_charged ?? 0;
+            $ipd->amount_paid    = $ipd->amount_paid ?? 0;
+            $ipd->balance        = $ipd->amount_charged - $ipd->amount_paid;
+            return $ipd;
+        });
+        // ->get()
+        // ->map(function ($ipd) {
+        //     $ipd->amount_charged = $ipd->amount_charged ?? 0;
+        //     $ipd->amount_paid = $ipd->amount_paid ?? 0;
+        //     $ipd->balance = $ipd->amount_charged - $ipd->amount_paid;
+        //     return $ipd;
+        // });
 
         return view('admin.reports.ipd.ipd_balance_reports', compact('ipdReports'));
     }
     public function ipdDischargeReport(Request $request)
     {
 
-          $perPage = (int) $request->input('perPage', 10);
-    if ($perPage <= 0) {
-        $perPage = 10;
-    }
-        
+        $perPage = (int) $request->input('perPage', 10);
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
+
         $discharges = DischargeCard::query()
 
             ->with('ipdDetails') // optional if you need IPD info
@@ -1878,7 +2215,7 @@ class IpdController extends Controller
             ->when($request->date_from && $request->date_to, function ($q) use ($request) {
                 $q->whereBetween('discharge_date', [
                     $request->date_from,
-                    $request->date_to
+                    $request->date_to,
                 ]);
             })
 
@@ -1892,9 +2229,9 @@ class IpdController extends Controller
             })
 
             ->orderByDesc('discharge_date')
-            // ->get();
-        ->paginate($perPage)
-        ->withQueryString();
+        // ->get();
+            ->paginate($perPage)
+            ->withQueryString();
 
         return view('admin.reports.ipd.ipd_discharge_patient', compact('discharges'));
     }
@@ -1906,14 +2243,14 @@ class IpdController extends Controller
     public function applyPackage(Request $request, $id)
     {
         $request->validate([
-            'package_id' => 'required|exists:packages,id',
+            'package_id'   => 'required|exists:packages,id',
             'applied_date' => 'nullable|date_format:Y-m-d',
-            'notes' => 'nullable|string|max:500',
+            'notes'        => 'nullable|string|max:500',
         ]);
 
         try {
             $packageService = new IpdPackageService();
-            
+
             $result = $packageService->applyPackage(
                 $id,
                 $request->package_id,
@@ -1925,7 +2262,7 @@ class IpdController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => $result['message'],
-                    'data' => $result['data'],
+                    'data'    => $result['data'],
                 ], 200);
             } else {
                 return response()->json([
@@ -1953,7 +2290,7 @@ class IpdController extends Controller
 
         try {
             $packageService = new IpdPackageService();
-            
+
             $result = $packageService->removePackage($id, $request->ipd_package_id);
 
             if ($result['success']) {
@@ -1983,19 +2320,19 @@ class IpdController extends Controller
     {
         try {
             $ipd = IpdDetail::findOrFail($id);
-            
+
             // Get all active packages
             $availablePackages = Package::where('is_active', true)
                 ->get(['id', 'name', 'package_rate', 'gst_amount', 'description']);
 
             // Get applied packages
-            $packageService = new IpdPackageService();
+            $packageService  = new IpdPackageService();
             $appliedPackages = $packageService->getAppliedPackages($id, 'applied');
 
             return response()->json([
-                'success' => true,
+                'success'            => true,
                 'available_packages' => $availablePackages,
-                'applied_packages' => $appliedPackages,
+                'applied_packages'   => $appliedPackages,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -2006,4 +2343,3 @@ class IpdController extends Controller
     }
 
 }
-

@@ -38,7 +38,7 @@ class DoctorVisitController extends Controller
             'amount' => 'required|numeric|min:0',
             'doctor_pay_amount' => 'nullable|numeric|min:0',
             'visit_date' => 'required|date',
-            'visit_time' => 'required',
+            'visit_time' => 'nullable',
         ]);
 
         try {
@@ -68,7 +68,7 @@ class DoctorVisitController extends Controller
                     'amount' => $request->amount,
                     'doctor_pay_amount' => $request->doctor_pay_amount ?? 0.00,
                     'visit_date' => $request->visit_date,
-                    'visit_time' => $request->visit_time,
+                    'visit_time' => $request->visit_time ?? null,
                 ]);
                 $message = 'Doctor visit record updated successfully!';
             } else {
@@ -82,7 +82,7 @@ class DoctorVisitController extends Controller
                     'amount' => $request->amount,
                     'doctor_pay_amount' => $request->doctor_pay_amount ?? 0.00,
                     'visit_date' => $request->visit_date,
-                    'visit_time' => $request->visit_time,
+                    'visit_time' => $request->visit_time ?? null,
                 ]);
                 $message = 'Doctor visit record created successfully!';
             }
@@ -154,7 +154,7 @@ class DoctorVisitController extends Controller
             'amount' => 'required|numeric|min:0',
             'doctor_pay_amount' => 'nullable|numeric|min:0',
             'visit_date' => 'required|date',
-            'visit_time' => 'required',
+            'visit_time' => 'nullable',
         ]);
 
         try {
@@ -182,7 +182,7 @@ class DoctorVisitController extends Controller
                 'amount' => $request->amount,
                 'doctor_pay_amount' => $request->doctor_pay_amount ?? 0.00,
                 'visit_date' => $request->visit_date,
-                'visit_time' => $request->visit_time,
+                'visit_time' => $request->visit_time ?? null,
             ]);
 
             DB::commit();

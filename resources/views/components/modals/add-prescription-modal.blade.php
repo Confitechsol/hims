@@ -1,4 +1,21 @@
 <style>
+    /* Ensure Add Prescription modal displays correctly - critical for overlays */
+    #addPrescriptionModal.modal {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        z-index: 1060 !important;
+        width: 100% !important;
+        height: 100% !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+    }
+    #addPrescriptionModal.modal.show {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
     .modal-backdrop.show {
         opacity: 0.6;
     }
@@ -9,10 +26,32 @@
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
         overflow: visible;
     }
-    /* Ensure Select2 dropdown is visible inside prescription modal */
+        /* Medicine Category & Medicine - compact font size */
+    #addPrescriptionModal .medicine-row .select2-container,
+    #addPrescriptionModal .medicine-row .select2-container .select2-selection__rendered,
+    #addPrescriptionModal .medicine-row .select2-container .select2-selection--single {
+        font-size: 0.8125rem !important;
+    }
+    #addPrescriptionModal .select2-dropdown .select2-results__option,
+    #addPrescriptionModal .select2-dropdown .select2-search__field,
+    #addPrescriptionModal .select2-dropdown .select2-results__message {
+        font-size: 0.8125rem !important;
+    }
+
+        /* Ensure Select2 dropdown is visible - pathology/radiology appended to body */
     #addPrescriptionModal .select2-container { z-index: 1060 !important; }
-    #addPrescriptionModal .select2-dropdown { z-index: 1061 !important; }
     #addPrescriptionModal .select2-container--open { z-index: 1061 !important; }
+    .pathology-radiology-dropdown,
+    .select2-dropdown.pathology-radiology-dropdown,
+    body .select2-dropdown,
+    body > .select2-container--open + .select2-dropdown { z-index: 99999 !important; }
+    .pathology-radiology-dropdown .select2-results__options { max-height: 280px !important; overflow-y: auto !important; }
+    .pathology-radiology-dropdown .select2-results__options,
+    .select2-container--default .select2-results__options,
+    .pathology-radiology-dropdown ul.select2-results__options { max-height: 300px !important; overflow-y: auto !important; display: block !important; }
+    .pathology-radiology-dropdown { min-width: 280px !important; }
+    .pathology-radiology-dropdown .select2-results__list,
+    .pathology-radiology-dropdown ul.select2-results__options { overflow-y: auto !important; max-height: 280px !important; }
     #addPrescriptionModal .modal-body { overflow-x: visible; overflow-y: auto; }
     .pathology-selected-list .selected-test-row,
     .radiology-selected-list .selected-test-row {
@@ -403,6 +442,7 @@
         border-color: #aaa;
     }
 </style>
+{{-- IPD Add Prescription modal: id="addPrescriptionModal" must be unique app-wide (only this div). Do not reuse this id in other modals. See .cursor/rules/add-prescription-modal.mdc --}}
 <div class="modal fade" id="addPrescriptionModal" tabindex="-1" aria-labelledby="addPrescriptionModalLabel"
     aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
     <div class="modal-dialog modal-xl ">
@@ -421,7 +461,7 @@
 
             <!-- Modal Body (scrollable area provided by modal-dialog-scrollable) -->
             <form action="{{ route('ipd.addPrescription') }}" id="ipdAddPrescriptionForm" method="post" enctype="multipart/form-data">@csrf
-                <div class="modal-body" style="max-height: calc(100vh - 160px); overflow-x:hiden;">
+                <div class="modal-body" style="max-height: calc(100vh - 160px); overflow-x: visible; overflow-y: auto;">
                     <div class="row p-4 mx-1">
                         <div class="col-sm-9">
                             <div class="ptt10">
@@ -463,7 +503,7 @@
                                                 <div class="col-md-3">
                                                     <label for="finding_type" class="form-label">Finding
                                                         Category</label>
-                                                    <select class="form-select multiselect2 select2-hidden-accessible"
+                                                    <select class="form-select multiselect2"
                                                         name="finding_type[]" id="finding_type" multiple>
                                                         <option value="1">General Examination</option>
                                                         <option value="2">Vitals</option>
@@ -475,7 +515,7 @@
                                                 <div class="col-md-3">
                                                     <label for="filterinput" class="form-label">
                                                         Finding List</label>
-                                                    <select class="form-control multiselect2 select2-hidden-accessible"
+                                                    <select class="form-control multiselect2"
                                                         name="findings[]" id="finding" multiple>
                                                         <option value="1">General Examination</option>
                                                         <option value="2">Vitals</option>
@@ -744,7 +784,7 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Prescription Date</label>
-                            <input type="date" name="date" id="prescription_date" class="form-control" value="{{ now()->format('Y-m-d') }}">
+                            <input type="date" name="date" id="prescription_date" class="form-control" value="">
                         </div>
                     </div>
                 </div>
@@ -895,6 +935,32 @@
         console.log('🔴 Total pathology items added to FormData:', (window.selectedPathologyList || []).length);
         console.log('🔴 Total radiology items added to FormData:', (window.selectedRadiologyList || []).length);
         
+        // CRITICAL: Always include prescription date for back-dated support
+        // Read from form's date input (use #prescription_date to avoid picking wrong 'date' input elsewhere)
+        const prescriptionDateEl = form.querySelector('#prescription_date') || form.querySelector('input[name="date"]');
+        let dateToSend = prescriptionDateEl ? (prescriptionDateEl.value || '').trim() : '';
+        if (!dateToSend && form.querySelector('[name="ipd_id"]')) {
+            const ipdIdVal = ((form.querySelector('[name="ipd_id"]') || {}).value || '').trim();
+            if (ipdIdVal) {
+                const btn = document.querySelector('[data-bs-target="#addPrescriptionModal"][data-ipd-id="' + ipdIdVal + '"]');
+                if (btn && btn.getAttribute('data-admission-date')) {
+                    dateToSend = btn.getAttribute('data-admission-date');
+                    console.log('🔴 Using admission date from button for empty date field:', dateToSend);
+                } else {
+                    const ctx = document.getElementById('ipdViewContext');
+                    if (ctx && ctx.getAttribute('data-ipd-id') === ipdIdVal && ctx.getAttribute('data-admission-date')) {
+                        dateToSend = ctx.getAttribute('data-admission-date');
+                        console.log('🔴 Using admission date from ipdViewContext for empty date field:', dateToSend);
+                    }
+                }
+            }
+        }
+        if (!dateToSend) {
+            dateToSend = new Date().toISOString().split('T')[0];
+        }
+        formData.append('date', dateToSend);
+        console.log('🔴 Prescription date appended to FormData:', dateToSend);
+        
         // Add all other form fields
         const formElements = form.elements;
         for (let i = 0; i < formElements.length; i++) {
@@ -904,6 +970,7 @@
             if (!name) continue;
             if (element.type === 'submit' || element.type === 'button') continue;
             if (name === '_token') continue;
+            if (name === 'date') continue; // Handled explicitly above for back-dated support
             if (name === 'pathology[]' || name === 'pathology_notes[]' || name === 'radiology[]' || name === 'radiology_notes[]') continue;
             
             // Handle multi-select fields (finding_type[], findings[], etc.)
@@ -1276,7 +1343,17 @@
     }
 })();
 </script>
+{{-- Old prescription data in data attribute to avoid @json() breaking script if content has special chars --}}
+<div id="addPrescriptionModalOldData" data-old-prescription="{{ e(json_encode(['finding_type' => old('finding_type[]', []), 'finding' => old('finding[]', []), 'pathology' => old('pathology[]', []), 'radiology' => old('radiology[]', [])])) }}" style="display:none" aria-hidden="true"></div>
 <script>
+    (function() {
+        var el = document.getElementById('addPrescriptionModalOldData');
+        try {
+            window.__oldPrescription = el && el.getAttribute('data-old-prescription') ? JSON.parse(el.getAttribute('data-old-prescription')) : { finding_type: [], finding: [], pathology: [], radiology: [] };
+        } catch (e) {
+            window.__oldPrescription = { finding_type: [], finding: [], pathology: [], radiology: [] };
+        }
+    })();
     document.addEventListener('DOMContentLoaded', function() {
         console.log('DOMContentLoaded fired for prescription modal');
         const createPrescriptionModal = document.getElementById("addPrescriptionModal");
@@ -1455,8 +1532,14 @@
 
             // Fallback: if relatedTarget is not available, try to find the button
             if (!button) {
-                // Try to find button with data-ipd-id or data-id attribute
-                button = document.querySelector('[data-bs-target="#addPrescriptionModal"][data-ipd-id], [data-bs-target="#addPrescriptionModal"][data-id]');
+                // Prefer button matching ipd_id from form/URL (for programmatic open or when relatedTarget is null)
+                const ipdIdVal = (ipdIdField ? ipdIdField.value : '').trim();
+                if (ipdIdVal) {
+                    button = document.querySelector('[data-bs-target="#addPrescriptionModal"][data-ipd-id="' + ipdIdVal + '"]');
+                }
+                if (!button) {
+                    button = document.querySelector('[data-bs-target="#addPrescriptionModal"][data-ipd-id], [data-bs-target="#addPrescriptionModal"][data-id]');
+                }
             }
 
             // Additional fallback: try to get from URL if on IPD view page
@@ -1490,6 +1573,34 @@
                 ipd_id = ipd_id_from_url;
                 if (ipdIdField) ipdIdField.value = ipd_id;
                 console.log('Using IPD ID from URL:', ipd_id);
+            }
+
+            // Set prescription date from trigger button or page context (for back-dated IPD prescriptions)
+            // IMPORTANT: Only set when empty to avoid overwriting user's back-dated selection
+            const prescriptionDateEl = document.getElementById('prescription_date');
+            let admissionDate = button ? button.getAttribute('data-admission-date') : null;
+            // Fallback: use ipdViewContext when on IPD view page (e.g. programmatic modal open)
+            if (!admissionDate && ipd_id) {
+                const ctx = document.getElementById('ipdViewContext');
+                if (ctx && ctx.getAttribute('data-ipd-id') === String(ipd_id)) {
+                    admissionDate = ctx.getAttribute('data-admission-date');
+                }
+            }
+            if (prescriptionDateEl) {
+                const today = new Date().toISOString().split('T')[0];
+                prescriptionDateEl.max = today; // Prevent future dates; allow back-dating up to today
+                if (admissionDate) {
+                    prescriptionDateEl.min = admissionDate; // Allow dates from admission to today
+                    if (!prescriptionDateEl.value || prescriptionDateEl.value.trim() === '') {
+                        prescriptionDateEl.value = admissionDate;
+                        console.log('Prescription date set to admission date:', admissionDate);
+                    }
+                } else {
+                    prescriptionDateEl.removeAttribute('min');
+                    if (!prescriptionDateEl.value || prescriptionDateEl.value.trim() === '') {
+                        prescriptionDateEl.value = today;
+                    }
+                }
             }
 
             // Set values only if they exist and are not empty
@@ -1566,898 +1677,91 @@
             }, 200);
         });
 
+        // Reset form when modal is closed - keep Select2 alive (don't destroy) so dropdown works on reopen
+        createPrescriptionModal.addEventListener('hidden.bs.modal', function() {
+            const pathOpt = document.getElementById('pathologyOpt');
+            const radOpt = document.getElementById('radiologyOpt');
+            if (pathOpt && window.jQuery) {
+                var $p = window.jQuery(pathOpt);
+                if ($p.hasClass('select2-hidden-accessible')) $p.val(null).trigger('change');
+                else { pathOpt.value = ''; Array.from(pathOpt.options).forEach(function(o) { o.selected = false; }); }
+            }
+            if (radOpt && window.jQuery) {
+                var $r = window.jQuery(radOpt);
+                if ($r.hasClass('select2-hidden-accessible')) $r.val(null).trigger('change');
+                else { radOpt.value = ''; Array.from(radOpt.options).forEach(function(o) { o.selected = false; }); }
+            }
+            const prescriptionDateEl = document.getElementById('prescription_date');
+            if (prescriptionDateEl) prescriptionDateEl.value = '';
+            window.selectedPathologyList = [];
+            window.selectedRadiologyList = [];
+            const pathContainer = document.getElementById('pathologySelectedList');
+            const radContainer = document.getElementById('radiologySelectedList');
+            if (pathContainer) pathContainer.innerHTML = '';
+            if (radContainer) radContainer.innerHTML = '';
+        });
+
+        // CRITICAL: Init pathology/radiology Select2 when modal is FULLY shown (fixes options not displaying)
+        // Select2 must init when modal is visible - init on hidden modal causes dropdown/options to not display
+        createPrescriptionModal.addEventListener('shown.bs.modal', function() {
+            function initPathRadSelect2() {
+                if (typeof window.jQuery === 'undefined' || !window.jQuery.fn.select2) return;
+                var $ = window.jQuery;
+                var pathEl = document.getElementById('pathologyOpt');
+                var radEl = document.getElementById('radiologyOpt');
+                if (!pathEl && !radEl) return;
+                // Only init when we have real options (not just "Loading..." or "Select Tests")
+                if (pathEl && pathEl.options.length > 1) {
+                    try {
+                        if ($(pathEl).hasClass('select2-hidden-accessible') || $(pathEl).data('select2')) {
+                            try { $(pathEl).select2('destroy'); } catch(d) {}
+                        }
+                        $(pathEl).select2({
+                            placeholder: 'Select Tests',
+                            allowClear: true,
+                            width: '100%',
+                            dropdownParent: $('body'),
+                            dropdownCssClass: 'pathology-radiology-dropdown',
+                            minimumResultsForSearch: 0,
+                            multiple: true,
+                            closeOnSelect: false
+                        });
+                        console.log('Pathology Select2 initialized with', pathEl.options.length, 'options');
+                    } catch (e) { console.debug('Pathology Select2 init:', e); }
+                }
+                if (radEl && radEl.options.length > 1) {
+                    try {
+                        if ($(radEl).hasClass('select2-hidden-accessible') || $(radEl).data('select2')) {
+                            try { $(radEl).select2('destroy'); } catch(d) {}
+                        }
+                        $(radEl).select2({
+                            placeholder: 'Select Tests',
+                            allowClear: true,
+                            width: '100%',
+                            dropdownParent: $('body'),
+                            dropdownCssClass: 'pathology-radiology-dropdown',
+                            minimumResultsForSearch: 0,
+                            multiple: true,
+                            closeOnSelect: false
+                        });
+                        console.log('Radiology Select2 initialized with', radEl.options.length, 'options');
+                    } catch (e) { console.debug('Radiology Select2 init:', e); }
+                }
+            }
+            initPathRadSelect2();
+            setTimeout(initPathRadSelect2, 300);
+            setTimeout(initPathRadSelect2, 800);
+        });
+
         // OLD SUBMIT HANDLER REMOVED - Now handled by document-level capture-phase listener
         // The capture-phase listener (registered earlier) handles all submit events for ipdAddPrescriptionForm
 
         const container = document.getElementById("medicineContainer");
         const addButton = document.getElementById("addMedicineBtn");
         const addButtonContainer = document.getElementById("addMedicineContainer");
-                    const intervalSelect = row.querySelector('select[name="interval_dosages[]"]');
-                    const durationSelect = row.querySelector('select[name="duration_dosages[]"]');
 
-                    let medicineValue = null;
-
-                    // Get value from Select2 if it's initialized, otherwise use regular value
-                    if (medicineSelect) {
-                        if (window.jQuery && $(medicineSelect).hasClass('select2-hidden-accessible')) {
-                            const select2Val = $(medicineSelect).val();
-                            // Handle Select2 value - it can be null, string, or array
-                            if (select2Val === null || select2Val === undefined) {
-                                medicineValue = null;
-                            } else if (Array.isArray(select2Val)) {
-                                medicineValue = select2Val.length > 0 ? String(select2Val[0]).trim() : null;
-                            } else {
-                                medicineValue = String(select2Val).trim();
-                            }
-                        } else {
-                            medicineValue = medicineSelect.value ? String(medicineSelect.value).trim() : null;
-                        }
-
-                        // Ensure value is set as string in the actual select element
-                        if (medicineValue && medicineValue !== 'null' && medicineValue !== 'undefined' && medicineValue !== '') {
-                            medicineSelect.value = medicineValue;
-                            // Also update Select2 if it's initialized
-                            if (window.jQuery && $(medicineSelect).hasClass('select2-hidden-accessible')) {
-                                $(medicineSelect).val(medicineValue).trigger('change');
-                            }
-                            medicineValues.push(medicineValue);
-                        } else {
-                            medicineValue = null;
-                        }
-                    }
-
-                    // If medicine is empty or invalid, mark row for removal
-                    if (!medicineValue || medicineValue === '' || medicineValue === 'null' || medicineValue === 'undefined') {
-                        rowsToRemove.push(row);
-                    } else {
-                        // Ensure all related fields are also valid strings
-                        if (dosageSelect) {
-                            const dosageVal = dosageSelect.value ? String(dosageSelect.value).trim() : '';
-                            if (!dosageVal) {
-                                console.warn('Medicine row', index, 'has medicine but no dosage - keeping row');
-                            }
-                        }
-                    }
-                });
-
-                // Remove all empty rows
-                rowsToRemove.forEach(row => {
-                    row.remove();
-                });
-
-                // Final check: ensure all remaining medicine selects have valid string values
-                const finalMedicineRows = document.querySelectorAll('.medicine-row');
-                finalMedicineRows.forEach((row, index) => {
-                    const medicineSelect = row.querySelector('select[name="medicines[]"]');
-                    if (medicineSelect) {
-                        let finalValue = medicineSelect.value;
-                        // Convert to string explicitly
-                        if (finalValue === null || finalValue === undefined) {
-                            // This shouldn't happen, but if it does, remove the row
-                            console.error('Medicine select has null/undefined value at index', index);
-                            row.remove();
-                        } else {
-                            finalValue = String(finalValue).trim();
-                            if (finalValue === '' || finalValue === 'null' || finalValue === 'undefined') {
-                                console.error('Medicine select has invalid value at index', index);
-                                row.remove();
-                            } else {
-                                // Explicitly set as string
-                                medicineSelect.value = finalValue;
-                            }
-                        }
-                    }
-                });
-
-                // Final pass: Ensure all medicine values are explicitly set as strings
-                const allMedicineSelects = document.querySelectorAll('select[name="medicines[]"]');
-                allMedicineSelects.forEach((select, idx) => {
-                    let val = select.value;
-
-                    // If Select2 is initialized, sync the value
-                    if (window.jQuery && $(select).hasClass('select2-hidden-accessible')) {
-                        const select2Val = $(select).val();
-                        if (select2Val !== null && select2Val !== undefined) {
-                            val = Array.isArray(select2Val) ? select2Val[0] : select2Val;
-                        }
-                    }
-
-                    // Convert to string and set
-                    if (val !== null && val !== undefined) {
-                        val = String(val).trim();
-                        if (val !== '' && val !== 'null' && val !== 'undefined') {
-                            select.value = val;
-                            // Ensure Select2 is in sync
-                            if (window.jQuery && $(select).hasClass('select2-hidden-accessible')) {
-                                $(select).val(val).trigger('change');
-                            }
-                        } else {
-                            console.error('Invalid medicine value at index', idx, ':', val);
-                            // Remove the entire row if value is invalid
-                            const row = select.closest('.medicine-row');
-                            if (row) row.remove();
-                        }
-                    } else {
-                        console.error('Null/undefined medicine value at index', idx);
-                        // Remove the entire row if value is null/undefined
-                        const row = select.closest('.medicine-row');
-                        if (row) row.remove();
-                    }
-                });
-
-                console.log('Form submitting with - OPD ID:', finalOpdId, 'IPD ID:', finalIpdId, 'Prescribe By:', prescribeBy);
-                console.log('Medicine rows after cleanup:', document.querySelectorAll('.medicine-row').length);
-                console.log('Medicine values being sent:', Array.from(document.querySelectorAll('select[name="medicines[]"]')).map(s => ({value: s.value, type: typeof s.value})));
-                console.log('Form action:', this.action);
-
-                // If submitting to IPD route, ensure ipd_id is not empty
-                if (this.action === ipdRoute && !finalIpdId) {
-                    e.preventDefault();
-                    alert('Error: IPD ID is required but is missing. Please refresh the page and try again.');
-                    console.error('IPD ID is empty when submitting to IPD route');
-                    return false;
-                }
-
-                // If submitting to OPD route, ensure opd_id is not empty
-                if (this.action === opdRoute && !finalOpdId) {
-                    e.preventDefault();
-                    alert('Error: OPD ID is required but is missing. Please refresh the page and try again.');
-                    console.error('OPD ID is empty when submitting to OPD route');
-                    return false;
-                }
-
-                // Last check: Sync all Select2 values to native select elements before submission
-                if (window.jQuery && $.fn.select2) {
-                    const allSelects = document.querySelectorAll('select[name="medicines[]"], select[name="dosages[]"], select[name="interval_dosages[]"], select[name="duration_dosages[]"]');
-                    allSelects.forEach(select => {
-                        if ($(select).hasClass('select2-hidden-accessible')) {
-                            const select2Val = $(select).val();
-                            if (select2Val !== null && select2Val !== undefined) {
-                                const stringVal = Array.isArray(select2Val) ? String(select2Val[0]) : String(select2Val);
-                                select.value = stringVal;
-                                // Force update the native select
-                                select.setAttribute('value', stringVal);
-                            } else {
-                                select.value = '';
-                                select.removeAttribute('value');
-                            }
-                        }
-                    });
-                }
-
-                // Final validation: Check all medicine values are valid strings and remove any invalid ones
-                const finalMedicineSelects = document.querySelectorAll('select[name="medicines[]"]');
-                const invalidRows = [];
-
-                finalMedicineSelects.forEach((select, idx) => {
-                    let val = select.value;
-
-                    // Get from Select2 if needed
-                    if (window.jQuery && $(select).hasClass('select2-hidden-accessible')) {
-                        const select2Val = $(select).val();
-                        if (select2Val !== null && select2Val !== undefined) {
-                            val = Array.isArray(select2Val) ? select2Val[0] : select2Val;
-                        }
-                    }
-
-                    // Convert to string and validate
-                    if (val === null || val === undefined || val === '') {
-                        console.warn('Empty medicine value at index', idx, '- removing row');
-                        invalidRows.push(select.closest('.medicine-row'));
-                    } else {
-                        const stringVal = String(val).trim();
-                        if (stringVal === '' || stringVal === 'null' || stringVal === 'undefined' || isNaN(stringVal) === false && stringVal === '0') {
-                            console.warn('Invalid medicine value at index', idx, ':', stringVal, '- removing row');
-                            invalidRows.push(select.closest('.medicine-row'));
-                        } else {
-                            // Ensure it's a valid string (should be a number as string like "1", "2", etc.)
-                            select.value = stringVal;
-                            select.setAttribute('value', stringVal);
-                            // Also update Select2
-                            if (window.jQuery && $(select).hasClass('select2-hidden-accessible')) {
-                                $(select).val(stringVal).trigger('change');
-                            }
-                        }
-                    }
-                });
-
-                // Remove invalid rows
-                invalidRows.forEach(row => {
-                    if (row) row.remove();
-                });
-
-                // Final check: If no valid medicines remain, that's okay (medicines is nullable)
-                const remainingMedicines = document.querySelectorAll('select[name="medicines[]"]');
-                console.log('Final medicine count:', remainingMedicines.length);
-                console.log('Final medicine values:', Array.from(remainingMedicines).map((s, i) => {
-                    const val = s.value;
-                    return {
-                        index: i,
-                        value: val,
-                        type: typeof val,
-                        isString: typeof val === 'string',
-                        isValid: val && val !== '' && val !== 'null' && val !== 'undefined'
-                    };
-                }));
-
-                // Ensure all remaining values are strings
-                remainingMedicines.forEach(select => {
-                    const val = select.value;
-                    if (val !== null && val !== undefined && val !== '') {
-                        const stringVal = String(val).trim();
-                        select.value = stringVal;
-                        select.setAttribute('value', stringVal);
-                    }
-                });
-
-                // CRITICAL: Before allowing form submission, ensure ALL medicine selects have valid string values
-                // If any don't, remove them or prevent submission
-                const allMedSelects = document.querySelectorAll('select[name="medicines[]"]');
-                const validMedicines = [];
-                const rowsToKeep = [];
-
-                allMedSelects.forEach((select, idx) => {
-                    let val = select.value;
-
-                    // Force get from Select2 if initialized
-                    if (window.jQuery && $(select).hasClass('select2-hidden-accessible')) {
-                        const select2Val = $(select).val();
-                        if (select2Val !== null && select2Val !== undefined) {
-                            val = Array.isArray(select2Val) ? String(select2Val[0]) : String(select2Val);
-                        } else {
-                            val = null;
-                        }
-                    }
-
-                    // Validate and convert to string
-                    if (val !== null && val !== undefined && val !== '') {
-                        val = String(val).trim();
-                        if (val !== '' && val !== 'null' && val !== 'undefined') {
-                            // Valid medicine value
-                            select.value = val;
-                            select.setAttribute('value', val);
-                            validMedicines.push(val);
-                            rowsToKeep.push(select.closest('.medicine-row'));
-                        } else {
-                            // Invalid - remove row
-                            const row = select.closest('.medicine-row');
-                            if (row) row.remove();
-                        }
-                    } else {
-                        // Null/undefined/empty - remove row
-                        const row = select.closest('.medicine-row');
-                        if (row) row.remove();
-                    }
-                });
-
-                // Remove any rows that weren't marked to keep
-                document.querySelectorAll('.medicine-row').forEach(row => {
-                    if (!rowsToKeep.includes(row)) {
-                        row.remove();
-                    }
-                });
-
-                console.log('Valid medicines after final cleanup:', validMedicines);
-                console.log('Medicine rows remaining:', document.querySelectorAll('.medicine-row').length);
-
-                // Final verification - check each remaining select one more time
-                document.querySelectorAll('select[name="medicines[]"]').forEach((select, idx) => {
-                    const val = select.value;
-                    if (!val || val === '' || val === 'null' || val === 'undefined') {
-                        console.error('CRITICAL: Medicine select at index', idx, 'still has invalid value:', val);
-                        select.closest('.medicine-row')?.remove();
-                    } else {
-                        // Force to string one more time
-                        const finalVal = String(val).trim();
-                        select.value = finalVal;
-                        console.log('Medicine', idx, 'final value:', finalVal, 'type:', typeof finalVal);
-                    }
-                });
-
-                // NUCLEAR OPTION: Destroy Select2 on ALL selects to ensure native values are used
-                // This applies to medicines, dosages, interval_dosages, and duration_dosages
-                if (window.jQuery && $.fn.select2) {
-                    const allSelectFields = [
-                        'select[name="medicines[]"]',
-                        'select[name="dosages[]"]',
-                        'select[name="interval_dosages[]"]',
-                        'select[name="duration_dosages[]"]'
-                    ];
-
-                    allSelectFields.forEach(selector => {
-                        document.querySelectorAll(selector).forEach(select => {
-                            if ($(select).hasClass('select2-hidden-accessible')) {
-                                const currentVal = $(select).val();
-                                // Get the value before destroying
-                                let stringVal = '';
-                                if (currentVal !== null && currentVal !== undefined) {
-                                    stringVal = Array.isArray(currentVal) ? String(currentVal[0]) : String(currentVal);
-                                }
-                                // Destroy Select2 (safely - override handles this)
-                                try {
-                                    const $selectEl = $(select);
-                                    if ($selectEl.hasClass('select2-hidden-accessible') || $selectEl.data('select2')) {
-                                        $selectEl.select2('destroy');
-                                    }
-                                } catch(e) {
-                                    // Ignore - Select2 not initialized
-                                }
-                                // Set the native value
-                                if (stringVal && stringVal !== '' && stringVal !== 'null' && stringVal !== 'undefined') {
-                                    select.value = stringVal.trim();
-                                } else {
-                                    // For non-medicine fields, set to empty string (they're nullable)
-                                    if (selector.includes('medicines')) {
-                                        // If medicine is empty, remove the entire row
-                                        select.closest('.medicine-row')?.remove();
-                                    } else {
-                                        select.value = '';
-                                    }
-                                }
-                            }
-                        });
-                    });
-                }
-
-                // One final pass to remove any remaining invalid medicine rows
-                document.querySelectorAll('select[name="medicines[]"]').forEach(select => {
-                    const val = select.value;
-                    if (!val || val === '' || val === 'null' || val === 'undefined') {
-                        select.closest('.medicine-row')?.remove();
-                    } else {
-                        // Ensure it's a string
-                        select.value = String(val).trim();
-                    }
-                });
-
-                // Ensure all other medicine-related fields are strings
-                document.querySelectorAll('select[name="dosages[]"], select[name="interval_dosages[]"], select[name="duration_dosages[]"]').forEach(select => {
-                    const val = select.value;
-                    if (val !== null && val !== undefined && val !== '') {
-                        select.value = String(val).trim();
-                    } else {
-                        select.value = '';
-                    }
-                });
-
-                // Ensure instructions are strings
-                document.querySelectorAll('textarea[name="instructions[]"]').forEach(textarea => {
-                    const val = textarea.value;
-                    if (val !== null && val !== undefined) {
-                        textarea.value = String(val);
-                    } else {
-                        textarea.value = '';
-                    }
-                });
-
-                console.log('Final medicine count before submission:', document.querySelectorAll('select[name="medicines[]"]').length);
-                console.log('Final medicine values:', Array.from(document.querySelectorAll('select[name="medicines[]"]')).map(s => s.value));
-
-                // CRITICAL: Intercept form submission and manually build FormData with string values
-                e.preventDefault();
-
-                // CRITICAL: Read pathology/radiology from selects BEFORE destroying Select2
-                var pathOpt = document.getElementById('pathologyOpt');
-                var radOpt = document.getElementById('radiologyOpt');
-                var pathologyIdsFromSelect = [];
-                var radiologyIdsFromSelect = [];
-                
-                // Read from Select2 if active, otherwise from native select
-                if (pathOpt) {
-                    if (window.jQuery && $(pathOpt).hasClass('select2-hidden-accessible')) {
-                        var v = $(pathOpt).val();
-                        if (v) pathologyIdsFromSelect = Array.isArray(v) ? v : [v];
-                        console.log('🔴 Pathology Select2 value:', v, '-> IDs:', pathologyIdsFromSelect);
-                    } else if (pathOpt.selectedOptions && pathOpt.selectedOptions.length) {
-                        pathologyIdsFromSelect = Array.from(pathOpt.selectedOptions).map(function(o) { return o.value; }).filter(Boolean);
-                        console.log('🔴 Pathology native selectedOptions:', pathOpt.selectedOptions.length, '-> IDs:', pathologyIdsFromSelect);
-                    }
-                }
-                
-                if (radOpt) {
-                    if (window.jQuery && $(radOpt).hasClass('select2-hidden-accessible')) {
-                        var v = $(radOpt).val();
-                        if (v) radiologyIdsFromSelect = Array.isArray(v) ? v : [v];
-                        console.log('🔴 Radiology Select2 value:', v, '-> IDs:', radiologyIdsFromSelect);
-                    } else if (radOpt.selectedOptions && radOpt.selectedOptions.length) {
-                        radiologyIdsFromSelect = Array.from(radOpt.selectedOptions).map(function(o) { return o.value; }).filter(Boolean);
-                        console.log('🔴 Radiology native selectedOptions:', radOpt.selectedOptions.length, '-> IDs:', radiologyIdsFromSelect);
-                    }
-                }
-                
-                // Ensure lists are populated (from selects if empty)
-                if (!window.selectedPathologyList || window.selectedPathologyList.length === 0) {
-                    window.selectedPathologyList = [];
-                    pathologyIdsFromSelect.forEach(function(id) {
-                        var name = 'ID ' + id;
-                        if (pathOpt) pathOpt.querySelectorAll('option').forEach(function(o) { if (String(o.value) == String(id)) name = (o.text || '').trim() || name; });
-                        window.selectedPathologyList.push({ id: String(id), name: name, notes: '' });
-                    });
-                    console.log('🔴 Populated selectedPathologyList from select:', window.selectedPathologyList);
-                }
-                
-                if (!window.selectedRadiologyList || window.selectedRadiologyList.length === 0) {
-                    window.selectedRadiologyList = [];
-                    radiologyIdsFromSelect.forEach(function(id) {
-                        var name = 'ID ' + id;
-                        if (radOpt) radOpt.querySelectorAll('option').forEach(function(o) { if (String(o.value) == String(id)) name = (o.text || '').trim() || name; });
-                        window.selectedRadiologyList.push({ id: String(id), name: name, notes: '' });
-                    });
-                    console.log('🔴 Populated selectedRadiologyList from select:', window.selectedRadiologyList);
-                }
-                
-                console.log('🔴 Final selectedPathologyList:', window.selectedPathologyList);
-                console.log('🔴 Final selectedRadiologyList:', window.selectedRadiologyList);
-
-                // First, sync Select2 values to native selects, then destroy Select2 instances
-                const allSelect2Selects = document.querySelectorAll('select.select2, select.multiselect2, select.medicine_category, select.medicine_name, select.medicine_dosage, select.interval_dosage, select.duration_dosage, select[name="pathology[]"], select[name="radiology[]"]');
-                allSelect2Selects.forEach(select => {
-                    if (window.jQuery && $(select).hasClass('select2-hidden-accessible')) {
-                        try {
-                            // Get value from Select2
-                            const select2Value = $(select).val();
-
-                            // Sync to native select
-                            if (select2Value !== null && select2Value !== undefined) {
-                                if (Array.isArray(select2Value)) {
-                                    // For multi-select, set all selected options
-                                    $(select).val(select2Value);
-                                } else {
-                                    // For single select, set the value
-                                    select.value = String(select2Value);
-                                }
-                            }
-
-                            // Now destroy Select2 (safely)
-                            try {
-                                const $selectEl = $(select);
-                                if ($selectEl.hasClass('select2-hidden-accessible') || $selectEl.data('select2')) {
-                                    $selectEl.select2('destroy');
-                                }
-                            } catch(e) {
-                                // Ignore - Select2 not initialized
-                            }
-                            console.log('Synced and destroyed Select2 for:', select.name, 'value:', select.value || $(select).val());
-                        } catch(e) {
-                            console.warn('Error syncing/destroying Select2:', e);
-                        }
-                    }
-                });
-
-                // Create FormData manually to ensure all values are strings
-                const formData = new FormData();
-
-                // Add CSRF token first
-                const csrfToken = document.querySelector('input[name="_token"]')?.value ||
-                                 document.querySelector('meta[name="csrf-token"]')?.content;
-                if (csrfToken) {
-                    formData.append('_token', String(csrfToken));
-                }
-
-                // Add pathology and radiology from lists to FormData
-                (window.selectedPathologyList || []).forEach(function(item) {
-                    formData.append('pathology[]', String(item.id));
-                    formData.append('pathology_notes[]', String(item.notes || ''));
-                    console.log('🔴 FormData.append pathology[]:', item.id, 'notes:', item.notes);
-                });
-                (window.selectedRadiologyList || []).forEach(function(item) {
-                    formData.append('radiology[]', String(item.id));
-                    formData.append('radiology_notes[]', String(item.notes || ''));
-                    console.log('🔴 FormData.append radiology[]:', item.id, 'notes:', item.notes);
-                });
-                
-                console.log('🔴 Total pathology items added to FormData:', (window.selectedPathologyList || []).length);
-                console.log('🔴 Total radiology items added to FormData:', (window.selectedRadiologyList || []).length);
-
-                // Process medicine rows first - collect all medicine-related data
-                const validMedicineRows = document.querySelectorAll('.medicine-row');
-                const validMedicineData = [];
-
-                console.log('Processing', validMedicineRows.length, 'medicine rows');
-
-                validMedicineRows.forEach((row, index) => {
-                    const medicineSelect = row.querySelector('select[name="medicines[]"]');
-                    const dosageSelect = row.querySelector('select[name="dosages[]"]');
-                    const intervalSelect = row.querySelector('select[name="interval_dosages[]"]');
-                    const durationSelect = row.querySelector('select[name="duration_dosages[]"]');
-                    const instructionTextarea = row.querySelector('textarea[name="instructions[]"]');
-
-                    if (!medicineSelect) {
-                        console.warn(`Row ${index + 1}: Medicine select not found, skipping`);
-                        return;
-                    }
-
-                    // Get values from native selects (Select2 should be destroyed by now)
-                    // Double-check: if Select2 is still active, get value from Select2
-                    let medicineValue = null;
-                    let dosageValue = null;
-                    let intervalValue = null;
-                    let durationValue = null;
-                    let instructionValue = null;
-
-                    // Check if Select2 is still active and get value from it
-                    if (window.jQuery && $(medicineSelect).hasClass('select2-hidden-accessible')) {
-                        const select2Val = $(medicineSelect).val();
-                        medicineValue = select2Val !== null && select2Val !== undefined ?
-                                       (Array.isArray(select2Val) ? select2Val[0] : select2Val) :
-                                       medicineSelect.value;
-                    } else {
-                        medicineValue = medicineSelect.value;
-                    }
-
-                    if (window.jQuery && dosageSelect && $(dosageSelect).hasClass('select2-hidden-accessible')) {
-                        const select2Val = $(dosageSelect).val();
-                        dosageValue = select2Val !== null && select2Val !== undefined ?
-                                     (Array.isArray(select2Val) ? select2Val[0] : select2Val) :
-                                     dosageSelect.value;
-                    } else {
-                        dosageValue = dosageSelect ? dosageSelect.value : null;
-                    }
-
-                    if (window.jQuery && intervalSelect && $(intervalSelect).hasClass('select2-hidden-accessible')) {
-                        const select2Val = $(intervalSelect).val();
-                        intervalValue = select2Val !== null && select2Val !== undefined ?
-                                       (Array.isArray(select2Val) ? select2Val[0] : select2Val) :
-                                       intervalSelect.value;
-                    } else {
-                        intervalValue = intervalSelect ? intervalSelect.value : null;
-                    }
-
-                    if (window.jQuery && durationSelect && $(durationSelect).hasClass('select2-hidden-accessible')) {
-                        const select2Val = $(durationSelect).val();
-                        durationValue = select2Val !== null && select2Val !== undefined ?
-                                       (Array.isArray(select2Val) ? select2Val[0] : select2Val) :
-                                       durationSelect.value;
-                    } else {
-                        durationValue = durationSelect ? durationSelect.value : null;
-                    }
-
-                    instructionValue = instructionTextarea ? instructionTextarea.value : null;
-
-                    // Convert all to strings and validate - ensure they're actual strings, not null/undefined
-                    medicineValue = (medicineValue !== null && medicineValue !== undefined && medicineValue !== '') ? String(medicineValue).trim() : '';
-                    dosageValue = (dosageValue !== null && dosageValue !== undefined && dosageValue !== '') ? String(dosageValue).trim() : '';
-                    intervalValue = (intervalValue !== null && intervalValue !== undefined && intervalValue !== '') ? String(intervalValue).trim() : '';
-                    durationValue = (durationValue !== null && durationValue !== undefined && durationValue !== '') ? String(durationValue).trim() : '';
-                    instructionValue = (instructionValue !== null && instructionValue !== undefined) ? String(instructionValue).trim() : '';
-
-                    console.log(`Row ${index + 1} values:`, {
-                        medicine: medicineValue,
-                        dosage: dosageValue,
-                        interval: intervalValue,
-                        duration: durationValue,
-                        instruction: instructionValue,
-                        medicineType: typeof medicineValue,
-                        medicineLength: medicineValue.length
-                    });
-
-                    // Only add if medicine is selected and is a valid non-empty string
-                    if (medicineValue && medicineValue !== '' && medicineValue !== 'null' && medicineValue !== 'undefined' && medicineValue.length > 0) {
-                        // Verify it's actually a string
-                        if (typeof medicineValue !== 'string') {
-                            console.error(`Row ${index + 1}: Medicine value is not a string! Type:`, typeof medicineValue, 'Value:', medicineValue);
-                            medicineValue = String(medicineValue);
-                        }
-
-                        validMedicineData.push({
-                            medicine: medicineValue,
-                            dosage: dosageValue,
-                            interval: intervalValue,
-                            duration: durationValue,
-                            instruction: instructionValue
-                        });
-                        console.log(`✓ Row ${index + 1} added to valid data`);
-                    } else {
-                        console.warn(`Row ${index + 1}: Skipped - medicine value is empty or invalid:`, medicineValue);
-                    }
-                });
-
-                console.log('Total valid medicine rows:', validMedicineData.length);
-
-                // Add medicine data to FormData - ensure all values are strings
-                console.log('Valid medicine data to send:', validMedicineData);
-                validMedicineData.forEach((data, index) => {
-                    // CRITICAL: Ensure all values are strings and not empty/null/undefined
-                    // Convert to string explicitly, handling all edge cases
-                    let medicineVal = '';
-                    let dosageVal = '';
-                    let intervalVal = '';
-                    let durationVal = '';
-                    let instructionVal = '';
-
-                    // Medicine - must be non-empty string
-                    if (data.medicine !== null && data.medicine !== undefined) {
-                        medicineVal = String(data.medicine).trim();
-                    }
-
-                    // Dosage - can be empty but must be string
-                    if (data.dosage !== null && data.dosage !== undefined) {
-                        dosageVal = String(data.dosage).trim();
-                    }
-
-                    // Interval - can be empty but must be string
-                    if (data.interval !== null && data.interval !== undefined) {
-                        intervalVal = String(data.interval).trim();
-                    }
-
-                    // Duration - can be empty but must be string
-                    if (data.duration !== null && data.duration !== undefined) {
-                        durationVal = String(data.duration).trim();
-                    }
-
-                    // Instruction - can be empty but must be string
-                    if (data.instruction !== null && data.instruction !== undefined) {
-                        instructionVal = String(data.instruction).trim();
-                    }
-
-                    // Final type check - ensure they're all strings
-                    medicineVal = typeof medicineVal === 'string' ? medicineVal : String(medicineVal || '');
-                    dosageVal = typeof dosageVal === 'string' ? dosageVal : String(dosageVal || '');
-                    intervalVal = typeof intervalVal === 'string' ? intervalVal : String(intervalVal || '');
-                    durationVal = typeof durationVal === 'string' ? durationVal : String(durationVal || '');
-                    instructionVal = typeof instructionVal === 'string' ? instructionVal : String(instructionVal || '');
-
-                    // Only add if medicine is not empty
-                    if (medicineVal && medicineVal !== '' && medicineVal !== 'null' && medicineVal !== 'undefined') {
-                        // Append as strings - FormData will handle the array notation
-                        formData.append('medicines[]', medicineVal);
-                        formData.append('dosages[]', dosageVal);
-                        formData.append('interval_dosages[]', intervalVal);
-                        formData.append('duration_dosages[]', durationVal);
-                        formData.append('instructions[]', instructionVal);
-
-                        console.log(`Row ${index + 1} added to FormData:`, {
-                            medicine: `"${medicineVal}"`,
-                            dosage: `"${dosageVal}"`,
-                            interval: `"${intervalVal}"`,
-                            duration: `"${durationVal}"`,
-                            instruction: `"${instructionVal}"`,
-                            types: {
-                                medicine: typeof medicineVal,
-                                dosage: typeof dosageVal,
-                                interval: typeof intervalVal,
-                                duration: typeof durationVal,
-                                instruction: typeof instructionVal
-                            },
-                            lengths: {
-                                medicine: medicineVal.length,
-                                dosage: dosageVal.length,
-                                interval: intervalVal.length,
-                                duration: durationVal.length,
-                                instruction: instructionVal.length
-                            }
-                        });
-                    } else {
-                        console.warn(`Skipping row ${index + 1} - empty or invalid medicine value:`, medicineVal);
-                    }
-                });
-
-                // Add all other form fields (excluding medicine-related fields which we already added)
-                const formElements = this.elements;
-                for (let i = 0; i < formElements.length; i++) {
-                    const element = formElements[i];
-                    const name = element.name;
-
-                    if (!name) continue;
-
-                    // Skip submit buttons and CSRF token (already added)
-                    if (element.type === 'submit' || element.type === 'button') continue;
-                    if (name === '_token') continue;
-
-                    // Skip medicine-related fields (already processed above)
-                    if (name === 'medicines[]' || name === 'dosages[]' ||
-                        name === 'interval_dosages[]' || name === 'duration_dosages[]' ||
-                        name === 'instructions[]') {
-                        continue;
-                    }
-                    // Skip pathology/radiology (already added from selectedPathologyList/selectedRadiologyList above)
-                    if (name === 'pathology[]' || name === 'pathology_notes[]' || name === 'radiology[]' || name === 'radiology_notes[]') {
-                        continue;
-                    }
-
-                    // Handle other array fields (pathology, radiology, etc.)
-                    if (name.endsWith('[]')) {
-                        // Handle multi-select or array inputs
-                        if (element.type === 'select-multiple' || element.hasAttribute('multiple')) {
-                            // Get selected options
-                            const selectedOptions = Array.from(element.selectedOptions);
-                            console.log(`Processing ${name}:`, selectedOptions.map(opt => ({value: opt.value, type: typeof opt.value})));
-
-                            selectedOptions.forEach(option => {
-                                const val = option.value;
-                                if (val !== null && val !== undefined && val !== '' && val !== 'null' && val !== 'undefined') {
-                                    const stringVal = String(val).trim();
-                                    formData.append(name, stringVal);
-                                    console.log(`Added ${name}: "${stringVal}" (type: ${typeof stringVal})`);
-                                }
-                            });
-                        } else {
-                            const val = element.value;
-                            if (val !== null && val !== undefined && val !== '' && val !== 'null' && val !== 'undefined') {
-                                formData.append(name, String(val).trim());
-                            }
-                        }
-                    }
-                    // Handle regular fields
-                    else {
-                        if (element.type === 'checkbox' || element.type === 'radio') {
-                            if (element.checked) {
-                                formData.append(name, String(element.value || '1'));
-                            }
-                        } else if (element.type === 'file') {
-                            // Handle file inputs
-                            if (element.files && element.files.length > 0) {
-                                for (let j = 0; j < element.files.length; j++) {
-                                    formData.append(name, element.files[j]);
-                                }
-                            }
-                        } else {
-                            const val = element.value;
-                            if (val !== null && val !== undefined) {
-                                formData.append(name, String(val));
-                            }
-                        }
-                    }
-                }
-
-                // Log what we're sending (especially medicines)
-                console.log('=== FormData entries ===');
-                const medicineEntries = [];
-                const dosageEntries = [];
-                const intervalEntries = [];
-                const durationEntries = [];
-                const instructionEntries = [];
-
-                for (let pair of formData.entries()) {
-                    const key = pair[0];
-                    const value = pair[1];
-                    const valueType = typeof value;
-
-                    if (key === 'medicines[]') {
-                        medicineEntries.push(value);
-                    } else if (key === 'dosages[]') {
-                        dosageEntries.push(value);
-                    } else if (key === 'interval_dosages[]') {
-                        intervalEntries.push(value);
-                    } else if (key === 'duration_dosages[]') {
-                        durationEntries.push(value);
-                    } else if (key === 'instructions[]') {
-                        instructionEntries.push(value);
-                    }
-
-                    console.log(`${key}: "${value}" (type: ${valueType}, length: ${String(value).length})`);
-                }
-
-                console.log('=== Medicine Arrays Summary ===');
-                console.log('medicines[]:', medicineEntries);
-                console.log('dosages[]:', dosageEntries);
-                console.log('interval_dosages[]:', intervalEntries);
-                console.log('duration_dosages[]:', durationEntries);
-                console.log('instructions[]:', instructionEntries);
-
-                // Verify all are strings
-                const allValid = medicineEntries.every(v => typeof v === 'string') &&
-                                dosageEntries.every(v => typeof v === 'string') &&
-                                intervalEntries.every(v => typeof v === 'string') &&
-                                durationEntries.every(v => typeof v === 'string') &&
-                                instructionEntries.every(v => typeof v === 'string');
-
-                if (!allValid) {
-                    console.error('ERROR: Some values are not strings!');
-                    console.error('Medicine types:', medicineEntries.map(v => typeof v));
-                    console.error('Dosage types:', dosageEntries.map(v => typeof v));
-                    console.error('Interval types:', intervalEntries.map(v => typeof v));
-                    console.error('Duration types:', durationEntries.map(v => typeof v));
-                    console.error('Instruction types:', instructionEntries.map(v => typeof v));
-                } else {
-                    console.log('✓ All values are strings');
-                }
-
-                // Final validation before submission
-                if (validMedicineData.length === 0) {
-                    alert('Please add at least one medicine to the prescription.');
-                    return;
-                }
-
-                // Verify all medicine values are strings
-                const allStrings = validMedicineData.every(data =>
-                    typeof data.medicine === 'string' &&
-                    typeof data.dosage === 'string' &&
-                    typeof data.interval === 'string' &&
-                    typeof data.duration === 'string' &&
-                    typeof data.instruction === 'string'
-                );
-
-                if (!allStrings) {
-                    console.error('ERROR: Not all medicine values are strings!');
-                    alert('Error: Invalid data format. Please check the console for details.');
-                    return;
-                }
-
-                console.log('=== Submitting form ===');
-                console.log('Action:', this.action);
-                console.log('Method:', this.method || 'POST');
-                console.log('Valid medicine rows:', validMedicineData.length);
-
-                // Alternative: Try sending as URLSearchParams to ensure proper array formatting
-                // But first, let's try FormData with explicit Content-Type
-                console.log('=== Final FormData Check ===');
-                const finalCheck = {};
-                for (let pair of formData.entries()) {
-                    const key = pair[0];
-                    const value = pair[1];
-                    if (!finalCheck[key]) {
-                        finalCheck[key] = [];
-                    }
-                    finalCheck[key].push(value);
-                }
-                console.log('FormData as object:', finalCheck);
-                console.log('Medicines array:', finalCheck['medicines[]']);
-                console.log('All medicine values are strings:', finalCheck['medicines[]'] ? finalCheck['medicines[]'].every(v => typeof v === 'string') : 'N/A');
-
-                // Submit via fetch
-                fetch(this.action, {
-                    method: this.method || 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json',
-                        // Don't set Content-Type for FormData - browser will set it with boundary
-                    },
-                    credentials: 'same-origin'
-                })
-                .then(async response => {
-                    console.log('Response status:', response.status);
-                    const data = await response.json();
-                    console.log('Response data:', data);
-
-                    if (!response.ok) {
-                        // Handle validation errors
-                        if (data.errors) {
-                            console.error('Validation errors:', data.errors);
-                            const errorMessages = Object.values(data.errors).flat().join(', ');
-                            throw new Error(errorMessages);
-                        }
-                        throw new Error(data.message || 'Server error');
-                    }
-                    return data;
-                })
-                .then(data => {
-                    console.log('Success:', data);
-                    // Close modal
-                    if (window.jQuery && $('#addPrescriptionModal').length) {
-                        $('#addPrescriptionModal').modal('hide');
-                    }
-                    // Show success notification
-                    if (typeof Swal !== 'undefined') {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: data.message || 'Prescription created successfully.',
-                            confirmButtonColor: '#7c3aed',
-                            confirmButtonText: 'OK'
-                        }).then(() => {
-                            location.reload();
-                        });
-                    } else {
-                        // Fallback if SweetAlert2 is not available
-                        alert(data.message || 'Prescription created successfully!');
-                        location.reload();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Something went wrong: ' + error.message);
-                });
-            });
-        }
-
-            const container = document.getElementById("medicineContainer");
-            const addButton = document.getElementById("addMedicineBtn");
-            const addButtonContainer = document.getElementById("addMedicineContainer");
-
-            // Global fillSelect function to populate select elements
-            window.fillSelect = function(selectElement, data, textKey) {
+        // Global fillSelect function to populate select elements
+        window.fillSelect = function(selectElement, data, textKey) {
                 if (!selectElement) {
                     console.error('Select element not provided to fillSelect');
                     return;
@@ -3566,7 +2870,7 @@
                     const option = document.createElement('option');
                     option.value = category.id;
                     option.textContent = category.category;
-                    if ("{{ old('finding_type[]') }}" == category.id) {
+                    if (window.__oldPrescription && [].concat(window.__oldPrescription.finding_type).indexOf(String(category.id)) !== -1) {
                         option.selected = true;
                     }
                     findingCategorySelect.appendChild(option);
@@ -3623,7 +2927,7 @@
                         const option = document.createElement('option');
                         option.value = finding.id;
                         option.textContent = finding.name;
-                        if ("{{ old('finding[]') }}" == finding.id) {
+                        if (window.__oldPrescription && [].concat(window.__oldPrescription.finding).indexOf(String(finding.id)) !== -1) {
                             option.selected = true;
                         }
                         findingsSelect.appendChild(option);
@@ -3680,7 +2984,7 @@
                             const option = document.createElement('option');
                             option.value = patho.id;
                             option.textContent = (patho.test_name || 'Unknown') + (patho.short_name ? "(" + patho.short_name + ")" : "");
-                            if ("{{ old('pathology[]') }}" == patho.id) {
+                            if (window.__oldPrescription && [].concat(window.__oldPrescription.pathology).indexOf(String(patho.id)) !== -1) {
                                 option.selected = true;
                             }
                             pathologySelectEl.appendChild(option);
@@ -3745,7 +3049,7 @@
                             const option = document.createElement('option');
                             option.value = radio.id;
                             option.textContent = (radio.test_name || 'Unknown') + (radio.short_name ? "(" + radio.short_name + ")" : "");
-                            if ("{{ old('radiology[]') }}" == radio.id) {
+                            if (window.__oldPrescription && [].concat(window.__oldPrescription.radiology).indexOf(String(radio.id)) !== -1) {
                                 option.selected = true;
                             }
                             radiologySelectEl.appendChild(option);
@@ -4082,12 +3386,14 @@
                         if ($(pathologySelectModal).hasClass('select2-hidden-accessible')) $(pathologySelectModal).select2('destroy');
                         $(pathologySelectModal).select2({
                             placeholder: 'Select Tests', allowClear: true, width: '100%',
-                            dropdownParent: $('#addPrescriptionModal'), multiple: true, closeOnSelect: false
+                            dropdownParent: $('body'), dropdownCssClass: 'pathology-radiology-dropdown',
+                            minimumResultsForSearch: 0, multiple: true, closeOnSelect: false
                         });
                         if ($(radiologySelectModal).hasClass('select2-hidden-accessible')) $(radiologySelectModal).select2('destroy');
                         $(radiologySelectModal).select2({
                             placeholder: 'Select Tests', allowClear: true, width: '100%',
-                            dropdownParent: $('#addPrescriptionModal'), multiple: true, closeOnSelect: false
+                            dropdownParent: $('body'), dropdownCssClass: 'pathology-radiology-dropdown',
+                            minimumResultsForSearch: 0, multiple: true, closeOnSelect: false
                         });
                     } catch(e) { console.error('Select2 init:', e); }
                 }
@@ -4139,15 +3445,16 @@
                                             $(pathologySelectModal).select2('destroy');
                                         }
                                         
-                                        // Initialize Select2 for multiselect
+                                        // Initialize Select2 for multiselect (dropdownParent: body avoids overflow clipping)
                                         $(pathologySelectModal).select2({
                                             placeholder: 'Select Tests',
                                             allowClear: true,
                                             width: '100%',
-                                            dropdownParent: $('#addPrescriptionModal'),
+                                            dropdownParent: $('body'),
+                                            dropdownCssClass: 'pathology-radiology-dropdown',
                                             minimumResultsForSearch: 0,
-                                            multiple: true, // Enable multiselect
-                                            closeOnSelect: false // Keep dropdown open for multiple selections
+                                            multiple: true,
+                                            closeOnSelect: false
                                         });
                                         console.log('✅ Pathology Select2 initialized with', pathologySelectModal.options.length, 'options');
                                         
@@ -4179,7 +3486,7 @@
                                                 placeholder: 'No tests available',
                                                 allowClear: true,
                                                 width: '100%',
-                                                dropdownParent: $('#addPrescriptionModal'),
+                                                dropdownParent: $('body'),
                                                 minimumResultsForSearch: 0,
                                                 multiple: true,
                                                 disabled: true
@@ -4246,15 +3553,16 @@
                                                 $(radiologySelectModal).select2('destroy');
                                             }
                                             
-                                            // Initialize Select2 for multiselect
+                                            // Initialize Select2 for multiselect (dropdownParent: body avoids overflow clipping)
                                             $(radiologySelectModal).select2({
                                                 placeholder: 'Select Tests',
                                                 allowClear: true,
                                                 width: '100%',
-                                                dropdownParent: $('#addPrescriptionModal'),
+                                                dropdownParent: $('body'),
+                                                dropdownCssClass: 'pathology-radiology-dropdown',
                                                 minimumResultsForSearch: 0,
-                                                multiple: true, // Enable multiselect
-                                                closeOnSelect: false // Keep dropdown open for multiple selections
+                                                multiple: true,
+                                                closeOnSelect: false
                                             });
                                             console.log('✅ Radiology Select2 initialized with', radiologySelectModal.options.length, 'options');
                                             
@@ -4396,6 +3704,13 @@
         console.log('✅ loadPathologyRadiologyData function defined globally');
         
         if (createPrescriptionModal) {
+            // Move modal to body when about to show - escapes overflow/transform parents that clip it
+            createPrescriptionModal.addEventListener('show.bs.modal', function(event) {
+                if (createPrescriptionModal.parentNode !== document.body) {
+                    document.body.appendChild(createPrescriptionModal);
+                    console.log('✅ Add Prescription modal moved to body');
+                }
+            });
             // Listen for Bootstrap modal shown event
             createPrescriptionModal.addEventListener('shown.bs.modal', function(event) {
                 console.log('✅ Bootstrap shown.bs.modal event fired');
@@ -4421,20 +3736,22 @@
                         window.initializeMedicineRows();
                     }
                 })();
-                // Re-init Select2 on pathology/radiology when modal is visible (so dropdown renders correctly)
-                setTimeout(function() {
-                    if (typeof window.initPathologyRadiologySelect2 === 'function') {
-                        window.initPathologyRadiologySelect2();
-                    } else if (window.jQuery && $.fn.select2) {
-                        var $p = $('#pathologyOpt'), $r = $('#radiologyOpt');
-                        if ($p.length && $p[0].options.length > 0) {
-                            try { if ($p.hasClass('select2-hidden-accessible')) $p.select2('destroy'); $p.select2({ placeholder: 'Select Tests', allowClear: true, width: '100%', dropdownParent: $('#addPrescriptionModal'), multiple: true, closeOnSelect: false }); } catch(e) {}
+                // Re-init Select2 on pathology/radiology when modal is visible (multiple delays to catch async data)
+                [300, 800, 1500].forEach(function(delay) {
+                    setTimeout(function() {
+                        if (typeof window.initPathologyRadiologySelect2 === 'function') {
+                            window.initPathologyRadiologySelect2();
+                        } else if (window.jQuery && $.fn.select2) {
+                            var $p = $('#pathologyOpt'), $r = $('#radiologyOpt');
+                            if ($p.length && $p[0].options.length > 0) {
+                                try { if ($p.data('select2')) $p.select2('destroy'); $p.select2({ placeholder: 'Select Tests', allowClear: true, width: '100%', dropdownParent: $('body'), dropdownCssClass: 'pathology-radiology-dropdown', minimumResultsForSearch: 0, multiple: true, closeOnSelect: false }); } catch(e) {}
+                            }
+                            if ($r.length && $r[0].options.length > 0) {
+                                try { if ($r.data('select2')) $r.select2('destroy'); $r.select2({ placeholder: 'Select Tests', allowClear: true, width: '100%', dropdownParent: $('body'), dropdownCssClass: 'pathology-radiology-dropdown', minimumResultsForSearch: 0, multiple: true, closeOnSelect: false }); } catch(e) {}
+                            }
                         }
-                        if ($r.length && $r[0].options.length > 0) {
-                            try { if ($r.hasClass('select2-hidden-accessible')) $r.select2('destroy'); $r.select2({ placeholder: 'Select Tests', allowClear: true, width: '100%', dropdownParent: $('#addPrescriptionModal'), multiple: true, closeOnSelect: false }); } catch(e) {}
-                        }
-                    }
-                }, 300);
+                    }, delay);
+                });
             });
             
             // Also listen for manual modal show (when modal becomes visible)
@@ -4788,10 +4105,10 @@
         const findingTypeEl = document.getElementById('finding_type');
         const multiselect2Elements = document.querySelectorAll('.multiselect2');
         
-        // Process finding_type if it exists
+        // Process finding_type if it exists - only destroy when Select2 was actually initialized (data('select2'))
         if (findingTypeEl && window.jQuery) {
             const $findingType = $(findingTypeEl);
-            if ($findingType.length && ($findingType.hasClass('select2-hidden-accessible') || $findingType.data('select2'))) {
+            if ($findingType.length && $findingType.data('select2')) {
                 try {
                     $findingType.select2('destroy');
                 } catch(e) {
@@ -4800,11 +4117,11 @@
             }
         }
         
-        // Process multiselect2 elements if they exist
+        // Process multiselect2 elements - only destroy when Select2 was actually initialized
         if (multiselect2Elements.length && window.jQuery) {
             multiselect2Elements.forEach(function(el) {
                 const $el = $(el);
-                if ($el.length && ($el.hasClass('select2-hidden-accessible') || $el.data('select2'))) {
+                if ($el.length && $el.data('select2')) {
                     try {
                         $el.select2('destroy');
                     } catch(e) {

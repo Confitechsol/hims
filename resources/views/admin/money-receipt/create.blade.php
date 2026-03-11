@@ -50,7 +50,7 @@
                                     <select name="receipt_type" class="form-select" required>
                                         <option value="">-- Select --</option>
                                         @foreach($receiptTypes as $type)
-                                            <option value="{{ $type }}" {{ old('receipt_type') == $type ? 'selected' : '' }}>
+                                            <option value="{{ $type }}" {{ old('receipt_type', 'Current') == $type ? 'selected' : '' }}>
                                                 {{ $type }}
                                             </option>
                                         @endforeach

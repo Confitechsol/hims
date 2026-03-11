@@ -104,7 +104,7 @@
                                                                             <option value="">Select</option>
                                                                         </select>
                                                                     </div>
-                                                                    <div class="col-md-6">
+                                                                    <!-- <div class="col-md-6">
                                                                         <label for="" class="form-label">Tax
                                                                             Category</label>
                                                                         <select name="tax_category" id="tax_category"
@@ -129,7 +129,7 @@
                                                                                 disabled>
                                                                             <span class="input-group-addon "> %</span>
                                                                         </div>
-                                                                    </div>
+                                                                    </div> -->
                                                                     <div class="col-md-12">
                                                                         <label for="" class="form-label">Standard
                                                                             Charge
@@ -377,7 +377,7 @@
                                             <option value="">Select</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-6">
+                                    <!-- <div class="col-md-6">
                                         <label for="" class="form-label">Tax
                                             Category </label>
                                         <select name="tax_category" id="tax_category" class="form-select"
@@ -398,7 +398,7 @@
                                                 id="edit_tax_percentage" disabled>
                                             <span class="input-group-addon "> %</span>
                                         </div>
-                                    </div>
+                                    </div> -->
                                     <div class="col-md-12">
                                         <label for="" class="form-label">Standard Charge
                                             (INR) <span class="text-danger">*</span></label>

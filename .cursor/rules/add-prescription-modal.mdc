@@ -1,0 +1,28 @@
+---
+description: Keep IPD Add Prescription modal working; avoid duplicate IDs and script breakage
+globs: resources/views/**/add-prescription*.blade.php, resources/views/**/ipd_view.blade.php, resources/views/components/modals/*.blade.php
+alwaysApply: false
+---
+
+# Add Prescription Modal (IPD) – Must Always Show Correctly
+
+## Unique ID rule (critical)
+
+- **Only one element in the entire app** may have `id="addPrescriptionModal"`: the **root div** of the IPD Add Prescription modal in `resources/views/components/modals/add-prescription-modal.blade.php`.
+- **Never** use `id="addPrescriptionModal"` on any other modal, or on an `<h5>`/title inside another modal. Duplicate IDs cause `document.getElementById('addPrescriptionModal')` and Bootstrap to target the wrong node (e.g. a title), so the backdrop shows but the prescription modal does not.
+- Other modals must use their own IDs for both the modal div and the title, e.g. `id="addRadioLabModal"` and `id="addRadioLabModalLabel"` for the rad-lab report modal; OPD prescription modal uses the same file but different context—ensure its **title** uses `id="addPrescriptionModalLabel"` (not `id="addPrescriptionModal"`).
+
+## IPD Add Prescription modal structure (reference)
+
+- **Modal root:** `<div class="modal fade" id="addPrescriptionModal" ...>`
+- **Title (for aria-labelledby):** `<h5 class="modal-title" id="addPrescriptionModalLabel">`
+
+## Scripts and Blade in modals
+
+- Avoid `@json()` or Blade that can output raw `else`/`}` inside `<script>`; use data attributes + `JSON.parse()` or ensure output is valid JavaScript.
+- The opener is defined in `ipd_view.blade.php` Script Block 1 as `window.showIpdPrescriptionModal(btn)` and is also triggered by the Add Prescription button’s inline `onclick` so the modal opens even if later scripts fail.
+
+## When adding or editing modals
+
+- Before adding a new modal, search the repo for `id="addPrescriptionModal"` and ensure it appears only in the IPD add-prescription modal root div.
+- When copying modal markup from the prescription modal to another modal, change both the modal container `id` and the title `id` to unique values (e.g. `addFooModal`, `addFooModalLabel`).

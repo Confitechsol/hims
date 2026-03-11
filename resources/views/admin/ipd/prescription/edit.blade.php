@@ -107,7 +107,10 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Date</label>
-                                <input type="date" name="date" class="form-control" value="{{ $prescription->date->format('Y-m-d') }}">
+                                <input type="date" name="date" id="prescription_date" class="form-control" value="{{ $prescription->date->format('Y-m-d') }}"
+                                    data-original-date="{{ $prescription->date->format('Y-m-d') }}"
+                                    @if(isset($admissionDate) && $admissionDate) min="{{ $admissionDate }}" @endif
+                                    max="{{ date('Y-m-d') }}" required>
                             </div>
                         </div>
 
@@ -548,15 +551,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
             
-            // Build FormData
-            const formData = new FormData(form);
+            // Build FormData (use 'this' = form element that was submitted)
+            const submittedForm = this;
+            const formData = new FormData(submittedForm);
+            
+            // Ensure prescription date is always sent (for back-dated prescriptions)
+            const dateInput = submittedForm.querySelector('#prescription_date') || submittedForm.querySelector('input[name="date"]');
+            const dateToSend = dateInput && dateInput.value
+                ? dateInput.value.trim()
+                : (dateInput && dateInput.getAttribute('data-original-date')) || new Date().toISOString().split('T')[0];
+            formData.set('date', dateToSend);
             
             // Debug: Log form data
-            console.log('🔴 Form submitting with - Prescribe By:', formData.get('prescribe_by'));
+            console.log('🔴 Form submitting with - Date:', dateToSend, 'Prescribe By:', formData.get('prescribe_by'));
             
             // Submit via fetch
-            fetch(form.action, {
-                method: form.method || 'POST',
+            fetch(submittedForm.action, {
+                method: submittedForm.method || 'POST',
                 body: formData,
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',

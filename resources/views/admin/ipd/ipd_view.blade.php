@@ -1,7 +1,8 @@
 {{-- resources/views/settings.blade.php --}}
 @extends('layouts.adminLayout')
 @section('content')
-
+    {{-- Hidden element for back-dated prescription: admission date used when Add Prescription modal opens --}}
+    <div id="ipdViewContext" data-admission-date="{{ $ipd->date ? \Carbon\Carbon::parse($ipd->date)->format('Y-m-d') : '' }}" data-ipd-id="{{ $ipd->id ?? '' }}" style="display:none"></div>
     <style>
         .module_billing {
             border-radius: 8px;
@@ -505,20 +506,20 @@
     <div class="p-4">
         @if (session('success'))
             <script>
-                Swal.fire({
-                    icon: 'success',
-                    title: "{{ session('alertTitle') ?? 'Success' }}",
-                    text: "{{ session('success') }}",
-                });
+                (function(){
+                    var title = @json(session('alertTitle') ?? 'Success');
+                    var text = @json(session('success'));
+                    if (typeof Swal !== 'undefined') Swal.fire({ icon: 'success', title: title, text: text });
+                })();
             </script>
         @endif
         @if (session('error'))
             <script>
-                Swal.fire({
-                    icon: 'error',
-                    title: "{{ session('alertTitle') ?? 'Error' }}",
-                    text: "{{ session('error') }}",
-                });
+                (function(){
+                    var title = @json(session('alertTitle') ?? 'Error');
+                    var text = @json(session('error'));
+                    if (typeof Swal !== 'undefined') Swal.fire({ icon: 'error', title: title, text: text });
+                })();
             </script>
         @endif
         <!-- tab start -->
@@ -805,6 +806,37 @@
                                             @endforeach
                                         </ul>
                                         </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Finance Section --}}
+                        <div class="card shadow-sm border-0 mt-2">
+                            <div class="card-header"
+                                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-wallet me-2"></i> Finance
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="border rounded p-3 bg-light">
+                                            <div class="text-muted small mb-1">Total Billing (INR)</div>
+                                            <div class="fw-bold fs-5">{{ number_format($billingSummary['total_charges'] ?? 0, 2) }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="border rounded p-3 bg-light">
+                                            <div class="text-muted small mb-1">Total Payment (INR)</div>
+                                            <div class="fw-bold fs-5 text-success">{{ number_format($billingSummary['total_payments'] ?? 0, 2) }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="border rounded p-3 bg-light">
+                                            <div class="text-muted small mb-1">Total Outstanding (INR)</div>
+                                            <div class="fw-bold fs-5 {{ ($billingSummary['outstanding'] ?? 0) > 0 ? 'text-danger' : '' }}">{{ number_format($billingSummary['outstanding'] ?? 0, 2) }}</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1167,11 +1199,7 @@
                                             @foreach ($labInvestigations as $lab)
                                                 <tr>
                                                     <td>
-                                                        {{ $lab->pathology->test_name .
-                                                            "
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    (" .
-                                                            $lab->pathology->short_name .
-                                                            ')' }}
+                                                        {{ $lab->pathology->test_name . ($lab->pathology->short_name ? ' (' . $lab->pathology->short_name . ')' : '') }}
                                                     </td>
                                                     <td>Pathology</td>
                                                     <td>{{ '--' }}</td>
@@ -1209,11 +1237,7 @@
                                             @foreach ($radiologyReports as $lab)
                                                 <tr>
                                                     <td>
-                                                        {{ $lab->radiology->test_name .
-                                                            "
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    (" .
-                                                            $lab->radiology->short_name .
-                                                            ')' }}
+                                                        {{ $lab->radiology->test_name . ($lab->radiology->short_name ? ' (' . $lab->radiology->short_name . ')' : '') }}
                                                     </td>
                                                     <td>Radiology</td>
                                                     <td>{{ '--' }}</td>
@@ -2380,11 +2404,7 @@
                                                             @foreach ($labInvestigations as $lab)
                                                                 <tr>
                                                                     <td>
-                                                                        {{ $lab->pathology->test_name .
-                                                                            "
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                (" .
-                                                                            $lab->pathology->short_name .
-                                                                            ')' }}
+                                                                        {{ $lab->pathology->test_name . ($lab->pathology->short_name ? ' (' . $lab->pathology->short_name . ')' : '') }}
                                                                     </td>
                                                                     <td>Pathology</td>
                                                                     <td>{{ '--' }}</td>
@@ -2482,11 +2502,7 @@
                                                             @foreach ($radiologyReports as $lab)
                                                                 <tr>
                                                                     <td>
-                                                                        {{ $lab->radiology->test_name .
-                                                                            "
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                (" .
-                                                                            $lab->radiology->short_name .
-                                                                            ')' }}
+                                                                        {{ $lab->radiology->test_name . ($lab->radiology->short_name ? ' (' . $lab->radiology->short_name . ')' : '') }}
                                                                     </td>
                                                                     <td>Radiology</td>
                                                                     <td>{{ '--' }}</td>
@@ -4163,11 +4179,13 @@
                                                                     id="addPrescriptionBtn_{{ $ipd->id }}"
                                                                     data-bs-toggle="modal"
                                                                     data-bs-target="#addPrescriptionModal"
-                                                                    data-ipd-id="{{ $ipd->id }}"><i
+                                                                    data-ipd-id="{{ $ipd->id }}"
+                                                                    data-admission-date="{{ $ipd->date ? \Carbon\Carbon::parse($ipd->date)->format('Y-m-d') : date('Y-m-d') }}"
+                                                                    onclick="if(window.showIpdPrescriptionModal){ event.preventDefault(); event.stopPropagation(); window.showIpdPrescriptionModal(this); }"><i
                                                                         class="ti ti-plus me-1"></i>Add Prescription</a>
                                                             </div>
                                                         @endif
-                                                       @include('components.modals.add-prescription-modal')
+                                                        <!-- add-prescription-modal moved to page level (outside tab-pane) so it displays correctly -->
                                                         <!-- First Modal -->
                                                         <div class="modal fade" id="add_timeline" tabindex="-1"
                                                             aria-hidden="true">
@@ -4350,7 +4368,8 @@
                                                                 <th>Bed</th>
                                                                 <th>From Date</th>
                                                                 <th>To Date</th>
-                                                                <th>Active Bed</th>
+                                                                <th>Active</th>
+                                                                <th>Action</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -4360,13 +4379,30 @@
                                                                         <h6 class="fs-14 mb-1">
                                                                             {{ $history->bedGroup->name ?? '-' }}</h6>
                                                                     </td>
-                                                                    <td>{{ $history->bed->name }}</td>
+                                                                    <td>{{ $history->bed->name ?? '-' }}</td>
                                                                     <td>{{ \Carbon\Carbon::parse($history->from_date)->format('d/m/Y h:i A') }}
                                                                     </td>
                                                                     <td>{{ $history->to_date ? \Carbon\Carbon::parse($history->to_date)->format('d/m/Y h:i A') : '--' }}
                                                                     </td>
-                                                                    <td>{{ $history->bed->is_active }}</td>
-
+                                                                    <td>{{ $history->is_active === 'yes' ? 'Yes' : 'No' }}</td>
+                                                                    <td>
+                                                                        @php
+                                                                            $daywiseCharge = \App\Models\IpdDaywiseBedCharge::where('ipd_id', $ipd->id)->whereDate('charge_date', \Carbon\Carbon::parse($history->from_date)->format('Y-m-d'))->where('bed_group_id', $history->bed_group_id)->first();
+                                                                            $existingCharge = $daywiseCharge && $daywiseCharge->bed_charge ? $daywiseCharge->bed_charge : ($history->bedGroup->bed_cost ?? '');
+                                                                        @endphp
+                                                                        <button type="button" class="btn btn-sm btn-soft-warning edit-bed-history-btn"
+                                                                            data-history-id="{{ $history->id }}"
+                                                                            data-ipd-id="{{ $ipd->id }}"
+                                                                            data-bed-group-id="{{ $history->bed_group_id }}"
+                                                                            data-bed-id="{{ $history->bed_id }}"
+                                                                            data-from-date="{{ $history->from_date ? \Carbon\Carbon::parse($history->from_date)->format('Y-m-d\TH:i') : '' }}"
+                                                                            data-to-date="{{ $history->to_date ? \Carbon\Carbon::parse($history->to_date)->format('Y-m-d\TH:i') : '' }}"
+                                                                            data-bed-charge="{{ $existingCharge }}"
+                                                                            data-is-active="{{ $history->is_active }}"
+                                                                            title="Edit">
+                                                                            <i class="ti ti-edit"></i>
+                                                                        </button>
+                                                                    </td>
                                                                 </tr>
                                                             @endforeach
 
@@ -4377,13 +4413,63 @@
                                             </div>
                                         </div>
                                     </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="tab-pane" id="bed_issue">
+                            {{-- Edit Bed History Modal --}}
+                            <div class="modal fade" id="editBedHistoryModal" tabindex="-1" aria-labelledby="editBedHistoryModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%);">
+                                            <h5 class="modal-title text-white" id="editBedHistoryModalLabel"><i class="ti ti-edit me-2"></i>Edit Bed History</h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <form id="editBedHistoryForm" method="POST" action="{{ route('ipd.bedHistory.update') }}">
+                                            @csrf
+                                            <input type="hidden" name="bed_history_id" id="edit_bed_history_id">
+                                            <input type="hidden" name="ipd_id" id="edit_ipd_id" value="{{ $ipd->id }}">
+                                            <div class="modal-body">
+                                                <div id="editBedHistoryError" class="alert alert-danger d-none"></div>
+                                                <div class="row gy-3">
+                                                    <div class="col-md-6">
+                                                        <label for="edit_bed_group" class="form-label">Bed Group <span class="text-danger">*</span></label>
+                                                        <select name="bed_group" id="edit_bed_group" class="form-select" required>
+                                                            <option value="">Select Bed Group</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label for="edit_bed" class="form-label">Bed <span class="text-danger">*</span></label>
+                                                        <select name="bed" id="edit_bed" class="form-select" required>
+                                                            <option value="">Select Bed</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label for="edit_from_date" class="form-label">From Date <span class="text-danger">*</span></label>
+                                                        <input type="datetime-local" name="from_date" id="edit_from_date" class="form-control" required>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label for="edit_to_date" class="form-label">To Date <span class="text-muted">(leave empty for active)</span></label>
+                                                        <input type="datetime-local" name="to_date" id="edit_to_date" class="form-control">
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <label for="edit_bed_charge" class="form-label">Bed Charge (INR)</label>
+                                                        <input type="number" name="bed_charge" id="edit_bed_charge" class="form-control" step="0.01" min="0" placeholder="0.00">
+                                                        <small class="text-muted">Auto-filled from bed group (editable)</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-primary">Update</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="bed_issue">
                 <!-- row start -->
                 <div class="row">
                     <div class="col-12 d-flex">
@@ -4678,7 +4764,8 @@
     <!-- tab content end -->
     </div>
 
-    {{-- modal ends --}}
+    {{-- Modals: placed at page level (outside tab-panes) so they display correctly --}}
+    @include('components.modals.add-prescription-modal')
     @include('components.modals.discharge-modal')
     @include('components.modals.discharge-details-modal')
     
@@ -4703,6 +4790,56 @@
     }, true);
     
     console.log('🔵 IPD View Script Block 1 Loaded');
+    
+    // --- Prescription modal: global opener (used by inline onclick so modal opens even if other scripts fail) ---
+    window.showIpdPrescriptionModal = function(btn) {
+        var m = document.getElementById('addPrescriptionModal');
+        if (!m) { console.error('addPrescriptionModal not found'); return; }
+        if (m.parentNode !== document.body) document.body.appendChild(m);
+        if (btn) {
+            var ipdId = btn.getAttribute('data-ipd-id');
+            if (ipdId) {
+                var f = document.getElementById('ipd_id');
+                if (f) f.value = ipdId;
+                var ad = btn.getAttribute('data-admission-date');
+                var dateEl = document.getElementById('prescription_date');
+                if (dateEl) {
+                    dateEl.max = new Date().toISOString().split('T')[0];
+                    dateEl.value = ad || dateEl.max;
+                    if (ad) dateEl.setAttribute('min', ad);
+                }
+            }
+        }
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            bootstrap.Modal.getOrCreateInstance(m).show();
+        } else {
+            m.classList.remove('fade');
+            m.classList.add('show');
+            m.style.display = 'block';
+            m.style.visibility = 'visible';
+            m.style.opacity = '1';
+            m.style.zIndex = '1055';
+            m.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('modal-open');
+            var back = document.querySelector('.modal-backdrop');
+            if (!back) {
+                back = document.createElement('div');
+                back.className = 'modal-backdrop fade show';
+                back.style.zIndex = '1050';
+                document.body.insertBefore(back, m);
+            }
+            back.classList.add('show');
+        }
+    };
+    (function prescriptionModalFallback() {
+        function run() {
+            var modal = document.getElementById('addPrescriptionModal');
+            if (!modal) return;
+            if (modal.parentNode !== document.body) document.body.appendChild(modal);
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+        else run();
+    })();
     
     // Direct function to open prescription modal - bypasses Bootstrap issues
     // Define function to fetch pathology/radiology data DIRECTLY (not dependent on modal)
@@ -4817,46 +4954,39 @@
         };
     }
     
-    // Initialize Select2 on pathology and radiology with multiselect + filter (called after data is populated and modal is visible)
     window.initPathologyRadiologySelect2 = function() {
         if (typeof window.jQuery === 'undefined' || !window.jQuery.fn.select2) return;
         var $ = window.jQuery;
         var pathEl = document.getElementById('pathologyOpt');
         var radEl = document.getElementById('radiologyOpt');
         if (!pathEl && !radEl) return;
+        var opts = {
+            placeholder: 'Select Tests',
+            allowClear: true,
+            width: '100%',
+            dropdownParent: $('body'),
+            dropdownCssClass: 'pathology-radiology-dropdown',
+            minimumResultsForSearch: 0,
+            multiple: true,
+            closeOnSelect: false,
+            language: { inputTooShort: function() { return ''; }, searching: function() { return ''; } }
+        };
+        function initOne(el) {
+            if (!el || el.options.length === 0) return;
+            try {
+                if ($(el).data('select2')) { try { $(el).select2('destroy'); } catch(d) {} }
+                $(el).select2(opts);
+            } catch (e) { console.debug('Select2 init:', e); }
+        }
         function doInit() {
             var modal = document.getElementById('addPrescriptionModal');
-            if (!modal || !modal.classList.contains('show')) return;
-            if (pathEl && pathEl.options.length > 0) {
-                try {
-                    if ($(pathEl).hasClass('select2-hidden-accessible')) $(pathEl).select2('destroy');
-                    $(pathEl).select2({
-                        placeholder: 'Select Tests',
-                        allowClear: true,
-                        width: '100%',
-                        dropdownParent: $('#addPrescriptionModal'),
-                        multiple: true,
-                        closeOnSelect: false
-                    });
-                } catch (e) { console.debug('Pathology Select2 init:', e); }
-            }
-            if (radEl && radEl.options.length > 0) {
-                try {
-                    if ($(radEl).hasClass('select2-hidden-accessible')) $(radEl).select2('destroy');
-                    $(radEl).select2({
-                        placeholder: 'Select Tests',
-                        allowClear: true,
-                        width: '100%',
-                        dropdownParent: $('#addPrescriptionModal'),
-                        multiple: true,
-                        closeOnSelect: false
-                    });
-                } catch (e) { console.debug('Radiology Select2 init:', e); }
-            }
+            if (!modal) return;
+            initOne(pathEl);
+            initOne(radEl);
         }
-        setTimeout(doInit, 150);
-        setTimeout(doInit, 500);
-        setTimeout(doInit, 1000);
+        setTimeout(doInit, 100);
+        setTimeout(doInit, 400);
+        setTimeout(doInit, 800);
     };
     
     // Ensure function is available
@@ -5091,6 +5221,23 @@
             console.log('IPD ID set to:', ipdId);
         }
         
+        // Set prescription date for back-dated support
+        const btn = document.querySelector('[data-bs-target="#addPrescriptionModal"][data-ipd-id="' + ipdId + '"]');
+        const prescriptionDateEl = document.getElementById('prescription_date');
+        const today = new Date().toISOString().split('T')[0];
+        if (prescriptionDateEl) {
+            prescriptionDateEl.max = today;
+            const admissionDate = btn ? btn.getAttribute('data-admission-date') : null;
+            if (admissionDate) {
+                prescriptionDateEl.value = admissionDate;
+                prescriptionDateEl.min = admissionDate;
+                console.log('Prescription date set to admission date:', admissionDate);
+            } else {
+                prescriptionDateEl.value = today;
+                prescriptionDateEl.removeAttribute('min');
+            }
+        }
+        
         // IMMEDIATELY fetch data - don't wait for modal
         if (typeof window.fetchPathologyRadiologyData === 'function') {
             window.fetchPathologyRadiologyData();
@@ -5121,8 +5268,11 @@
                 console.log('Calling modalInstance.show()...');
                 modalInstance.show();
                 console.log('✅ Bootstrap modal.show() called');
+                // CRITICAL: Return here - do NOT fall through to manual fallback. Bootstrap manages show/hide/backdrop.
+                // Manual fallback only runs when Bootstrap is unavailable (see below).
+                return true;
                 
-                // Verify modal is showing after a short delay
+                // Verify modal is showing after a short delay (kept for reference, Bootstrap handles it)
                 setTimeout(() => {
                     // Check visibility - aria-hidden must be explicitly 'false' (not null)
                     const ariaHidden = modalEl.getAttribute('aria-hidden');
@@ -5242,20 +5392,10 @@
         document.body.style.paddingRight = '0px';
         document.body.style.overflow = 'hidden';
         
-        // Create backdrop FIRST (before modal z-index)
-        let backdrop = document.querySelector('.modal-backdrop');
-        if (!backdrop) {
-            backdrop = document.createElement('div');
-            backdrop.className = 'modal-backdrop fade show';
-            backdrop.id = 'manualModalBackdrop';
-            backdrop.setAttribute('aria-hidden', 'true');
-            backdrop.style.cssText = 'position: fixed !important; top: 0 !important; left: 0 !important; z-index: 1040 !important; width: 100vw !important; height: 100vh !important; background-color: rgba(0, 0, 0, 0.5) !important;';
-            document.body.appendChild(backdrop);
-            console.log('✅ Backdrop created with z-index 1040');
-        } else {
-            backdrop.style.cssText = 'position: fixed !important; top: 0 !important; left: 0 !important; z-index: 1040 !important; width: 100vw !important; height: 100vh !important; background-color: rgba(0, 0, 0, 0.5) !important;';
-            backdrop.classList.add('show');
-            console.log('✅ Existing backdrop updated');
+        // Use Bootstrap's backdrop if present; do NOT create our own (causes lingering overlay on close)
+        const existingBackdrop = document.querySelector('.modal-backdrop');
+        if (existingBackdrop) {
+            existingBackdrop.classList.add('show');
         }
         
         // Trigger shown event manually
@@ -5320,277 +5460,55 @@
     document.addEventListener('DOMContentLoaded', function() {
         console.log('🔵 DOMContentLoaded fired for IPD view');
         
-        // Find all prescription buttons
-        const prescriptionButtons = document.querySelectorAll('[data-bs-target="#addPrescriptionModal"][data-ipd-id]');
-        console.log('Found prescription buttons:', prescriptionButtons.length);
-        
-        if (prescriptionButtons.length === 0) {
-            console.warn('⚠️ No prescription buttons found!');
+        const addPrescriptionModal = document.getElementById('addPrescriptionModal');
+        if (addPrescriptionModal && addPrescriptionModal.parentNode !== document.body) {
+            document.body.appendChild(addPrescriptionModal);
+        }
+        if (addPrescriptionModal) {
+            addPrescriptionModal.addEventListener('show.bs.modal', function() {
+                document.body.appendChild(addPrescriptionModal);
+                addPrescriptionModal.classList.add('show');
+                addPrescriptionModal.style.display = 'block';
+                addPrescriptionModal.style.visibility = 'visible';
+                addPrescriptionModal.setAttribute('aria-hidden', 'false');
+            });
+            addPrescriptionModal.addEventListener('shown.bs.modal', function() {
+                addPrescriptionModal.classList.add('show');
+                addPrescriptionModal.style.display = 'block';
+                addPrescriptionModal.style.visibility = 'visible';
+                function doInit() {
+                    if (typeof window.initPathologyRadiologySelect2 === 'function') window.initPathologyRadiologySelect2();
+                    if (typeof window.loadPathologyRadiologyData === 'function') window.loadPathologyRadiologyData();
+                }
+                doInit();
+                [200, 500, 1000, 1500, 2500, 3500].forEach(function(d) { setTimeout(doInit, d); });
+            });
         }
         
+        const prescriptionButtons = document.querySelectorAll('[data-bs-target="#addPrescriptionModal"][data-ipd-id]');
         prescriptionButtons.forEach(function(btn) {
-            // Use capture phase to intercept BEFORE Bootstrap
             btn.addEventListener('click', function(e) {
-                console.log('🔴 CLICK EVENT FIRED on button');
+                e.preventDefault();
+                e.stopPropagation();
                 const ipdId = this.getAttribute('data-ipd-id');
-                console.log('🔴 Prescription button clicked, IPD ID:', ipdId);
-                
-                // Don't prevent default - let Bootstrap handle it, but also do our stuff
-                
+                const modalEl = document.getElementById('addPrescriptionModal');
+                if (!modalEl) return;
+                document.body.appendChild(modalEl);
                 if (ipdId) {
-                    // Set IPD ID immediately
                     const ipdIdField = document.getElementById('ipd_id');
-                    if (ipdIdField) {
-                        ipdIdField.value = ipdId;
-                        console.log('✅ IPD ID set to:', ipdId);
-                    } else {
-                        console.error('❌ ipd_id field not found');
+                    if (ipdIdField) ipdIdField.value = ipdId;
+                    const admissionDate = this.getAttribute('data-admission-date');
+                    const prescriptionDateEl = document.getElementById('prescription_date');
+                    if (prescriptionDateEl) {
+                        prescriptionDateEl.max = new Date().toISOString().split('T')[0];
+                        if (admissionDate) { prescriptionDateEl.value = admissionDate; prescriptionDateEl.min = admissionDate; }
+                        else { prescriptionDateEl.removeAttribute('min'); if (!prescriptionDateEl.value) prescriptionDateEl.value = prescriptionDateEl.max; }
                     }
-                    
-                    // IMMEDIATELY trigger data fetch - don't wait for modal to open
-                    console.log('🔴 Immediately calling fetchPathologyRadiologyData...');
-                    if (typeof window.fetchPathologyRadiologyData === 'function') {
-                        window.fetchPathologyRadiologyData();
-                    }
-                    console.log('🔴 Calling fetchMedicineDropdownData (categories, intervals, durations)...');
-                    if (typeof window.fetchMedicineDropdownData === 'function') {
-                        window.fetchMedicineDropdownData();
-                    } else {
-                        console.error('❌ fetchMedicineDropdownData NOT FOUND');
-                    }
-                    
-                    // Re-apply Select2 to pathology/radiology after modal is open and data may be loaded
-                    setTimeout(function() {
-                        if (typeof window.initPathologyRadiologySelect2 === 'function') {
-                            window.initPathologyRadiologySelect2();
-                        }
-                    }, 900);
-                    
-                    // Check if Bootstrap is available and modal element exists
-                    const modalEl = document.getElementById('addPrescriptionModal');
-                    console.log('Modal element found:', !!modalEl);
-                    console.log('Bootstrap available:', typeof bootstrap !== 'undefined');
-                    console.log('Bootstrap.Modal available:', typeof bootstrap !== 'undefined' && typeof bootstrap.Modal !== 'undefined');
-                    
-                    if (modalEl) {
-                        console.log('Modal current state:', {
-                            hasShowClass: modalEl.classList.contains('show'),
-                            display: modalEl.style.display,
-                            ariaHidden: modalEl.getAttribute('aria-hidden'),
-                            visibility: window.getComputedStyle(modalEl).visibility,
-                            opacity: window.getComputedStyle(modalEl).opacity,
-                            zIndex: window.getComputedStyle(modalEl).zIndex
-                        });
-                    }
-                    
-                    // Let Bootstrap handle the modal opening - DON'T prevent default
-                    // But also set up a fallback check
-                    setTimeout(() => {
-                        const modalEl = document.getElementById('addPrescriptionModal');
-                        if (modalEl) {
-                            const ariaHidden = modalEl.getAttribute('aria-hidden');
-                            const computedStyle = window.getComputedStyle(modalEl);
-                            const isVisible = modalEl.classList.contains('show') && 
-                                           (ariaHidden === 'false' || ariaHidden === null) &&
-                                           computedStyle.display !== 'none' &&
-                                           computedStyle.visibility !== 'hidden' &&
-                                           parseFloat(computedStyle.opacity) > 0;
-                            
-                            console.log('Modal visibility check after 200ms:', {
-                                isVisible: isVisible,
-                                hasShowClass: modalEl.classList.contains('show'),
-                                ariaHidden: ariaHidden,
-                                display: computedStyle.display,
-                                visibility: computedStyle.visibility,
-                                opacity: computedStyle.opacity,
-                                zIndex: computedStyle.zIndex
-                            });
-                            
-                            if (!isVisible) {
-                                console.warn('⚠️ Bootstrap modal not visible after 200ms, using fallback');
-                                openAddPrescriptionModal(ipdId);
-                            } else {
-                                console.log('✅ Modal is visible via Bootstrap');
-                                
-                                // CRITICAL: Even though Bootstrap says it's visible, ensure it's actually displayed
-                                // Set aria-hidden explicitly to 'false' (Bootstrap sometimes leaves it null)
-                                modalEl.setAttribute('aria-hidden', 'false');
-                                
-                                // Do NOT force other modals (e.g. addPathLabModal) to display - duplicate ID in add-pathlab-report was fixed so we now target the correct modal.
-                                // Check z-index and positioning
-                                const modalComputed = window.getComputedStyle(modalEl);
-                                const modalDialog = modalEl.querySelector('.modal-dialog');
-                                const dialogComputed = modalDialog ? window.getComputedStyle(modalDialog) : null;
-                                const backdrop = document.querySelector('.modal-backdrop');
-                                
-                                console.log('🔍 Modal detailed check:', {
-                                    modalZIndex: modalComputed.zIndex,
-                                    modalPosition: modalComputed.position,
-                                    modalTop: modalComputed.top,
-                                    modalLeft: modalComputed.left,
-                                    modalWidth: modalComputed.width,
-                                    modalHeight: modalComputed.height,
-                                    dialogZIndex: dialogComputed ? dialogComputed.zIndex : 'N/A',
-                                    dialogPosition: dialogComputed ? dialogComputed.position : 'N/A',
-                                    dialogMargin: dialogComputed ? dialogComputed.margin : 'N/A',
-                                    backdropExists: !!backdrop,
-                                    backdropZIndex: backdrop ? window.getComputedStyle(backdrop).zIndex : 'N/A',
-                                    bodyHasModalOpen: document.body.classList.contains('modal-open')
-                                });
-                                
-                                // Force proper z-index ALWAYS (Bootstrap might not set it correctly)
-                                console.log('🔧 Forcing modal z-index to 1055...');
-                                
-                                // CRITICAL: Set ALL positioning properties explicitly
-                                modalEl.style.cssText = `
-                                    display: block !important;
-                                    visibility: visible !important;
-                                    opacity: 1 !important;
-                                    position: fixed !important;
-                                    z-index: 1055 !important;
-                                    top: 0 !important;
-                                    left: 0 !important;
-                                    width: 100% !important;
-                                    height: 100% !important;
-                                    overflow-x: hidden !important;
-                                    overflow-y: auto !important;
-                                    padding: 0 !important;
-                                    margin: 0 !important;
-                                `;
-                                
-                                if (modalDialog) {
-                                    modalDialog.style.cssText = `
-                                        position: relative !important;
-                                        z-index: 1056 !important;
-                                        margin: 1.75rem auto !important;
-                                        max-width: 1140px !important;
-                                        width: 90% !important;
-                                    `;
-                                    console.log('✅ Modal dialog styled with full CSS');
-                                }
-                                
-                                // Also ensure modal-content is visible
-                                const modalContent = modalEl.querySelector('.modal-content');
-                                if (modalContent) {
-                                    modalContent.style.cssText = `
-                                        position: relative !important;
-                                        z-index: 1057 !important;
-                                        display: flex !important;
-                                        flex-direction: column !important;
-                                        width: 100% !important;
-                                        pointer-events: auto !important;
-                                        background-color: #fff !important;
-                                        border: 1px solid rgba(0,0,0,.2) !important;
-                                        border-radius: 0.3rem !important;
-                                    `;
-                                    console.log('✅ Modal content styled');
-                                }
-                                
-                                // Ensure backdrop exists and is below modal
-                                if (!backdrop) {
-                                    console.warn('⚠️ Backdrop missing, creating...');
-                                    const newBackdrop = document.createElement('div');
-                                    newBackdrop.className = 'modal-backdrop fade show';
-                                    newBackdrop.style.cssText = 'position: fixed !important; top: 0 !important; left: 0 !important; z-index: 1040 !important; width: 100vw !important; height: 100vh !important; background-color: rgba(0, 0, 0, 0.5) !important;';
-                                    document.body.appendChild(newBackdrop);
-                                    console.log('✅ Backdrop created');
-                                } else {
-                                    // Ensure backdrop z-index is below modal
-                                    const backdropZ = parseInt(window.getComputedStyle(backdrop).zIndex) || 1040;
-                                    if (backdropZ >= 1055) {
-                                        backdrop.style.zIndex = '1040';
-                                        console.log('✅ Backdrop z-index fixed to 1040');
-                                    }
-                                }
-                                
-                                // Ensure body has modal-open class
-                                if (!document.body.classList.contains('modal-open')) {
-                                    document.body.classList.add('modal-open');
-                                    console.log('✅ Added modal-open class to body');
-                                }
-                                
-                                // Final verification with detailed checks
-                                setTimeout(() => {
-                                    const finalCheck = window.getComputedStyle(modalEl);
-                                    const dialogCheck = modalDialog ? window.getComputedStyle(modalDialog) : null;
-                                    const contentCheck = modalContent ? window.getComputedStyle(modalContent) : null;
-                                    
-                                    // Check if modal is in viewport
-                                    const rect = modalEl.getBoundingClientRect();
-                                    const isInViewport = rect.top >= 0 && rect.left >= 0 && 
-                                                         rect.bottom <= window.innerHeight && 
-                                                         rect.right <= window.innerWidth;
-                                    
-                                    console.log('🔍 Final modal check:', {
-                                        display: finalCheck.display,
-                                        visibility: finalCheck.visibility,
-                                        opacity: finalCheck.opacity,
-                                        zIndex: finalCheck.zIndex,
-                                        position: finalCheck.position,
-                                        top: finalCheck.top,
-                                        left: finalCheck.left,
-                                        width: finalCheck.width,
-                                        height: finalCheck.height,
-                                        ariaHidden: modalEl.getAttribute('aria-hidden'),
-                                        dialogDisplay: dialogCheck ? dialogCheck.display : 'N/A',
-                                        dialogZIndex: dialogCheck ? dialogCheck.zIndex : 'N/A',
-                                        contentDisplay: contentCheck ? contentCheck.display : 'N/A',
-                                        boundingRect: {
-                                            top: rect.top,
-                                            left: rect.left,
-                                            width: rect.width,
-                                            height: rect.height
-                                        },
-                                        isInViewport: isInViewport,
-                                        windowSize: {
-                                            width: window.innerWidth,
-                                            height: window.innerHeight
-                                        }
-                                    });
-                                    
-                                    // Check parent containers for issues - only fix tab-panes etc., NEVER other modals (e.g. addPathLabModal)
-                                    let parent = modalEl.parentElement;
-                                    let parentLevel = 0;
-                                    while (parent && parentLevel < 5) {
-                                        const parentStyle = window.getComputedStyle(parent);
-                                        const isOtherModal = parent.classList.contains('modal') || parent.id === 'addPathLabModal';
-                                        if (!isOtherModal && (parentStyle.display === 'none' || parentStyle.visibility === 'hidden' || parentStyle.opacity === '0')) {
-                                            console.warn(`⚠️ Parent container issue at level ${parentLevel}:`, {
-                                                tag: parent.tagName,
-                                                id: parent.id,
-                                                class: parent.className,
-                                                display: parentStyle.display
-                                            });
-                                            parent.style.display = 'block';
-                                            parent.style.visibility = 'visible';
-                                            parent.style.opacity = '1';
-                                            console.log(`🔧 Fixed parent container ${parent.id || parent.className}`);
-                                        }
-                                        parent = parent.parentElement;
-                                        parentLevel++;
-                                    }
-                                    
-                                    // If still not visible, try manual fallback
-                                    if (finalCheck.display === 'none' || 
-                                        finalCheck.visibility === 'hidden' || 
-                                        parseFloat(finalCheck.opacity) === 0 ||
-                                        !isInViewport) {
-                                        console.error('❌ Modal still not visible after fixes, using manual fallback');
-                                        openAddPrescriptionModal(ipdId);
-                                    } else {
-                                        console.log('✅ Modal should be visible now - check browser viewport');
-                                    }
-                                }, 200);
-                                
-                                // Modal is open, ensure data is loaded
-                                if (typeof window.loadPathologyRadiologyData === 'function') {
-                                    window.loadPathologyRadiologyData();
-                                }
-                            }
-                        } else {
-                            console.error('❌ Modal element not found in timeout check');
-                        }
-                    }, 300);
+                }
+                if (typeof window.fetchPathologyRadiologyData === 'function') window.fetchPathologyRadiologyData();
+                if (typeof window.fetchMedicineDropdownData === 'function') window.fetchMedicineDropdownData();
+                if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                    bootstrap.Modal.getOrCreateInstance(modalEl).show();
                 }
             });
         });
@@ -5600,45 +5518,50 @@
     
     console.log('🔵 IPD View Script Block 2 Loaded');
     </script>
-    <!-- Chart JS -->
-    <script src="assets/plugins/chartjs/chart.min.js"></script>
-    <script src="assets/plugins/chartjs/chart-data.js"></script>
+    <!-- Chart JS (CDN fallback; chart.min.js may not exist in assets) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="{{ asset('assets/plugins/chartjs/chart-data.js') }}"></script>
     <script>
-        document.getElementById('payment_mode').addEventListener('change', function () {
-            const chequeFields = document.getElementById('chequeFields');
-
-            if (this.value === 'Cheque') {
-                chequeFields.style.display = 'flex';
-                chequeFields.querySelectorAll('input').forEach(el => el.required = true);
-            } else {
-                chequeFields.style.display = 'none';
-                chequeFields.querySelectorAll('input').forEach(el => {
-                    el.required = false;
-                    el.value = '';
-                });
-            }
-        });
+        (function() {
+            const paymentModeEl = document.getElementById('payment_mode');
+            if (!paymentModeEl) return;
+            paymentModeEl.addEventListener('change', function () {
+                const chequeFields = document.getElementById('chequeFields');
+                if (!chequeFields) return;
+                if (this.value === 'Cheque') {
+                    chequeFields.style.display = 'flex';
+                    chequeFields.querySelectorAll('input').forEach(el => el.required = true);
+                } else {
+                    chequeFields.style.display = 'none';
+                    chequeFields.querySelectorAll('input').forEach(el => {
+                        el.required = false;
+                        el.value = '';
+                    });
+                }
+            });
+        })();
     </script>
 
     <script>
         let operations = @json($operations); // All operations from DB
 
-        document.getElementById('operation_category').addEventListener('change', function() {
-
-            let catId = this.value;
-            let operationDropdown = document.getElementById('operation_type');
-
-            // Clear old options
-            operationDropdown.innerHTML = '<option value="">Select Operation</option>';
-
-            if (catId) {
-                operations.forEach(op => {
-                    if (op.category_id == catId) {
-                        operationDropdown.innerHTML += `<option value="${op.id}">${op.operation}</option>`;
-                    }
-                });
-            }
-        });
+        (function() {
+            const operationCategoryEl = document.getElementById('operation_category');
+            if (!operationCategoryEl) return;
+            operationCategoryEl.addEventListener('change', function() {
+                let catId = this.value;
+                let operationDropdown = document.getElementById('operation_type');
+                if (!operationDropdown) return;
+                operationDropdown.innerHTML = '<option value="">Select Operation</option>';
+                if (catId) {
+                    operations.forEach(op => {
+                        if (op.category_id == catId) {
+                            operationDropdown.innerHTML += `<option value="${op.id}">${op.operation}</option>`;
+                        }
+                    });
+                }
+            });
+        })();
     </script>
 
 
@@ -5658,36 +5581,33 @@
         let medicines = @json($medicinesByCategory);
         let dosages = @json($dosages); // grouped by medicine_id
 
-        let mediCatDropdown = document.getElementById('medi_cat');
-        let medDropdown = document.getElementById('med_name');
-        let doseDropdown = document.getElementById('dosage');
+        (function() {
+            let mediCatDropdown = document.getElementById('medi_cat');
+            let medDropdown = document.getElementById('med_name');
+            let doseDropdown = document.getElementById('dosage');
+            if (!mediCatDropdown || !medDropdown || !doseDropdown) return;
 
-        mediCatDropdown.addEventListener('change', function() {
-            let categoryId = this.value;
+            mediCatDropdown.addEventListener('change', function() {
+                let categoryId = this.value;
+                medDropdown.innerHTML = '<option value="">Select</option>';
+                doseDropdown.innerHTML = '<option value="">Select</option>';
+                if (categoryId && medicines[categoryId]) {
+                    medicines[categoryId].forEach(med => {
+                        medDropdown.innerHTML += `<option value="${med.id}">${med.medicine_name}</option>`;
+                    });
+                }
+            });
 
-            // Reset medicine dropdown
-            medDropdown.innerHTML = '<option value="">Select</option>';
-            doseDropdown.innerHTML = '<option value="">Select</option>';
-
-            if (categoryId && medicines[categoryId]) {
-                medicines[categoryId].forEach(med => {
-                    medDropdown.innerHTML += `<option value="${med.id}">${med.medicine_name}</option>`;
-                });
-            }
-        });
-
-        // When user selects medicine, load its dosage
-        medDropdown.addEventListener('change', function() {
-            let medId = this.value;
-
-            doseDropdown.innerHTML = '<option value="">Select</option>';
-
-            if (medId && dosages[medId]) {
-                dosages[medId].forEach(dose => {
-                    doseDropdown.innerHTML += `<option value="${dose.id}">${dose.dosage}</option>`;
-                });
-            }
-        });
+            medDropdown.addEventListener('change', function() {
+                let medId = this.value;
+                doseDropdown.innerHTML = '<option value="">Select</option>';
+                if (medId && dosages[medId]) {
+                    dosages[medId].forEach(dose => {
+                        doseDropdown.innerHTML += `<option value="${dose.id}">${dose.dosage}</option>`;
+                    });
+                }
+            });
+        })();
     </script>
 
 
@@ -6109,7 +6029,9 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             if (window.Chart) {
-                var ctx = document.getElementById('chartLine1').getContext('2d');
+                var chartEl = document.getElementById('chartLine1');
+                if (!chartEl) return;
+                var ctx = chartEl.getContext('2d');
                 var chartLine1 = new Chart(ctx, {
                     type: 'line',
                     data: {
@@ -6148,7 +6070,8 @@
         document.addEventListener("DOMContentLoaded", function() {
             const addBtn = document.getElementById("addBtn");
             const vitalFields = document.getElementById("vitalFields");
-            const nurseSelect = document.getElementById('nurse')
+            const nurseSelect = document.getElementById('nurse');
+            if (!nurseSelect) return;
             nurseSelect.innerHTML = '<option value="">Loading...</option>';
 
             fetch("{{ route('getNurses') }}")
@@ -6171,46 +6094,49 @@
                     nurseSelect.innerHTML = '<option value="">Error loading options</option>';
                 });
             // Attach remove event to existing remove buttons
-            vitalFields.querySelectorAll(".remove-btn").forEach(function(btn) {
+            if (vitalFields) vitalFields.querySelectorAll(".remove-btn").forEach(function(btn) {
                 btn.addEventListener("click", function() {
                     btn.closest(".vital-row").remove();
                 });
             });
 
-            addBtn.addEventListener("click", function() {
-                // Clone the first row
-                let firstRow = vitalFields.querySelector(".vital-row");
-                let newRow = firstRow.cloneNode(true);
+            if (addBtn && vitalFields) {
+                addBtn.addEventListener("click", function() {
+                    let firstRow = vitalFields.querySelector(".vital-row");
+                    if (!firstRow) return;
+                    let newRow = firstRow.cloneNode(true);
 
-                // Clear input values
-                newRow.querySelectorAll("input, select").forEach(el => el.value = "");
+                    newRow.querySelectorAll("input, select").forEach(el => el.value = "");
+                    let removeBtn = newRow.querySelector(".remove-btn");
+                    if (removeBtn) removeBtn.style.display = "inline-block";
 
-                // Show remove button
-                let removeBtn = newRow.querySelector(".remove-btn");
-                removeBtn.style.display = "inline-block";
+                    removeBtn && removeBtn.addEventListener("click", function() {
+                        newRow.remove();
+                    });
 
-                // Attach remove event to the new button
-                removeBtn.addEventListener("click", function() {
-                    newRow.remove();
+                    vitalFields.appendChild(newRow);
                 });
-
-                // Append new row
-                vitalFields.appendChild(newRow);
-            });
+            }
         });
     </script>
     <script>
         $(document).ready(function() {
 
             // Load bed groups on page load
-            $.get("{{ route('getBedGroups') }}", function(data) {
-                let options = '<option value="">Select Bed Group</option>';
-                data.forEach(function(group) {
-                    options +=
-                        `<option value="${group.id}">${group.name} - ${group.floor_detail?.name ?? '-'}</option>`;
+            $.get("{{ route('getBedGroups') }}")
+                .done(function(data) {
+                    var options = '<option value="">Select Bed Group</option>';
+                    if (Array.isArray(data)) {
+                        data.forEach(function(group) {
+                            var floorName = (group.floor_detail && group.floor_detail.name) ? group.floor_detail.name : '-';
+                            options += '<option value="' + (group.id || '') + '">' + (group.name || '') + ' - ' + floorName + '</option>';
+                        });
+                    }
+                    $('#bed_group').html(options);
+                })
+                .fail(function() {
+                    $('#bed_group').html('<option value="">Select Bed Group</option><option value="" disabled>Could not load bed groups</option>');
                 });
-                $('#bed_group').html(options);
-            });
 
             // Load available beds when bed group changes
             $('#bed_group').on('change', function() {
@@ -6245,6 +6171,87 @@
                 }
             });
 
+            // Edit Bed History modal - load groups and beds before showing
+            $(document).on('click', '.edit-bed-history-btn', function() {
+                var btn = $(this);
+                var bedId = btn.data('bed-id');
+                var groupId = btn.data('bed-group-id');
+                $('#edit_bed_history_id').val(btn.data('history-id'));
+                $('#edit_ipd_id').val(btn.data('ipd-id'));
+                $('#edit_from_date').val(btn.data('from-date'));
+                $('#edit_to_date').val(btn.data('to-date') || '');
+                $('#editBedHistoryError').addClass('d-none').text('');
+                $('#edit_bed_group').html('<option value="">Loading...</option>');
+                $('#edit_bed').html('<option value="">Loading...</option>');
+
+                function showModal() {
+                    new bootstrap.Modal(document.getElementById('editBedHistoryModal')).show();
+                }
+
+                if (!groupId) {
+                    $('#edit_bed_group').html('<option value="">Select Bed Group</option>');
+                    $('#edit_bed').html('<option value="">Select Bed</option>');
+                    showModal();
+                    return;
+                }
+
+                $.get("{{ route('getBedGroups') }}")
+                    .done(function(data) {
+                        var opts = '<option value="">Select Bed Group</option>';
+                        if (Array.isArray(data)) {
+                            data.forEach(function(g) {
+                                var fn = (g.floor_detail && g.floor_detail.name) ? g.floor_detail.name : '-';
+                                opts += '<option value="' + (g.id || '') + '">' + (g.name || '') + ' - ' + fn + '</option>';
+                            });
+                        }
+                        $('#edit_bed_group').html(opts).val(groupId);
+
+                    $.get("{{ route('get.available.beds') }}", { bed_group_id: groupId, include_bed_id: bedId }, function(beds) {
+                        var options = '<option value="">Select Bed</option>';
+                        beds.forEach(function(bed) {
+                            var sel = (bed.id == bedId) ? ' selected' : '';
+                            options += '<option value="' + bed.id + '"' + sel + '>' + bed.name + '</option>';
+                        });
+                        $('#edit_bed').html(options);
+                    });
+
+                    var existingCharge = btn.data('bed-charge');
+                    if (existingCharge !== undefined && existingCharge !== null && existingCharge !== '') {
+                        $('#edit_bed_charge').val(existingCharge);
+                    } else {
+                        $.get("{{ url('/getBedGroupCharge') }}/" + groupId, function(data) {
+                            $('#edit_bed_charge').val(data && data.bed_cost ? data.bed_cost : '');
+                        });
+                    }
+
+                    showModal();
+                    })
+                    .fail(function() {
+                        $('#edit_bed_group').html('<option value="">Select Bed Group</option>');
+                        showModal();
+                    });
+            });
+            $('#edit_bed_group').on('change', function() {
+                var groupId = $(this).val();
+                var curBedId = $('#edit_bed').val();
+                $('#edit_bed').html('<option value="">Loading...</option>');
+                if (groupId) {
+                    $.get("{{ url('/getBedGroupCharge') }}/" + groupId, function(data) {
+                        if (data && data.bed_cost) $('#edit_bed_charge').val(data.bed_cost);
+                        else $('#edit_bed_charge').val('');
+                    });
+                    $.get("{{ route('get.available.beds') }}", { bed_group_id: groupId, include_bed_id: curBedId }, function(data) {
+                        var options = '<option value="">Select Bed</option>';
+                        data.forEach(function(bed) {
+                            var sel = (bed.id == curBedId) ? ' selected' : '';
+                            options += '<option value="' + bed.id + '"' + sel + '>' + bed.name + '</option>';
+                        });
+                        $('#edit_bed').html(options);
+                    });
+                } else {
+                    $('#edit_bed').html('<option value="">Select Bed</option>');
+                }
+            });
         });
     </script>
     <script>
@@ -6291,28 +6298,40 @@
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const ipdId = "{{ $ipd->id }}";
+        const packagesUrl = "{{ route('ipd.packages', $ipd->id) }}";
         const packageSelectEl = document.getElementById('package_select');
         const applyPackageForm = document.getElementById('apply_package_form');
         const appliedPackagesList = document.getElementById('applied-packages-list');
+        const applyPackageModal = document.getElementById('apply_package_modal');
+        const packagesTabLink = document.querySelector('a[href="#packages"]');
 
-        // Load available packages on modal open
-        document.getElementById('apply_package_modal').addEventListener('shown.bs.modal', function() {
-            loadAvailablePackages();
-        });
+        if (applyPackageModal) {
+            applyPackageModal.addEventListener('shown.bs.modal', function() {
+                loadAvailablePackages();
+            });
+        }
 
-        // Load applied packages on tab activation
-        document.querySelector('a[href="#packages"]').addEventListener('shown.bs.tab', function() {
+        if (packagesTabLink) {
+            packagesTabLink.addEventListener('shown.bs.tab', function() {
+                loadAppliedPackages();
+            });
+        }
+
+        if (appliedPackagesList) {
             loadAppliedPackages();
-        });
-
-        // Load applied packages on page load
-        loadAppliedPackages();
+        }
 
         function loadAvailablePackages() {
             if (!packageSelectEl) return;
             
-            fetch(`/ipd/${ipdId}/packages`)
-                .then(response => response.json())
+            fetch(packagesUrl)
+                .then(response => {
+                    const ct = (response.headers.get('content-type') || '').toLowerCase();
+                    if (!ct.includes('application/json')) {
+                        return { success: false, available_packages: [] };
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success && data.available_packages) {
                         const currentOptions = packageSelectEl.value;
@@ -6333,15 +6352,23 @@
                         }
                     }
                 })
-                .catch(error => console.error('Error loading packages:', error));
+                .catch(error => { console.error('Error loading packages:', error); });
         }
 
         function loadAppliedPackages() {
             if (!appliedPackagesList) return;
             
-            fetch(`/ipd/${ipdId}/packages`)
-                .then(response => response.json())
+            fetch(packagesUrl)
+                .then(response => {
+                    const ct = (response.headers.get('content-type') || '').toLowerCase();
+                    if (!response.ok || !ct.includes('application/json')) {
+                        appliedPackagesList.innerHTML = '<div class="alert alert-warning"><i class="ti ti-alert-circle me-2"></i>Could not load packages. You can still add prescriptions.</div>';
+                        return null;
+                    }
+                    return response.json();
+                })
                 .then(data => {
+                    if (!data) return;
                     if (data.success && data.applied_packages) {
                         if (data.applied_packages.length === 0) {
                             appliedPackagesList.innerHTML = '<div class="alert alert-info"><i class="ti ti-info-circle me-2"></i>No packages applied yet.</div>';
@@ -6362,7 +6389,6 @@
                             html += '</tbody></table></div>';
                             appliedPackagesList.innerHTML = html;
                             
-                            // Attach remove event handlers
                             document.querySelectorAll('.remove-pkg-btn').forEach(btn => {
                                 btn.addEventListener('click', function() {
                                     if (confirm('Are you sure you want to remove this package?')) {
@@ -6373,7 +6399,7 @@
                         }
                     }
                 })
-                .catch(error => console.error('Error loading applied packages:', error));
+                .catch(error => { console.error('Error loading applied packages:', error); });
         }
 
         // Handle package selection change - show details
@@ -6406,7 +6432,7 @@
                     return;
                 }
                 
-                fetch(`/ipd/${ipdId}/apply-package`, {
+                fetch("{{ url('ipd/' . $ipd->id . '/apply-package') }}", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -6439,7 +6465,7 @@
         }
 
         function removePackage(ipdPackageId) {
-            fetch(`/ipd/${ipdId}/remove-package`, {
+            fetch("{{ url('ipd/' . $ipd->id . '/remove-package') }}", {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

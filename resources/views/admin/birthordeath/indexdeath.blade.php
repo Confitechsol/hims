@@ -740,7 +740,7 @@
             ['name' => 'doctor_name', 'label' => 'Doctors', 'type' => 'select', 'required' => true, 'options' => $doctors->pluck('name', 'name')->toArray(), 'size' => '5'],
             ['name' => 'death_date', 'label' => 'Death Date', 'type' => 'date', 'required' => true, 'size' => '6'],
 
-            ['name' => 'guardian_name', 'label' => 'Guardian Name ', 'type' => 'text', 'required' => true, 'size' => '12'],
+            {{-- ['name' => 'guardian_name', 'label' => 'Guardian Name ', 'type' => 'text', 'required' => true, 'size' => '12'], --}}
             ['name' => 'due_to_a', 'label' => 'Due to (a)', 'type' => 'text', 'required' => false, 'size' => '5'],
             ['name' => 'due_to_b', 'label' => 'Due to (b)', 'type' => 'text', 'required' => false, 'size' => '5'],
             ['name' => 'due_to_c', 'label' => 'Due to (c)', 'type' => 'text', 'required' => false, 'size' => '5'],
@@ -798,7 +798,7 @@
             ['name' => 'doctor_name', 'label' => 'Doctors', 'type' => 'select', 'required' => true, 'options' => $doctors->pluck('name', 'name')->toArray(), 'size' => '5'],
 
             ['name' => 'death_date', 'label' => 'Death Date', 'type' => 'date', 'required' => true, 'size' => '4'],
-            ['name' => 'guardian_name', 'label' => 'Guardian Name ', 'type' => 'text', 'required' => true, 'size' => '12'],
+            {{-- ['name' => 'guardian_name', 'label' => 'Guardian Name ', 'type' => 'text', 'required' => true, 'size' => '12'], --}}
             [
                 'name' => 'report',
                 'label' => 'Report',

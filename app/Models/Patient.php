@@ -64,6 +64,7 @@ class Patient extends Model
         'languages_speak',
         'newspaper_preference',
         'occupation',
+        'police_station',
     ];
 
     protected $casts = [
@@ -124,6 +125,11 @@ class Patient extends Model
     public function appointments()
     {
         return $this->hasMany(Appointment::class, 'patient_id');
+    }
+
+    public function areaName()
+    {
+        return $this->belongsTo(Area::class, 'area');
     }
 
 }

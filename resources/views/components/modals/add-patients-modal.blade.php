@@ -279,6 +279,18 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+
+
+                         {{-- police_station --}}
+                        <div class="col-md-6">
+                            <label for="police_station" class="form-label">Police Station</label>
+                            <input type="text" id="police_station" name="police_station"
+                                class="form-control @error('police_station') is-invalid @enderror"
+                                value="{{ old('police_station') }}" />
+                            @error('police_station')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
                         
                         
     

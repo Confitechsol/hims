@@ -101,7 +101,7 @@
                                     <td>{{ $receipt->final_bill_no ?? '-' }}</td>
                                     <td><strong>₹ {{ number_format($receipt->amount ?? 0, 2) }}</strong></td>
                                     <td>{{ $receipt->payment_mode ?? '-' }}</td>
-                                    <td>{{ $receipt->receiver->name ?? '-' }}</td>
+                                    <td>{{ $receipt->receiver->username ?? '-' }}</td>
                                     <td>
                                         <div class="d-flex gap-1">
                                             <a href="{{ route('money-receipt.show', $receipt->id) }}" 

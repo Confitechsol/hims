@@ -309,7 +309,7 @@
                     </div>
                     :
                     <div class="patient_data">
-                        .
+                        
                     </div>
                 </div>
                 <div class="patient_items">
@@ -318,9 +318,20 @@
                     </div>
                     :
                     <div class="patient_data">
-                        .
+                        {{ $IpdPatient->patient['occupation'] ?? '' }}
                     </div>
                 </div>
+
+                 <div class="patient_items">
+                        <div class="patient_head">
+                            GENDER
+                        </div>
+                        :
+                        <div class="patient_data">
+                            {{ $IpdPatient->patient['gender'] }}
+                        </div>
+                 </div>
+                    
 
             </div>
 
@@ -335,25 +346,18 @@
                             {{ $IpdPatient->patient['age'] }} y
                         </div>
                     </div>
-                    <div class="patient_items">
-                        <div class="patient_head">
-                            GENDER
-                        </div>
-                        :
-                        <div class="patient_data">
-                            {{ $IpdPatient->patient['gender'] }}
-                        </div>
-                    </div>
+                   
+                    
                 </div>
                 <div class="patient_items">
-                    <div class="patient_head">
-                        AREA
-                    </div>
-                    :
-                    <div class="patient_data">
-                        {{ $IpdPatient->patient['address'] }}
-                    </div>
-                </div>
+    <div class="patient_head">
+        AREA
+    </div>
+    :
+    <div class="patient_data">
+        {{ $IpdPatient->patient->areaName->name ?? '' }}
+    </div>
+</div>
                 <div class="patient_items">
                     <div class="patient_head">
                         STATUS
@@ -381,6 +385,17 @@
                         {{ $IpdPatient->patient['nationality'] ?? '' }}
                     </div>
                 </div>
+
+                <div class="patient_items">
+                        <div class="patient_head">
+                            Police Station
+                        </div>
+                        :
+                        <div class="patient_data">
+                            {{ $IpdPatient->patient['police_station'] }}
+                        </div>
+                    </div>
+
             </div>
 
         </div>
@@ -618,9 +633,9 @@
                 <li>An ADVANCE PAYMENT shuld be made at the time of admission
                     accordingly
                     <br><br>
-                    <span>a) Rs. 5000/- For GENERAL WARD</span>
-                    <span>b) Rs. 8000/- For CABINS.</span>
-                    <span>c) Rs. 15000/- For ICU.</span>
+                    <span>a) Rs. 15000/- For GENERAL WARD</span>
+                    <span>b) Rs. 20000/- For CABINS.</span>
+                    <span>c) Rs. 30000/- For ICU.</span>
                 </li>
                 <li>A minimum of 80% to 85% amount of the surgery package must be paid
                     before the oparation .</li>
