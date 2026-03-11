@@ -520,7 +520,25 @@ class IpdBillingController extends Controller
      */
     public function getBillingSummaryForIpd($ipdId)
     {
-        $breakup = $this->calculateBreakup($ipdId);
+        // If IPD is discharged, lock the summary to the discharge date
+        // so bed charges (and other time-based items) are not extended beyond discharge.
+        $endDate = null;
+
+        $ipd = IpdDetail::find($ipdId);
+        if ($ipd && $ipd->discharged === 'yes') {
+            // Prefer explicit discharged_date on IPD record if present
+            if (!empty($ipd->discharged_date)) {
+                $endDate = Carbon::parse($ipd->discharged_date)->format('Y-m-d');
+            } else {
+                // Fallback to discharge card date if available
+                $dischargeCard = DischargeCard::where('ipd_details_id', $ipdId)->orderByDesc('id')->first();
+                if ($dischargeCard && !empty($dischargeCard->discharge_date)) {
+                    $endDate = Carbon::parse($dischargeCard->discharge_date)->format('Y-m-d');
+                }
+            }
+        }
+
+        $breakup = $this->calculateBreakup($ipdId, $endDate);
         return [
             'total_charges' => $breakup['total_charges'] ?? 0,
             'total_payments' => $breakup['total_payments'] ?? 0,
