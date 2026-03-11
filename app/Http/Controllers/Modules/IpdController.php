@@ -1559,19 +1559,22 @@ class IpdController extends Controller
     public function getAvailableBeds(Request $request)
     {
         $bedGroupId = $request->bed_group_id;
+        $includeBedId = $request->include_bed_id; // For edit: include current bed even if occupied
 
-        // Beds currently assigned (is_active = 1)
         $occupiedBeds = PatientBedHistory::where('is_active', 'yes')
             ->pluck('bed_id')
             ->toArray();
 
-        // Fetch beds excluding occupied ones
-        $availableBeds = Bed::where('bed_group_id', $bedGroupId)
-            ->where('is_active', 'yes')
-            ->whereNotIn('id', $occupiedBeds)
-            ->get();
-
-        return response()->json($availableBeds);
+        $query = Bed::where('bed_group_id', $bedGroupId)->where('is_active', 'yes');
+        if ($includeBedId) {
+            $query->where(function ($q) use ($occupiedBeds, $includeBedId) {
+                $q->whereNotIn('id', $occupiedBeds)->orWhere('id', $includeBedId);
+            });
+        } else {
+            $query->whereNotIn('id', $occupiedBeds);
+        }
+        $beds = $query->get();
+        return response()->json($beds);
     }
     public function assignNewBed(Request $request)
     {
@@ -1661,6 +1664,117 @@ class IpdController extends Controller
         );
 
         return redirect()->back()->with('success', 'Bed assigned successfully.');
+    }
+
+    /**
+     * Update a bed history record (edit from Bed History table).
+     * Affects: patient_bed_history, bed occupancy, ipd_details (if active), ipd_daywise_bed_charges.
+     */
+    public function updateBedHistory(Request $request)
+    {
+        $request->validate([
+            'bed_history_id' => 'required|exists:patient_bed_history,id',
+            'ipd_id'         => 'required|exists:ipd_details,id',
+            'bed_group'      => 'required|exists:bed_group,id',
+            'bed'            => 'required|exists:bed,id',
+            'from_date'      => 'required|date',
+            'to_date'        => 'nullable|date|after_or_equal:from_date',
+            'bed_charge'     => 'nullable|numeric|min:0',
+        ]);
+
+        $history = PatientBedHistory::with(['bedGroup', 'bed'])->findOrFail($request->bed_history_id);
+        if ((int) $history->ipd_id !== (int) $request->ipd_id) {
+            return redirect()->back()->with('error', 'Invalid bed history for this IPD.');
+        }
+
+        $ipd = IpdDetail::findOrFail($request->ipd_id);
+        $oldBedId = $history->bed_id;
+        $newBedId = (int) $request->bed;
+        $isActive = $history->is_active === 'yes';
+
+        // Check bed belongs to selected bed group
+        $bed = Bed::findOrFail($newBedId);
+        if ((int) $bed->bed_group_id !== (int) $request->bed_group) {
+            return redirect()->back()->with('error', 'Selected bed must belong to the selected bed group.');
+        }
+
+        // Check for date overlaps with adjacent history records
+        $fromDate = Carbon::parse($request->from_date);
+        $toDate = $request->to_date ? Carbon::parse($request->to_date) : null;
+
+        $adjacent = PatientBedHistory::where('ipd_id', $ipd->id)
+            ->where('id', '!=', $history->id)
+            ->orderBy('from_date')
+            ->get();
+
+        foreach ($adjacent as $adj) {
+            $adjFrom = Carbon::parse($adj->from_date);
+            $adjTo = $adj->to_date ? Carbon::parse($adj->to_date) : Carbon::now()->endOfDay();
+            $myTo = $toDate ?? Carbon::now()->endOfDay();
+
+            if ($fromDate->lt($adjTo) && $myTo->gt($adjFrom)) {
+                return redirect()->back()->with('error', 'Date overlap detected with another bed history record (From: ' . $adjFrom->format('d/m/Y') . ', To: ' . $adjTo->format('d/m/Y') . '). Please adjust dates to avoid overlap.');
+            }
+        }
+
+        DB::beginTransaction();
+        try {
+            // 1. Update bed occupancy if bed changed
+            if ((int) $oldBedId !== (int) $newBedId) {
+                Bed::where('id', $oldBedId)->update(['is_active' => 'yes']); // Old bed available
+                Bed::where('id', $newBedId)->update(['is_active' => 'no']);   // New bed occupied
+            }
+
+            // 2. Update patient_bed_history
+            $history->bed_group_id = $request->bed_group;
+            $history->bed_id = $newBedId;
+            $history->from_date = $fromDate;
+            $history->to_date = $request->to_date ? $toDate : null;
+            $history->save();
+
+            // 3. If active record, update ipd_details
+            if ($isActive) {
+                $ipd->bed = $newBedId;
+                $ipd->bed_group_id = $request->bed_group;
+                $ipd->save();
+            }
+
+            // 4. Update ipd_daywise_bed_charges for from_date (billing uses this)
+            $bedChargeRate = $request->bed_charge !== null && $request->bed_charge !== ''
+                ? (float) $request->bed_charge
+                : (float) ($history->bedGroup->bed_cost ?? 0);
+
+            $chargeDate = $fromDate->format('Y-m-d');
+            $periodStart = $fromDate->copy()->subDay()->setTime(10, 0, 0);
+            $periodEnd = $fromDate->copy()->setTime(10, 0, 0);
+
+            IpdDaywiseBedCharge::updateOrCreate(
+                [
+                    'ipd_id'      => $ipd->id,
+                    'charge_date' => $chargeDate,
+                ],
+                [
+                    'hospital_id'        => $ipd->hospital_id,
+                    'branch_id'          => $ipd->branch_id ?? null,
+                    'case_reference_id'  => $ipd->case_reference_id ?? null,
+                    'patient_id'         => $ipd->patient_id,
+                    'period_start_date'  => $periodStart->format('Y-m-d'),
+                    'period_end_date'    => $periodEnd->format('Y-m-d'),
+                    'bed_group_id'       => $request->bed_group,
+                    'bed_id'             => $newBedId,
+                    'bed_charge'         => $bedChargeRate,
+                    'bed_charge_rate'    => $bedChargeRate,
+                    'no_of_days'         => 1,
+                    'is_active'          => 'yes',
+                ]
+            );
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Bed history updated successfully. Estimate and final bill will reflect the changes.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to update: ' . $e->getMessage());
+        }
     }
 
     public function storeDischarge(Request $request)

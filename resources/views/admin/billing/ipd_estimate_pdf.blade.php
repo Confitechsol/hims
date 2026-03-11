@@ -410,6 +410,11 @@
                                 </td>
                             </tr>
                             <tr>
+                                <td class="patient_label">Police Station</td>
+                                <td class="patient_colon">:</td>
+                                <td class="patient_value">{{ $ipd->patient->police_station ?? 'N/A' }}</td>
+                            </tr>
+                            <tr>
                                 <td class="patient_label">Phone No.</td>
                                 <td class="patient_colon">:</td>
                                 <td class="patient_value">{{ $ipd->patient->mobileno ?? 'N/A' }}</td>
@@ -609,7 +614,7 @@
 
         <!-- Pathology Section (Date wise details) -->
         @if(isset($investigationDatewise) && $investigationDatewise->where('type', 'pathology')->count() > 0)
-        <div class="section-title">Pathology (Date wise)</div>
+        <div class="section-title">Pathology Details</div>
         <table class="charges-table">
             <thead>
                 <tr>
@@ -647,7 +652,7 @@
 
         <!-- Radiology Section (Date wise details) -->
         @if(isset($investigationDatewise) && $investigationDatewise->where('type', 'radiology')->count() > 0)
-        <div class="section-title">Radiology (Date wise)</div>
+        <div class="section-title">Radiology Details</div>
         <table class="charges-table">
             <thead>
                 <tr>

@@ -89,7 +89,7 @@
                             <div class="col-md-4"><strong>Cheque No.:</strong> {{ $receipt->cheque_no }}</div>
                             <div class="col-md-4"><strong>Cheque Date:</strong> {{ $receipt->cheque_date ? \Carbon\Carbon::parse($receipt->cheque_date)->format('d/m/Y') : '-' }}</div>
                             @endif
-                            <div class="col-md-6"><strong>Received By:</strong> {{ $receipt->receiver->name ?? '-' }}</div>
+                            <div class="col-md-6"><strong>Received By:</strong> {{ $receipt->receiver->username ?? '-' }}</div>
                             <div class="col-md-6"><strong>Created At:</strong> {{ $receipt->created_at ? \Carbon\Carbon::parse($receipt->created_at)->format('d/m/Y H:i:s') : '-' }}</div>
                         </div>
                     </div>

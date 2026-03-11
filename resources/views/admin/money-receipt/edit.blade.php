@@ -254,7 +254,7 @@
                                 <div class="col-md-6">
                                     <label class="form-label">Received By</label>
                                     <input type="text" class="form-control" 
-                                        value="{{ $receipt->receiver->name ?? Auth::user()->name ?? 'Current User' }}" readonly>
+                                        value="{{ $receipt->receiver->username ?? Auth::user()->username ?? 'Current User' }}" readonly>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Current User</label>
