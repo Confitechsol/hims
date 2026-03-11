@@ -522,6 +522,7 @@ class IpdBillingController extends Controller
     {
         $breakup = $this->calculateBreakup($ipdId);
         return [
+            'total_charges' => $breakup['total_charges'] ?? 0,
             'total_payments' => $breakup['total_payments'] ?? 0,
             'outstanding' => $breakup['outstanding'] ?? 0,
         ];

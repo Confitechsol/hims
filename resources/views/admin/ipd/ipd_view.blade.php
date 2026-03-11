@@ -506,20 +506,20 @@
     <div class="p-4">
         @if (session('success'))
             <script>
-                Swal.fire({
-                    icon: 'success',
-                    title: "{{ session('alertTitle') ?? 'Success' }}",
-                    text: "{{ session('success') }}",
-                });
+                (function(){
+                    var title = @json(session('alertTitle') ?? 'Success');
+                    var text = @json(session('success'));
+                    if (typeof Swal !== 'undefined') Swal.fire({ icon: 'success', title: title, text: text });
+                })();
             </script>
         @endif
         @if (session('error'))
             <script>
-                Swal.fire({
-                    icon: 'error',
-                    title: "{{ session('alertTitle') ?? 'Error' }}",
-                    text: "{{ session('error') }}",
-                });
+                (function(){
+                    var title = @json(session('alertTitle') ?? 'Error');
+                    var text = @json(session('error'));
+                    if (typeof Swal !== 'undefined') Swal.fire({ icon: 'error', title: title, text: text });
+                })();
             </script>
         @endif
         <!-- tab start -->
@@ -806,6 +806,37 @@
                                             @endforeach
                                         </ul>
                                         </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Finance Section --}}
+                        <div class="card shadow-sm border-0 mt-2">
+                            <div class="card-header"
+                                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-wallet me-2"></i> Finance
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="border rounded p-3 bg-light">
+                                            <div class="text-muted small mb-1">Total Billing (INR)</div>
+                                            <div class="fw-bold fs-5">{{ number_format($billingSummary['total_charges'] ?? 0, 2) }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="border rounded p-3 bg-light">
+                                            <div class="text-muted small mb-1">Total Payment (INR)</div>
+                                            <div class="fw-bold fs-5 text-success">{{ number_format($billingSummary['total_payments'] ?? 0, 2) }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="border rounded p-3 bg-light">
+                                            <div class="text-muted small mb-1">Total Outstanding (INR)</div>
+                                            <div class="fw-bold fs-5 {{ ($billingSummary['outstanding'] ?? 0) > 0 ? 'text-danger' : '' }}">{{ number_format($billingSummary['outstanding'] ?? 0, 2) }}</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -4149,7 +4180,8 @@
                                                                     data-bs-toggle="modal"
                                                                     data-bs-target="#addPrescriptionModal"
                                                                     data-ipd-id="{{ $ipd->id }}"
-                                                                    data-admission-date="{{ $ipd->date ? \Carbon\Carbon::parse($ipd->date)->format('Y-m-d') : date('Y-m-d') }}"><i
+                                                                    data-admission-date="{{ $ipd->date ? \Carbon\Carbon::parse($ipd->date)->format('Y-m-d') : date('Y-m-d') }}"
+                                                                    onclick="if(window.showIpdPrescriptionModal){ event.preventDefault(); event.stopPropagation(); window.showIpdPrescriptionModal(this); }"><i
                                                                         class="ti ti-plus me-1"></i>Add Prescription</a>
                                                             </div>
                                                         @endif
@@ -4758,6 +4790,56 @@
     }, true);
     
     console.log('🔵 IPD View Script Block 1 Loaded');
+    
+    // --- Prescription modal: global opener (used by inline onclick so modal opens even if other scripts fail) ---
+    window.showIpdPrescriptionModal = function(btn) {
+        var m = document.getElementById('addPrescriptionModal');
+        if (!m) { console.error('addPrescriptionModal not found'); return; }
+        if (m.parentNode !== document.body) document.body.appendChild(m);
+        if (btn) {
+            var ipdId = btn.getAttribute('data-ipd-id');
+            if (ipdId) {
+                var f = document.getElementById('ipd_id');
+                if (f) f.value = ipdId;
+                var ad = btn.getAttribute('data-admission-date');
+                var dateEl = document.getElementById('prescription_date');
+                if (dateEl) {
+                    dateEl.max = new Date().toISOString().split('T')[0];
+                    dateEl.value = ad || dateEl.max;
+                    if (ad) dateEl.setAttribute('min', ad);
+                }
+            }
+        }
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            bootstrap.Modal.getOrCreateInstance(m).show();
+        } else {
+            m.classList.remove('fade');
+            m.classList.add('show');
+            m.style.display = 'block';
+            m.style.visibility = 'visible';
+            m.style.opacity = '1';
+            m.style.zIndex = '1055';
+            m.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('modal-open');
+            var back = document.querySelector('.modal-backdrop');
+            if (!back) {
+                back = document.createElement('div');
+                back.className = 'modal-backdrop fade show';
+                back.style.zIndex = '1050';
+                document.body.insertBefore(back, m);
+            }
+            back.classList.add('show');
+        }
+    };
+    (function prescriptionModalFallback() {
+        function run() {
+            var modal = document.getElementById('addPrescriptionModal');
+            if (!modal) return;
+            if (modal.parentNode !== document.body) document.body.appendChild(modal);
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+        else run();
+    })();
     
     // Direct function to open prescription modal - bypasses Bootstrap issues
     // Define function to fetch pathology/radiology data DIRECTLY (not dependent on modal)
@@ -6041,14 +6123,20 @@
         $(document).ready(function() {
 
             // Load bed groups on page load
-            $.get("{{ route('getBedGroups') }}", function(data) {
-                let options = '<option value="">Select Bed Group</option>';
-                data.forEach(function(group) {
-                    options +=
-                        `<option value="${group.id}">${group.name} - ${group.floor_detail?.name ?? '-'}</option>`;
+            $.get("{{ route('getBedGroups') }}")
+                .done(function(data) {
+                    var options = '<option value="">Select Bed Group</option>';
+                    if (Array.isArray(data)) {
+                        data.forEach(function(group) {
+                            var floorName = (group.floor_detail && group.floor_detail.name) ? group.floor_detail.name : '-';
+                            options += '<option value="' + (group.id || '') + '">' + (group.name || '') + ' - ' + floorName + '</option>';
+                        });
+                    }
+                    $('#bed_group').html(options);
+                })
+                .fail(function() {
+                    $('#bed_group').html('<option value="">Select Bed Group</option><option value="" disabled>Could not load bed groups</option>');
                 });
-                $('#bed_group').html(options);
-            });
 
             // Load available beds when bed group changes
             $('#bed_group').on('change', function() {
@@ -6107,12 +6195,16 @@
                     return;
                 }
 
-                $.get("{{ route('getBedGroups') }}", function(data) {
-                    var opts = '<option value="">Select Bed Group</option>';
-                    data.forEach(function(g) {
-                        opts += '<option value="' + g.id + '">' + (g.name || '') + ' - ' + (g.floor_detail?.name || '-') + '</option>';
-                    });
-                    $('#edit_bed_group').html(opts).val(groupId);
+                $.get("{{ route('getBedGroups') }}")
+                    .done(function(data) {
+                        var opts = '<option value="">Select Bed Group</option>';
+                        if (Array.isArray(data)) {
+                            data.forEach(function(g) {
+                                var fn = (g.floor_detail && g.floor_detail.name) ? g.floor_detail.name : '-';
+                                opts += '<option value="' + (g.id || '') + '">' + (g.name || '') + ' - ' + fn + '</option>';
+                            });
+                        }
+                        $('#edit_bed_group').html(opts).val(groupId);
 
                     $.get("{{ route('get.available.beds') }}", { bed_group_id: groupId, include_bed_id: bedId }, function(beds) {
                         var options = '<option value="">Select Bed</option>';
@@ -6133,7 +6225,11 @@
                     }
 
                     showModal();
-                });
+                    })
+                    .fail(function() {
+                        $('#edit_bed_group').html('<option value="">Select Bed Group</option>');
+                        showModal();
+                    });
             });
             $('#edit_bed_group').on('change', function() {
                 var groupId = $(this).val();

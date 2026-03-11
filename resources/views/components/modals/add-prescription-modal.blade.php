@@ -442,6 +442,7 @@
         border-color: #aaa;
     }
 </style>
+{{-- IPD Add Prescription modal: id="addPrescriptionModal" must be unique app-wide (only this div). Do not reuse this id in other modals. See .cursor/rules/add-prescription-modal.mdc --}}
 <div class="modal fade" id="addPrescriptionModal" tabindex="-1" aria-labelledby="addPrescriptionModalLabel"
     aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
     <div class="modal-dialog modal-xl ">
@@ -1342,14 +1343,16 @@
     }
 })();
 </script>
+{{-- Old prescription data in data attribute to avoid @json() breaking script if content has special chars --}}
+<div id="addPrescriptionModalOldData" data-old-prescription="{{ e(json_encode(['finding_type' => old('finding_type[]', []), 'finding' => old('finding[]', []), 'pathology' => old('pathology[]', []), 'radiology' => old('radiology[]', [])])) }}" style="display:none" aria-hidden="true"></div>
 <script>
     (function() {
-        window.__oldPrescription = {
-            finding_type: @json(old('finding_type[]', [])),
-            finding: @json(old('finding[]', [])),
-            pathology: @json(old('pathology[]', [])),
-            radiology: @json(old('radiology[]', []))
-        };
+        var el = document.getElementById('addPrescriptionModalOldData');
+        try {
+            window.__oldPrescription = el && el.getAttribute('data-old-prescription') ? JSON.parse(el.getAttribute('data-old-prescription')) : { finding_type: [], finding: [], pathology: [], radiology: [] };
+        } catch (e) {
+            window.__oldPrescription = { finding_type: [], finding: [], pathology: [], radiology: [] };
+        }
     })();
     document.addEventListener('DOMContentLoaded', function() {
         console.log('DOMContentLoaded fired for prescription modal');
