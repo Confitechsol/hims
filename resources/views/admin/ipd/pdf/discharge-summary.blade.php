@@ -172,6 +172,7 @@
         display: grid;
         grid-template-columns: 1fr auto;
         width: 100%;
+        margin-top: 30px;
         align-items: stretch;
     }
 
@@ -189,17 +190,24 @@
     }
 
     .sig_box {
-        border-top: 1px solid #000;
+        margin-top: 50px;
+        /* border-top: 1px solid #000; */
         /* Line only on top */
-        padding-top: 5px;
+        /* padding-top: 5px; */
         /* Space between line and text */
-        display: inline-block;
+        /* display: inline-block; */
         /* Line width matches content */
     }
 
     .sig_box p {
         margin: 0;
         white-space: nowrap;
+    }
+
+    .d-signature {
+        height: 40px;
+        max-height: 50px;
+        width: 200px;
     }
 
 
@@ -294,12 +302,13 @@
         <tr>
             <td class="label">OT Date</td>
             <td class="colon">:</td>
-            <td class="value">{{ \Carbon\Carbon::parse($data->ot_date)->format('d-m-Y') }}</td>
+            <td class="value">{{ $data->ot_date ? \Carbon\Carbon::parse($data->ot_date)->format('d-m-Y') : '' }}</td>
 
             <td class="label">Discharge Time</td>
             <td class="colon">:</td>
             <td class="value">{{ $data->discharge_time }}</td>
         </tr>
+
         <tr>
             <td class="label">Admission No.</td>
             <td class="colon">:</td>
@@ -308,6 +317,15 @@
             <td class="label">Bed</td>
             <td class="colon">:</td>
             <td class="value">{{ $data->bed }}</td>
+        </tr>
+        <tr>
+            <td class="label"></td>
+            <td class="colon"></td>
+            <td class="value"></td>
+
+            <td class="label">Discharge Contact</td>
+            <td class="colon">:</td>
+            <td class="value">{{ $data->discharge_contact }}</td>
         </tr>
     </table>
     <table class="table-box-border">
@@ -371,15 +389,49 @@
         </div>
 
         <div class="grid-box">
-            <div class="left">
-                DATE : {{ \Carbon\Carbon::now()->format('d-m-Y') }}
-            </div>
+            {{-- <div class="left align-self-end">
+
+            </div> --}}
 
             <div class="right">
-                <div class="sig_box">
+
+
+                <div class="d-flex flex-column align-items-center">
+
+                    @php
+                        $signature = $data->signature_base64 ?? null;
+                        $signaturePath = public_path('uploads/Doctor/signatures/' . $signature);
+                    @endphp
+
+
+
+                    <div class="sig_box text-center">
+                        {{-- @php
+                            dd(!empty($data->signature_base64));
+                        @endphp --}}
+                        {!! $data->signature_base64 !!}
+                        {{-- @if (!empty($data->signature_base64))
+                            <img class="d-signature" src="{{ $data->signature_base64 }}">
+                        @else
+                            <p class="fw-bold mb-2">{{ $data->under_care_dr }}</p>
+                        @endif --}}
+                        <div style="text-align: right; padding-top: 5px;">
+                            <p style="border-top: 1px solid #000; margin: 0; width: 220px; display:inline-block;"></p>
+                        </div>
+                        <p>Signature of Doctor / R.M.O</p>
+                        @if (!empty($signature) && file_exists($signaturePath))
+                            <p class="mb-2 fw-bold">Doctor : {{ $data->under_care_dr }}</p>
+                        @endif
+                        <p>Regn No : {{ $data->registration_no }}</p>
+                        <p>DATE : {{ \Carbon\Carbon::now()->format('d-m-Y') }}</p>
+                    </div>
+
+                </div>
+
+                {{-- <div class="sig_box">
                     <p>Signature of Doctor / R.M.O</p>
                     <p>Regn No. : {{ $data->registration_no }}</p>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>

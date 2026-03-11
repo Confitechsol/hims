@@ -439,7 +439,25 @@ private function formatExcelDate($value)
     // If date is already a string like 9/21/2008 or 21-09-2008
     return date('Y-m-d', strtotime($value));
 }
+public function enable($id)
+{
+    $staff = Staff::findOrFail($id);
+    $staff->is_active = 1;
+    $staff->save();
 
+    return back()->with('success', 'Staff enabled successfully.');
+}
+
+public function disable($id)
+{
+    $staff = Staff::findOrFail($id);
+    $staff->is_active = 0;
+    $staff->save();
+
+    User::where('staff_id', $staff->id)->delete();
+
+    return back()->with('success', 'Staff disabled successfully.');
+}
     
 
 }

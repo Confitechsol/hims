@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('patient_name');
             $table->integer('patient_id')->nullable();
             $table->string('admission_no')->nullable();
+            $table->string('discharge_contact')->nullable();
             $table->string('bed')->nullable();
 
             $table->date('admission_date')->nullable();
@@ -72,6 +73,7 @@ return new class extends Migration
             $table->text('present_complaints')->nullable();
             $table->text('remarks')->nullable();
             $table->text('medicines')->nullable();
+            $table->text('medicine_types')->nullable();
             $table->text('intervals')->nullable();
             $table->text('durations')->nullable();
 

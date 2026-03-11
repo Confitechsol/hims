@@ -761,6 +761,8 @@ Route::prefix('staffs')->group(function () {
     Route::get('/edit/{id}', [StaffController::class, 'edit'])->name('staff.edit');
     Route::put('/update/{id}', [StaffController::class, 'update'])->name('staff.update');
     Route::delete('/delete', [StaffController::class, 'bulkDelete'])->name('staffs.bulkDelete');
+    Route::patch('/staff/{id}/enable', [StaffController::class, 'enable'])->name('staff.enable');
+    Route::patch('/staff/{id}/disable', [StaffController::class, 'disable'])->name('staff.disable');
 });
 Route::prefix('bloodBank')->group(function () {
 

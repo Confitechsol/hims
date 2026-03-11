@@ -62,7 +62,8 @@ class IpdViewController extends Controller
         $symptoms = ! empty($symptomIds)
             ? Symptom::whereIn('id', $symptomIds)->get()
             : collect();
-        $nurseNotes       = NurseNote::with('staff')->where('ipd_id', $id)->get();
+        $nurseNotes = NurseNote::with('staff')->where('ipd_id', $id)->get();
+        // dd($nurseNotes);
         $medicationReport = MedicationReport::with('medicineDosage.unit', 'pharmacy.medicineCategory', 'generatedBy.userRole')->where('ipd_id', $id)->get();
         //dd($medicationReport);
         $ipdCharges        = IpdCharges::with('ipd', 'charge.taxCategory', 'chargeCategory.chargeType')->where('ipd_id', $id)->get();
@@ -122,6 +123,10 @@ class IpdViewController extends Controller
                 explode(',', $dischargeCard->medicines),
                 fn($med) => $med !== null && trim($med) !== ''
             );
+            $medTypes = array_filter(
+                explode(',', $dischargeCard->medicine_types),
+                fn($med) => $med !== null && trim($med) !== ''
+            );
             $intervals = array_filter(
                 explode(',', $dischargeCard->intervals),
                 fn($inv) => $inv !== null && trim($inv) !== ''
@@ -130,10 +135,10 @@ class IpdViewController extends Controller
                 explode(',', $dischargeCard->durations),
                 fn($dur) => $dur !== null && trim($dur) !== ''
             );
-            $count = min(count($meds), count($intervals), count($durations));
+            $count = min(count($meds), count($medTypes), count($intervals), count($durations));
 
             for ($i = 0; $i < $count; $i++) {
-                $medCombinations[] = "{$meds[$i]} {$intervals[$i]} x {$durations[$i]}";
+                $medCombinations[] = "{$meds[$i]} ({$medTypes[$i]}) {$intervals[$i]} x {$durations[$i]}";
             }
 
             $ipd->discharge_medicines = $medCombinations;
@@ -141,6 +146,10 @@ class IpdViewController extends Controller
             if ($ipd->dischargeCard->barcode) {
                 $ipd->dischargeCard->barcode = $this->encodeImage($ipd->dischargeCard->barcode);
 
+            }
+
+            if ($ipd->doctor->signature) {
+                $ipd->dischargeCard->signature = $ipd->doctor->signature;
             }
         }
         $currentUser = User::with('userRole')->where('id', Auth::id())->firstOrFail();
