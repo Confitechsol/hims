@@ -330,9 +330,6 @@
 
                     </div>
 
-                    @include('components.modals.bed-modal')
-
-
                     <!-- Bed -->
 
                     <!-- Appointment -->
@@ -649,6 +646,9 @@
 
         </div>
     </div>
+
+    @include('components.modals.bed-modal')
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js"></script>
