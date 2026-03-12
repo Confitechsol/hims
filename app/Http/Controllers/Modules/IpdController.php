@@ -71,12 +71,13 @@ class IpdController extends Controller
                     });
                 })->get();
 
-            // Attach billing summary (total payments, outstanding) for each IPD
+            // Attach billing summary (total billing, total payments, outstanding) for each IPD
             $billingController = app(\App\Http\Controllers\IpdBillingController::class);
             foreach ($ipd as $ipdDetails) {
                 $summary                    = $billingController->getBillingSummaryForIpd($ipdDetails->id);
                 $ipdDetails->total_payments = $summary['total_payments'];
                 $ipdDetails->outstanding    = $summary['outstanding'];
+                $ipdDetails->total_billing = $summary['total_charges'];
             }
         } else {
             // $patients = Patient::with(['ipds.doctor'])->get();
@@ -406,13 +407,22 @@ class IpdController extends Controller
     {
         try {
             $bedGroups = BedGroup::with('floorDetail')->get();
-            return response()->json($bedGroups, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
-        } catch (\Exception $e) {
-            \Log::error('Error fetching bed groups: ' . $e->getMessage());
+            // Build a plain array to avoid JSON encoding issues (e.g. invalid UTF-8, circular refs)
+            $data = $bedGroups->map(function ($g) {
+                $floor = $g->relationLoaded('floorDetail') ? $g->floorDetail : null;
+                return [
+                    'id' => $g->id,
+                    'name' => $g->name ?? '',
+                    'floor_detail' => $floor ? ['name' => $floor->name ?? ''] : null,
+                ];
+            })->values()->all();
+            return response()->json($data, 200, [], JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR);
+        } catch (\Throwable $e) {
+            \Log::error('Error fetching bed groups: ' . $e->getMessage(), ['exception' => $e]);
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-            ], 500);
+            ], 500, [], JSON_UNESCAPED_UNICODE);
         }
     }
     public function getBedNumbers(Request $request, $id)

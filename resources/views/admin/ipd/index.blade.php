@@ -122,6 +122,7 @@
                                                     <th>Guardian Phone</th>
                                                     <th>Consultant</th>
                                                     <th>Bed</th>
+                                                    <th>Total Billing (INR)</th>
                                                     <th>Total Payment (INR)</th>
                                                     <th>Total Outstanding (INR)</th>
                                                     <th>Credit Limit (INR)</th>
@@ -148,6 +149,7 @@
                                                                 }}
                                                             </span>
                                                         </td>
+                                                        <td>{{ number_format($ipdDetails->total_billing ?? 0, 2) }}</td>
                                                         <td>{{ number_format($ipdDetails->total_payments ?? 0, 2) }}</td>
                                                         <td>{{ number_format($ipdDetails->outstanding ?? 0, 2) }}</td>
                                                         <td>{{ $ipdDetails->credit_limit }}</td>
