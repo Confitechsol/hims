@@ -583,6 +583,7 @@ Route::put('/ipd/update/{id}', [IpdController::class, 'update'])->name('ipd.upda
 Route::get('/ipd/{id}/packages', [IpdController::class, 'getIpdPackages'])->name('ipd.packages');
 Route::post('/ipd/{id}/apply-package', [IpdController::class, 'applyPackage'])->name('ipd.apply-package');
 Route::delete('/ipd/{id}/remove-package', [IpdController::class, 'removePackage'])->name('ipd.remove-package');
+Route::patch('/ipd/{id}/packages/{ipdPackageId}', [IpdController::class, 'updatePackageAmount'])->name('ipd.packages.update-amount');
 Route::get('/getBedGroups', [IpdController::class, 'getBedGroups'])->name('getBedGroups');
 Route::get('/get-available-beds', [IpdController::class, 'getAvailableBeds'])->name('get.available.beds');
 Route::get('/getBedNumbers/{id}', [IpdController::class, 'getBedNumbers'])->name('getBedNumbers');

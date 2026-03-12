@@ -20,9 +20,10 @@ class IpdPackageService
      * @param int $packageId Package ID to apply
      * @param string|null $appliedDate Date when package is applied (Y-m-d format, default: today)
      * @param string|null $notes Notes for package application
+     * @param float|null $packageRateOverride Optional custom package amount (overrides package master rate)
      * @return array Result with status, message, and package data
      */
-    public function applyPackage($ipdId, $packageId, $appliedDate = null, $notes = null)
+    public function applyPackage($ipdId, $packageId, $appliedDate = null, $notes = null, $packageRateOverride = null)
     {
         try {
             DB::beginTransaction();
@@ -69,10 +70,12 @@ class IpdPackageService
                 throw new \Exception("This package is already applied on {$appliedDate}");
             }
 
-            // Calculate package charges with discounts and GST
-            $calculatedCharge = $this->calculatePackageCharge($ipd, $package);
+            // Calculate package charges with discounts and GST (use override amount if provided).
+            // Package Master (packages table) is never updated; custom rate is stored only in ipd_packages
+            // so it affects only this patient's estimate and final bill.
+            $calculatedCharge = $this->calculatePackageCharge($ipd, $package, $packageRateOverride);
 
-            // Create IpdPackage record
+            // Create IpdPackage record (per-patient; does not modify Package Master)
             $ipdPackage = IpdPackage::create([
                 'ipd_id' => $ipdId,
                 'package_id' => $packageId,
@@ -127,6 +130,65 @@ class IpdPackageService
                 'package_id' => $packageId,
             ]);
 
+            return [
+                'success' => false,
+                'message' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Update package amount for an applied IPD package (on-the-fly change).
+     * Recalculates discount, GST and final amount from the new package rate.
+     * Only updates ipd_packages; Package Master (packages table) is never modified.
+     *
+     * @param int $ipdId IPD patient ID
+     * @param int $ipdPackageId IpdPackage record ID
+     * @param float $newPackageRate New package amount (INR)
+     * @return array Result with success and message
+     */
+    public function updatePackageAmount($ipdId, $ipdPackageId, $newPackageRate)
+    {
+        try {
+            $ipdPackage = IpdPackage::where('id', $ipdPackageId)
+                ->where('ipd_id', $ipdId)
+                ->where('status', 'applied')
+                ->with('package')
+                ->firstOrFail();
+
+            $ipd = IpdDetail::find($ipdId);
+            if (!$ipd) {
+                throw new \Exception("IPD record not found");
+            }
+            if ($ipd->discharged === 'yes') {
+                throw new \Exception("Cannot change package amount after discharge");
+            }
+
+            $packageRate = (float) $newPackageRate;
+            $discountPercentage = (float) ($ipdPackage->discount_percentage ?? 0);
+            $discountAmount = $discountPercentage > 0 ? ($packageRate * $discountPercentage) / 100 : 0;
+            $amountAfterDiscount = $packageRate - $discountAmount;
+            $gstPct = (float) ($ipdPackage->package->gst_amount ?? 0);
+            $gstAmount = $gstPct > 0 ? ($amountAfterDiscount * $gstPct) / 100 : 0;
+            $finalAmount = $amountAfterDiscount + $gstAmount;
+
+            $ipdPackage->update([
+                'package_rate' => round($packageRate, 2),
+                'discount_amount' => round($discountAmount, 2),
+                'gst_amount' => round($gstAmount, 2),
+                'final_amount' => round($finalAmount, 2),
+            ]);
+
+            return [
+                'success' => true,
+                'message' => 'Package amount updated',
+                'data' => $ipdPackage->fresh(),
+            ];
+        } catch (\Exception $e) {
+            Log::error('Error updating package amount: ' . $e->getMessage(), [
+                'ipd_id' => $ipdId,
+                'ipd_package_id' => $ipdPackageId,
+            ]);
             return [
                 'success' => false,
                 'message' => $e->getMessage(),
@@ -201,11 +263,12 @@ class IpdPackageService
      *
      * @param IpdDetail $ipd IPD patient record
      * @param Package $package Package to apply
+     * @param float|null $rateOverride Optional custom package rate (overrides package master)
      * @return array Calculated charges array
      */
-    private function calculatePackageCharge($ipd, $package)
+    private function calculatePackageCharge($ipd, $package, $rateOverride = null)
     {
-        $packageRate = $package->package_rate ?? 0.00;
+        $packageRate = $rateOverride !== null && $rateOverride !== '' ? (float) $rateOverride : (float) ($package->package_rate ?? 0.00);
         
         // Calculate discount percentage
         // Priority: MOU Discount > Special Discount

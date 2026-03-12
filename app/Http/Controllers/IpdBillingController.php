@@ -543,6 +543,12 @@ class IpdBillingController extends Controller
             'total_charges' => $breakup['total_charges'] ?? 0,
             'total_payments' => $breakup['total_payments'] ?? 0,
             'outstanding' => $breakup['outstanding'] ?? 0,
+            'package_charges' => $breakup['package_charges'] ?? 0,
+            'bed_charges' => $breakup['bed_charges'] ?? 0,
+            'ipd_charges' => $breakup['ipd_charges'] ?? 0,
+            'pathology_charges' => $breakup['pathology_charges'] ?? 0,
+            'radiology_charges' => $breakup['radiology_charges'] ?? 0,
+            'doctor_visit_charges' => $breakup['doctor_visit_charges'] ?? 0,
         ];
     }
 

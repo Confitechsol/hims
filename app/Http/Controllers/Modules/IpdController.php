@@ -116,6 +116,7 @@ class IpdController extends Controller
             'bed_number'           => 'nullable|exists:bed,id',
             'bed_charge'           => 'nullable|numeric|min:0',
             'package_id'           => 'nullable|exists:packages,id',
+            'package_rate'         => 'nullable|numeric|min:0',
             'symptoms_type'        => 'nullable|array',
             'symptoms_type.*'      => 'string',
             'symptoms_title'       => 'array',
@@ -268,14 +269,16 @@ class IpdController extends Controller
                 );
             }
 
-            // Apply package if selected during admission
+            // Apply package if selected during admission (with optional custom package amount)
             if ($request->package_id) {
                 $packageService = new IpdPackageService();
+                $packageRateOverride = $request->filled('package_rate') ? (float) $request->package_rate : null;
                 $packageResult  = $packageService->applyPackage(
                     $ipd->id,
                     $request->package_id,
                     $request->admission_date, // Apply package from admission date
-                    'Applied during IPD admission'
+                    'Applied during IPD admission',
+                    $packageRateOverride
                 );
 
                 if (! $packageResult['success']) {
@@ -296,7 +299,9 @@ class IpdController extends Controller
 
     public function edit(Request $request, $id)
     {
-        $ipd     = IpdDetail::with('patient', 'doctor', 'bedDetail', 'bedGroup.floorDetail')->where('id', $id)->firstOrFail();
+        $ipd     = IpdDetail::with(['patient', 'doctor', 'bedDetail', 'bedGroup.floorDetail', 'ipdPackages.package'])
+            ->where('id', $id)
+            ->firstOrFail();
         $doctors = Doctor::all();
 
         $symptomTypeIds = array_filter(
@@ -322,7 +327,23 @@ class IpdController extends Controller
         $bedNumbers = Bed::where('bed_group_id', $ipd->bed_group_id)->where('is_active', 'yes')->get();
         $patients   = Patient::with('organisation', 'bloodGroup')->get();
         // dd($patients);
-        return view('admin.ipd.edit-ipd', compact('ipd', 'doctors', 'symptomTypeIds', 'allSymptomTypes', 'symptoms', 'bedGroups', 'bedNumbers', 'patients'));
+        $appliedPackage = $ipd->ipdPackages()
+            ->where('status', 'applied')
+            ->orderByDesc('applied_date')
+            ->orderByDesc('id')
+            ->first();
+
+        return view('admin.ipd.edit-ipd', compact(
+            'ipd',
+            'doctors',
+            'symptomTypeIds',
+            'allSymptomTypes',
+            'symptoms',
+            'bedGroups',
+            'bedNumbers',
+            'patients',
+            'appliedPackage'
+        ));
 
     }
 
@@ -335,6 +356,8 @@ class IpdController extends Controller
             'old_patient'    => 'required|string',
             'casualty'       => 'required|string',
             'date'           => 'nullable|date',
+            'package_id'     => 'nullable|exists:packages,id',
+            'package_rate'   => 'nullable|numeric|min:0',
         ]);
         try {
             // $symptomTitle         = array_filter($request->symptoms_title, fn($title) => $title !== null && $title !== '');
@@ -392,6 +415,40 @@ class IpdController extends Controller
             $ipdPatient->doctor3_id = $request->consultant_doctor3 ?? null;
             $ipdPatient->doctor4_id = $request->consultant_doctor4 ?? null;
             $ipdPatient->save();
+
+            // Package update during admission edit:
+            // - If there is an applied package, update its amount (per patient) when package_rate provided.
+            // - If no applied package yet, apply selected package from admission date (with optional override).
+            if ($request->filled('package_id')) {
+                $packageService = new IpdPackageService();
+                $packageRateOverride = $request->filled('package_rate') ? (float) $request->package_rate : null;
+
+                $existingApplied = \App\Models\IpdPackage::where('ipd_id', $id)
+                    ->where('status', 'applied')
+                    ->orderByDesc('applied_date')
+                    ->orderByDesc('id')
+                    ->first();
+
+                if ($existingApplied) {
+                    if ($packageRateOverride !== null) {
+                        $res = $packageService->updatePackageAmount($id, $existingApplied->id, $packageRateOverride);
+                        if (!($res['success'] ?? false)) {
+                            throw new \Exception('Failed to update package amount: ' . ($res['message'] ?? 'Unknown error'));
+                        }
+                    }
+                } else {
+                    $res = $packageService->applyPackage(
+                        $id,
+                        $request->package_id,
+                        \Carbon\Carbon::parse($request->admission_date)->format('Y-m-d'),
+                        'Applied during IPD admission edit',
+                        $packageRateOverride
+                    );
+                    if (!($res['success'] ?? false)) {
+                        throw new \Exception('Failed to apply package: ' . ($res['message'] ?? 'Unknown error'));
+                    }
+                }
+            }
 
             DB::commit();
 
@@ -2246,16 +2303,19 @@ class IpdController extends Controller
             'package_id'   => 'required|exists:packages,id',
             'applied_date' => 'nullable|date_format:Y-m-d',
             'notes'        => 'nullable|string|max:500',
+            'package_rate' => 'nullable|numeric|min:0',
         ]);
 
         try {
             $packageService = new IpdPackageService();
+            $packageRateOverride = $request->filled('package_rate') ? (float) $request->package_rate : null;
 
             $result = $packageService->applyPackage(
                 $id,
                 $request->package_id,
                 $request->applied_date,
-                $request->notes
+                $request->notes,
+                $packageRateOverride
             );
 
             if ($result['success']) {
@@ -2308,6 +2368,39 @@ class IpdController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error removing package: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Update package amount for an applied package (on-the-fly).
+     * PATCH /ipd/{id}/packages/{ipdPackageId}
+     */
+    public function updatePackageAmount(Request $request, $id, $ipdPackageId)
+    {
+        $request->validate([
+            'package_rate' => 'required|numeric|min:0',
+        ]);
+
+        try {
+            $packageService = new IpdPackageService();
+            $result = $packageService->updatePackageAmount($id, $ipdPackageId, $request->package_rate);
+
+            if ($result['success']) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $result['message'],
+                    'data' => $result['data'] ?? null,
+                ], 200);
+            }
+            return response()->json([
+                'success' => false,
+                'message' => $result['message'],
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating package amount: ' . $e->getMessage(),
             ], 500);
         }
     }

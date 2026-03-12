@@ -59,7 +59,11 @@
                         <tbody>
                             <tr>
                                 <td><i class="fas fa-bed me-2 text-primary"></i> Bed Charges</td>
-                                <td class="text-end">{{ number_format($breakup['bed_charges'], 2) }}</td>
+                                <td class="text-end">{{ number_format($breakup['bed_charges'] ?? 0, 2) }}</td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas fa-box me-2 text-secondary"></i> Package Charges</td>
+                                <td class="text-end">{{ number_format($breakup['package_charges'] ?? 0, 2) }}</td>
                             </tr>
                             <tr>
                                 <td><i class="fas fa-file-invoice me-2 text-info"></i> IPD Charges</td>
@@ -121,6 +125,8 @@
                                             <td>
                                                 @if($charge['type'] == 'bed')
                                                     <span class="badge bg-primary">Bed</span>
+                                                @elseif($charge['type'] == 'package')
+                                                    <span class="badge bg-secondary">Package</span>
                                                 @elseif($charge['type'] == 'ipd')
                                                     <span class="badge bg-info">IPD</span>
                                                 @elseif($charge['type'] == 'pathology')
@@ -129,6 +135,8 @@
                                                     <span class="badge bg-warning">Radiology</span>
                                                 @elseif($charge['type'] == 'doctor_visit')
                                                     <span class="badge bg-danger">Doctor</span>
+                                                @else
+                                                    <span class="badge bg-light text-dark">{{ $charge['type'] ?? '-' }}</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -137,6 +145,8 @@
                                                     @if(isset($charge['period_start']) && isset($charge['period_end']))
                                                         <br><small class="text-muted">Period: {{ \Carbon\Carbon::parse($charge['period_start'])->format('d/m/Y') }} to {{ \Carbon\Carbon::parse($charge['period_end'])->format('d/m/Y') }}</small>
                                                     @endif
+                                                @elseif($charge['type'] == 'package')
+                                                    {{ $charge['description'] ?? ('Package - ' . ($charge['package_name'] ?? 'N/A')) }}
                                                 @elseif($charge['type'] == 'ipd')
                                                     {{ $charge['description'] }}
                                                     @if(isset($charge['qty']) && $charge['qty'] > 1)
@@ -148,6 +158,8 @@
                                                     {{ $charge['test_name'] ?? $charge['description'] }}
                                                 @elseif($charge['type'] == 'doctor_visit')
                                                     {{ $charge['description'] }}
+                                                @else
+                                                    {{ $charge['description'] ?? '-' }}
                                                 @endif
                                             </td>
                                             <td>
@@ -157,6 +169,8 @@
                                                         Rate: ₹{{ number_format($charge['rate'] ?? 0, 2) }}/day<br>
                                                         Days: {{ $charge['days'] ?? 1 }}
                                                     </small>
+                                                @elseif($charge['type'] == 'package')
+                                                    <small>{{ $charge['package_name'] ?? 'Package' }}</small>
                                                 @elseif($charge['type'] == 'ipd')
                                                     <small>
                                                         Category: {{ $charge['category'] ?? 'N/A' }}<br>
