@@ -225,7 +225,7 @@
                                                 <th>Charge Category</th>
                                                 <th>Charge Type</th>
                                                 <th>Unit</th>
-                                                <th>Tax(%)</th>
+                                                {{-- <th>Tax(%)</th> --}}
                                                 <th>Standard Charge (INR)</th>
                                                 <th>Action</th>
                                             </tr>
@@ -244,7 +244,7 @@
 
                                                     <td>{{ optional($charge->unit)->unit }}</td>
 
-                                                    <td>{{ optional($charge->taxCategory)->percentage }}</td>
+                                                    {{-- <td>{{ optional($charge->taxCategory)->percentage }}</td> --}}
 
                                                     <td>{{ $charge->standard_charge }}</td>
 
