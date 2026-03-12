@@ -154,6 +154,10 @@ class IpdViewController extends Controller
         }
         $currentUser = User::with('userRole')->where('id', Auth::id())->firstOrFail();
 
+        // Billing summary for overview Finance section
+        $billingController = app(\App\Http\Controllers\IpdBillingController::class);
+        $billingSummary = $billingController->getBillingSummaryForIpd($ipd->id);
+
         // dd($ipd);
         //dd($currentUser->username);
         return view('admin.ipd.ipd_view', compact(
@@ -182,7 +186,8 @@ class IpdViewController extends Controller
             'vitalDetails',
             'vitals',
             'dosages',
-            'currentUser'
+            'currentUser',
+            'billingSummary'
         ));
     }
     public function store(Request $request)

@@ -351,7 +351,7 @@
         <div class="modal-content" style="overflow: visible;">
             <!-- Modal Header -->
             <div class="modal-header">
-                <h5 class="modal-title" id="addPrescriptionModal">
+                <h5 class="modal-title" id="addPrescriptionModalLabel">
                     <div class="section-icon">
                         <i class="bi bi-person-badge"></i>
                     </div>

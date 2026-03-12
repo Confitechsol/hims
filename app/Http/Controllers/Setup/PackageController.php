@@ -34,8 +34,9 @@ class PackageController extends Controller
     {
         $chargeCategories = ChargeCategory::with('chargeType')->get();
         $charges = Charge::with('category')->get();
+        $package = new Package(); // form expects $package for old() fallbacks
         
-        return view('admin.setup.packages.form', compact('chargeCategories', 'charges'));
+        return view('admin.setup.packages.form', compact('package', 'chargeCategories', 'charges'));
     }
 
     /**
@@ -50,42 +51,51 @@ class PackageController extends Controller
             'package_rate' => 'required|numeric|min:0',
             'description' => 'nullable|string',
             'status' => 'nullable|string|in:active,inactive',
-            'charges' => 'required|array',
-            'charges.*.charge_type' => 'required|string',
-            'charges.*.amount' => 'required|numeric|min:0',
         ]);
 
         try {
             DB::beginTransaction();
 
             $user = Auth::user();
-            
+
             $package = Package::create([
+                // Legacy integer column `packageId` without default; keep it in a safe small range
+                // This column is not used as primary key (the `id` column is), so we can use a fixed value.
+                'packageId' => 1,
                 'hospital_id' => $user->hospital_id ?? null,
                 'branch_id' => $user->branch_id ?? null,
                 'name' => $request->name,
-                'account_head' => $request->account_head,
+                'account_head' => $request->account_head ?? null,
                 'gst_amount' => $request->gst_amount ?? 0,
-                'package_rate' => $request->package_rate,
-                'description' => $request->description,
+                'package_rate' => (float) $request->package_rate,
+                'description' => $request->description ?? null,
                 'status' => $request->status ?? 'active',
                 'is_active' => ($request->status ?? 'active') === 'active',
                 'created_by' => $user->id ?? null,
             ]);
 
-            // Save package charges
-            if ($request->has('charges') && is_array($request->charges)) {
-                foreach ($request->charges as $index => $chargeData) {
-                    PackageCharge::create([
-                        'package_id' => $package->id,
-                        'charge_type' => $chargeData['charge_type'],
-                        'charge_category_id' => $chargeData['charge_category_id'] ?? null,
-                        'charge_id' => $chargeData['charge_id'] ?? null,
-                        'amount' => $chargeData['amount'],
-                        'is_percentage' => $chargeData['is_percentage'] ?? false,
-                        'display_order' => $index,
-                    ]);
+            // Save package charges (normalize from request; charges array may be missing or have empty values)
+            $charges = is_array($request->input('charges')) ? $request->input('charges') : [];
+            $displayOrder = 0;
+            foreach ($charges as $chargeData) {
+                $chargeType = isset($chargeData['charge_type']) ? trim((string) $chargeData['charge_type']) : '';
+                $amountRaw = $chargeData['amount'] ?? null;
+                $amount = $amountRaw === null || $amountRaw === '' ? 0 : (float) $amountRaw;
+
+                // Skip row only if both type and amount are empty
+                if ($chargeType === '' && $amount == 0) {
+                    continue;
                 }
+
+                PackageCharge::create([
+                    'package_id' => $package->id,
+                    'charge_type' => $chargeType !== '' ? $chargeType : 'Other',
+                    'charge_category_id' => $chargeData['charge_category_id'] ?? null,
+                    'charge_id' => $chargeData['charge_id'] ?? null,
+                    'amount' => $amount,
+                    'is_percentage' => !empty($chargeData['is_percentage']),
+                    'display_order' => $displayOrder++,
+                ]);
             }
 
             // Save package excludes
@@ -149,9 +159,6 @@ class PackageController extends Controller
             'package_rate' => 'required|numeric|min:0',
             'description' => 'nullable|string',
             'status' => 'nullable|string|in:active,inactive',
-            'charges' => 'required|array',
-            'charges.*.charge_type' => 'required|string',
-            'charges.*.amount' => 'required|numeric|min:0',
         ]);
 
         try {
@@ -161,30 +168,36 @@ class PackageController extends Controller
             
             $package->update([
                 'name' => $request->name,
-                'account_head' => $request->account_head,
+                'account_head' => $request->account_head ?? null,
                 'gst_amount' => $request->gst_amount ?? 0,
-                'package_rate' => $request->package_rate,
-                'description' => $request->description,
+                'package_rate' => (float) $request->package_rate,
+                'description' => $request->description ?? null,
                 'status' => $request->status ?? 'active',
                 'is_active' => ($request->status ?? 'active') === 'active',
             ]);
 
-            // Delete existing charges
             PackageCharge::where('package_id', $package->id)->delete();
 
-            // Save new package charges
-            if ($request->has('charges') && is_array($request->charges)) {
-                foreach ($request->charges as $index => $chargeData) {
-                    PackageCharge::create([
-                        'package_id' => $package->id,
-                        'charge_type' => $chargeData['charge_type'],
-                        'charge_category_id' => $chargeData['charge_category_id'] ?? null,
-                        'charge_id' => $chargeData['charge_id'] ?? null,
-                        'amount' => $chargeData['amount'],
-                        'is_percentage' => $chargeData['is_percentage'] ?? false,
-                        'display_order' => $index,
-                    ]);
+            $charges = is_array($request->input('charges')) ? $request->input('charges') : [];
+            $displayOrder = 0;
+            foreach ($charges as $chargeData) {
+                $chargeType = isset($chargeData['charge_type']) ? trim((string) $chargeData['charge_type']) : '';
+                $amountRaw = $chargeData['amount'] ?? null;
+                $amount = $amountRaw === null || $amountRaw === '' ? 0 : (float) $amountRaw;
+
+                if ($chargeType === '' && $amount == 0) {
+                    continue;
                 }
+
+                PackageCharge::create([
+                    'package_id' => $package->id,
+                    'charge_type' => $chargeType !== '' ? $chargeType : 'Other',
+                    'charge_category_id' => $chargeData['charge_category_id'] ?? null,
+                    'charge_id' => $chargeData['charge_id'] ?? null,
+                    'amount' => $amount,
+                    'is_percentage' => !empty($chargeData['is_percentage']),
+                    'display_order' => $displayOrder++,
+                ]);
             }
 
             // Delete existing excludes
