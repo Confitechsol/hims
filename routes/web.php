@@ -4,15 +4,17 @@ use App\Http\Controllers\AmbulanceController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AppointmentsController;
 use App\Http\Controllers\AppSwitchController;
+use App\Http\Controllers\AreaController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\BedChargeBackfillController;
 use App\Http\Controllers\BedController;
 use App\Http\Controllers\BedGroupController;
-use App\Http\Controllers\AreaController;
-use App\Http\Controllers\BedChargeBackfillController;
 use App\Http\Controllers\BedTypeController;
 use App\Http\Controllers\BirthController;
 use App\Http\Controllers\BloodBankController;
 use App\Http\Controllers\BloodDonorController;
+use App\Http\Controllers\CashRegisterController;
+use App\Http\Controllers\DailyCollectionReportController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\DeathController;
@@ -23,18 +25,21 @@ use App\Http\Controllers\DutyRosterController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\ExcelImportController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\ExpenseRegisterController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\FloorController;
 use App\Http\Controllers\FrontOfficeController;
 use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\InventoriesController;
 use App\Http\Controllers\IpdBillingController;
+use App\Http\Controllers\IpdFinalBillRegisterController;
 use App\Http\Controllers\MedicineCategoryController;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\MedicineGroupController;
 use App\Http\Controllers\Modules\IpdController;
 use App\Http\Controllers\Modules\IpdViewController;
 use App\Http\Controllers\Modules\OpdController;
+use App\Http\Controllers\MoneyReceiptRegisterController;
 use App\Http\Controllers\OperationController;
 use App\Http\Controllers\PathologyBillingController;
 use App\Http\Controllers\PathologyController;
@@ -66,6 +71,7 @@ use App\Http\Controllers\Setup\MedicineCompanyController as SetupMedicineCompany
 use App\Http\Controllers\Setup\MedicineDosageController;
 use App\Http\Controllers\Setup\MedicineDosageController as SetupMedicineDosageController;
 use App\Http\Controllers\Setup\MedicineGroupController as SetupMedicineGroupController;
+use App\Http\Controllers\Setup\MedicineMasterController;
 use App\Http\Controllers\Setup\MedicineSupplierController;
 use App\Http\Controllers\Setup\MedicineSupplierController as SetupMedicineSupplierController;
 use App\Http\Controllers\Setup\MedicineUnitController as SetupMedicineUnitController;
@@ -80,11 +86,6 @@ use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\TpamanagmentController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\TransactionReportController;
-use App\Http\Controllers\MoneyReceiptRegisterController;
-use App\Http\Controllers\CashRegisterController;
-use App\Http\Controllers\ExpenseRegisterController;
-use App\Http\Controllers\IpdFinalBillRegisterController;
-use App\Http\Controllers\DailyCollectionReportController;
 use App\Http\Controllers\VisitorsController;
 use App\Http\Controllers\VitalController;
 use Illuminate\Support\Facades\Route;
@@ -134,11 +135,11 @@ Route::middleware(['admin'])->group(function () {
     // Route::post('/database/restore', [DatabaseController::class, 'restore'])->name('database.restore');
     // Route::get('/database/backup', [DatabaseController::class, 'backup'])->name('database.backup'); // optional link
     Route::get('/patients', [PatientController::class, 'index'])->name('patients');
-    
+
     Route::get('/get-district-by-area/{id}', [AreaController::class, 'getDistrict'])
-    ->name('get.district');
+        ->name('get.district');
     Route::get('/get-state-by-district/{id}', [AreaController::class, 'getState'])
-    ->name('get.state');
+        ->name('get.state');
     Route::get('/getPatients', [PatientController::class, 'getPatients'])->name('getPatients');
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::post('/profile/store', [ProfileController::class, 'store'])->name('profile.store');
@@ -195,7 +196,7 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/change-password', [UsersController::class, 'updatePassword'])
         ->name('password.update');
     Route::post('/users/store', [UsersController::class, 'store'])->name('users.store');
-    Route::post('/users/create-credentials/{staff}',[UsersController::class, 'createCredentials'])->name('users.store.credentials');
+    Route::post('/users/create-credentials/{staff}', [UsersController::class, 'createCredentials'])->name('users.store.credentials');
     Route::get('/charges', [HospitalChargesController::class, 'index'])->name('charges');
     Route::post('/charges', [HospitalChargesController::class, 'store'])->name('charges.store');
     Route::put('/charges/update', [HospitalChargesController::class, 'update'])->name('charges.update');
@@ -573,8 +574,6 @@ Route::post('/add_prescription', [OpdController::class, 'storePrescription'])->n
 Route::post('/opd_medication', [OpdController::class, 'createOpdMedication'])->name('opd.createMedication');
 Route::post('/opd_charge', [OpdController::class, 'addOpdCharge'])->name('opd.addOpdCharge');
 Route::post('/opd_visit', [OpdController::class, 'storeVisitDetails'])->name('opd.visit.store');
-
-
 
 Route::get('/ipd', [IpdController::class, 'index'])->name('ipd');
 Route::post('/ipd/store', [IpdController::class, 'store'])->name('ipd.store');
@@ -1085,18 +1084,18 @@ Route::prefix('reports')->group(function () {
     Route::get('/money-receipt-register', [MoneyReceiptRegisterController::class, 'index'])->name('reports.money-receipt-register');
     Route::get('/money-receipt-register/excel', [MoneyReceiptRegisterController::class, 'exportExcel'])->name('reports.money-receipt-register.excel');
     Route::get('/money-receipt-register/pdf', [MoneyReceiptRegisterController::class, 'exportPdf'])->name('reports.money-receipt-register.pdf');
-Route::get('/cash-register', [CashRegisterController::class, 'index'])->name('reports.cash-register');
-Route::get('/cash-register/excel', [CashRegisterController::class, 'exportExcel'])->name('reports.cash-register.excel');
-Route::get('/cash-register/pdf', [CashRegisterController::class, 'exportPdf'])->name('reports.cash-register.pdf');
-Route::get('/expense-register', [ExpenseRegisterController::class, 'index'])->name('reports.expense-register');
-Route::get('/expense-register/excel', [ExpenseRegisterController::class, 'exportExcel'])->name('reports.expense-register.excel');
-Route::get('/expense-register/pdf', [ExpenseRegisterController::class, 'exportPdf'])->name('reports.expense-register.pdf');
-Route::get('/ipd-final-bill-register', [IpdFinalBillRegisterController::class, 'index'])->name('reports.ipd-final-bill-register');
-Route::get('/ipd-final-bill-register/excel', [IpdFinalBillRegisterController::class, 'exportExcel'])->name('reports.ipd-final-bill-register.excel');
-Route::get('/ipd-final-bill-register/pdf', [IpdFinalBillRegisterController::class, 'exportPdf'])->name('reports.ipd-final-bill-register.pdf');
-Route::get('/daily-collection-report', [DailyCollectionReportController::class, 'index'])->name('reports.daily-collection');
-Route::get('/daily-collection-report/excel', [DailyCollectionReportController::class, 'exportExcel'])->name('reports.daily-collection.excel');
-Route::get('/daily-collection-report/pdf', [DailyCollectionReportController::class, 'exportPdf'])->name('reports.daily-collection.pdf');
+    Route::get('/cash-register', [CashRegisterController::class, 'index'])->name('reports.cash-register');
+    Route::get('/cash-register/excel', [CashRegisterController::class, 'exportExcel'])->name('reports.cash-register.excel');
+    Route::get('/cash-register/pdf', [CashRegisterController::class, 'exportPdf'])->name('reports.cash-register.pdf');
+    Route::get('/expense-register', [ExpenseRegisterController::class, 'index'])->name('reports.expense-register');
+    Route::get('/expense-register/excel', [ExpenseRegisterController::class, 'exportExcel'])->name('reports.expense-register.excel');
+    Route::get('/expense-register/pdf', [ExpenseRegisterController::class, 'exportPdf'])->name('reports.expense-register.pdf');
+    Route::get('/ipd-final-bill-register', [IpdFinalBillRegisterController::class, 'index'])->name('reports.ipd-final-bill-register');
+    Route::get('/ipd-final-bill-register/excel', [IpdFinalBillRegisterController::class, 'exportExcel'])->name('reports.ipd-final-bill-register.excel');
+    Route::get('/ipd-final-bill-register/pdf', [IpdFinalBillRegisterController::class, 'exportPdf'])->name('reports.ipd-final-bill-register.pdf');
+    Route::get('/daily-collection-report', [DailyCollectionReportController::class, 'index'])->name('reports.daily-collection');
+    Route::get('/daily-collection-report/excel', [DailyCollectionReportController::class, 'exportExcel'])->name('reports.daily-collection.excel');
+    Route::get('/daily-collection-report/pdf', [DailyCollectionReportController::class, 'exportPdf'])->name('reports.daily-collection.pdf');
 
     Route::get('/opd-reports-index', [OpdController::class, 'reports'])->name('opd.reports');
     Route::get('/opd-reports', [OpdController::class, 'opdReport'])->name('opd.opd_reports');
@@ -1106,7 +1105,6 @@ Route::get('/daily-collection-report/pdf', [DailyCollectionReportController::cla
     Route::get('/ipd-reports', [IpdController::class, 'ipdReport'])->name('ipd.ipd_reports');
     Route::get('/ipd-balance-reports', [ipdController::class, 'ipdBalanceReport'])->name('ipd.ipd_balance_reports');
     Route::get('/ipd-discharge-reports', [ipdController::class, 'ipdDischargeReport'])->name('ipd.ipd-discharge-reports');
-
 
 });
 Route::get('/allTransactionReport', function () {
@@ -1133,7 +1131,6 @@ Route::get('/processingTransactionReport', function () {
 
 // OPD
 
-
 Route::get('/opdBalanceReports', function () {
     return view('admin.reports.opd.opd_balance_reports');
 })->name('opdBalanceReports');
@@ -1142,7 +1139,6 @@ Route::get('/opdDischargePatient', function () {
 })->name('opdDischargePatient');
 
 // ipd
-
 
 Route::get('/discharge/pdf/{id}', [DischargePdfController::class, 'generate'])
     ->name('discharge.pdf');
@@ -1154,3 +1150,17 @@ Route::get('/opd/prescription/{id}/edit', [OpdController::class, 'editPrescripti
 Route::get('/opd/prescription/{id}/print', [OpdController::class, 'printPrescription'])->name('opd.prescription.print');
 Route::put('/opd/prescription/{id}', [OpdController::class, 'updatePrescription'])->name('opd.prescription.update');
 Route::delete('/opd/prescription/{id}', [OpdController::class, 'deletePrescription'])->name('opd.prescription.delete');
+
+Route::prefix('medicines')->group(function () {
+    Route::get('/', [MedicineMasterController::class, 'index'])->name('medicine-master');
+    Route::get('/create', [MedicineMasterController::class, 'create'])->name('medicine-master.create');
+    Route::post('/store', [MedicineMasterController::class, 'store'])->name('medicine-master.store');
+    Route::get('/edit/{id}', [MedicineMasterController::class, 'edit'])->name('medicine-master.edit');
+    Route::put('/edit/{id}', [MedicineMasterController::class, 'update'])->name('medicine-master.update');
+    Route::delete('/delete/{id}', [MedicineMasterController::class, 'destroy'])->name('medicine-master.delete');
+    Route::get('/import/medicine', [MedicineMasterController::class, 'importMedicine'])->name('medicine-master.import');
+
+    Route::get('/medicine_master_export', [ExcelImportController::class, 'exportMedicineMasterCSV'])->name('medicineMaster.export');
+    Route::post('/medicine_master_import', [ExcelImportController::class, 'importMedicineMasterExcel'])->name('medicineMaster.import');
+
+});
