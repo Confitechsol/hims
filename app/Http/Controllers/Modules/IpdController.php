@@ -44,57 +44,7 @@ use Milon\Barcode\Facades\DNS1DFacade as DNS1D;
 
 class IpdController extends Controller
 {
-    // public function index(Request $request)
-    // // {
-    // //     $search     = $request->get('search');
-    // //     $isIpdTab   = $request->get('tab', 'ipd') == 'ipd';
-    // //     $doctors    = Doctor::all();
-    // //     $bedGroups  = BedGroup::with('floorDetail')->get();
-    // //     $chargeType = ChargeTypeMaster::all();
-    // //     $charges    = Charge::all();
-    // //     $references = ['Direct', 'Doctor', 'Marketer', 'Other'];
-    // //     if ($isIpdTab) {
-    // //         $ipd = IpdDetail::with('patient', 'ipdPatients', 'doctor', 'bedDetail', 'bedGroup.floorDetail')->where('discharged', null)
-    // //             ->when($search, function ($query) use ($search) {
-    // //                 $query->where(function ($q) use ($search) {
-    // //                     $q->where('ipd_no', 'LIKE', "%{$search}%")
-    // //                         ->orWhereHas('patient', function ($p) use ($search) {
-    // //                             $p->where('patient_name', 'LIKE', "%{$search}%")
-    // //                                 ->orWhere('mobileno', 'LIKE', "%{$search}%")
-    // //                                 ->orWhere('email', 'LIKE', "%{$search}%");
-    // //                         });
-
-    // //                     // Consultant (Doctor)
-    // //                     //     ->orWhereHas('doctor', function ($d) use ($search) {
-    // //                     //         $d->where('name', 'LIKE', "%{$search}%");
-    // //                     //     });
-    // //                 });
-    // //             })->get();
-
-    // //         // Attach billing summary (total billing, total payments, outstanding) for each IPD
-    // //         $billingController = app(\App\Http\Controllers\IpdBillingController::class);
-    // //         foreach ($ipd as $ipdDetails) {
-    // //             $summary                    = $billingController->getBillingSummaryForIpd($ipdDetails->id);
-    // //             $ipdDetails->total_payments = $summary['total_payments'];
-    // //             $ipdDetails->outstanding    = $summary['outstanding'];
-    // //             $ipdDetails->total_billing = $summary['total_charges'];
-    // //         }
-    // //     } else {
-    // //         // $patients = Patient::with(['ipds.doctor'])->get();
-    // //         $patients = IpdDetail::with('patient', 'ipdPatients', 'doctor')->where('discharged', 'yes')
-    // //             ->when($search, function ($query) use ($search) {
-    // //                 $query->where(function ($q) use ($search) {
-    // //                     $q->whereHas('patient', function ($p) use ($search) {
-    // //                         $p->where('patient_name', 'LIKE', "%{$search}%")
-    // //                             ->orWhere('mobileno', 'LIKE', "%{$search}%")
-    // //                             ->orWhere('email', 'LIKE', "%{$search}%");
-    // //                     });
-    // //                 });
-    // //             })->get();
-    // //         $ipd = $patients;
-    // //     }
-    // //     return view("admin.ipd.index", compact("ipd", 'doctors', 'isIpdTab', 'bedGroups', 'references'));
-    // // }
+    
    public function index(Request $request)
 {
     // Search term and pagination
