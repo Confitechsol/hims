@@ -89,7 +89,7 @@ class AppointmentsController extends Controller
         $appointment->appointment_id = $appointmentId;
         $appointment->patient_id     = $request->patient_id;
         $appointment->doctor         = $request->doctor;
-        // $appointment->amount = $request->doctor_fees;
+        $appointment->amount = $request->doctor_fees;
         $appointment->doctor_global_shift_id = $request->shift;
         $appointment->date                   = $request->appointment_date;
         $appointment->doctor_shift_time_id   = $request->slot;
@@ -175,7 +175,7 @@ class AppointmentsController extends Controller
             $visitDetail->cons_doctor       = $request->doctor_id;
             $visitDetail->case_type         = $request->case_type;
             $visitDetail->appointment_date  = $request->appointment_date;
-
+            $visitDetail->payment_mode      = $request->payment_method ?? 'Cash';
             $visitDetail->symptoms_type     = $implodedSymptomType ?? null;
             $visitDetail->symptoms          = $implodedSymptomTitle ?? null;
 

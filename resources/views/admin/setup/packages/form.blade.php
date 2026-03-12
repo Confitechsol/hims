@@ -5,9 +5,9 @@
     <div class="card shadow-sm">
         <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0" style="color: #750096">
+                    <h5 class="mb-0" style="color: #750096">
                     <i class="ti ti-package me-2"></i>
-                    {{ isset($package) ? 'Edit Package' : 'Create Package' }}
+                    {{ (isset($package) && $package->id) ? 'Edit Package' : 'Create Package' }}
                 </h5>
                 <a href="{{ route('packages.index') }}" class="btn btn-secondary">
                     <i class="ti ti-arrow-left"></i> Back to List
@@ -15,6 +15,18 @@
             </div>
         </div>
         <div class="card-body">
+            @if(session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="alert alert-danger">
+                    {{ session('error') }}
+                </div>
+            @endif
+
             @if($errors->any())
                 <div class="alert alert-danger">
                     <ul class="mb-0">
@@ -25,9 +37,9 @@
                 </div>
             @endif
 
-            <form action="{{ isset($package) ? route('packages.update', $package->id) : route('packages.store') }}" method="POST">
+            <form action="{{ (isset($package) && $package->id) ? route('packages.update', $package->id) : route('packages.store') }}" method="POST">
                 @csrf
-                @if(isset($package))
+                @if(isset($package) && $package->id)
                     @method('PUT')
                 @endif
 
@@ -60,8 +72,8 @@
                         <div class="mb-3">
                             <label for="package_rate" class="form-label">Package Rate <span class="text-danger">*</span></label>
                             <input type="number" step="0.01" class="form-control" id="package_rate" name="package_rate" 
-                                   value="{{ old('package_rate', $package->package_rate ?? 0) }}" readonly required>
-                            <small class="text-muted">Auto-calculated from service charges</small>
+                                   value="{{ old('package_rate', $package->package_rate ?? 0) }}" required>
+                            <small class="text-muted">Enter the final package rate manually.</small>
                         </div>
                     </div>
                 </div>
@@ -83,11 +95,11 @@
                 <div class="mb-4">
                     <h6 class="mb-3">Service Includes</h6>
                     <div id="charges-container">
-                        @if(isset($package) && $package->charges->count() > 0)
+                        @if(isset($package) && $package->id && $package->charges->count() > 0)
                             @foreach($package->charges as $index => $charge)
                                 <div class="row charge-row mb-2">
                                     <div class="col-md-4">
-                                        <select class="form-select charge-type" name="charges[{{ $index }}][charge_type]" required>
+                                        <select class="form-select charge-type" name="charges[{{ $index }}][charge_type]">
                                             <option value="">Select Charge Type</option>
                                             <option value="Other Charges" {{ $charge->charge_type == 'Other Charges' ? 'selected' : '' }}>Other Charges</option>
                                             <option value="Bed Charges" {{ $charge->charge_type == 'Bed Charges' ? 'selected' : '' }}>Bed Charges</option>
@@ -99,10 +111,10 @@
                                         </select>
                                     </div>
                                     <div class="col-md-6">
-                                        <input type="number" step="0.01" class="form-control charge-amount" 
+                                    <input type="number" step="0.01" class="form-control charge-amount" 
                                                name="charges[{{ $index }}][amount]" 
                                                value="{{ $charge->amount }}" 
-                                               placeholder="Amount" required>
+                                               placeholder="Amount">
                                     </div>
                                     <div class="col-md-2">
                                         <button type="button" class="btn btn-danger btn-sm remove-charge">
@@ -114,7 +126,7 @@
                         @else
                             <div class="row charge-row mb-2">
                                 <div class="col-md-4">
-                                    <select class="form-select charge-type" name="charges[0][charge_type]" required>
+                                    <select class="form-select charge-type" name="charges[0][charge_type]">
                                         <option value="">Select Charge Type</option>
                                         <option value="Other Charges">Other Charges</option>
                                         <option value="Bed Charges">Bed Charges</option>
@@ -127,7 +139,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <input type="number" step="0.01" class="form-control charge-amount" 
-                                           name="charges[0][amount]" placeholder="Amount" required>
+                                           name="charges[0][amount]" placeholder="Amount">
                                 </div>
                                 <div class="col-md-2">
                                     <button type="button" class="btn btn-danger btn-sm remove-charge">
@@ -145,7 +157,7 @@
                 <div class="d-flex justify-content-end gap-2">
                     <a href="{{ route('packages.index') }}" class="btn btn-secondary">Cancel</a>
                     <button type="submit" class="btn btn-primary">
-                        <i class="ti ti-check"></i> {{ isset($package) ? 'Update' : 'Create' }} Package
+                        <i class="ti ti-check"></i> {{ (isset($package) && $package->id) ? 'Update' : 'Create' }} Package
                     </button>
                 </div>
             </form>
@@ -154,41 +166,16 @@
 </div>
 
 <script>
-let chargeIndex = {{ isset($package) && $package->charges->count() > 0 ? $package->charges->count() : 1 }};
+let chargeIndex = {{ (isset($package) && $package->id && $package->charges->count() > 0) ? $package->charges->count() : 1 }};
 
-// Function to calculate and update package rate
-function updatePackageRate() {
-    let total = 0;
-    document.querySelectorAll('.charge-amount').forEach(input => {
-        const value = parseFloat(input.value) || 0;
-        total += value;
-    });
-    const packageRateInput = document.getElementById('package_rate');
-    if (packageRateInput) {
-        packageRateInput.value = total.toFixed(2);
-    }
-}
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-    // Add event listeners to existing charge amount inputs
-    document.querySelectorAll('.charge-amount').forEach(input => {
-        input.addEventListener('input', updatePackageRate);
-        input.addEventListener('change', updatePackageRate);
-    });
-    
-    // Initial calculation on page load
-    updatePackageRate();
-});
-
-// Add charge row
+// Add charge row (no auto package-rate calculation; rate is fully manual)
 document.getElementById('add-charge').addEventListener('click', function() {
     const container = document.getElementById('charges-container');
     const row = document.createElement('div');
     row.className = 'row charge-row mb-2';
     row.innerHTML = `
         <div class="col-md-4">
-            <select class="form-select charge-type" name="charges[${chargeIndex}][charge_type]" required>
+            <select class="form-select charge-type" name="charges[${chargeIndex}][charge_type]">
                 <option value="">Select Charge Type</option>
                 <option value="Other Charges">Other Charges</option>
                 <option value="Bed Charges">Bed Charges</option>
@@ -201,7 +188,7 @@ document.getElementById('add-charge').addEventListener('click', function() {
         </div>
         <div class="col-md-6">
             <input type="number" step="0.01" class="form-control charge-amount" 
-                   name="charges[${chargeIndex}][amount]" placeholder="Amount" required>
+                   name="charges[${chargeIndex}][amount]" placeholder="Amount">
         </div>
         <div class="col-md-2">
             <button type="button" class="btn btn-danger btn-sm remove-charge">
@@ -210,31 +197,14 @@ document.getElementById('add-charge').addEventListener('click', function() {
         </div>
     `;
     container.appendChild(row);
-    
-    // Add event listeners to the new amount input
-    const newAmountInput = row.querySelector('.charge-amount');
-    newAmountInput.addEventListener('input', updatePackageRate);
-    newAmountInput.addEventListener('change', updatePackageRate);
-    
+
     chargeIndex++;
-    
-    // Update package rate after adding new charge
-    updatePackageRate();
 });
 
 // Remove charge row
 document.addEventListener('click', function(e) {
     if (e.target.closest('.remove-charge')) {
         e.target.closest('.charge-row').remove();
-        // Recalculate package rate after removal
-        updatePackageRate();
-    }
-});
-
-// Also handle input events for dynamically added fields (backup)
-document.addEventListener('input', function(e) {
-    if (e.target.classList.contains('charge-amount')) {
-        updatePackageRate();
     }
 });
 </script>
