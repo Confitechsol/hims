@@ -261,57 +261,38 @@
 
                                             <td>
                                                 <div class="d-flex">
-                                                    <a href="#"
-                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
-                                                    data-bs-toggle="tooltip" title="Show">
-                                                        <i class="ti ti-menu"></i>
+                                                    
+
+                                                    <a href="javascript:void(0);" 
+                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill rescheduleBtn" 
+                                                        data-id="{{ $appointment->id }}" 
+                                                        data-bs-toggle="tooltip" 
+                                                        title="Reschedule">
+                                                            <i class="ti ti-calendar-time"></i>
                                                     </a>
+                                                    <a href="javascript:void(0);"  class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill deleteAppointmentBtn"
+                                                        data-id="{{ $appointment->id }}"
+                                                        title="Delete">
+                                                            <i class="ti ti-trash"></i>
+                                                        </a>
 
-                                                    <a href="#"
-                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-warning rounded-pill"
-                                                    data-bs-toggle="tooltip" title="Print">
-                                                        <i class="ti ti-file-description"></i>
-                                                    </a>
+                                                        <form id="delete-form-{{ $appointment->id }}" 
+                                                            action="{{ route('appointments.destroy',$appointment->id) }}" 
+                                                            method="POST" 
+                                                            style="display:none;">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                        </form>
 
-                                                    <!-- <a href="javascript:void(0);"
-                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill reschedule-btn"
-                                                data-bs-toggle="tooltip" 
-                                                title="Reschedule"
-                                                data-id="{{ $appointment->id }}"
-                                                data-patient="{{ $appointment->patient->patient_name ?? '' }}"
-                                                data-patientid="{{ $appointment->patient_id }}"
-                                                data-doctor="{{ $appointment->doctor->name ?? '' }}"
-                                                data-doctorid="{{ $appointment->doctor_id }}"
-                                                data-fees="{{ $appointment->doctor_fees ?? '' }}"
-                                                data-date="{{ $appointment->appointment_date }}"
-                                                data-shift="{{ $appointment->shift_id }}"
-                                                data-slot="{{ $appointment->slot_id }}"
-                                                data-priority="{{ $appointment->appointment_priority }}"
-                                                data-status="{{ $appointment->status }}"
-                                                data-payment="{{ $appointment->payment_method }}"
-                                                data-discount="{{ $appointment->discount_percentage }}"
-                                                data-message="{{ $appointment->message }}"
-                                                data-live="{{ $appointment->live_con }}">
-                                                    <i class="ti ti-calendar-time"></i>
-                                                </a> -->
-
-                                                <a href="javascript:void(0);" 
-                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill rescheduleBtn" 
-                                                    data-id="{{ $appointment->id }}" 
-                                                    data-bs-toggle="tooltip" 
-                                                    title="Reschedule">
-                                                        <i class="ti ti-calendar-time"></i>
-                                                </a>
-
-
+                                                
                                                 </div>
                                             </td>
                                         </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="13" class="text-center text-muted">No appointments found.</td>
-                                        </tr>
-                                    @endforelse
+                                        @empty
+                                            <tr>
+                                                <td colspan="13" class="text-center text-muted">No appointments found.</td>
+                                            </tr>
+                                        @endforelse
                                     </tbody>
                                 </table>
                             </div>
@@ -400,6 +381,23 @@
         
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/js/select2.min.js"></script>
         <script>
+            document.querySelectorAll('.deleteAppointmentBtn').forEach(button => {
+
+                button.addEventListener('click', function () {
+
+                    let id = this.dataset.id;
+
+                    if(confirm('Are you sure you want to delete this appointment?')) {
+
+                        document.getElementById('delete-form-' + id).submit();
+
+                    }
+
+                });
+
+            });
+        </script>
+        <script>
 
             document.querySelectorAll('.rescheduleBtn').forEach(btn => {
                 btn.addEventListener('click', function() {
@@ -408,6 +406,7 @@
                     fetch(`{{ url('appointment-details/appointments') }}/${id}/edit`)
                         .then(response => response.json())
                         .then(data => {
+                        console.log(data);
                             const appointment = data.appointment;
 
                             // Set form action dynamically
@@ -556,7 +555,7 @@
                     let doctorId = $('#doctor').val();
                     console.log('doctor:', doctorId);
                     let shiftId = $(this).val();
-                    console.log('doctor:', shiftId);
+                    console.log('doctor shift:', shiftId);
                     if (!shiftId || !doctorId) {
                         $('#slot').html('<option value="">Select</option>');
                         return;

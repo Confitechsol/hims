@@ -182,25 +182,6 @@ class AppointmentController extends Controller
         return response()->json(['fees' => 0]);
     }
 
-
-    // public function searchSlots(Request $request)
-    // {
-    //     $doctorId = $request->doctor;
-    //     $shiftId = $request->shift;
-
-    //     // Get existing slots for doctor & shift
-    //     $slots = DoctorShiftTime::where('doctor_id', $doctorId)
-    //                 ->where('doctor_global_shift_id', $shiftId)
-    //                 ->get();
-
-    //     // Get shift timings
-    //     $shift = GlobalShift::find($shiftId);
-
-    //     return response()->json([
-    //         'slots' => $slots,
-    //         'shift' => $shift
-    //     ]);
-    // }
     public function searchSlots(Request $request)
     {
         $doctorId = $request->doctor;
@@ -342,7 +323,9 @@ class AppointmentController extends Controller
                     ->get()
                     ->map(function($item) {
                         return [
+                            
                             'id' => $item->globalShift->id,
+                            'doctor_shift_id' => $item->id,
                             'name' => $item->globalShift->name
                         ];
                     });

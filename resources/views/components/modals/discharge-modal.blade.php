@@ -753,9 +753,6 @@
                                     <label class="form-label">Medicine Name</label>
                                     <select class="med-medicine" name="meds[]" id="meds">
                                         <option value="">Select Medicine</option>
-                                        {{-- @foreach ($medicines as $med)
-                                            <option value="{{ $med->id }}">{{ $med->name }}</option>
-                                        @endforeach --}}
                                     </select>
                                 </div>
 
@@ -990,11 +987,12 @@
 
     function initTomSelects(row) {
         const medicineSelect = row.querySelector('.med-medicine');
+        const medTypeSelect = row.querySelector('.med-types');
         const intervalSelect = row.querySelector('.med-interval');
         const durationSelect = row.querySelector('.med-duration');
 
         if (medicineSelect && !medicineSelect.tomselect) {
-            new TomSelect(medicineSelect, {
+            const ts = new TomSelect(medicineSelect, {
                 options: medMaster.map(i => ({
                     value: i.name,
                     label: i.name
@@ -1002,7 +1000,25 @@
                 valueField: 'value',
                 labelField: 'label',
                 searchField: 'label',
-                placeholder: 'Select Interval'
+                placeholder: 'Select Medicine',
+
+                onChange: function(value) {
+
+                    const selectedMed = medMaster.find(m => m.name === value);
+
+                    if (selectedMed && selectedMed.medicine_type) {
+
+                        medTypeSelect.value = selectedMed.medicine_type ?
+                            selectedMed.medicine_type.charAt(0).toUpperCase() + selectedMed.medicine_type
+                            .slice(1).toLowerCase() :
+                            '';
+                        medTypeSelect.dispatchEvent(new Event('change'));
+
+                    } else {
+
+                        medTypeSelect.value = "";
+                    }
+                }
             });
         }
 
