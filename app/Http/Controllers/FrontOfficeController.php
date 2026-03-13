@@ -11,10 +11,36 @@ use Illuminate\Support\Facades\Validator;
 
 class FrontOfficeController extends Controller
 {
-    public function purposes()
+    public function purposes(Request $request)
     {
-        $purposes = VisitorsPurpose::all();
-        return view('admin.setup.visitorspurpose', compact('purposes'));
+          $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
+
+     $search = $request->input('search');
+       $query = VisitorsPurpose::query();
+         if (!empty($search)) {
+        $query->where(function ($q) use ($search) {
+            $q->where('visitors_purpose', 'like', "%{$search}%");
+              
+        });
+    }
+
+    $purposes = $query->paginate($perPage);
+
+    //    return response()->json([
+    //     'status' => true,
+    //     'message' => 'Visitors purpose list fetched successfully',
+    //     'data' => $purposes->items(),
+    //     'pagination' => [
+    //         'current_page' => $purposes->currentPage(),
+    //         'last_page' => $purposes->lastPage(),
+    //         'per_page' => $purposes->perPage(),
+    //         'total' => $purposes->total(),
+    //     ]
+    // ]);
+        return view('admin.setup.visitorspurpose', compact('purposes', 'perPage', 'search'));
     }
      public function storePurpose(Request $request)
     {
