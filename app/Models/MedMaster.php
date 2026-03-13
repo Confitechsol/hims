@@ -14,6 +14,7 @@ class MedMaster extends Model
     protected $fillable = [
         'name',
         'price',
+        'medicine_type',
         'manufacturer_name',
         'pack_size_label',
         'short_composition1',

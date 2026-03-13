@@ -624,6 +624,7 @@ class ExcelImportController extends Controller
         $headers = [
             'Name',
             'Price',
+            'Type',
             'Manufacturer Name',
             'Pack Size Label',
             'Short Composition 1',
@@ -655,17 +656,17 @@ class ExcelImportController extends Controller
     public function importMedicineMasterExcel(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv',
+            'master_file' => 'required|file|mimes:xlsx,xls,csv,txt',
         ]);
 
         try {
-            $file        = $request->file('file');
+            $file        = $request->file('master_file');
             $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file);
             $sheet       = $spreadsheet->getActiveSheet();
             $rows        = $sheet->toArray(null, true, true, true);
 
             DB::beginTransaction();
-
+            // dd($file);
             foreach ($rows as $index => $row) {
 
                 if ($index == 1) {
@@ -680,10 +681,11 @@ class ExcelImportController extends Controller
                 // Excel columns
                 $medicine_name      = trim($row['A']);
                 $medicine_price     = trim($row['B']);
-                $manufacturer_name  = trim($row['C']);
-                $pack_size_label    = trim($row['D']);
-                $short_composition1 = trim($row['E']);
-                $short_composition2 = trim($row['F']);
+                $medicine_type      = trim($row['C']);
+                $manufacturer_name  = trim($row['D']);
+                $pack_size_label    = trim($row['E']);
+                $short_composition1 = trim($row['F']);
+                $short_composition2 = trim($row['G']);
 
                 $med_price = str_replace([',', '₹', ' '], '', $medicine_price);
                 // Skip duplicates
@@ -695,6 +697,7 @@ class ExcelImportController extends Controller
                 $createData = [
                     'name'               => $medicine_name ?? '',
                     'price'              => is_numeric($med_price) ? (float) $med_price : 0,
+                    'medicine_type'      => $medicine_type ?? '',
                     'manufacturer_name'  => $manufacturer_name ?? '',
                     'pack_size_label'    => $pack_size_label ?? '',
                     'short_composition1' => $short_composition1 ?? '',
