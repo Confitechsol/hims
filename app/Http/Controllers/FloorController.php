@@ -41,7 +41,7 @@ class FloorController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'id' => 'required|exists:floors,id',
+            'id' => 'required|exists:floor,id',
             'name' => 'required|string|max:255|unique:floors,name,' . $request->id,
         ]);
 
@@ -55,7 +55,7 @@ class FloorController extends Controller
     public function destroy(Request $request)
     {
         $request->validate([
-            'id' => 'required|exists:floors,id',
+            'id' => 'required|exists:floor,id',
         ]);
 
         Floor::findOrFail($request->id)->delete();
