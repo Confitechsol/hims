@@ -914,6 +914,11 @@
                                 </select>
                                 <small class="text-muted">Select a package to include it from day 1</small>
                             </div>
+                            <div class="col-md-6" id="package_amount_wrapper_admission">
+                                <label class="form-label">Package Amount (INR)</label>
+                                <input type="number" class="form-control" name="package_rate" id="package_amount_admission" step="0.01" min="0" placeholder="0.00">
+                                <small class="text-muted">Auto-filled from package (editable). Reflects on estimate &amp; final bill.</small>
+                            </div>
                             {{-- <div class="col-md-6">
                                 <label class="form-label">Charge Category</label>
                                 <select class="form-select" name="charge_category" id="charge_category_select">
@@ -1567,6 +1572,8 @@
 
             // Load available packages (fully dynamic URL via named route)
             const packageSelect = $modal.find('#package_select_admission');
+            const packageAmountInput = $modal.find('#package_amount_admission');
+            const packageAmountWrapper = $modal.find('#package_amount_wrapper_admission');
             if (packageSelect.length) {
                 fetch("{{ route('packages.api.active') }}")
                     .then(response => response.json())
@@ -1581,14 +1588,27 @@
                                     false,
                                     false
                                 );
+                                option.dataset.rate = pkg.package_rate;
                                 packageSelect.append(option);
                             });
                         }
+                        packageAmountWrapper.hide();
                     })
                     .catch(error => {
                         console.error('Error loading packages:', error);
                         packageSelect.empty().append('<option value="">Error loading packages</option>');
                     });
+
+                packageSelect.on('change', function() {
+                    const opt = this.options[this.selectedIndex];
+                    if (this.value && opt && opt.dataset.rate !== undefined) {
+                        packageAmountInput.val(parseFloat(opt.dataset.rate).toFixed(2));
+                        packageAmountWrapper.show();
+                    } else {
+                        packageAmountInput.val('');
+                        packageAmountWrapper.hide();
+                    }
+                });
             }
         });
     </script>

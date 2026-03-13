@@ -216,18 +216,21 @@
             padding-top: 4px;
             padding-bottom: 3px;
         }
+
         /* CSS for validation error */
-        .input-group{
+        .input-group {
             position: relative;
         }
-        .input-group .invalid-feedback{
+
+        .input-group .invalid-feedback {
             position: absolute;
             left: 0;
             bottom: -17px;
         }
-        .modal .modal-body{
+
+        .modal .modal-body {
             max-height: 75vh;
-            overflow-y:auto;
+            overflow-y: auto;
         }
     </style>
     @yield('select2cdn')
@@ -259,12 +262,14 @@
                         <!-- Logo Normal -->
                         <span class="logo-light">
                             <span class="logo-lg"><img src="{{asset('assets/img/logo.png')}}" alt="logo"></span>
-                            <span class="logo-sm"><img src="{{asset('assets/img/logo-small.svg')}}" alt="small logo"></span>
+                            <span class="logo-sm"><img src="{{asset('assets/img/logo-small.svg')}}"
+                                    alt="small logo"></span>
                         </span>
 
                         <!-- Logo Dark -->
                         <span class="logo-dark">
-                            <span class="logo-lg"><img src="{{asset('assets/img/logo-white.svg')}}" alt="dark logo"></span>
+                            <span class="logo-lg"><img src="{{asset('assets/img/logo-white.svg')}}"
+                                    alt="dark logo"></span>
                         </span>
                     </a>
 
@@ -315,6 +320,17 @@
                             <i class="ti ti-external-link ms-1"></i>
                         </a>
                     @endauth
+
+                    <!-- Bed -->
+                    <div class="header-item">
+                        <div class="dropdown me-2">
+                            <button class="btn topbar-link" data-bs-toggle="modal" data-bs-target="#bedModal"><i
+                                    class="fa-solid fa-bed"></i></button>
+                        </div>
+
+                    </div>
+
+                    <!-- Bed -->
 
                     <!-- Appointment -->
                     <div class="header-item">
@@ -525,8 +541,7 @@
                     <div class="dropdown profile-dropdown d-flex align-items-center justify-content-center">
                         <a href="javascript:void(0);"
                             class="topbar-link dropdown-toggle drop-arrow-none position-relative"
-                            data-bs-toggle="dropdown" data-bs-offset="0,22" aria-haspopup="false"
-                            aria-expanded="false">
+                            data-bs-toggle="dropdown" data-bs-offset="0,22" aria-haspopup="false" aria-expanded="false">
                             <img src="{{ asset('assets/img/users/user-01.jpg') }}" width="32"
                                 class="rounded-circle d-flex" alt="user-image">
                             <span class="online text-success"><i
@@ -535,8 +550,8 @@
                         <div class="dropdown-menu dropdown-menu-end dropdown-menu-md p-2">
 
                             <div class="d-flex align-items-center bg-light rounded-3 p-2 mb-2">
-                                <img src="{{ asset('assets/img/users/user-01.jpg') }}" class="rounded-circle"
-                                    width="42" height="42" alt>
+                                <img src="{{ asset('assets/img/users/user-01.jpg') }}" class="rounded-circle" width="42"
+                                    height="42" alt>
                                 <div class="ms-2">
                                     <p class="fw-medium text-dark mb-0">{{ Auth::user()->username }}</p>
                                     <span class="d-block fs-13">Administrator</span>
@@ -573,8 +588,8 @@
 
                             <!-- Item-->
                             <div class="pt-2 mt-2 border-top">
-                                <form action="{{ route('logout') }}" method="POST"
-                                    class="dropdown-item text-danger" style="cursor: pointer">
+                                <form action="{{ route('logout') }}" method="POST" class="dropdown-item text-danger"
+                                    style="cursor: pointer">
                                     @csrf
                                     <button type="submit" class="btn w-100 justify-content-start p-0">
                                         <i class="ti ti-logout me-1 fs-17 align-middle text-danger fw-bold"></i>
@@ -631,6 +646,9 @@
 
         </div>
     </div>
+
+    @include('components.modals.bed-modal')
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js"></script>
@@ -768,8 +786,8 @@
         // }, 150);
 
         // Hide loader when page is ready
-        window.addEventListener('load', function() {
-            setTimeout(function() {
+        window.addEventListener('load', function () {
+            setTimeout(function () {
                 const loader = document.querySelector('.loader');
                 if (loader) {
                     loader.style.display = 'none';
@@ -778,8 +796,8 @@
         });
 
         // Also hide loader on DOMContentLoaded as fallback
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
+        document.addEventListener('DOMContentLoaded', function () {
+            setTimeout(function () {
                 const loader = document.querySelector('.loader');
                 if (loader) {
                     loader.style.display = 'none';
@@ -821,68 +839,68 @@
         //     });
         // });
         $(document).on('shown.bs.modal', '.use-select2', function () {
-    const $modal = $(this);
+            const $modal = $(this);
 
-    $modal.find('.select2-input').each(function () {
-        const $select = $(this);
+            $modal.find('.select2-input').each(function () {
+                const $select = $(this);
 
-        if ($select.hasClass('select2-hidden-accessible')) {
-            return;
-        }
+                if ($select.hasClass('select2-hidden-accessible')) {
+                    return;
+                }
 
-        const oldValue = $select.val();
+                const oldValue = $select.val();
 
-        $select.select2({
-            dropdownParent: $modal,
-            width: '100%'
+                $select.select2({
+                    dropdownParent: $modal,
+                    width: '100%'
+                });
+
+                // Find scrollable container (BS5 usually .modal-body)
+                const $scrollContainer = $select.closest('.modal-body');
+
+                // Reposition while scrolling
+                $scrollContainer.on('scroll.select2fix', function () {
+                    const instance = $select.data('select2');
+
+                    if (instance && instance.isOpen()) {
+                        instance.dropdown._positionDropdown();
+                    }
+                });
+
+                // Also reposition when opening (extra safety)
+                $select.on('select2:open', function () {
+                    const instance = $select.data('select2');
+                    if (instance) {
+                        instance.dropdown._positionDropdown();
+                    }
+                });
+
+                if (oldValue) {
+                    $select.val(oldValue).trigger('change');
+                }
+            });
         });
 
-        // Find scrollable container (BS5 usually .modal-body)
-        const $scrollContainer = $select.closest('.modal-body');
 
-        // Reposition while scrolling
-        $scrollContainer.on('scroll.select2fix', function () {
-            const instance = $select.data('select2');
-
-            if (instance && instance.isOpen()) {
-                instance.dropdown._positionDropdown();
-            }
+        // Cleanup
+        $(document).on('hidden.bs.modal', '.use-select2', function () {
+            $(this).find('.modal-body').off('scroll.select2fix');
         });
 
-        // Also reposition when opening (extra safety)
-        $select.on('select2:open', function () {
-            const instance = $select.data('select2');
-            if (instance) {
-                instance.dropdown._positionDropdown();
-            }
+        // Global: Remove lingering modal backdrops when any modal hides (fixes stuck overlay)
+        document.addEventListener('hidden.bs.modal', function () {
+            setTimeout(function () {
+                var openModals = document.querySelectorAll('.modal.show');
+                if (openModals.length === 0) {
+                    document.querySelectorAll('.modal-backdrop').forEach(function (b) { b.remove(); });
+                    document.body.classList.remove('modal-open');
+                    document.body.style.paddingRight = '';
+                    document.body.style.overflow = '';
+                }
+            }, 50);
         });
-
-        if (oldValue) {
-            $select.val(oldValue).trigger('change');
-        }
-    });
-});
-
-
-// Cleanup
-$(document).on('hidden.bs.modal', '.use-select2', function () {
-    $(this).find('.modal-body').off('scroll.select2fix');
-});
-
-// Global: Remove lingering modal backdrops when any modal hides (fixes stuck overlay)
-document.addEventListener('hidden.bs.modal', function() {
-    setTimeout(function() {
-        var openModals = document.querySelectorAll('.modal.show');
-        if (openModals.length === 0) {
-            document.querySelectorAll('.modal-backdrop').forEach(function(b) { b.remove(); });
-            document.body.classList.remove('modal-open');
-            document.body.style.paddingRight = '';
-            document.body.style.overflow = '';
-        }
-    }, 50);
-});        
-        $(document).ready(function() {
-            $('.add-select2').each(function() {
+        $(document).ready(function () {
+            $('.add-select2').each(function () {
                 if (!$(this).hasClass('select2-hidden-accessible')) {
                     $(this).select2();
                 }

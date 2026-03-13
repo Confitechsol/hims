@@ -73,6 +73,7 @@
 
                                                     <div class="modal-body">
                                                         <div class="row align-items-center gy-3">
+                                                            
                                                             <div class="col-md-3">
                                                                 <label for="doctor" class="form-label">Doctor <span class="text-danger">*</span></label>
                                                                 <select class="form-select" id="doctor" name="doctor" required>
