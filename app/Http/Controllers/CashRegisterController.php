@@ -112,7 +112,7 @@ class CashRegisterController extends Controller
         
         // Receipt types that need case/prescription number
         $opdReceiptTypes = ['OPD Doctor Consultation', 'OPD Pathology', 'OPD Radiology'];
-        $ipdReceiptTypes = ['IPD Pathology', 'IPD Radiology'];
+        $ipdReceiptTypes = ['IPD Pathology', 'IPD Radiology', 'IPD Pharmacy'];
         
         if (in_array($receiptType, $opdReceiptTypes) && $opdId && $opdId > 0) {
             $prescription = null;
