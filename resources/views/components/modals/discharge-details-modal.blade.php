@@ -330,7 +330,7 @@
                                               <div class="colon">:</div>
                                               <div class="patient_data w-auto" id="dis_admission_time_text"></div>
                                           </div>
-                                          <div class="patient_items">
+                                          <div class="patient_items" id="ot-date">
                                               <div class="patient_head">OT Date</div>
                                               <div class="colon">:</div>
                                               <div class="patient_data" id="dis_ot_date_text"></div>
@@ -445,7 +445,10 @@
 
                                       <h6 id="dis_discharge_advice_label">Condition at Discharge:</h6>
                                       <div class="general_list" id="dis_discharge_advice_html"></div>
-
+                                      <br />
+                                      <h6 id="dis_remarks_label">Remarks:</h6>
+                                      <div class="general_list" id="dis_remarks_text"></div>
+                                      <br />
                                       <div class="end">
                                           {{-- <p>---- xxxx -- END -- xxxx ---</p> --}}
                                       </div>
@@ -560,6 +563,8 @@
 
               if (data.ot_date) {
                   setText('dis_ot_date_text', formatDate(new Date(data.ot_date)));
+              } else {
+                  hideLabel('ot-date');
               }
 
               if (medicines.length > 0) {
@@ -608,6 +613,12 @@
                   hideLabel('dis_discharge_advice_label')
               } else {
                   setHTML('dis_discharge_advice_html', data.discharge_advice);
+              }
+
+              if (data.remarks === "" || data.remarks === null) {
+                  hideLabel('dis_remarks_label')
+              } else {
+                  setText('dis_remarks_text', data.remarks);
               }
 
               if (data.present_complaints === "" || data.present_complaints === null) {

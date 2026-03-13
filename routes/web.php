@@ -582,6 +582,7 @@ Route::put('/ipd/update/{id}', [IpdController::class, 'update'])->name('ipd.upda
 Route::get('/ipd/{id}/packages', [IpdController::class, 'getIpdPackages'])->name('ipd.packages');
 Route::post('/ipd/{id}/apply-package', [IpdController::class, 'applyPackage'])->name('ipd.apply-package');
 Route::delete('/ipd/{id}/remove-package', [IpdController::class, 'removePackage'])->name('ipd.remove-package');
+Route::patch('/ipd/{id}/packages/{ipdPackageId}', [IpdController::class, 'updatePackageAmount'])->name('ipd.packages.update-amount');
 Route::get('/getBedGroups', [IpdController::class, 'getBedGroups'])->name('getBedGroups');
 Route::get('/get-available-beds', [IpdController::class, 'getAvailableBeds'])->name('get.available.beds');
 Route::get('/getBedNumbers/{id}', [IpdController::class, 'getBedNumbers'])->name('getBedNumbers');
@@ -633,6 +634,7 @@ Route::delete('/ipd/prescription/{id}', [IpdController::class, 'deletePrescripti
 Route::post('/ipd_charge', [IpdController::class, 'addIpdCharge'])->name('ipd.addIpdCharge');
 Route::get('/ipd_charge/{charge}', [IpdController::class, 'getIpdCharge'])->name('ipd.charge.show');
 Route::put('/ipd_charge/{charge}', [IpdController::class, 'updateIpdCharge'])->name('ipd.charge.update');
+Route::delete('/ipd_charge/{charge}', [IpdController::class, 'deleteIpdCharge'])->name('ipd.charge.delete');
 Route::post('/assignNewBed', [IpdController::class, 'assignNewBed'])->name('assignNewBed');
 Route::post('/ipd/bed-history/update', [IpdController::class, 'updateBedHistory'])->name('ipd.bedHistory.update');
 //

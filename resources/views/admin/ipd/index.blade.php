@@ -171,6 +171,32 @@
 
                                         </table>
                                     </div>
+                                       {{-- Pagination Links --}}
+                                       <div class="mt-3" id="pagination-wrapper">
+                                       @php
+                                       $currentPage = $ipd->currentPage();
+                                       $lastPage = $ipd->lastPage();
+                                       $window = 2; // how many pages to show on each side
+                                       $start = max(1, $currentPage - $window);
+                                       $end = min($lastPage, $currentPage + $window);
+                                       @endphp
+                                       @if ($ipd->onFirstPage())
+                                       <button class="btn btn-outline-secondary btn-sm me-1" disabled>« Prev</button>
+                                       @else
+                                       <a href="{{ $ipd->previousPageUrl() }}" class="btn btn-outline-secondary btn-sm me-1">« Prev</a>
+                                       @endif
+                                       @for ($i = 1; $i <= $ipd->lastPage(); $i++)
+                                       <a href="{{ $ipd->url($i) }}" 
+                                          class="btn btn-sm {{ $i == $ipd->currentPage() ? 'btn-primary' : 'btn-outline-secondary' }}">
+                                       {{ $i }}
+                                       </a>
+                                       @endfor
+                                       @if ($ipd->hasMorePages())
+                                       <a href="{{ $ipd->nextPageUrl() }}" class="btn btn-outline-secondary btn-sm ms-1">Next »</a>
+                                       @else
+                                       <button class="btn btn-outline-secondary btn-sm ms-1" disabled>Next »</button>
+                                       @endif     
+                                    
                                 @else
                                     <div class="table-responsive">
                                         <table class="table mb-0">

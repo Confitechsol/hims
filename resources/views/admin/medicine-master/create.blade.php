@@ -59,33 +59,46 @@
                                         <label class="form-label">Medicine Name *</label>
                                         <input type="text" name="medicine_name[]" class="form-control" required>
                                     </div>
-
+                                    <div class="col-md-4">
+                                        <label class="form-label">Medicine Type</label>
+                                        <select class="form-select med-types" name="medicine_type[]" id="med-types">
+                                            <option value="">Select Medicine Type</option>
+                                            <option value="Tablet">Tablet</option>
+                                            <option value="Capsule">Capsule</option>
+                                            <option value="Syrup">Syrup</option>
+                                            <option value="Injection">Injection</option>
+                                            <option value="Ointment">Ointment</option>
+                                            <option value="Powder">Powder</option>
+                                            <option value="Drop">Drop</option>
+                                        </select>
+                                    </div>
                                     <div class="col-md-4">
                                         <label class="form-label">Price</label>
                                         <input type="number" step="0.01" name="medicine_price[]" class="form-control"
                                             min="0">
                                     </div>
 
-                                    <div class="col-md-4">
-                                        <label class="form-label">Manufacturer Name</label>
-                                        <input type="text" name="manufacturer_name[]" class="form-control">
-                                    </div>
+
 
                                 </div>
 
                                 <div class="row">
-
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Manufacturer Name</label>
+                                        <input type="text" name="manufacturer_name[]" class="form-control">
+                                    </div>
+                                    <div class="col-md-6">
                                         <label class="form-label">Pack Size Label</label>
                                         <input type="text" name="pack_size_label[]" class="form-control">
                                     </div>
-
-                                    <div class="col-md-4">
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
                                         <label class="form-label">Short Composition 1</label>
                                         <input type="text" name="short_composition1[]" class="form-control">
                                     </div>
 
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <label class="form-label">Short Composition 2</label>
                                         <input type="text" name="short_composition2[]" class="form-control">
                                     </div>
@@ -218,24 +231,37 @@
             </div>
 
             <div class="col-md-4">
-                <label class="form-label">Price</label>
-                <input type="number" step="0.01" name="medicine_price[]" class="form-control" min="0">
+                <label class="form-label">Medicine Type</label>
+                <select class="form-select med-types" name="medicine_type[]" id="med-types">
+                    <option value="">Select Medicine Type</option>
+                    <option value="Tablet">Tablet</option>
+                    <option value="Capsule">Capsule</option>
+                    <option value="Syrup">Syrup</option>
+                    <option value="Injection">Injection</option>
+                    <option value="Ointment">Ointment</option>
+                    <option value="Powder">Powder</option>
+                    <option value="Drop">Drop</option>
+                </select>
             </div>
 
             <div class="col-md-4">
-                <label class="form-label">Manufacturer Name</label>
-                <input type="text" name="manufacturer_name[]" class="form-control">
+                <label class="form-label">Price</label>
+                <input type="number" step="0.01" name="medicine_price[]" class="form-control" min="0">
             </div>
 
         </div>
 
         <div class="row">
-
-            <div class="col-md-4">
+            <div class="col-md-6">
+                <label class="form-label">Manufacturer Name</label>
+                <input type="text" name="manufacturer_name[]" class="form-control">
+            </div>
+            <div class="col-md-6">
                 <label class="form-label">Pack Size Label</label>
                 <input type="text" name="pack_size_label[]" class="form-control">
             </div>
-
+        </div>
+        <div class="row">
             <div class="col-md-4">
                 <label class="form-label">Short Composition 1</label>
                 <input type="text" name="short_composition1[]" class="form-control">

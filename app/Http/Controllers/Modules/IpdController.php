@@ -44,57 +44,73 @@ use Milon\Barcode\Facades\DNS1DFacade as DNS1D;
 
 class IpdController extends Controller
 {
-    public function index(Request $request)
-    {
-        $search     = $request->get('search');
-        $isIpdTab   = $request->get('tab', 'ipd') == 'ipd';
-        $doctors    = Doctor::all();
-        $bedGroups  = BedGroup::with('floorDetail')->get();
-        $chargeType = ChargeTypeMaster::all();
-        $charges    = Charge::all();
-        $references = ['Direct', 'Doctor', 'Marketer', 'Other'];
-        if ($isIpdTab) {
-            $ipd = IpdDetail::with('patient', 'ipdPatients', 'doctor', 'bedDetail', 'bedGroup.floorDetail')->where('discharged', null)
-                ->when($search, function ($query) use ($search) {
-                    $query->where(function ($q) use ($search) {
-                        $q->where('ipd_no', 'LIKE', "%{$search}%")
-                            ->orWhereHas('patient', function ($p) use ($search) {
-                                $p->where('patient_name', 'LIKE', "%{$search}%")
-                                    ->orWhere('mobileno', 'LIKE', "%{$search}%")
-                                    ->orWhere('email', 'LIKE', "%{$search}%");
-                            });
+    
+   public function index(Request $request)
+{
+    // Search term and pagination
+    $search    = $request->get('search');
+    $perPage   = intval($request->input('per_page', 10));
+    if ($perPage <= 0) $perPage = 10;
 
-                        // Consultant (Doctor)
-                        //     ->orWhereHas('doctor', function ($d) use ($search) {
-                        //         $d->where('name', 'LIKE', "%{$search}%");
-                        //     });
-                    });
-                })->get();
+    // Determine tab
+    $isIpdTab  = $request->get('tab', 'ipd') == 'ipd';
 
-            // Attach billing summary (total billing, total payments, outstanding) for each IPD
-            $billingController = app(\App\Http\Controllers\IpdBillingController::class);
-            foreach ($ipd as $ipdDetails) {
-                $summary                    = $billingController->getBillingSummaryForIpd($ipdDetails->id);
-                $ipdDetails->total_payments = $summary['total_payments'];
-                $ipdDetails->outstanding    = $summary['outstanding'];
-                $ipdDetails->total_billing = $summary['total_charges'];
-            }
-        } else {
-            // $patients = Patient::with(['ipds.doctor'])->get();
-            $patients = IpdDetail::with('patient', 'ipdPatients', 'doctor')->where('discharged', 'yes')
-                ->when($search, function ($query) use ($search) {
-                    $query->where(function ($q) use ($search) {
-                        $q->whereHas('patient', function ($p) use ($search) {
-                            $p->where('patient_name', 'LIKE', "%{$search}%")
-                                ->orWhere('mobileno', 'LIKE', "%{$search}%")
-                                ->orWhere('email', 'LIKE', "%{$search}%");
-                        });
-                    });
-                })->get();
-            $ipd = $patients;
-        }
-        return view("admin.ipd.index", compact("ipd", 'doctors', 'isIpdTab', 'bedGroups', 'references'));
+    // Common data
+    $doctors     = Doctor::all();
+    $bedGroups   = BedGroup::with('floorDetail')->get();
+    $chargeType  = ChargeTypeMaster::all();
+    $charges     = Charge::all();
+    $references  = ['Direct', 'Doctor', 'Marketer', 'Other'];
+
+    if ($isIpdTab) {
+        // Query for ongoing IPDs
+        $query = IpdDetail::with('patient', 'ipdPatients', 'doctor', 'bedDetail', 'bedGroup.floorDetail')
+            ->where('discharged', null)
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('ipd_no', 'LIKE', "%{$search}%")
+                      ->orWhereHas('patient', function ($p) use ($search) {
+                          $p->where('patient_name', 'LIKE', "%{$search}%")
+                            ->orWhere('mobileno', 'LIKE', "%{$search}%")
+                            ->orWhere('email', 'LIKE', "%{$search}%");
+                      });
+                });
+            });
+
+        // Paginate
+        $ipd = $query->paginate($perPage)->withQueryString();
+
+        // Attach billing summary
+        $billingController = app(\App\Http\Controllers\IpdBillingController::class);
+        $ipd->getCollection()->transform(function ($ipdDetails) use ($billingController) {
+            $summary = $billingController->getBillingSummaryForIpd($ipdDetails->id);
+            $ipdDetails->total_payments = $summary['total_payments'];
+            $ipdDetails->outstanding    = $summary['outstanding'];
+            $ipdDetails->total_billing  = $summary['total_charges'];
+            return $ipdDetails;
+        });
+
+    } else {
+        // Query for discharged IPDs
+        $query = IpdDetail::with('patient', 'ipdPatients', 'doctor')
+            ->where('discharged', 'yes')
+            ->when($search, function ($query) use ($search) {
+                $query->whereHas('patient', function ($p) use ($search) {
+                    $p->where('patient_name', 'LIKE', "%{$search}%")
+                      ->orWhere('mobileno', 'LIKE', "%{$search}%")
+                      ->orWhere('email', 'LIKE', "%{$search}%");
+                });
+            });
+
+        // Paginate
+        $ipd = $query->paginate($perPage)->withQueryString();
     }
+
+    // Return view with paginated data
+    return view("admin.ipd.index", compact(
+        'ipd', 'doctors', 'isIpdTab', 'bedGroups', 'references'
+    ));
+}
 
     public function store(Request $request)
     {
@@ -116,6 +132,7 @@ class IpdController extends Controller
             'bed_number'           => 'nullable|exists:bed,id',
             'bed_charge'           => 'nullable|numeric|min:0',
             'package_id'           => 'nullable|exists:packages,id',
+            'package_rate'         => 'nullable|numeric|min:0',
             'symptoms_type'        => 'nullable|array',
             'symptoms_type.*'      => 'string',
             'symptoms_title'       => 'array',
@@ -268,14 +285,16 @@ class IpdController extends Controller
                 );
             }
 
-            // Apply package if selected during admission
+            // Apply package if selected during admission (with optional custom package amount)
             if ($request->package_id) {
                 $packageService = new IpdPackageService();
+                $packageRateOverride = $request->filled('package_rate') ? (float) $request->package_rate : null;
                 $packageResult  = $packageService->applyPackage(
                     $ipd->id,
                     $request->package_id,
                     $request->admission_date, // Apply package from admission date
-                    'Applied during IPD admission'
+                    'Applied during IPD admission',
+                    $packageRateOverride
                 );
 
                 if (! $packageResult['success']) {
@@ -296,7 +315,9 @@ class IpdController extends Controller
 
     public function edit(Request $request, $id)
     {
-        $ipd     = IpdDetail::with('patient', 'doctor', 'bedDetail', 'bedGroup.floorDetail')->where('id', $id)->firstOrFail();
+        $ipd     = IpdDetail::with(['patient', 'doctor', 'bedDetail', 'bedGroup.floorDetail', 'ipdPackages.package'])
+            ->where('id', $id)
+            ->firstOrFail();
         $doctors = Doctor::all();
 
         $symptomTypeIds = array_filter(
@@ -322,7 +343,23 @@ class IpdController extends Controller
         $bedNumbers = Bed::where('bed_group_id', $ipd->bed_group_id)->where('is_active', 'yes')->get();
         $patients   = Patient::with('organisation', 'bloodGroup')->get();
         // dd($patients);
-        return view('admin.ipd.edit-ipd', compact('ipd', 'doctors', 'symptomTypeIds', 'allSymptomTypes', 'symptoms', 'bedGroups', 'bedNumbers', 'patients'));
+        $appliedPackage = $ipd->ipdPackages()
+            ->where('status', 'applied')
+            ->orderByDesc('applied_date')
+            ->orderByDesc('id')
+            ->first();
+
+        return view('admin.ipd.edit-ipd', compact(
+            'ipd',
+            'doctors',
+            'symptomTypeIds',
+            'allSymptomTypes',
+            'symptoms',
+            'bedGroups',
+            'bedNumbers',
+            'patients',
+            'appliedPackage'
+        ));
 
     }
 
@@ -335,6 +372,8 @@ class IpdController extends Controller
             'old_patient'    => 'required|string',
             'casualty'       => 'required|string',
             'date'           => 'nullable|date',
+            'package_id'     => 'nullable|exists:packages,id',
+            'package_rate'   => 'nullable|numeric|min:0',
         ]);
         try {
             // $symptomTitle         = array_filter($request->symptoms_title, fn($title) => $title !== null && $title !== '');
@@ -392,6 +431,40 @@ class IpdController extends Controller
             $ipdPatient->doctor3_id = $request->consultant_doctor3 ?? null;
             $ipdPatient->doctor4_id = $request->consultant_doctor4 ?? null;
             $ipdPatient->save();
+
+            // Package update during admission edit:
+            // - If there is an applied package, update its amount (per patient) when package_rate provided.
+            // - If no applied package yet, apply selected package from admission date (with optional override).
+            if ($request->filled('package_id')) {
+                $packageService = new IpdPackageService();
+                $packageRateOverride = $request->filled('package_rate') ? (float) $request->package_rate : null;
+
+                $existingApplied = \App\Models\IpdPackage::where('ipd_id', $id)
+                    ->where('status', 'applied')
+                    ->orderByDesc('applied_date')
+                    ->orderByDesc('id')
+                    ->first();
+
+                if ($existingApplied) {
+                    if ($packageRateOverride !== null) {
+                        $res = $packageService->updatePackageAmount($id, $existingApplied->id, $packageRateOverride);
+                        if (!($res['success'] ?? false)) {
+                            throw new \Exception('Failed to update package amount: ' . ($res['message'] ?? 'Unknown error'));
+                        }
+                    }
+                } else {
+                    $res = $packageService->applyPackage(
+                        $id,
+                        $request->package_id,
+                        \Carbon\Carbon::parse($request->admission_date)->format('Y-m-d'),
+                        'Applied during IPD admission edit',
+                        $packageRateOverride
+                    );
+                    if (!($res['success'] ?? false)) {
+                        throw new \Exception('Failed to apply package: ' . ($res['message'] ?? 'Unknown error'));
+                    }
+                }
+            }
 
             DB::commit();
 
@@ -1566,6 +1639,18 @@ class IpdController extends Controller
             ->with('success', 'Charge updated successfully!');
     }
 
+    /**
+     * Delete a single IPD charge row.
+     */
+    public function deleteIpdCharge(IpdCharges $charge)
+    {
+        $charge->delete();
+
+        return redirect()
+            ->back()
+            ->with('success', 'Charge deleted successfully!');
+    }
+
     public function getAvailableBeds(Request $request)
     {
         $bedGroupId = $request->bed_group_id;
@@ -2246,16 +2331,19 @@ class IpdController extends Controller
             'package_id'   => 'required|exists:packages,id',
             'applied_date' => 'nullable|date_format:Y-m-d',
             'notes'        => 'nullable|string|max:500',
+            'package_rate' => 'nullable|numeric|min:0',
         ]);
 
         try {
             $packageService = new IpdPackageService();
+            $packageRateOverride = $request->filled('package_rate') ? (float) $request->package_rate : null;
 
             $result = $packageService->applyPackage(
                 $id,
                 $request->package_id,
                 $request->applied_date,
-                $request->notes
+                $request->notes,
+                $packageRateOverride
             );
 
             if ($result['success']) {
@@ -2308,6 +2396,39 @@ class IpdController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error removing package: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Update package amount for an applied package (on-the-fly).
+     * PATCH /ipd/{id}/packages/{ipdPackageId}
+     */
+    public function updatePackageAmount(Request $request, $id, $ipdPackageId)
+    {
+        $request->validate([
+            'package_rate' => 'required|numeric|min:0',
+        ]);
+
+        try {
+            $packageService = new IpdPackageService();
+            $result = $packageService->updatePackageAmount($id, $ipdPackageId, $request->package_rate);
+
+            if ($result['success']) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $result['message'],
+                    'data' => $result['data'] ?? null,
+                ], 200);
+            }
+            return response()->json([
+                'success' => false,
+                'message' => $result['message'],
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating package amount: ' . $e->getMessage(),
             ], 500);
         }
     }

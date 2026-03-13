@@ -698,6 +698,23 @@
                                                         placeholder="Enter reference">
                                                 </div>
 
+                                                {{-- Package (same behavior as Add Admission) --}}
+                                                <div class="field-group">
+                                                    <label class="form-label">Package (Optional)</label>
+                                                    <select class="form-select" name="package_id" id="package_select_admission_edit">
+                                                        <option value="">-- Select Package --</option>
+                                                    </select>
+                                                    <small class="text-muted">Select a package to include it from day 1</small>
+                                                </div>
+
+                                                <div class="field-group" id="package_amount_wrapper_admission_edit" style="display:none;">
+                                                    <label class="form-label">Package Amount (INR)</label>
+                                                    <input type="number" class="form-control" name="package_rate" id="package_amount_admission_edit"
+                                                        step="0.01" min="0" placeholder="0.00"
+                                                        value="{{ old('package_rate', isset($appliedPackage) ? ($appliedPackage->package_rate ?? '') : '') }}">
+                                                    <small class="text-muted">Auto-filled from package (editable). Reflects on estimate &amp; final bill.</small>
+                                                </div>
+
                                                 <div class="field-group">
                                                     <label for="consultant_doctor" class="form-label">
                                                         Consultant Doctor <span class="required">*</span>
@@ -819,6 +836,15 @@
                                                         @endforeach
                                                     </select>
                                                 </div>
+                                                {{-- Bed charge (same UX as Add Admission) --}}
+                                                <div class="field-group">
+                                                    <label class="form-label">Bed Charge (INR)</label>
+                                                    <input type="number" class="form-control" name="bed_charge"
+                                                        id="bed_charge_input_edit" step="0.01" min="0"
+                                                        placeholder="0.00"
+                                                        value="{{ old('bed_charge') }}">
+                                                    <small class="text-muted">Auto-filled from bed group (editable)</small>
+                                                </div>
                                                 <div class="field-group">
                                                     <label for="note" class="form-label">Note</label>
                                                     <textarea name="note" id="note" class="form-control" placeholder="Enter notes" rows="1">{{ old('note', $ipd->note) }}</textarea>
@@ -853,6 +879,12 @@
             const bedGroupSelect = document.getElementById('bed_group_select');
             const bedNumberSelect = document.getElementById('bed_number_select');
             const patientSelect = document.getElementById('patient_select');
+            const bedChargeInputEdit = document.getElementById('bed_charge_input_edit');
+            const packageSelectEdit = document.getElementById('package_select_admission_edit');
+            const packageAmountWrapperEdit = document.getElementById('package_amount_wrapper_admission_edit');
+            const packageAmountInputEdit = document.getElementById('package_amount_admission_edit');
+            const appliedPackageId = @json($appliedPackage->package_id ?? null);
+
             bedGroupSelect.addEventListener('change', function() {
                 const selectedId = this.value;
                 const baseUrl = "{{ route('getBedNumbers', ['id' => 'ID']) }}";
@@ -896,7 +928,63 @@
                         console.error('Error fetching Bed Numbers:', error);
                         bedNumberSelect.innerHTML = '<option value="">Error loading options</option>';
                     });
+
+                // Fetch bed group charge for edit screen
+                if (selectedId && bedChargeInputEdit) {
+                    const chargeUrl = "{{ route('getBedGroupCharge', ['id' => 'ID']) }}".replace('ID', selectedId);
+                    fetch(chargeUrl)
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data && data.success && data.bed_cost !== undefined) {
+                                bedChargeInputEdit.value = parseFloat(data.bed_cost).toFixed(2);
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Error fetching bed charge:', err);
+                        });
+                }
             });
+
+            // Load available packages for edit (same as Add Admission)
+            if (packageSelectEdit) {
+                fetch("{{ route('packages.api.active') }}")
+                    .then(response => response.json())
+                    .then(data => {
+                        packageSelectEdit.innerHTML = '<option value=\"\">-- Select Package --</option>';
+
+                        if (data.success && data.packages) {
+                            data.packages.forEach(pkg => {
+                                const opt = document.createElement('option');
+                                opt.value = pkg.id;
+                                opt.textContent = `${pkg.name} - ₹${pkg.package_rate}`;
+                                opt.dataset.rate = pkg.package_rate;
+                                packageSelectEdit.appendChild(opt);
+                            });
+                        }
+
+                        if (appliedPackageId) {
+                            packageSelectEdit.value = appliedPackageId;
+                            if (packageAmountWrapperEdit) packageAmountWrapperEdit.style.display = '';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading packages:', error);
+                        packageSelectEdit.innerHTML = '<option value=\"\">Error loading packages</option>';
+                    });
+
+                packageSelectEdit.addEventListener('change', function () {
+                    const opt = this.options[this.selectedIndex];
+                    if (this.value && opt && opt.dataset.rate !== undefined) {
+                        if (packageAmountInputEdit) {
+                            packageAmountInputEdit.value = parseFloat(opt.dataset.rate || 0).toFixed(2);
+                        }
+                        if (packageAmountWrapperEdit) packageAmountWrapperEdit.style.display = '';
+                    } else {
+                        if (packageAmountInputEdit) packageAmountInputEdit.value = '';
+                        if (packageAmountWrapperEdit) packageAmountWrapperEdit.style.display = 'none';
+                    }
+                });
+            }
 
             patientSelect.addEventListener('change', function() {
                 const selectedOption = patientSelect.options[patientSelect.selectedIndex];
@@ -1398,3 +1486,50 @@
         });
     </script>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const select = document.getElementById('package_select_admission_edit');
+    const amountWrapper = document.getElementById('package_amount_wrapper_admission_edit');
+    const amountInput = document.getElementById('package_amount_admission_edit');
+    if (!select) return;
+
+    const appliedPackageId = "{{ $appliedPackage->package_id ?? '' }}";
+
+    fetch("{{ route('packages.api.active') }}")
+        .then(r => r.json())
+        .then(data => {
+            select.innerHTML = '<option value="">-- Select Package --</option>';
+            if (data.success && data.packages) {
+                data.packages.forEach(pkg => {
+                    const opt = document.createElement('option');
+                    opt.value = pkg.id;
+                    opt.textContent = `${pkg.name} - ₹${pkg.package_rate}`;
+                    opt.dataset.rate = pkg.package_rate;
+                    select.appendChild(opt);
+                });
+            }
+
+            if (appliedPackageId) {
+                select.value = appliedPackageId;
+                if (amountWrapper) amountWrapper.style.display = '';
+            }
+        })
+        .catch(() => {
+            select.innerHTML = '<option value="">Error loading packages</option>';
+        });
+
+    select.addEventListener('change', function () {
+        const opt = this.options[this.selectedIndex];
+        if (this.value && opt && opt.dataset.rate !== undefined) {
+            if (amountInput) amountInput.value = parseFloat(opt.dataset.rate || 0).toFixed(2);
+            if (amountWrapper) amountWrapper.style.display = '';
+        } else {
+            if (amountInput) amountInput.value = '';
+            if (amountWrapper) amountWrapper.style.display = 'none';
+        }
+    });
+});
+</script>
+@endpush

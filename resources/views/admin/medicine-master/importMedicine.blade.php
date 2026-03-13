@@ -119,6 +119,7 @@
                                                 <tr>
                                                     <th>Name</th>
                                                     <th>Price</th>
+                                                    <th>Type</th>
                                                     <th>Manufacturer Name</th>
                                                     <th>Pack Size Label</th>
                                                     <th>Short Composition 1</th>
@@ -127,6 +128,7 @@
                                             </thead>
                                             <tbody>
                                                 <tr>
+                                                    <td>Sample Data</td>
                                                     <td>Sample Data</td>
                                                     <td>Sample Data</td>
                                                     <td>Sample Data</td>
@@ -148,7 +150,7 @@
                                                     <label class="form-label">
                                                         Select CSV File <span class="text-danger">*</span>
                                                     </label>
-                                                    <input type="file" name="file" id="csv_file" class="form-control"
+                                                    <input type="file" name="master_file" id="csv_file" class="form-control"
                                                         required accept=".csv">
                                                 </div>
                                             </div>

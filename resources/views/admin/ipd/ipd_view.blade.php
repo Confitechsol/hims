@@ -811,7 +811,7 @@
                             </div>
                         </div>
 
-                        {{-- Finance Section --}}
+                        {{-- Finance / Billing Summary Section --}}
                         <div class="card shadow-sm border-0 mt-2">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
@@ -837,6 +837,27 @@
                                             <div class="text-muted small mb-1">Total Outstanding (INR)</div>
                                             <div class="fw-bold fs-5 {{ ($billingSummary['outstanding'] ?? 0) > 0 ? 'text-danger' : '' }}">{{ number_format($billingSummary['outstanding'] ?? 0, 2) }}</div>
                                         </div>
+                                    </div>
+                                </div>
+                                {{-- Billing breakdown (always show; includes Package) --}}
+                                @php
+                                    $bs = $billingSummary ?? [];
+                                    $bedCh = $bs['bed_charges'] ?? 0;
+                                    $pkgCh = $bs['package_charges'] ?? 0;
+                                    $ipdCh = $bs['ipd_charges'] ?? 0;
+                                    $pathCh = $bs['pathology_charges'] ?? 0;
+                                    $radCh = $bs['radiology_charges'] ?? 0;
+                                    $docCh = $bs['doctor_visit_charges'] ?? 0;
+                                @endphp
+                                <div class="mt-3 pt-3 border-top">
+                                    <h6 class="text-muted small mb-2">Billing breakdown</h6>
+                                    <div class="row g-2 small">
+                                        <div class="col-md-4 col-6"><span class="text-muted">Bed charges:</span> ₹{{ number_format($bedCh, 2) }}</div>
+                                        <div class="col-md-4 col-6"><span class="text-muted">Package:</span> ₹{{ number_format($pkgCh, 2) }}</div>
+                                        <div class="col-md-4 col-6"><span class="text-muted">IPD charges:</span> ₹{{ number_format($ipdCh, 2) }}</div>
+                                        <div class="col-md-4 col-6"><span class="text-muted">Pathology:</span> ₹{{ number_format($pathCh, 2) }}</div>
+                                        <div class="col-md-4 col-6"><span class="text-muted">Radiology:</span> ₹{{ number_format($radCh, 2) }}</div>
+                                        <div class="col-md-4 col-6"><span class="text-muted">Doctor visit:</span> ₹{{ number_format($docCh, 2) }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -3501,6 +3522,19 @@
                                                                                title="Edit">
                                                                                 <i class="ti ti-pencil"></i>
                                                                             </a>
+                                                                            <form action="{{ route('ipd.charge.delete', $charge->id) }}"
+                                                                                  method="POST"
+                                                                                  class="d-inline-block"
+                                                                                  onsubmit="return confirm('Are you sure you want to delete this charge?');">
+                                                                                @csrf
+                                                                                @method('DELETE')
+                                                                                <button type="submit"
+                                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
+                                                                                        data-bs-toggle="tooltip"
+                                                                                        title="Delete">
+                                                                                    <i class="ti ti-trash"></i>
+                                                                                </button>
+                                                                            </form>
                                                                         </div>
                                                                     </td>
                                                                 </tr>
@@ -3570,6 +3604,11 @@
                                         <p><strong>GST:</strong> <span id="pkg_gst">0</span>%</p>
                                         <p><strong>Description:</strong> <span id="pkg_desc">-</span></p>
                                     </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="package_amount_input" class="form-label">Package Amount (INR) <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="package_amount_input" step="0.01" min="0" placeholder="0.00" value="">
+                                    <small class="text-muted">Auto-filled from package (editable). Reflects on estimate &amp; final bill.</small>
                                 </div>
                                 <div class="mb-3">
                                     <label for="applied_date" class="form-label">Applied Date</label>
@@ -6308,6 +6347,10 @@
         if (applyPackageModal) {
             applyPackageModal.addEventListener('shown.bs.modal', function() {
                 loadAvailablePackages();
+                const packageAmountInputEl = document.getElementById('package_amount_input');
+                if (packageAmountInputEl) packageAmountInputEl.value = '';
+                const detailsDiv = document.getElementById('package_details');
+                if (detailsDiv) detailsDiv.style.display = 'none';
             });
         }
 
@@ -6369,17 +6412,20 @@
                 })
                 .then(data => {
                     if (!data) return;
-                    if (data.success && data.applied_packages) {
-                        if (data.applied_packages.length === 0) {
-                            appliedPackagesList.innerHTML = '<div class="alert alert-info"><i class="ti ti-info-circle me-2"></i>No packages applied yet.</div>';
+                        if (data.success && data.applied_packages) {
+                            if (data.applied_packages.length === 0) {
+                                appliedPackagesList.innerHTML = '<div class="alert alert-info"><i class="ti ti-info-circle me-2"></i>No packages applied yet.</div>';
                         } else {
-                            let html = '<div class="table-responsive"><table class="table table-hover"><thead><tr><th>Package</th><th>Applied Date</th><th>Amount</th><th>Action</th></tr></thead><tbody>';
+                            let html = '<div class="table-responsive"><table class="table table-hover"><thead><tr><th>Package</th><th>Applied Date</th><th>Package Amount (INR)</th><th>Final Amount</th><th>Action</th></tr></thead><tbody>';
                             
                             data.applied_packages.forEach(pkg => {
+                                const rate = parseFloat(pkg.package_rate);
+                                const finalAmt = parseFloat(pkg.final_amount);
                                 html += `<tr>
                                     <td><strong>${pkg.package.name}</strong></td>
                                     <td>${new Date(pkg.applied_date).toLocaleDateString()}</td>
-                                    <td>₹${parseFloat(pkg.final_amount).toFixed(2)}</td>
+                                    <td><input type="number" class="form-control form-control-sm package-amount-input" data-ipd-pkg-id="${pkg.id}" value="${rate.toFixed(2)}" step="0.01" min="0" style="width:110px;"></td>
+                                    <td>₹${finalAmt.toFixed(2)}</td>
                                     <td>
                                         ${pkg.status === 'applied' ? `<button class="btn btn-sm btn-danger remove-pkg-btn" data-ipd-pkg-id="${pkg.id}"><i class="ti ti-trash me-1"></i>Remove</button>` : `<span class="badge bg-secondary">${pkg.status}</span>`}
                                     </td>
@@ -6396,24 +6442,33 @@
                                     }
                                 });
                             });
+                            document.querySelectorAll('.package-amount-input').forEach(input => {
+                                input.addEventListener('blur', function() {
+                                    updatePackageAmount(this.dataset.ipdPkgId, parseFloat(this.value));
+                                });
+                            });
                         }
                     }
                 })
                 .catch(error => { console.error('Error loading applied packages:', error); });
         }
 
-        // Handle package selection change - show details
+        // Handle package selection change - show details and set package amount
+        const packageAmountInputEl = document.getElementById('package_amount_input');
         if (packageSelectEl) {
             packageSelectEl.addEventListener('change', function() {
                 const detailsDiv = document.getElementById('package_details');
                 if (this.value) {
                     const selected = this.options[this.selectedIndex];
-                    document.getElementById('pkg_rate').textContent = selected.dataset.rate;
+                    const rate = selected.dataset.rate ? parseFloat(selected.dataset.rate) : 0;
+                    document.getElementById('pkg_rate').textContent = selected.dataset.rate ?? '0';
                     document.getElementById('pkg_gst').textContent = selected.dataset.gst || '0';
                     document.getElementById('pkg_desc').textContent = selected.dataset.desc || '-';
                     detailsDiv.style.display = 'block';
+                    if (packageAmountInputEl) packageAmountInputEl.value = rate.toFixed(2);
                 } else {
                     detailsDiv.style.display = 'none';
+                    if (packageAmountInputEl) packageAmountInputEl.value = '';
                 }
             });
         }
@@ -6426,6 +6481,8 @@
                 const packageId = document.getElementById('package_select').value;
                 const appliedDate = document.getElementById('applied_date').value;
                 const notes = document.getElementById('notes').value;
+                const packageAmountEl = document.getElementById('package_amount_input');
+                const packageRate = packageAmountEl && packageAmountEl.value ? parseFloat(packageAmountEl.value) : null;
                 
                 if (!packageId) {
                     alert('Please select a package');
@@ -6441,7 +6498,8 @@
                     body: JSON.stringify({
                         package_id: packageId,
                         applied_date: appliedDate,
-                        notes: notes
+                        notes: notes,
+                        package_rate: packageRate
                     })
                 })
                 .then(response => response.json())
@@ -6488,6 +6546,31 @@
             .catch(error => {
                 console.error('Error:', error);
                 alert('Error removing package: ' + error.message);
+            });
+        }
+
+        function updatePackageAmount(ipdPackageId, packageRate) {
+            if (packageRate == null || isNaN(packageRate) || packageRate < 0) return;
+            const url = "{{ url('ipd/' . $ipd->id . '/packages') }}/" + ipdPackageId;
+            fetch(url, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({ package_rate: packageRate })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    loadAppliedPackages();
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to update amount'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating package amount: ' + error.message);
             });
         }
     });

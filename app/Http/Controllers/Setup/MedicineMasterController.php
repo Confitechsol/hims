@@ -59,6 +59,7 @@ class MedicineMasterController extends Controller
             $request->validate([
                 'medicine_name.*'      => 'required|string',
                 'medicine_price.*'     => 'nullable|numeric',
+                'medicine_type.*'      => 'nullable|string',
                 'manufacturer_name.*'  => 'nullable|string',
                 'pack_size_label.*'    => 'nullable|string',
                 'short_composition1.*' => 'nullable|string',
@@ -70,6 +71,7 @@ class MedicineMasterController extends Controller
                 MedMaster::create([
                     'name'               => $name,
                     'price'              => $request->medicine_price[$key] ?? 0,
+                    'medicine_type'      => $request->medicine_type[$key] ?? null,
                     'manufacturer_name'  => $request->manufacturer_name[$key] ?? "NA",
                     'pack_size_label'    => $request->pack_size_label[$key] ?? "NA",
                     'short_composition1' => $request->short_composition1[$key] ?? "NA",
@@ -136,6 +138,7 @@ class MedicineMasterController extends Controller
             $request->validate([
                 'medicine_name'      => 'required|string',
                 'medicine_price'     => 'nullable|numeric',
+                'medicine_type'      => 'nullable|string',
                 'manufacturer_name'  => 'nullable|string',
                 'pack_size_label'    => 'nullable|string',
                 'short_composition1' => 'nullable|string',
@@ -145,6 +148,7 @@ class MedicineMasterController extends Controller
             $medicine->update([
                 'name'               => $request->medicine_name,
                 'price'              => $request->medicine_price ?? 0,
+                'medicine_type'      => $request->medicine_type ?? null,
                 'manufacturer_name'  => $request->manufacturer_name ?? "NA",
                 'pack_size_label'    => $request->pack_size_label ?? "NA",
                 'short_composition1' => $request->short_composition1 ?? "NA",
