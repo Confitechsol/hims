@@ -3522,6 +3522,19 @@
                                                                                title="Edit">
                                                                                 <i class="ti ti-pencil"></i>
                                                                             </a>
+                                                                            <form action="{{ route('ipd.charge.delete', $charge->id) }}"
+                                                                                  method="POST"
+                                                                                  class="d-inline-block"
+                                                                                  onsubmit="return confirm('Are you sure you want to delete this charge?');">
+                                                                                @csrf
+                                                                                @method('DELETE')
+                                                                                <button type="submit"
+                                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
+                                                                                        data-bs-toggle="tooltip"
+                                                                                        title="Delete">
+                                                                                    <i class="ti ti-trash"></i>
+                                                                                </button>
+                                                                            </form>
                                                                         </div>
                                                                     </td>
                                                                 </tr>
