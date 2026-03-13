@@ -1639,6 +1639,18 @@ class IpdController extends Controller
             ->with('success', 'Charge updated successfully!');
     }
 
+    /**
+     * Delete a single IPD charge row.
+     */
+    public function deleteIpdCharge(IpdCharges $charge)
+    {
+        $charge->delete();
+
+        return redirect()
+            ->back()
+            ->with('success', 'Charge deleted successfully!');
+    }
+
     public function getAvailableBeds(Request $request)
     {
         $bedGroupId = $request->bed_group_id;

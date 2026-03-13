@@ -63,7 +63,7 @@ class MoneyReceiptController extends Controller
 
         $receipts = $query->paginate($perPage);
 
-        $receiptTypes = ['Current', 'Patient Due', 'Corporate Due', 'In Admissible', 'Booking', 'Refund', 'OPD Doctor Consultation', 'OPD Pathology', 'OPD Radiology', 'IPD Pathology', 'IPD Radiology'];
+        $receiptTypes = ['Current', 'Patient Due', 'Corporate Due', 'In Admissible', 'Booking', 'Refund', 'OPD Doctor Consultation', 'OPD Pathology', 'OPD Radiology', 'IPD Pathology', 'IPD Radiology', 'IPD Pharmacy'];
 
         return view('admin.money-receipt.index', compact('receipts', 'perPage', 'receiptTypes'));
     }
@@ -73,7 +73,7 @@ class MoneyReceiptController extends Controller
      */
     public function create()
     {
-        $receiptTypes = ['Current', 'Patient Due', 'Corporate Due', 'In Admissible', 'Booking', 'Refund', 'OPD Doctor Consultation', 'OPD Pathology', 'OPD Radiology', 'IPD Pathology', 'IPD Radiology'];
+        $receiptTypes = ['Current', 'Patient Due', 'Corporate Due', 'In Admissible', 'Booking', 'Refund', 'OPD Doctor Consultation', 'OPD Pathology', 'OPD Radiology', 'IPD Pathology', 'IPD Radiology', 'IPD Pharmacy'];
         $paymentModes = ['Cash', 'Cheque', 'Card', 'UPI', 'Online', 'Transfer to Bank Account', 'Other'];
         
         // Get the next receipt number (latest + 1) for display
@@ -89,7 +89,7 @@ class MoneyReceiptController extends Controller
     {
         $request->validate([
             'payment_date' => 'required|date',
-            'receipt_type' => 'required|in:Current,Patient Due,Corporate Due,In Admissible,Booking,Refund,OPD Doctor Consultation,OPD Pathology,OPD Radiology,IPD Pathology,IPD Radiology',
+            'receipt_type' => 'required|in:Current,Patient Due,Corporate Due,In Admissible,Booking,Refund,OPD Doctor Consultation,OPD Pathology,OPD Radiology,IPD Pathology,IPD Radiology,IPD Pharmacy',
             'amount' => 'required|numeric|min:0.01',
             'payment_mode' => 'required|string',
             'patient_id' => 'nullable|integer|exists:patients,id',
@@ -103,7 +103,7 @@ class MoneyReceiptController extends Controller
 
         // Determine if this is an OPD or IPD receipt type
         $isOpdReceiptType = in_array($request->receipt_type, ['OPD Doctor Consultation', 'OPD Pathology', 'OPD Radiology'], true);
-        $isIpdReceiptType = in_array($request->receipt_type, ['IPD Pathology', 'IPD Radiology'], true);
+        $isIpdReceiptType = in_array($request->receipt_type, ['IPD Pathology', 'IPD Radiology', 'IPD Pharmacy'], true);
 
         // Get IPD/OPD and final bill number
         $ipd = null;
@@ -139,7 +139,7 @@ class MoneyReceiptController extends Controller
                 ->withErrors(['final_bill_no' => 'For Receipt Type "' . $request->receipt_type . '", an OPD record must be selected.']);
         }
 
-        // For IPD receipt types (Pathology/Radiology), require IPD linkage
+        // For IPD receipt types (Pathology/Radiology/Pharmacy), require IPD linkage
         if ($isIpdReceiptType && !$ipd && !$request->ipd_id) {
             return redirect()->back()
                 ->withInput()
@@ -234,7 +234,7 @@ class MoneyReceiptController extends Controller
             ->whereNotNull('receipt_no')
             ->findOrFail($id);
 
-        $receiptTypes = ['Current', 'Patient Due', 'Corporate Due', 'In Admissible', 'Booking', 'Refund', 'OPD Doctor Consultation', 'OPD Pathology', 'OPD Radiology', 'IPD Pathology', 'IPD Radiology'];
+        $receiptTypes = ['Current', 'Patient Due', 'Corporate Due', 'In Admissible', 'Booking', 'Refund', 'OPD Doctor Consultation', 'OPD Pathology', 'OPD Radiology', 'IPD Pathology', 'IPD Radiology', 'IPD Pharmacy'];
         $paymentModes = ['Cash', 'Cheque', 'Card', 'UPI', 'Online', 'Transfer to Bank Account', 'Other'];
 
         return view('admin.money-receipt.edit', compact('receipt', 'receiptTypes', 'paymentModes'));
@@ -249,7 +249,7 @@ class MoneyReceiptController extends Controller
 
         $request->validate([
             'payment_date' => 'required|date',
-            'receipt_type' => 'required|in:Current,Patient Due,Corporate Due,In Admissible,Booking,Refund,OPD Doctor Consultation,OPD Pathology,OPD Radiology,IPD Pathology,IPD Radiology',
+            'receipt_type' => 'required|in:Current,Patient Due,Corporate Due,In Admissible,Booking,Refund,OPD Doctor Consultation,OPD Pathology,OPD Radiology,IPD Pathology,IPD Radiology,IPD Pharmacy',
             'amount' => 'required|numeric|min:0.01',
             'payment_mode' => 'required|string',
             'patient_id' => 'nullable|integer|exists:patients,id',
@@ -259,7 +259,7 @@ class MoneyReceiptController extends Controller
 
         // Determine if this is an OPD or IPD receipt type
         $isOpdReceiptType = in_array($request->receipt_type, ['OPD Doctor Consultation', 'OPD Pathology', 'OPD Radiology'], true);
-        $isIpdReceiptType = in_array($request->receipt_type, ['IPD Pathology', 'IPD Radiology'], true);
+        $isIpdReceiptType = in_array($request->receipt_type, ['IPD Pathology', 'IPD Radiology', 'IPD Pharmacy'], true);
 
         // Get IPD/OPD and final bill number
         $ipd = null;
@@ -628,7 +628,7 @@ class MoneyReceiptController extends Controller
         
         // Receipt types that need case/prescription number
         $opdReceiptTypes = ['OPD Doctor Consultation', 'OPD Pathology', 'OPD Radiology'];
-        $ipdReceiptTypes = ['IPD Pathology', 'IPD Radiology'];
+        $ipdReceiptTypes = ['IPD Pathology', 'IPD Radiology', 'IPD Pharmacy'];
         
         if (in_array($receiptType, $opdReceiptTypes) && $opdId) {
             // For OPD Doctor Consultation, get latest prescription
@@ -682,8 +682,12 @@ class MoneyReceiptController extends Controller
                     ->orderBy('id', 'desc')
                     ->first();
             }
+            // For IPD Pharmacy, optional: could link to pharmacy prescription if available
+            elseif ($receiptType === 'IPD Pharmacy') {
+                $casePrescriptionNo = null;
+            }
             
-            if ($prescription && $prescription->prescription_number) {
+            if (isset($prescription) && $prescription && $prescription->prescription_number) {
                 $casePrescriptionNo = $prescription->prescription_number;
             }
         }

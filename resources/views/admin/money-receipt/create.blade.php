@@ -395,7 +395,8 @@ document.addEventListener('DOMContentLoaded', function() {
             'OPD Pathology', 
             'OPD Radiology', 
             'IPD Pathology', 
-            'IPD Radiology'
+            'IPD Radiology',
+            'IPD Pharmacy'
         ];
         
         if (showFieldTypes.includes(receiptType) && (opdId || ipdId)) {
