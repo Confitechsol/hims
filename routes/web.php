@@ -215,8 +215,8 @@ Route::middleware(['admin'])->group(function () {
     Route::prefix('operations')->group(function () {
         Route::get('/', [OperationController::class, 'Operations'])->name('operations');
         Route::post('/store', [OperationController::class, 'store'])->name('operations.store');
-        Route::put('/update/{id}', [OperationController::class, 'updateCategory'])->name('operations.update');
-        Route::delete('/destroy/{id}', [OperationController::class, 'destroyCategory'])->name('operations.destroy');
+        Route::put('/update/{id}', [OperationController::class, 'update'])->name('operations.update');
+        Route::delete('/destroy/{id}', [OperationController::class, 'destroy'])->name('operations.destroy');
     });
     Route::prefix('operation-category')->group(function () {
         Route::get('/', [OperationController::class, 'operationCategories'])->name('operation-category');
