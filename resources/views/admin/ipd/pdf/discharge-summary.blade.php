@@ -300,10 +300,16 @@
             </td>
         </tr>
         <tr>
-            <td class="label">OT Date</td>
-            <td class="colon">:</td>
-            <td class="value">{{ $data->ot_date ? \Carbon\Carbon::parse($data->ot_date)->format('d-m-Y') : '' }}</td>
-
+            @if ($data->ot_date != null || $data->ot_date != '')
+                <td class="label">OT Date</td>
+                <td class="colon">:</td>
+                <td class="value">{{ $data->ot_date ? \Carbon\Carbon::parse($data->ot_date)->format('d-m-Y') : '' }}
+                </td>
+            @else
+                <td class="label">Discharge Contact</td>
+                <td class="colon">:</td>
+                <td class="value">{{ $data->discharge_contact }}</td>
+            @endif
             <td class="label">Discharge Time</td>
             <td class="colon">:</td>
             <td class="value">{{ $data->discharge_time }}</td>
@@ -318,15 +324,17 @@
             <td class="colon">:</td>
             <td class="value">{{ $data->bed }}</td>
         </tr>
-        <tr>
-            <td class="label"></td>
-            <td class="colon"></td>
-            <td class="value"></td>
+        @if ($data->ot_date != null || $data->ot_date != '')
+            <tr>
+                <td class="label"></td>
+                <td class="colon"></td>
+                <td class="value"></td>
 
-            <td class="label">Discharge Contact</td>
-            <td class="colon">:</td>
-            <td class="value">{{ $data->discharge_contact }}</td>
-        </tr>
+                <td class="label">Discharge Contact</td>
+                <td class="colon">:</td>
+                <td class="value">{{ $data->discharge_contact }}</td>
+            </tr>
+        @endif
     </table>
     <table class="table-box-border">
         <tr>
@@ -384,6 +392,11 @@
         @if ($data->discharge_advice != null || $data->discharge_advice != '')
             <h4>Condition at Discharge</h4>
             {!! $data->discharge_advice !!}
+        @endif
+
+        @if ($data->remarks != null || $data->remarks != '')
+            <h4>Remarks</h4>
+            {!! $data->remarks !!}
         @endif
         <div class="end">
         </div>
