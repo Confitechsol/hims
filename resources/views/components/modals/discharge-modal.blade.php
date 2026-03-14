@@ -758,7 +758,7 @@
 
                                 <div class="col-md-3">
                                     <label class="form-label">Medicine Type</label>
-                                    <select class="form-select med-types" name="med_types[]" id="med-types" required>
+                                    <select class="form-select med-types" name="med_types[]" id="med-types">
                                         <option value="">Select Medicine Type</option>
                                         <option value="Tablet">Tablet</option>
                                         <option value="Capsule">Capsule</option>
@@ -1048,6 +1048,7 @@
             });
         }
     }
+
     document.addEventListener('DOMContentLoaded', function() {
 
         const dischargeModal = document.getElementById('patientDischargeModal');
@@ -1132,7 +1133,8 @@
 
             const doctors = JSON.parse(button.getAttribute('data-doctors') || '[]');
             const currentUser = JSON.parse(button.getAttribute('data-user') || '{}')
-
+            const outstanding = JSON.parse(button.getAttribute('data-outstanding') || 0)
+            window.outstanding = outstanding
             window.currentUser = currentUser.role
             // 🔹 Basic identifiers
             document.getElementById('ipd-id').value = ipd.id ?? '';
@@ -1250,10 +1252,24 @@
 
 <script>
     document.getElementById('patientDischargeForm').addEventListener('submit', function(e) {
+
         e.preventDefault(); // ⛔ stop immediate submit
+        const form = this;
 
         // Dummy payment status (for now)
-        const isPaymentCleared = false; // 🔁 change later with real API
+        const isPaymentCleared = window.outstanding == 0; // 🔁 change later with real API
+
+        function cleanEmptyMedicineRows() {
+            const rows = document.querySelectorAll('.med-row');
+
+            rows.forEach(row => {
+                const med = row.querySelector('.med-medicine')?.value;
+
+                if (!med) {
+                    row.remove(); // remove empty row
+                }
+            });
+        }
 
         if (!isPaymentCleared) {
             Swal.fire({
@@ -1266,19 +1282,23 @@
                 confirmButtonColor: '#28a745',
                 cancelButtonColor: '#dc3545',
             }).then((result) => {
-                if (result.isConfirmed && window.currentUser === 1) {
-                    e.target.submit(); // ✅ submit form manually
-                } else {
-                    Swal.fire({
-                        title: 'Contact Admin',
-                        text: 'Payment is Not clear. Please Contact Admin.',
-                        icon: 'success',
-                        timer: 1500,
-                        showConfirmButton: false,
-                    }).then(() => {
-                        e.target.submit(); // ✅ submit form
-                    });
+
+                if (result.isConfirmed && window.currentUser === '1') {
+                    cleanEmptyMedicineRows();
+                    form.submit();
+                    // e.target.submit(); // ✅ submit form manually
                 }
+                // else {
+                //     Swal.fire({
+                //         title: 'Contact Admin',
+                //         text: 'Payment is Not clear. Please Contact Admin.',
+                //         icon: 'success',
+                //         timer: 1500,
+                //         showConfirmButton: false,
+                //     }).then(() => {
+                //         e.target.submit(); // ✅ submit form
+                //     });
+                // }
             });
         } else {
             Swal.fire({
@@ -1288,6 +1308,7 @@
                 timer: 1500,
                 showConfirmButton: false,
             }).then(() => {
+                cleanEmptyMedicineRows();
                 e.target.submit(); // ✅ submit form
             });
         }
