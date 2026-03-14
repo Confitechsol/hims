@@ -81,7 +81,7 @@ class AppointmentsController extends Controller
         } else {
             $nextNumber = 1;
         }
-
+        //dd($request->all());
         // ✅ Generate new appointment_id
         $appointmentId = $prefix . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
 
@@ -217,8 +217,10 @@ class AppointmentsController extends Controller
 
         $shifts = DoctorGlobalShift::with('globalShift')->where('doctor_id', $appointment->doctor)->get();
         $slots  = DoctorShiftTime::where('doctor_id', $appointment->doctor)
-            ->where('doctor_global_shift_id', $appointment->doctor_global_shift_id)
+            ->where('id', $appointment->doctor_shift_time_id)
             ->get();
+
+           // dd($appointment->doctor_global_shift_id);
 
         return response()->json([
             'appointment' => $appointment,
@@ -412,6 +414,14 @@ class AppointmentsController extends Controller
         ];
 
         return response()->json($data);
+    }
+    public function destroy($id)
+    {
+        $appointment = Appointment::findOrFail($id);
+
+        $appointment->delete(); // this fills deleted_at
+
+        return redirect()->back()->with('success','Appointment deleted successfully');
     }
 
 }

@@ -3513,6 +3513,7 @@
                                                                     </td>
                                                                     <!-- <td>{{ $taxAmount }}&nbsp;({{ $charge->charge?->taxCategory?->percentage ?? '-' }}%)
                                                                     </td> -->
+                                                                    <td>&nbsp;</td>
                                                                     <td>{{ $amount }}</td>
                                                                     <td>
                                                                         <div class="d-flex gap-2">

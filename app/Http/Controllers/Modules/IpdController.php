@@ -33,6 +33,7 @@ use App\Models\Staff;
 use App\Models\Symptom;
 use App\Models\SymptomsClassification;
 use App\Services\IpdPackageService;
+use App\Services\PmsBridgeService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -961,6 +962,17 @@ class IpdController extends Controller
                     }
                 }
 
+                // Send pathology tests to PMS (if any and PMS is configured)
+                if (! empty($pathology_ids) && config('services.pms.base_url')) {
+                    try {
+                        $pmsBridge = app(PmsBridgeService::class);
+                        $pmsBridge->sendIpdPathologyOrder($prescription);
+                    } catch (\Throwable $e) {
+                        \Log::error('Error sending IPD pathology order to PMS: '.$e->getMessage(), [
+                            'prescription_id' => $prescription->id ?? null,
+                        ]);
+                    }
+                }
                 // Store medicines
                 if (! empty($request->medicines)) {
                     foreach ($request->medicines as $i => $med) {
