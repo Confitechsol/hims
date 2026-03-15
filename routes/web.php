@@ -18,6 +18,7 @@ use App\Http\Controllers\DailyCollectionReportController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\DeathController;
+use App\Http\Controllers\DischargeController;
 use App\Http\Controllers\DischargePdfController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\DoctorVisitController;
@@ -640,8 +641,12 @@ Route::post('/ipd/bed-history/update', [IpdController::class, 'updateBedHistory'
 //
 Route::get('/ipd/{id}/pdf', [PdfController::class, 'generatePdf'])->name('ipd.pdf');
 
-Route::post('/discharge-card/store', [IpdController::class, 'storeDischarge'])
+Route::post('/discharge-card/store', [DischargeController::class, 'storeDischarge'])
     ->name('discharge.store');
+Route::get('/discharge-card/edit/{id}', [DischargeController::class, 'editDischarge'])
+    ->name('discharge.edit');
+Route::put('/discharge-card/update/{id}', [DischargeController::class, 'updateDischarge'])
+    ->name('discharge.update');
 
 Route::get('/billing', function () {
     return view('admin.billing.billing');
