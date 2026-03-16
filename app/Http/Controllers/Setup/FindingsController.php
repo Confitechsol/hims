@@ -98,9 +98,26 @@ class FindingsController extends Controller
     // finding category
     public function indexCategory(Request $request)
     {
-        $findingCategories = FindingCategory::all();
-        // dd($findings);
-        return view("admin.setup.finding_category", compact('findingCategories'));
+        $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
+
+    $query = FindingCategory::query();
+
+    // 🔍 Search
+    if ($request->filled('search')) {
+        $search = $request->search;
+
+        $query->where('category', 'like', "%{$search}%");
+    }
+
+    // Pagination
+    $findingCategories = $query->orderBy('id','desc')
+                               ->paginate($perPage)
+                               ->appends($request->all());
+
+    return view("admin.setup.finding_category", compact('findingCategories','perPage'));
     }
 
     public function storeCategory(Request $request)

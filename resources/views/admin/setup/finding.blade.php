@@ -154,7 +154,7 @@
                                         @if ($findings->onFirstPage())
                                             <button class="btn btn-outline-secondary btn-sm me-1" disabled>« Prev</button>
                                         @else
-                                            <a href="{{ $doctorfindingss->previousPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm me-1">« Prev</a>
+                                            <a href="{{ $findingss->previousPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm me-1">« Prev</a>
                                         @endif
 
                                         @if ($start > 1)
