@@ -376,11 +376,11 @@
                                               <div class="colon">:</div>
                                               <div class="patient_data" id="discharge_type_text"></div>
                                           </div> --}}
-                                          <div class="patient_items">
+                                          {{-- <div class="patient_items">
                                               <div class="patient_head">Discharge Contact No.</div>
                                               <div class="colon">:</div>
                                               <div class="patient_data" id="dis_contact_no_text"></div>
-                                          </div>
+                                          </div> --}}
                                           <div class="patient_items">
                                               <div class="patient_head">BED</div>
                                               <div class="colon">:</div>
@@ -393,7 +393,7 @@
                                   <div class="patient_info">
                                       <div class="patient_details">
                                           <div class="patient_items">
-                                              <div class="patient_head">Under Care</div>
+                                              <div class="patient_head">Under Care Dr.</div>
                                               <div class="colon">:</div>
                                               <div class="patient_data" id="dis_under_care_text"></div>
                                           </div>
@@ -446,7 +446,7 @@
                                       <h6 id="dis_discharge_advice_label">Condition at Discharge:</h6>
                                       <div class="general_list" id="dis_discharge_advice_html"></div>
                                       <br />
-                                      <h6 id="dis_remarks_label">Remarks:</h6>
+                                      <h6 id="dis_remarks_label">Follow Up:</h6>
                                       <div class="general_list" id="dis_remarks_text"></div>
                                       <br />
                                       <div class="end">
