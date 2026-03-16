@@ -24,7 +24,7 @@
 
 
     .about_info {
-        font-size: 12px;
+        font-size: 11px;
     }
 
     .wreeti {
@@ -55,7 +55,7 @@
     .heading h4 {
         text-transform: uppercase;
         text-align: center;
-        margin: 10px auto;
+        margin: 10px auto 5px;
     }
 
     .red {
@@ -77,8 +77,9 @@
         display: flex;
         padding: 8px;
         margin-bottom: 2px;
-        font-weight: 700;
+        /* font-weight: 700; */
         font-size: 10px;
+        padding-bottom: 0;
     }
 
     .patient_details {
@@ -89,7 +90,7 @@
         display: flex;
         align-items: center;
         gap: 20px;
-        margin-bottom: 10px;
+        margin-bottom: 6px;
     }
 
     .patient_head {
@@ -130,7 +131,7 @@
 
     .wreeti_items {
         font-weight: 700;
-        margin-bottom: 8px;
+        /* margin-bottom: 8px; */
     }
 
     .wreeti_box {
@@ -157,7 +158,8 @@
     }
 
     .text {
-        font-size: 10px;
+        font-size: 11px;
+        line-height: 1.3;
     }
 
     @media print {
@@ -199,18 +201,21 @@
         padding-bottom: 30px;
         text-align: center;
     }
+
     .btn-primary:hover {
         /* background-color: #b14cc1; */
         /* border-color: #b14cc1; */
         color: #fff;
     }
+
     .btn-primary:focus {
         /* background-color: #b14cc1; */
         /* border-color: #b14cc1; */
         color: #fff;
         box-shadow: 0 0 0 0.2rem rgba(177, 76, 193, 0.5);
     }
-    .btn-primary{
+
+    .btn-primary {
         background-color: #cb6ce6;
         border-color: #cb6ce6;
         color: #fff;
@@ -225,16 +230,15 @@
     <div class="main_box" id="pdf-content">
 
         <div class="top_head">
-            <div class="first_logo">
+            <div class="second_logo">
+                @if (file_exists(public_path('assets/images/nabh-logo.png')))
+                    <img src="{{ asset('assets/images/nabh-logo.png') }}" alt="LOGO2" style="height: auto; width:70%;">
+                @endif
+            </div>
+            <div class="first_logo" style="text-align: center;">
                 <img src="{{ asset('assets/images/logo.webp') }}" alt="LOGO1" style="height: 50px">
                 <p>NABH/PESHCO-2018-3150/L-03
                 </p>
-            </div>
-            <div class="second_logo">
-                @if (file_exists(public_path('assets/images/nabh-logo.png')))
-                    <img src="{{ asset('assets/images/nabh-logo.png') }}" alt="LOGO2"
-                        style="height: auto; width:100%;">
-                @endif
             </div>
             <div class="about_info">
                 <p>{{ $hospital->name ?? '' }} </p>
@@ -280,7 +284,9 @@
                     </div>
                     :
                     <div class="patient_data">
-                        {{ $IpdPatient->patient['patient_name'] }}
+                        <strong>
+                            {{ $IpdPatient->patient['patient_name'] }}
+                        </strong>
                     </div>
                 </div>
 
@@ -309,7 +315,7 @@
                     </div>
                     :
                     <div class="patient_data">
-                        
+
                     </div>
                 </div>
                 <div class="patient_items">
@@ -322,16 +328,16 @@
                     </div>
                 </div>
 
-                 <div class="patient_items">
-                        <div class="patient_head">
-                            GENDER
-                        </div>
-                        :
-                        <div class="patient_data">
-                            {{ $IpdPatient->patient['gender'] }}
-                        </div>
-                 </div>
-                    
+                <div class="patient_items">
+                    <div class="patient_head">
+                        GENDER
+                    </div>
+                    :
+                    <div class="patient_data">
+                        {{ $IpdPatient->patient['gender'] }}
+                    </div>
+                </div>
+
 
             </div>
 
@@ -346,18 +352,18 @@
                             {{ $IpdPatient->patient['age'] }} y
                         </div>
                     </div>
-                   
-                    
+
+
                 </div>
                 <div class="patient_items">
-    <div class="patient_head">
-        AREA
-    </div>
-    :
-    <div class="patient_data">
-        {{ $IpdPatient->patient->areaName->name ?? '' }}
-    </div>
-</div>
+                    <div class="patient_head">
+                        AREA
+                    </div>
+                    :
+                    <div class="patient_data">
+                        {{ $IpdPatient->patient->areaName->name ?? '' }}
+                    </div>
+                </div>
                 <div class="patient_items">
                     <div class="patient_head">
                         STATUS
@@ -387,14 +393,14 @@
                 </div>
 
                 <div class="patient_items">
-                        <div class="patient_head">
-                            Police Station
-                        </div>
-                        :
-                        <div class="patient_data">
-                            {{ $IpdPatient->patient['police_station'] }}
-                        </div>
+                    <div class="patient_head">
+                        Police Station
                     </div>
+                    :
+                    <div class="patient_data">
+                        {{ $IpdPatient->patient['police_station'] }}
+                    </div>
+                </div>
 
             </div>
 
@@ -627,7 +633,7 @@
             <p>I have been fully explained the consequences of the procedures and
                 their risks.</p>
 
-            <h4>GENERAL NORMS FOR PATIENT ADMISSION:</h4>
+            <h4 style="margin:0;">GENERAL NORMS FOR PATIENT ADMISSION:</h4>
 
             <ol class="general_list">
                 <li>An ADVANCE PAYMENT shuld be made at the time of admission
@@ -668,7 +674,7 @@
 
         <div class="bottom_box">
             <div class="contact_box">
-                <p>Contact No :</p>
+                <p style="margin:0;">Contact No :</p>
                 <p class="red">Full charge on the day of the admission. No charge if
                     the patient leaves before 11:30 am on the day of discharge.</p>
             </div>
