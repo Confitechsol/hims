@@ -9,13 +9,36 @@ use Illuminate\Support\Facades\Auth;
 
 class FindingsController extends Controller
 {
-    public function index(Request $request)
-    {
-        $findings          = Finding::with('category')->get();
-        $findingCategories = FindingCategory::all();
-        // dd($findings);
-        return view("admin.setup.finding", compact("findings", 'findingCategories'));
+   public function index(Request $request)
+{
+    $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
     }
+
+    $search = $request->input('search');
+
+    $query = Finding::with('category');
+
+    // 🔍 Search
+    if (!empty($search)) {
+        $query->where(function ($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhereHas('category', function ($cat) use ($search) {
+                  $cat->where('category', 'like', "%{$search}%");
+              });
+        });
+    }
+
+    // Pagination
+    $findings = $query->orderBy('id','desc')
+                      ->paginate($perPage)
+                      ->appends($request->all());
+
+    $findingCategories = FindingCategory::all();
+
+    return view("admin.setup.finding", compact("findings", 'findingCategories','perPage'));
+}
     public function store(Request $request)
     {
         $request->validate([
