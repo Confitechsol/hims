@@ -257,7 +257,7 @@
         <div class="admission_info">
             <div class="admission_item">
                 <p>
-                    <b>ADMISSION NO.</b> : <span class="red">{{ $IpdPatient->ipd['ipd_no'] }}</span>
+                    <b>ADMISSION NO.</b> : <b class="red">{{ $IpdPatient->ipd['ipd_no'] }}</b>
                 </p>
             </div>
             <div class="admission_item">
@@ -394,7 +394,7 @@
 
                 <div class="patient_items">
                     <div class="patient_head">
-                        Police Station
+                        POLICE STATION
                     </div>
                     :
                     <div class="patient_data">
@@ -422,11 +422,11 @@
 
                 <div class="patient_items">
                     <div class="patient_head">
-                        RELATIVE NAME
+                        PRIMARY PHONE NUMBER
                     </div>
                     :
                     <div class="patient_data">
-                        {{ $IpdPatient->patient['guardian_name'] }}
+                        {{ $IpdPatient->patient['mobileno'] }}
                     </div>
                 </div>
 
@@ -446,7 +446,8 @@
 
                 <div class="patient_items">
                     <div class="patient_head">
-                        PHONE NO.
+                        ALTERNATE PHONE NUMBER
+                        
                     </div>
                     :
                     <div class="patient_data">
@@ -668,6 +669,7 @@
                 <li>In the event of a delay in body release due to unavoidable reasons, the deceased will be
                     respectfully transferred to the mortuary freezer after four hours (4 hours), subject to consent from
                     the next of kin.</li>
+                <li>Emergency Icu Number 9674777261</li>
             </ol>
             <p>Witness Signature with relation</p>
         </div>

@@ -305,11 +305,11 @@
                 <td class="colon">:</td>
                 <td class="value">{{ $data->ot_date ? \Carbon\Carbon::parse($data->ot_date)->format('d-m-Y') : '' }}
                 </td>
-            {{-- @else
-                <td class="label">Discharge Contact</td>
+            @else
+                {{-- <td class="label">Discharge Contact</td>
                 <td class="colon">:</td>
-                <td class="value">{{ $data->discharge_contact }}</td>
-            @endif --}}
+                <td class="value">{{ $data->discharge_contact }}</td> --}}
+            @endif
             <td class="label">Discharge Time</td>
             <td class="colon">:</td>
             <td class="value">{{ $data->discharge_time }}</td>
