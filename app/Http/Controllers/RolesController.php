@@ -21,9 +21,19 @@ class RolesController extends Controller
         });
     }
 
-    $roles = $query->orderBy('id', 'desc')->get();
+    // $roles = $query->orderBy('id', 'desc')->get();
+    // Custom per page
+    $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
 
-    return view('admin.setup.role', compact('roles'));
+    // Pagination
+    $roles = $query->orderBy('id', 'desc')
+                   ->paginate($perPage)
+                   ->appends($request->all());
+
+    return view('admin.setup.role', compact('roles','perPage'));
 }
     public function store(Request $request)
     {

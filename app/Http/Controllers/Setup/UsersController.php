@@ -16,6 +16,10 @@ class UsersController extends Controller
     {
         $isDoctorTab = $request->get('tab', 'doctor') == 'doctor';
         $statusTab   = $request->get('statusTab', 'active');
+         $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
         if ($isDoctorTab) {
             // Query from doctors table
             $query = Doctor::query()
@@ -81,9 +85,9 @@ class UsersController extends Controller
         });
     }
 
-        $users = $query->get();
+         $users = $query->paginate($perPage)->appends($request->all());
 
-        return view("admin.setup.users", compact("users", 'isDoctorTab', 'statusTab'));
+        return view("admin.setup.users", compact("users", 'isDoctorTab', 'statusTab','perPage'));
     }
 
     public function updateDrStatus(Request $request, $id)

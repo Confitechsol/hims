@@ -306,9 +306,9 @@
                 <td class="value">{{ $data->ot_date ? \Carbon\Carbon::parse($data->ot_date)->format('d-m-Y') : '' }}
                 </td>
             @else
-                <td class="label">Discharge Contact</td>
+                {{-- <td class="label">Discharge Contact</td>
                 <td class="colon">:</td>
-                <td class="value">{{ $data->discharge_contact }}</td>
+                <td class="value">{{ $data->discharge_contact }}</td> --}}
             @endif
             <td class="label">Discharge Time</td>
             <td class="colon">:</td>
@@ -338,7 +338,7 @@
     </table>
     <table class="table-box-border">
         <tr>
-            <td class="label under_care">Under Care</td>
+            <td class="label under_care">Under Care Dr.</td>
             <td class="colon">:</td>
             <td class="value">{{ $data->under_care_dr }}</td>
 
@@ -395,7 +395,7 @@
         @endif
 
         @if ($data->remarks != null || $data->remarks != '')
-            <h4>Remarks</h4>
+            <h4>Follow Up</h4>
             {!! $data->remarks !!}
         @endif
         <div class="end">
