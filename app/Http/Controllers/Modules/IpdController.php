@@ -11,6 +11,7 @@ use App\Models\Doctor;
 use App\Models\Finding;
 use App\Models\IpdCharges;
 use App\Models\IpdDaywiseBedCharge;
+use App\Services\BedOccupancyService;
 use App\Models\IpdDetail;
 use App\Models\IpdMedicine;
 use App\Models\IpdPatient;
@@ -256,10 +257,10 @@ class IpdController extends Controller
                 $admissionDate = Carbon::parse($request->admission_date);
                 $chargeDate    = $admissionDate->format('Y-m-d');
 
-                // Start: Previous day 10:00 AM
-                $periodStart = $admissionDate->copy()->subDay()->setTime(10, 0, 0);
-                // End: Current day 10:00 AM
-                $periodEnd = $admissionDate->copy()->setTime(10, 0, 0);
+                // Start: Previous day 10:01 AM
+                $periodStart = $admissionDate->copy()->subDay()->setTime(10, 1, 0);
+                // End: Current day 10:01 AM
+                $periodEnd = $admissionDate->copy()->setTime(10, 1, 0);
 
                 $periodStartDate = $periodStart->format('Y-m-d');
                 $periodEndDate   = $periodEnd->format('Y-m-d');
@@ -364,7 +365,7 @@ class IpdController extends Controller
 
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, BedOccupancyService $bedOccupancyService)
     {
         //dd($request->all());
         $validator = Validator::make($request->all(), [
@@ -387,17 +388,44 @@ class IpdController extends Controller
             $allotedBed = $ipd->bed;
             //dd($id, IpdPatient::where('ipd_id', $id)->first());
             $ipdPatient = IpdPatient::where('ipd_id', $id)->firstOrFail();
+
+            // Bed change or admission date change: validate occupancy for first bed period
+            $newAdmissionDate = Carbon::parse($request->admission_date);
+            $targetBedId      = $request->bed_number ?? $allotedBed;
+
+            // Check availability of this bed at the new admission datetime
+            // For admission edit we care about occupancy at that exact moment,
+            // so use a zero-length window [admissionDate, admissionDate]
+            $availability = $bedOccupancyService->checkAvailability(
+                (int) $targetBedId,
+                $newAdmissionDate,
+                $newAdmissionDate->copy(),
+                null,
+                $ipd->id
+            );
+            if (! $availability['available']) {
+                return redirect()->back()->with('error', $availability['message'])->withInput();
+            }
+
             if ($request->bed_number != $allotedBed) {
                 $newBedDetail          = Bed::where('id', $request->bed_number)->firstOrFail();
                 $allotedBedDetail      = Bed::where('id', $allotedBed)->firstOrFail();
-                $bedhistory            = PatientBedHistory::where('ipd_id', $id)->firstOrFail();
-                $bedhistory->bed_group = $request->bed_group_id;
-                $bedhistory->bed_id    = $request->bed_number;
+                $bedhistory            = PatientBedHistory::where('ipd_id', $id)->orderBy('from_date')->firstOrFail();
+                $bedhistory->bed_group_id = $request->bed_group;
+                $bedhistory->bed_id       = $request->bed_number;
+                $bedhistory->from_date    = $newAdmissionDate;
                 $bedhistory->save();
                 $newBedDetail->is_active = 'no';
                 $newBedDetail->save();
                 $allotedBedDetail->is_active = 'yes';
                 $allotedBedDetail->save();
+            } else {
+                // Same bed, just align first history from_date with edited admission date
+                $bedhistory = PatientBedHistory::where('ipd_id', $id)->orderBy('from_date')->first();
+                if ($bedhistory) {
+                    $bedhistory->from_date = $newAdmissionDate;
+                    $bedhistory->save();
+                }
             }
             // dd($opd);
             // Doctor Details
@@ -1672,13 +1700,20 @@ class IpdController extends Controller
             ->pluck('bed_id')
             ->toArray();
 
-        $query = Bed::where('bed_group_id', $bedGroupId)->where('is_active', 'yes');
+        $query = Bed::where('bed_group_id', $bedGroupId);
+
         if ($includeBedId) {
+            // For edit: show all free & active beds, plus the currently selected bed (even if inactive/occupied)
             $query->where(function ($q) use ($occupiedBeds, $includeBedId) {
-                $q->whereNotIn('id', $occupiedBeds)->orWhere('id', $includeBedId);
+                $q->where(function ($qq) use ($occupiedBeds) {
+                    $qq->where('is_active', 'yes')
+                       ->whereNotIn('id', $occupiedBeds);
+                })->orWhere('id', $includeBedId);
             });
         } else {
-            $query->whereNotIn('id', $occupiedBeds);
+            // For add: only active and not currently occupied beds
+            $query->where('is_active', 'yes')
+                  ->whereNotIn('id', $occupiedBeds);
         }
         $beds = $query->get();
         return response()->json($beds);
@@ -1738,11 +1773,11 @@ class IpdController extends Controller
             ? (float) $request->bed_charge
             : (float) ($bedGroup->bed_cost ?? 0);
 
-        // Calculate period (10 AM to next 10 AM)
-        // Start: Previous day 10:00 AM
-        $periodStart = $transferDate->copy()->subDay()->setTime(10, 0, 0);
-        // End: Current day 10:00 AM
-        $periodEnd = $transferDate->copy()->setTime(10, 0, 0);
+        // Calculate period (10:01 AM to next 10:01 AM)
+        // Start: Previous day 10:01 AM
+        $periodStart = $transferDate->copy()->subDay()->setTime(10, 1, 0);
+        // End: Current day 10:01 AM
+        $periodEnd = $transferDate->copy()->setTime(10, 1, 0);
 
         $periodStartDate = $periodStart->format('Y-m-d');
         $periodEndDate   = $periodEnd->format('Y-m-d');
@@ -1777,7 +1812,7 @@ class IpdController extends Controller
      * Update a bed history record (edit from Bed History table).
      * Affects: patient_bed_history, bed occupancy, ipd_details (if active), ipd_daywise_bed_charges.
      */
-    public function updateBedHistory(Request $request)
+    public function updateBedHistory(Request $request, BedOccupancyService $bedOccupancyService)
     {
         $request->validate([
             'bed_history_id' => 'required|exists:patient_bed_history,id',
@@ -1809,19 +1844,17 @@ class IpdController extends Controller
         $fromDate = Carbon::parse($request->from_date);
         $toDate = $request->to_date ? Carbon::parse($request->to_date) : null;
 
-        $adjacent = PatientBedHistory::where('ipd_id', $ipd->id)
-            ->where('id', '!=', $history->id)
-            ->orderBy('from_date')
-            ->get();
-
-        foreach ($adjacent as $adj) {
-            $adjFrom = Carbon::parse($adj->from_date);
-            $adjTo = $adj->to_date ? Carbon::parse($adj->to_date) : Carbon::now()->endOfDay();
-            $myTo = $toDate ?? Carbon::now()->endOfDay();
-
-            if ($fromDate->lt($adjTo) && $myTo->gt($adjFrom)) {
-                return redirect()->back()->with('error', 'Date overlap detected with another bed history record (From: ' . $adjFrom->format('d/m/Y') . ', To: ' . $adjTo->format('d/m/Y') . '). Please adjust dates to avoid overlap.');
-            }
+        // Use shared service to prevent overlaps / double-occupancy for this bed
+        // Allow overlap with the same IPD's other history records; only block if some OTHER patient is on this bed
+        $availability = $bedOccupancyService->checkAvailability(
+            (int) $newBedId,
+            $fromDate,
+            $toDate,
+            $history->id,
+            $ipd->id
+        );
+        if (! $availability['available']) {
+            return redirect()->back()->with('error', $availability['message']);
         }
 
         DB::beginTransaction();
@@ -1852,8 +1885,8 @@ class IpdController extends Controller
                 : (float) ($history->bedGroup->bed_cost ?? 0);
 
             $chargeDate = $fromDate->format('Y-m-d');
-            $periodStart = $fromDate->copy()->subDay()->setTime(10, 0, 0);
-            $periodEnd = $fromDate->copy()->setTime(10, 0, 0);
+            $periodStart = $fromDate->copy()->subDay()->setTime(10, 1, 0);
+            $periodEnd = $fromDate->copy()->setTime(10, 1, 0);
 
             IpdDaywiseBedCharge::updateOrCreate(
                 [
@@ -1881,6 +1914,99 @@ class IpdController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Failed to update: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Store a new bed history record from the Bed History popup (Add mode).
+     * Uses the same modal UI as edit, without affecting existing edit behaviour.
+     */
+    public function storeBedHistory(Request $request, BedOccupancyService $bedOccupancyService)
+    {
+        $request->validate([
+            'ipd_id'    => 'required|exists:ipd_details,id',
+            'bed_group' => 'required|exists:bed_group,id',
+            'bed'       => 'required|exists:bed,id',
+            'from_date' => 'required|date',
+            'to_date'   => 'nullable|date|after_or_equal:from_date',
+            'bed_charge'=> 'nullable|numeric|min:0',
+        ]);
+
+        $ipd = IpdDetail::findOrFail($request->ipd_id);
+
+        $newBedId = (int) $request->bed;
+        $bed = Bed::findOrFail($newBedId);
+        if ((int) $bed->bed_group_id !== (int) $request->bed_group) {
+            return redirect()->back()->with('error', 'Selected bed must belong to the selected bed group.');
+        }
+
+        $fromDate = Carbon::parse($request->from_date);
+        $toDate   = $request->to_date ? Carbon::parse($request->to_date) : null;
+
+        // Prevent double-occupancy / overlaps for this bed via shared service
+        // For add, also allow same-IPD history on this bed; only conflict with other patients
+        $availability = $bedOccupancyService->checkAvailability(
+            (int) $newBedId,
+            $fromDate,
+            $toDate,
+            null,
+            $ipd->id
+        );
+        if (! $availability['available']) {
+            return redirect()->back()->with('error', $availability['message']);
+        }
+
+        DB::beginTransaction();
+        try {
+            // Create new bed history entry (non-active by default to avoid changing current bed unexpectedly)
+            $history = new PatientBedHistory();
+            $history->hospital_id   = $ipd->hospital_id;
+            $history->branch_id     = $ipd->branch_id ?? null;
+            $history->ipd_id        = $ipd->id;
+            $history->case_reference_id = $ipd->case_reference_id ?? null;
+            $history->bed_group_id  = $request->bed_group;
+            $history->bed_id        = $newBedId;
+            $history->from_date     = $fromDate;
+            $history->to_date       = $request->to_date ? $toDate : null;
+            $history->is_active     = 'no';
+            $history->created_at    = now();
+            $history->save();
+
+            // Create / update daywise bed charge for the from_date so estimate/final bill consider it
+            $bedChargeRate = $request->bed_charge !== null && $request->bed_charge !== ''
+                ? (float) $request->bed_charge
+                : (float) ($bed->bedGroup->bed_cost ?? 0);
+
+            $chargeDate  = $fromDate->format('Y-m-d');
+            $periodStart = $fromDate->copy()->subDay()->setTime(10, 1, 0);
+            $periodEnd   = $fromDate->copy()->setTime(10, 1, 0);
+
+            IpdDaywiseBedCharge::updateOrCreate(
+                [
+                    'ipd_id'      => $ipd->id,
+                    'charge_date' => $chargeDate,
+                ],
+                [
+                    'hospital_id'        => $ipd->hospital_id,
+                    'branch_id'          => $ipd->branch_id ?? null,
+                    'case_reference_id'  => $ipd->case_reference_id ?? null,
+                    'patient_id'         => $ipd->patient_id,
+                    'period_start_date'  => $periodStart->format('Y-m-d'),
+                    'period_end_date'    => $periodEnd->format('Y-m-d'),
+                    'bed_group_id'       => $request->bed_group,
+                    'bed_id'             => $newBedId,
+                    'bed_charge'         => $bedChargeRate,
+                    'bed_charge_rate'    => $bedChargeRate,
+                    'no_of_days'         => 1,
+                    'is_active'          => 'yes',
+                ]
+            );
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Bed history added successfully. Estimate and final bill will reflect the changes.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to add bed history: ' . $e->getMessage());
         }
     }
 

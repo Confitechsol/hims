@@ -35,7 +35,7 @@ class DaywiseBedChargeService
                 $chargeDate = Carbon::yesterday()->format('Y-m-d');
             }
 
-            // Calculate day period (10 AM to next 10 AM)
+            // Calculate day period (10:01 AM to next 10:01 AM)
             $dayPeriod = $this->getDayPeriod($chargeDate);
             $startTime = $dayPeriod['start'];
             $endTime = $dayPeriod['end'];
@@ -127,7 +127,7 @@ class DaywiseBedChargeService
                 'bed_id' => $lastBed->bed_id,
                 'bed_charge' => $bedCharge, // Total charge for the period
                 'bed_charge_rate' => $bedChargeRate, // Per-day rate from bed_group.bed_cost
-                'no_of_days' => 1, // Always 1 for each day period (10 AM to next 10 AM)
+                'no_of_days' => 1, // Always 1 for each day period (10:01 AM to next 10:01 AM)
                 'is_active' => 'yes',
             ]);
 
@@ -166,7 +166,7 @@ class DaywiseBedChargeService
     }
 
     /**
-     * Get day period (10 AM to next 10 AM)
+     * Get day period (10:01 AM to next 10:01 AM)
      *
      * @param string $date Date in Y-m-d format
      * @return array Array with 'start' and 'end' Carbon instances
@@ -175,11 +175,11 @@ class DaywiseBedChargeService
     {
         $dateCarbon = Carbon::parse($date);
 
-        // Start: Previous day 10:00 AM
-        $start = $dateCarbon->copy()->subDay()->setTime(10, 0, 0);
+        // Start: Previous day 10:01 AM
+        $start = $dateCarbon->copy()->subDay()->setTime(10, 1, 0);
 
-        // End: Current day 10:00 AM
-        $end = $dateCarbon->copy()->setTime(10, 0, 0);
+        // End: Current day 10:01 AM
+        $end = $dateCarbon->copy()->setTime(10, 1, 0);
 
         return [
             'start' => $start,
