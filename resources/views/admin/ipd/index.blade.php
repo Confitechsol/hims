@@ -132,7 +132,7 @@
                                             <tbody>
                                                 @foreach ($ipd as $ipdDetails)
                                                     <tr>
-                                                        <td>{{ $loop->iteration }}</td>
+                                                        <td>{{ ($ipd->currentPage() - 1) * $ipd->perPage() + $loop->iteration }}</td>
                                                         <td><a href="{{ route('ipd.show', ['id' => $ipdDetails->id]) }}"
                                                                 class="text-primary">{{ $ipdDetails->ipd_no }}</a>
                                                         </td>
