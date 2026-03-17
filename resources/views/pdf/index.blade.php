@@ -803,7 +803,7 @@
         </div>
 
         <div class="wreeti_sig">
-            <p><b>Signature of the Front Office Executive : </b>WREETI</p>
+            <p><b>Signature of the Front Office Executive : </b>{{ $user->username }}</p>
             <div class="line">
 
             </div>
