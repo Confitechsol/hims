@@ -85,7 +85,7 @@ class DutyRosterController extends Controller
 
         $dutyRosterList->delete(); // soft delete (sets deleted_at)
 
-        return response()->json(['success' => 'Duty roster deleted successfully.']);
+        return redirect()->back()->with('success', 'Duty roster deleted successfully.');
     }
 
     public function showShift(Request $request)

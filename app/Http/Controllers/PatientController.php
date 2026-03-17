@@ -14,11 +14,35 @@ use Illuminate\Support\Facades\Validator;
 
 class PatientController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $bloodGroups = BloodBankProduct::where('is_blood_group', 1)->get();
-        $patients = Patient::get();
-        return view('admin.setup.patient', compact('patients','bloodGroups'));
+        // $patients = Patient::get();
+        $query = Patient::query();
+
+    // 🔍 Search
+    if ($request->filled('search')) {
+        $search = $request->search;
+
+        $query->where(function ($q) use ($search) {
+            $q->where('patient_name', 'like', "%{$search}%")
+              
+              ->orWhere('guardian_name', 'like', "%{$search}%")
+              ->orWhere('mobileno', 'like', "%{$search}%");
+        });
+    }
+
+    // Custom per page
+    $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
+
+    // Pagination
+    $patients = $query->orderBy('id','desc')
+                      ->paginate($perPage)
+                      ->appends($request->all());
+        return view('admin.setup.patient', compact('patients','bloodGroups','perPage'));
     }
     // public function storeOld(Request $request)
     // {

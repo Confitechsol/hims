@@ -42,18 +42,19 @@ class OperationController extends Controller
     }
     public function update(Request $request, $id)
     {
+        
         $validated = $request->validate([
             'operation_name' => 'required|string|max:255',
             'category_id' => 'required|string|max:500',
         ]);
 
-        $purpose = Operation::findOrFail($id);
-        $purpose->update([
+        $operation = Operation::findOrFail($id);
+        $operation->update([
             'operation' => $validated['operation_name'],
             'category_id' => $validated['category_id'],
         ]);
 
-        return redirect()->back()->with('success', 'Purpose updated successfully!');
+        return redirect()->back()->with('success', 'Operation updated successfully!');
     }
     public function destroy($id)
     {

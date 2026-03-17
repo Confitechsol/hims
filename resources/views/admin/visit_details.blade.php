@@ -89,13 +89,13 @@
                         <span>Payments</span>
                     </a>
                 </li>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a href="#live_consultation" data-bs-toggle="tab" aria-expanded="true"
                         class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
                             class="fa-solid fa-hand-holding-dollar text-primary pe-1"></i>
                         <span>Live Consultation</span>
                     </a>
-                </li>
+                </li> -->
                 <li class="nav-item">
                     <a href="#timeline" data-bs-toggle="tab" aria-expanded="true"
                         class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i

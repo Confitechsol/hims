@@ -666,7 +666,8 @@
                                                 class="bi bi-clipboard-pulse text-white"></i></button>
                                     @else
                                         <button class="bg-transparent border-0" data-bs-toggle="modal"
-                                            data-bs-target="#patientDischargeModal" data-ipd="{{ $ipd }}" data-doctors="{{$doctors}}" data-user="{{$currentUser}}"><i
+                                            data-bs-target="#patientDischargeModal" data-ipd="{{ $ipd }}" data-doctors="{{$doctors}}" data-user="{{$currentUser}}"
+                                            data-outstanding={{$billingSummary['outstanding'] ?? 0}}><i
                                                 class="bi bi-clipboard-pulse text-white"></i></button>
                                     @endif
                                 </div>
@@ -3638,7 +3639,7 @@
             </div>
 
             <!-- <div class="tab-pane" id="payments">
-                
+
                 <div class="row">
                     <div class="col-12 d-flex">
                         <div class="card shadow-sm flex-fill w-100">
@@ -3671,7 +3672,7 @@
                                                                         class="ti ti-plus me-1"></i>Add Payment</a>
                                                             </div>
                                                         @endif
-                                                        
+
                                                         <div class="modal fade" id="add_payment" tabindex="-1"
                                                             aria-hidden="true">
                                                             <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -3755,7 +3756,7 @@
                                                                                         <input type="date" name="cheque_date" id="cheque_date" class="form-control">
                                                                                     </div>
 
-                                                                                    
+
                                                                                 </div>
 
                                                                                 <div class="col-md-6">
@@ -3836,7 +3837,7 @@
                                                         </tbody>
                                                     </table>
                                                 </div>
-                                                
+
                                             </div>
                                         </div>
                                     </div>
@@ -4828,10 +4829,10 @@
     @include('components.modals.add-prescription-modal')
     @include('components.modals.discharge-modal')
     @include('components.modals.discharge-details-modal')
-    
+
     <script>
     console.log('🔵 IPD View Script Block 1 Loading...');
-    
+
     // Test: Verify script is executing
     try {
         console.log('✅ Script execution test passed');
@@ -4839,7 +4840,7 @@
         console.error('❌ Script execution test failed:', e);
         alert('Script error: ' + e.message);
     }
-    
+
     // Suppress browser extension errors (they're harmless but noisy)
     window.addEventListener('error', function(e) {
         if (e.message && e.message.includes('message channel closed')) {
@@ -4848,9 +4849,9 @@
             return false;
         }
     }, true);
-    
+
     console.log('🔵 IPD View Script Block 1 Loaded');
-    
+
     // --- Prescription modal: global opener (used by inline onclick so modal opens even if other scripts fail) ---
     window.showIpdPrescriptionModal = function(btn) {
         var m = document.getElementById('addPrescriptionModal');
@@ -4900,7 +4901,7 @@
         if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
         else run();
     })();
-    
+
     // Direct function to open prescription modal - bypasses Bootstrap issues
     // Define function to fetch pathology/radiology data DIRECTLY (not dependent on modal)
     // Make sure this is defined BEFORE any button click handlers
@@ -5013,7 +5014,7 @@
             }
         };
     }
-    
+
     window.initPathologyRadiologySelect2 = function() {
         if (typeof window.jQuery === 'undefined' || !window.jQuery.fn.select2) return;
         var $ = window.jQuery;
@@ -5048,10 +5049,10 @@
         setTimeout(doInit, 400);
         setTimeout(doInit, 800);
     };
-    
+
     // Ensure function is available
     console.log('fetchPathologyRadiologyData defined:', typeof window.fetchPathologyRadiologyData === 'function');
-    
+
     // Directly populate medicine category, dose interval, dose duration in the prescription modal (no dependency on modal script)
     window.populateMedicineDropdownsInModal = function() {
         var modal = document.getElementById('addPrescriptionModal');
@@ -5264,7 +5265,7 @@
             }, 300);
         });
     };
-    
+
     function openAddPrescriptionModal(ipdId) {
         console.log('openAddPrescriptionModal called with IPD ID:', ipdId);
         const modalEl = document.getElementById('addPrescriptionModal');
@@ -5273,14 +5274,14 @@
             alert('Error: Prescription modal not found. Please refresh the page.');
             return false;
         }
-        
+
         // Set IPD ID in hidden field
         const ipdIdField = document.getElementById('ipd_id');
         if (ipdIdField) {
             ipdIdField.value = ipdId;
             console.log('IPD ID set to:', ipdId);
         }
-        
+
         // Set prescription date for back-dated support
         const btn = document.querySelector('[data-bs-target="#addPrescriptionModal"][data-ipd-id="' + ipdId + '"]');
         const prescriptionDateEl = document.getElementById('prescription_date');
@@ -5297,7 +5298,7 @@
                 prescriptionDateEl.removeAttribute('min');
             }
         }
-        
+
         // IMMEDIATELY fetch data - don't wait for modal
         if (typeof window.fetchPathologyRadiologyData === 'function') {
             window.fetchPathologyRadiologyData();
@@ -5305,12 +5306,12 @@
         if (typeof window.fetchMedicineDropdownData === 'function') {
             window.fetchMedicineDropdownData();
         }
-        
+
         // Try Bootstrap modal first
         try {
             if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
                 console.log('✅ Bootstrap and Modal are available');
-                
+
                 // Check if modal already has an instance
                 let modalInstance = bootstrap.Modal.getInstance(modalEl);
                 if (!modalInstance) {
@@ -5323,7 +5324,7 @@
                 } else {
                     console.log('Using existing Bootstrap Modal instance');
                 }
-                
+
                 // Show the modal
                 console.log('Calling modalInstance.show()...');
                 modalInstance.show();
@@ -5331,18 +5332,18 @@
                 // CRITICAL: Return here - do NOT fall through to manual fallback. Bootstrap manages show/hide/backdrop.
                 // Manual fallback only runs when Bootstrap is unavailable (see below).
                 return true;
-                
+
                 // Verify modal is showing after a short delay (kept for reference, Bootstrap handles it)
                 setTimeout(() => {
                     // Check visibility - aria-hidden must be explicitly 'false' (not null)
                     const ariaHidden = modalEl.getAttribute('aria-hidden');
                     const computedStyle = window.getComputedStyle(modalEl);
-                    const isVisible = modalEl.classList.contains('show') && 
+                    const isVisible = modalEl.classList.contains('show') &&
                                      (ariaHidden === 'false' || ariaHidden === null) && // Accept null as visible too
                                      computedStyle.display !== 'none' &&
                                      computedStyle.visibility !== 'hidden' &&
                                      parseFloat(computedStyle.opacity) > 0;
-                    
+
                     console.log('Modal visibility check after Bootstrap show:', {
                         isVisible: isVisible,
                         hasShowClass: modalEl.classList.contains('show'),
@@ -5353,14 +5354,14 @@
                         zIndex: computedStyle.zIndex,
                         position: computedStyle.position
                     });
-                    
+
                     if (!isVisible) {
                         console.warn('⚠️ Bootstrap modal.show() did not make modal visible, using manual fallback');
                         // Don't return, fall through to manual fallback
                     } else {
                         console.log('✅ Modal is visible via Bootstrap');
                     }
-                    
+
                     // Ensure medicine categories, dose intervals, dose durations and medicine rows are loaded
                     setTimeout(function() {
                         if (typeof window.loadPathologyRadiologyData === 'function') {
@@ -5388,14 +5389,14 @@
                         }
                     }, 400);
                 }, 300);
-                
+
                 // Also call the other function if available
                 setTimeout(() => {
                     if (typeof window.loadPathologyRadiologyData === 'function') {
                         window.loadPathologyRadiologyData();
                     }
                 }, 500);
-                
+
                 // Don't return immediately - let fallback run if Bootstrap fails
                 // return true;
             } else {
@@ -5408,7 +5409,7 @@
             console.error('❌ Bootstrap modal error:', bootstrapError);
             console.error('Error stack:', bootstrapError.stack);
         }
-        
+
         // Fallback: Manual modal display
         console.warn('⚠️ Using manual modal fallback');
         console.log('Modal element before manual show:', {
@@ -5417,26 +5418,26 @@
             currentDisplay: modalEl ? modalEl.style.display : 'N/A',
             currentAriaHidden: modalEl ? modalEl.getAttribute('aria-hidden') : 'N/A'
         });
-        
+
         // Do NOT force other modals to display - duplicate ID was causing wrong modal to be targeted (now fixed in add-pathlab-report).
         // CRITICAL: Set aria-hidden to 'false' (not null, not remove attribute)
         modalEl.setAttribute('aria-hidden', 'false');
         modalEl.setAttribute('aria-modal', 'true');
-        
+
         // Remove fade class temporarily to show immediately
         modalEl.classList.remove('fade');
         modalEl.classList.add('show');
-        
+
         // Set inline styles with !important to override any CSS
         modalEl.style.cssText += 'display: block !important; visibility: visible !important; opacity: 1 !important; position: fixed !important; z-index: 1055 !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; overflow-x: hidden !important; overflow-y: auto !important;';
-        
+
         // Also ensure modal-dialog has proper positioning
         const modalDialog = modalEl.querySelector('.modal-dialog');
         if (modalDialog) {
             modalDialog.style.cssText += 'position: relative !important; margin: 1.75rem auto !important; z-index: 1056 !important;';
             console.log('✅ Modal dialog styled');
         }
-        
+
         // Ensure modal is visible
         const computedStyle = window.getComputedStyle(modalEl);
         console.log('Modal computed styles after manual show:', {
@@ -5447,24 +5448,24 @@
             position: computedStyle.position,
             ariaHidden: modalEl.getAttribute('aria-hidden')
         });
-        
+
         document.body.classList.add('modal-open');
         document.body.style.paddingRight = '0px';
         document.body.style.overflow = 'hidden';
-        
+
         // Use Bootstrap's backdrop if present; do NOT create our own (causes lingering overlay on close)
         const existingBackdrop = document.querySelector('.modal-backdrop');
         if (existingBackdrop) {
             existingBackdrop.classList.add('show');
         }
-        
+
         // Trigger shown event manually
         const shownEvent = new Event('shown.bs.modal', { bubbles: true });
         modalEl.dispatchEvent(shownEvent);
-        
+
         // Verify modal is actually visible
         setTimeout(() => {
-            const isNowVisible = modalEl.classList.contains('show') && 
+            const isNowVisible = modalEl.classList.contains('show') &&
                                window.getComputedStyle(modalEl).display !== 'none' &&
                                window.getComputedStyle(modalEl).visibility !== 'hidden';
             console.log('Modal visibility verification:', {
@@ -5474,14 +5475,14 @@
                 visibility: window.getComputedStyle(modalEl).visibility,
                 opacity: window.getComputedStyle(modalEl).opacity
             });
-            
+
             if (!isNowVisible) {
                 console.error('❌ Modal still not visible after manual show attempt');
                 // Try even more aggressive approach
                 modalEl.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; z-index: 1055 !important; position: relative !important;';
             }
         }, 100);
-        
+
         // Ensure data loads after modal opens
         setTimeout(() => {
             console.log('🔵 Triggering data load from manual fallback');
@@ -5505,21 +5506,21 @@
                 }
             }
         }, 500);
-        
+
         console.log('✅ Modal manually shown');
         return true;
     }
-    
+
     // Also handle Bootstrap data attributes as fallback for all prescription buttons
     // Ensure functions are available before DOMContentLoaded
     console.log('🔵 IPD View Script Block 2 Loading - checking functions:', {
         fetchPathologyRadiologyData: typeof window.fetchPathologyRadiologyData,
         openAddPrescriptionModal: typeof openAddPrescriptionModal
     });
-    
+
     document.addEventListener('DOMContentLoaded', function() {
         console.log('🔵 DOMContentLoaded fired for IPD view');
-        
+
         const addPrescriptionModal = document.getElementById('addPrescriptionModal');
         if (addPrescriptionModal && addPrescriptionModal.parentNode !== document.body) {
             document.body.appendChild(addPrescriptionModal);
@@ -5544,7 +5545,7 @@
                 [200, 500, 1000, 1500, 2500, 3500].forEach(function(d) { setTimeout(doInit, d); });
             });
         }
-        
+
         const prescriptionButtons = document.querySelectorAll('[data-bs-target="#addPrescriptionModal"][data-ipd-id]');
         prescriptionButtons.forEach(function(btn) {
             btn.addEventListener('click', function(e) {
@@ -5572,10 +5573,10 @@
                 }
             });
         });
-        
+
         console.log('🔵 Button event listeners attached');
     });
-    
+
     console.log('🔵 IPD View Script Block 2 Loaded');
     </script>
     <!-- Chart JS (CDN fallback; chart.min.js may not exist in assets) -->
@@ -6422,7 +6423,7 @@
 
         function loadAvailablePackages() {
             if (!packageSelectEl) return;
-            
+
             fetch(packagesUrl)
                 .then(response => {
                     const ct = (response.headers.get('content-type') || '').toLowerCase();
@@ -6435,7 +6436,7 @@
                     if (data.success && data.available_packages) {
                         const currentOptions = packageSelectEl.value;
                         packageSelectEl.innerHTML = '<option value="">-- Select Package --</option>';
-                        
+
                         data.available_packages.forEach(pkg => {
                             const option = document.createElement('option');
                             option.value = pkg.id;
@@ -6445,7 +6446,7 @@
                             option.dataset.desc = pkg.description;
                             packageSelectEl.appendChild(option);
                         });
-                        
+
                         if (currentOptions) {
                             packageSelectEl.value = currentOptions;
                         }
@@ -6456,7 +6457,7 @@
 
         function loadAppliedPackages() {
             if (!appliedPackagesList) return;
-            
+
             fetch(packagesUrl)
                 .then(response => {
                     const ct = (response.headers.get('content-type') || '').toLowerCase();
@@ -6473,7 +6474,7 @@
                                 appliedPackagesList.innerHTML = '<div class="alert alert-info"><i class="ti ti-info-circle me-2"></i>No packages applied yet.</div>';
                         } else {
                             let html = '<div class="table-responsive"><table class="table table-hover"><thead><tr><th>Package</th><th>Applied Date</th><th>Package Amount (INR)</th><th>Final Amount</th><th>Action</th></tr></thead><tbody>';
-                            
+
                             data.applied_packages.forEach(pkg => {
                                 const rate = parseFloat(pkg.package_rate);
                                 const finalAmt = parseFloat(pkg.final_amount);
@@ -6487,10 +6488,10 @@
                                     </td>
                                 </tr>`;
                             });
-                            
+
                             html += '</tbody></table></div>';
                             appliedPackagesList.innerHTML = html;
-                            
+
                             document.querySelectorAll('.remove-pkg-btn').forEach(btn => {
                                 btn.addEventListener('click', function() {
                                     if (confirm('Are you sure you want to remove this package?')) {
@@ -6533,18 +6534,18 @@
         if (applyPackageForm) {
             applyPackageForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                
+
                 const packageId = document.getElementById('package_select').value;
                 const appliedDate = document.getElementById('applied_date').value;
                 const notes = document.getElementById('notes').value;
                 const packageAmountEl = document.getElementById('package_amount_input');
                 const packageRate = packageAmountEl && packageAmountEl.value ? parseFloat(packageAmountEl.value) : null;
-                
+
                 if (!packageId) {
                     alert('Please select a package');
                     return;
                 }
-                
+
                 fetch("{{ url('ipd/' . $ipd->id . '/apply-package') }}", {
                     method: 'POST',
                     headers: {
