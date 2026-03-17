@@ -38,7 +38,7 @@
         margin: 20px auto;
         width: 210mm;
         height: 297mm;
-        line-height: 10px;
+        line-height: 7px;
     }
 
     .top_head {
@@ -230,14 +230,14 @@
     <div class="main_box" id="pdf-content">
 
         <div class="top_head">
-            <div class="second_logo">
+            <div class="second_logo" style="text-align: center;">
                 @if (file_exists(public_path('assets/images/nabh-logo.png')))
-                    <img src="{{ asset('assets/images/nabh-logo.png') }}" alt="LOGO2" style="height: auto; width:70%;">
+                    <img src="{{ asset('assets/images/nabh-logo.png') }}" alt="LOGO2" style="height: auto; width:50%;">
+                    <p>NABH/PESHCO-2018-3150/L-03
                 @endif
             </div>
             <div class="first_logo" style="text-align: center;">
                 <img src="{{ asset('assets/images/logo.webp') }}" alt="LOGO1" style="height: 50px">
-                <p>NABH/PESHCO-2018-3150/L-03
                 </p>
             </div>
             <div class="about_info">
