@@ -38,7 +38,7 @@
         margin: 20px auto;
         width: 210mm;
         height: 297mm;
-        line-height: 7px;
+        line-height: 10px;
     }
 
     .top_head {
@@ -46,6 +46,10 @@
         align-items: center;
         justify-content: space-between;
     }
+
+.admission_item p {
+margin: 10px 0;
+}
 
     .about_info {
         text-align: end;
@@ -160,6 +164,14 @@
     .text {
         font-size: 11px;
         line-height: 1.3;
+    }
+
+    .text p {
+        margin: 5px 0;
+    }
+
+    .general_list {
+        margin: 5px 0;
     }
 
     @media print {
