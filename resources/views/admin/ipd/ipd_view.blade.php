@@ -2504,7 +2504,12 @@
                                                         </span>
                                                         <input type="text" class="form-control shadow-sm"
                                                             placeholder="Search">
-
+                                                    </div>
+                                                    <div class="text-end d-flex">
+                                                        <button type="button"
+                                                            class="btn btn-primary text-white ms-2 btn-md add-bed-history-btn">
+                                                            <i class="ti ti-plus me-1"></i>Add Bed History
+                                                        </button>
                                                     </div>
                                                 </div>
                                                 <!-- Table start -->
@@ -3866,7 +3871,12 @@
                                                         </span>
                                                         <input type="text" class="form-control shadow-sm"
                                                             placeholder="Search">
-
+                                                    </div>
+                                                    <div class="text-end d-flex">
+                                                        <button type="button"
+                                                            class="btn btn-primary text-white ms-2 btn-md add-bed-history-btn">
+                                                            <i class="ti ti-plus me-1"></i>Add Bed History
+                                                        </button>
                                                     </div>
                                                 </div>
                                                 <!-- Table start -->
@@ -4152,7 +4162,12 @@
                                                         </span>
                                                         <input type="text" class="form-control shadow-sm"
                                                             placeholder="Search">
-
+                                                    </div>
+                                                    <div class="text-end d-flex">
+                                                        <button type="button"
+                                                            class="btn btn-primary text-white ms-2 btn-md add-bed-history-btn">
+                                                            <i class="ti ti-plus me-1"></i>Add Bed History
+                                                        </button>
                                                     </div>
                                                 </div>
                                                 <!-- Table start -->
@@ -4397,7 +4412,12 @@
                                                         </span>
                                                         <input type="text" class="form-control shadow-sm"
                                                             placeholder="Search">
-
+                                                    </div>
+                                                    <div class="text-end d-flex">
+                                                        <button type="button"
+                                                            class="btn btn-primary text-white ms-2 btn-md add-bed-history-btn">
+                                                            <i class="ti ti-plus me-1"></i>Add Bed History
+                                                        </button>
                                                     </div>
                                                 </div>
                                                 <!-- Table start -->
@@ -6272,6 +6292,41 @@
                         showModal();
                     });
             });
+
+            // Add Bed History - reuse same modal in create mode
+            $(document).on('click', '.add-bed-history-btn', function() {
+                $('#editBedHistoryError').addClass('d-none').text('');
+                $('#edit_bed_history_id').val(''); // no existing record
+                $('#edit_from_date').val('');
+                $('#edit_to_date').val('');
+                $('#edit_bed_charge').val('');
+
+                // Set form to store route and adjust labels
+                $('#editBedHistoryForm').attr('action', "{{ route('ipd.bedHistory.store') }}");
+                $('#editBedHistoryModalLabel').html('<i class="ti ti-plus me-2"></i>Add Bed History');
+                $('#editBedHistoryForm button[type=\"submit\"]').text('Save');
+
+                $('#edit_bed_group').html('<option value=\"\">Loading...</option>');
+                $('#edit_bed').html('<option value=\"\">Select Bed</option>');
+
+                $.get("{{ route('getBedGroups') }}")
+                    .done(function(data) {
+                        var opts = '<option value=\"\">Select Bed Group</option>';
+                        if (Array.isArray(data)) {
+                            data.forEach(function(g) {
+                                var fn = (g.floor_detail && g.floor_detail.name) ? g.floor_detail.name : '-';
+                                opts += '<option value=\"' + (g.id || '') + '\">' + (g.name || '') + ' - ' + fn + '</option>';
+                            });
+                        }
+                        $('#edit_bed_group').html(opts);
+                    })
+                    .fail(function() {
+                        $('#edit_bed_group').html('<option value=\"\">Select Bed Group</option>');
+                    });
+
+                new bootstrap.Modal(document.getElementById('editBedHistoryModal')).show();
+            });
+
             $('#edit_bed_group').on('change', function() {
                 var groupId = $(this).val();
                 var curBedId = $('#edit_bed').val();
