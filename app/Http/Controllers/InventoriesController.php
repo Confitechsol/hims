@@ -679,9 +679,9 @@ class InventoriesController extends Controller
         $search   = $request->search;
 
          $perPage = (int) $request->input('perPage', 10);
-    if ($perPage <= 0) {
-        $perPage = 10;
-    }
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
 
         $assets = ItemStock::with([
                 'item',
@@ -715,27 +715,27 @@ class InventoriesController extends Controller
         ->withQueryString();
 
     // ✅ Replace map() with transform()
-    $assets->getCollection()->transform(function ($asset) {
+        $assets->getCollection()->transform(function ($asset) {
 
-        $asset->salvage_value = $asset->batches->sum('salvage_value');
-        $asset->annual_depreciation = $asset->batches->sum('annual_depreciation');
-        $asset->useful_life = $asset->batches->avg('useful_life');
-        $asset->expiry_date = $asset->batches->min('expiry_date');
+            $asset->salvage_value = $asset->batches->sum('salvage_value');
+            $asset->annual_depreciation = $asset->batches->sum('annual_depreciation');
+            $asset->useful_life = $asset->batches->avg('useful_life');
+            $asset->expiry_date = $asset->batches->min('expiry_date');
 
-        $asset->total_cost = $asset->batches
-            ->whereNotNull('purchase_price')
-            ->sum('purchase_price');
+            $asset->total_cost = $asset->batches
+                ->whereNotNull('purchase_price')
+                ->sum('purchase_price');
 
-        $asset->net_book_value =
-            $asset->total_cost - $asset->salvage_value;
+            $asset->net_book_value =
+                $asset->total_cost - $asset->salvage_value;
 
-        $asset->asset_age =
-            $asset->date
-                ? \Carbon\Carbon::parse($asset->date)->diffInYears(now())
-                : null;
+            $asset->asset_age =
+                $asset->date
+                    ? \Carbon\Carbon::parse($asset->date)->diffInYears(now())
+                    : null;
 
-        return $asset;
-    });
+            return $asset;
+        });
             // ->get()
             // ->map(function ($asset) {
 
@@ -767,72 +767,72 @@ class InventoriesController extends Controller
         );
     }
     public function issueReport(Request $request)
-{
-    $dateFrom = $request->date_from;
-    $dateTo   = $request->date_to;
-    $search   = $request->search;
-    $returned = $request->is_returned; // yes / no / null
+    {
+        $dateFrom = $request->date_from;
+        $dateTo   = $request->date_to;
+        $search   = $request->search;
+        $returned = $request->is_returned; // yes / no / null
 
-    $issues = ItemIssue::with([
-            'item',
-            'category',
-            'department',
-            'issuedTo'
-        ])
+        $issues = ItemIssue::with([
+                'item',
+                'category',
+                'department',
+                'issuedTo'
+            ])
 
-        // 🔹 Date filter (issue date)
-        ->when($dateFrom && $dateTo, function ($query) use ($dateFrom, $dateTo) {
-            $query->whereBetween('issue_date', [$dateFrom, $dateTo]);
-        })
+            // 🔹 Date filter (issue date)
+            ->when($dateFrom && $dateTo, function ($query) use ($dateFrom, $dateTo) {
+                $query->whereBetween('issue_date', [$dateFrom, $dateTo]);
+            })
 
-        // 🔹 Returned filter
-        ->when($returned !== null && $returned !== '', function ($query) use ($returned) {
-            $query->where('is_returned', $returned);
-        })
+            // 🔹 Returned filter
+            ->when($returned !== null && $returned !== '', function ($query) use ($returned) {
+                $query->where('is_returned', $returned);
+            })
 
-        // 🔹 Search filter
-        ->when($search, function ($query) use ($search) {
-            $query->where(function ($q) use ($search) {
+            // 🔹 Search filter
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
 
-                $q->whereHas('item', function ($qi) use ($search) {
-                        $qi->where('name', 'like', "%{$search}%");
-                    })
-                  ->orWhereHas('category', function ($qc) use ($search) {
-                        $qc->where('item_category', 'like', "%{$search}%");
-                    })
-                  ->orWhereHas('department', function ($qd) use ($search) {
-                        $qd->where('name', 'like', "%{$search}%");
-                    })
-                  ->orWhereHas('issuedTo', function ($qs) use ($search) {
-                        $qs->where('name', 'like', "%{$search}%");
-                    });
+                    $q->whereHas('item', function ($qi) use ($search) {
+                            $qi->where('name', 'like', "%{$search}%");
+                        })
+                    ->orWhereHas('category', function ($qc) use ($search) {
+                            $qc->where('item_category', 'like', "%{$search}%");
+                        })
+                    ->orWhereHas('department', function ($qd) use ($search) {
+                            $qd->where('name', 'like', "%{$search}%");
+                        })
+                    ->orWhereHas('issuedTo', function ($qs) use ($search) {
+                            $qs->where('name', 'like', "%{$search}%");
+                        });
 
+                });
+            })
+
+            ->where('is_active', 'yes')
+            ->orderBy('issue_date', 'desc')
+            ->get()
+
+            // 🔹 Computed fields
+            ->map(function ($issue) {
+
+                $issue->issue_status = $issue->is_returned === 'yes'
+                    ? 'Returned'
+                    : 'Issued';
+
+                $issue->issue_age = $issue->issue_date
+                    ? Carbon::parse($issue->issue_date)->diffInDays(now())
+                    : null;
+
+                return $issue;
             });
-        })
 
-        ->where('is_active', 'yes')
-        ->orderBy('issue_date', 'desc')
-        ->get()
-
-        // 🔹 Computed fields
-        ->map(function ($issue) {
-
-            $issue->issue_status = $issue->is_returned === 'yes'
-                ? 'Returned'
-                : 'Issued';
-
-            $issue->issue_age = $issue->issue_date
-                ? Carbon::parse($issue->issue_date)->diffInDays(now())
-                : null;
-
-            return $issue;
-        });
-
-    return view(
-        'admin.reports.inventory.inventory-issue-report',
-        compact('issues', 'dateFrom', 'dateTo', 'search', 'returned')
-    );
-}
+        return view(
+            'admin.reports.inventory.inventory-issue-report',
+            compact('issues', 'dateFrom', 'dateTo', 'search', 'returned')
+        );
+    }
     public function returnIssuedItem(Request $request, $id)
     {
 

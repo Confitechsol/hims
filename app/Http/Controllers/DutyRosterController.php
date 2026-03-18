@@ -134,11 +134,22 @@ class DutyRosterController extends Controller
 
     public function updateShift(Request $request, $id)
     {
-        $request->validate([
+        $request->merge([
+            'shift_start' => \Carbon\Carbon::parse($request->shift_start)->format('H:i'),
+            'shift_end'   => \Carbon\Carbon::parse($request->shift_end)->format('H:i'),
+        ]);
+        
+    
+        $validator = Validator::make($request->all(), [
             'shift_name' => 'required|string|max:255',
             'shift_start' => 'required|date_format:H:i',
             'shift_end' => 'required|date_format:H:i',
         ]);
+        if ($validator->fails()) {
+            return back()
+            ->withErrors($validator)
+            ->withInput();
+        }
 
         // Fetch existing shift
         $shift = DutyRosterShift::findOrFail($id);
@@ -177,7 +188,7 @@ class DutyRosterController extends Controller
 
         $shifts->delete(); // soft delete (sets deleted_at)
 
-        return response()->json(['success' => 'Duty roster deleted successfully.']);
+       return redirect()->back()->with('success', 'Shift deleted successfully!');
     }
 
 
