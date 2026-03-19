@@ -13,6 +13,7 @@ class ItemStockBatches extends Model
         'item_stock_id',
         'batch_no',
         'serial_no',
+        'purchase_price',
         'salvage_value',
         'useful_life',
         'annual_depreciation',

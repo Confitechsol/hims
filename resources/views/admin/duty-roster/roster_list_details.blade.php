@@ -237,22 +237,35 @@
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const start = document.getElementById('duty_roster_start_date');
-        const end = document.getElementById('duty_roster_end_date');
-        const total = document.getElementById('duty_roster_total_day');
+        // ✅ CREATE FORM
+    const start = document.getElementById('duty_roster_start_date');
+    const end = document.getElementById('duty_roster_end_date');
+    const total = document.getElementById('duty_roster_total_day');
 
-        function calculateDays() {
-            if (start.value && end.value) {
-                const startDate = new Date(start.value);
-                const endDate = new Date(end.value);
-                const diffTime = Math.abs(endDate - startDate);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-                total.value = diffDays;
-            }
+    function calculateDays(startEl, endEl, totalEl) {
+        if (startEl.value && endEl.value) {
+            const startDate = new Date(startEl.value);
+            const endDate = new Date(endEl.value);
+            const diffTime = Math.abs(endDate - startDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            totalEl.value = diffDays;
         }
+    }
 
-        start.addEventListener('change', calculateDays);
-        end.addEventListener('change', calculateDays);
+    if (start && end) {
+        start.addEventListener('change', () => calculateDays(start, end, total));
+        end.addEventListener('change', () => calculateDays(start, end, total));
+    }
+
+    // ✅ EDIT FORM
+    const editStart = document.getElementById('edit_duty_roster_start_date');
+    const editEnd = document.getElementById('edit_duty_roster_end_date');
+    const editTotal = document.getElementById('edit_duty_roster_total_day');
+
+    if (editStart && editEnd) {
+        editStart.addEventListener('change', () => calculateDays(editStart, editEnd, editTotal));
+        editEnd.addEventListener('change', () => calculateDays(editStart, editEnd, editTotal));
+    }
     });
 </script>
 <script>
