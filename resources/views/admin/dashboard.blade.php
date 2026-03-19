@@ -206,7 +206,7 @@
                     <div class="card-header d-flex align-items-center justify-content-between">
                         <h5 class="fw-bold mb-0">Popular
                             Doctors</h5>
-                        <div class="dropdown">
+                        {{-- <div class="dropdown">
                             <a href="javascript:void(0);"
                                 class="btn btn-sm px-2 border shadow-sm btn-outline-white d-inline-flex align-items-center"
                                 data-bs-toggle="dropdown">
@@ -223,7 +223,7 @@
                                     <a class="dropdown-item" href="#">Yearly</a>
                                 </li>
                             </ul>
-                        </div>
+                        </div> --}}
                     </div>
                     <div class="card-body">
                         <div class="row row-gap-3">
@@ -316,7 +316,7 @@
             <!-- col end -->
 
             <!-- col start -->
-            <div class="col-xl-4">
+            {{-- <div class="col-xl-4">
                 <div class="card shadow-sm">
                     <div class="card-header d-flex align-items-center justify-content-between">
                         <h5 class="fw-bold mb-0 text-truncate">Appointments</h5>
@@ -391,7 +391,7 @@
                             Appointments</a>
                     </div>
                 </div>
-            </div>
+            </div> --}}
             <!-- col end -->
         </div>
         <!-- end row -->
@@ -648,7 +648,7 @@
                     <div class="card-header d-flex align-items-center justify-content-between">
                         <h5 class="fw-bold mb-0">All
                             Appointments</h5>
-                        <a href="appointments.html" class="btn fw-normal btn-outline-white">View
+                        <a href="{{route('appointment-details')}}" class="btn fw-normal btn-outline-white">View
                             All</a>
                     </div>
                     <div class="card-body">
@@ -665,46 +665,68 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    @forEach ($appointments as $appointment)
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
+                                                @if($appointment->doctorUser['photo'])
+                                                <a href="#" class="avatar me-2">
+                                                        <img src="{{$appointment->doctorUser['photo']}}"
+                                                            alt="img" class="rounded-circle">
+                                                    {{-- <img src="{{ asset('assets/img/doctors/doctor-06.jpg') }}"
+                                                        alt="img" class="rounded-circle"> --}}
+                                                @else        
                                                 <a href="doctor-details.html" class="avatar me-2">
                                                     <img src="{{ asset('assets/img/doc_user.png') }}"
                                                         alt="img" class="rounded-circle">
                                                 </a>
+                                                @endif
                                                 <div>
-                                                    <h6 class="fs-14 mb-1"><a href="doctor-details.html"
+                                                    <h6 class="fs-14 mb-1"><a href="#"
                                                             class="fw-semibold">Dr.
-                                                            John
-                                                            Smith</a></h6>
+                                                            {{$appointment->doctorUser['name']}}</a></h6>
                                                     <p class="mb-0 fs-13">Neurosurgeon</p>
                                                 </div>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="d-flex align-items-center">
+                                                @if($appointment->patient["image"])
+                                                <a href="#" class="avatar me-2">
+                                                    <img src="{{ $appointment->patient["image"] ? url('/')."/".$appointment->patient["image"] : "" }}"/>
+                                                    @else
                                                 <a href="patient-details.html" class="avatar me-2">
                                                     <img src="{{ asset('assets/img/patient.png') }}"
                                                         alt="img" class="rounded-circle">
                                                 </a>
+                                                @endif
                                                 <div>
-                                                    <h6 class="fs-14 mb-1"><a href="patient-details.html"
-                                                            class="fw-medium">Jesus
-                                                            Adams</a></h6>
-                                                    <p class="mb-0 fs-13">+1
-                                                        41254
-                                                        45214</p>
+                                                    <h6 class="fs-14 mb-1"><a href="#"
+                                                            class="fw-medium">{{$appointment->patient['patient_name']}}</a></h6>
+                                                    <p class="mb-0 fs-13">{{$appointment->patient['mobileno']}}</p>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>28 May 2025 - 11:15
-                                            AM</td>
-                                        <td>Online</td>
-                                        <td><span
+                                        <td>{{ \Carbon\Carbon::parse($appointment->date)->format('d-M-Y h:i A') }}</td>
+                                        <td>{{$appointment->source}}</td>
+                                        <td>
+                                            @if($appointment->appointment_status == 'confirmed')
+                                            <span
                                                 class="badge fs-13 py-1 badge-soft-success border border-success rounded text-success fw-medium">Confirmed</span>
+                                            @elseif($appointment->appointment_status == 'cancelled')
+                                            <span
+                                                class="badge fs-13 py-1 badge-soft-danger border border-danger rounded fw-medium">Cancelled</span>
+                                            @elseif($appointment->appointment_status == 'rescheduled')
+                                            <span
+                                                class="badge fs-13 py-1 badge-soft-warning border border-warning rounded fw-medium">Rescheduled</span>
+                                            @elseif($appointment->appointment_status == 'completed')
+                                            <span
+                                                class="badge fs-13 py-1 badge-soft-secondary border border-secondary rounded fw-medium">Completed</span>
+                                            @endif        
                                         </td>
                                     </tr>
-                                    <tr>
+                                    @endforeach
+                                    {{-- <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <a href="doctor-details.html" class="avatar me-2">
@@ -859,7 +881,7 @@
                                         <td><span
                                                 class="badge fs-13 py-1 badge-soft-info border border-info rounded fw-medium">Schedule</span>
                                         </td>
-                                    </tr>
+                                    </tr> --}}
                                 </tbody>
                             </table>
                         </div>
