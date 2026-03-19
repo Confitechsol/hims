@@ -50,6 +50,8 @@ class IpdController extends Controller
     {
         // Search term and pagination
         $search  = $request->get('search');
+        $fromDate = $request->get('from_date');
+        $toDate = $request->get('to_date');
         $perPage = intval($request->input('per_page', 10));
         if ($perPage <= 0) {
             $perPage = 10;
@@ -69,6 +71,15 @@ class IpdController extends Controller
             // Query for ongoing IPDs
             $query = IpdDetail::with('patient', 'ipdPatients', 'doctor', 'bedDetail', 'bedGroup.floorDetail')
                 ->where('discharged', null)
+                ->when($fromDate || $toDate, function ($query) use ($fromDate, $toDate) {
+                    // IPD tab: filter by admission date stored in ipd_details.date
+                    if ($fromDate) {
+                        $query->whereDate('date', '>=', Carbon::parse($fromDate)->toDateString());
+                    }
+                    if ($toDate) {
+                        $query->whereDate('date', '<=', Carbon::parse($toDate)->toDateString());
+                    }
+                })
                 ->when($search, function ($query) use ($search) {
                     $query->where(function ($q) use ($search) {
                         $q->where('ipd_no', 'LIKE', "%{$search}%")
@@ -97,6 +108,15 @@ class IpdController extends Controller
             // Query for discharged IPDs
             $query = IpdDetail::with('patient', 'ipdPatients', 'doctor')
                 ->where('discharged', 'yes')
+                ->when($fromDate || $toDate, function ($query) use ($fromDate, $toDate) {
+                    // Discharge tab: filter by discharged_date
+                    if ($fromDate) {
+                        $query->whereDate('discharged_date', '>=', Carbon::parse($fromDate)->toDateString());
+                    }
+                    if ($toDate) {
+                        $query->whereDate('discharged_date', '<=', Carbon::parse($toDate)->toDateString());
+                    }
+                })
                 ->when($search, function ($query) use ($search) {
                     $query->whereHas('patient', function ($p) use ($search) {
                         $p->where('patient_name', 'LIKE', "%{$search}%")
