@@ -79,6 +79,14 @@
                                                         </a>
                                                     </div>
                                                 </div>
+                                                <div class="me-2">
+                                                    <input type="date" name="from_date" value="{{ request('from_date') }}"
+                                                        class="form-control shadow-sm" title="From date">
+                                                </div>
+                                                <div class="me-2">
+                                                    <input type="date" name="to_date" value="{{ request('to_date') }}"
+                                                        class="form-control shadow-sm" title="To date">
+                                                </div>
                                                 <div>
                                                     <button class="btn btn-primary" type="submit">Search</button>
                                                 </div>
