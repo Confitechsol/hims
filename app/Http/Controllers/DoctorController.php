@@ -71,6 +71,7 @@ class DoctorController extends Controller
     }
     public function store(Request $request)
     {
+        
         $request->validate([
             'doctor_id' => 'required',
             'name' => 'required',
@@ -78,7 +79,7 @@ class DoctorController extends Controller
            
         ]);
 
-        //dd($request->all());
+        // dd($request->all());
 
         $doctor = new Doctor();
         $doctor->hospital_id     = Auth::user()->hospital_id;
@@ -95,7 +96,7 @@ class DoctorController extends Controller
         $doctor->mother_name = $request->mother_name;
         $doctor->gender = $request->gender;
         $doctor->marital_status = $request->marital_status;
-        $doctor->blood_group = $request->blood_group;
+        $doctor->blood_group = $request->blood_group ?? null;
         $doctor->dob = $request->dob;
         $doctor->date_of_joining = $request->date_of_joining;
         $doctor->contact_no = $request->contactno;
@@ -204,20 +205,20 @@ class DoctorController extends Controller
 
     }
 
+   
     public function bulkDelete(Request $request)
-    {
-        $ids = $request->input('selected_Doctors');
-        //dd($ids);
+{
+    $ids = $request->input('selected_Doctors');
 
-        if (! $ids || count($ids) === 0) {
-            return redirect()->back()->with('error', 'No Doctors selected.');
-        }
-
-        // Soft delete
-        Doctor::whereIn('id', $ids)->update(['deleted_at' => now()]);
-
-        return redirect()->back()->with('success', 'Selected Doctors are deleted successfully.');
+    if (! $ids || count($ids) === 0) {
+        return redirect()->back()->with('error', 'No Doctors selected.');
     }
+
+    // Soft delete (make sure Doctor model uses SoftDeletes)
+    Doctor::whereIn('id', $ids)->delete();
+
+    return redirect()->back()->with('success', 'Selected Doctors deleted successfully.');
+}
     
     public function importDoctor()
     {
