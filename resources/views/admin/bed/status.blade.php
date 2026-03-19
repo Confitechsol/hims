@@ -66,10 +66,42 @@
                             </tbody>
                         </table>
                     </div>
-                    <!--  End Table -->
-                      <div class="mt-3">
-                    <strong>Total Beds: <span id="bed-count">{{ count($beds) }}</span></strong>
-                    </div>
+                     {{-- Pagination Links --}}
+                    <div class="mt-3" id="pagination-wrapper">
+                        @php
+                            $currentPage = $beds->currentPage();
+                            $lastPage = $beds->lastPage();
+                        @endphp
+                    
+                        {{-- Previous --}}
+                        @if ($beds->onFirstPage())
+                            <button class="btn btn-outline-secondary btn-sm me-1" disabled>« Prev</button>
+                        @else
+                            <a href="{{ $beds->previousPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm me-1">
+                                « Prev
+                            </a>
+                        @endif
+                    
+                        {{-- Page numbers --}}
+                        @for ($page = 1; $page <= $lastPage; $page++)
+                            @if ($page == $currentPage)
+                                <button class="btn btn-primary btn-sm me-1">{{ $page }}</button>
+                            @else
+                                <a href="{{ $beds->url($page) }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm me-1">
+                                    {{ $page }}
+                                </a>
+                            @endif
+                        @endfor
+                    
+                        {{-- Next --}}
+                        @if ($beds->hasMorePages())
+                            <a href="{{ $beds->nextPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm">
+                                Next »
+                            </a>
+                        @else
+                            <button class="btn btn-outline-secondary btn-sm" disabled>Next »</button>
+                        @endif
+                    </div>              
                 </div>
             </div>
         </div>

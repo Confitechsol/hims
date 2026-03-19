@@ -41,9 +41,9 @@ class BedController extends Controller
    }   
    public function status(Request $request)
    {
-   $perPage = intval($request->input('perPage', 5));
+   $perPage = intval($request->input('perPage', 10));
    if ($perPage <= 0) {
-          $perPage = 5;
+          $perPage = 10;
    }
      $bedsQuery = Bed::with(['bedGroup', 'bedType']);
      if ($request->has('search')) {
