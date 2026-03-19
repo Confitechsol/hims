@@ -350,6 +350,16 @@ margin: 10px 0;
                     </div>
                 </div>
 
+                <div class="patient_items">
+                    <div class="patient_head">
+                        PINCODE
+                    </div>
+                    :
+                    <div class="patient_data">
+                        {{ $IpdPatient->patient->areaName->pincode ?? '' }}
+                    </div>
+                </div>
+
 
             </div>
 
