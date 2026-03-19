@@ -272,7 +272,7 @@
                                     <div class="col-sm-12">
                                         <label>Doctor <small class="req">*</small></label>
                                         <div class="p-2 select2-full-width">
-                                            <select class="form-control select2" id="edit_doctor_id" name="doctor_id"
+                                            <select class="form-control select2-input" id="edit_doctor_id" name="doctor_id"
                                                 required>
                                                 <option value="">Select</option>
                                                 @foreach($doctorList as $doctor)
