@@ -18,6 +18,7 @@ use App\Http\Controllers\DailyCollectionReportController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\DeathController;
+use App\Http\Controllers\DischargeController;
 use App\Http\Controllers\DischargePdfController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\DoctorVisitController;
@@ -215,8 +216,8 @@ Route::middleware(['admin'])->group(function () {
     Route::prefix('operations')->group(function () {
         Route::get('/', [OperationController::class, 'Operations'])->name('operations');
         Route::post('/store', [OperationController::class, 'store'])->name('operations.store');
-        Route::put('/update/{id}', [OperationController::class, 'updateCategory'])->name('operations.update');
-        Route::delete('/destroy/{id}', [OperationController::class, 'destroyCategory'])->name('operations.destroy');
+        Route::put('/update/{id}', [OperationController::class, 'update'])->name('operations.update');
+        Route::delete('/destroy/{id}', [OperationController::class, 'destroy'])->name('operations.destroy');
     });
     Route::prefix('operation-category')->group(function () {
         Route::get('/', [OperationController::class, 'operationCategories'])->name('operation-category');
@@ -634,13 +635,19 @@ Route::delete('/ipd/prescription/{id}', [IpdController::class, 'deletePrescripti
 Route::post('/ipd_charge', [IpdController::class, 'addIpdCharge'])->name('ipd.addIpdCharge');
 Route::get('/ipd_charge/{charge}', [IpdController::class, 'getIpdCharge'])->name('ipd.charge.show');
 Route::put('/ipd_charge/{charge}', [IpdController::class, 'updateIpdCharge'])->name('ipd.charge.update');
+Route::delete('/ipd_charge/{charge}', [IpdController::class, 'deleteIpdCharge'])->name('ipd.charge.delete');
 Route::post('/assignNewBed', [IpdController::class, 'assignNewBed'])->name('assignNewBed');
+Route::post('/ipd/bed-history/store', [IpdController::class, 'storeBedHistory'])->name('ipd.bedHistory.store');
 Route::post('/ipd/bed-history/update', [IpdController::class, 'updateBedHistory'])->name('ipd.bedHistory.update');
 //
 Route::get('/ipd/{id}/pdf', [PdfController::class, 'generatePdf'])->name('ipd.pdf');
 
-Route::post('/discharge-card/store', [IpdController::class, 'storeDischarge'])
+Route::post('/discharge-card/store', [DischargeController::class, 'storeDischarge'])
     ->name('discharge.store');
+Route::get('/discharge-card/edit/{id}', [DischargeController::class, 'editDischarge'])
+    ->name('discharge.edit');
+Route::put('/discharge-card/update/{id}', [DischargeController::class, 'updateDischarge'])
+    ->name('discharge.update');
 
 Route::get('/billing', function () {
     return view('admin.billing.billing');
@@ -675,6 +682,7 @@ Route::prefix('/appointment-details')->group(function () {
     Route::put('/appointments/{id}', [AppointmentsController::class, 'update'])->name('appointments.update');
     Route::get('/doctor-wise', [AppointmentsController::class, 'doctorwise'])->name('appointments.doctor-wise');
     Route::post('/doctor-wise/search', [AppointmentsController::class, 'searchAppointments'])->name('appointments.search');
+    Route::delete('/appointments/{id}', [AppointmentsController::class, 'destroy'])->name('appointments.destroy');
     Route::get('/queue', function () {
         return view('admin.appointments.queue');
     })->name('appointments.queue');

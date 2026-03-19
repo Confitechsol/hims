@@ -90,7 +90,7 @@
                                                     <div class="col-sm-12">
                                                         <label>Staff <small class="req">*</small></label>
                                                         <div class="p-2 select2-full-width">
-                                                            <select class="form-control select2" id="duty_roster_staff" name="staff_id" required>
+                                                            <select class="form-control select2-input" id="duty_roster_staff" name="staff_id" required>
                                                                 <option value="">Select</option>
                                                                 @foreach($staffList as $staff)
                                                                     <option value="{{ $staff->id }}">

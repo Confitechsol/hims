@@ -79,6 +79,14 @@
                                                         </a>
                                                     </div>
                                                 </div>
+                                                <div class="me-2">
+                                                    <input type="date" name="from_date" value="{{ request('from_date') }}"
+                                                        class="form-control shadow-sm" title="From date">
+                                                </div>
+                                                <div class="me-2">
+                                                    <input type="date" name="to_date" value="{{ request('to_date') }}"
+                                                        class="form-control shadow-sm" title="To date">
+                                                </div>
                                                 <div>
                                                     <button class="btn btn-primary" type="submit">Search</button>
                                                 </div>
@@ -132,7 +140,7 @@
                                             <tbody>
                                                 @foreach ($ipd as $ipdDetails)
                                                     <tr>
-                                                        <td>{{ $loop->iteration }}</td>
+                                                        <td>{{ ($ipd->currentPage() - 1) * $ipd->perPage() + $loop->iteration }}</td>
                                                         <td><a href="{{ route('ipd.show', ['id' => $ipdDetails->id]) }}"
                                                                 class="text-primary">{{ $ipdDetails->ipd_no }}</a>
                                                         </td>
@@ -141,12 +149,12 @@
                                                         <td>{{ $ipdDetails->doctor->name ?? '-' }}</td>
                                                         <td><span class="badge"
                                                                 style="background-color: {{ $ipdDetails->bedGroup?->color ?? '#6c757d' }}">
-                                                                
-                                                                {{ 
-                                                                    ($ipdDetails->bedDetail?->name ?? '-') . ' - ' . 
-                                                                    ($ipdDetails->bedGroup?->name ?? '-') . ' - ' . 
-                                                                    ($ipdDetails->bedGroup?->floorDetail?->name ?? '-') 
-                                                                }}
+
+                                                                {{ ($ipdDetails->bedDetail?->name ?? '-') .
+                                                                    ' - ' .
+                                                                    ($ipdDetails->bedGroup?->name ?? '-') .
+                                                                    ' - ' .
+                                                                    ($ipdDetails->bedGroup?->floorDetail?->name ?? '-') }}
                                                             </span>
                                                         </td>
                                                         <td>{{ number_format($ipdDetails->total_billing ?? 0, 2) }}</td>
@@ -171,52 +179,85 @@
 
                                         </table>
                                     </div>
-                                @else
-                                    <div class="table-responsive">
-                                        <table class="table mb-0">
-                                            <thead>
-                                                <tr>
-                                                    <th>#</th>
-                                                    <th>IPD No.</th>
-                                                    <th>Name</th>
-                                                    <th>Phone</th>
-                                                    <th>Email</th>
-                                                    <th>Address</th>
-                                                    <th>Gender</th>
-                                                    <th>Consultant</th>
-                                                    <th>Discharged Date</th>
-                                                    <th>Net Amount (INR)</th>
-                                                    <th>Tax (INR)</th>
-                                                    <th>Total (INR)</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach ($ipd as $ipdDetails)
+                                    {{-- Pagination Links --}}
+                                    <div class="mt-3" id="pagination-wrapper">
+                                        @php
+                                            $currentPage = $ipd->currentPage();
+                                            $lastPage = $ipd->lastPage();
+                                            $window = 2; // how many pages to show on each side
+                                            $start = max(1, $currentPage - $window);
+                                            $end = min($lastPage, $currentPage + $window);
+                                        @endphp
+                                        @if ($ipd->onFirstPage())
+                                            <button class="btn btn-outline-secondary btn-sm me-1" disabled>« Prev</button>
+                                        @else
+                                            <a href="{{ $ipd->previousPageUrl() }}"
+                                                class="btn btn-outline-secondary btn-sm me-1">« Prev</a>
+                                        @endif
+                                        @for ($i = 1; $i <= $ipd->lastPage(); $i++)
+                                            <a href="{{ $ipd->url($i) }}"
+                                                class="btn btn-sm {{ $i == $ipd->currentPage() ? 'btn-primary' : 'btn-outline-secondary' }}">
+                                                {{ $i }}
+                                            </a>
+                                        @endfor
+                                        @if ($ipd->hasMorePages())
+                                            <a href="{{ $ipd->nextPageUrl() }}"
+                                                class="btn btn-outline-secondary btn-sm ms-1">Next »</a>
+                                        @else
+                                            <button class="btn btn-outline-secondary btn-sm ms-1" disabled>Next »</button>
+                                        @endif
+                                    @else
+                                        <div class="table-responsive">
+                                            <table class="table mb-0">
+                                                <thead>
                                                     <tr>
-                                                        <td>{{ $loop->iteration }}</td>
-                                                        <td><a href="{{ route('ipd.show', ['id' => $ipdDetails->id]) }}"
-                                                                class="text-primary">{{ $ipdDetails->ipd_no }}</a>
-                                                        </td>
-                                                        <td>{{ $ipdDetails->patient->patient_name }}
-                                                        </td>
-                                                        <td>{{ $ipdDetails->patient->mobileno }}</td>
-                                                        <td>{{ $ipdDetails->patient->email }}</td>
-                                                        <td>{{ $ipdDetails->patient->address }}</td>
-                                                        <td>{{ $ipdDetails->patient->gender }}</td>
-                                                        <td>{{ $ipdDetails->doctor->name ?? '-' }}</td>
-                                                        <td>{{ \Carbon\Carbon::parse($ipdDetails->discharged_date)->format('d-M-Y') ?? '-' }}
-                                                        </td>
-                                                        <td>{{ $ipdDetails->net_amount ?? 0 }}</td>
-                                                        <td>{{ $ipdDetails->tax ?? 0 }}</td>
-                                                        <td>{{ $ipdDetails->amount ?? 0 }}</td>
-
-
+                                                        <th>#</th>
+                                                        <th>IPD No.</th>
+                                                        <th>Name</th>
+                                                        <th>Phone</th>
+                                                        <th>Email</th>
+                                                        <th>Address</th>
+                                                        <th>Gender</th>
+                                                        <th>Consultant</th>
+                                                        <th>Discharged Date</th>
+                                                        <th>Net Amount (INR)</th>
+                                                        <th>Tax (INR)</th>
+                                                        <th>Total (INR)</th>
+                                                        <th>Action</th>
                                                     </tr>
-                                                @endforeach
-                                            </tbody>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach ($ipd as $ipdDetails)
+                                                        <tr>
+                                                            <td>{{ $loop->iteration }}</td>
+                                                            <td><a href="{{ route('ipd.show', ['id' => $ipdDetails->id]) }}"
+                                                                    class="text-primary">{{ $ipdDetails->ipd_no }}</a>
+                                                            </td>
+                                                            <td>{{ $ipdDetails->patient->patient_name }}
+                                                            </td>
+                                                            <td>{{ $ipdDetails->patient->mobileno }}</td>
+                                                            <td>{{ $ipdDetails->patient->email }}</td>
+                                                            <td>{{ $ipdDetails->patient->address }}</td>
+                                                            <td>{{ $ipdDetails->patient->gender }}</td>
+                                                            <td>{{ $ipdDetails->doctor->name ?? '-' }}</td>
+                                                            <td>{{ \Carbon\Carbon::parse($ipdDetails->discharged_date)->format('d-M-Y') ?? '-' }}
+                                                            </td>
+                                                            <td>{{ $ipdDetails->net_amount ?? 0 }}</td>
+                                                            <td>{{ $ipdDetails->tax ?? 0 }}</td>
+                                                            <td>{{ $ipdDetails->amount ?? 0 }}</td>
+                                                            <td>
+                                                                <a href="{{ route('discharge.edit', $ipdDetails->id) }}"
+                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                                    title="Edit">
+                                                                    <i class="ti ti-pencil"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
 
-                                        </table>
-                                    </div>
+                                            </table>
+                                        </div>
                                 @endif
                             </div>
 

@@ -90,11 +90,15 @@
                                                 <i class="ti ti-pencil"></i>
                                             </a>
 
-                                            <a href="javascript:void(0);" 
-                                                onclick="confirmDelete('{{ route('dutyroster.destroyShift', $shift->id) }}')" 
+                                            <a href="javascript:void(0);"
+                                                onclick="deleteRosterShift({{ $shift->id }})"
                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
                                                 <i class="ti ti-trash"></i>
                                             </a>
+                                            <form id="deleteShiftForm" method="POST" style="display:none;">
+                                                @csrf
+                                                @method('DELETE')
+                                            </form>
                                         </td>
                                     </tr>
                                 @empty
@@ -277,114 +281,114 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 <!-- End Edit Shift Modal -->
-
 <script>
-   function openEditModal(id, name, start, end, hour) {
-    console.log({ id, name, start, end, hour });
+    document.addEventListener('DOMContentLoaded', function() {
+        const startInput = document.getElementById('edit_shift_start');
+        const endInput = document.getElementById('edit_shift_end');
+        const hourInput = document.getElementById('edit_shift_hour');
 
-    let hourValue = 0;
-    if (hour) {
-        const parts = hour.split(':');
-        hourValue = parseInt(parts[0]) + parseInt(parts[1]) / 60;
-    }
-    // Populate modal fields
-    document.getElementById('edit_shift_id').value = id;
-    document.getElementById('edit_shift_name').value = name;
-    document.getElementById('edit_shift_start').value = start;
-    document.getElementById('edit_shift_end').value = end;
-    document.getElementById('edit_shift_hour').value = hourValue; // corrected ID
+        function calculateShiftHours() {
+            const startTime = startInput.value.trim();
+            const endTime = endInput.value.trim();
 
-    // Dynamically set form action
-    let form = document.getElementById('editShiftForm');
-    form.action = "{{ route('dutyroster.updateShift', ':id') }}".replace(':id', id);
+            console.log("🕒 Start:", startTime, "End:", endTime);
 
-    // Show modal
-    $('#edit_shift').modal('show'); // corrected modal ID
-    }
+            if (startTime && endTime) {
+                // Ensure both are valid times (HH:mm:ss or HH:mm)
+                let startParts = startTime.split(':').map(Number);
+                let endParts = endTime.split(':').map(Number);
 
+                // Normalize to HH:mm:ss
+                if (startParts.length === 2) startParts.push(0);
+                if (endParts.length === 2) endParts.push(0);
 
-    function confirmDelete(url) {
-        Swal.fire({
-            title: "Are you sure?",
-            text: "This shift will be deleted permanently.",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "Yes, delete it!"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // ✅ Create and submit a form using DELETE method
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = url;
+                // Create date objects for same base date
+                const start = new Date(1970, 0, 1, startParts[0], startParts[1], startParts[2]);
+                const end = new Date(1970, 0, 1, endParts[0], endParts[1], endParts[2]);
 
-                const csrf = document.createElement('input');
-                csrf.type = 'hidden';
-                csrf.name = '_token';
-                csrf.value = '{{ csrf_token() }}';
+                let diff = (end - start) / (1000 * 60 * 60);
 
-                const method = document.createElement('input');
-                method.type = 'hidden';
-                method.name = '_method';
-                method.value = 'DELETE';
+                // Handle overnight shifts (e.g. 22:00 to 06:00)
+                if (diff < 0) diff += 24;
 
-                form.appendChild(csrf);
-                form.appendChild(method);
-                document.body.appendChild(form);
-                form.submit();
+                console.log("✅ Calculated Hours:", diff);
+
+                // Convert to HH:mm:ss format
+                let totalSeconds = Math.round(diff * 3600);
+                let hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+                let minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+                let seconds = String(totalSeconds % 60).padStart(2, '0');
+
+                hourInput.value = `${hours}:${minutes}:${seconds}`;
             }
-        });
-    }
+        }
 
-
+        startInput.addEventListener('change', calculateShiftHours);
+        endInput.addEventListener('change', calculateShiftHours);
+    });
 </script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const startInput = document.getElementById('edit_shift_start');
-    const endInput = document.getElementById('edit_shift_end');
-    const hourInput = document.getElementById('edit_shift_hour');
+    function openEditModal(id, name, start, end, hour) {
+        console.log({ id, name, start, end, hour });
 
-    function calculateShiftHours() {
-        const startTime = startInput.value.trim();
-        const endTime = endInput.value.trim();
-
-        console.log("🕒 Start:", startTime, "End:", endTime);
-
-        if (startTime && endTime) {
-            // Ensure both are valid times (HH:mm:ss or HH:mm)
-            let startParts = startTime.split(':').map(Number);
-            let endParts = endTime.split(':').map(Number);
-
-            // Normalize to HH:mm:ss
-            if (startParts.length === 2) startParts.push(0);
-            if (endParts.length === 2) endParts.push(0);
-
-            // Create date objects for same base date
-            const start = new Date(1970, 0, 1, startParts[0], startParts[1], startParts[2]);
-            const end = new Date(1970, 0, 1, endParts[0], endParts[1], endParts[2]);
-
-            let diff = (end - start) / (1000 * 60 * 60);
-
-            // Handle overnight shifts (e.g. 22:00 to 06:00)
-            if (diff < 0) diff += 24;
-
-            console.log("✅ Calculated Hours:", diff);
-
-            // Convert to HH:mm:ss format
-            let totalSeconds = Math.round(diff * 3600);
-            let hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
-            let minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
-            let seconds = String(totalSeconds % 60).padStart(2, '0');
-
-            hourInput.value = `${hours}:${minutes}:${seconds}`;
+        let hourValue = 0;
+        if (hour) {
+            const parts = hour.split(':');
+            hourValue = parseInt(parts[0]) + parseInt(parts[1]) / 60;
         }
+        // Populate modal fields
+        document.getElementById('edit_shift_id').value = id;
+        document.getElementById('edit_shift_name').value = name;
+        document.getElementById('edit_shift_start').value = start;
+        document.getElementById('edit_shift_end').value = end;
+        document.getElementById('edit_shift_hour').value = hourValue; // corrected ID
+
+        // Dynamically set form action
+        let form = document.getElementById('editShiftForm');
+        form.action = "{{ route('dutyroster.updateShift', ':id') }}".replace(':id', id);
+
+        // Show modal
+        $('#edit_shift').modal('show'); // corrected modal ID
     }
 
-    startInput.addEventListener('change', calculateShiftHours);
-    endInput.addEventListener('change', calculateShiftHours);
+</script>
+
+<script>
+    function deleteRosterShift(id) {
+
+    Swal.fire({
+        title: 'Delete Roster?',
+        text: 'Are you sure you want to delete this roster?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#750096',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+
+        if (result.isConfirmed) {
+
+            let form = document.getElementById("deleteShiftForm");
+
+            let action = "{{ route('dutyroster.destroyShift', ':id') }}";
+            form.action = action.replace(':id', id);
+
+            form.submit();
+        } 
+
+    });
+
+}
+</script>
+@if(session('success'))
+<script>
+Swal.fire({
+    icon: 'success',
+    title: '{{ session('success') }}',
+    showConfirmButton: false,
+    timer: 1500
 });
 </script>
-
-
+@endif
 @endsection

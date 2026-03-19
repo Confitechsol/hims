@@ -126,7 +126,7 @@
             height: 60px;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            z-index: 2;
+            z-index: 9998;
             background-image: url("{{ asset('/assets/images/bot.png') }}");
             background-size: 50%;
             background-repeat: no-repeat;
@@ -330,9 +330,6 @@
 
                     </div>
 
-                    @include('components.modals.bed-modal')
-
-
                     <!-- Bed -->
 
                     <!-- Appointment -->
@@ -391,7 +388,7 @@
                                         id="notification-1">
                                         <div class="d-flex">
                                             <div class="me-2 position-relative flex-shrink-0">
-                                                <img src="{{ asset('assets/img/doctors/doctor-01.jpg') }}"
+                                                <img src="{{ asset('assets/img/doc_user.png') }}"
                                                     class="avatar-md rounded-circle" alt>
                                             </div>
                                             <div class="flex-grow-1">
@@ -426,7 +423,7 @@
                                         id="notification-2">
                                         <div class="d-flex">
                                             <div class="me-2 position-relative flex-shrink-0">
-                                                <img src="{{ asset('assets/img/doctors/doctor-06.jpg') }}"
+                                                <img src="{{ asset('assets/img/doc_user.png') }}"
                                                     class="avatar-md rounded-circle" alt>
                                             </div>
                                             <div class="flex-grow-1">
@@ -461,7 +458,7 @@
                                         id="notification-3">
                                         <div class="d-flex">
                                             <div class="me-2 position-relative flex-shrink-0">
-                                                <img src="{{ asset('assets/img/doctors/doctor-02.jpg') }}"
+                                                <img src="{{ asset('assets/img/doc_user.png') }}"
                                                     class="avatar-md rounded-circle" alt>
                                             </div>
                                             <div class="flex-grow-1">
@@ -497,7 +494,7 @@
                                     <div class="dropdown-item notification-item py-3 text-wrap" id="notification-4">
                                         <div class="d-flex">
                                             <div class="me-2 position-relative flex-shrink-0">
-                                                <img src="{{ asset('assets/img/doctors/doctor-07.jpg') }}"
+                                                <img src="{{ asset('assets/img/doc_user.png') }}"
                                                     class="avatar-md rounded-circle" alt>
                                             </div>
                                             <div class="flex-grow-1">
@@ -545,7 +542,7 @@
                         <a href="javascript:void(0);"
                             class="topbar-link dropdown-toggle drop-arrow-none position-relative"
                             data-bs-toggle="dropdown" data-bs-offset="0,22" aria-haspopup="false" aria-expanded="false">
-                            <img src="{{ asset('assets/img/users/user-01.jpg') }}" width="32"
+                            <img src="{{ asset('assets/img/patient.png') }}" width="32"
                                 class="rounded-circle d-flex" alt="user-image">
                             <span class="online text-success"><i
                                     class="ti ti-circle-filled d-flex bg-white rounded-circle border border-1 border-white"></i></span>
@@ -553,7 +550,7 @@
                         <div class="dropdown-menu dropdown-menu-end dropdown-menu-md p-2">
 
                             <div class="d-flex align-items-center bg-light rounded-3 p-2 mb-2">
-                                <img src="{{ asset('assets/img/users/user-01.jpg') }}" class="rounded-circle" width="42"
+                                <img src="{{ asset('assets/img/patient.png') }}" class="rounded-circle" width="42"
                                     height="42" alt>
                                 <div class="ms-2">
                                     <p class="fw-medium text-dark mb-0">{{ Auth::user()->username }}</p>
@@ -649,6 +646,9 @@
 
         </div>
     </div>
+
+    @include('components.modals.bed-modal')
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js"></script>

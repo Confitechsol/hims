@@ -235,8 +235,10 @@
 
             // Update form action dynamically
             let form = document.getElementById("editOperationForm");
-            form.action = "{{ url('operations/update') }}/" + id; // route to update
-
+            
+            let action = "{{ route('operations.update', ':id') }}";
+            form.action = action.replace(':id', id);
+            //alert('test');
             // Show modal
             let modal = new bootstrap.Modal(document.getElementById("editOperationModal"));
             modal.show();
@@ -244,24 +246,33 @@
     </script>
 
     <script>
-    function deleteOperation(id) {
-        Swal.fire({
-            title: 'Delete Operation?',
-            text: 'Are you sure you want to delete this operation?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#750096',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                let form = document.getElementById("deleteOperationForm");
-                form.action = "{{ url('operations/destroy') }}/" + id;
-                form.submit();
-            }
+function deleteOperation(id) {
+
+    Swal.fire({
+        title: 'Delete Operation?',
+        text: 'Are you sure you want to delete this operation?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#750096',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+
+        if (result.isConfirmed) {
+
+            let form = document.getElementById("deleteOperationForm");
+
+            let action = "{{ route('operations.destroy', ':id') }}";
+            form.action = action.replace(':id', id);
+
+            form.submit();
         }
-    </script>
+
+    });
+
+}
+</script>
 
 
 @endsection

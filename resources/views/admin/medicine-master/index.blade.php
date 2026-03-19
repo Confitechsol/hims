@@ -54,6 +54,7 @@
                                                 <tr>
                                                     <th>#</th>
                                                     <th>Name</th>
+                                                    <th>Type</th>
                                                     <th>Price</th>
                                                     <th>Manufacturer Name</th>
                                                     <th>Pack Size Label</th>
@@ -67,6 +68,7 @@
                                                     <tr>
                                                         <td>{{ $medicine->id }}</td>
                                                         <td class="fw-bold">{{ $medicine->name }}</td>
+                                                        <td>{{ $medicine->medicine_type ?? '-' }}</td>
                                                         <td>{{ $medicine->price }}</td>
                                                         <td>{{ $medicine->manufacturer_name ?? '-' }}</td>
                                                         <td>{{ $medicine->pack_size_label ?? '-' }}</td>

@@ -117,12 +117,17 @@
                                                     <i class="ti ti-pencil"></i>
                                             </a>
 
-                                            <a href="javascript:void(0);" 
+                                            <!-- <a href="javascript:void(0);" 
                                                 onclick="confirmDelete('{{ route('dutyroster.destroy', $roster->id) }}')" 
                                                 class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
                                                 <i class="ti ti-trash"></i>
+                                            </a> -->
+                                            <a href="javascript:void(0);"
+                                                onclick="deleteRoster({{ $roster->id }})"
+                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                <i class="ti ti-trash"></i>
                                             </a>
-                                            <form id="deleteForm" method="POST" style="display: none;">
+                                            <form id="deleteRosterForm" method="POST" style="display:none;">
                                                 @csrf
                                                 @method('DELETE')
                                             </form>
@@ -232,22 +237,35 @@
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const start = document.getElementById('duty_roster_start_date');
-        const end = document.getElementById('duty_roster_end_date');
-        const total = document.getElementById('duty_roster_total_day');
+        // ✅ CREATE FORM
+    const start = document.getElementById('duty_roster_start_date');
+    const end = document.getElementById('duty_roster_end_date');
+    const total = document.getElementById('duty_roster_total_day');
 
-        function calculateDays() {
-            if (start.value && end.value) {
-                const startDate = new Date(start.value);
-                const endDate = new Date(end.value);
-                const diffTime = Math.abs(endDate - startDate);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-                total.value = diffDays;
-            }
+    function calculateDays(startEl, endEl, totalEl) {
+        if (startEl.value && endEl.value) {
+            const startDate = new Date(startEl.value);
+            const endDate = new Date(endEl.value);
+            const diffTime = Math.abs(endDate - startDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            totalEl.value = diffDays;
         }
+    }
 
-        start.addEventListener('change', calculateDays);
-        end.addEventListener('change', calculateDays);
+    if (start && end) {
+        start.addEventListener('change', () => calculateDays(start, end, total));
+        end.addEventListener('change', () => calculateDays(start, end, total));
+    }
+
+    // ✅ EDIT FORM
+    const editStart = document.getElementById('edit_duty_roster_start_date');
+    const editEnd = document.getElementById('edit_duty_roster_end_date');
+    const editTotal = document.getElementById('edit_duty_roster_total_day');
+
+    if (editStart && editEnd) {
+        editStart.addEventListener('change', () => calculateDays(editStart, editEnd, editTotal));
+        editEnd.addEventListener('change', () => calculateDays(editStart, editEnd, editTotal));
+    }
     });
 </script>
 <script>
@@ -270,44 +288,32 @@ function openEditModal(id, shiftId, startDate, endDate, totalDays) {
 </script>
 <!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
 <script>
+function deleteRoster(id) {
 
-function confirmDelete(url) {
     Swal.fire({
-        title: "Are you sure?",
-        text: "This roster will be marked as deleted (soft delete).",
-        icon: "warning",
+        title: 'Delete Roster?',
+        text: 'Are you sure you want to delete this roster?',
+        icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!"
+        confirmButtonColor: '#750096',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
     }).then((result) => {
+
         if (result.isConfirmed) {
-            // Create and submit a hidden form dynamically
-            let form = document.createElement('form');
-            form.action = url;
-            form.method = 'POST';
 
-            // Add CSRF token
-            let csrf = document.createElement('input');
-            csrf.type = 'hidden';
-            csrf.name = '_token';
-            csrf.value = '{{ csrf_token() }}';
-            form.appendChild(csrf);
+            let form = document.getElementById("deleteRosterForm");
 
-            // Spoof DELETE method
-            let method = document.createElement('input');
-            method.type = 'hidden';
-            method.name = '_method';
-            method.value = 'DELETE';
-            form.appendChild(method);
+            let action = "{{ route('dutyroster.destroy', ':id') }}";
+            form.action = action.replace(':id', id);
 
-            document.body.appendChild(form);
             form.submit();
-        }
+        } 
+
     });
+
 }
-
-
 </script>
 @if(session('success'))
 <script>

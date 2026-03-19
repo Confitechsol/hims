@@ -23,18 +23,13 @@
                                             <div
                                                 class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
 
-                                                <form method="GET" action="{{ route('roles') }}">
-                                                    <div class="input-icon-start position-relative me-2">
-                                                        <span class="input-icon-addon">
-                                                            <i class="ti ti-search"></i>
-                                                        </span>
-                                                        <input type="text"
-                                                            name="search"
-                                                            class="form-control shadow-sm"
-                                                            placeholder="Search role..."
-                                                            value="{{ request('search') }}">
-                                                    </div>
-                                                </form>
+                                                 <form method="GET" action="" class="input-icon-start position-relative me-2 d-flex align-items-center">
+                                            <span class="input-icon-addon">
+                                                <i class="ti ti-search"></i>
+                                            </span>
+                                            <input type="text" name="search" class="form-control shadow-sm" placeholder="Search" value="{{ request('search') }}" style="max-width: 300px;">
+                                            <button type="submit" class="btn btn-primary ms-2">Search</button>
+                                        </form>
                                                 <div class="text-end d-flex">
                                                     <a href="javascript:void(0);"
                                                         class="btn btn-primary text-white ms-2 fs-13 btn-md"
@@ -163,6 +158,53 @@
                                                     </tbody>
                                                 </table>
                                             </div>
+
+                                                         {{-- Pagination Links --}}
+                                         
+                                    <div class="mt-3" id="pagination-wrapper">
+                                        @php
+                                            $currentPage = $roles->currentPage();
+                                            $lastPage = $roles->lastPage();
+                                            $window = 2; // how many pages to show on each side
+                                            $start = max(1, $currentPage - $window);
+                                            $end = min($lastPage, $currentPage + $window);
+                                        @endphp
+
+                                        @if ($roles->onFirstPage())
+                                            <button class="btn btn-outline-secondary btn-sm me-1" disabled>« Prev</button>
+                                        @else
+                                            <a href="{{ $roles->previousPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm me-1">« Prev</a>
+                                        @endif
+
+                                        @if ($start > 1)
+                                            <a href="{{ $roles->url(1) }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm me-1">1</a>
+                                            @if ($start > 2)
+                                                <span class="btn btn-outline-secondary btn-sm me-1 disabled">...</span>
+                                            @endif
+                                        @endif
+
+                                        @for ($page = $start; $page <= $end; $page++)
+                                            @if ($page == $currentPage)
+                                                <button class="btn btn-primary btn-sm me-1">{{ $page }}</button>
+                                            @else
+                                                <a href="{{ $roles->url($page) }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm me-1">{{ $page }}</a>
+                                            @endif
+                                        @endfor
+
+                                        @if ($end < $lastPage)
+                                            @if ($end < $lastPage - 1)
+                                                <span class="btn btn-outline-secondary btn-sm me-1 disabled">...</span>
+                                            @endif
+                                            <a href="{{ $roles->url($lastPage) }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm me-1">{{ $lastPage }}</a>
+                                        @endif
+
+                                        @if ($roles->hasMorePages())
+                                            <a href="{{ $roles->nextPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm">Next »</a>
+                                        @else
+                                            <button class="btn btn-outline-secondary btn-sm" disabled>Next »</button>
+                                        @endif
+                                    </div>
+
 
                                         </div> <!-- end card-body -->
                                     </div> <!-- end card -->

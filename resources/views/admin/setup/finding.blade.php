@@ -22,20 +22,12 @@
                                     <div
                                         class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
 
-                                        <form action="{{ route('users') }}" method="GET">
-                                            <div class="d-flex align-items-center">
-                                                <div class="input-icon-start position-relative me-2">
-                                                    <span class="input-icon-addon">
-                                                        <i class="ti ti-search"></i>
-                                                    </span>
-                                                    <input type="text" id="language-search" name="search"
-                                                        value="{{ request('search') }}" class="form-control shadow-sm"
-                                                        placeholder="Search">
-                                                </div>
-                                                <div>
-                                                    <button class="btn btn-primary" type="submit">Search</button>
-                                                </div>
-                                            </div>
+                                        <form method="GET" action="" class="input-icon-start position-relative me-2 d-flex align-items-center">
+                                            <span class="input-icon-addon">
+                                                <i class="ti ti-search"></i>
+                                            </span>
+                                            <input type="text" name="search" class="form-control shadow-sm" placeholder="Search" value="{{ request('search') }}" style="max-width: 300px;">
+                                            <button type="submit" class="btn btn-primary ms-2">Search</button>
                                         </form>
                                         <div class="page_btn d-flex">
                                             <div class="text-end d-flex">
@@ -147,6 +139,51 @@
                                                 @endforeach
                                             </tbody>
                                         </table>
+                                    </div>
+                                       {{-- Pagination Links --}}
+                                         
+                                    <div class="mt-3" id="pagination-wrapper">
+                                        @php
+                                            $currentPage = $findings->currentPage();
+                                            $lastPage = $findings->lastPage();
+                                            $window = 2; // how many pages to show on each side
+                                            $start = max(1, $currentPage - $window);
+                                            $end = min($lastPage, $currentPage + $window);
+                                        @endphp
+
+                                        @if ($findings->onFirstPage())
+                                            <button class="btn btn-outline-secondary btn-sm me-1" disabled>« Prev</button>
+                                        @else
+                                            <a href="{{ $findingss->previousPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm me-1">« Prev</a>
+                                        @endif
+
+                                        @if ($start > 1)
+                                            <a href="{{ $findings->url(1) }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm me-1">1</a>
+                                            @if ($start > 2)
+                                                <span class="btn btn-outline-secondary btn-sm me-1 disabled">...</span>
+                                            @endif
+                                        @endif
+
+                                        @for ($page = $start; $page <= $end; $page++)
+                                            @if ($page == $currentPage)
+                                                <button class="btn btn-primary btn-sm me-1">{{ $page }}</button>
+                                            @else
+                                                <a href="{{ $findings->url($page) }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm me-1">{{ $page }}</a>
+                                            @endif
+                                        @endfor
+
+                                        @if ($end < $lastPage)
+                                            @if ($end < $lastPage - 1)
+                                                <span class="btn btn-outline-secondary btn-sm me-1 disabled">...</span>
+                                            @endif
+                                            <a href="{{ $findings->url($lastPage) }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm me-1">{{ $lastPage }}</a>
+                                        @endif
+
+                                        @if ($findings->hasMorePages())
+                                            <a href="{{ $findings->nextPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm">Next »</a>
+                                        @else
+                                            <button class="btn btn-outline-secondary btn-sm" disabled>Next »</button>
+                                        @endif
                                     </div>
                                     <!--Edit Modal -->
                                     <div class="modal fade" id="edit_finding" tabindex="-1" aria-hidden="true">

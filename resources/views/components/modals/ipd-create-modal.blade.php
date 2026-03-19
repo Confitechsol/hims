@@ -800,7 +800,7 @@
                         <div class="row g-3">
                             <div class="col-md-3">
                                 <label class="form-label">Admission Date & Time<span class="required">*</span></label>
-                                <input type="datetime-local" class="form-control" name="admission_date" max="{{ now()->format('Y-m-d\TH:i') }}">
+                                <input type="datetime-local" class="form-control" name="admission_date">
                             </div>
                             <!-- <div class="col-md-3">
                                 <label class="form-label">Case</label>

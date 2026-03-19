@@ -253,9 +253,9 @@ class IpdBillingController extends Controller
             $chargeDate = $currentDate->format('Y-m-d');
             $chargeDateCarbon = $currentDate->copy();
 
-            // Period: 10 AM previous day to 10 AM current day (for "which bed was active")
-            $periodStart = $currentDate->copy()->subDay()->setTime(10, 0, 0);
-            $periodEnd = $currentDate->copy()->setTime(10, 0, 0);
+            // Period: 10:01 AM previous day to 10:01 AM current day (for "which bed was active")
+            $periodStart = $currentDate->copy()->subDay()->setTime(10, 1, 0);
+            $periodEnd = $currentDate->copy()->setTime(10, 1, 0);
 
             // Find which bed was assigned during this period (use date-only so admission time doesn't exclude same day)
             $activeBed = null;
@@ -1606,9 +1606,10 @@ class IpdBillingController extends Controller
             $pdf->setOption('enable-local-file-access', true);
             $pdf->setPaper('a4', 'portrait');
             
-            \Log::info('PDF generated, returning download');
-            
-            return $pdf->download('IPD_Estimate_Bill_' . $ipd->ipd_no . '.pdf');
+            \Log::info('PDF generated, returning inline stream');
+
+            // Open in browser tab (inline) instead of forcing download
+            return $pdf->stream('IPD_Estimate_Bill_' . $ipd->ipd_no . '.pdf');
         } catch (\Exception $e) {
             \Log::error('Error in exportEstimate: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
@@ -1989,8 +1990,10 @@ class IpdBillingController extends Controller
             $pdf->setOption('enable-local-file-access', true);
             $pdf->setPaper('a4', 'portrait');
 
-            \Log::info('PDF generated successfully, returning download');
-            return $pdf->download('IPD_Final_Bill_' . $ipd->ipd_no . '.pdf');
+            \Log::info('PDF generated successfully, returning inline stream');
+
+            // Open in browser tab (inline) instead of forcing download
+            return $pdf->stream('IPD_Final_Bill_' . $ipd->ipd_no . '.pdf');
         } catch (\Exception $e) {
             \Log::error('Error in exportFinal: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),

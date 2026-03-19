@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name', 255);
             $table->double('price')->default(0);
+            $table->string('medicine_type', 255)->nullable();
             $table->string('manufacturer_name', 255)->nullable();
             $table->string('pack_size_label', 255)->nullable();
             $table->text('short_composition1')->nullable();

@@ -97,7 +97,7 @@
                                                         <div class="col-sm-12">
                                                             <label>Doctor <small class="req">*</small></label>
                                                             <div class="p-2 select2-full-width">
-                                                                <select class="form-control select2" id="duty_roster_doctor"
+                                                                <select class="form-control select2-input" id="duty_roster_doctor"
                                                                     name="doctor_id" required>
                                                                     <option value="">Select</option>
                                                                     @foreach($doctorList as $doctor)

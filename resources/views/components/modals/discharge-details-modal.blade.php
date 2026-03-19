@@ -330,7 +330,7 @@
                                               <div class="colon">:</div>
                                               <div class="patient_data w-auto" id="dis_admission_time_text"></div>
                                           </div>
-                                          <div class="patient_items">
+                                          <div class="patient_items" id="ot-date">
                                               <div class="patient_head">OT Date</div>
                                               <div class="colon">:</div>
                                               <div class="patient_data" id="dis_ot_date_text"></div>
@@ -376,11 +376,11 @@
                                               <div class="colon">:</div>
                                               <div class="patient_data" id="discharge_type_text"></div>
                                           </div> --}}
-                                          <div class="patient_items">
+                                          {{-- <div class="patient_items">
                                               <div class="patient_head">Discharge Contact No.</div>
                                               <div class="colon">:</div>
                                               <div class="patient_data" id="dis_contact_no_text"></div>
-                                          </div>
+                                          </div> --}}
                                           <div class="patient_items">
                                               <div class="patient_head">BED</div>
                                               <div class="colon">:</div>
@@ -393,7 +393,7 @@
                                   <div class="patient_info">
                                       <div class="patient_details">
                                           <div class="patient_items">
-                                              <div class="patient_head">Under Care</div>
+                                              <div class="patient_head">Under Care Dr.</div>
                                               <div class="colon">:</div>
                                               <div class="patient_data" id="dis_under_care_text"></div>
                                           </div>
@@ -445,7 +445,10 @@
 
                                       <h6 id="dis_discharge_advice_label">Condition at Discharge:</h6>
                                       <div class="general_list" id="dis_discharge_advice_html"></div>
-
+                                      <br />
+                                      <h6 id="dis_remarks_label">Follow Up:</h6>
+                                      <div class="general_list" id="dis_remarks_text"></div>
+                                      <br />
                                       <div class="end">
                                           {{-- <p>---- xxxx -- END -- xxxx ---</p> --}}
                                       </div>
@@ -469,7 +472,7 @@
                                                       alt="Doctor Signature">
                                               @else
                                                   <p class="fw-bold mb-2" style="font-size: small;">
-                                                      {{ $ipd->doctor->name }}</p>
+                                                      {{ $ipd->doctor?->name ?? 'N/A' }}</p>
                                               @endif
 
                                               <div class="sig_box text-center">
@@ -560,6 +563,8 @@
 
               if (data.ot_date) {
                   setText('dis_ot_date_text', formatDate(new Date(data.ot_date)));
+              } else {
+                  hideLabel('ot-date');
               }
 
               if (medicines.length > 0) {
@@ -608,6 +613,12 @@
                   hideLabel('dis_discharge_advice_label')
               } else {
                   setHTML('dis_discharge_advice_html', data.discharge_advice);
+              }
+
+              if (data.remarks === "" || data.remarks === null) {
+                  hideLabel('dis_remarks_label')
+              } else {
+                  setText('dis_remarks_text', data.remarks);
               }
 
               if (data.present_complaints === "" || data.present_complaints === null) {

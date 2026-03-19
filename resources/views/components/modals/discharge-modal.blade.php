@@ -438,7 +438,7 @@
                                 Patient Name <span class="required">*</span>
                             </label>
                             <input type="text" class="form-control" id="patient_name_text" name="patient_name"
-                                required>
+                                autocomplete="off" required>
                             <input type="hidden" class="form-control" id="patient_id_text" name="patient_id" required>
                         </div>
 
@@ -447,7 +447,8 @@
                                 <i class="bi bi-credit-card"></i>
                                 Admission No.
                             </label>
-                            <input type="text" class="form-control" id="admission_no_text" name="admission_no">
+                            <input type="text" class="form-control" id="admission_no_text" name="admission_no"
+                                autocomplete="off">
                         </div>
                         <div class="col-md-4">
                             <label for="discharge_contact" class="form-label">
@@ -455,21 +456,22 @@
                                 Discharge Contact No.
                             </label>
                             <input type="text" class="form-control" id="discharge_contact_text"
-                                name="discharge_contact" required>
+                                name="discharge_contact" autocomplete="off" required>
                         </div>
                         <div class="col-md-3">
                             <label for="bed" class="form-label">
                                 <i class="bi bi-hospital"></i>
                                 Bed
                             </label>
-                            <input type="text" class="form-control" id="bed_text" name="bed">
+                            <input type="text" class="form-control" id="bed_text" name="bed" autocomplete="off">
                         </div>
                         <div class="col-md-3">
                             <label for="discharge_time" class="form-label">
                                 <i class="bi bi-clock"></i>
                                 Discharge Time
                             </label>
-                            <input type="time" class="form-control" id="discharge_time_text" name="discharge_time">
+                            <input type="time" class="form-control" id="discharge_time_text" autocomplete="off"
+                                name="discharge_time">
                         </div>
 
                         <div class="col-md-3">
@@ -477,8 +479,8 @@
                                 <i class="bi bi-calendar-event"></i>
                                 Discharge Date <span class="required">*</span>
                             </label>
-                            <input type="date" class="form-control" id="discharge_date_text" name="discharge_date"
-                                required>
+                            <input type="date" class="form-control" id="discharge_date_text" autocomplete="off"
+                                name="discharge_date" required>
                         </div>
 
 
@@ -488,7 +490,8 @@
                                 <i class="bi bi-clock-history"></i>
                                 Admit Time
                             </label>
-                            <input type="time" class="form-control" id="admit_time_text" name="admit_time" readonly>
+                            <input type="time" class="form-control" id="admit_time_text" name="admit_time"
+                                autocomplete="off" readonly>
                         </div>
                     </div>
 
@@ -505,8 +508,8 @@
                                 <i class="bi bi-calendar3"></i>
                                 Age
                             </label>
-                            <input type="text" class="form-control" id="age_text" name="age"
-                                step="0.01">
+                            <input type="text" class="form-control" id="age_text" name="age" step="0.01"
+                                autocomplete="off">
                         </div>
 
                         <div class="col-md-2">
@@ -527,7 +530,8 @@
                                 <i class="bi bi-telephone"></i>
                                 Phone
                             </label>
-                            <input type="tel" class="form-control" id="phone_text" name="phone">
+                            <input type="tel" class="form-control" id="phone_text" name="phone"
+                                autocomplete="off">
                         </div>
 
                         <div class="col-md-4">
@@ -558,7 +562,7 @@
                                 Admission Date
                             </label>
                             <input type="date" class="form-control" id="admission_date_text"
-                                name="admission_date">
+                                name="admission_date" autocomplete="off">
                         </div>
 
                         <div class="col-md-4">
@@ -566,7 +570,8 @@
                                 <i class="bi bi-person-check"></i>
                                 W/O S/O D/O
                             </label>
-                            <input type="text" class="form-control" id="guardian_text" name="guardian">
+                            <input type="text" class="form-control" id="guardian_text" name="guardian"
+                                autocomplete="off">
                         </div>
 
                         <div class="col-md-4">
@@ -574,7 +579,8 @@
                                 <i class="bi bi-people"></i>
                                 Relation
                             </label>
-                            <input type="text" class="form-control" id="relation_text" name="relation">
+                            <input type="text" class="form-control" id="relation_text" name="relation"
+                                autocomplete="off">
                         </div>
 
                         <div class="col-md-4">
@@ -582,7 +588,8 @@
                                 <i class="bi bi-flag"></i>
                                 Nationality
                             </label>
-                            <input type="text" class="form-control" id="nationality_text" name="nationality">
+                            <input type="text" class="form-control" id="nationality_text" name="nationality"
+                                autocomplete="off">
                         </div>
 
                         <div class="col-md-6">
@@ -590,7 +597,8 @@
                                 <i class="bi bi-person-badge"></i>
                                 Under Care Dr
                             </label>
-                            <input type="text" class="form-control" id="under_care_dr_text" name="under_care_dr">
+                            <input type="text" class="form-control" id="under_care_dr_text" name="under_care_dr"
+                                autocomplete="off">
                             <input type="hidden" class="form-control" id="registration_no_text"
                                 name="registration_no">
                         </div>
@@ -600,7 +608,8 @@
                                 <i class="bi bi-arrow-right-circle"></i>
                                 Referral
                             </label>
-                            <input type="text" class="form-control" id="referral_text" name="referral">
+                            <input type="text" class="form-control" id="referral_text" name="referral"
+                                autocomplete="off">
                         </div>
 
                         <div class="col-md-12">
@@ -608,7 +617,8 @@
                                 <i class="bi bi-building"></i>
                                 Corporate
                             </label>
-                            <input type="text" class="form-control" id="corporate_text" name="corporate">
+                            <input type="text" class="form-control" id="corporate_text" name="corporate"
+                                autocomplete="off">
                         </div>
                     </div>
 
@@ -640,7 +650,8 @@
                                 <i class="bi bi-calendar-plus"></i>
                                 OT Date
                             </label>
-                            <input type="date" class="form-control" id="ot_date_text" name="ot_date">
+                            <input type="date" class="form-control" id="ot_date_text" name="ot_date"
+                                autocomplete="off">
                         </div>
 
                         <div class="col-md-4">
@@ -648,21 +659,24 @@
                                 <i class="bi bi-activity"></i>
                                 O.T Type
                             </label>
-                            <input type="text" class="form-control" id="ot_type_text" name="ot_type">
+                            <input type="text" class="form-control" id="ot_type_text" name="ot_type"
+                                autocomplete="off">
                         </div>
                         <div class="col-md-4">
                             <label for="ot_name" class="form-label">
                                 <i class="bi bi-activity"></i>
                                 O.T Name
                             </label>
-                            <input type="text" class="form-control" id="ot_name_text" name="ot_name">
+                            <input type="text" class="form-control" id="ot_name_text" name="ot_name"
+                                autocomplete="off">
                         </div>
                         <div class="col-md-2">
                             <label for="ot_done" class="form-label">
                                 <i class="bi bi-activity"></i>
                                 O.T Count
                             </label>
-                            <input type="number" class="form-control" id="ot_done_text" name="ot_done">
+                            <input type="number" class="form-control" id="ot_done_text" name="ot_done"
+                                autocomplete="off">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="ot_done_by">
@@ -753,15 +767,12 @@
                                     <label class="form-label">Medicine Name</label>
                                     <select class="med-medicine" name="meds[]" id="meds">
                                         <option value="">Select Medicine</option>
-                                        {{-- @foreach ($medicines as $med)
-                                            <option value="{{ $med->id }}">{{ $med->name }}</option>
-                                        @endforeach --}}
                                     </select>
                                 </div>
 
                                 <div class="col-md-3">
                                     <label class="form-label">Medicine Type</label>
-                                    <select class="form-select med-types" name="med_types[]" id="med-types" required>
+                                    <select class="form-select med-types" name="med_types[]" id="med-types">
                                         <option value="">Select Medicine Type</option>
                                         <option value="Tablet">Tablet</option>
                                         <option value="Capsule">Capsule</option>
@@ -885,7 +896,8 @@
                                 <i class="bi bi-person-check-fill"></i>
                                 Discharged By
                             </label>
-                            <input type="text" class="form-control" id="discharged_by_text" name="discharged_by">
+                            <input type="text" class="form-control" id="discharged_by_text" name="discharged_by"
+                                autocomplete="off">
                         </div>
 
                         <div class="col-md-6">
@@ -893,7 +905,8 @@
                                 <i class="bi bi-person-circle"></i>
                                 Current User
                             </label>
-                            <input type="text" class="form-control" id="current_user_text" name="current_user">
+                            <input type="text" class="form-control" id="current_user_text" name="current_user"
+                                autocomplete="off">
                         </div>
                     </div>
                     <!-- Action Buttons -->
@@ -990,11 +1003,12 @@
 
     function initTomSelects(row) {
         const medicineSelect = row.querySelector('.med-medicine');
+        const medTypeSelect = row.querySelector('.med-types');
         const intervalSelect = row.querySelector('.med-interval');
         const durationSelect = row.querySelector('.med-duration');
 
         if (medicineSelect && !medicineSelect.tomselect) {
-            new TomSelect(medicineSelect, {
+            const ts = new TomSelect(medicineSelect, {
                 options: medMaster.map(i => ({
                     value: i.name,
                     label: i.name
@@ -1002,7 +1016,25 @@
                 valueField: 'value',
                 labelField: 'label',
                 searchField: 'label',
-                placeholder: 'Select Interval'
+                placeholder: 'Select Medicine',
+
+                onChange: function(value) {
+
+                    const selectedMed = medMaster.find(m => m.name === value);
+
+                    if (selectedMed && selectedMed.medicine_type) {
+
+                        medTypeSelect.value = selectedMed.medicine_type ?
+                            selectedMed.medicine_type.charAt(0).toUpperCase() + selectedMed.medicine_type
+                            .slice(1).toLowerCase() :
+                            '';
+                        medTypeSelect.dispatchEvent(new Event('change'));
+
+                    } else {
+
+                        medTypeSelect.value = "";
+                    }
+                }
             });
         }
 
@@ -1032,6 +1064,7 @@
             });
         }
     }
+
     document.addEventListener('DOMContentLoaded', function() {
 
         const dischargeModal = document.getElementById('patientDischargeModal');
@@ -1068,6 +1101,7 @@
 
 
             } catch (error) {
+                hideMedLoader();
                 console.error(err);
                 Swal.fire({
                     icon: 'error',
@@ -1116,7 +1150,8 @@
 
             const doctors = JSON.parse(button.getAttribute('data-doctors') || '[]');
             const currentUser = JSON.parse(button.getAttribute('data-user') || '{}')
-
+            const outstanding = JSON.parse(button.getAttribute('data-outstanding') || 0)
+            window.outstanding = outstanding
             window.currentUser = currentUser.role
             // 🔹 Basic identifiers
             document.getElementById('ipd-id').value = ipd.id ?? '';
@@ -1234,10 +1269,24 @@
 
 <script>
     document.getElementById('patientDischargeForm').addEventListener('submit', function(e) {
+
         e.preventDefault(); // ⛔ stop immediate submit
+        const form = this;
 
         // Dummy payment status (for now)
-        const isPaymentCleared = false; // 🔁 change later with real API
+        const isPaymentCleared = window.outstanding == 0; // 🔁 change later with real API
+
+        function cleanEmptyMedicineRows() {
+            const rows = document.querySelectorAll('.med-row');
+
+            rows.forEach(row => {
+                const med = row.querySelector('.med-medicine')?.value;
+
+                if (!med) {
+                    row.remove(); // remove empty row
+                }
+            });
+        }
 
         if (!isPaymentCleared) {
             Swal.fire({
@@ -1250,19 +1299,23 @@
                 confirmButtonColor: '#28a745',
                 cancelButtonColor: '#dc3545',
             }).then((result) => {
-                if (result.isConfirmed && window.currentUser === 1) {
-                    e.target.submit(); // ✅ submit form manually
-                } else {
-                    Swal.fire({
-                        title: 'Contact Admin',
-                        text: 'Payment is Not clear. Please Contact Admin.',
-                        icon: 'success',
-                        timer: 1500,
-                        showConfirmButton: false,
-                    }).then(() => {
-                        e.target.submit(); // ✅ submit form
-                    });
+
+                if (result.isConfirmed && window.currentUser === '1') {
+                    cleanEmptyMedicineRows();
+                    form.submit();
+                    // e.target.submit(); // ✅ submit form manually
                 }
+                // else {
+                //     Swal.fire({
+                //         title: 'Contact Admin',
+                //         text: 'Payment is Not clear. Please Contact Admin.',
+                //         icon: 'success',
+                //         timer: 1500,
+                //         showConfirmButton: false,
+                //     }).then(() => {
+                //         e.target.submit(); // ✅ submit form
+                //     });
+                // }
             });
         } else {
             Swal.fire({
@@ -1272,6 +1325,7 @@
                 timer: 1500,
                 showConfirmButton: false,
             }).then(() => {
+                cleanEmptyMedicineRows();
                 e.target.submit(); // ✅ submit form
             });
         }

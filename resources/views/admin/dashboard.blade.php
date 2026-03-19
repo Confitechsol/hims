@@ -234,7 +234,7 @@
                                         <a href="doctor-details.html" class="avatar me-2 flex-shrink-0 position-relative">
                                             <span class="online text-success position-absolute end-0 bottom-0 pe-1"><i
                                                     class="ti ti-circle-filled d-flex bg-white fs-6 rounded-circle border border-1 border-white"></i></span>
-                                            <img src="{{ asset('assets/img/doctors/doctor-01.jpg') }}" alt="img"
+                                            <img src="{{ asset('assets/img/doc_user.png') }}" alt="img"
                                                 class="rounded-circle">
                                         </a>
                                         <div>
@@ -675,6 +675,10 @@
                                                             alt="img" class="rounded-circle">
                                                     {{-- <img src="{{ asset('assets/img/doctors/doctor-06.jpg') }}"
                                                         alt="img" class="rounded-circle"> --}}
+                                                @else        
+                                                <a href="doctor-details.html" class="avatar me-2">
+                                                    <img src="{{ asset('assets/img/doc_user.png') }}"
+                                                        alt="img" class="rounded-circle">
                                                 </a>
                                                 @endif
                                                 <div>
@@ -689,7 +693,10 @@
                                             <div class="d-flex align-items-center">
                                                 @if($appointment->patient["image"])
                                                 <a href="#" class="avatar me-2">
-                                                    <img src="{{ $appointment->patient["image"] ? url('/')."/".$appointment->patient["image"] : "" }}"
+                                                    <img src="{{ $appointment->patient["image"] ? url('/')."/".$appointment->patient["image"] : "" }}"/>
+                                                    @else
+                                                <a href="patient-details.html" class="avatar me-2">
+                                                    <img src="{{ asset('assets/img/patient.png') }}"
                                                         alt="img" class="rounded-circle">
                                                 </a>
                                                 @endif
@@ -723,7 +730,7 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <a href="doctor-details.html" class="avatar me-2">
-                                                    <img src="{{ asset('assets/img/doctors/doctor-07.jpg') }}"
+                                                    <img src="{{ asset('assets/img/doc_user.png') }}"
                                                         alt="img" class="rounded-circle">
                                                 </a>
                                                 <div>
@@ -738,7 +745,7 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <a href="patient-details.html" class="avatar me-2">
-                                                    <img src="{{ asset('assets/img/profiles/avatar-27.jpg') }}"
+                                                    <img src="{{ asset('assets/img/patient.png') }}"
                                                         alt="img" class="rounded-circle">
                                                 </a>
                                                 <div>
@@ -762,7 +769,7 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <a href="doctor-details.html" class="avatar me-2">
-                                                    <img src="{{ asset('assets/img/doctors/doctor-10.jpg') }}"
+                                                    <img src="{{ asset('assets/img/doc_user.png') }}"
                                                         alt="img" class="rounded-circle">
                                                 </a>
                                                 <div>
@@ -777,7 +784,7 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <a href="patient-details.html" class="avatar me-2">
-                                                    <img src="{{ asset('assets/img/profiles/avatar-20.jpg') }}"
+                                                    <img src="{{ asset('assets/img/patient.png') }}"
                                                         alt="img" class="rounded-circle">
                                                 </a>
                                                 <div>
@@ -801,7 +808,7 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <a href="doctor-details.html" class="avatar me-2">
-                                                    <img src="{{ asset('assets/img/doctors/doctor-11.jpg') }}"
+                                                    <img src="{{ asset('assets/img/doc_user.png') }}"
                                                         alt="img" class="rounded-circle">
                                                 </a>
                                                 <div>
@@ -816,7 +823,7 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <a href="patient-details.html" class="avatar me-2">
-                                                    <img src="{{ asset('assets/img/profiles/avatar-06.jpg') }}"
+                                                    <img src="{{ asset('assets/img/patient.png') }}"
                                                         alt="img" class="rounded-circle">
                                                 </a>
                                                 <div>
@@ -840,7 +847,7 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <a href="doctor-details.html" class="avatar me-2">
-                                                    <img src="{{ asset('assets/img/doctors/doctor-14.jpg') }}"
+                                                    <img src="{{ asset('assets/img/doc_user.png') }}"
                                                         alt="img" class="rounded-circle">
                                                 </a>
                                                 <div>
@@ -855,7 +862,7 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <a href="patient-details.html" class="avatar me-2">
-                                                    <img src="{{ asset('assets/img/profiles/avatar-25.jpg') }}"
+                                                    <img src="{{ asset('assets/img/patient.png') }}"
                                                         alt="img" class="rounded-circle">
                                                 </a>
                                                 <div>

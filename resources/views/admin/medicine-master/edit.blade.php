@@ -33,8 +33,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('medicine-master.update', $medicine->id) }}" method="POST"
-                        id="medicineForm">
+                    <form action="{{ route('medicine-master.update', $medicine->id) }}" method="POST" id="medicineForm">
                         @csrf
                         @method('PUT')
 
@@ -51,6 +50,20 @@
                             </div>
 
                             <div class="col-md-4">
+                                <label class="form-label">Medicine Type</label>
+                                <select class="form-select med-types" name="medicine_type" id="med-types">
+                                    <option value="">Select Medicine Type</option>
+                                    <option value="Tablet">Tablet</option>
+                                    <option value="Capsule">Capsule</option>
+                                    <option value="Syrup">Syrup</option>
+                                    <option value="Injection">Injection</option>
+                                    <option value="Ointment">Ointment</option>
+                                    <option value="Powder">Powder</option>
+                                    <option value="Drop">Drop</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
                                 <label class="form-label">Price</label>
                                 <input type="number" step="0.01" name="medicine_price" class="form-control"
                                     value="{{ old('medicine_price', $medicine->price) }}" min="0"
@@ -59,8 +72,11 @@
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror
                             </div>
+                        </div>
 
-                            <div class="col-md-4">
+                        <!-- Row 2 -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
                                 <label class="form-label">Manufacturer Name</label>
                                 <input type="text" name="manufacturer_name" class="form-control"
                                     value="{{ old('manufacturer_name', $medicine->manufacturer_name) }}"
@@ -69,13 +85,7 @@
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror
                             </div>
-
-
-                        </div>
-
-                        <!-- Row 2 -->
-                        <div class="row mb-3">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label class="form-label">Pack Size Label</label>
                                 <input type="text" name="pack_size_label" class="form-control"
                                     value="{{ old('pack_size_label', $medicine->pack_size_label) }}"
@@ -84,7 +94,9 @@
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="col-md-4">
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
                                 <label class="form-label">Short Composition 1</label>
                                 <input type="text" name="short_composition1" class="form-control"
                                     value="{{ old('short_composition1', $medicine->short_composition1) }}" maxlength="25"
@@ -93,7 +105,7 @@
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label class="form-label">Short Composition 2</label>
                                 <input type="text" name="short_composition2" class="form-control"
                                     value="{{ old('short_composition2', $medicine->short_composition2) }}" maxlength="25"
@@ -115,4 +127,14 @@
             </div>
         </div>
     </div>
+
+    <script>
+        let medicineType = "{{ $medicine->medicine_type ?? '' }}";
+
+        document.addEventListener("DOMContentLoaded", function() {
+            if (medicineType) {
+                document.getElementById("med-types").value = medicineType;
+            }
+        });
+    </script>
 @endsection

@@ -24,7 +24,7 @@
 
 
     .about_info {
-        font-size: 12px;
+        font-size: 11px;
     }
 
     .wreeti {
@@ -47,6 +47,10 @@
         justify-content: space-between;
     }
 
+.admission_item p {
+margin: 10px 0;
+}
+
     .about_info {
         text-align: end;
         line-height: 0.5;
@@ -55,7 +59,7 @@
     .heading h4 {
         text-transform: uppercase;
         text-align: center;
-        margin: 10px auto;
+        margin: 10px auto 5px;
     }
 
     .red {
@@ -77,8 +81,9 @@
         display: flex;
         padding: 8px;
         margin-bottom: 2px;
-        font-weight: 700;
+        /* font-weight: 700; */
         font-size: 10px;
+        padding-bottom: 0;
     }
 
     .patient_details {
@@ -89,7 +94,7 @@
         display: flex;
         align-items: center;
         gap: 20px;
-        margin-bottom: 10px;
+        margin-bottom: 6px;
     }
 
     .patient_head {
@@ -130,7 +135,7 @@
 
     .wreeti_items {
         font-weight: 700;
-        margin-bottom: 8px;
+        /* margin-bottom: 8px; */
     }
 
     .wreeti_box {
@@ -157,7 +162,16 @@
     }
 
     .text {
-        font-size: 10px;
+        font-size: 11px;
+        line-height: 1.3;
+    }
+
+    .text p {
+        margin: 5px 0;
+    }
+
+    .general_list {
+        margin: 5px 0;
     }
 
     @media print {
@@ -199,18 +213,21 @@
         padding-bottom: 30px;
         text-align: center;
     }
+
     .btn-primary:hover {
         /* background-color: #b14cc1; */
         /* border-color: #b14cc1; */
         color: #fff;
     }
+
     .btn-primary:focus {
         /* background-color: #b14cc1; */
         /* border-color: #b14cc1; */
         color: #fff;
         box-shadow: 0 0 0 0.2rem rgba(177, 76, 193, 0.5);
     }
-    .btn-primary{
+
+    .btn-primary {
         background-color: #cb6ce6;
         border-color: #cb6ce6;
         color: #fff;
@@ -225,16 +242,15 @@
     <div class="main_box" id="pdf-content">
 
         <div class="top_head">
-            <div class="first_logo">
-                <img src="{{ asset('assets/images/logo.webp') }}" alt="LOGO1" style="height: 50px">
-                <p>NABH/PESHCO-2018-3150/L-03
-                </p>
-            </div>
-            <div class="second_logo">
+            <div class="second_logo" style="text-align: center;">
                 @if (file_exists(public_path('assets/images/nabh-logo.png')))
-                    <img src="{{ asset('assets/images/nabh-logo.png') }}" alt="LOGO2"
-                        style="height: auto; width:100%;">
+                    <img src="{{ asset('assets/images/nabh-logo.png') }}" alt="LOGO2" style="height: auto; width:50%;">
+                    <p>NABH/PESHCO-2018-3150/L-03
                 @endif
+            </div>
+            <div class="first_logo" style="text-align: center;">
+                <img src="{{ asset('assets/images/logo.webp') }}" alt="LOGO1" style="height: 50px">
+                </p>
             </div>
             <div class="about_info">
                 <p>{{ $hospital->name ?? '' }} </p>
@@ -253,7 +269,7 @@
         <div class="admission_info">
             <div class="admission_item">
                 <p>
-                    <b>ADMISSION NO.</b> : <span class="red">{{ $IpdPatient->ipd['ipd_no'] }}</span>
+                    <b>ADMISSION NO.</b> : <b class="red">{{ $IpdPatient->ipd['ipd_no'] }}</b>
                 </p>
             </div>
             <div class="admission_item">
@@ -280,7 +296,9 @@
                     </div>
                     :
                     <div class="patient_data">
-                        {{ $IpdPatient->patient['patient_name'] }}
+                        <strong>
+                            {{ $IpdPatient->patient['patient_name'] }}
+                        </strong>
                     </div>
                 </div>
 
@@ -309,7 +327,7 @@
                     </div>
                     :
                     <div class="patient_data">
-                        
+
                     </div>
                 </div>
                 <div class="patient_items">
@@ -322,16 +340,26 @@
                     </div>
                 </div>
 
-                 <div class="patient_items">
-                        <div class="patient_head">
-                            GENDER
-                        </div>
-                        :
-                        <div class="patient_data">
-                            {{ $IpdPatient->patient['gender'] }}
-                        </div>
-                 </div>
-                    
+                <div class="patient_items">
+                    <div class="patient_head">
+                        GENDER
+                    </div>
+                    :
+                    <div class="patient_data">
+                        {{ $IpdPatient->patient['gender'] }}
+                    </div>
+                </div>
+
+                <div class="patient_items">
+                    <div class="patient_head">
+                        PINCODE
+                    </div>
+                    :
+                    <div class="patient_data">
+                        {{ $IpdPatient->patient->areaName->pincode ?? '' }}
+                    </div>
+                </div>
+
 
             </div>
 
@@ -346,18 +374,18 @@
                             {{ $IpdPatient->patient['age'] }} y
                         </div>
                     </div>
-                   
-                    
+
+
                 </div>
                 <div class="patient_items">
-    <div class="patient_head">
-        AREA
-    </div>
-    :
-    <div class="patient_data">
-        {{ $IpdPatient->patient->areaName->name ?? '' }}
-    </div>
-</div>
+                    <div class="patient_head">
+                        AREA
+                    </div>
+                    :
+                    <div class="patient_data">
+                        {{ $IpdPatient->patient->areaName->name ?? '' }}
+                    </div>
+                </div>
                 <div class="patient_items">
                     <div class="patient_head">
                         STATUS
@@ -387,14 +415,14 @@
                 </div>
 
                 <div class="patient_items">
-                        <div class="patient_head">
-                            Police Station
-                        </div>
-                        :
-                        <div class="patient_data">
-                            {{ $IpdPatient->patient['police_station'] }}
-                        </div>
+                    <div class="patient_head">
+                        POLICE STATION
                     </div>
+                    :
+                    <div class="patient_data">
+                        {{ $IpdPatient->patient['police_station'] }}
+                    </div>
+                </div>
 
             </div>
 
@@ -416,11 +444,11 @@
 
                 <div class="patient_items">
                     <div class="patient_head">
-                        RELATIVE NAME
+                        PRIMARY PHONE NUMBER
                     </div>
                     :
                     <div class="patient_data">
-                        {{ $IpdPatient->patient['guardian_name'] }}
+                        {{ $IpdPatient->patient['mobileno'] }}
                     </div>
                 </div>
 
@@ -440,7 +468,8 @@
 
                 <div class="patient_items">
                     <div class="patient_head">
-                        PHONE NO.
+                        ALTERNATE PHONE NUMBER
+                        
                     </div>
                     :
                     <div class="patient_data">
@@ -627,7 +656,7 @@
             <p>I have been fully explained the consequences of the procedures and
                 their risks.</p>
 
-            <h4>GENERAL NORMS FOR PATIENT ADMISSION:</h4>
+            <h4 style="margin:0;">GENERAL NORMS FOR PATIENT ADMISSION:</h4>
 
             <ol class="general_list">
                 <li>An ADVANCE PAYMENT shuld be made at the time of admission
@@ -662,13 +691,14 @@
                 <li>In the event of a delay in body release due to unavoidable reasons, the deceased will be
                     respectfully transferred to the mortuary freezer after four hours (4 hours), subject to consent from
                     the next of kin.</li>
+                <li>Emergency Icu Number 9674777261</li>
             </ol>
             <p>Witness Signature with relation</p>
         </div>
 
         <div class="bottom_box">
             <div class="contact_box">
-                <p>Contact No :</p>
+                <p style="margin:0;">Contact No :</p>
                 <p class="red">Full charge on the day of the admission. No charge if
                     the patient leaves before 11:30 am on the day of discharge.</p>
             </div>
@@ -795,7 +825,7 @@
         </div>
 
         <div class="wreeti_sig">
-            <p><b>Signature of the Front Office Executive : </b>WREETI</p>
+            <p><b>Signature of the Front Office Executive : </b>{{ $user->username }}</p>
             <div class="line">
 
             </div>

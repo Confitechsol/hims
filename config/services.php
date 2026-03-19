@@ -39,4 +39,9 @@ return [
         'base_url' => env('HRMS_URL', 'http://127.0.0.1/hrms'),
     ],
 
+    'pms' => [
+        'base_url' => env('PMS_BASE_URL', 'http://localhost/pms'),
+        'token' => env('PMS_BRIDGE_TOKEN'),
+    ],
+
 ];
