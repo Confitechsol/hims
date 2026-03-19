@@ -46,8 +46,9 @@ class DashboardController extends Controller
     ->withCount('appointments')
     ->orderByDesc('appointments_count')->limit(3)
     ->get();
+    $appointments = \App\Models\Appointment::with(['patient','doctorUser'])->get();
     // return $doctors;
-        return view('admin.dashboard',compact('doctorsCount','patientsCount','appointmentsCount','rescheduledAppointmentsCount','cancelledAppointmentsCount','completedAppointmentsCount','doctors'));
+        return view('admin.dashboard',compact('doctorsCount','patientsCount','appointmentsCount','rescheduledAppointmentsCount','cancelledAppointmentsCount','completedAppointmentsCount','doctors','appointments'));
     }
 
 }
