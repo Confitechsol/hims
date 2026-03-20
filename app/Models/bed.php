@@ -43,4 +43,10 @@ class Bed extends Model
     {
         return $this->hasMany(PatientBedHistory::class, 'bed_id', 'id');
     }
+    public function activePatient()
+    {
+        return $this->hasOne(PatientBedHistory::class, 'bed_id')
+            ->where('is_active', 'yes')
+            ->with('ipd.patient:id,patient_name');
+    }
 }
