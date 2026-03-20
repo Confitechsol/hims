@@ -356,30 +356,30 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
     function deleteRosterShift(id) {
 
-    Swal.fire({
-        title: 'Delete Roster?',
-        text: 'Are you sure you want to delete this roster?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#750096',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'Cancel'
-    }).then((result) => {
+        Swal.fire({
+            title: 'Delete Roster?',
+            text: 'Are you sure you want to delete this roster?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#750096',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
 
-        if (result.isConfirmed) {
+            if (result.isConfirmed) {
 
-            let form = document.getElementById("deleteShiftForm");
+                let form = document.getElementById("deleteShiftForm");
 
-            let action = "{{ route('dutyroster.destroyShift', ':id') }}";
-            form.action = action.replace(':id', id);
+                let action = "{{ route('dutyroster.destroyShift', ':id') }}";
+                form.action = action.replace(':id', id);
 
-            form.submit();
-        } 
+                form.submit();
+            } 
 
-    });
+        });
 
-}
+    }
 </script>
 @if(session('success'))
 <script>
