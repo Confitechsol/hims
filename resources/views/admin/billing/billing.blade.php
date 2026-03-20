@@ -453,11 +453,14 @@
                             if (totalDiscountEl) totalDiscountEl.textContent = '₹ ' + (data.total_discount || 0).toFixed(2);
                             const duePartyEl = document.getElementById('summaryDuePatientParty');
                             if (duePartyEl && data.due_patient_party_amount != null) {
-                                duePartyEl.textContent = '₹ ' + parseFloat(data.due_patient_party_amount).toFixed(2);
-                                if (duePartyInput) duePartyInput.value = parseFloat(data.due_patient_party_amount).toFixed(2);
+                                // After discount changes, suggest latest outstanding-after-discount as due amount
+                                const suggestedDue = Math.max(0, parseFloat(data.outstanding_after_discount ?? (data.outstanding - (data.total_discount || 0))) || 0);
+                                duePartyEl.textContent = '₹ ' + suggestedDue.toFixed(2);
+                                if (duePartyInput) duePartyInput.value = suggestedDue.toFixed(2);
                             }
                             if (typeof data.outstanding !== 'undefined' && duePartyInput) {
-                                duePartyInput.placeholder = '₹ ' + parseFloat(data.outstanding).toFixed(2);
+                                const suggestedDue = Math.max(0, parseFloat(data.outstanding_after_discount ?? (data.outstanding - (data.total_discount || 0))) || 0);
+                                duePartyInput.placeholder = '₹ ' + suggestedDue.toFixed(2);
                             }
                             if (netBalanceEl) netBalanceEl.textContent = '₹ ' + (data.net_balance != null ? data.net_balance.toFixed(2) : (data.outstanding - (data.total_discount || 0) - (data.due_patient_party_amount || 0)).toFixed(2));
                         } else {
