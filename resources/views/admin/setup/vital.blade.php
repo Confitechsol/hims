@@ -23,13 +23,13 @@
                                     <div
                                         class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
 
-                                        <div class="input-icon-start position-relative me-2">
+                                        <form method="GET" action="" class="input-icon-start position-relative me-2 d-flex align-items-center">
                                             <span class="input-icon-addon">
                                                 <i class="ti ti-search"></i>
                                             </span>
-                                            <input type="text" class="form-control shadow-sm" placeholder="Search">
-
-                                        </div>
+                                            <input type="text" name="search" class="form-control shadow-sm" placeholder="Search" value="{{ request('search') }}" style="max-width: 300px;">
+                                            <button type="submit" class="btn btn-primary ms-2">Search</button>
+                                        </form>
                                         <div class="page_btn d-flex">
                                             <div class="text-end d-flex">
                                                 <a href="javascript:void(0);"
@@ -140,6 +140,43 @@
                                             </tbody>
                                         </table>
                                     </div>
+
+                                     {{-- Pagination Links --}}
+                    <div class="mt-3" id="pagination-wrapper">
+                        @php
+                            $currentPage = $vitals->currentPage();
+                            $lastPage = $vitals->lastPage();
+                        @endphp
+                    
+                        {{-- Previous --}}
+                        @if ($vitals->onFirstPage())
+                            <button class="btn btn-outline-secondary btn-sm me-1" disabled>« Prev</button>
+                        @else
+                            <a href="{{ $vitals->previousPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm me-1">
+                                « Prev
+                            </a>
+                        @endif
+                    
+                        {{-- Page numbers --}}
+                        @for ($page = 1; $page <= $lastPage; $page++)
+                            @if ($page == $currentPage)
+                                <button class="btn btn-primary btn-sm me-1">{{ $page }}</button>
+                            @else
+                                <a href="{{ $vitals->url($page) }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm me-1">
+                                    {{ $page }}
+                                </a>
+                            @endif
+                        @endfor
+                    
+                        {{-- Next --}}
+                        @if ($vitals->hasMorePages())
+                            <a href="{{ $vitals->nextPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm">
+                                Next »
+                            </a>
+                        @else
+                            <button class="btn btn-outline-secondary btn-sm" disabled>Next »</button>
+                        @endif
+                    </div>
 
                                 </div> <!-- end card-body -->
                             </div> <!-- end card -->

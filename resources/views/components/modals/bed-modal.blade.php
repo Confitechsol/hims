@@ -7,7 +7,43 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div class="card shadow-lg border-0 mt-4">
+                @foreach($grouped as $floor => $groups)
+    <div class="card shadow-lg border-0 mt-4">
+        <div class="card-header">
+            <span class="badge pill bg-primary">Floor {{ $floor }}</span>
+        </div>
+
+        @foreach($groups as $groupName => $beds)
+            <div class="px-3 pt-2">
+                <span class="badge pill bg-warning">{{ $groupName }}</span>
+            </div>
+
+            <div class="card-body">
+                <div class="row align-items-center gy-4">
+                    
+                    @foreach($beds as $bed)
+                        <div class="col-md-3">
+                            <a href="#">
+                                <div
+                                    class="{{ $bed['is_occupied'] ? 'bg-danger' : 'bg-success' }} text-white bg-opacity-75 bg-gradient p-2 rounded d-flex align-items-center gap-2"
+                                    data-bs-toggle="tooltip"
+                                    title="{{ $bed['is_occupied'] 
+                                        ? 'Occupied: '.($bed['patient_name'] ?? 'Unknown') 
+                                        : 'Available Bed' }}">
+                                    
+                                    <i class="fa-solid fa-bed"></i>
+                                    <p>{{ $bed['name'] }}</p>
+                                </div>
+                            </a>
+                        </div>
+                    @endforeach
+
+                </div>
+            </div>
+        @endforeach
+    </div>
+@endforeach
+                {{-- <div class="card shadow-lg border-0 mt-4">
                     <div class="card-header">
                         <span class="badge pill bg-primary">Floor 4</span>
                         <span class="badge pill bg-warning">Test ward</span>
@@ -279,8 +315,8 @@
 
                         </div>
                     </div>
-                </div>
-                <div class="card shadow-lg border-0 mt-4">
+                </div> --}}
+                {{-- <div class="card shadow-lg border-0 mt-4">
                     <div class="card-header">
                         <span class="badge pill bg-warning">Day Care Unit</span>
                     </div>
@@ -370,8 +406,8 @@
 
                         </div>
                     </div>
-                </div>
-                <div class="card shadow-lg border-0 mt-4">
+                </div> --}}
+                {{-- <div class="card shadow-lg border-0 mt-4">
                     <div class="card-header">
                         <span class="badge pill bg-primary">Floor 1</span>
                         <span class="badge pill bg-warning">ICU (Intensive Care Unit)</span>
@@ -462,7 +498,7 @@
 
                         </div>
                     </div>
-                </div>
+                </div> --}}
             </div>
 
             </form>

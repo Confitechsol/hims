@@ -7,10 +7,19 @@ use App\Models\Vital;
 
 class VitalController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $vitals = Vital::all();
-        return view('admin.setup.vital', compact('vitals'));
+        $vitals = Vital::query();
+         $perPage = intval($request->input('perPage', 10));
+        if ($perPage <= 0) {
+           $perPage = 10;
+        }
+       if ($request->filled('search')) {
+        $search_term = $request->search;
+        $vitals->where('name', 'like', "%{$search_term}%");
+    }
+        $vitals = $vitals->paginate($perPage);
+         return view('admin.setup.vital', compact('vitals'));
     }
 
     public function store(Request $request)

@@ -10,6 +10,7 @@ use App\Models\BloodBankProduct;
 use Illuminate\Support\Facades\View;
 use App\Http\View\Composers\BloodGroupComposer;
 use App\Http\View\Composers\AreaComposer;
+use App\Models\Bed;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -43,7 +44,35 @@ class AppServiceProvider extends ServiceProvider
             'areas' => $areas,
         ]);
     });
+    View::composer('components.modals.bed-modal', function ($view) {
 
+        $beds = Bed::with([
+            'bedGroup:id,name,floor',
+            'activePatient'
+        ])->get();
+
+        $grouped = [];
+
+        foreach ($beds as $bed) {
+            $floor = $bed->bedGroup->floor ?? 'Unknown';
+            $groupName = $bed->bedGroup->name ?? 'General';
+        
+            $active = $bed->activePatient;
+        
+            $isOccupied = $active ? true : false;
+            $patientName = $active?->ipd?->patient?->patient_name;
+        
+            $grouped[$floor][$groupName][] = [
+                'id' => $bed->id,
+                'name' => $bed->name,
+                'is_occupied' => $isOccupied,
+                'patient_name' => $patientName,
+            ];
+        }
+        $view->with([
+            'grouped' => $grouped,
+        ]);
+    });
     // ✅ Share Hospital Data Globally
     View::composer('*', function ($view) {
         $hospital = Hospital::first();
