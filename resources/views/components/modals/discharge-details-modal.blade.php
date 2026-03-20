@@ -472,7 +472,7 @@
                                                       alt="Doctor Signature">
                                               @else
                                                   <p class="fw-bold mb-2" style="font-size: small;">
-                                                      {{ $ipd->doctor->name }}</p>
+                                                      {{ $ipd->doctor?->name ?? 'N/A' }}</p>
                                               @endif
 
                                               <div class="sig_box text-center">

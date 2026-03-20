@@ -1221,12 +1221,21 @@
                                             @foreach ($labInvestigations as $lab)
                                                 <tr>
                                                     <td>
-                                                        {{ $lab->pathology->test_name . ($lab->pathology->short_name ? ' (' . $lab->pathology->short_name . ')' : '') }}
-                                                    </td>
+    {{ optional($lab->pathology)->test_name 
+        ? optional($lab->pathology)->test_name . 
+          (optional($lab->pathology)->short_name 
+              ? ' (' . optional($lab->pathology)->short_name . ')' 
+              : '') 
+        : 'N/A' }}
+</td>
+
                                                     <td>Pathology</td>
                                                     <td>{{ '--' }}</td>
-                                                    <td>{{ \Carbon\Carbon::today()->copy()->addDays(intval($lab->pathology->report_days))->format('d-M-Y') }}
-                                                    </td>
+                                                    <td>
+    {{ \Carbon\Carbon::today()
+        ->addDays((int) ($lab->pathology?->report_days ?? 0))
+        ->format('d-M-Y') }}
+</td>
                                                     <td>{{ $lab->approved_by ?? '--' }}</td>
                                                 </tr>
                                             @endforeach
@@ -2426,11 +2435,19 @@
                                                             @foreach ($labInvestigations as $lab)
                                                                 <tr>
                                                                     <td>
-                                                                        {{ $lab->pathology->test_name . ($lab->pathology->short_name ? ' (' . $lab->pathology->short_name . ')' : '') }}
+                                                                        @php $p = $lab->pathology; @endphp
+
+                                                                        {{ $p?->test_name
+                                                                             ? $p->test_name . ($p->short_name ? ' (' . $p->short_name . ')' : '')
+                                                                         : 'N/A' }}
                                                                     </td>
                                                                     <td>Pathology</td>
                                                                     <td>{{ '--' }}</td>
-                                                                    <td>{{ \Carbon\Carbon::today()->copy()->addDays(intval($lab->pathology->report_days))->format('d-M-Y') }}
+                                                                    <td>
+                                                                       {{ \Carbon\Carbon::today()
+                                                                             ->copy()
+                                                                            ->addDays(intval($lab->pathology?->report_days ?? 0))
+                                                                            ->format('d-M-Y') }}
                                                                     </td>
                                                                     <td>{{ $lab->approved_by ?? '--' }}</td>
                                                                     <td>

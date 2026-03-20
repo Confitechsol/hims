@@ -811,7 +811,7 @@
                                         </div>
                                     </div>
 
-                                    <!-- BLOOD GROUP -->
+                                    {{-- <!-- BLOOD GROUP -->
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label class="form-label">Blood Group</label>
@@ -825,7 +825,22 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                    </div>
+                                    </div> --}}
+                                    <!-- BLOOD GROUP -->
+                                     <div class="col-md-4">
+                                         <div class="form-group">
+                                             <label class="form-label">Blood Group</label>
+                                             <select class="form-control" name="blood_group">
+                                                 <option value="">Select</option>
+                                                 @foreach ($bloodgroups as $bg)
+                                                     <option value="{{ $bg->name }}" 
+                                                         {{ old('blood_group', $doctor->blood_group ?? '') == $bg->name ? 'selected' : '' }}>
+                                                         {{ $bg->name }}
+                                                     </option>
+                                                 @endforeach
+                                             </select>
+                                         </div>
+                                     </div>
 
                                     <!-- DOB -->
                                     <div class="col-md-6">
