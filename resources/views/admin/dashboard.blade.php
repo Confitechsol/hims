@@ -29,6 +29,7 @@
         <!-- start row -->
         <div class="row">
             <div class="col-xl-4 col-md-6">
+                <a href="{{route('doctors.index')}}">
                 <div class="position-relative border card rounded-2 shadow-sm">
                     <img src="{{ asset('assets/img/bg/bg-01.svg') }}" alt="img"
                         class="position-absolute start-0 top-0">
@@ -52,9 +53,11 @@
                         </div>
                     </div>
                 </div>
+                </a>
             </div>
             <!-- end col -->
             <div class="col-xl-4 col-md-6">
+                <a href="{{route('patients')}}">
                 <div class="position-relative border card rounded-2 shadow-sm">
                     <img src="{{ asset('assets/img/bg/bg-02.svg') }}" alt="img"
                         class="position-absolute start-0 top-0">
@@ -78,9 +81,11 @@
                         </div>
                     </div>
                 </div>
+                </a>
             </div>
             <!-- end col -->
             <div class="col-xl-4 col-md-6">
+                <a href="{{route('appointment-details')}}">
                 <div class="position-relative border card rounded-2 shadow-sm">
                     <img src="{{ asset('assets/img/bg/bg-03.svg') }}" alt="img"
                         class="position-absolute start-0 top-0">
@@ -104,6 +109,7 @@
                         </div>
                     </div>
                 </div>
+                </a>
             </div>
             <!-- end col -->
             {{-- <div class="col-xl-3 col-md-6">
@@ -138,7 +144,7 @@
         <!-- row start -->
         <div class="row">
             <!-- col start -->
-            <div class="col-xl-8">
+            <div class="col-xl-6">
 
                 <!-- card start -->
                 <div class="card shadow-sm flex-fill w-100">
@@ -166,7 +172,7 @@
                     </div>
                     <div class="card-body pb-0">
                         <div class="row row-gap-3 mb-2">
-                            <div class="col-md-3 col-sm-6">
+                            <div class="col-md-6 col-sm-6">
                                 <div class="bg-light border p-2 text-center rounded-2">
                                     <p class="mb-1 text-body text-truncate"><i
                                             class="ti ti-point-filled me-1 text-primary"></i>All
@@ -174,21 +180,21 @@
                                     <h5 class="fw-bold mb-0">{{$appointmentsCount}}</h5>
                                 </div>
                             </div>
-                            <div class="col-md-3 col-sm-6">
+                            <div class="col-md-6 col-sm-6">
                                 <div class="bg-light border p-2 text-center rounded-2">
                                     <p class="mb-1 text-body"><i class="ti ti-point-filled me-1 text-danger"></i>Cancelled
                                     </p>
                                     <h5 class="fw-bold mb-0">{{$cancelledAppointmentsCount}}</h5>
                                 </div>
                             </div>
-                            <div class="col-md-3 col-sm-6">
+                            <div class="col-md-6 col-sm-6">
                                 <div class="bg-light border p-2 text-center rounded-2">
                                     <p class="mb-1 text-body"><i
                                             class="ti ti-point-filled me-1 text-warning"></i>Reschedule</p>
                                     <h5 class="fw-bold mb-0">{{$rescheduledAppointmentsCount}}</h5>
                                 </div>
                             </div>
-                            <div class="col-md-3 col-sm-6">
+                            <div class="col-md-6 col-sm-6">
                                 <div class="bg-light border p-2 text-center rounded-2">
                                     <p class="mb-1 text-body"><i
                                             class="ti ti-point-filled me-1 text-success"></i>Completed</p>
@@ -200,121 +206,121 @@
                     </div>
                 </div>
                 <!-- card end -->
-
-                <!-- card start -->
-                <div class="card shadow-sm flex-fill w-100">
-                    <div class="card-header d-flex align-items-center justify-content-between">
-                        <h5 class="fw-bold mb-0">Popular
-                            Doctors</h5>
-                        {{-- <div class="dropdown">
-                            <a href="javascript:void(0);"
-                                class="btn btn-sm px-2 border shadow-sm btn-outline-white d-inline-flex align-items-center"
-                                data-bs-toggle="dropdown">
-                                Weekly <i class="ti ti-chevron-down ms-1"></i>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a class="dropdown-item" href="#">Monthly</a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="#">Weekly</a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="#">Yearly</a>
-                                </li>
-                            </ul>
-                        </div> --}}
-                    </div>
-                    <div class="card-body">
-                        <div class="row row-gap-3">
-                            @foreach ($doctors as $doctor)
-                            <div class="col-md-4">
-                                <div class="border shadow-sm p-3 rounded-2">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <a href="doctor-details.html" class="avatar me-2 flex-shrink-0 position-relative">
-                                            <span class="online text-success position-absolute end-0 bottom-0 pe-1"><i
-                                                    class="ti ti-circle-filled d-flex bg-white fs-6 rounded-circle border border-1 border-white"></i></span>
-                                            <img src="{{ asset('assets/img/doc_user.png') }}" alt="img"
-                                                class="rounded-circle">
-                                        </a>
-                                        <div>
-                                            <h6 class="fs-14 mb-1 text-truncate"><a href="doctor-details.html"
-                                                    class="fw-semibold">Dr. {{$doctor->name}}</a></h6>
-                                            <p class="mb-0 fs-13" style="
-                                            white-space: nowrap;
-                                            text-overflow: ellipsis;
-                                            max-width: 120px;
-                                            overflow: hidden;">{{ $doctor->department->department_name ?? 'N/A' }}</p>
-                                        </div>
-                                    </div>
-                                    <p class="mb-0"><span class="text-dark fw-semibold">{{$doctor->appointments_count}}</span>
-                                        Bookings</p>
-                                </div>
-                            </div>
-                            @endforeach
-                            {{-- <div class="col-md-4">
-                                <div class="border shadow-sm p-3 rounded-2">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <a href="doctor-details.html" class="avatar me-2 flex-shrink-0 position-relative">
-                                            <span class="online text-success position-absolute end-0 bottom-0 pe-1"><i
-                                                    class="ti ti-circle-filled d-flex bg-white fs-6 rounded-circle border border-1 border-white"></i></span>
-                                            <img src="{{ asset('assets/img/doctors/doctor-01.jpg') }}" alt="img"
-                                                class="rounded-circle">
-                                        </a>
-                                        <div>
-                                            <h6 class="fs-14 mb-1 text-truncate"><a href="doctor-details.html"
-                                                    class="fw-semibold">Dr. Vikram Patel</a></h6>
-                                            <p class="mb-0 fs-13">Cardiologist</p>
-                                        </div>
-                                    </div>
-                                    <p class="mb-0"><span class="text-dark fw-semibold">258</span>
-                                        Bookings</p>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="border shadow-sm p-3 rounded-2">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <a href="doctor-details.html" class="avatar me-2 flex-shrink-0 position-relative">
-                                            <span class="online text-success position-absolute end-0 bottom-0 pe-1"><i
-                                                    class="ti ti-circle-filled d-flex bg-white fs-6 rounded-circle border border-1 border-white"></i></span>
-                                            <img src="{{ asset('assets/img/doctors/doctor-03.jpg') }}" alt="img"
-                                                class="rounded-circle">
-                                        </a>
-                                        <div>
-                                            <h6 class="fs-14 mb-1 text-truncate"><a href="doctor-details.html"
-                                                    class="fw-semibold">Dr. Ashok Seth</a></h6>
-                                            <p class="mb-0 fs-13">Pediatrician</p>
-                                        </div>
-                                    </div>
-                                    <p class="mb-0"><span class="text-dark fw-semibold">125</span>
-                                        Bookings</p>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="border shadow-sm p-3 rounded-2">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <a href="doctor-details.html" class="avatar me-2 flex-shrink-0 position-relative">
-                                            <img src="{{ asset('assets/img/doctors/doctor-04.jpg') }}" alt="img"
-                                                class="rounded-circle">
-                                        </a>
-                                        <div>
-                                            <h6 class="fs-14 mb-1 text-truncate"><a href="doctor-details.html"
-                                                    class="fw-semibold">Dr. Indira Hinduja</a></h6>
-                                            <p class="mb-0 fs-13">Gynecologist</p>
-                                        </div>
-                                    </div>
-                                    <p class="mb-0"><span class="text-dark fw-semibold">115</span>
-                                        Bookings</p>
-                                </div>
-                            </div> --}}
-                        </div>
-                    </div>
-                </div>
-                <!-- card end -->
-
             </div>
             <!-- col end -->
-
+            <div class="col-xl-6">
+                                <!-- card start -->
+                                <div class="card shadow-sm flex-fill w-100">
+                                    <div class="card-header d-flex align-items-center justify-content-between">
+                                        <h5 class="fw-bold mb-0">Popular
+                                            Doctors</h5>
+                                        <div class="dropdown" style="opacity: 0;pointer-events:none">
+                                            <a href="javascript:void(0);"
+                                                class="btn btn-sm px-2 border shadow-sm btn-outline-white d-inline-flex align-items-center"
+                                                data-bs-toggle="dropdown">
+                                                Weekly <i class="ti ti-chevron-down ms-1"></i>
+                                            </a>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a class="dropdown-item" href="#">Monthly</a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="#">Weekly</a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="#">Yearly</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="card-body" style="max-height: 173px;overflow-y:auto;">
+                                        <div class="row row-gap-3">
+                                            @foreach ($doctors as $doctor)
+                                            <div class="col-md-12">
+                                                <div class="border shadow-sm px-3 py-2 rounded-2 d-flex align-items-center justify-content-between">
+                                                    <div class="d-flex align-items-center">
+                                                        <a href="#" class="avatar me-2 flex-shrink-0 position-relative">
+                                                            <span class="online text-success position-absolute end-0 bottom-0 pe-1"><i
+                                                                    class="ti ti-circle-filled d-flex bg-white fs-6 rounded-circle border border-1 border-white"></i></span>
+                                                            <img src="{{ asset('assets/img/doc_user.png') }}" alt="img"
+                                                                class="rounded-circle">
+                                                        </a>
+                                                        <div>
+                                                            <h6 class="fs-12 mb-1 text-truncate"><a href="#"
+                                                                    class="fw-semibold">Dr. {{$doctor->name}}</a></h6>
+                                                            <p class="mb-0 fs-10" style="
+                                                            white-space: nowrap;
+                                                            text-overflow: ellipsis;
+                                                            max-width: 120px;
+                                                            overflow: hidden;">{{ $doctor->department->department_name ?? 'N/A' }}</p>
+                                                        </div>
+                                                    </div>
+                                                    <p class="mb-0"><span class="text-dark fw-semibold">{{$doctor->appointments_count}}</span>
+                                                        Bookings</p>
+                                                </div>
+                                            </div>
+                                            @endforeach
+                                            {{-- <div class="col-md-4">
+                                                <div class="border shadow-sm p-3 rounded-2">
+                                                    <div class="d-flex align-items-center mb-3">
+                                                        <a href="doctor-details.html" class="avatar me-2 flex-shrink-0 position-relative">
+                                                            <span class="online text-success position-absolute end-0 bottom-0 pe-1"><i
+                                                                    class="ti ti-circle-filled d-flex bg-white fs-6 rounded-circle border border-1 border-white"></i></span>
+                                                            <img src="{{ asset('assets/img/doctors/doctor-01.jpg') }}" alt="img"
+                                                                class="rounded-circle">
+                                                        </a>
+                                                        <div>
+                                                            <h6 class="fs-14 mb-1 text-truncate"><a href="doctor-details.html"
+                                                                    class="fw-semibold">Dr. Vikram Patel</a></h6>
+                                                            <p class="mb-0 fs-13">Cardiologist</p>
+                                                        </div>
+                                                    </div>
+                                                    <p class="mb-0"><span class="text-dark fw-semibold">258</span>
+                                                        Bookings</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="border shadow-sm p-3 rounded-2">
+                                                    <div class="d-flex align-items-center mb-3">
+                                                        <a href="doctor-details.html" class="avatar me-2 flex-shrink-0 position-relative">
+                                                            <span class="online text-success position-absolute end-0 bottom-0 pe-1"><i
+                                                                    class="ti ti-circle-filled d-flex bg-white fs-6 rounded-circle border border-1 border-white"></i></span>
+                                                            <img src="{{ asset('assets/img/doctors/doctor-03.jpg') }}" alt="img"
+                                                                class="rounded-circle">
+                                                        </a>
+                                                        <div>
+                                                            <h6 class="fs-14 mb-1 text-truncate"><a href="doctor-details.html"
+                                                                    class="fw-semibold">Dr. Ashok Seth</a></h6>
+                                                            <p class="mb-0 fs-13">Pediatrician</p>
+                                                        </div>
+                                                    </div>
+                                                    <p class="mb-0"><span class="text-dark fw-semibold">125</span>
+                                                        Bookings</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="border shadow-sm p-3 rounded-2">
+                                                    <div class="d-flex align-items-center mb-3">
+                                                        <a href="doctor-details.html" class="avatar me-2 flex-shrink-0 position-relative">
+                                                            <img src="{{ asset('assets/img/doctors/doctor-04.jpg') }}" alt="img"
+                                                                class="rounded-circle">
+                                                        </a>
+                                                        <div>
+                                                            <h6 class="fs-14 mb-1 text-truncate"><a href="doctor-details.html"
+                                                                    class="fw-semibold">Dr. Indira Hinduja</a></h6>
+                                                            <p class="mb-0 fs-13">Gynecologist</p>
+                                                        </div>
+                                                    </div>
+                                                    <p class="mb-0"><span class="text-dark fw-semibold">115</span>
+                                                        Bookings</p>
+                                                </div>
+                                            </div> --}}
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- card end -->
+                
+            </div>
             <!-- col start -->
             {{-- <div class="col-xl-4">
                 <div class="card shadow-sm">
@@ -675,8 +681,9 @@
                                                             alt="img" class="rounded-circle">
                                                     {{-- <img src="{{ asset('assets/img/doctors/doctor-06.jpg') }}"
                                                         alt="img" class="rounded-circle"> --}}
+                                                </a>
                                                 @else        
-                                                <a href="doctor-details.html" class="avatar me-2">
+                                                <a href="#" class="avatar me-2">
                                                     <img src="{{ asset('assets/img/doc_user.png') }}"
                                                         alt="img" class="rounded-circle">
                                                 </a>
@@ -694,8 +701,9 @@
                                                 @if($appointment->patient["image"])
                                                 <a href="#" class="avatar me-2">
                                                     <img src="{{ $appointment->patient["image"] ? url('/')."/".$appointment->patient["image"] : "" }}"/>
+                                                </a>
                                                     @else
-                                                <a href="patient-details.html" class="avatar me-2">
+                                                <a href="#" class="avatar me-2">
                                                     <img src="{{ asset('assets/img/patient.png') }}"
                                                         alt="img" class="rounded-circle">
                                                 </a>
