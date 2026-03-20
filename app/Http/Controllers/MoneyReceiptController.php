@@ -79,6 +79,7 @@ class MoneyReceiptController extends Controller
             'EXTRA BED CHARGES',
             'EXTRA PLATE CHARGES',
             'DISPOSABLE CHARGES',
+            'Dialysis',
         ];
 
         return view('admin.money-receipt.index', compact('receipts', 'perPage', 'receiptTypes'));
@@ -105,6 +106,7 @@ class MoneyReceiptController extends Controller
             'EXTRA BED CHARGES',
             'EXTRA PLATE CHARGES',
             'DISPOSABLE CHARGES',
+            'Dialysis',
         ];
         $paymentModes = ['Cash', 'Cheque', 'Card', 'UPI', 'Online', 'Transfer to Bank Account', 'Other'];
         
@@ -121,7 +123,7 @@ class MoneyReceiptController extends Controller
     {
         $request->validate([
             'payment_date' => 'required|date',
-            'receipt_type' => 'required|in:Current,Patient Due,Corporate Due,In Admissible,Booking,Refund,OPD Doctor Consultation,OPD Pathology,OPD Radiology,IPD Pathology,IPD Radiology,IPD Pharmacy,EXTRA BED CHARGES,EXTRA PLATE CHARGES,DISPOSABLE CHARGES',
+            'receipt_type' => 'required|in:Current,Patient Due,Corporate Due,In Admissible,Booking,Refund,OPD Doctor Consultation,OPD Pathology,OPD Radiology,IPD Pathology,IPD Radiology,IPD Pharmacy,EXTRA BED CHARGES,EXTRA PLATE CHARGES,DISPOSABLE CHARGES,Dialysis',
             'amount' => 'required|numeric|min:0.01',
             'payment_mode' => 'required|string',
             'patient_id' => 'nullable|integer|exists:patients,id',
@@ -266,7 +268,24 @@ class MoneyReceiptController extends Controller
             ->whereNotNull('receipt_no')
             ->findOrFail($id);
 
-        $receiptTypes = ['Current', 'Patient Due', 'Corporate Due', 'In Admissible', 'Booking', 'Refund', 'OPD Doctor Consultation', 'OPD Pathology', 'OPD Radiology', 'IPD Pathology', 'IPD Radiology', 'IPD Pharmacy'];
+        $receiptTypes = [
+            'Current',
+            'Patient Due',
+            'Corporate Due',
+            'In Admissible',
+            'Booking',
+            'Refund',
+            'OPD Doctor Consultation',
+            'OPD Pathology',
+            'OPD Radiology',
+            'IPD Pathology',
+            'IPD Radiology',
+            'IPD Pharmacy',
+            'EXTRA BED CHARGES',
+            'EXTRA PLATE CHARGES',
+            'DISPOSABLE CHARGES',
+            'Dialysis',
+        ];
         $paymentModes = ['Cash', 'Cheque', 'Card', 'UPI', 'Online', 'Transfer to Bank Account', 'Other'];
 
         return view('admin.money-receipt.edit', compact('receipt', 'receiptTypes', 'paymentModes'));
@@ -281,7 +300,7 @@ class MoneyReceiptController extends Controller
 
         $request->validate([
             'payment_date' => 'required|date',
-            'receipt_type' => 'required|in:Current,Patient Due,Corporate Due,In Admissible,Booking,Refund,OPD Doctor Consultation,OPD Pathology,OPD Radiology,IPD Pathology,IPD Radiology,IPD Pharmacy,EXTRA BED CHARGES,EXTRA PLATE CHARGES,DISPOSABLE CHARGES',
+            'receipt_type' => 'required|in:Current,Patient Due,Corporate Due,In Admissible,Booking,Refund,OPD Doctor Consultation,OPD Pathology,OPD Radiology,IPD Pathology,IPD Radiology,IPD Pharmacy,EXTRA BED CHARGES,EXTRA PLATE CHARGES,DISPOSABLE CHARGES,Dialysis',
             'amount' => 'required|numeric|min:0.01',
             'payment_mode' => 'required|string',
             'patient_id' => 'nullable|integer|exists:patients,id',

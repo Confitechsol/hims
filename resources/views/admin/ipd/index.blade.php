@@ -90,6 +90,12 @@
                                                 <div>
                                                     <button class="btn btn-primary" type="submit">Search</button>
                                                 </div>
+                                                <div class="ms-2">
+                                                    <a href="{{ route('ipd', ['tab' => request('tab', 'ipd')]) }}"
+                                                        class="btn btn-outline-primary">
+                                                        <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+                                                    </a>
+                                                </div>
                                             </div>
                                         </form>
 

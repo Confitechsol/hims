@@ -132,6 +132,7 @@ class IpdBillingController extends Controller
         $duePatientPartyAmount = (float) ($ipd->due_patient_party_amount ?? 0);
         $breakup = $this->calculateBreakup($ipdId);
         $outstanding = $breakup['outstanding'] ?? 0;
+        $outstandingAfterDiscount = max(0, $outstanding - $totalDiscount);
         $netBalance = max(0, $outstanding - $totalDiscount - $duePatientPartyAmount);
 
         return response()->json([
@@ -142,6 +143,7 @@ class IpdBillingController extends Controller
             'total_discount' => $totalDiscount,
             'due_patient_party_amount' => $duePatientPartyAmount,
             'outstanding' => $outstanding,
+            'outstanding_after_discount' => $outstandingAfterDiscount,
             'net_balance' => $netBalance,
         ]);
     }
