@@ -191,10 +191,19 @@
                                 </a>
                                 <!-- Delete Button -->
                                 <a href="javascript:void(0);"
-                                   onclick="confirmDelete('{{ route('dutyroster.destroyStaffRoster', ['code' => $roster['code'] ?? 0]) }}')"
+                                   onclick="deleteStaffRoster('{{ route('dutyroster.destroyStaffRoster', ['code' => $roster['code'] ?? 0]) }}')"
                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
                                     <i class="ti ti-trash"></i>
                                 </a>
+                                <a href="javascript:void(0);"
+                                                onclick="deleteRosterShift({{ $shift->id }})"
+                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                <i class="ti ti-trash"></i>
+                                            </a>
+                                            <form id="deleteShiftForm" method="POST" style="display:none;">
+                                                @csrf
+                                                @method('DELETE')
+                                            </form>
                             </td>
                         </tr>
                     @endforeach
