@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -24,7 +23,7 @@ class Bed extends Model
     ];
 
     protected $casts = [
-        'bed_type_id' => 'integer',
+        'bed_type_id'  => 'integer',
         'bed_group_id' => 'integer',
     ];
 
