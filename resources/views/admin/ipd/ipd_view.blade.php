@@ -2,7 +2,8 @@
 @extends('layouts.adminLayout')
 @section('content')
     {{-- Hidden element for back-dated prescription: admission date used when Add Prescription modal opens --}}
-    <div id="ipdViewContext" data-admission-date="{{ $ipd->date ? \Carbon\Carbon::parse($ipd->date)->format('Y-m-d') : '' }}" data-ipd-id="{{ $ipd->id ?? '' }}" style="display:none"></div>
+    <div id="ipdViewContext" data-admission-date="{{ $ipd->date ? \Carbon\Carbon::parse($ipd->date)->format('Y-m-d') : '' }}"
+        data-ipd-id="{{ $ipd->id ?? '' }}" style="display:none"></div>
     <style>
         .module_billing {
             border-radius: 8px;
@@ -506,19 +507,27 @@
     <div class="p-4">
         @if (session('success'))
             <script>
-                (function(){
+                (function() {
                     var title = @json(session('alertTitle') ?? 'Success');
                     var text = @json(session('success'));
-                    if (typeof Swal !== 'undefined') Swal.fire({ icon: 'success', title: title, text: text });
+                    if (typeof Swal !== 'undefined') Swal.fire({
+                        icon: 'success',
+                        title: title,
+                        text: text
+                    });
                 })();
             </script>
         @endif
         @if (session('error'))
             <script>
-                (function(){
+                (function() {
                     var title = @json(session('alertTitle') ?? 'Error');
                     var text = @json(session('error'));
-                    if (typeof Swal !== 'undefined') Swal.fire({ icon: 'error', title: title, text: text });
+                    if (typeof Swal !== 'undefined') Swal.fire({
+                        icon: 'error',
+                        title: title,
+                        text: text
+                    });
                 })();
             </script>
         @endif
@@ -582,12 +591,12 @@
                     </a>
                 </li>
                 <!-- <li class="nav-item">
-                    <a href="#payments" data-bs-toggle="tab" aria-expanded="true"
-                        class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
-                            class="fa-solid fa-hand-holding-dollar text-primary pe-1"></i>
-                        <span>Payments</span>
-                    </a>
-                </li> -->
+                        <a href="#payments" data-bs-toggle="tab" aria-expanded="true"
+                            class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
+                                class="fa-solid fa-hand-holding-dollar text-primary pe-1"></i>
+                            <span>Payments</span>
+                        </a>
+                    </li> -->
                 <li class="nav-item">
                     <a href="#live_consultation" data-bs-toggle="tab" aria-expanded="true"
                         class="d-flex align-items-center justify-space-between px-2 nav-link bg-transparent"><i
@@ -658,16 +667,18 @@
                                         {{ $ipd->patient->patient_name }}
                                     </h5>
                                     @if ($ipd->discharged == 'yes')
-                                        <button class="bg-transparent border-0" data-bs-toggle="modal"
-                                            data-bs-target="#dischargePreviewModal"
+                                        <button class="border-0 text-white"
+                                            style="background-color: #750096;padding: 0.5rem;border-radius: 8px;"
+                                            data-bs-toggle="modal" data-bs-target="#dischargePreviewModal"
                                             data-discharge='@json($ipd->dischargeCard)'
-                                            data-medicines='@json($ipd->discharge_medicines)'
-                                            ><i
-                                                class="bi bi-clipboard-pulse text-white"></i></button>
+                                            data-medicines='@json($ipd->discharge_medicines)'><i
+                                                class="bi bi-clipboard-pulse text-white"></i>
+                                            Discharge</button>
                                     @else
                                         <button class="bg-transparent border-0" data-bs-toggle="modal"
-                                            data-bs-target="#patientDischargeModal" data-ipd="{{ $ipd }}" data-doctors="{{$doctors}}" data-user="{{$currentUser}}"
-                                            data-outstanding={{$billingSummary['outstanding'] ?? 0}}><i
+                                            data-bs-target="#patientDischargeModal" data-ipd="{{ $ipd }}"
+                                            data-doctors="{{ $doctors }}" data-user="{{ $currentUser }}"
+                                            data-outstanding={{ $billingSummary['outstanding'] ?? 0 }}><i
                                                 class="bi bi-clipboard-pulse text-white"></i></button>
                                     @endif
                                 </div>
@@ -675,7 +686,7 @@
                             <div class="card-body">
                                 <div class="d-sm-flex position-relative z-0 overflow-hidden p-2">
                                     <!-- <img src="assets/img/icons/shape-01.svg" alt="img"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            class="z-n1 position-absolute end-0 top-0 d-none d-lg-flex"> -->
                                     <a href="javascript:void(0);"
                                         class="avatar avatar-xxxl patient-avatar me-2 flex-shrink-0">
                                         <img src="{{ asset('assets/img/patient.png') }}" alt="product" class="rounded">
@@ -763,19 +774,19 @@
                                         </div>
                                     </div>
                                     <!-- <div class="row">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="col-sm-5">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="col-sm-5">
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="col-sm-7">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="col-sm-7">
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="col-sm-5">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="col-sm-5">
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="col-sm-7">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="col-sm-7">
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </div> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div> -->
                                 </div>
                                 <hr>
                                 <div class="d-flex align-items-center mb-3">
@@ -824,19 +835,23 @@
                                     <div class="col-md-4">
                                         <div class="border rounded p-3 bg-light">
                                             <div class="text-muted small mb-1">Total Billing (INR)</div>
-                                            <div class="fw-bold fs-5">{{ number_format($billingSummary['total_charges'] ?? 0, 2) }}</div>
+                                            <div class="fw-bold fs-5">
+                                                {{ number_format($billingSummary['total_charges'] ?? 0, 2) }}</div>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="border rounded p-3 bg-light">
                                             <div class="text-muted small mb-1">Total Payment (INR)</div>
-                                            <div class="fw-bold fs-5 text-success">{{ number_format($billingSummary['total_payments'] ?? 0, 2) }}</div>
+                                            <div class="fw-bold fs-5 text-success">
+                                                {{ number_format($billingSummary['total_payments'] ?? 0, 2) }}</div>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="border rounded p-3 bg-light">
                                             <div class="text-muted small mb-1">Total Outstanding (INR)</div>
-                                            <div class="fw-bold fs-5 {{ ($billingSummary['outstanding'] ?? 0) > 0 ? 'text-danger' : '' }}">{{ number_format($billingSummary['outstanding'] ?? 0, 2) }}</div>
+                                            <div
+                                                class="fw-bold fs-5 {{ ($billingSummary['outstanding'] ?? 0) > 0 ? 'text-danger' : '' }}">
+                                                {{ number_format($billingSummary['outstanding'] ?? 0, 2) }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -853,12 +868,18 @@
                                 <div class="mt-3 pt-3 border-top">
                                     <h6 class="text-muted small mb-2">Billing breakdown</h6>
                                     <div class="row g-2 small">
-                                        <div class="col-md-4 col-6"><span class="text-muted">Bed charges:</span> ₹{{ number_format($bedCh, 2) }}</div>
-                                        <div class="col-md-4 col-6"><span class="text-muted">Package:</span> ₹{{ number_format($pkgCh, 2) }}</div>
-                                        <div class="col-md-4 col-6"><span class="text-muted">IPD charges:</span> ₹{{ number_format($ipdCh, 2) }}</div>
-                                        <div class="col-md-4 col-6"><span class="text-muted">Pathology:</span> ₹{{ number_format($pathCh, 2) }}</div>
-                                        <div class="col-md-4 col-6"><span class="text-muted">Radiology:</span> ₹{{ number_format($radCh, 2) }}</div>
-                                        <div class="col-md-4 col-6"><span class="text-muted">Doctor visit:</span> ₹{{ number_format($docCh, 2) }}</div>
+                                        <div class="col-md-4 col-6"><span class="text-muted">Bed charges:</span>
+                                            ₹{{ number_format($bedCh, 2) }}</div>
+                                        <div class="col-md-4 col-6"><span class="text-muted">Package:</span>
+                                            ₹{{ number_format($pkgCh, 2) }}</div>
+                                        <div class="col-md-4 col-6"><span class="text-muted">IPD charges:</span>
+                                            ₹{{ number_format($ipdCh, 2) }}</div>
+                                        <div class="col-md-4 col-6"><span class="text-muted">Pathology:</span>
+                                            ₹{{ number_format($pathCh, 2) }}</div>
+                                        <div class="col-md-4 col-6"><span class="text-muted">Radiology:</span>
+                                            ₹{{ number_format($radCh, 2) }}</div>
+                                        <div class="col-md-4 col-6"><span class="text-muted">Doctor visit:</span>
+                                            ₹{{ number_format($docCh, 2) }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -908,7 +929,8 @@
                         <div class="card shadow-sm border-0 mt-2">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Doctor Visit Details
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Doctor Visit
+                                    Details
                                 </h5>
                             </div>
                             <div class="card-body">
@@ -935,7 +957,7 @@
                                                     </td>
 
                                                     <td>
-                                                       {{ $doctorvisit->rate ?? '-' }}
+                                                        {{ $doctorvisit->rate ?? '-' }}
                                                     </td>
 
                                                     <td>
@@ -1171,15 +1193,13 @@
                                                             <div class="d-flex gap-2">
                                                                 <a href="{{ route('ipd.prescription.edit', $prescription->id) }}"
                                                                     class="fs-18 p-1 btn btn-icon btn-sm btn-soft-warning rounded-pill"
-                                                                    data-bs-toggle="tooltip"
-                                                                    title="Edit">
+                                                                    data-bs-toggle="tooltip" title="Edit">
                                                                     <i class="fa-solid fa-pencil"></i>
                                                                 </a>
                                                                 <a href="{{ route('ipd.prescription.print', $prescription->id) }}"
                                                                     target="_blank"
                                                                     class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
-                                                                    data-bs-toggle="tooltip"
-                                                                    title="Print">
+                                                                    data-bs-toggle="tooltip" title="Print">
                                                                     <i class="fa-solid fa-print"></i>
                                                                 </a>
                                                             </div>
@@ -1221,21 +1241,17 @@
                                             @foreach ($labInvestigations as $lab)
                                                 <tr>
                                                     <td>
-    {{ optional($lab->pathology)->test_name 
-        ? optional($lab->pathology)->test_name . 
-          (optional($lab->pathology)->short_name 
-              ? ' (' . optional($lab->pathology)->short_name . ')' 
-              : '') 
-        : 'N/A' }}
-</td>
+                                                        {{ optional($lab->pathology)->test_name
+                                                            ? optional($lab->pathology)->test_name .
+                                                                (optional($lab->pathology)->short_name ? ' (' . optional($lab->pathology)->short_name . ')' : '')
+                                                            : 'N/A' }}
+                                                    </td>
 
                                                     <td>Pathology</td>
                                                     <td>{{ '--' }}</td>
                                                     <td>
-    {{ \Carbon\Carbon::today()
-        ->addDays((int) ($lab->pathology?->report_days ?? 0))
-        ->format('d-M-Y') }}
-</td>
+                                                        {{ \Carbon\Carbon::today()->addDays((int) ($lab->pathology?->report_days ?? 0))->format('d-M-Y') }}
+                                                    </td>
                                                     <td>{{ $lab->approved_by ?? '--' }}</td>
                                                 </tr>
                                             @endforeach
@@ -1348,23 +1364,26 @@
                                         <tbody>
                                             @foreach ($ipdCharges as $charge)
                                                 @php
-                                                    $standardCharge = $charge->charge?->standard_charge ?? $charge->standard_charge ?? 0;
+                                                    $standardCharge =
+                                                        $charge->charge?->standard_charge ??
+                                                        ($charge->standard_charge ?? 0);
                                                     $taxPct = $charge->charge?->taxCategory?->percentage ?? 0;
                                                     $taxAmount = ($standardCharge * $taxPct) / 100;
-                                                    $amount = ($charge->standard_charge ?? $standardCharge) + $taxAmount;
+                                                    $amount =
+                                                        ($charge->standard_charge ?? $standardCharge) + $taxAmount;
                                                 @endphp
                                                 <tr>
                                                     <td>
-                                                        {{ $charge->charge?->name ?? '-'}}
+                                                        {{ $charge->charge?->name ?? '-' }}
                                                     </td>
                                                     <td style="text-transform: capitalize;">
                                                         {{ $charge->chargeCategory?->chargeType?->charge_type ?? '-' }}
                                                     </td>
-                                                    <td class="text-right">{{ $charge->standard_charge ?? '-'}}</td>
+                                                    <td class="text-right">{{ $charge->standard_charge ?? '-' }}</td>
                                                     <!-- <td class="text-right">
-                                                        ({{ $charge->charge->taxCategory->percentage ?? '-' }}%)
-                                                        {{ $taxAmount }}
-                                                    </td> -->
+                                                            ({{ $charge->charge->taxCategory->percentage ?? '-' }}%)
+    {{ $taxAmount }}
+                                                        </td> -->
                                                     <td class="text-right">{{ $charge->standard_charge ?? '-' }}</td>
                                                     <td class="text-right">{{ $amount }}</td>
                                                 </tr>
@@ -1419,11 +1438,10 @@
                                                     </td>
 
                                                     <td class="text-center">
-                                                        @if(!empty($transaction->receipt_no))
+                                                        @if (!empty($transaction->receipt_no))
                                                             <a href="{{ route('money-receipt.print', $transaction->id) }}"
-                                                               class="btn btn-sm btn-primary"
-                                                               target="_blank"
-                                                               title="Print Money Receipt">
+                                                                class="btn btn-sm btn-primary" target="_blank"
+                                                                title="Print Money Receipt">
                                                                 <i class="ti ti-printer"></i>
                                                             </a>
                                                         @else
@@ -2061,7 +2079,8 @@
                                                             <div class="text-end d-flex">
                                                                 <a href="javascript:void(0);"
                                                                     class="btn btn-primary text-white ms-2 btn-md"
-                                                                    data-bs-toggle="modal" data-bs-target="#add_medication"><i
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#add_medication"><i
                                                                         class="ti ti-plus me-1"></i>Add Medication Dose</a>
                                                             </div>
                                                         @endif
@@ -2237,10 +2256,10 @@
                                                                                     <i class="ti ti-pencil"></i>
                                                                                 </a>
                                                                                 <!-- <a href="javascript:void(0);"
-                                                                                                                onclick="confirmDelete('{{ route('medication.delete', $medication->id) }}')"
-                                                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                                                                    <i class="ti ti-trash" data-bs-toggle="tooltip" title="Delete"></i>
-                                                                                                            </a> -->
+                                                                                                                    onclick="confirmDelete('{{ route('medication.delete', $medication->id) }}')"
+                                                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                                                                                        <i class="ti ti-trash" data-bs-toggle="tooltip" title="Delete"></i>
+                                                                                                                </a> -->
 
                                                                             </div>
                                                                         </td>
@@ -2437,17 +2456,12 @@
                                                                     <td>
                                                                         @php $p = $lab->pathology; @endphp
 
-                                                                        {{ $p?->test_name
-                                                                             ? $p->test_name . ($p->short_name ? ' (' . $p->short_name . ')' : '')
-                                                                         : 'N/A' }}
+                                                                        {{ $p?->test_name ? $p->test_name . ($p->short_name ? ' (' . $p->short_name . ')' : '') : 'N/A' }}
                                                                     </td>
                                                                     <td>Pathology</td>
                                                                     <td>{{ '--' }}</td>
                                                                     <td>
-                                                                       {{ \Carbon\Carbon::today()
-                                                                             ->copy()
-                                                                            ->addDays(intval($lab->pathology?->report_days ?? 0))
-                                                                            ->format('d-M-Y') }}
+                                                                        {{ \Carbon\Carbon::today()->copy()->addDays(intval($lab->pathology?->report_days ?? 0))->format('d-M-Y') }}
                                                                     </td>
                                                                     <td>{{ $lab->approved_by ?? '--' }}</td>
                                                                     <td>
@@ -2460,22 +2474,20 @@
                                                                                     data-bs-target="#addPathLabModal"
                                                                                     data-lab-id="{{ $lab->id }}"
                                                                                     title="Edit">
-                                                                                        <i class="ti ti-edit"></i>
+                                                                                    <i class="ti ti-edit"></i>
                                                                                 </a>
                                                                             @endif
                                                                             <!-- Download -->
-                                                                            @if($lab->path_doc_path)
+                                                                            @if ($lab->path_doc_path)
                                                                                 <a href="{{ route('path.report.download', $lab->id) }}"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
-                                                                                title="Download"
-                                                                                download>
+                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                                                    title="Download" download>
                                                                                     <i class="ti ti-download"></i>
                                                                                 </a>
                                                                             @else
                                                                                 <a href="javascript:void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill disabled"
-                                                                                title="No file available"
-                                                                                >
+                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill disabled"
+                                                                                    title="No file available">
                                                                                     <i class="ti ti-download"></i>
                                                                                 </a>
                                                                             @endif
@@ -2563,23 +2575,21 @@
                                                                                     data-bs-target="#addRadioLabModal"
                                                                                     data-lab-id="{{ $lab->id }}"
                                                                                     title="Edit">
-                                                                                        <i class="ti ti-edit"></i>
+                                                                                    <i class="ti ti-edit"></i>
                                                                                 </a>
                                                                             @endif
 
                                                                             <!-- Download -->
-                                                                            @if($lab->radio_doc_path)
+                                                                            @if ($lab->radio_doc_path)
                                                                                 <a href="{{ route('radio.report.download', $lab->id) }}"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
-                                                                                title="Download"
-                                                                                download>
+                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
+                                                                                    title="Download" download>
                                                                                     <i class="ti ti-download"></i>
                                                                                 </a>
                                                                             @else
                                                                                 <a href="javascript:void(0);"
-                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill disabled"
-                                                                                title="No file available"
-                                                                                >
+                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill disabled"
+                                                                                    title="No file available">
                                                                                     <i class="ti ti-download"></i>
                                                                                 </a>
                                                                             @endif
@@ -2631,7 +2641,7 @@
                                                     </div>
 
                                                     @if ($ipd->discharged != 'yes')
-                                                    <!-- Add Operation Button -->
+                                                        <!-- Add Operation Button -->
                                                         <button type="button" class="btn btn-primary shadow-sm"
                                                             data-bs-toggle="modal" data-bs-target="#addOperationModal">
                                                             <i class="ti ti-plus me-1"></i> Add Operation
@@ -2660,8 +2670,8 @@
                                                                     method="POST">
                                                                     @csrf
                                                                     <input type="text" name="ipd_details_id"
-                                                                        class="form-control" value="{{ $ipd->id }}"
-                                                                        hidden>
+                                                                        class="form-control"
+                                                                        value="{{ $ipd->id }}" hidden>
                                                                     <div class="row gy-3 py-4 mx-1">
 
                                                                         <div class="col-md-4 mb-3">
@@ -2729,43 +2739,48 @@
                                                                             <label class="form-label">Assistant Consultant
                                                                                 1</label>
                                                                             <!-- <input type="text"
-                                                                                name="ass_consultant_1"
-                                                                                class="form-control"> -->
-                                                                                <select name="ass_consultant_1" class="form-select">
-                                                                                    <option value="">Select Assistant Consultant 2
-                                                                                    </option>
-                                                                                    @foreach ($doctors as $doctor)
-                                                                                        <option value="{{ $doctor->id }}">
-                                                                                            {{ $doctor->name }}</option>
-                                                                                    @endforeach
-                                                                                </select>
+                                                                                    name="ass_consultant_1"
+                                                                                    class="form-control"> -->
+                                                                            <select name="ass_consultant_1"
+                                                                                class="form-select">
+                                                                                <option value="">Select Assistant
+                                                                                    Consultant 2
+                                                                                </option>
+                                                                                @foreach ($doctors as $doctor)
+                                                                                    <option value="{{ $doctor->id }}">
+                                                                                        {{ $doctor->name }}</option>
+                                                                                @endforeach
+                                                                            </select>
                                                                         </div>
 
                                                                         <div class="col-md-4 mb-3">
                                                                             <label class="form-label">Assistant Consultant
                                                                                 2</label>
 
-                                                                                <select name="ass_consultant_2" class="form-select">
-                                                                                    <option value="">Select Assistant Consultant 2
-                                                                                    </option>
-                                                                                    @foreach ($doctors as $doctor)
-                                                                                        <option value="{{ $doctor->id }}">
-                                                                                            {{ $doctor->name }}</option>
-                                                                                    @endforeach
-                                                                                </select>
+                                                                            <select name="ass_consultant_2"
+                                                                                class="form-select">
+                                                                                <option value="">Select Assistant
+                                                                                    Consultant 2
+                                                                                </option>
+                                                                                @foreach ($doctors as $doctor)
+                                                                                    <option value="{{ $doctor->id }}">
+                                                                                        {{ $doctor->name }}</option>
+                                                                                @endforeach
+                                                                            </select>
                                                                         </div>
 
                                                                         <div class="col-md-4 mb-3">
                                                                             <label class="form-label">Anesthetist</label>
 
-                                                                            <select name="anesthetist" class="form-select">
-                                                                                    <option value="">Select Anesthetist
-                                                                                    </option>
-                                                                                    @foreach ($doctors as $doctor)
-                                                                                        <option value="{{ $doctor->id }}">
-                                                                                            {{ $doctor->name }}</option>
-                                                                                    @endforeach
-                                                                                </select>
+                                                                            <select name="anesthetist"
+                                                                                class="form-select">
+                                                                                <option value="">Select Anesthetist
+                                                                                </option>
+                                                                                @foreach ($doctors as $doctor)
+                                                                                    <option value="{{ $doctor->id }}">
+                                                                                        {{ $doctor->name }}</option>
+                                                                                @endforeach
+                                                                            </select>
                                                                         </div>
 
                                                                         <div class="col-md-4 mb-3">
@@ -2853,12 +2868,12 @@
                                                                                     <i class="ti ti-pencil"></i>
                                                                                 </a>
                                                                                 <!-- <a href="javascript: void(0);"
-                                                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
-                                                                                                                <i class="ti ti-trash"
-                                                                                                                    data-bs-toggle="tooltip"
-                                                                                                                    title="Show"></i></a> -->
+                                                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
+                                                                                                                    <i class="ti ti-trash"
+                                                                                                                        data-bs-toggle="tooltip"
+                                                                                                                        title="Show"></i></a> -->
                                                                             </div>
-                                                                    </td>
+                                                                        </td>
                                                                     @endif
                                                                 </tr>
                                                                 <!-- EDIT OPERATION MODAL -->
@@ -2984,54 +2999,59 @@
                                                                                                 class="form-label">Assistant
                                                                                                 Consultant 1</label>
 
-                                                                                                <select name="ass_consultant_1"
-                                                                                                    class="form-select">
-                                                                                                    <option value="">
-                                                                                                    Select Consultant</option>
-                                                                                                    @foreach ($doctors as $doctor)
-                                                                                                        <option
-                                                                                                            value="{{ $doctor->id }}"
-                                                                                                            {{ $operation->ass_consultant_1 == $doctor->id ? 'selected' : '' }}>
-                                                                                                            {{ $doctor->name }}
-                                                                                                        </option>
-                                                                                                    @endforeach
-                                                                                                </select>
+                                                                                            <select
+                                                                                                name="ass_consultant_1"
+                                                                                                class="form-select">
+                                                                                                <option value="">
+                                                                                                    Select Consultant
+                                                                                                </option>
+                                                                                                @foreach ($doctors as $doctor)
+                                                                                                    <option
+                                                                                                        value="{{ $doctor->id }}"
+                                                                                                        {{ $operation->ass_consultant_1 == $doctor->id ? 'selected' : '' }}>
+                                                                                                        {{ $doctor->name }}
+                                                                                                    </option>
+                                                                                                @endforeach
+                                                                                            </select>
                                                                                         </div>
 
                                                                                         <div class="col-md-4 mb-3">
                                                                                             <label
                                                                                                 class="form-label">Assistant
                                                                                                 Consultant 2</label>
-                                                                                                <select name="ass_consultant_2"
-                                                                                                    class="form-select">
-                                                                                                    <option value="">
-                                                                                                    Select Consultant</option>
-                                                                                                    @foreach ($doctors as $doctor)
-                                                                                                        <option
-                                                                                                            value="{{ $doctor->id }}"
-                                                                                                            {{ $operation->ass_consultant_2 == $doctor->id ? 'selected' : '' }}>
-                                                                                                            {{ $doctor->name }}
-                                                                                                        </option>
-                                                                                                    @endforeach
-                                                                                                </select>
+                                                                                            <select
+                                                                                                name="ass_consultant_2"
+                                                                                                class="form-select">
+                                                                                                <option value="">
+                                                                                                    Select Consultant
+                                                                                                </option>
+                                                                                                @foreach ($doctors as $doctor)
+                                                                                                    <option
+                                                                                                        value="{{ $doctor->id }}"
+                                                                                                        {{ $operation->ass_consultant_2 == $doctor->id ? 'selected' : '' }}>
+                                                                                                        {{ $doctor->name }}
+                                                                                                    </option>
+                                                                                                @endforeach
+                                                                                            </select>
                                                                                         </div>
 
                                                                                         <div class="col-md-4 mb-3">
                                                                                             <label
                                                                                                 class="form-label">Anesthetist</label>
 
-                                                                                                <select name="anesthetist"
-                                                                                                    class="form-select">
-                                                                                                    <option value="">
-                                                                                                    Select Consultant</option>
-                                                                                                    @foreach ($doctors as $doctor)
-                                                                                                        <option
-                                                                                                            value="{{ $doctor->id }}"
-                                                                                                            {{ $operation->ass_consultant_2 == $doctor->id ? 'selected' : '' }}>
-                                                                                                            {{ $doctor->name }}
-                                                                                                        </option>
-                                                                                                    @endforeach
-                                                                                                </select>
+                                                                                            <select name="anesthetist"
+                                                                                                class="form-select">
+                                                                                                <option value="">
+                                                                                                    Select Consultant
+                                                                                                </option>
+                                                                                                @foreach ($doctors as $doctor)
+                                                                                                    <option
+                                                                                                        value="{{ $doctor->id }}"
+                                                                                                        {{ $operation->ass_consultant_2 == $doctor->id ? 'selected' : '' }}>
+                                                                                                        {{ $doctor->name }}
+                                                                                                    </option>
+                                                                                                @endforeach
+                                                                                            </select>
                                                                                         </div>
 
                                                                                         <div class="col-md-4 mb-3">
@@ -3133,7 +3153,8 @@
                                                             <div class="text-end d-flex">
                                                                 <a href="javascript:void(0);"
                                                                     class="btn btn-primary text-white ms-2 btn-md"
-                                                                    data-bs-toggle="modal" data-bs-target="#add_charges" id="open_add_charges_btn"><i
+                                                                    data-bs-toggle="modal" data-bs-target="#add_charges"
+                                                                    id="open_add_charges_btn"><i
                                                                         class="ti ti-plus me-1"></i>Add Charges</a>
                                                             </div>
                                                         @endif
@@ -3235,17 +3256,17 @@
                                                                                                     Name<small
                                                                                                         class="req">
                                                                                                         *</small></label>
-                                                                                                        <select name="charge_id"
-                                                                                                            id="charge_id"
-                                                                                                            style="width: 100%"
-                                                                                                            class="form-control addcharge  select2 reset_value "
-                                                                                                            tabindex="-1"
-                                                                                                            aria-hidden="true">
-                                                                                                            <option
-                                                                                                                value="">
-                                                                                                                Select
-                                                                                                            </option>
-                                                                                                        </select>
+                                                                                                <select name="charge_id"
+                                                                                                    id="charge_id"
+                                                                                                    style="width: 100%"
+                                                                                                    class="form-control addcharge  select2 reset_value "
+                                                                                                    tabindex="-1"
+                                                                                                    aria-hidden="true">
+                                                                                                    <option
+                                                                                                        value="">
+                                                                                                        Select
+                                                                                                    </option>
+                                                                                                </select>
                                                                                             </div>
                                                                                         </div>
                                                                                         <div class="col-md-2">
@@ -3254,12 +3275,13 @@
                                                                                                     class="form-label">Standard
                                                                                                     Charge
                                                                                                     (INR)</label>
-                                                                                                    <input type="text"
-                                                                                                        name="standard_charge"
-                                                                                                        id="addstandard_charge"
-                                                                                                        class="form-control reset_value standard_charge"
-                                                                                                        value="">
-                                                                                                        <span class="text-danger"></span>
+                                                                                                <input type="text"
+                                                                                                    name="standard_charge"
+                                                                                                    id="addstandard_charge"
+                                                                                                    class="form-control reset_value standard_charge"
+                                                                                                    value="">
+                                                                                                <span
+                                                                                                    class="text-danger"></span>
                                                                                             </div>
                                                                                         </div>
                                                                                         <div class="col-md-2">
@@ -3404,7 +3426,8 @@
                                                                                                 </div>
                                                                                             </div>
                                                                                         </div><!--./col-sm-6-->
-                                                                                        <div class="col-sm-3" id="charge_add_button_col">
+                                                                                        <div class="col-sm-3"
+                                                                                            id="charge_add_button_col">
                                                                                             <div class="form-group mb-2">
                                                                                                 <label for=""
                                                                                                     class="form-label">Date
@@ -3427,8 +3450,7 @@
                                                                                     </div><!--./row-->
                                                                                     <hr>
                                                                                 </div>
-                                                                                <div
-                                                                                    class="col-lg-12 col-md-12 col-sm-12"
+                                                                                <div class="col-lg-12 col-md-12 col-sm-12"
                                                                                     id="charge_preview_wrapper">
                                                                                     <table
                                                                                         class="table table-striped table-bordered table-hover">
@@ -3506,11 +3528,17 @@
                                                         <tbody>
                                                             @foreach ($ipdCharges as $charge)
                                                                 @php
-                                                                    $standardCharge = $charge->charge?->standard_charge ?? $charge->standard_charge ?? 0;
-                                                                    $taxPct = $charge->charge?->taxCategory?->percentage ?? 0;
+                                                                    $standardCharge =
+                                                                        $charge->charge?->standard_charge ??
+                                                                        ($charge->standard_charge ?? 0);
+                                                                    $taxPct =
+                                                                        $charge->charge?->taxCategory?->percentage ?? 0;
                                                                     $taxAmount = ($standardCharge * $taxPct) / 100;
-                                                                    $discountAmount = ($standardCharge * ($charge->discount ?? 0)) / 100;
-                                                                    $amount = $standardCharge - $discountAmount + $taxAmount;
+                                                                    $discountAmount =
+                                                                        ($standardCharge * ($charge->discount ?? 0)) /
+                                                                        100;
+                                                                    $amount =
+                                                                        $standardCharge - $discountAmount + $taxAmount;
                                                                 @endphp
                                                                 <tr>
                                                                     <td>
@@ -3534,28 +3562,27 @@
                                                                     <td>{{ $discountAmount }}&nbsp;({{ $charge->discount }}%)
                                                                     </td>
                                                                     <!-- <td>{{ $taxAmount }}&nbsp;({{ $charge->charge?->taxCategory?->percentage ?? '-' }}%)
-                                                                    </td> -->
+                                                                        </td> -->
                                                                     <td>&nbsp;</td>
                                                                     <td>{{ $amount }}</td>
                                                                     <td>
                                                                         <div class="d-flex gap-2">
                                                                             <a href="javascript:void(0);"
-                                                                               class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-ipd-charge-btn"
-                                                                               data-charge-id="{{ $charge->id }}"
-                                                                               data-bs-toggle="tooltip"
-                                                                               title="Edit">
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-ipd-charge-btn"
+                                                                                data-charge-id="{{ $charge->id }}"
+                                                                                data-bs-toggle="tooltip" title="Edit">
                                                                                 <i class="ti ti-pencil"></i>
                                                                             </a>
-                                                                            <form action="{{ route('ipd.charge.delete', $charge->id) }}"
-                                                                                  method="POST"
-                                                                                  class="d-inline-block"
-                                                                                  onsubmit="return confirm('Are you sure you want to delete this charge?');">
+                                                                            <form
+                                                                                action="{{ route('ipd.charge.delete', $charge->id) }}"
+                                                                                method="POST" class="d-inline-block"
+                                                                                onsubmit="return confirm('Are you sure you want to delete this charge?');">
                                                                                 @csrf
                                                                                 @method('DELETE')
                                                                                 <button type="submit"
-                                                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
-                                                                                        data-bs-toggle="tooltip"
-                                                                                        title="Delete">
+                                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
+                                                                                    data-bs-toggle="tooltip"
+                                                                                    title="Delete">
                                                                                     <i class="ti ti-trash"></i>
                                                                                 </button>
                                                                             </form>
@@ -3583,13 +3610,15 @@
                 <div class="row">
                     <div class="col-12 d-flex">
                         <div class="card shadow-sm flex-fill w-100">
-                            <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                            <div class="card-header"
+                                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h5 class="mb-0" style="color: #750096">
                                         <i class="fa-solid fa-gift me-2"></i>Applied Packages
                                     </h5>
                                     @if ($ipd->discharged != 'yes')
-                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#apply_package_modal">
+                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                            data-bs-target="#apply_package_modal">
                                             <i class="ti ti-plus me-1"></i>Apply Package
                                         </button>
                                     @endif
@@ -3608,21 +3637,25 @@
             </div>
 
             <!-- Apply Package Modal -->
-            <div class="modal fade" id="apply_package_modal" tabindex="-1" aria-labelledby="apply_package_label" aria-hidden="true">
+            <div class="modal fade" id="apply_package_modal" tabindex="-1" aria-labelledby="apply_package_label"
+                aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="apply_package_label">Apply Package</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
                         </div>
                         <form id="apply_package_form">
                             <div class="modal-body">
                                 <div class="mb-3">
-                                    <label for="package_select" class="form-label">Select Package <span class="text-danger">*</span></label>
+                                    <label for="package_select" class="form-label">Select Package <span
+                                            class="text-danger">*</span></label>
                                     <select class="form-select" id="package_select" name="package_id" required>
                                         <option value="">-- Select Package --</option>
                                     </select>
-                                    <div id="package_details" class="mt-3 p-3 bg-light rounded" style="display: none;">
+                                    <div id="package_details" class="mt-3 p-3 bg-light rounded"
+                                        style="display: none;">
                                         <h6>Package Details</h6>
                                         <p><strong>Rate:</strong> <span id="pkg_rate">0</span></p>
                                         <p><strong>GST:</strong> <span id="pkg_gst">0</span>%</p>
@@ -3630,13 +3663,17 @@
                                     </div>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="package_amount_input" class="form-label">Package Amount (INR) <span class="text-danger">*</span></label>
-                                    <input type="number" class="form-control" id="package_amount_input" step="0.01" min="0" placeholder="0.00" value="">
-                                    <small class="text-muted">Auto-filled from package (editable). Reflects on estimate &amp; final bill.</small>
+                                    <label for="package_amount_input" class="form-label">Package Amount (INR) <span
+                                            class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="package_amount_input"
+                                        step="0.01" min="0" placeholder="0.00" value="">
+                                    <small class="text-muted">Auto-filled from package (editable). Reflects on estimate
+                                        &amp; final bill.</small>
                                 </div>
                                 <div class="mb-3">
                                     <label for="applied_date" class="form-label">Applied Date</label>
-                                    <input type="date" class="form-control" id="applied_date" name="applied_date" value="{{ date('Y-m-d') }}">
+                                    <input type="date" class="form-control" id="applied_date" name="applied_date"
+                                        value="{{ date('Y-m-d') }}">
                                     <small class="text-muted">Default: Today. Leave blank for today's date</small>
                                 </div>
                                 <div class="mb-3">
@@ -3645,7 +3682,8 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Cancel</button>
                                 <button type="submit" class="btn btn-primary" id="apply_package_btn">
                                     <i class="ti ti-check me-1"></i>Apply Package
                                 </button>
@@ -3657,204 +3695,205 @@
 
             <!-- <div class="tab-pane" id="payments">
 
-                <div class="row">
-                    <div class="col-12 d-flex">
-                        <div class="card shadow-sm flex-fill w-100">
-                            <div class="card-header"
-                                style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Payments
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-lg-12">
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <div
-                                                    class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
-                                                    <div class="input-icon-start position-relative me-2">
-                                                        <span class="input-icon-addon">
-                                                            <i class="ti ti-search"></i>
-                                                        </span>
-                                                        <input type="text" class="form-control shadow-sm"
-                                                            placeholder="Search">
+                    <div class="row">
+                        <div class="col-12 d-flex">
+                            <div class="card shadow-sm flex-fill w-100">
+                                <div class="card-header"
+                                    style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                    <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>Payments
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div
+                                                        class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
+                                                        <div class="input-icon-start position-relative me-2">
+                                                            <span class="input-icon-addon">
+                                                                <i class="ti ti-search"></i>
+                                                            </span>
+                                                            <input type="text" class="form-control shadow-sm"
+                                                                placeholder="Search">
 
-                                                    </div>
-                                                    <div class="d-flex align-items-center flex-wrap gap-2">
-                                                        @if ($ipd->discharged != 'yes')
-                                                            <div class="text-end d-flex">
-                                                                <a href="javascript:void(0);"
-                                                                    class="btn btn-primary text-white ms-2 btn-md"
-                                                                    data-bs-toggle="modal" data-bs-target="#add_payment"><i
-                                                                        class="ti ti-plus me-1"></i>Add Payment</a>
-                                                            </div>
-                                                        @endif
+                                                        </div>
+                                                        <div class="d-flex align-items-center flex-wrap gap-2">
+                                                            @if ($ipd->discharged != 'yes')
+    <div class="text-end d-flex">
+                                                                    <a href="javascript:void(0);"
+                                                                        class="btn btn-primary text-white ms-2 btn-md"
+                                                                        data-bs-toggle="modal" data-bs-target="#add_payment"><i
+                                                                            class="ti ti-plus me-1"></i>Add Payment</a>
+                                                                </div>
+    @endif
 
-                                                        <div class="modal fade" id="add_payment" tabindex="-1"
-                                                            aria-hidden="true">
-                                                            <div class="modal-dialog modal-dialog-centered modal-lg">
-                                                                <div class="modal-content ">
+                                                            <div class="modal fade" id="add_payment" tabindex="-1"
+                                                                aria-hidden="true">
+                                                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                                    <div class="modal-content ">
 
-                                                                    <div class="modal-header"
-                                                                        style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                                                        <div class="modal-header"
+                                                                            style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
 
-                                                                        <h5 class="modal-title"
-                                                                            id="addSpecializationLabel">
-                                                                            Add Payment
-                                                                        </h5>
-                                                                        <button type="button" class="btn-close"
-                                                                            data-bs-dismiss="modal"></button>
+                                                                            <h5 class="modal-title"
+                                                                                id="addSpecializationLabel">
+                                                                                Add Payment
+                                                                            </h5>
+                                                                            <button type="button" class="btn-close"
+                                                                                data-bs-dismiss="modal"></button>
 
+                                                                        </div>
+
+                                                                        <div class="modal-body">
+                                                                            <form action="{{ route('transactions.store') }}"
+                                                                                method="POST">
+                                                                                @csrf
+                                                                                <input type="hidden" name="ipd_id"
+                                                                                    value="{{ $ipd->id }}">
+                                                                                <input type="hidden" name="patient_id"
+                                                                                    value="{{ $ipd->patient_id }}">
+                                                                                <input type="hidden" name="type"
+                                                                                    value="payment">
+                                                                                <input type="hidden" name="section"
+                                                                                    value="ipd">
+                                                                                <div class="row gy-3 py-4 mx-1">
+
+                                                                                    <div class="col-md-6">
+                                                                                        <label for="date"
+                                                                                            class="form-label">Date
+                                                                                            <span class="text-danger">*</span>
+                                                                                        </label>
+                                                                                        <input type="date" name="date"
+                                                                                            id="date"
+                                                                                            class="form-control" required>
+                                                                                    </div>
+                                                                                    <div class="col-md-6">
+                                                                                        <label for="amount"
+                                                                                            class="form-label">Amount (INR)
+                                                                                            <span class="text-danger">*</span>
+                                                                                        </label>
+                                                                                        <input type="text" name="amount"
+                                                                                            id="amount"
+                                                                                            class="form-control" required>
+                                                                                    </div>
+                                                                                    <div class="col-md-6">
+                                                                                        <label for="payment_mode"
+                                                                                            class="form-label">Payment Mode
+
+                                                                                        </label>
+                                                                                        <select name="payment_mode"
+                                                                                            id="payment_mode"
+                                                                                            class="form-select"
+                                                                                            data-placeholder="Enter Patient Name or Id…">
+                                                                                            <option value="0">Select
+                                                                                            </option>
+                                                                                            <option value="Cash">Cash</option>
+                                                                                            <option value="Cheque">Cheque</option>
+                                                                                            <option value="transfer_to_bank_account">Transfer to Bank Account</option>
+                                                                                            <option value="UPI">UPI</option>
+                                                                                            <option value="Online">Online</option>
+                                                                                            <option value="Other">Other</option>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                    <div class="row gy-3 mt-2" id="chequeFields" style="display: none;">
+                                                                                        <div class="col-md-6">
+                                                                                            <label for="cheque_no" class="form-label">
+                                                                                                Cheque No <span class="text-danger">*</span>
+                                                                                            </label>
+                                                                                            <input type="text" name="cheque_no" id="cheque_no" class="form-control">
+                                                                                        </div>
+
+                                                                                        <div class="col-md-6">
+                                                                                            <label for="cheque_date" class="form-label">
+                                                                                                Cheque Date <span class="text-danger">*</span>
+                                                                                            </label>
+                                                                                            <input type="date" name="cheque_date" id="cheque_date" class="form-control">
+                                                                                        </div>
+
+
+                                                                                    </div>
+
+                                                                                    <div class="col-md-6">
+                                                                                        <label for="note"
+                                                                                            class="form-label">Note
+                                                                                        </label>
+                                                                                        <textarea name="note" id="note" class="form-control"></textarea>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                </div>
+                                                                                <div class="modal-footer">
+                                                                                    <button type="submit"
+                                                                                        class="btn btn-primary">Save</button>
+                                                                                </div>
+                                                                            </form>
                                                                     </div>
-
-                                                                    <div class="modal-body">
-                                                                        <form action="{{ route('transactions.store') }}"
-                                                                            method="POST">
-                                                                            @csrf
-                                                                            <input type="hidden" name="ipd_id"
-                                                                                value="{{ $ipd->id }}">
-                                                                            <input type="hidden" name="patient_id"
-                                                                                value="{{ $ipd->patient_id }}">
-                                                                            <input type="hidden" name="type"
-                                                                                value="payment">
-                                                                            <input type="hidden" name="section"
-                                                                                value="ipd">
-                                                                            <div class="row gy-3 py-4 mx-1">
-
-                                                                                <div class="col-md-6">
-                                                                                    <label for="date"
-                                                                                        class="form-label">Date
-                                                                                        <span class="text-danger">*</span>
-                                                                                    </label>
-                                                                                    <input type="date" name="date"
-                                                                                        id="date"
-                                                                                        class="form-control" required>
-                                                                                </div>
-                                                                                <div class="col-md-6">
-                                                                                    <label for="amount"
-                                                                                        class="form-label">Amount (INR)
-                                                                                        <span class="text-danger">*</span>
-                                                                                    </label>
-                                                                                    <input type="text" name="amount"
-                                                                                        id="amount"
-                                                                                        class="form-control" required>
-                                                                                </div>
-                                                                                <div class="col-md-6">
-                                                                                    <label for="payment_mode"
-                                                                                        class="form-label">Payment Mode
-
-                                                                                    </label>
-                                                                                    <select name="payment_mode"
-                                                                                        id="payment_mode"
-                                                                                        class="form-select"
-                                                                                        data-placeholder="Enter Patient Name or Id…">
-                                                                                        <option value="0">Select
-                                                                                        </option>
-                                                                                        <option value="Cash">Cash</option>
-                                                                                        <option value="Cheque">Cheque</option>
-                                                                                        <option value="transfer_to_bank_account">Transfer to Bank Account</option>
-                                                                                        <option value="UPI">UPI</option>
-                                                                                        <option value="Online">Online</option>
-                                                                                        <option value="Other">Other</option>
-                                                                                    </select>
-                                                                                </div>
-                                                                                <div class="row gy-3 mt-2" id="chequeFields" style="display: none;">
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="cheque_no" class="form-label">
-                                                                                            Cheque No <span class="text-danger">*</span>
-                                                                                        </label>
-                                                                                        <input type="text" name="cheque_no" id="cheque_no" class="form-control">
-                                                                                    </div>
-
-                                                                                    <div class="col-md-6">
-                                                                                        <label for="cheque_date" class="form-label">
-                                                                                            Cheque Date <span class="text-danger">*</span>
-                                                                                        </label>
-                                                                                        <input type="date" name="cheque_date" id="cheque_date" class="form-control">
-                                                                                    </div>
-
-
-                                                                                </div>
-
-                                                                                <div class="col-md-6">
-                                                                                    <label for="note"
-                                                                                        class="form-label">Note
-                                                                                    </label>
-                                                                                    <textarea name="note" id="note" class="form-control"></textarea>
-                                                                                </div>
-                                                                            </div>
-
-                                                                            </div>
-                                                                            <div class="modal-footer">
-                                                                                <button type="submit"
-                                                                                    class="btn btn-primary">Save</button>
-                                                                            </div>
-                                                                        </form>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
 
-                                                <div class="table-responsive table-nowrap">
-                                                    <table class="table border">
-                                                        <thead class="thead-light">
-                                                            <tr>
-                                                                <th>Transaction ID</th>
-                                                                <th>Date</th>
-                                                                <th>Note</th>
-                                                                <th>Payment Mode</th>
-                                                                <th>Paid Amount (INR)</th>
-                                                                <th class="text-center">Money Receipt</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @forelse($transactions as $transaction)
+                                                    <div class="table-responsive table-nowrap">
+                                                        <table class="table border">
+                                                            <thead class="thead-light">
                                                                 <tr>
-                                                                    <td>
-                                                                        {{ $transaction->transaction_no ?? 'TRID' . $transaction->id }}
-                                                                    </td>
-
-                                                                    <td>
-                                                                        {{ \Carbon\Carbon::parse($transaction->transaction_date)->format('d/m/Y h:i A') }}
-                                                                    </td>
-
-                                                                    <td>
-                                                                        {{ $transaction->note ?? '-' }}
-                                                                    </td>
-
-                                                                    <td>
-                                                                        {{ $transaction->payment_mode }}
-                                                                    </td>
-
-                                                                    <td>
-                                                                        {{ number_format($transaction->amount, 2) }}
-                                                                    </td>
-
-                                                                    <td class="text-center">
-                                                                        @if(!empty($transaction->receipt_no))
-                                                                            <a href="{{ route('money-receipt.print', $transaction->id) }}"
-                                                                               class="btn btn-sm btn-primary"
-                                                                               target="_blank"
-                                                                               title="Print Money Receipt">
-                                                                                <i class="ti ti-printer"></i>
-                                                                            </a>
-                                                                        @else
-                                                                            <span class="text-muted">-</span>
-                                                                        @endif
-                                                                    </td>
+                                                                    <th>Transaction ID</th>
+                                                                    <th>Date</th>
+                                                                    <th>Note</th>
+                                                                    <th>Payment Mode</th>
+                                                                    <th>Paid Amount (INR)</th>
+                                                                    <th class="text-center">Money Receipt</th>
                                                                 </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @forelse($transactions as $transaction)
+    <tr>
+                                                                        <td>
+                                                                            {{ $transaction->transaction_no ?? 'TRID' . $transaction->id }}
+                                                                        </td>
+
+                                                                        <td>
+                                                                            {{ \Carbon\Carbon::parse($transaction->transaction_date)->format('d/m/Y h:i A') }}
+                                                                        </td>
+
+                                                                        <td>
+                                                                            {{ $transaction->note ?? '-' }}
+                                                                        </td>
+
+                                                                        <td>
+                                                                            {{ $transaction->payment_mode }}
+                                                                        </td>
+
+                                                                        <td>
+                                                                            {{ number_format($transaction->amount, 2) }}
+                                                                        </td>
+
+                                                                        <td class="text-center">
+                                                                            @if (!empty($transaction->receipt_no))
+    <a href="{{ route('money-receipt.print', $transaction->id) }}"
+                                                                                   class="btn btn-sm btn-primary"
+                                                                                   target="_blank"
+                                                                                   title="Print Money Receipt">
+                                                                                    <i class="ti ti-printer"></i>
+                                                                                </a>
+@else
+    <span class="text-muted">-</span>
+    @endif
+                                                                        </td>
+                                                                    </tr>
                                                             @empty
-                                                                <tr>
-                                                                    <td colspan="6" class="text-center text-muted">
-                                                                        No payments found
-                                                                    </td>
-                                                                </tr>
-                                                            @endforelse
-                                                        </tbody>
-                                                    </table>
-                                                </div>
+                                                                    <tr>
+                                                                        <td colspan="6" class="text-center text-muted">
+                                                                            No payments found
+                                                                        </td>
+                                                                    </tr>
+    @endforelse
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
 
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -3862,8 +3901,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div> -->
+                </div> -->
             <div class="tab-pane" id="live_consultation">
                 <!-- row start -->
                 <div class="row">
@@ -3974,7 +4012,8 @@
                                                             <div class="text-end d-flex">
                                                                 <a href="javascript:void(0);"
                                                                     class="btn btn-primary text-white ms-2 btn-md"
-                                                                    data-bs-toggle="modal" data-bs-target="#add_timeline"><i
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#add_timeline"><i
                                                                         class="ti ti-plus me-1"></i>Add Timeline</a>
                                                             </div>
                                                         @endif
@@ -4202,9 +4241,9 @@
                                                         <tbody>
                                                             <td>{{ $ipd->ipd_no }}</td>
                                                             <td>{{ $ipd->patient_id }}</td>
-                                                            <td>{{ $ipd->doctor ? ($ipd->doctor->name . ' ' . $ipd->doctor->surname) : '--' }}
+                                                            <td>{{ $ipd->doctor ? $ipd->doctor->name . ' ' . $ipd->doctor->surname : '--' }}
                                                             </td>
-                                                            <td>{{ ($ipd->bedGroup ? $ipd->bedGroup->name : '--') }}-{{ ($ipd->bedDetail ? $ipd->bedDetail->name : '--') }}
+                                                            <td>{{ $ipd->bedGroup ? $ipd->bedGroup->name : '--' }}-{{ $ipd->bedDetail ? $ipd->bedDetail->name : '--' }}
                                                             </td>
                                                         </tbody>
                                                     </table>
@@ -4462,13 +4501,34 @@
                                                                     </td>
                                                                     <td>{{ $history->to_date ? \Carbon\Carbon::parse($history->to_date)->format('d/m/Y h:i A') : '--' }}
                                                                     </td>
-                                                                    <td>{{ $history->is_active === 'yes' ? 'Yes' : 'No' }}</td>
+                                                                    <td>{{ $history->is_active === 'yes' ? 'Yes' : 'No' }}
+                                                                    </td>
                                                                     <td>
                                                                         @php
-                                                                            $daywiseCharge = \App\Models\IpdDaywiseBedCharge::where('ipd_id', $ipd->id)->whereDate('charge_date', \Carbon\Carbon::parse($history->from_date)->format('Y-m-d'))->where('bed_group_id', $history->bed_group_id)->first();
-                                                                            $existingCharge = $daywiseCharge && $daywiseCharge->bed_charge ? $daywiseCharge->bed_charge : ($history->bedGroup->bed_cost ?? '');
+                                                                            $daywiseCharge = \App\Models\IpdDaywiseBedCharge::where(
+                                                                                'ipd_id',
+                                                                                $ipd->id,
+                                                                            )
+                                                                                ->whereDate(
+                                                                                    'charge_date',
+                                                                                    \Carbon\Carbon::parse(
+                                                                                        $history->from_date,
+                                                                                    )->format('Y-m-d'),
+                                                                                )
+                                                                                ->where(
+                                                                                    'bed_group_id',
+                                                                                    $history->bed_group_id,
+                                                                                )
+                                                                                ->first();
+                                                                            $existingCharge =
+                                                                                $daywiseCharge &&
+                                                                                $daywiseCharge->bed_charge
+                                                                                    ? $daywiseCharge->bed_charge
+                                                                                    : $history->bedGroup->bed_cost ??
+                                                                                        '';
                                                                         @endphp
-                                                                        <button type="button" class="btn btn-sm btn-soft-warning edit-bed-history-btn"
+                                                                        <button type="button"
+                                                                            class="btn btn-sm btn-soft-warning edit-bed-history-btn"
                                                                             data-history-id="{{ $history->id }}"
                                                                             data-ipd-id="{{ $ipd->id }}"
                                                                             data-bed-group-id="{{ $history->bed_group_id }}"
@@ -4491,70 +4551,83 @@
                                             </div>
                                         </div>
                                     </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{-- Edit Bed History Modal --}}
+            <div class="modal fade" id="editBedHistoryModal" tabindex="-1"
+                aria-labelledby="editBedHistoryModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header"
+                            style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%);">
+                            <h5 class="modal-title text-white" id="editBedHistoryModalLabel"><i
+                                    class="ti ti-edit me-2"></i>Edit Bed History</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <form id="editBedHistoryForm" method="POST" action="{{ route('ipd.bedHistory.update') }}">
+                            @csrf
+                            <input type="hidden" name="bed_history_id" id="edit_bed_history_id">
+                            <input type="hidden" name="ipd_id" id="edit_ipd_id" value="{{ $ipd->id }}">
+                            <div class="modal-body">
+                                <div id="editBedHistoryError" class="alert alert-danger d-none"></div>
+                                <div class="row gy-3">
+                                    <div class="col-md-6">
+                                        <label for="edit_bed_group" class="form-label">Bed Group <span
+                                                class="text-danger">*</span></label>
+                                        <select name="bed_group" id="edit_bed_group" class="form-select" required>
+                                            <option value="">Select Bed Group</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="edit_bed" class="form-label">Bed <span
+                                                class="text-danger">*</span></label>
+                                        <select name="bed" id="edit_bed" class="form-select" required>
+                                            <option value="">Select Bed</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="edit_from_date" class="form-label">From Date <span
+                                                class="text-danger">*</span></label>
+                                        <input type="datetime-local" name="from_date" id="edit_from_date"
+                                            class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="edit_to_date" class="form-label">To Date <span
+                                                class="text-muted">(leave empty for active)</span></label>
+                                        <input type="datetime-local" name="to_date" id="edit_to_date"
+                                            class="form-control">
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label for="edit_bed_charge" class="form-label">Bed Charge (INR)</label>
+                                        <input type="number" name="bed_charge" id="edit_bed_charge"
+                                            class="form-control" step="0.01" min="0" placeholder="0.00">
+                                        <small class="text-muted">Auto-filled from bed group (editable)</small>
                                     </div>
                                 </div>
                             </div>
-                            {{-- Edit Bed History Modal --}}
-                            <div class="modal fade" id="editBedHistoryModal" tabindex="-1" aria-labelledby="editBedHistoryModalLabel" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content">
-                                        <div class="modal-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%);">
-                                            <h5 class="modal-title text-white" id="editBedHistoryModalLabel"><i class="ti ti-edit me-2"></i>Edit Bed History</h5>
-                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <form id="editBedHistoryForm" method="POST" action="{{ route('ipd.bedHistory.update') }}">
-                                            @csrf
-                                            <input type="hidden" name="bed_history_id" id="edit_bed_history_id">
-                                            <input type="hidden" name="ipd_id" id="edit_ipd_id" value="{{ $ipd->id }}">
-                                            <div class="modal-body">
-                                                <div id="editBedHistoryError" class="alert alert-danger d-none"></div>
-                                                <div class="row gy-3">
-                                                    <div class="col-md-6">
-                                                        <label for="edit_bed_group" class="form-label">Bed Group <span class="text-danger">*</span></label>
-                                                        <select name="bed_group" id="edit_bed_group" class="form-select" required>
-                                                            <option value="">Select Bed Group</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <label for="edit_bed" class="form-label">Bed <span class="text-danger">*</span></label>
-                                                        <select name="bed" id="edit_bed" class="form-select" required>
-                                                            <option value="">Select Bed</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <label for="edit_from_date" class="form-label">From Date <span class="text-danger">*</span></label>
-                                                        <input type="datetime-local" name="from_date" id="edit_from_date" class="form-control" required>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <label for="edit_to_date" class="form-label">To Date <span class="text-muted">(leave empty for active)</span></label>
-                                                        <input type="datetime-local" name="to_date" id="edit_to_date" class="form-control">
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <label for="edit_bed_charge" class="form-label">Bed Charge (INR)</label>
-                                                        <input type="number" name="bed_charge" id="edit_bed_charge" class="form-control" step="0.01" min="0" placeholder="0.00">
-                                                        <small class="text-muted">Auto-filled from bed group (editable)</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                <button type="submit" class="btn btn-primary">Update</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Update</button>
                             </div>
-                            <div class="tab-pane" id="bed_issue">
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane" id="bed_issue">
                 <!-- row start -->
                 <div class="row">
                     <div class="col-12 d-flex">
                         <div class="card shadow-sm flex-fill w-100">
                             <div class="card-header"
                                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>New Bed Assign
+                                <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>New Bed
+                                    Assign
                                 </h5>
                             </div>
                             <div class="card-body">
@@ -4592,7 +4665,8 @@
                                                     <label for="released_date" class="form-label">Select Released Date
                                                         <span class="text-danger">*</span></label>
                                                     <input type="datetime-local" name="released_date"
-                                                        id="released_date" class="form-control" max="{{ now()->format('Y-m-d\TH:i') }}">
+                                                        id="released_date" class="form-control"
+                                                        max="{{ now()->format('Y-m-d\TH:i') }}">
                                                 </div>
                                                 <div class="col-md-4">
                                                     <label for="bed_group" class="form-label">Select Bed Group <span
@@ -4611,11 +4685,13 @@
                                                 </div>
 
                                                 <div class="col-md-4">
-                                                    <label for="bed_charge_transfer" class="form-label">Bed Charge (INR) <span
-                                                            class="text-danger">*</span></label>
+                                                    <label for="bed_charge_transfer" class="form-label">Bed Charge (INR)
+                                                        <span class="text-danger">*</span></label>
                                                     <input type="number" class="form-control" name="bed_charge"
-                                                        id="bed_charge_transfer" step="0.01" min="0" placeholder="0.00">
-                                                    <small class="text-muted">Auto-filled from bed group (editable)</small>
+                                                        id="bed_charge_transfer" step="0.01" min="0"
+                                                        placeholder="0.00">
+                                                    <small class="text-muted">Auto-filled from bed group
+                                                        (editable)</small>
                                                 </div>
 
                                                 <div class="col-md-12 text-end mt-4">
@@ -4661,7 +4737,8 @@
                                                             <div class="text-end d-flex">
                                                                 <a href="javascript:void(0);"
                                                                     class="btn btn-primary text-white ms-2 btn-md"
-                                                                    data-bs-toggle="modal" data-bs-target="#add_vital"><i
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#add_vital"><i
                                                                         class="ti ti-plus me-1"></i>Add Vitals</a>
                                                             </div>
                                                         @endif
@@ -4805,14 +4882,14 @@
                                                                     @endforeach
 
                                                                     <!-- <td>
-                                                                                                    <div class="d-flex gap-2">
-                                                                                                        <a href="#"
-                                                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
-                                                                                                            data-bs-toggle="tooltip" title="Show">
-                                                                                                            <i class="ti ti-menu"></i>
-                                                                                                        </a>
-                                                                                                    </div>
-                                                                                                </td> -->
+                                                                                                        <div class="d-flex gap-2">
+                                                                                                            <a href="#"
+                                                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
+                                                                                                                data-bs-toggle="tooltip" title="Show">
+                                                                                                                <i class="ti ti-menu"></i>
+                                                                                                            </a>
+                                                                                                        </div>
+                                                                                                    </td> -->
                                                                 </tr>
                                                             @empty
                                                                 <tr>
@@ -4848,753 +4925,887 @@
     @include('components.modals.discharge-details-modal')
 
     <script>
-    console.log('🔵 IPD View Script Block 1 Loading...');
+        console.log('🔵 IPD View Script Block 1 Loading...');
 
-    // Test: Verify script is executing
-    try {
-        console.log('✅ Script execution test passed');
-    } catch(e) {
-        console.error('❌ Script execution test failed:', e);
-        alert('Script error: ' + e.message);
-    }
-
-    // Suppress browser extension errors (they're harmless but noisy)
-    window.addEventListener('error', function(e) {
-        if (e.message && e.message.includes('message channel closed')) {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
+        // Test: Verify script is executing
+        try {
+            console.log('✅ Script execution test passed');
+        } catch (e) {
+            console.error('❌ Script execution test failed:', e);
+            alert('Script error: ' + e.message);
         }
-    }, true);
 
-    console.log('🔵 IPD View Script Block 1 Loaded');
-
-    // --- Prescription modal: global opener (used by inline onclick so modal opens even if other scripts fail) ---
-    window.showIpdPrescriptionModal = function(btn) {
-        var m = document.getElementById('addPrescriptionModal');
-        if (!m) { console.error('addPrescriptionModal not found'); return; }
-        if (m.parentNode !== document.body) document.body.appendChild(m);
-        if (btn) {
-            var ipdId = btn.getAttribute('data-ipd-id');
-            if (ipdId) {
-                var f = document.getElementById('ipd_id');
-                if (f) f.value = ipdId;
-                var ad = btn.getAttribute('data-admission-date');
-                var dateEl = document.getElementById('prescription_date');
-                if (dateEl) {
-                    dateEl.max = new Date().toISOString().split('T')[0];
-                    dateEl.value = ad || dateEl.max;
-                    if (ad) dateEl.setAttribute('min', ad);
-                }
+        // Suppress browser extension errors (they're harmless but noisy)
+        window.addEventListener('error', function(e) {
+            if (e.message && e.message.includes('message channel closed')) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
             }
-        }
-        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-            bootstrap.Modal.getOrCreateInstance(m).show();
-        } else {
-            m.classList.remove('fade');
-            m.classList.add('show');
-            m.style.display = 'block';
-            m.style.visibility = 'visible';
-            m.style.opacity = '1';
-            m.style.zIndex = '1055';
-            m.setAttribute('aria-hidden', 'false');
-            document.body.classList.add('modal-open');
-            var back = document.querySelector('.modal-backdrop');
-            if (!back) {
-                back = document.createElement('div');
-                back.className = 'modal-backdrop fade show';
-                back.style.zIndex = '1050';
-                document.body.insertBefore(back, m);
-            }
-            back.classList.add('show');
-        }
-    };
-    (function prescriptionModalFallback() {
-        function run() {
-            var modal = document.getElementById('addPrescriptionModal');
-            if (!modal) return;
-            if (modal.parentNode !== document.body) document.body.appendChild(modal);
-        }
-        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
-        else run();
-    })();
+        }, true);
 
-    // Direct function to open prescription modal - bypasses Bootstrap issues
-    // Define function to fetch pathology/radiology data DIRECTLY (not dependent on modal)
-    // Make sure this is defined BEFORE any button click handlers
-    if (typeof window.fetchPathologyRadiologyData === 'undefined') {
-        window.fetchPathologyRadiologyData = function() {
-            console.log('🔴 fetchPathologyRadiologyData called directly');
-            var pathSelect = document.getElementById('pathologyOpt');
-            var radSelect = document.getElementById('radiologyOpt');
-            var pathologyUrl = "{{ url(route('getPathologies')) }}";
-            var radiologyUrl = "{{ url(route('getRadiologies')) }}";
+        console.log('🔵 IPD View Script Block 1 Loaded');
 
-            function initAfterBothLoaded() {
-                if (typeof window.initPathologyRadiologySelect2 === 'function') {
-                    window.initPathologyRadiologySelect2();
-                }
-            }
-
-            if (pathSelect && pathSelect.options.length > 1 && radSelect && radSelect.options.length > 1) {
-                console.log('📡 Pathology/Radiology already have options, initializing Select2 only');
-                initAfterBothLoaded();
+        // --- Prescription modal: global opener (used by inline onclick so modal opens even if other scripts fail) ---
+        window.showIpdPrescriptionModal = function(btn) {
+            var m = document.getElementById('addPrescriptionModal');
+            if (!m) {
+                console.error('addPrescriptionModal not found');
                 return;
             }
-
-            var pathDone = false, radDone = false;
-            function maybeInit() {
-                if (pathDone && radDone) {
-                    console.log('✅ Both pathology and radiology loaded, initializing Select2');
-                    initAfterBothLoaded();
+            if (m.parentNode !== document.body) document.body.appendChild(m);
+            if (btn) {
+                var ipdId = btn.getAttribute('data-ipd-id');
+                if (ipdId) {
+                    var f = document.getElementById('ipd_id');
+                    if (f) f.value = ipdId;
+                    var ad = btn.getAttribute('data-admission-date');
+                    var dateEl = document.getElementById('prescription_date');
+                    if (dateEl) {
+                        dateEl.max = new Date().toISOString().split('T')[0];
+                        dateEl.value = ad || dateEl.max;
+                        if (ad) dateEl.setAttribute('min', ad);
+                    }
                 }
             }
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                bootstrap.Modal.getOrCreateInstance(m).show();
+            } else {
+                m.classList.remove('fade');
+                m.classList.add('show');
+                m.style.display = 'block';
+                m.style.visibility = 'visible';
+                m.style.opacity = '1';
+                m.style.zIndex = '1055';
+                m.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('modal-open');
+                var back = document.querySelector('.modal-backdrop');
+                if (!back) {
+                    back = document.createElement('div');
+                    back.className = 'modal-backdrop fade show';
+                    back.style.zIndex = '1050';
+                    document.body.insertBefore(back, m);
+                }
+                back.classList.add('show');
+            }
+        };
+        (function prescriptionModalFallback() {
+            function run() {
+                var modal = document.getElementById('addPrescriptionModal');
+                if (!modal) return;
+                if (modal.parentNode !== document.body) document.body.appendChild(modal);
+            }
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+            else run();
+        })();
 
-            if (pathSelect) {
-                if (pathSelect.options.length <= 1) {
-                    if (window.jQuery && window.jQuery(pathSelect).hasClass('select2-hidden-accessible')) {
-                        try { window.jQuery(pathSelect).select2('destroy'); } catch(e) {}
+        // Direct function to open prescription modal - bypasses Bootstrap issues
+        // Define function to fetch pathology/radiology data DIRECTLY (not dependent on modal)
+        // Make sure this is defined BEFORE any button click handlers
+        if (typeof window.fetchPathologyRadiologyData === 'undefined') {
+            window.fetchPathologyRadiologyData = function() {
+                console.log('🔴 fetchPathologyRadiologyData called directly');
+                var pathSelect = document.getElementById('pathologyOpt');
+                var radSelect = document.getElementById('radiologyOpt');
+                var pathologyUrl = "{{ url(route('getPathologies')) }}";
+                var radiologyUrl = "{{ url(route('getRadiologies')) }}";
+
+                function initAfterBothLoaded() {
+                    if (typeof window.initPathologyRadiologySelect2 === 'function') {
+                        window.initPathologyRadiologySelect2();
                     }
-                    pathSelect.innerHTML = '<option value="">Loading...</option>';
-                    fetch(pathologyUrl)
-                        .then(function(r) {
-                            if (!r.ok) throw new Error('HTTP ' + r.status);
-                            return r.json();
-                        })
-                        .then(function(data) {
-                            pathSelect.innerHTML = '';
-                            if (data && Array.isArray(data) && data.length > 0) {
-                                data.forEach(function(p) {
-                                    var opt = document.createElement('option');
-                                    opt.value = p.id;
-                                    opt.textContent = (p.test_name || 'Unknown') + (p.short_name ? ' (' + p.short_name + ')' : '');
-                                    pathSelect.appendChild(opt);
-                                });
-                                console.log('✅ Pathology options added:', pathSelect.options.length);
-                            }
-                            pathDone = true;
-                            maybeInit();
-                        })
-                        .catch(function(err) {
-                            console.error('❌ Pathology fetch error:', err);
-                            pathSelect.innerHTML = '<option value="">Error loading</option>';
-                            pathDone = true;
-                            maybeInit();
-                        });
+                }
+
+                if (pathSelect && pathSelect.options.length > 1 && radSelect && radSelect.options.length > 1) {
+                    console.log('📡 Pathology/Radiology already have options, initializing Select2 only');
+                    initAfterBothLoaded();
+                    return;
+                }
+
+                var pathDone = false,
+                    radDone = false;
+
+                function maybeInit() {
+                    if (pathDone && radDone) {
+                        console.log('✅ Both pathology and radiology loaded, initializing Select2');
+                        initAfterBothLoaded();
+                    }
+                }
+
+                if (pathSelect) {
+                    if (pathSelect.options.length <= 1) {
+                        if (window.jQuery && window.jQuery(pathSelect).hasClass('select2-hidden-accessible')) {
+                            try {
+                                window.jQuery(pathSelect).select2('destroy');
+                            } catch (e) {}
+                        }
+                        pathSelect.innerHTML = '<option value="">Loading...</option>';
+                        fetch(pathologyUrl)
+                            .then(function(r) {
+                                if (!r.ok) throw new Error('HTTP ' + r.status);
+                                return r.json();
+                            })
+                            .then(function(data) {
+                                pathSelect.innerHTML = '';
+                                if (data && Array.isArray(data) && data.length > 0) {
+                                    data.forEach(function(p) {
+                                        var opt = document.createElement('option');
+                                        opt.value = p.id;
+                                        opt.textContent = (p.test_name || 'Unknown') + (p.short_name ?
+                                            ' (' + p.short_name + ')' : '');
+                                        pathSelect.appendChild(opt);
+                                    });
+                                    console.log('✅ Pathology options added:', pathSelect.options.length);
+                                }
+                                pathDone = true;
+                                maybeInit();
+                            })
+                            .catch(function(err) {
+                                console.error('❌ Pathology fetch error:', err);
+                                pathSelect.innerHTML = '<option value="">Error loading</option>';
+                                pathDone = true;
+                                maybeInit();
+                            });
+                    } else {
+                        pathDone = true;
+                        maybeInit();
+                    }
                 } else {
                     pathDone = true;
                     maybeInit();
                 }
-            } else {
-                pathDone = true;
-                maybeInit();
-            }
 
-            if (radSelect) {
-                if (radSelect.options.length <= 1) {
-                    if (window.jQuery && window.jQuery(radSelect).hasClass('select2-hidden-accessible')) {
-                        try { window.jQuery(radSelect).select2('destroy'); } catch(e) {}
+                if (radSelect) {
+                    if (radSelect.options.length <= 1) {
+                        if (window.jQuery && window.jQuery(radSelect).hasClass('select2-hidden-accessible')) {
+                            try {
+                                window.jQuery(radSelect).select2('destroy');
+                            } catch (e) {}
+                        }
+                        radSelect.innerHTML = '<option value="">Loading...</option>';
+                        fetch(radiologyUrl)
+                            .then(function(r) {
+                                if (!r.ok) throw new Error('HTTP ' + r.status);
+                                return r.json();
+                            })
+                            .then(function(data) {
+                                radSelect.innerHTML = '';
+                                if (data && Array.isArray(data) && data.length > 0) {
+                                    data.forEach(function(r) {
+                                        var opt = document.createElement('option');
+                                        opt.value = r.id;
+                                        opt.textContent = (r.test_name || 'Unknown') + (r.short_name ?
+                                            ' (' + r.short_name + ')' : '');
+                                        radSelect.appendChild(opt);
+                                    });
+                                    console.log('✅ Radiology options added:', radSelect.options.length);
+                                }
+                                radDone = true;
+                                maybeInit();
+                            })
+                            .catch(function(err) {
+                                console.error('❌ Radiology fetch error:', err);
+                                radSelect.innerHTML = '<option value="">Error loading</option>';
+                                radDone = true;
+                                maybeInit();
+                            });
+                    } else {
+                        radDone = true;
+                        maybeInit();
                     }
-                    radSelect.innerHTML = '<option value="">Loading...</option>';
-                    fetch(radiologyUrl)
-                        .then(function(r) {
-                            if (!r.ok) throw new Error('HTTP ' + r.status);
-                            return r.json();
-                        })
-                        .then(function(data) {
-                            radSelect.innerHTML = '';
-                            if (data && Array.isArray(data) && data.length > 0) {
-                                data.forEach(function(r) {
-                                    var opt = document.createElement('option');
-                                    opt.value = r.id;
-                                    opt.textContent = (r.test_name || 'Unknown') + (r.short_name ? ' (' + r.short_name + ')' : '');
-                                    radSelect.appendChild(opt);
-                                });
-                                console.log('✅ Radiology options added:', radSelect.options.length);
-                            }
-                            radDone = true;
-                            maybeInit();
-                        })
-                        .catch(function(err) {
-                            console.error('❌ Radiology fetch error:', err);
-                            radSelect.innerHTML = '<option value="">Error loading</option>';
-                            radDone = true;
-                            maybeInit();
-                        });
                 } else {
                     radDone = true;
                     maybeInit();
                 }
-            } else {
-                radDone = true;
-                maybeInit();
-            }
-        };
-    }
-
-    window.initPathologyRadiologySelect2 = function() {
-        if (typeof window.jQuery === 'undefined' || !window.jQuery.fn.select2) return;
-        var $ = window.jQuery;
-        var pathEl = document.getElementById('pathologyOpt');
-        var radEl = document.getElementById('radiologyOpt');
-        if (!pathEl && !radEl) return;
-        var opts = {
-            placeholder: 'Select Tests',
-            allowClear: true,
-            width: '100%',
-            dropdownParent: $('body'),
-            dropdownCssClass: 'pathology-radiology-dropdown',
-            minimumResultsForSearch: 0,
-            multiple: true,
-            closeOnSelect: false,
-            language: { inputTooShort: function() { return ''; }, searching: function() { return ''; } }
-        };
-        function initOne(el) {
-            if (!el || el.options.length === 0) return;
-            try {
-                if ($(el).data('select2')) { try { $(el).select2('destroy'); } catch(d) {} }
-                $(el).select2(opts);
-            } catch (e) { console.debug('Select2 init:', e); }
+            };
         }
-        function doInit() {
+
+        window.initPathologyRadiologySelect2 = function() {
+            if (typeof window.jQuery === 'undefined' || !window.jQuery.fn.select2) return;
+            var $ = window.jQuery;
+            var pathEl = document.getElementById('pathologyOpt');
+            var radEl = document.getElementById('radiologyOpt');
+            if (!pathEl && !radEl) return;
+            var opts = {
+                placeholder: 'Select Tests',
+                allowClear: true,
+                width: '100%',
+                dropdownParent: $('body'),
+                dropdownCssClass: 'pathology-radiology-dropdown',
+                minimumResultsForSearch: 0,
+                multiple: true,
+                closeOnSelect: false,
+                language: {
+                    inputTooShort: function() {
+                        return '';
+                    },
+                    searching: function() {
+                        return '';
+                    }
+                }
+            };
+
+            function initOne(el) {
+                if (!el || el.options.length === 0) return;
+                try {
+                    if ($(el).data('select2')) {
+                        try {
+                            $(el).select2('destroy');
+                        } catch (d) {}
+                    }
+                    $(el).select2(opts);
+                } catch (e) {
+                    console.debug('Select2 init:', e);
+                }
+            }
+
+            function doInit() {
+                var modal = document.getElementById('addPrescriptionModal');
+                if (!modal) return;
+                initOne(pathEl);
+                initOne(radEl);
+            }
+            setTimeout(doInit, 100);
+            setTimeout(doInit, 400);
+            setTimeout(doInit, 800);
+        };
+
+        // Ensure function is available
+        console.log('fetchPathologyRadiologyData defined:', typeof window.fetchPathologyRadiologyData === 'function');
+
+        // Directly populate medicine category, dose interval, dose duration in the prescription modal (no dependency on modal script)
+        window.populateMedicineDropdownsInModal = function() {
             var modal = document.getElementById('addPrescriptionModal');
             if (!modal) return;
-            initOne(pathEl);
-            initOne(radEl);
-        }
-        setTimeout(doInit, 100);
-        setTimeout(doInit, 400);
-        setTimeout(doInit, 800);
-    };
+            var container = modal.querySelector('#medicineContainer') || document.getElementById('medicineContainer');
+            if (!container) return;
+            var rows = container.querySelectorAll('.medicine-row');
+            var cats = window.medicineCategories || [];
+            var intervals = window.doseIntervals || [];
+            var durations = window.doseDurations || [];
+            var $ = window.jQuery;
+            var hasSelect2 = $ && $.fn.select2;
 
-    // Ensure function is available
-    console.log('fetchPathologyRadiologyData defined:', typeof window.fetchPathologyRadiologyData === 'function');
-
-    // Directly populate medicine category, dose interval, dose duration in the prescription modal (no dependency on modal script)
-    window.populateMedicineDropdownsInModal = function() {
-        var modal = document.getElementById('addPrescriptionModal');
-        if (!modal) return;
-        var container = modal.querySelector('#medicineContainer') || document.getElementById('medicineContainer');
-        if (!container) return;
-        var rows = container.querySelectorAll('.medicine-row');
-        var cats = window.medicineCategories || [];
-        var intervals = window.doseIntervals || [];
-        var durations = window.doseDurations || [];
-        var $ = window.jQuery;
-        var hasSelect2 = $ && $.fn.select2;
-        function fillSelect(sel, list, textKey) {
-            if (!sel) return;
-            if (hasSelect2 && $(sel).hasClass('select2-hidden-accessible')) {
-                try { $(sel).select2('destroy'); } catch(e) {}
-            }
-            sel.innerHTML = '';
-            var opt0 = document.createElement('option');
-            opt0.value = '';
-            opt0.textContent = textKey === 'cat' ? 'Select Category' : (textKey === 'int' ? 'Select Interval' : 'Select Duration');
-            sel.appendChild(opt0);
-            if (Array.isArray(list) && list.length > 0) {
-                list.forEach(function(item) {
-                    if (!item || item.id == null) return;
-                    var o = document.createElement('option');
-                    o.value = item.id;
-                    o.textContent = textKey === 'cat' ? (item.medicine_category || item.name || item.category || '') : (item.name || '');
-                    sel.appendChild(o);
-                });
-            }
-            if (hasSelect2) {
-                try {
-                    $(sel).select2({
-                        width: '100%',
-                        placeholder: textKey === 'cat' ? 'Select Category' : (textKey === 'int' ? 'Select Interval' : 'Select Duration'),
-                        allowClear: true,
-                        dropdownParent: $('#addPrescriptionModal')
-                    });
-                } catch(e) {}
-            }
-        }
-        rows.forEach(function(row) {
-            var catSel = row.querySelector('.medicine_category');
-            var intSel = row.querySelector('.interval_dosage');
-            var durSel = row.querySelector('.duration_dosage');
-            fillSelect(catSel, cats, 'cat');
-            fillSelect(intSel, intervals, 'int');
-            fillSelect(durSel, durations, 'dur');
-        });
-        if (typeof window.attachMedicineCategoryChangeInModal === 'function') {
-            window.attachMedicineCategoryChangeInModal();
-        }
-        if (typeof window.attachMedicineChangeForDosesInModal === 'function') {
-            window.attachMedicineChangeForDosesInModal();
-        }
-        console.log('✅ Medicine dropdowns populated in modal:', rows.length, 'rows');
-    };
-
-    // When user selects a medicine category, fetch medicines and fill the medicine dropdown (works with our populated category select)
-    window.attachMedicineCategoryChangeInModal = function() {
-        var modal = document.getElementById('addPrescriptionModal');
-        if (!modal) return;
-        var $ = window.jQuery;
-        if (!$ || !$.fn.select2) return;
-        var baseUrl = "{{ url(route('getMedicines', ['categoryId' => 'ID'])) }}";
-        $(modal).off('change.medcat select2:select.medcat select2:clear.medcat', '.medicine_category').on('change.medcat select2:select.medcat select2:clear.medcat', '.medicine_category', function() {
-            var categoryId = $(this).val();
-            var row = $(this).closest('.medicine-row')[0];
-            if (!row) return;
-            var medicineSelect = row.querySelector('.medicine_name');
-            if (!medicineSelect) return;
-            if (!categoryId || categoryId === '') {
-                medicineSelect.innerHTML = '<option value="">Select Medicine</option>';
-                try { $(medicineSelect).select2('destroy'); } catch(e) {}
-                $(medicineSelect).select2({ width: '100%', placeholder: 'Select Medicine', allowClear: true, dropdownParent: $('#addPrescriptionModal') });
-                return;
-            }
-            var url = baseUrl.replace('ID', categoryId);
-            $(medicineSelect).prop('disabled', true).html('<option value="">Loading...</option>');
-            try { $(medicineSelect).select2('destroy'); } catch(e) {}
-            fetch(url)
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    var list = Array.isArray(data) ? data : (data && data.data) || [];
-                    medicineSelect.innerHTML = '';
-                    var o0 = document.createElement('option');
-                    o0.value = '';
-                    o0.textContent = 'Select Medicine';
-                    medicineSelect.appendChild(o0);
+            function fillSelect(sel, list, textKey) {
+                if (!sel) return;
+                if (hasSelect2 && $(sel).hasClass('select2-hidden-accessible')) {
+                    try {
+                        $(sel).select2('destroy');
+                    } catch (e) {}
+                }
+                sel.innerHTML = '';
+                var opt0 = document.createElement('option');
+                opt0.value = '';
+                opt0.textContent = textKey === 'cat' ? 'Select Category' : (textKey === 'int' ? 'Select Interval' :
+                    'Select Duration');
+                sel.appendChild(opt0);
+                if (Array.isArray(list) && list.length > 0) {
                     list.forEach(function(item) {
                         if (!item || item.id == null) return;
                         var o = document.createElement('option');
                         o.value = item.id;
-                        o.textContent = item.medicine_name || item.name || 'Unknown';
-                        medicineSelect.appendChild(o);
+                        o.textContent = textKey === 'cat' ? (item.medicine_category || item.name || item
+                            .category || '') : (item.name || '');
+                        sel.appendChild(o);
                     });
-                    $(medicineSelect).prop('disabled', false);
-                    $(medicineSelect).select2({
-                        width: '100%',
-                        placeholder: 'Select Medicine',
-                        allowClear: true,
-                        dropdownParent: $('#addPrescriptionModal')
-                    });
-                    console.log('✅ Medicines filled in dropdown:', list.length);
-                })
-                .catch(function(e) {
-                    console.warn('Medicine fetch error:', e);
-                    medicineSelect.innerHTML = '<option value="">Error loading</option>';
-                    $(medicineSelect).prop('disabled', false);
-                    $(medicineSelect).select2({ width: '100%', placeholder: 'Select Medicine', allowClear: true, dropdownParent: $('#addPrescriptionModal') });
-                });
-        });
-        console.log('✅ Medicine category change handler attached');
-    };
-
-    // When user selects a medicine, fetch doses for that category and fill the dose dropdown
-    window.attachMedicineChangeForDosesInModal = function() {
-        var modal = document.getElementById('addPrescriptionModal');
-        if (!modal) return;
-        var $ = window.jQuery;
-        if (!$ || !$.fn.select2) return;
-        var baseUrl = "{{ url(route('getDoses', ['categoryId' => 'ID'])) }}";
-        $(modal).off('change.meddose select2:select.meddose select2:clear.meddose', '.medicine_name').on('change.meddose select2:select.meddose select2:clear.meddose', '.medicine_name', function() {
-            var row = $(this).closest('.medicine-row')[0];
-            if (!row) return;
-            var categorySelect = row.querySelector('.medicine_category');
-            var doseSelect = row.querySelector('.medicine_dosage');
-            if (!categorySelect || !doseSelect) return;
-            var categoryId = $(categorySelect).val();
-            if (!categoryId || categoryId === '') {
-                doseSelect.innerHTML = '<option value="">Select Category First</option>';
-                try { $(doseSelect).select2('destroy'); } catch(e) {}
-                $(doseSelect).select2({ width: '100%', placeholder: 'Select Dose', allowClear: true, dropdownParent: $('#addPrescriptionModal') });
-                return;
-            }
-            var url = baseUrl.replace('ID', categoryId);
-            $(doseSelect).prop('disabled', true);
-            doseSelect.innerHTML = '<option value="">Loading doses...</option>';
-            try { $(doseSelect).select2('destroy'); } catch(e) {}
-            fetch(url)
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    var list = Array.isArray(data) ? data : (data && data.data) || [];
-                    doseSelect.innerHTML = '';
-                    var o0 = document.createElement('option');
-                    o0.value = '';
-                    o0.textContent = 'Select Dose';
-                    doseSelect.appendChild(o0);
-                    list.forEach(function(item) {
-                        if (!item || item.id == null) return;
-                        var o = document.createElement('option');
-                        o.value = item.id;
-                        var label = item.dosage || item.name || 'Unknown';
-                        if (item.unit && item.unit.unit_name) label += ' ' + item.unit.unit_name;
-                        o.textContent = label;
-                        doseSelect.appendChild(o);
-                    });
-                    $(doseSelect).prop('disabled', false);
-                    $(doseSelect).select2({
-                        width: '100%',
-                        placeholder: 'Select Dose',
-                        allowClear: true,
-                        dropdownParent: $('#addPrescriptionModal')
-                    });
-                    console.log('✅ Doses filled in dropdown:', list.length);
-                })
-                .catch(function(e) {
-                    console.warn('Doses fetch error:', e);
-                    doseSelect.innerHTML = '<option value="">Error loading doses</option>';
-                    $(doseSelect).prop('disabled', false);
-                    $(doseSelect).select2({ width: '100%', placeholder: 'Select Dose', allowClear: true, dropdownParent: $('#addPrescriptionModal') });
-                });
-        });
-        console.log('✅ Medicine change → doses handler attached');
-    };
-
-    // Fetch medicine category, dose interval, dose duration - call this when Add Prescription is clicked so APIs always run
-    window.fetchMedicineDropdownData = function() {
-        var catUrl = "{{ url(route('getMedicineCategories')) }}";
-        var intUrl = "{{ url(route('getDoseIntervals')) }}";
-        var durUrl = "{{ url(route('getDoseDurations')) }}";
-        console.log('📡 Fetching medicine dropdowns:', catUrl, intUrl, durUrl);
-        Promise.all([
-            fetch(catUrl).then(function(r) { return r.json().then(function(d) { return Array.isArray(d) ? d : []; }).catch(function() { return []; }); }),
-            fetch(intUrl).then(function(r) { return r.json().then(function(d) { return Array.isArray(d) ? d : []; }).catch(function() { return []; }); }),
-            fetch(durUrl).then(function(r) { return r.json().then(function(d) { return Array.isArray(d) ? d : []; }).catch(function() { return []; }); })
-        ]).then(function(arr) {
-            window.medicineCategories = arr[0] || [];
-            window.doseIntervals = arr[1] || [];
-            window.doseDurations = arr[2] || [];
-            console.log('✅ Medicine dropdowns loaded:', window.medicineCategories.length, 'categories', window.doseIntervals.length, 'intervals', window.doseDurations.length, 'durations');
-            // Populate modal dropdowns directly so data always shows (then run modal init if present)
-            setTimeout(function() {
-                if (typeof window.populateMedicineDropdownsInModal === 'function') {
-                    window.populateMedicineDropdownsInModal();
                 }
-                if (typeof window.initializeMedicineRows === 'function') {
-                    window.initializeMedicineRows();
+                if (hasSelect2) {
+                    try {
+                        $(sel).select2({
+                            width: '100%',
+                            placeholder: textKey === 'cat' ? 'Select Category' : (textKey === 'int' ?
+                                'Select Interval' : 'Select Duration'),
+                            allowClear: true,
+                            dropdownParent: $('#addPrescriptionModal')
+                        });
+                    } catch (e) {}
                 }
-            }, 300);
-        }).catch(function(e) {
-            console.warn('Medicine dropdown fetch error:', e);
-            window.medicineCategories = window.medicineCategories || [];
-            window.doseIntervals = window.doseIntervals || [];
-            window.doseDurations = window.doseDurations || [];
-            setTimeout(function() {
-                if (typeof window.populateMedicineDropdownsInModal === 'function') window.populateMedicineDropdownsInModal();
-                if (typeof window.initializeMedicineRows === 'function') window.initializeMedicineRows();
-            }, 300);
-        });
-    };
-
-    function openAddPrescriptionModal(ipdId) {
-        console.log('openAddPrescriptionModal called with IPD ID:', ipdId);
-        const modalEl = document.getElementById('addPrescriptionModal');
-        if (!modalEl) {
-            console.error('addPrescriptionModal element not found');
-            alert('Error: Prescription modal not found. Please refresh the page.');
-            return false;
-        }
-
-        // Set IPD ID in hidden field
-        const ipdIdField = document.getElementById('ipd_id');
-        if (ipdIdField) {
-            ipdIdField.value = ipdId;
-            console.log('IPD ID set to:', ipdId);
-        }
-
-        // Set prescription date for back-dated support
-        const btn = document.querySelector('[data-bs-target="#addPrescriptionModal"][data-ipd-id="' + ipdId + '"]');
-        const prescriptionDateEl = document.getElementById('prescription_date');
-        const today = new Date().toISOString().split('T')[0];
-        if (prescriptionDateEl) {
-            prescriptionDateEl.max = today;
-            const admissionDate = btn ? btn.getAttribute('data-admission-date') : null;
-            if (admissionDate) {
-                prescriptionDateEl.value = admissionDate;
-                prescriptionDateEl.min = admissionDate;
-                console.log('Prescription date set to admission date:', admissionDate);
-            } else {
-                prescriptionDateEl.value = today;
-                prescriptionDateEl.removeAttribute('min');
             }
-        }
+            rows.forEach(function(row) {
+                var catSel = row.querySelector('.medicine_category');
+                var intSel = row.querySelector('.interval_dosage');
+                var durSel = row.querySelector('.duration_dosage');
+                fillSelect(catSel, cats, 'cat');
+                fillSelect(intSel, intervals, 'int');
+                fillSelect(durSel, durations, 'dur');
+            });
+            if (typeof window.attachMedicineCategoryChangeInModal === 'function') {
+                window.attachMedicineCategoryChangeInModal();
+            }
+            if (typeof window.attachMedicineChangeForDosesInModal === 'function') {
+                window.attachMedicineChangeForDosesInModal();
+            }
+            console.log('✅ Medicine dropdowns populated in modal:', rows.length, 'rows');
+        };
 
-        // IMMEDIATELY fetch data - don't wait for modal
-        if (typeof window.fetchPathologyRadiologyData === 'function') {
-            window.fetchPathologyRadiologyData();
-        }
-        if (typeof window.fetchMedicineDropdownData === 'function') {
-            window.fetchMedicineDropdownData();
-        }
+        // When user selects a medicine category, fetch medicines and fill the medicine dropdown (works with our populated category select)
+        window.attachMedicineCategoryChangeInModal = function() {
+            var modal = document.getElementById('addPrescriptionModal');
+            if (!modal) return;
+            var $ = window.jQuery;
+            if (!$ || !$.fn.select2) return;
+            var baseUrl = "{{ url(route('getMedicines', ['categoryId' => 'ID'])) }}";
+            $(modal).off('change.medcat select2:select.medcat select2:clear.medcat', '.medicine_category').on(
+                'change.medcat select2:select.medcat select2:clear.medcat', '.medicine_category',
+                function() {
+                    var categoryId = $(this).val();
+                    var row = $(this).closest('.medicine-row')[0];
+                    if (!row) return;
+                    var medicineSelect = row.querySelector('.medicine_name');
+                    if (!medicineSelect) return;
+                    if (!categoryId || categoryId === '') {
+                        medicineSelect.innerHTML = '<option value="">Select Medicine</option>';
+                        try {
+                            $(medicineSelect).select2('destroy');
+                        } catch (e) {}
+                        $(medicineSelect).select2({
+                            width: '100%',
+                            placeholder: 'Select Medicine',
+                            allowClear: true,
+                            dropdownParent: $('#addPrescriptionModal')
+                        });
+                        return;
+                    }
+                    var url = baseUrl.replace('ID', categoryId);
+                    $(medicineSelect).prop('disabled', true).html('<option value="">Loading...</option>');
+                    try {
+                        $(medicineSelect).select2('destroy');
+                    } catch (e) {}
+                    fetch(url)
+                        .then(function(r) {
+                            return r.json();
+                        })
+                        .then(function(data) {
+                            var list = Array.isArray(data) ? data : (data && data.data) || [];
+                            medicineSelect.innerHTML = '';
+                            var o0 = document.createElement('option');
+                            o0.value = '';
+                            o0.textContent = 'Select Medicine';
+                            medicineSelect.appendChild(o0);
+                            list.forEach(function(item) {
+                                if (!item || item.id == null) return;
+                                var o = document.createElement('option');
+                                o.value = item.id;
+                                o.textContent = item.medicine_name || item.name || 'Unknown';
+                                medicineSelect.appendChild(o);
+                            });
+                            $(medicineSelect).prop('disabled', false);
+                            $(medicineSelect).select2({
+                                width: '100%',
+                                placeholder: 'Select Medicine',
+                                allowClear: true,
+                                dropdownParent: $('#addPrescriptionModal')
+                            });
+                            console.log('✅ Medicines filled in dropdown:', list.length);
+                        })
+                        .catch(function(e) {
+                            console.warn('Medicine fetch error:', e);
+                            medicineSelect.innerHTML = '<option value="">Error loading</option>';
+                            $(medicineSelect).prop('disabled', false);
+                            $(medicineSelect).select2({
+                                width: '100%',
+                                placeholder: 'Select Medicine',
+                                allowClear: true,
+                                dropdownParent: $('#addPrescriptionModal')
+                            });
+                        });
+                });
+            console.log('✅ Medicine category change handler attached');
+        };
 
-        // Try Bootstrap modal first
-        try {
-            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                console.log('✅ Bootstrap and Modal are available');
+        // When user selects a medicine, fetch doses for that category and fill the dose dropdown
+        window.attachMedicineChangeForDosesInModal = function() {
+            var modal = document.getElementById('addPrescriptionModal');
+            if (!modal) return;
+            var $ = window.jQuery;
+            if (!$ || !$.fn.select2) return;
+            var baseUrl = "{{ url(route('getDoses', ['categoryId' => 'ID'])) }}";
+            $(modal).off('change.meddose select2:select.meddose select2:clear.meddose', '.medicine_name').on(
+                'change.meddose select2:select.meddose select2:clear.meddose', '.medicine_name',
+                function() {
+                    var row = $(this).closest('.medicine-row')[0];
+                    if (!row) return;
+                    var categorySelect = row.querySelector('.medicine_category');
+                    var doseSelect = row.querySelector('.medicine_dosage');
+                    if (!categorySelect || !doseSelect) return;
+                    var categoryId = $(categorySelect).val();
+                    if (!categoryId || categoryId === '') {
+                        doseSelect.innerHTML = '<option value="">Select Category First</option>';
+                        try {
+                            $(doseSelect).select2('destroy');
+                        } catch (e) {}
+                        $(doseSelect).select2({
+                            width: '100%',
+                            placeholder: 'Select Dose',
+                            allowClear: true,
+                            dropdownParent: $('#addPrescriptionModal')
+                        });
+                        return;
+                    }
+                    var url = baseUrl.replace('ID', categoryId);
+                    $(doseSelect).prop('disabled', true);
+                    doseSelect.innerHTML = '<option value="">Loading doses...</option>';
+                    try {
+                        $(doseSelect).select2('destroy');
+                    } catch (e) {}
+                    fetch(url)
+                        .then(function(r) {
+                            return r.json();
+                        })
+                        .then(function(data) {
+                            var list = Array.isArray(data) ? data : (data && data.data) || [];
+                            doseSelect.innerHTML = '';
+                            var o0 = document.createElement('option');
+                            o0.value = '';
+                            o0.textContent = 'Select Dose';
+                            doseSelect.appendChild(o0);
+                            list.forEach(function(item) {
+                                if (!item || item.id == null) return;
+                                var o = document.createElement('option');
+                                o.value = item.id;
+                                var label = item.dosage || item.name || 'Unknown';
+                                if (item.unit && item.unit.unit_name) label += ' ' + item.unit
+                                .unit_name;
+                                o.textContent = label;
+                                doseSelect.appendChild(o);
+                            });
+                            $(doseSelect).prop('disabled', false);
+                            $(doseSelect).select2({
+                                width: '100%',
+                                placeholder: 'Select Dose',
+                                allowClear: true,
+                                dropdownParent: $('#addPrescriptionModal')
+                            });
+                            console.log('✅ Doses filled in dropdown:', list.length);
+                        })
+                        .catch(function(e) {
+                            console.warn('Doses fetch error:', e);
+                            doseSelect.innerHTML = '<option value="">Error loading doses</option>';
+                            $(doseSelect).prop('disabled', false);
+                            $(doseSelect).select2({
+                                width: '100%',
+                                placeholder: 'Select Dose',
+                                allowClear: true,
+                                dropdownParent: $('#addPrescriptionModal')
+                            });
+                        });
+                });
+            console.log('✅ Medicine change → doses handler attached');
+        };
 
-                // Check if modal already has an instance
-                let modalInstance = bootstrap.Modal.getInstance(modalEl);
-                if (!modalInstance) {
-                    console.log('Creating new Bootstrap Modal instance');
-                    modalInstance = new bootstrap.Modal(modalEl, {
-                        backdrop: true,
-                        keyboard: true,
-                        focus: true
+        // Fetch medicine category, dose interval, dose duration - call this when Add Prescription is clicked so APIs always run
+        window.fetchMedicineDropdownData = function() {
+            var catUrl = "{{ url(route('getMedicineCategories')) }}";
+            var intUrl = "{{ url(route('getDoseIntervals')) }}";
+            var durUrl = "{{ url(route('getDoseDurations')) }}";
+            console.log('📡 Fetching medicine dropdowns:', catUrl, intUrl, durUrl);
+            Promise.all([
+                fetch(catUrl).then(function(r) {
+                    return r.json().then(function(d) {
+                        return Array.isArray(d) ? d : [];
+                    }).catch(function() {
+                        return [];
                     });
+                }),
+                fetch(intUrl).then(function(r) {
+                    return r.json().then(function(d) {
+                        return Array.isArray(d) ? d : [];
+                    }).catch(function() {
+                        return [];
+                    });
+                }),
+                fetch(durUrl).then(function(r) {
+                    return r.json().then(function(d) {
+                        return Array.isArray(d) ? d : [];
+                    }).catch(function() {
+                        return [];
+                    });
+                })
+            ]).then(function(arr) {
+                window.medicineCategories = arr[0] || [];
+                window.doseIntervals = arr[1] || [];
+                window.doseDurations = arr[2] || [];
+                console.log('✅ Medicine dropdowns loaded:', window.medicineCategories.length, 'categories',
+                    window.doseIntervals.length, 'intervals', window.doseDurations.length, 'durations');
+                // Populate modal dropdowns directly so data always shows (then run modal init if present)
+                setTimeout(function() {
+                    if (typeof window.populateMedicineDropdownsInModal === 'function') {
+                        window.populateMedicineDropdownsInModal();
+                    }
+                    if (typeof window.initializeMedicineRows === 'function') {
+                        window.initializeMedicineRows();
+                    }
+                }, 300);
+            }).catch(function(e) {
+                console.warn('Medicine dropdown fetch error:', e);
+                window.medicineCategories = window.medicineCategories || [];
+                window.doseIntervals = window.doseIntervals || [];
+                window.doseDurations = window.doseDurations || [];
+                setTimeout(function() {
+                    if (typeof window.populateMedicineDropdownsInModal === 'function') window
+                        .populateMedicineDropdownsInModal();
+                    if (typeof window.initializeMedicineRows === 'function') window
+                        .initializeMedicineRows();
+                }, 300);
+            });
+        };
+
+        function openAddPrescriptionModal(ipdId) {
+            console.log('openAddPrescriptionModal called with IPD ID:', ipdId);
+            const modalEl = document.getElementById('addPrescriptionModal');
+            if (!modalEl) {
+                console.error('addPrescriptionModal element not found');
+                alert('Error: Prescription modal not found. Please refresh the page.');
+                return false;
+            }
+
+            // Set IPD ID in hidden field
+            const ipdIdField = document.getElementById('ipd_id');
+            if (ipdIdField) {
+                ipdIdField.value = ipdId;
+                console.log('IPD ID set to:', ipdId);
+            }
+
+            // Set prescription date for back-dated support
+            const btn = document.querySelector('[data-bs-target="#addPrescriptionModal"][data-ipd-id="' + ipdId + '"]');
+            const prescriptionDateEl = document.getElementById('prescription_date');
+            const today = new Date().toISOString().split('T')[0];
+            if (prescriptionDateEl) {
+                prescriptionDateEl.max = today;
+                const admissionDate = btn ? btn.getAttribute('data-admission-date') : null;
+                if (admissionDate) {
+                    prescriptionDateEl.value = admissionDate;
+                    prescriptionDateEl.min = admissionDate;
+                    console.log('Prescription date set to admission date:', admissionDate);
                 } else {
-                    console.log('Using existing Bootstrap Modal instance');
+                    prescriptionDateEl.value = today;
+                    prescriptionDateEl.removeAttribute('min');
                 }
+            }
 
-                // Show the modal
-                console.log('Calling modalInstance.show()...');
-                modalInstance.show();
-                console.log('✅ Bootstrap modal.show() called');
-                // CRITICAL: Return here - do NOT fall through to manual fallback. Bootstrap manages show/hide/backdrop.
-                // Manual fallback only runs when Bootstrap is unavailable (see below).
-                return true;
+            // IMMEDIATELY fetch data - don't wait for modal
+            if (typeof window.fetchPathologyRadiologyData === 'function') {
+                window.fetchPathologyRadiologyData();
+            }
+            if (typeof window.fetchMedicineDropdownData === 'function') {
+                window.fetchMedicineDropdownData();
+            }
 
-                // Verify modal is showing after a short delay (kept for reference, Bootstrap handles it)
-                setTimeout(() => {
-                    // Check visibility - aria-hidden must be explicitly 'false' (not null)
-                    const ariaHidden = modalEl.getAttribute('aria-hidden');
-                    const computedStyle = window.getComputedStyle(modalEl);
-                    const isVisible = modalEl.classList.contains('show') &&
-                                     (ariaHidden === 'false' || ariaHidden === null) && // Accept null as visible too
-                                     computedStyle.display !== 'none' &&
-                                     computedStyle.visibility !== 'hidden' &&
-                                     parseFloat(computedStyle.opacity) > 0;
+            // Try Bootstrap modal first
+            try {
+                if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                    console.log('✅ Bootstrap and Modal are available');
 
-                    console.log('Modal visibility check after Bootstrap show:', {
-                        isVisible: isVisible,
-                        hasShowClass: modalEl.classList.contains('show'),
-                        ariaHidden: ariaHidden,
-                        display: computedStyle.display,
-                        visibility: computedStyle.visibility,
-                        opacity: computedStyle.opacity,
-                        zIndex: computedStyle.zIndex,
-                        position: computedStyle.position
-                    });
-
-                    if (!isVisible) {
-                        console.warn('⚠️ Bootstrap modal.show() did not make modal visible, using manual fallback');
-                        // Don't return, fall through to manual fallback
+                    // Check if modal already has an instance
+                    let modalInstance = bootstrap.Modal.getInstance(modalEl);
+                    if (!modalInstance) {
+                        console.log('Creating new Bootstrap Modal instance');
+                        modalInstance = new bootstrap.Modal(modalEl, {
+                            backdrop: true,
+                            keyboard: true,
+                            focus: true
+                        });
                     } else {
-                        console.log('✅ Modal is visible via Bootstrap');
+                        console.log('Using existing Bootstrap Modal instance');
                     }
 
-                    // Ensure medicine categories, dose intervals, dose durations and medicine rows are loaded
-                    setTimeout(function() {
+                    // Show the modal
+                    console.log('Calling modalInstance.show()...');
+                    modalInstance.show();
+                    console.log('✅ Bootstrap modal.show() called');
+                    // CRITICAL: Return here - do NOT fall through to manual fallback. Bootstrap manages show/hide/backdrop.
+                    // Manual fallback only runs when Bootstrap is unavailable (see below).
+                    return true;
+
+                    // Verify modal is showing after a short delay (kept for reference, Bootstrap handles it)
+                    setTimeout(() => {
+                        // Check visibility - aria-hidden must be explicitly 'false' (not null)
+                        const ariaHidden = modalEl.getAttribute('aria-hidden');
+                        const computedStyle = window.getComputedStyle(modalEl);
+                        const isVisible = modalEl.classList.contains('show') &&
+                            (ariaHidden === 'false' || ariaHidden === null) && // Accept null as visible too
+                            computedStyle.display !== 'none' &&
+                            computedStyle.visibility !== 'hidden' &&
+                            parseFloat(computedStyle.opacity) > 0;
+
+                        console.log('Modal visibility check after Bootstrap show:', {
+                            isVisible: isVisible,
+                            hasShowClass: modalEl.classList.contains('show'),
+                            ariaHidden: ariaHidden,
+                            display: computedStyle.display,
+                            visibility: computedStyle.visibility,
+                            opacity: computedStyle.opacity,
+                            zIndex: computedStyle.zIndex,
+                            position: computedStyle.position
+                        });
+
+                        if (!isVisible) {
+                            console.warn(
+                                '⚠️ Bootstrap modal.show() did not make modal visible, using manual fallback');
+                            // Don't return, fall through to manual fallback
+                        } else {
+                            console.log('✅ Modal is visible via Bootstrap');
+                        }
+
+                        // Ensure medicine categories, dose intervals, dose durations and medicine rows are loaded
+                        setTimeout(function() {
+                            if (typeof window.loadPathologyRadiologyData === 'function') {
+                                window.loadPathologyRadiologyData();
+                            }
+                            var needsCat = !window.medicineCategories || !window.medicineCategories.length;
+                            var needsInt = !window.doseIntervals || !window.doseIntervals.length;
+                            var needsDur = !window.doseDurations || !window.doseDurations.length;
+                            if (needsCat || needsInt || needsDur) {
+                                var catUrl = "{{ url(route('getMedicineCategories')) }}",
+                                    intUrl = "{{ url(route('getDoseIntervals')) }}",
+                                    durUrl = "{{ url(route('getDoseDurations')) }}";
+                                Promise.all([
+                                    needsCat ? fetch(catUrl).then(function(r) {
+                                        return r.json().then(function(d) {
+                                            return Array.isArray(d) ? d : [];
+                                        }).catch(function() {
+                                            return [];
+                                        });
+                                    }) : Promise.resolve(window.medicineCategories || []),
+                                    needsInt ? fetch(intUrl).then(function(r) {
+                                        return r.json().then(function(d) {
+                                            return Array.isArray(d) ? d : [];
+                                        }).catch(function() {
+                                            return [];
+                                        });
+                                    }) : Promise.resolve(window.doseIntervals || []),
+                                    needsDur ? fetch(durUrl).then(function(r) {
+                                        return r.json().then(function(d) {
+                                            return Array.isArray(d) ? d : [];
+                                        }).catch(function() {
+                                            return [];
+                                        });
+                                    }) : Promise.resolve(window.doseDurations || [])
+                                ]).then(function(arr) {
+                                    window.medicineCategories = arr[0] || [];
+                                    window.doseIntervals = arr[1] || [];
+                                    window.doseDurations = arr[2] || [];
+                                    if (typeof window.initializeMedicineRows === 'function') {
+                                        window.initializeMedicineRows();
+                                    }
+                                }).catch(function(e) {
+                                    console.warn('Medicine data fallback:', e);
+                                    if (typeof window.initializeMedicineRows === 'function') window
+                                        .initializeMedicineRows();
+                                });
+                            } else if (typeof window.initializeMedicineRows === 'function') {
+                                window.initializeMedicineRows();
+                            }
+                        }, 400);
+                    }, 300);
+
+                    // Also call the other function if available
+                    setTimeout(() => {
                         if (typeof window.loadPathologyRadiologyData === 'function') {
                             window.loadPathologyRadiologyData();
                         }
-                        var needsCat = !window.medicineCategories || !window.medicineCategories.length;
-                        var needsInt = !window.doseIntervals || !window.doseIntervals.length;
-                        var needsDur = !window.doseDurations || !window.doseDurations.length;
-                        if (needsCat || needsInt || needsDur) {
-                            var catUrl = "{{ url(route('getMedicineCategories')) }}", intUrl = "{{ url(route('getDoseIntervals')) }}", durUrl = "{{ url(route('getDoseDurations')) }}";
-                            Promise.all([
-                                needsCat ? fetch(catUrl).then(function(r){ return r.json().then(function(d){ return Array.isArray(d) ? d : []; }).catch(function(){ return []; }); }) : Promise.resolve(window.medicineCategories || []),
-                                needsInt ? fetch(intUrl).then(function(r){ return r.json().then(function(d){ return Array.isArray(d) ? d : []; }).catch(function(){ return []; }); }) : Promise.resolve(window.doseIntervals || []),
-                                needsDur ? fetch(durUrl).then(function(r){ return r.json().then(function(d){ return Array.isArray(d) ? d : []; }).catch(function(){ return []; }); }) : Promise.resolve(window.doseDurations || [])
-                            ]).then(function(arr) {
-                                window.medicineCategories = arr[0] || [];
-                                window.doseIntervals = arr[1] || [];
-                                window.doseDurations = arr[2] || [];
-                                if (typeof window.initializeMedicineRows === 'function') {
-                                    window.initializeMedicineRows();
-                                }
-                            }).catch(function(e){ console.warn('Medicine data fallback:', e); if (typeof window.initializeMedicineRows === 'function') window.initializeMedicineRows(); });
-                        } else if (typeof window.initializeMedicineRows === 'function') {
-                            window.initializeMedicineRows();
+                    }, 500);
+
+                    // Don't return immediately - let fallback run if Bootstrap fails
+                    // return true;
+                } else {
+                    console.error('❌ Bootstrap or Modal not available:', {
+                        bootstrap: typeof bootstrap,
+                        Modal: typeof bootstrap !== 'undefined' ? typeof bootstrap.Modal : 'N/A'
+                    });
+                }
+            } catch (bootstrapError) {
+                console.error('❌ Bootstrap modal error:', bootstrapError);
+                console.error('Error stack:', bootstrapError.stack);
+            }
+
+            // Fallback: Manual modal display
+            console.warn('⚠️ Using manual modal fallback');
+            console.log('Modal element before manual show:', {
+                exists: !!modalEl,
+                currentClasses: modalEl ? Array.from(modalEl.classList) : [],
+                currentDisplay: modalEl ? modalEl.style.display : 'N/A',
+                currentAriaHidden: modalEl ? modalEl.getAttribute('aria-hidden') : 'N/A'
+            });
+
+            // Do NOT force other modals to display - duplicate ID was causing wrong modal to be targeted (now fixed in add-pathlab-report).
+            // CRITICAL: Set aria-hidden to 'false' (not null, not remove attribute)
+            modalEl.setAttribute('aria-hidden', 'false');
+            modalEl.setAttribute('aria-modal', 'true');
+
+            // Remove fade class temporarily to show immediately
+            modalEl.classList.remove('fade');
+            modalEl.classList.add('show');
+
+            // Set inline styles with !important to override any CSS
+            modalEl.style.cssText +=
+                'display: block !important; visibility: visible !important; opacity: 1 !important; position: fixed !important; z-index: 1055 !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; overflow-x: hidden !important; overflow-y: auto !important;';
+
+            // Also ensure modal-dialog has proper positioning
+            const modalDialog = modalEl.querySelector('.modal-dialog');
+            if (modalDialog) {
+                modalDialog.style.cssText +=
+                    'position: relative !important; margin: 1.75rem auto !important; z-index: 1056 !important;';
+                console.log('✅ Modal dialog styled');
+            }
+
+            // Ensure modal is visible
+            const computedStyle = window.getComputedStyle(modalEl);
+            console.log('Modal computed styles after manual show:', {
+                display: computedStyle.display,
+                visibility: computedStyle.visibility,
+                opacity: computedStyle.opacity,
+                zIndex: computedStyle.zIndex,
+                position: computedStyle.position,
+                ariaHidden: modalEl.getAttribute('aria-hidden')
+            });
+
+            document.body.classList.add('modal-open');
+            document.body.style.paddingRight = '0px';
+            document.body.style.overflow = 'hidden';
+
+            // Use Bootstrap's backdrop if present; do NOT create our own (causes lingering overlay on close)
+            const existingBackdrop = document.querySelector('.modal-backdrop');
+            if (existingBackdrop) {
+                existingBackdrop.classList.add('show');
+            }
+
+            // Trigger shown event manually
+            const shownEvent = new Event('shown.bs.modal', {
+                bubbles: true
+            });
+            modalEl.dispatchEvent(shownEvent);
+
+            // Verify modal is actually visible
+            setTimeout(() => {
+                const isNowVisible = modalEl.classList.contains('show') &&
+                    window.getComputedStyle(modalEl).display !== 'none' &&
+                    window.getComputedStyle(modalEl).visibility !== 'hidden';
+                console.log('Modal visibility verification:', {
+                    isVisible: isNowVisible,
+                    hasShowClass: modalEl.classList.contains('show'),
+                    display: window.getComputedStyle(modalEl).display,
+                    visibility: window.getComputedStyle(modalEl).visibility,
+                    opacity: window.getComputedStyle(modalEl).opacity
+                });
+
+                if (!isNowVisible) {
+                    console.error('❌ Modal still not visible after manual show attempt');
+                    // Try even more aggressive approach
+                    modalEl.style.cssText =
+                        'display: block !important; visibility: visible !important; opacity: 1 !important; z-index: 1055 !important; position: relative !important;';
+                }
+            }, 100);
+
+            // Ensure data loads after modal opens
+            setTimeout(() => {
+                console.log('🔵 Triggering data load from manual fallback');
+                if (typeof window.loadPathologyRadiologyData === 'function') {
+                    window.loadPathologyRadiologyData();
+                } else {
+                    console.warn('⚠️ loadPathologyRadiologyData function not found, trying fallback');
+                    const pathEl = document.getElementById('pathologyOpt');
+                    const radEl = document.getElementById('radiologyOpt');
+                    if (pathEl && pathEl.options.length <= 1) {
+                        console.log('Pathology data missing, triggering fetch...');
+                        if (typeof window.initializePathologyMultiselect === 'function') {
+                            window.initializePathologyMultiselect();
                         }
-                    }, 400);
-                }, 300);
-
-                // Also call the other function if available
-                setTimeout(() => {
-                    if (typeof window.loadPathologyRadiologyData === 'function') {
-                        window.loadPathologyRadiologyData();
                     }
-                }, 500);
+                    if (radEl && radEl.options.length <= 1) {
+                        console.log('Radiology data missing, triggering fetch...');
+                        if (typeof window.initializeRadiologyMultiselect === 'function') {
+                            window.initializeRadiologyMultiselect();
+                        }
+                    }
+                }
+            }, 500);
 
-                // Don't return immediately - let fallback run if Bootstrap fails
-                // return true;
-            } else {
-                console.error('❌ Bootstrap or Modal not available:', {
-                    bootstrap: typeof bootstrap,
-                    Modal: typeof bootstrap !== 'undefined' ? typeof bootstrap.Modal : 'N/A'
+            console.log('✅ Modal manually shown');
+            return true;
+        }
+
+        // Also handle Bootstrap data attributes as fallback for all prescription buttons
+        // Ensure functions are available before DOMContentLoaded
+        console.log('🔵 IPD View Script Block 2 Loading - checking functions:', {
+            fetchPathologyRadiologyData: typeof window.fetchPathologyRadiologyData,
+            openAddPrescriptionModal: typeof openAddPrescriptionModal
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔵 DOMContentLoaded fired for IPD view');
+
+            const addPrescriptionModal = document.getElementById('addPrescriptionModal');
+            if (addPrescriptionModal && addPrescriptionModal.parentNode !== document.body) {
+                document.body.appendChild(addPrescriptionModal);
+            }
+            if (addPrescriptionModal) {
+                addPrescriptionModal.addEventListener('show.bs.modal', function() {
+                    document.body.appendChild(addPrescriptionModal);
+                    addPrescriptionModal.classList.add('show');
+                    addPrescriptionModal.style.display = 'block';
+                    addPrescriptionModal.style.visibility = 'visible';
+                    addPrescriptionModal.setAttribute('aria-hidden', 'false');
+                });
+                addPrescriptionModal.addEventListener('shown.bs.modal', function() {
+                    addPrescriptionModal.classList.add('show');
+                    addPrescriptionModal.style.display = 'block';
+                    addPrescriptionModal.style.visibility = 'visible';
+
+                    function doInit() {
+                        if (typeof window.initPathologyRadiologySelect2 === 'function') window
+                            .initPathologyRadiologySelect2();
+                        if (typeof window.loadPathologyRadiologyData === 'function') window
+                            .loadPathologyRadiologyData();
+                    }
+                    doInit();
+                    [200, 500, 1000, 1500, 2500, 3500].forEach(function(d) {
+                        setTimeout(doInit, d);
+                    });
                 });
             }
-        } catch (bootstrapError) {
-            console.error('❌ Bootstrap modal error:', bootstrapError);
-            console.error('Error stack:', bootstrapError.stack);
-        }
 
-        // Fallback: Manual modal display
-        console.warn('⚠️ Using manual modal fallback');
-        console.log('Modal element before manual show:', {
-            exists: !!modalEl,
-            currentClasses: modalEl ? Array.from(modalEl.classList) : [],
-            currentDisplay: modalEl ? modalEl.style.display : 'N/A',
-            currentAriaHidden: modalEl ? modalEl.getAttribute('aria-hidden') : 'N/A'
+            const prescriptionButtons = document.querySelectorAll(
+                '[data-bs-target="#addPrescriptionModal"][data-ipd-id]');
+            prescriptionButtons.forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const ipdId = this.getAttribute('data-ipd-id');
+                    const modalEl = document.getElementById('addPrescriptionModal');
+                    if (!modalEl) return;
+                    document.body.appendChild(modalEl);
+                    if (ipdId) {
+                        const ipdIdField = document.getElementById('ipd_id');
+                        if (ipdIdField) ipdIdField.value = ipdId;
+                        const admissionDate = this.getAttribute('data-admission-date');
+                        const prescriptionDateEl = document.getElementById('prescription_date');
+                        if (prescriptionDateEl) {
+                            prescriptionDateEl.max = new Date().toISOString().split('T')[0];
+                            if (admissionDate) {
+                                prescriptionDateEl.value = admissionDate;
+                                prescriptionDateEl.min = admissionDate;
+                            } else {
+                                prescriptionDateEl.removeAttribute('min');
+                                if (!prescriptionDateEl.value) prescriptionDateEl.value =
+                                    prescriptionDateEl.max;
+                            }
+                        }
+                    }
+                    if (typeof window.fetchPathologyRadiologyData === 'function') window
+                        .fetchPathologyRadiologyData();
+                    if (typeof window.fetchMedicineDropdownData === 'function') window
+                        .fetchMedicineDropdownData();
+                    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                        bootstrap.Modal.getOrCreateInstance(modalEl).show();
+                    }
+                });
+            });
+
+            console.log('🔵 Button event listeners attached');
         });
 
-        // Do NOT force other modals to display - duplicate ID was causing wrong modal to be targeted (now fixed in add-pathlab-report).
-        // CRITICAL: Set aria-hidden to 'false' (not null, not remove attribute)
-        modalEl.setAttribute('aria-hidden', 'false');
-        modalEl.setAttribute('aria-modal', 'true');
-
-        // Remove fade class temporarily to show immediately
-        modalEl.classList.remove('fade');
-        modalEl.classList.add('show');
-
-        // Set inline styles with !important to override any CSS
-        modalEl.style.cssText += 'display: block !important; visibility: visible !important; opacity: 1 !important; position: fixed !important; z-index: 1055 !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; overflow-x: hidden !important; overflow-y: auto !important;';
-
-        // Also ensure modal-dialog has proper positioning
-        const modalDialog = modalEl.querySelector('.modal-dialog');
-        if (modalDialog) {
-            modalDialog.style.cssText += 'position: relative !important; margin: 1.75rem auto !important; z-index: 1056 !important;';
-            console.log('✅ Modal dialog styled');
-        }
-
-        // Ensure modal is visible
-        const computedStyle = window.getComputedStyle(modalEl);
-        console.log('Modal computed styles after manual show:', {
-            display: computedStyle.display,
-            visibility: computedStyle.visibility,
-            opacity: computedStyle.opacity,
-            zIndex: computedStyle.zIndex,
-            position: computedStyle.position,
-            ariaHidden: modalEl.getAttribute('aria-hidden')
-        });
-
-        document.body.classList.add('modal-open');
-        document.body.style.paddingRight = '0px';
-        document.body.style.overflow = 'hidden';
-
-        // Use Bootstrap's backdrop if present; do NOT create our own (causes lingering overlay on close)
-        const existingBackdrop = document.querySelector('.modal-backdrop');
-        if (existingBackdrop) {
-            existingBackdrop.classList.add('show');
-        }
-
-        // Trigger shown event manually
-        const shownEvent = new Event('shown.bs.modal', { bubbles: true });
-        modalEl.dispatchEvent(shownEvent);
-
-        // Verify modal is actually visible
-        setTimeout(() => {
-            const isNowVisible = modalEl.classList.contains('show') &&
-                               window.getComputedStyle(modalEl).display !== 'none' &&
-                               window.getComputedStyle(modalEl).visibility !== 'hidden';
-            console.log('Modal visibility verification:', {
-                isVisible: isNowVisible,
-                hasShowClass: modalEl.classList.contains('show'),
-                display: window.getComputedStyle(modalEl).display,
-                visibility: window.getComputedStyle(modalEl).visibility,
-                opacity: window.getComputedStyle(modalEl).opacity
-            });
-
-            if (!isNowVisible) {
-                console.error('❌ Modal still not visible after manual show attempt');
-                // Try even more aggressive approach
-                modalEl.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; z-index: 1055 !important; position: relative !important;';
-            }
-        }, 100);
-
-        // Ensure data loads after modal opens
-        setTimeout(() => {
-            console.log('🔵 Triggering data load from manual fallback');
-            if (typeof window.loadPathologyRadiologyData === 'function') {
-                window.loadPathologyRadiologyData();
-            } else {
-                console.warn('⚠️ loadPathologyRadiologyData function not found, trying fallback');
-                const pathEl = document.getElementById('pathologyOpt');
-                const radEl = document.getElementById('radiologyOpt');
-                if (pathEl && pathEl.options.length <= 1) {
-                    console.log('Pathology data missing, triggering fetch...');
-                    if (typeof window.initializePathologyMultiselect === 'function') {
-                        window.initializePathologyMultiselect();
-                    }
-                }
-                if (radEl && radEl.options.length <= 1) {
-                    console.log('Radiology data missing, triggering fetch...');
-                    if (typeof window.initializeRadiologyMultiselect === 'function') {
-                        window.initializeRadiologyMultiselect();
-                    }
-                }
-            }
-        }, 500);
-
-        console.log('✅ Modal manually shown');
-        return true;
-    }
-
-    // Also handle Bootstrap data attributes as fallback for all prescription buttons
-    // Ensure functions are available before DOMContentLoaded
-    console.log('🔵 IPD View Script Block 2 Loading - checking functions:', {
-        fetchPathologyRadiologyData: typeof window.fetchPathologyRadiologyData,
-        openAddPrescriptionModal: typeof openAddPrescriptionModal
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('🔵 DOMContentLoaded fired for IPD view');
-
-        const addPrescriptionModal = document.getElementById('addPrescriptionModal');
-        if (addPrescriptionModal && addPrescriptionModal.parentNode !== document.body) {
-            document.body.appendChild(addPrescriptionModal);
-        }
-        if (addPrescriptionModal) {
-            addPrescriptionModal.addEventListener('show.bs.modal', function() {
-                document.body.appendChild(addPrescriptionModal);
-                addPrescriptionModal.classList.add('show');
-                addPrescriptionModal.style.display = 'block';
-                addPrescriptionModal.style.visibility = 'visible';
-                addPrescriptionModal.setAttribute('aria-hidden', 'false');
-            });
-            addPrescriptionModal.addEventListener('shown.bs.modal', function() {
-                addPrescriptionModal.classList.add('show');
-                addPrescriptionModal.style.display = 'block';
-                addPrescriptionModal.style.visibility = 'visible';
-                function doInit() {
-                    if (typeof window.initPathologyRadiologySelect2 === 'function') window.initPathologyRadiologySelect2();
-                    if (typeof window.loadPathologyRadiologyData === 'function') window.loadPathologyRadiologyData();
-                }
-                doInit();
-                [200, 500, 1000, 1500, 2500, 3500].forEach(function(d) { setTimeout(doInit, d); });
-            });
-        }
-
-        const prescriptionButtons = document.querySelectorAll('[data-bs-target="#addPrescriptionModal"][data-ipd-id]');
-        prescriptionButtons.forEach(function(btn) {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                const ipdId = this.getAttribute('data-ipd-id');
-                const modalEl = document.getElementById('addPrescriptionModal');
-                if (!modalEl) return;
-                document.body.appendChild(modalEl);
-                if (ipdId) {
-                    const ipdIdField = document.getElementById('ipd_id');
-                    if (ipdIdField) ipdIdField.value = ipdId;
-                    const admissionDate = this.getAttribute('data-admission-date');
-                    const prescriptionDateEl = document.getElementById('prescription_date');
-                    if (prescriptionDateEl) {
-                        prescriptionDateEl.max = new Date().toISOString().split('T')[0];
-                        if (admissionDate) { prescriptionDateEl.value = admissionDate; prescriptionDateEl.min = admissionDate; }
-                        else { prescriptionDateEl.removeAttribute('min'); if (!prescriptionDateEl.value) prescriptionDateEl.value = prescriptionDateEl.max; }
-                    }
-                }
-                if (typeof window.fetchPathologyRadiologyData === 'function') window.fetchPathologyRadiologyData();
-                if (typeof window.fetchMedicineDropdownData === 'function') window.fetchMedicineDropdownData();
-                if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                    bootstrap.Modal.getOrCreateInstance(modalEl).show();
-                }
-            });
-        });
-
-        console.log('🔵 Button event listeners attached');
-    });
-
-    console.log('🔵 IPD View Script Block 2 Loaded');
+        console.log('🔵 IPD View Script Block 2 Loaded');
     </script>
     <!-- Chart JS (CDN fallback; chart.min.js may not exist in assets) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -5603,7 +5814,7 @@
         (function() {
             const paymentModeEl = document.getElementById('payment_mode');
             if (!paymentModeEl) return;
-            paymentModeEl.addEventListener('change', function () {
+            paymentModeEl.addEventListener('change', function() {
                 const chequeFields = document.getElementById('chequeFields');
                 if (!chequeFields) return;
                 if (this.value === 'Cheque') {
@@ -5634,7 +5845,8 @@
                 if (catId) {
                     operations.forEach(op => {
                         if (op.category_id == catId) {
-                            operationDropdown.innerHTML += `<option value="${op.id}">${op.operation}</option>`;
+                            operationDropdown.innerHTML +=
+                                `<option value="${op.id}">${op.operation}</option>`;
                         }
                     });
                 }
@@ -5671,7 +5883,8 @@
                 doseDropdown.innerHTML = '<option value="">Select</option>';
                 if (categoryId && medicines[categoryId]) {
                     medicines[categoryId].forEach(med => {
-                        medDropdown.innerHTML += `<option value="${med.id}">${med.medicine_name}</option>`;
+                        medDropdown.innerHTML +=
+                            `<option value="${med.id}">${med.medicine_name}</option>`;
                     });
                 }
             });
@@ -5905,6 +6118,7 @@
              | RESET CHARGE MODAL ON CLOSE
              --------------------------------------------------*/
             const addChargesModalEl = document.getElementById('add_charges');
+
             function resetChargeModal() {
                 const form = document.getElementById('addChargeForm');
                 if (form) {
@@ -5918,12 +6132,12 @@
                 if (previewBody) previewBody.innerHTML = '';
 
                 // Reset calculated fields
-                totalInp.value       = '0.00';
+                totalInp.value = '0.00';
                 discountPercInp.value = '0';
-                discountAmtInp.value  = '0.00';
-                taxPercInp.value      = '0';
-                taxAmtInp.value       = '0.00';
-                netAmountInp.value    = '0.00';
+                discountAmtInp.value = '0.00';
+                taxPercInp.value = '0';
+                taxAmtInp.value = '0.00';
+                netAmountInp.value = '0.00';
 
                 // Return to Add mode layout (button + table visible, footer Save)
                 enterAddMode();
@@ -5934,7 +6148,7 @@
                     addChargesModalEl.addEventListener('hidden.bs.modal', resetChargeModal);
                 } else {
                     // Fallback: if closed via custom logic
-                    addChargesModalEl.addEventListener('click', function (e) {
+                    addChargesModalEl.addEventListener('click', function(e) {
                         if (e.target.classList.contains('btn-close')) {
                             resetChargeModal();
                         }
@@ -5947,7 +6161,7 @@
              | - Reuse Add Charges modal
              | - Uses delegated click handler for robustness
              --------------------------------------------------*/
-            document.addEventListener('click', function (event) {
+            document.addEventListener('click', function(event) {
                 const btn = event.target.closest('.edit-ipd-charge-btn');
                 if (!btn) {
                     return;
@@ -5985,7 +6199,8 @@
                             modalEl.removeAttribute('aria-hidden');
                         }
 
-                        document.querySelector('#add_charges .modal-title').textContent = 'Edit Charges';
+                        document.querySelector('#add_charges .modal-title').textContent =
+                        'Edit Charges';
                         const form = document.getElementById('addChargeForm');
                         form.action = "{{ url('/ipd_charge') }}/" + charge.id;
 
@@ -6023,22 +6238,26 @@
                             chargeCategorySelect.innerHTML = '<option value=\"\">Select</option>';
                             chargeSelect.innerHTML = '<option value=\"\">Select</option>';
 
-                            fetch("{{ route('getChargeCategoriesByTypeId', ['id' => 'ID']) }}".replace('ID', charge.charge_type_id))
+                            fetch("{{ route('getChargeCategoriesByTypeId', ['id' => 'ID']) }}"
+                                    .replace('ID', charge.charge_type_id))
                                 .then(res => res.json())
                                 .then(categoryData => {
                                     categoryData.forEach(cat => {
-                                        chargeCategorySelect.innerHTML += `<option value=\"${cat.id}\">${cat.name}</option>`;
+                                        chargeCategorySelect.innerHTML +=
+                                            `<option value=\"${cat.id}\">${cat.name}</option>`;
                                     });
                                     chargeCategorySelect.value = charge.charge_category_id;
 
                                     // 2) Load charges for this category
-                                    return fetch("{{ route('getCharges', ['id' => 'ID']) }}".replace('ID', charge.charge_category_id));
+                                    return fetch("{{ route('getCharges', ['id' => 'ID']) }}"
+                                        .replace('ID', charge.charge_category_id));
                                 })
                                 .then(res => res.json())
                                 .then(chargesData => {
                                     chargeSelect.innerHTML = '<option value=\"\">Select</option>';
                                     chargesData.forEach(ch => {
-                                        chargeSelect.innerHTML += `<option value=\"${ch.id}\">${ch.name}</option>`;
+                                        chargeSelect.innerHTML +=
+                                            `<option value=\"${ch.id}\">${ch.name}</option>`;
                                     });
                                     chargeSelect.value = charge.charge_id;
                                 })
@@ -6047,39 +6266,41 @@
                                 });
                         }
 
-                        const standardInp  = document.getElementById('addstandard_charge');
-                        const tpaInp       = document.getElementById('addscd_charge');
-                        const qtyInp       = document.getElementById('qty');
-                        const totalInp     = document.getElementById('apply_charge');
-                        const discPercInp  = document.getElementById('discount_percentage_add_charge');
-                        const discAmtInp   = document.getElementById('discount_percentage_amount');
-                        const taxPercInp   = document.getElementById('charge_tax');
-                        const taxAmtInp    = document.getElementById('tax_amt');
-                        const netAmtInp    = document.getElementById('final_amount');
+                        const standardInp = document.getElementById('addstandard_charge');
+                        const tpaInp = document.getElementById('addscd_charge');
+                        const qtyInp = document.getElementById('qty');
+                        const totalInp = document.getElementById('apply_charge');
+                        const discPercInp = document.getElementById('discount_percentage_add_charge');
+                        const discAmtInp = document.getElementById('discount_percentage_amount');
+                        const taxPercInp = document.getElementById('charge_tax');
+                        const taxAmtInp = document.getElementById('tax_amt');
+                        const netAmtInp = document.getElementById('final_amount');
 
-                        const appliedCharge   = parseFloat(charge.total ?? 0) || 0;
-                        const discountAmount  = parseFloat(charge.discount_percentage ?? 0) || 0; // stored as amount
-                        const taxAmount       = parseFloat(charge.tax ?? 0) || 0;
-                        const discountPercent = appliedCharge > 0 ? (discountAmount / appliedCharge) * 100 : 0;
-                        const taxPercent      = appliedCharge > 0 ? (taxAmount / appliedCharge) * 100 : 0;
+                        const appliedCharge = parseFloat(charge.total ?? 0) || 0;
+                        const discountAmount = parseFloat(charge.discount_percentage ?? 0) ||
+                        0; // stored as amount
+                        const taxAmount = parseFloat(charge.tax ?? 0) || 0;
+                        const discountPercent = appliedCharge > 0 ? (discountAmount / appliedCharge) *
+                            100 : 0;
+                        const taxPercent = appliedCharge > 0 ? (taxAmount / appliedCharge) * 100 : 0;
 
                         standardInp.value = charge.standard_charge ?? 0;
-                        tpaInp.value      = charge.tpa_charge ?? 0;
-                        qtyInp.value      = charge.qty ?? 1;
-                        totalInp.value    = appliedCharge.toFixed(2);
+                        tpaInp.value = charge.tpa_charge ?? 0;
+                        qtyInp.value = charge.qty ?? 1;
+                        totalInp.value = appliedCharge.toFixed(2);
 
                         // UI shows "Discount Percentage (INR)" – amount field + % label
                         discPercInp.value = discountPercent.toFixed(2);
-                        discAmtInp.value  = discountAmount.toFixed(2);
+                        discAmtInp.value = discountAmount.toFixed(2);
 
                         taxPercInp.value = taxPercent.toFixed(2);
-                        taxAmtInp.value  = taxAmount.toFixed(2);
+                        taxAmtInp.value = taxAmount.toFixed(2);
 
-                        netAmtInp.value  = (parseFloat(charge.net_amount ?? 0) || 0).toFixed(2);
+                        netAmtInp.value = (parseFloat(charge.net_amount ?? 0) || 0).toFixed(2);
                         document.getElementById('edit_note').value = charge.charge_note ?? '';
-                        document.getElementById('charge_date').value = charge.date
-                            ? String(charge.date).substring(0, 10)
-                            : '';
+                        document.getElementById('charge_date').value = charge.date ?
+                            String(charge.date).substring(0, 10) :
+                            '';
                     })
                     .catch(() => {
                         alert('Error loading charge details.');
@@ -6206,14 +6427,18 @@
                     var options = '<option value="">Select Bed Group</option>';
                     if (Array.isArray(data)) {
                         data.forEach(function(group) {
-                            var floorName = (group.floor_detail && group.floor_detail.name) ? group.floor_detail.name : '-';
-                            options += '<option value="' + (group.id || '') + '">' + (group.name || '') + ' - ' + floorName + '</option>';
+                            var floorName = (group.floor_detail && group.floor_detail.name) ? group
+                                .floor_detail.name : '-';
+                            options += '<option value="' + (group.id || '') + '">' + (group.name ||
+                                '') + ' - ' + floorName + '</option>';
                         });
                     }
                     $('#bed_group').html(options);
                 })
                 .fail(function() {
-                    $('#bed_group').html('<option value="">Select Bed Group</option><option value="" disabled>Could not load bed groups</option>');
+                    $('#bed_group').html(
+                        '<option value="">Select Bed Group</option><option value="" disabled>Could not load bed groups</option>'
+                        );
                 });
 
             // Load available beds when bed group changes
@@ -6278,31 +6503,39 @@
                         var opts = '<option value="">Select Bed Group</option>';
                         if (Array.isArray(data)) {
                             data.forEach(function(g) {
-                                var fn = (g.floor_detail && g.floor_detail.name) ? g.floor_detail.name : '-';
-                                opts += '<option value="' + (g.id || '') + '">' + (g.name || '') + ' - ' + fn + '</option>';
+                                var fn = (g.floor_detail && g.floor_detail.name) ? g
+                                    .floor_detail.name : '-';
+                                opts += '<option value="' + (g.id || '') + '">' + (g.name ||
+                                    '') + ' - ' + fn + '</option>';
                             });
                         }
                         $('#edit_bed_group').html(opts).val(groupId);
 
-                    $.get("{{ route('get.available.beds') }}", { bed_group_id: groupId, include_bed_id: bedId }, function(beds) {
-                        var options = '<option value="">Select Bed</option>';
-                        beds.forEach(function(bed) {
-                            var sel = (bed.id == bedId) ? ' selected' : '';
-                            options += '<option value="' + bed.id + '"' + sel + '>' + bed.name + '</option>';
+                        $.get("{{ route('get.available.beds') }}", {
+                            bed_group_id: groupId,
+                            include_bed_id: bedId
+                        }, function(beds) {
+                            var options = '<option value="">Select Bed</option>';
+                            beds.forEach(function(bed) {
+                                var sel = (bed.id == bedId) ? ' selected' : '';
+                                options += '<option value="' + bed.id + '"' + sel +
+                                    '>' + bed.name + '</option>';
+                            });
+                            $('#edit_bed').html(options);
                         });
-                        $('#edit_bed').html(options);
-                    });
 
-                    var existingCharge = btn.data('bed-charge');
-                    if (existingCharge !== undefined && existingCharge !== null && existingCharge !== '') {
-                        $('#edit_bed_charge').val(existingCharge);
-                    } else {
-                        $.get("{{ url('/getBedGroupCharge') }}/" + groupId, function(data) {
-                            $('#edit_bed_charge').val(data && data.bed_cost ? data.bed_cost : '');
-                        });
-                    }
+                        var existingCharge = btn.data('bed-charge');
+                        if (existingCharge !== undefined && existingCharge !== null &&
+                            existingCharge !== '') {
+                            $('#edit_bed_charge').val(existingCharge);
+                        } else {
+                            $.get("{{ url('/getBedGroupCharge') }}/" + groupId, function(data) {
+                                $('#edit_bed_charge').val(data && data.bed_cost ? data
+                                    .bed_cost : '');
+                            });
+                        }
 
-                    showModal();
+                        showModal();
                     })
                     .fail(function() {
                         $('#edit_bed_group').html('<option value="">Select Bed Group</option>');
@@ -6331,8 +6564,10 @@
                         var opts = '<option value=\"\">Select Bed Group</option>';
                         if (Array.isArray(data)) {
                             data.forEach(function(g) {
-                                var fn = (g.floor_detail && g.floor_detail.name) ? g.floor_detail.name : '-';
-                                opts += '<option value=\"' + (g.id || '') + '\">' + (g.name || '') + ' - ' + fn + '</option>';
+                                var fn = (g.floor_detail && g.floor_detail.name) ? g
+                                    .floor_detail.name : '-';
+                                opts += '<option value=\"' + (g.id || '') + '\">' + (g.name ||
+                                    '') + ' - ' + fn + '</option>';
                             });
                         }
                         $('#edit_bed_group').html(opts);
@@ -6353,11 +6588,15 @@
                         if (data && data.bed_cost) $('#edit_bed_charge').val(data.bed_cost);
                         else $('#edit_bed_charge').val('');
                     });
-                    $.get("{{ route('get.available.beds') }}", { bed_group_id: groupId, include_bed_id: curBedId }, function(data) {
+                    $.get("{{ route('get.available.beds') }}", {
+                        bed_group_id: groupId,
+                        include_bed_id: curBedId
+                    }, function(data) {
                         var options = '<option value="">Select Bed</option>';
                         data.forEach(function(bed) {
                             var sel = (bed.id == curBedId) ? ' selected' : '';
-                            options += '<option value="' + bed.id + '"' + sel + '>' + bed.name + '</option>';
+                            options += '<option value="' + bed.id + '"' + sel + '>' + bed
+                                .name + '</option>';
                         });
                         $('#edit_bed').html(options);
                     });
@@ -6409,93 +6648,101 @@
 
     <!-- Package Management Script -->
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const ipdId = "{{ $ipd->id }}";
-        const packagesUrl = "{{ route('ipd.packages', $ipd->id) }}";
-        const packageSelectEl = document.getElementById('package_select');
-        const applyPackageForm = document.getElementById('apply_package_form');
-        const appliedPackagesList = document.getElementById('applied-packages-list');
-        const applyPackageModal = document.getElementById('apply_package_modal');
-        const packagesTabLink = document.querySelector('a[href="#packages"]');
+        document.addEventListener('DOMContentLoaded', function() {
+            const ipdId = "{{ $ipd->id }}";
+            const packagesUrl = "{{ route('ipd.packages', $ipd->id) }}";
+            const packageSelectEl = document.getElementById('package_select');
+            const applyPackageForm = document.getElementById('apply_package_form');
+            const appliedPackagesList = document.getElementById('applied-packages-list');
+            const applyPackageModal = document.getElementById('apply_package_modal');
+            const packagesTabLink = document.querySelector('a[href="#packages"]');
 
-        if (applyPackageModal) {
-            applyPackageModal.addEventListener('shown.bs.modal', function() {
-                loadAvailablePackages();
-                const packageAmountInputEl = document.getElementById('package_amount_input');
-                if (packageAmountInputEl) packageAmountInputEl.value = '';
-                const detailsDiv = document.getElementById('package_details');
-                if (detailsDiv) detailsDiv.style.display = 'none';
-            });
-        }
+            if (applyPackageModal) {
+                applyPackageModal.addEventListener('shown.bs.modal', function() {
+                    loadAvailablePackages();
+                    const packageAmountInputEl = document.getElementById('package_amount_input');
+                    if (packageAmountInputEl) packageAmountInputEl.value = '';
+                    const detailsDiv = document.getElementById('package_details');
+                    if (detailsDiv) detailsDiv.style.display = 'none';
+                });
+            }
 
-        if (packagesTabLink) {
-            packagesTabLink.addEventListener('shown.bs.tab', function() {
+            if (packagesTabLink) {
+                packagesTabLink.addEventListener('shown.bs.tab', function() {
+                    loadAppliedPackages();
+                });
+            }
+
+            if (appliedPackagesList) {
                 loadAppliedPackages();
-            });
-        }
+            }
 
-        if (appliedPackagesList) {
-            loadAppliedPackages();
-        }
+            function loadAvailablePackages() {
+                if (!packageSelectEl) return;
 
-        function loadAvailablePackages() {
-            if (!packageSelectEl) return;
-
-            fetch(packagesUrl)
-                .then(response => {
-                    const ct = (response.headers.get('content-type') || '').toLowerCase();
-                    if (!ct.includes('application/json')) {
-                        return { success: false, available_packages: [] };
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success && data.available_packages) {
-                        const currentOptions = packageSelectEl.value;
-                        packageSelectEl.innerHTML = '<option value="">-- Select Package --</option>';
-
-                        data.available_packages.forEach(pkg => {
-                            const option = document.createElement('option');
-                            option.value = pkg.id;
-                            option.textContent = `${pkg.name} - ₹${pkg.package_rate}`;
-                            option.dataset.rate = pkg.package_rate;
-                            option.dataset.gst = pkg.gst_amount;
-                            option.dataset.desc = pkg.description;
-                            packageSelectEl.appendChild(option);
-                        });
-
-                        if (currentOptions) {
-                            packageSelectEl.value = currentOptions;
+                fetch(packagesUrl)
+                    .then(response => {
+                        const ct = (response.headers.get('content-type') || '').toLowerCase();
+                        if (!ct.includes('application/json')) {
+                            return {
+                                success: false,
+                                available_packages: []
+                            };
                         }
-                    }
-                })
-                .catch(error => { console.error('Error loading packages:', error); });
-        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success && data.available_packages) {
+                            const currentOptions = packageSelectEl.value;
+                            packageSelectEl.innerHTML = '<option value="">-- Select Package --</option>';
 
-        function loadAppliedPackages() {
-            if (!appliedPackagesList) return;
+                            data.available_packages.forEach(pkg => {
+                                const option = document.createElement('option');
+                                option.value = pkg.id;
+                                option.textContent = `${pkg.name} - ₹${pkg.package_rate}`;
+                                option.dataset.rate = pkg.package_rate;
+                                option.dataset.gst = pkg.gst_amount;
+                                option.dataset.desc = pkg.description;
+                                packageSelectEl.appendChild(option);
+                            });
 
-            fetch(packagesUrl)
-                .then(response => {
-                    const ct = (response.headers.get('content-type') || '').toLowerCase();
-                    if (!response.ok || !ct.includes('application/json')) {
-                        appliedPackagesList.innerHTML = '<div class="alert alert-warning"><i class="ti ti-alert-circle me-2"></i>Could not load packages. You can still add prescriptions.</div>';
-                        return null;
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (!data) return;
+                            if (currentOptions) {
+                                packageSelectEl.value = currentOptions;
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading packages:', error);
+                    });
+            }
+
+            function loadAppliedPackages() {
+                if (!appliedPackagesList) return;
+
+                fetch(packagesUrl)
+                    .then(response => {
+                        const ct = (response.headers.get('content-type') || '').toLowerCase();
+                        if (!response.ok || !ct.includes('application/json')) {
+                            appliedPackagesList.innerHTML =
+                                '<div class="alert alert-warning"><i class="ti ti-alert-circle me-2"></i>Could not load packages. You can still add prescriptions.</div>';
+                            return null;
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (!data) return;
                         if (data.success && data.applied_packages) {
                             if (data.applied_packages.length === 0) {
-                                appliedPackagesList.innerHTML = '<div class="alert alert-info"><i class="ti ti-info-circle me-2"></i>No packages applied yet.</div>';
-                        } else {
-                            let html = '<div class="table-responsive"><table class="table table-hover"><thead><tr><th>Package</th><th>Applied Date</th><th>Package Amount (INR)</th><th>Final Amount</th><th>Action</th></tr></thead><tbody>';
+                                appliedPackagesList.innerHTML =
+                                    '<div class="alert alert-info"><i class="ti ti-info-circle me-2"></i>No packages applied yet.</div>';
+                            } else {
+                                let html =
+                                    '<div class="table-responsive"><table class="table table-hover"><thead><tr><th>Package</th><th>Applied Date</th><th>Package Amount (INR)</th><th>Final Amount</th><th>Action</th></tr></thead><tbody>';
 
-                            data.applied_packages.forEach(pkg => {
-                                const rate = parseFloat(pkg.package_rate);
-                                const finalAmt = parseFloat(pkg.final_amount);
-                                html += `<tr>
+                                data.applied_packages.forEach(pkg => {
+                                    const rate = parseFloat(pkg.package_rate);
+                                    const finalAmt = parseFloat(pkg.final_amount);
+                                    html += `<tr>
                                     <td><strong>${pkg.package.name}</strong></td>
                                     <td>${new Date(pkg.applied_date).toLocaleDateString()}</td>
                                     <td><input type="number" class="form-control form-control-sm package-amount-input" data-ipd-pkg-id="${pkg.id}" value="${rate.toFixed(2)}" step="0.01" min="0" style="width:110px;"></td>
@@ -6504,150 +6751,160 @@
                                         ${pkg.status === 'applied' ? `<button class="btn btn-sm btn-danger remove-pkg-btn" data-ipd-pkg-id="${pkg.id}"><i class="ti ti-trash me-1"></i>Remove</button>` : `<span class="badge bg-secondary">${pkg.status}</span>`}
                                     </td>
                                 </tr>`;
-                            });
-
-                            html += '</tbody></table></div>';
-                            appliedPackagesList.innerHTML = html;
-
-                            document.querySelectorAll('.remove-pkg-btn').forEach(btn => {
-                                btn.addEventListener('click', function() {
-                                    if (confirm('Are you sure you want to remove this package?')) {
-                                        removePackage(this.dataset.ipdPkgId);
-                                    }
                                 });
-                            });
-                            document.querySelectorAll('.package-amount-input').forEach(input => {
-                                input.addEventListener('blur', function() {
-                                    updatePackageAmount(this.dataset.ipdPkgId, parseFloat(this.value));
+
+                                html += '</tbody></table></div>';
+                                appliedPackagesList.innerHTML = html;
+
+                                document.querySelectorAll('.remove-pkg-btn').forEach(btn => {
+                                    btn.addEventListener('click', function() {
+                                        if (confirm(
+                                                'Are you sure you want to remove this package?'
+                                                )) {
+                                            removePackage(this.dataset.ipdPkgId);
+                                        }
+                                    });
                                 });
-                            });
+                                document.querySelectorAll('.package-amount-input').forEach(input => {
+                                    input.addEventListener('blur', function() {
+                                        updatePackageAmount(this.dataset.ipdPkgId, parseFloat(
+                                            this.value));
+                                    });
+                                });
+                            }
                         }
-                    }
-                })
-                .catch(error => { console.error('Error loading applied packages:', error); });
-        }
-
-        // Handle package selection change - show details and set package amount
-        const packageAmountInputEl = document.getElementById('package_amount_input');
-        if (packageSelectEl) {
-            packageSelectEl.addEventListener('change', function() {
-                const detailsDiv = document.getElementById('package_details');
-                if (this.value) {
-                    const selected = this.options[this.selectedIndex];
-                    const rate = selected.dataset.rate ? parseFloat(selected.dataset.rate) : 0;
-                    document.getElementById('pkg_rate').textContent = selected.dataset.rate ?? '0';
-                    document.getElementById('pkg_gst').textContent = selected.dataset.gst || '0';
-                    document.getElementById('pkg_desc').textContent = selected.dataset.desc || '-';
-                    detailsDiv.style.display = 'block';
-                    if (packageAmountInputEl) packageAmountInputEl.value = rate.toFixed(2);
-                } else {
-                    detailsDiv.style.display = 'none';
-                    if (packageAmountInputEl) packageAmountInputEl.value = '';
-                }
-            });
-        }
-
-        // Handle form submission
-        if (applyPackageForm) {
-            applyPackageForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                const packageId = document.getElementById('package_select').value;
-                const appliedDate = document.getElementById('applied_date').value;
-                const notes = document.getElementById('notes').value;
-                const packageAmountEl = document.getElementById('package_amount_input');
-                const packageRate = packageAmountEl && packageAmountEl.value ? parseFloat(packageAmountEl.value) : null;
-
-                if (!packageId) {
-                    alert('Please select a package');
-                    return;
-                }
-
-                fetch("{{ url('ipd/' . $ipd->id . '/apply-package') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    body: JSON.stringify({
-                        package_id: packageId,
-                        applied_date: appliedDate,
-                        notes: notes,
-                        package_rate: packageRate
                     })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Package applied successfully!');
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('apply_package_modal'));
-                        modal.hide();
-                        applyPackageForm.reset();
-                        loadAppliedPackages();
-                        loadAvailablePackages();
+                    .catch(error => {
+                        console.error('Error loading applied packages:', error);
+                    });
+            }
+
+            // Handle package selection change - show details and set package amount
+            const packageAmountInputEl = document.getElementById('package_amount_input');
+            if (packageSelectEl) {
+                packageSelectEl.addEventListener('change', function() {
+                    const detailsDiv = document.getElementById('package_details');
+                    if (this.value) {
+                        const selected = this.options[this.selectedIndex];
+                        const rate = selected.dataset.rate ? parseFloat(selected.dataset.rate) : 0;
+                        document.getElementById('pkg_rate').textContent = selected.dataset.rate ?? '0';
+                        document.getElementById('pkg_gst').textContent = selected.dataset.gst || '0';
+                        document.getElementById('pkg_desc').textContent = selected.dataset.desc || '-';
+                        detailsDiv.style.display = 'block';
+                        if (packageAmountInputEl) packageAmountInputEl.value = rate.toFixed(2);
                     } else {
-                        alert('Error: ' + (data.message || 'Failed to apply package'));
+                        detailsDiv.style.display = 'none';
+                        if (packageAmountInputEl) packageAmountInputEl.value = '';
                     }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error applying package: ' + error.message);
                 });
-            });
-        }
+            }
 
-        function removePackage(ipdPackageId) {
-            fetch("{{ url('ipd/' . $ipd->id . '/remove-package') }}", {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: JSON.stringify({
-                    ipd_package_id: ipdPackageId
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Package removed successfully!');
-                    loadAppliedPackages();
-                    loadAvailablePackages();
-                } else {
-                    alert('Error: ' + (data.message || 'Failed to remove package'));
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error removing package: ' + error.message);
-            });
-        }
+            // Handle form submission
+            if (applyPackageForm) {
+                applyPackageForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
 
-        function updatePackageAmount(ipdPackageId, packageRate) {
-            if (packageRate == null || isNaN(packageRate) || packageRate < 0) return;
-            const url = "{{ url('ipd/' . $ipd->id . '/packages') }}/" + ipdPackageId;
-            fetch(url, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: JSON.stringify({ package_rate: packageRate })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    loadAppliedPackages();
-                } else {
-                    alert('Error: ' + (data.message || 'Failed to update amount'));
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error updating package amount: ' + error.message);
-            });
-        }
-    });
+                    const packageId = document.getElementById('package_select').value;
+                    const appliedDate = document.getElementById('applied_date').value;
+                    const notes = document.getElementById('notes').value;
+                    const packageAmountEl = document.getElementById('package_amount_input');
+                    const packageRate = packageAmountEl && packageAmountEl.value ? parseFloat(
+                        packageAmountEl.value) : null;
+
+                    if (!packageId) {
+                        alert('Please select a package');
+                        return;
+                    }
+
+                    fetch("{{ url('ipd/' . $ipd->id . '/apply-package') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                    .content
+                            },
+                            body: JSON.stringify({
+                                package_id: packageId,
+                                applied_date: appliedDate,
+                                notes: notes,
+                                package_rate: packageRate
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Package applied successfully!');
+                                const modal = bootstrap.Modal.getInstance(document.getElementById(
+                                    'apply_package_modal'));
+                                modal.hide();
+                                applyPackageForm.reset();
+                                loadAppliedPackages();
+                                loadAvailablePackages();
+                            } else {
+                                alert('Error: ' + (data.message || 'Failed to apply package'));
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Error applying package: ' + error.message);
+                        });
+                });
+            }
+
+            function removePackage(ipdPackageId) {
+                fetch("{{ url('ipd/' . $ipd->id . '/remove-package') }}", {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({
+                            ipd_package_id: ipdPackageId
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Package removed successfully!');
+                            loadAppliedPackages();
+                            loadAvailablePackages();
+                        } else {
+                            alert('Error: ' + (data.message || 'Failed to remove package'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error removing package: ' + error.message);
+                    });
+            }
+
+            function updatePackageAmount(ipdPackageId, packageRate) {
+                if (packageRate == null || isNaN(packageRate) || packageRate < 0) return;
+                const url = "{{ url('ipd/' . $ipd->id . '/packages') }}/" + ipdPackageId;
+                fetch(url, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({
+                            package_rate: packageRate
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            loadAppliedPackages();
+                        } else {
+                            alert('Error: ' + (data.message || 'Failed to update amount'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error updating package amount: ' + error.message);
+                    });
+            }
+        });
     </script>
 
 @endsection

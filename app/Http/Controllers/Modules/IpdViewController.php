@@ -56,7 +56,7 @@ class IpdViewController extends Controller
             ->where('ipd_id', $id)
             ->orderByDesc('from_date')
             ->first();
-        $symptomIds      = array_filter(
+        $symptomIds = array_filter(
             explode(',', $ipd->symptoms_title),
             fn($id) => $id !== null && trim($id) !== ''
         );
@@ -134,12 +134,53 @@ class IpdViewController extends Controller
                 explode(',', $dischargeCard->intervals),
                 fn($inv) => $inv !== null && trim($inv) !== ''
             );
-            $durations = array_filter(
-                explode(',', $dischargeCard->durations),
-                fn($dur) => $dur !== null && trim($dur) !== ''
-            );
-            $count = min(count($meds), count($medTypes), count($intervals), count($durations));
 
+            $rawDurations = $dischargeCard->durations ?? '';
+
+            if (str_contains($rawDurations, '||')) {
+                // New format (correct one)
+                $durations = explode('||', $rawDurations);
+            } else {
+                // Old format fallback
+                // Split ONLY on comma followed by capital letter (new item indicator)
+                $durations = preg_split('/,(?=[A-Z0-9])/', $rawDurations);
+            }
+
+            $durations = array_filter(
+                array_map('trim', $durations),
+                fn($dur) => $dur !== ''
+            );
+            // $durations = array_filter(
+            //     explode("||", $dischargeCard->durations ?? ''),
+            //     fn($dur) => $dur !== null && trim($dur) !== ''
+            // );
+            // array_filter(
+            //     explode(',', $dischargeCard->durations),
+            //     fn($dur) => $dur !== null && trim($dur) !== ''
+            // );
+            // $count = min(count($meds), count($medTypes), count($intervals), count($durations));
+            $count = count($meds);
+            if (count($medTypes) < count($meds)) {
+                $medTypes = array_pad(
+                    $medTypes,
+                    count($meds),
+                    ''
+                );
+            }
+            if (count($intervals) < count($meds)) {
+                $intervals = array_pad(
+                    $intervals,
+                    count($meds),
+                    ''
+                );
+            }
+            if (count($durations) < count($meds)) {
+                $durations = array_pad(
+                    $durations,
+                    count($meds),
+                    ''
+                );
+            }
             for ($i = 0; $i < $count; $i++) {
                 $medCombinations[] = "{$meds[$i]} ({$medTypes[$i]}) {$intervals[$i]} x {$durations[$i]}";
             }
@@ -159,7 +200,7 @@ class IpdViewController extends Controller
 
         // Billing summary for overview Finance section
         $billingController = app(\App\Http\Controllers\IpdBillingController::class);
-        $billingSummary = $billingController->getBillingSummaryForIpd($ipd->id);
+        $billingSummary    = $billingController->getBillingSummaryForIpd($ipd->id);
 
         // dd($ipd);
         //dd($currentUser->username);
