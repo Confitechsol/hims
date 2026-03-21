@@ -456,7 +456,7 @@
                                 Discharge Contact No.
                             </label>
                             <input type="text" class="form-control" id="discharge_contact_text"
-                                name="discharge_contact" autocomplete="off" required>
+                                name="discharge_contact" autocomplete="off">
                         </div>
                         <div class="col-md-3">
                             <label for="bed" class="form-label">
