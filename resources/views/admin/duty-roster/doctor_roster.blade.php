@@ -193,10 +193,14 @@
                                                 </a>
                                                 <!-- Delete Button -->
                                                 <a href="javascript:void(0);"
-                                                    onclick="confirmDelete('{{ route('dutyroster.destroyDoctorRoster', ['code' => $roster['code'] ?? 0]) }}')"
+                                                    onclick="deleteDoctorRoster('{{ $roster['code'] }}')"
                                                     class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill">
                                                     <i class="ti ti-trash"></i>
                                                 </a>
+                                                <form id="deleteDoctorRosterForm" method="POST" style="display:none;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                </form>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -379,38 +383,27 @@
     </script>
 
     <script>
-        function confirmDelete(url) {
-            Swal.fire({
-                title: "Are you sure?",
-                text: "This doctor roster will be marked as deleted (soft delete).",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Yes, delete it!"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = url;
+    function deleteDoctorRoster(code) {
 
-                    const csrf = document.createElement('input');
-                    csrf.type = 'hidden';
-                    csrf.name = '_token';
-                    csrf.value = '{{ csrf_token() }}';
-                    form.appendChild(csrf);
+        Swal.fire({
+            title: 'Delete Roster?',
+            text: 'Are you sure?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes'
+        }).then((result) => {
 
-                    const method = document.createElement('input');
-                    method.type = 'hidden';
-                    method.name = '_method';
-                    method.value = 'DELETE';
-                    form.appendChild(method);
+        if (result.isConfirmed) {
 
-                    document.body.appendChild(form);
-                    form.submit();
-                }
-            });
+            let form = document.getElementById("deleteDoctorRosterForm");
+
+            let action = "{{ route('dutyroster.destroyDoctorRoster', ':code') }}";
+            form.action = action.replace(':code', code);
+
+            form.submit();
         }
+        });
+    }
     </script>
     {{-- 🔹 AJAX Script --}}
     <script>

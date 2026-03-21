@@ -6,12 +6,23 @@
         <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
             <div class="d-flex justify-content-between align-items-center">
                 <h5 class="mb-0" style="color: #750096">Supplier List</h5>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
-                    <i class="ti ti-plus"></i> Add Supplier
-                </button>
+                
             </div>
+                
         </div>
         <div class="card-body">
+        <div class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
+            <form method="GET" action="" class="input-icon-start position-relative me-2 d-flex justify-content-between align-items-center">
+                                            <span class="input-icon-addon">
+                                                <i class="ti ti-search"></i>
+                                            </span>
+                                            <input type="text" name="search" class="form-control shadow-sm" placeholder="Search" value="{{ request('search') }}" style="max-width: 300px;">
+                                            <button type="submit" class="btn btn-primary ms-2">Search</button>
+                </form>
+                                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
+                    <i class="ti ti-plus"></i> Add Supplier
+                </button>
+        </div>
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ session('success') }}
@@ -62,6 +73,43 @@
                     </tbody>
                 </table>
             </div>
+            
+                                     {{-- Pagination Links --}}
+                    <div class="mt-3" id="pagination-wrapper">
+                        @php
+                            $currentPage = $suppliers->currentPage();
+                            $lastPage = $suppliers->lastPage();
+                        @endphp
+                    
+                        {{-- Previous --}}
+                        @if ($suppliers->onFirstPage())
+                            <button class="btn btn-outline-secondary btn-sm me-1" disabled>« Prev</button>
+                        @else
+                            <a href="{{ $suppliers->previousPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm me-1">
+                                « Prev
+                            </a>
+                        @endif
+                    
+                        {{-- Page numbers --}}
+                        @for ($page = 1; $page <= $lastPage; $page++)
+                            @if ($page == $currentPage)
+                                <button class="btn btn-primary btn-sm me-1">{{ $page }}</button>
+                            @else
+                                <a href="{{ $suppliers->url($page) }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm me-1">
+                                    {{ $page }}
+                                </a>
+                            @endif
+                        @endfor
+                    
+                        {{-- Next --}}
+                        @if ($suppliers->hasMorePages())
+                            <a href="{{ $suppliers->nextPageUrl() }}{{ request('perPage') ? '&perPage=' . request('perPage') : '' }}" class="btn btn-outline-secondary btn-sm">
+                                Next »
+                            </a>
+                        @else
+                            <button class="btn btn-outline-secondary btn-sm" disabled>Next »</button>
+                        @endif
+                    </div>
         </div>
     </div>
 </div>
