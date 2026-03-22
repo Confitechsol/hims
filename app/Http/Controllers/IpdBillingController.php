@@ -456,11 +456,10 @@ class IpdBillingController extends Controller
         $patientId = $ipd->patient_id ?? null;
         $admissionDate = $ipd->date ? Carbon::parse($ipd->date)->format('Y-m-d') : null;
 
-        // Doctor Visit Charges (for this patient on or after admission date)
+        // Doctor Visit Charges (patient + admission; optional end date; include rows with null visit_date if reporting_date qualifies)
         $doctorVisitCharges = 0;
         if ($patientId && $admissionDate) {
-            $doctorVisitCharges = DoctorVisit::where('patient_id', $patientId)
-                ->where('visit_date', '>=', $admissionDate)
+            $doctorVisitCharges = (float) $this->doctorVisitsBillableToIpdQuery($patientId, $ipd->date, $endDate)
                 ->sum('amount');
         }
 
@@ -716,17 +715,17 @@ class IpdBillingController extends Controller
             }
         })->flatten(1);
 
-        // Doctor Visit Charges Details (use date-only so same-day visits are included)
+        // Doctor Visit Charges Details (include null visit_date when reporting_date is set)
         $doctorVisitDetails = collect();
         if ($admissionDateOnly) {
-            $doctorVisitDetails = DoctorVisit::where('patient_id', $patientId)
-                ->where('visit_date', '>=', $admissionDateOnly)
+            $doctorVisitDetails = $this->doctorVisitsBillableToIpdQuery($patientId, $admissionDateOnly, null)
                 ->with(['doctor', 'charge'])
-                ->orderBy('visit_date', 'asc')
+                ->orderByRaw('COALESCE(visit_date, DATE(reporting_date), DATE(created_at)) ASC')
+                ->orderBy('id')
                 ->get()
                 ->map(function($visit) {
                     return [
-                        'date' => $visit->visit_date,
+                        'date' => $visit->visit_date ?? $visit->reporting_date,
                         'doctor' => ($visit->doctor->name ?? 'N/A') . ' ' . ($visit->doctor->surname ?? ''),
                         'charge_name' => $visit->charge->name ?? 'N/A',
                         'amount' => $visit->amount ?? 0,
@@ -849,6 +848,57 @@ class IpdBillingController extends Controller
     }
 
     /**
+     * Doctor visits billable on an IPD estimate/final: same patient, on/after admission date,
+     * optionally on/before discharge. Rows with null visit_date are included when reporting_date qualifies.
+     */
+    private function doctorVisitsBillableToIpdQuery(int $patientId, $admissionDate, $endDateYmd = null): \Illuminate\Database\Eloquent\Builder
+    {
+        $admissionYmd = Carbon::parse($admissionDate)->format('Y-m-d');
+        $endYmd = ($endDateYmd !== null && $endDateYmd !== '')
+            ? Carbon::parse($endDateYmd)->format('Y-m-d')
+            : null;
+
+        return DoctorVisit::query()
+            ->where('patient_id', $patientId)
+            ->where(function ($q) use ($admissionYmd, $endYmd) {
+                $q->where(function ($w) use ($admissionYmd, $endYmd) {
+                    $w->whereNotNull('visit_date')
+                        ->whereDate('visit_date', '>=', $admissionYmd);
+                    if ($endYmd) {
+                        $w->whereDate('visit_date', '<=', $endYmd);
+                    }
+                })->orWhere(function ($w) use ($admissionYmd, $endYmd) {
+                    $w->whereNull('visit_date')
+                        ->whereNotNull('reporting_date')
+                        ->whereDate('reporting_date', '>=', $admissionYmd);
+                    if ($endYmd) {
+                        $w->whereDate('reporting_date', '<=', $endYmd);
+                    }
+                });
+            });
+    }
+
+    /**
+     * Calendar date for sorting/grouping doctor visit lines (visit_date, else reporting_date, else created_at).
+     */
+    private function doctorVisitEffectiveDateForBilling($visit): string
+    {
+        if (! empty($visit->visit_date)) {
+            return $visit->visit_date instanceof \DateTimeInterface
+                ? $visit->visit_date->format('Y-m-d')
+                : Carbon::parse($visit->visit_date)->format('Y-m-d');
+        }
+        if (! empty($visit->reporting_date)) {
+            return Carbon::parse($visit->reporting_date)->format('Y-m-d');
+        }
+        if (! empty($visit->created_at)) {
+            return Carbon::parse($visit->created_at)->format('Y-m-d');
+        }
+
+        return Carbon::now()->format('Y-m-d');
+    }
+
+    /**
      * Group doctor visits by doctor + charge name and contiguous date ranges for display.
      * Returns one row per (doctor + visit type + continuous dates).
      *
@@ -861,17 +911,20 @@ class IpdBillingController extends Controller
             return collect();
         }
 
-        // Group by doctor + charge (visit type)
+        // Group by doctor + charge (visit type); use FK ids so missing relations don't throw
         $grouped = $doctorVisitDetails->groupBy(function ($visit) {
-            $doctorId = $visit->doctor->id ?? $visit->doctor_id ?? '0';
-            $chargeId = $visit->charge->id ?? $visit->charge_id ?? '0';
+            $doctorId = (string) ($visit->doctor_id ?? optional($visit->doctor)->id ?? '0');
+            $chargeId = (string) ($visit->charge_id ?? optional($visit->charge)->id ?? '0');
+
             return $doctorId . '|' . $chargeId;
         });
 
         $result = collect();
 
         foreach ($grouped as $key => $visits) {
-            $sorted = $visits->sortBy('visit_date')->values();
+            $sorted = $visits->sortBy(function ($v) {
+                return $this->doctorVisitEffectiveDateForBilling($v);
+            })->values();
 
             $prevDate = null;
             $rangeStart = null;
@@ -882,9 +935,7 @@ class IpdBillingController extends Controller
             $charge = null;
 
             foreach ($sorted as $v) {
-                $dateStr = $v->visit_date instanceof \DateTimeInterface
-                    ? $v->visit_date->format('Y-m-d')
-                    : \Carbon\Carbon::parse($v->visit_date)->format('Y-m-d');
+                $dateStr = $this->doctorVisitEffectiveDateForBilling($v);
 
                 // Quantity for this line: each row stores no_of_visit + amount (line total), not one visit per row.
                 $lineQty = max(1, (int) ($v->no_of_visit ?? 1));
@@ -1157,13 +1208,13 @@ class IpdBillingController extends Controller
             ];
         }
 
-        // Doctor visits (use date-only so same-day visits are included)
+        // Doctor visits (include null visit_date when reporting_date is in range)
         $doctorVisits = collect();
-        if ($admissionDateOnly) {
-            $doctorVisits = DoctorVisit::where('patient_id', $patientId)
-                ->where('visit_date', '>=', $admissionDateOnly)
-                ->where('visit_date', '<=', $dischargeDate)
+        if ($admissionDate) {
+            $doctorVisits = $this->doctorVisitsBillableToIpdQuery($patientId, $admissionDate, $dischargeDate)
                 ->with(['doctor', 'charge'])
+                ->orderByRaw('COALESCE(visit_date, DATE(reporting_date), DATE(created_at)) ASC')
+                ->orderBy('id')
                 ->get();
         }
         foreach ($doctorVisits as $v) {
@@ -1434,11 +1485,11 @@ class IpdBillingController extends Controller
             
             \Log::info('Radiology tests collected', ['test_count' => count($radiologyTestNames), 'total' => $radiologyTotal]);
 
-            $doctorVisitDetails = DoctorVisit::where('patient_id', $ipd->patient_id)
-                ->whereDate('visit_date', '>=', $ipd->date)
+            $doctorVisitDetails = $this->doctorVisitsBillableToIpdQuery((int) $ipd->patient_id, $ipd->date, null)
                 ->with(['doctor', 'charge'])
-                ->orderBy('visit_date', 'asc')
-                ->get() ?? collect();
+                ->orderByRaw('COALESCE(visit_date, DATE(reporting_date), DATE(created_at)) ASC')
+                ->orderBy('id')
+                ->get();
             // Group doctor visits by doctor + visit type, then by visit type for PDF display
             $doctorVisitGroupedForDisplay = $this->groupDoctorVisitsForDisplay($doctorVisitDetails);
             $doctorVisitGroupedByVisitType = $this->groupDoctorVisitsByVisitTypeForDisplay($doctorVisitGroupedForDisplay);
@@ -1766,11 +1817,11 @@ class IpdBillingController extends Controller
             })->orderBy('date', 'asc')->get() ?? collect();
 
             \Log::info('Getting doctor visit details');
-            $doctorVisitDetails = DoctorVisit::where('patient_id', $ipd->patient_id)
-                ->whereDate('visit_date', '>=', $ipd->date)
+            $doctorVisitDetails = $this->doctorVisitsBillableToIpdQuery((int) $ipd->patient_id, $ipd->date, $dischargeDate)
                 ->with(['doctor', 'charge'])
-                ->orderBy('visit_date', 'asc')
-                ->get() ?? collect();
+                ->orderByRaw('COALESCE(visit_date, DATE(reporting_date), DATE(created_at)) ASC')
+                ->orderBy('id')
+                ->get();
             // Group doctor visits by doctor + visit type, then by visit type for PDF display
             $doctorVisitGroupedForDisplay = $this->groupDoctorVisitsForDisplay($doctorVisitDetails);
             $doctorVisitGroupedByVisitType = $this->groupDoctorVisitsByVisitTypeForDisplay($doctorVisitGroupedForDisplay);
