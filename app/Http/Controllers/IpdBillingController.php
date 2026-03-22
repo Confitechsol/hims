@@ -877,6 +877,7 @@ class IpdBillingController extends Controller
             $rangeStart = null;
             $visitCount = 0;
             $totalAmount = 0;
+            $doctorPayTotal = 0;
             $doctor = null;
             $charge = null;
 
@@ -884,6 +885,9 @@ class IpdBillingController extends Controller
                 $dateStr = $v->visit_date instanceof \DateTimeInterface
                     ? $v->visit_date->format('Y-m-d')
                     : \Carbon\Carbon::parse($v->visit_date)->format('Y-m-d');
+
+                // Quantity for this line: each row stores no_of_visit + amount (line total), not one visit per row.
+                $lineQty = max(1, (int) ($v->no_of_visit ?? 1));
 
                 $isConsecutive = $prevDate !== null &&
                     \Carbon\Carbon::parse($prevDate)->addDay()->format('Y-m-d') === $dateStr;
@@ -896,7 +900,8 @@ class IpdBillingController extends Controller
                             'to_date' => $prevDate,
                             'visit_count' => $visitCount,
                             'total_amount' => $totalAmount,
-                            'rate_per_visit' => $visitCount > 0 ? ($totalAmount / $visitCount) : 0,
+                            'rate_per_visit' => $visitCount > 0 ? round($totalAmount / $visitCount, 2) : 0,
+                            'doctor_pay_total' => round($doctorPayTotal, 2),
                             'doctor' => $doctor,
                             'charge' => $charge,
                             'doctor_label' => $this->formatDoctorName($doctor),
@@ -905,13 +910,15 @@ class IpdBillingController extends Controller
                     }
 
                     $rangeStart = $dateStr;
-                    $visitCount = 1;
+                    $visitCount = $lineQty;
                     $totalAmount = (float) ($v->amount ?? 0);
+                    $doctorPayTotal = (float) ($v->doctor_pay_amount ?? 0);
                     $doctor = $v->doctor ?? null;
                     $charge = $v->charge ?? null;
                 } else {
-                    $visitCount++;
+                    $visitCount += $lineQty;
                     $totalAmount += (float) ($v->amount ?? 0);
+                    $doctorPayTotal += (float) ($v->doctor_pay_amount ?? 0);
                 }
 
                 $prevDate = $dateStr;
@@ -923,7 +930,8 @@ class IpdBillingController extends Controller
                     'to_date' => $prevDate,
                     'visit_count' => $visitCount,
                     'total_amount' => $totalAmount,
-                    'rate_per_visit' => $visitCount > 0 ? ($totalAmount / $visitCount) : 0,
+                    'rate_per_visit' => $visitCount > 0 ? round($totalAmount / $visitCount, 2) : 0,
+                    'doctor_pay_total' => round($doctorPayTotal, 2),
                     'doctor' => $doctor,
                     'charge' => $charge,
                     'doctor_label' => $this->formatDoctorName($doctor),
