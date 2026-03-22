@@ -46,9 +46,14 @@ class AppServiceProvider extends ServiceProvider
     });
     View::composer('components.modals.bed-modal', function ($view) {
 
+        // Use patientBedHistory (always on Bed) with a constraint — avoids requiring
+        // the activePatient() relationship, which may be missing on older deployments.
         $beds = Bed::with([
             'bedGroup:id,name,floor',
-            'activePatient'
+            'patientBedHistory' => function ($query) {
+                $query->where('is_active', 'yes')
+                    ->with('ipd.patient:id,patient_name');
+            },
         ])->get();
 
         $grouped = [];
@@ -56,9 +61,9 @@ class AppServiceProvider extends ServiceProvider
         foreach ($beds as $bed) {
             $floor = $bed->bedGroup->floor ?? 'Unknown';
             $groupName = $bed->bedGroup->name ?? 'General';
-        
-            $active = $bed->activePatient;
-        
+
+            $active = $bed->patientBedHistory->first();
+
             $isOccupied = $active ? true : false;
             $patientName = $active?->ipd?->patient?->patient_name;
         
