@@ -23,7 +23,9 @@ class InventoriesController extends Controller
         $categories = ItemCategory::all();
         $suppliers  = ItemSupplier::all();
         $stores     = ItemStore::all();
-        $stocks     = ItemStock::with(['itemCategory', 'item', 'supplier', 'store'])->latest()->get();
+        $stocks = ItemStock::with(['itemCategory', 'item', 'supplier', 'store'])
+    ->latest()
+    ->paginate(50);
         return view('admin.inventory.inventory_details', compact('categories', 'suppliers', 'stores', 'stocks'));
     }
     public function getItems($categoryId)
