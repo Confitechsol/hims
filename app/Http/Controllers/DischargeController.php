@@ -238,9 +238,23 @@ class DischargeController extends Controller
         $dischargeData->meds         = explode(',', $dischargeData->medicines ?? '');
         $dischargeData->med_types    = explode(',', $dischargeData->medicine_types ?? '');
         $dischargeData->med_interval = explode(',', $dischargeData->intervals ?? '');
-        $dischargeData->med_duration = explode("||", $dischargeData->durations ?? '');
-        $dischargeData->ot_done_by   = explode(",", $dischargeData->ot_done_by ?? '');
+        // $dischargeData->med_duration = explode("||", $dischargeData->durations ?? '');
+        $dischargeData->ot_done_by = explode(",", $dischargeData->ot_done_by ?? '');
+        $rawDurations              = $dischargeData->durations ?? '';
 
+        if (str_contains($rawDurations, '||')) {
+            // New format (correct one)
+            $durations = explode('||', $rawDurations);
+        } else {
+            // Old format fallback
+            // Split ONLY on comma followed by capital letter (new item indicator)
+            $durations = preg_split('/,(?=[A-Z0-9])/', $rawDurations);
+        }
+
+        $dischargeData->med_duration = array_filter(
+            array_map('trim', $durations),
+            fn($dur) => $dur !== ''
+        );
         $medCount      = count($dischargeData->meds);
         $durationCount = count($dischargeData->med_duration);
 
