@@ -274,7 +274,7 @@ margin: 10px 0;
             </div>
             <div class="admission_item">
                 <p>
-                    <b>ADMISSION DATE.</b> : {{ \Carbon\Carbon::parse($IpdPatient->created_at)->format('d-m-Y') ?? '' }}
+                    <b>ADMISSION DATE.</b> : {{ $IpdPatient->ipd['date'] ? \Carbon\Carbon::parse($IpdPatient->ipd['date'])->format('d-m-Y') : '' }}
                 </p>
             </div>
             <div class="admission_item">
@@ -831,7 +831,7 @@ margin: 10px 0;
             </div>
 
             <p><b>DATE : </b></p>
-            <p><b>{{ \Carbon\Carbon::parse($IpdPatient->created_at)->format('d-m-Y') ?? '' }}</b></p>
+            <p><b>{{ $IpdPatient->ipd['date'] ? \Carbon\Carbon::parse($IpdPatient->ipd['date'])->format('d-m-Y') : '' }}</b></p>
         </div>
 
 
