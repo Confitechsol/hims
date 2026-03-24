@@ -122,19 +122,21 @@ class IpdViewController extends Controller
             $dischargeCard      = DischargeCard::where('ipd_details_id', $id)->firstOrFail();
             $ipd->dischargeCard = $dischargeCard;
             $medCombinations    = [];
-            $meds               = array_filter(
-                explode(',', $dischargeCard->medicines),
-                fn($med) => $med !== null && trim($med) !== ''
-            );
-            $medTypes = array_filter(
-                explode(',', $dischargeCard->medicine_types),
-                fn($med) => $med !== null && trim($med) !== ''
-            );
-            $intervals = array_filter(
-                explode(',', $dischargeCard->intervals),
-                fn($inv) => $inv !== null && trim($inv) !== ''
-            );
+            $meds               = array_map(function ($med) {
+                return trim($med) === '' ? '' : trim($med);
+            }, explode(',', $dischargeCard->medicines ?? ''));
 
+            $medTypes = array_map(function ($types) {
+                return trim($types) === '' ? '' : trim($types);
+            }, explode(',', $dischargeCard->medicine_types ?? ''));
+
+            $intervals = array_map(function ($inv) {
+                return trim($inv) === '' ? '' : trim($inv);
+            }, explode(',', $dischargeCard->intervals ?? ''));
+
+            $medDates = array_map(function ($date) {
+                return trim($date) === '' ? '' : trim($date);
+            }, explode('||', $dischargeCard->med_dates ?? ''));
             $rawDurations = $dischargeCard->durations ?? '';
 
             if (str_contains($rawDurations, '||')) {
@@ -146,10 +148,9 @@ class IpdViewController extends Controller
                 $durations = preg_split('/,(?=[A-Z0-9])/', $rawDurations);
             }
 
-            $durations = array_filter(
-                array_map('trim', $durations),
-                fn($dur) => $dur !== ''
-            );
+            $durations = array_map(function ($dur) {
+                return trim($dur) === '' ? '' : trim($dur);
+            }, $durations);
             // $durations = array_filter(
             //     explode("||", $dischargeCard->durations ?? ''),
             //     fn($dur) => $dur !== null && trim($dur) !== ''
@@ -160,6 +161,7 @@ class IpdViewController extends Controller
             // );
             // $count = min(count($meds), count($medTypes), count($intervals), count($durations));
             $count = count($meds);
+
             if (count($medTypes) < count($meds)) {
                 $medTypes = array_pad(
                     $medTypes,
@@ -181,8 +183,32 @@ class IpdViewController extends Controller
                     ''
                 );
             }
+            if (count($medDates) < count($meds)) {
+                $medDates = array_pad(
+                    $medDates,
+                    count($meds),
+                    ''
+                );
+            }
             for ($i = 0; $i < $count; $i++) {
-                $medCombinations[] = "{$meds[$i]} ({$medTypes[$i]}) {$intervals[$i]} x {$durations[$i]}";
+                $medText = "{$meds[$i]} ({$medTypes[$i]})";
+                // Add interval if exists
+                if ($intervals[$i] != '') {
+                    $medText .= " {$intervals[$i]}";
+                }
+
+// Add duration with "x" ONLY if both interval & duration exist
+                if ($durations[$i] != '') {
+                    if ($intervals[$i] != '') {
+                        $medText .= " x {$durations[$i]}";
+                    } else {
+                        $medText .= " x {$durations[$i]}";
+                    }
+                }
+                if ($medDates[$i] != '') {
+                    $medText .= " - {$medDates[$i]}";
+                }
+                $medCombinations[] = $medText;
             }
 
             $ipd->discharge_medicines = $medCombinations;

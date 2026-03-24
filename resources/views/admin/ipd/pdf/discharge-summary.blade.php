@@ -374,6 +374,11 @@
             {!! $data->discharge_medicines_html !!}
         @endif
 
+        @if ($data->doctor_advice != null || $data->doctor_advice != '')
+            <h4>Doctor Advice</h4>
+            {!! $data->doctor_advice !!}
+        @endif
+
         @if ($data->investigation != null || $data->investigation != '')
             <h4>Investigations</h4>
             {!! $data->investigation !!}
