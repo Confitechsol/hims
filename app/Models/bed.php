@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,7 +24,7 @@ class Bed extends Model
     ];
 
     protected $casts = [
-        'bed_type_id'  => 'integer',
+        'bed_type_id' => 'integer',
         'bed_group_id' => 'integer',
     ];
 
@@ -41,11 +42,5 @@ class Bed extends Model
     public function patientBedHistory()
     {
         return $this->hasMany(PatientBedHistory::class, 'bed_id', 'id');
-    }
-    public function activePatient()
-    {
-        return $this->hasOne(PatientBedHistory::class, 'bed_id')
-            ->where('is_active', 'yes')
-            ->with('ipd.patient:id,patient_name');
     }
 }

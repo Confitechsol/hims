@@ -8,10 +8,22 @@ use Illuminate\Http\Request;
 
 class MedicineCategoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $categories = MedicineCategory::orderBy('id', 'desc')->get();
-        return view('admin.setup.medicine_category', compact('categories'));
+        $categories = MedicineCategory::query();
+           $perPage = intval($request->input('perPage', 10));
+        if ($perPage <= 0) {
+           $perPage = 10;
+        }
+       if ($request->filled('search')) {
+        $search_term = $request->search;
+        $categories->where('medicine_category', 'like', "%{$search_term}%");
+    }
+     $categories = $categories->paginate($perPage);
+    //    return response()->json([
+    //     "result" => $categories
+    // ]);
+       return view('admin.setup.medicine_category', compact('categories'));
     }
 
     public function store(Request $request)
