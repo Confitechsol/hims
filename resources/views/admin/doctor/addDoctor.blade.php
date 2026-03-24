@@ -677,14 +677,14 @@
                                 <div class="row gy-3">
 
                                     <!-- Doctor ID -->
-                                    <div class="col-md-6">
+                                    <!-- <div class="col-md-6">
                                         <div class="form-group">
                                             <label class="form-label">Doctor ID</label><small class="req"> *</small>
                                             <input id="doctor_id" name="doctor_id" type="text"
                                                 class="form-control"
                                                 value="{{ old('doctor_id', $doctor->doctor_id ?? '') }}">
                                         </div>
-                                    </div>
+                                    </div> -->
 
                                     <!-- ROLE -->
                                     <div class="col-md-6">
