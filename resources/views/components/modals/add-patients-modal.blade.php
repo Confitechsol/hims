@@ -10,6 +10,7 @@
         /* adjust as needed */
         border-radius: 8px;
     }
+    
 </style>
 
 <div class="modal fade use-select2" id="add_patient" tabindex="-1" aria-labelledby="addSpecializationLabel"
@@ -263,7 +264,7 @@
                             @enderror
                         </div>
                         {{-- Area --}}
-                        <div class="col-md-3">
+                        {{-- <div class="col-md-3">
                             <label for="area" class="form-label">Area</label>
                             <div class="input-group">
                                 <select id="area" name="area" class="form-select @error('area') is-invalid @enderror">
@@ -278,11 +279,11 @@
                             @error('area')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                        </div>
+                        </div> --}}
 
 
                          {{-- police_station --}}
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label for="police_station" class="form-label">Police Station</label>
                             <input type="text" id="police_station" name="police_station"
                                 class="form-control @error('police_station') is-invalid @enderror"
@@ -291,11 +292,48 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+
+                        {{-- Area --}}
+                        <div class="col-md-3">
+                            <label for="area" class="form-label">Area</label>
+                            <input type="text" id="area" name="area"
+                                class="form-control @error('area') is-invalid @enderror"
+                                value="{{ old('area') }}" />
+                            @error('area')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        {{-- Area --}}
+                        <div class="col-md-3">
+                            <label for="pin_code" class="form-label">Pin Code</label>
+                            <input type="text" id="pin_code" name="pin_code"
+                                class="form-control @error('pin_code') is-invalid @enderror"
+                                value="{{ old('pin_code') }}" />
+                            @error('pin_code')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                       {{-- State --}}
+                        <div class="col-md-3">
+                            <label class="form-label">State</label>
+                            <select id="stateDropdown" name="state_id" class="form-control">
+                            <option value="">Select State</option>
+                        </select>
+                        </div>
                         
+                        {{-- District --}}
+                        <div class="col-md-3">
+                            <label class="form-label mt-3">District</label>
+                            <select id="districtDropdown" name="district_id" class="form-control">
+                            <option value="">Select District</option>
+                        </select>
+                        </div>
                         
     
                         {{-- District --}}
-                        <div class="col-md-3">
+                        {{-- <div class="col-md-3">
                             <label for="district" class="form-label">District</label>
                             <input type="text" id="district" name="district_name"
                                 class="form-control @error('district') is-invalid @enderror"
@@ -306,9 +344,9 @@
                             @error('district')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                        </div>
+                        </div> --}}
                         {{-- State --}}
-                        <div class="col-md-3">
+                        {{-- <div class="col-md-3">
                             <label class="form-label">State</label>
                             <input type="text" id="state" name="state_name"
                                 class="form-control"
@@ -316,7 +354,8 @@
                         </div>
                         <input type="hidden"
                             id="state_id"
-                            name="state">
+                            name="state"> --}}
+                        
                         
                         {{-- religion --}}
                         <div class="col-md-3">
@@ -789,4 +828,78 @@ document.getElementById('area').addEventListener('change', function () {
             });
         }
     });
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Fetch states from API
+    fetch('{{url('/')}}/states')  // make sure this API route exists
+        .then(response => response.json())
+        .then(res => {
+            const dropdown = document.getElementById('stateDropdown');
+
+            if(res.status) {
+                res.data.forEach(state => {
+                    const option = document.createElement('option');
+                    option.value = state.id;    // your state id
+                    option.textContent = state.name; // your state name
+                    dropdown.appendChild(option);
+                });
+            }
+        })
+        .catch(error => console.error('Error fetching states:', error));
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const stateDropdown = document.getElementById('stateDropdown');
+    const districtDropdown = document.getElementById('districtDropdown');
+
+    // 1️⃣ Load all states on page load
+    fetch('{{ url("/states") }}') // Make sure this API route returns JSON
+        .then(response => response.json())
+        .then(res => {
+            if(res.status) {
+                res.data.forEach(state => {
+                    const option = document.createElement('option');
+                    option.value = state.id;
+                    option.textContent = state.name;
+                    stateDropdown.appendChild(option);
+                });
+            }
+        })
+        .catch(error => console.error('Error fetching states:', error));
+
+    // 2️⃣ Load districts when state changes
+    stateDropdown.addEventListener('change', function () {
+        const stateId = this.value;
+
+        if(!stateId) {
+            districtDropdown.innerHTML = '<option value="">Select District</option>';
+            return;
+        }
+
+        districtDropdown.innerHTML = '<option value="">Loading...</option>';
+
+        fetch(`{{ url('/districts') }}?state_id=${stateId}`)
+            .then(response => response.json())
+            .then(res => {
+                districtDropdown.innerHTML = '<option value="">Select District</option>';
+                if(res.status && res.data.length > 0) {
+                    res.data.forEach(district => {
+                        const option = document.createElement('option');
+                        option.value = district.id;
+                        option.textContent = district.name;
+                        districtDropdown.appendChild(option);
+                    });
+                } else {
+                    districtDropdown.innerHTML = '<option value="">No districts found</option>';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching districts:', error);
+                districtDropdown.innerHTML = '<option value="">Error loading districts</option>';
+            });
+    });
+});
 </script>
