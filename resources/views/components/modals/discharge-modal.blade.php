@@ -928,11 +928,15 @@
                     </div>
                     <!-- Action Buttons -->
                     <div class="action-buttons mt-4">
-                        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal"
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
                             aria-label="Close">
                             <i class="bi bi-x-circle"></i>
                             Cancel
                         </button>
+                        {{-- <button type="submit" class="btn btn-outline-primary" id="as-draft">
+                            <i class="bi bi-check-circle"></i>
+                            Save As Draft
+                        </button> --}}
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-check-circle"></i>
                             Submit

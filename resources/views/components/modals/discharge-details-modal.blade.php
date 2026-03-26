@@ -433,8 +433,7 @@
                                       <h6 id="discharge_medicine_label">Discharge Advised Medicines:</h6>
                                       <div class="general_list" id="discharge_medicine_list"></div>
                                       <br />
-                                      <h6 id="doctor_advice_label">Doctor Advise:</h6>
-                                      <div class="general_list" id="dis_doctor_advice_html"></div>
+                                      <div class="general_list ps-4" id="dis_doctor_advice_html"></div>
                                       <br />
                                       <h6 id="dis_investigation_label">Investigations:</h6>
                                       <div class="general_list" id="dis_investigation_html"></div>
@@ -596,9 +595,7 @@
                   setHTML('dis_investigation_html', data.investigation);
               }
 
-              if (data.doctor_advice === "" || data.doctor_advice === null) {
-                  hideLabel('doctor_advice_label')
-              } else {
+              if (data.doctor_advice !== "" || data.doctor_advice !== null) {
                   setHTML('dis_doctor_advice_html', data.doctor_advice);
               }
 

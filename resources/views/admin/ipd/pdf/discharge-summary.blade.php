@@ -375,7 +375,6 @@
         @endif
 
         @if ($data->doctor_advice != null || $data->doctor_advice != '')
-            <h4>Doctor Advice</h4>
             {!! $data->doctor_advice !!}
         @endif
 
