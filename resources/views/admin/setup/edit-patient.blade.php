@@ -309,19 +309,61 @@
                                                 </div>
         
                                                 {{-- Remarks --}}
-                                                <div class="col-md-6">
+                                                <div class="col-md-4">
                                                     <label class="form-label">Remarks</label>
                                                     <input type="text" name="remarks" class="form-control"
                                                         value="{{ old('remarks', $patient->remarks) }}" />
                                                 </div>
         
                                                 {{-- Allergies --}}
-                                                <div class="col-md-4">
+                                                {{-- <div class="col-md-4">
                                                     <label class="form-label">Allergies</label>
                                                     <input type="text" name="allergies"
                                                         class="form-control"
                                                         value="{{ old('allergies', $patient->known_allergies) }}" />
+                                                </div> --}}
+                                                 {{-- Area --}}
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Area</label>
+                                                    <input type="text" name="area"
+                                                        class="form-control"
+                                                        value="{{ old('area', $patient->area) }}" />
                                                 </div>
+                                                 {{-- Pin Code --}}
+                                                 <div class="col-md-4">
+                                                    <label class="form-label">Pin Code</label>
+                                                    <input type="text" name="pin_code"
+                                                        class="form-control"
+                                                        value="{{ old('pin_code', $patient->pin_code) }}" />
+                                                </div>
+
+                                                {{-- Police Station --}}
+                                                 <div class="col-md-4">
+                                                    <label class="form-label">Police Station</label>
+                                                    <input type="text" name="police_station"
+                                                        class="form-control"
+                                                        value="{{ old('police_station', $patient->police_station) }}" />
+                                                </div>
+
+                                                {{--state --}}
+                                               <div class="col-md-3">
+                                                    <label class="form-label">State</label>
+                                                    <select id="stateDropdown" name="state_id" class="form-control">
+                                                        <option value="">Select State</option>
+                                                    </select>
+                                                </div>
+                                                
+                                                {{-- District --}}  
+                                                <div class="col-md-3">
+                                                   <label class="form-label">District</label>
+                                                   <select id="districtDropdown" name="district_id" class="form-control">
+                                                       <option value="">Select District</option>
+                                                   </select>
+                                               </div>
+                        
+
+
+
         
                                                 {{-- Languages Speak --}}
                                                 <div class="col-md-4">
@@ -553,5 +595,121 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 </script>
+
+<script>
+    const selectedStateId = "{{ $patient->state }}"; // existing saved state id
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    fetch('{{ url('/') }}/states')
+        .then(response => response.json())
+        .then(res => {
+            const dropdown = document.getElementById('stateDropdown');
+
+            if (res.status) {
+                res.data.forEach(state => {
+                    const option = document.createElement('option');
+                    option.value = state.id;
+                    option.textContent = state.name;
+
+                    // ✅ Match with saved state_id
+                    if (state.id == selectedStateId) {
+                        option.selected = true;
+                    }
+
+                    dropdown.appendChild(option);
+                });
+            }
+        })
+        .catch(error => console.error('Error fetching states:', error));
+});
+</script>
+
+<script>
+   
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const selectedStateId = "{{ $patient->state }}";
+    const selectedDistrictId = "{{ $patient->district }}";
+
+    const stateDropdown = document.getElementById('stateDropdown');
+    const districtDropdown = document.getElementById('districtDropdown');
+
+    // ✅ Load States
+    fetch('{{ url("/states") }}')
+        .then(response => response.json())
+        .then(res => {
+            if(res.status) {
+                res.data.forEach(state => {
+                    const option = document.createElement('option');
+                    option.value = state.id;
+                    option.textContent = state.name;
+
+                    // ✅ SELECT STATE IN EDIT
+                    if(state.id == selectedStateId) {
+                        option.selected = true;
+                    }
+
+                    stateDropdown.appendChild(option);
+                });
+
+                // ✅ LOAD DISTRICT AUTOMATICALLY (EDIT FIX)
+                if(selectedStateId) {
+                    loadDistricts(selectedStateId);
+                }
+            }
+        });
+
+    // ✅ On State Change
+    stateDropdown.addEventListener('change', function () {
+        const stateId = this.value;
+
+        districtDropdown.innerHTML = '<option value="">Select District</option>';
+
+        if(stateId) {
+            loadDistricts(stateId);
+        }
+    });
+
+    // ✅ Load Districts
+    function loadDistricts(stateId) {
+        districtDropdown.innerHTML = '<option>Loading...</option>';
+
+        fetch(`{{ url('/districts') }}?state_id=${stateId}`)
+            .then(response => response.json())
+            .then(res => {
+
+                districtDropdown.innerHTML = '<option value="">Select District</option>';
+
+                if(res.status && res.data.length > 0) {
+                    res.data.forEach(district => {
+                        const option = document.createElement('option');
+                        option.value = district.id;
+                        option.textContent = district.name;
+
+                        // ✅ SELECT DISTRICT IN EDIT
+                        if(district.id == selectedDistrictId) {
+                            option.selected = true;
+                        }
+
+                        districtDropdown.appendChild(option);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                districtDropdown.innerHTML = '<option>Error loading districts</option>';
+            });
+    }
+
+});
+</script>
+
+
 
 @endsection

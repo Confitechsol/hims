@@ -11,6 +11,8 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 use Illuminate\Support\Facades\Validator;
+use App\Models\District;
+use \App\Models\State;
 
 class PatientController extends Controller
 {
@@ -137,9 +139,9 @@ class PatientController extends Controller
             'languages_known.*' => 'in:Bengali,Hindi,English,Urdu',
             'newspaper_preference'  => 'nullable|string|max:255',
             'address'               => 'nullable|string|max:500',
-            'area'                  => 'nullable|string|max:500',
-            'state'                 => 'nullable|string|max:500',
-            'district'              => 'nullable|string|max:500',
+            'area' => 'required|string|max:255',
+            'state_id'    => 'nullable|exists:states,id',
+            'district_id' => 'nullable|exists:district,id',
             'religion'              => 'nullable|string|max:500',
             'remarks'               => 'nullable|string|max:500',
             'allergies'             => 'nullable|string|max:255',
@@ -149,9 +151,10 @@ class PatientController extends Controller
             'national_id_number'    => 'nullable|string|max:50',
             'occupation'            => 'nullable|string|max:255',
             'police_station'        => 'nullable|string|max:255',
+            'pin_code'               => 'nullable|string|max:20',
         ]);
 
-        //dd($validated);
+      //  dd($validated);
 
         if ($validated->fails()) {
             //dd($validated->errors()->all());
@@ -170,6 +173,8 @@ class PatientController extends Controller
         }
 
         // Create patient
+        // dd($data['state_id']);
+        
         Patient::create([
             'patient_name'          => $data['name'],
             'guardian_name'         => $data['guardian_name'] ?? null,
@@ -198,8 +203,8 @@ class PatientController extends Controller
             'newspaper_preference'  => $data['newspaper_preference'] ?? null,
             'address'               => $data['address'] ?? null,
             'area'                  => $data['area'] ?? null,
-            'state'                  => $data['state'] ?? null,
-            'district'              => $data['district'] ?? null,
+            'state'    => $data['state_id'] ?? null,
+            'district' => $data['district_id'] ?? null,
             'religion'               => $data['religion'] ?? null,
             'note'                  => $data['remarks'] ?? null,
             'known_allergies'       => $data['allergies'] ?? null,
@@ -210,6 +215,7 @@ class PatientController extends Controller
             'identification_number' => $data['national_id_number'] ?? null,
             'occupation'            => $data['occupation'] ?? null,
             'police_station'        => $data['police_station'] ?? null,
+            'pin_code'             => $data['pin_code'] ?? null,
         ]);
 
         return redirect()->back()->with('success', 'Patient saved successfully!');
@@ -252,12 +258,17 @@ class PatientController extends Controller
             'languages_speak'       => 'nullable|string|max:255',
             'newspaper_preference'  => 'nullable|string|max:255',
             'address'               => 'nullable|string|max:500',
+            'area' => 'required|string|max:255',
+            'state_id'    => 'nullable|exists:states,id',
+            'district_id' => 'nullable|exists:district,id',
             'remarks'               => 'nullable|string|max:500',
-            'allergies'             => 'required|string|max:255',
+            // 'allergies'             => 'required|string|max:255',
             'tpa'                   => 'nullable|in:1,2,3,4,5',
             'tpa_id'                => 'nullable|string|max:100',
             'tpa_validity'          => 'nullable|string|max:100',
             'national_id_number'    => 'nullable|string|max:50',
+            'pin_code'               => 'nullable|string|max:20',
+            'police_station'        => 'nullable|string|max:255',
         ]);
 
         if ($validated->fails()) {
@@ -307,19 +318,21 @@ class PatientController extends Controller
         'newspaper_preference'  => $data['newspaper_preference'] ?? null,
         'address'               => $data['address'] ?? null,
         'area'                  => $data['area'] ?? null,
-        'state'                  => $data['state'] ?? null,
-        'district'              => $data['district'] ?? null,
+        'state'                 => $data['state_id'] ?? null,
+        'district'              => $data['district_id'] ?? null,
         'note'                  => $data['remarks'] ?? null,
-        'known_allergies'       => $data['allergies'] ?? null,
+        // 'known_allergies'       => $data['allergies'] ?? null,
 
         'organisation_id'       => $data['tpa'] ?? null,
         'insurance_id'          => $data['tpa_id'] ?? null,
         'insurance_validity'    => $data['tpa_validity'] ?? null,
         'identification_number' => $data['national_id_number'] ?? null,
+        'pin_code'             => $data['pin_code'] ?? null,
+        'police_station'       => $data['police_station'] ?? null,
         ]);
 
-       return redirect()->route('admin.setup.patients')->with('success', 'Patient updated successfully!');
-
+      // return redirect()->route('admin.setup.patients')->with('success', 'Patient updated successfully!');
+        return redirect()->route('patients')->with('success', 'Patient updated successfully!');
     }
 
 
@@ -662,6 +675,23 @@ class PatientController extends Controller
         $patients = Patient::with('organisation', 'bloodGroup')->get();
         // dd($patients);
         return response()->json($patients, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
+    }
+
+    public function district(Request $request) {
+    $stateId = $request->query('state_id');
+    $districts = District::where('state_id', $stateId)->get();
+    return response()->json(['status' => true, 'data' => $districts]);
+   }
+
+    public function state() {
+        $states = State::all();
+
+        return response()->json([
+            'status' => true,
+            'data' => $states
+        ]);
+
+       //  return view('patient.form', compact('states'));
     }
 
 }

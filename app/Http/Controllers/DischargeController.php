@@ -22,7 +22,7 @@ class DischargeController extends Controller
             'patient_name'       => ['required', 'string', 'max:255'],
             'patient_id'         => ['nullable', 'integer'],
             'admission_no'       => ['nullable', 'string'],
-            'discharge_contact'  => ['required', 'string'],
+            'discharge_contact'  => ['nullable', 'string'],
             'discharge_date'     => ['required', 'date'],
             'discharge_time'     => ['nullable'],
             'admission_date'     => ['nullable', 'date'],
@@ -57,13 +57,16 @@ class DischargeController extends Controller
             'present_complaints' => ['nullable', 'string'],
             'remarks'            => ['nullable', 'string'],
             'meds'               => ['nullable', 'array'],
-            'meds.*'             => ['string'],
+            'meds.*'             => ['nullable', 'string'],
             'med_types'          => ['nullable', 'array'],
-            'med_types.*'        => ['string'],
+            'med_types.*'        => ['nullable', 'string'],
             'med_interval'       => ['nullable', 'array'],
-            'med_interval.*'     => ['string'],
+            'med_interval.*'     => ['nullable', 'string'],
             'med_duration'       => ['nullable', 'array'],
-            'med_duration.*'     => ['string'],
+            'med_duration.*'     => ['nullable', 'string'],
+            'med_date'           => ['nullable', 'array'],
+            'med_date.*'         => ['nullable', 'date'],
+            'doctor_advice'      => ['nullable', 'string'],
             'discharged_by'      => ['nullable', 'string'],
             'current_user'       => ['nullable', 'string'],
         ]);
@@ -83,18 +86,49 @@ class DischargeController extends Controller
             }
             $nextNumber  = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
             $dischargeNo = 'D-' . $nextNumber;
-            $meds        = array_filter((array) $request->meds, fn($med) => $med !== null && $med !== '');
-            $medTypes    = array_filter((array) $request->med_types, fn($type) => $type !== null && $type !== '');
-            $intervals   = array_filter((array) $request->med_interval, fn($interval) => $interval !== null && $interval !== '');
-            $durations   = array_filter((array) $request->med_duration, fn($duration) => $duration !== null && $duration !== '');
+            // $meds        = array_filter((array) $request->meds, fn($med) => $med !== null && $med !== '');
+            // $medTypes    = array_filter((array) $request->med_types, fn($type) => $type !== null && $type !== '');
+            // $intervals   = array_filter((array) $request->med_interval, fn($interval) => $interval !== null && $interval !== '');
+            // $durations   = array_filter((array) $request->med_duration, fn($duration) => $duration !== null && $duration !== '');
 
+            $meds      = $request->meds ?? [];
+            $types     = $request->med_types ?? [];
+            $intervals = $request->med_interval ?? [];
+            $durations = $request->med_duration ?? [];
+            $dates     = $request->med_date ?? [];
+
+            $finalMeds      = [];
+            $finalTypes     = [];
+            $finalIntervals = [];
+            $finalDurations = [];
+            $finalDates     = [];
+
+            foreach ($meds as $i => $med) {
+
+                // skip completely empty row
+                if (empty($med)) {
+                    continue;
+                }
+
+                $finalMeds[]      = $med;
+                $finalTypes[]     = $types[$i] ?? "";
+                $finalIntervals[] = $intervals[$i] ?? "";
+                $finalDurations[] = $durations[$i] ?? "";
+                $finalDates[]     = $dates[$i] ?? "";
+            }
+
+            $implodedMeds      = ! empty($finalMeds) ? implode(", ", $finalMeds) : null;
+            $implodedMedTypes  = ! empty($finalTypes) ? implode(", ", $finalTypes) : null;
+            $implodedIntervals = ! empty($finalIntervals) ? implode(", ", $finalIntervals) : null;
+            $implodedDurations = ! empty($finalDurations) ? implode("||", $finalDurations) : null;
+            $implodedDates     = ! empty($finalDates) ? implode("||", $finalDates) : null;
             // $durations         = array_filter((array) $request->med_duration, fn($d) => $d !== null && $d !== '');
-            $implodedMeds      = implode(", ", $meds);
-            $implodedMedTypes  = implode(", ", $medTypes);
-            $implodedIntervals = implode(", ", $intervals);
-            $implodedDurations = implode("||", $durations);
+            // $implodedMeds      = implode(", ", $meds);
+            // $implodedMedTypes  = implode(", ", $medTypes);
+            // $implodedIntervals = implode(", ", $intervals);
+            // $implodedDurations = implode("||", $durations);
             // $durationsJson     = json_encode(array_values($durations));
-
+            // dd($implodedDates);
             $barcodePayload = [
                 'type'               => 'DISCHARGE',
                 'discharge_no'       => $dischargeNo,
@@ -206,7 +240,9 @@ class DischargeController extends Controller
                 'medicine_types'     => $implodedMedTypes ?? null,
                 'intervals'          => $implodedIntervals ?? null,
                 'durations'          => $implodedDurations ?? null,
+                'med_dates'          => $implodedDates ?? null,
 
+                'doctor_advice'      => $validated['doctor_advice'] ?? null,
                 'discharged_by'      => $validated['discharged_by'] ?? null,
                 'created_by'         => Auth::id(),
             ]);
@@ -238,6 +274,7 @@ class DischargeController extends Controller
         $dischargeData->meds         = explode(',', $dischargeData->medicines ?? '');
         $dischargeData->med_types    = explode(',', $dischargeData->medicine_types ?? '');
         $dischargeData->med_interval = explode(',', $dischargeData->intervals ?? '');
+        $dischargeData->med_dates    = explode('||', $dischargeData->med_dates ?? '');
         // $dischargeData->med_duration = explode("||", $dischargeData->durations ?? '');
         $dischargeData->ot_done_by = explode(",", $dischargeData->ot_done_by ?? '');
         $rawDurations              = $dischargeData->durations ?? '';
@@ -251,13 +288,33 @@ class DischargeController extends Controller
             $durations = preg_split('/,(?=[A-Z0-9])/', $rawDurations);
         }
 
-        $dischargeData->med_duration = array_filter(
-            array_map('trim', $durations),
-            fn($dur) => $dur !== ''
-        );
+        $dischargeData->med_duration = array_map(function ($dur) {
+            return trim($dur) === '' ? '' : trim($dur);
+        }, $durations);
         $medCount      = count($dischargeData->meds);
         $durationCount = count($dischargeData->med_duration);
 
+        if (count($dischargeData->med_types) < $medCount) {
+            $dischargeData->med_types = array_pad(
+                $dischargeData->med_types,
+                $medCount,
+                ''
+            );
+        }
+        if (count($dischargeData->med_interval) < $medCount) {
+            $dischargeData->med_interval = array_pad(
+                $dischargeData->med_interval,
+                $medCount,
+                ''
+            );
+        }
+        if (count($dischargeData->med_dates) < $medCount) {
+            $dischargeData->med_dates = array_pad(
+                $dischargeData->med_dates,
+                $medCount,
+                ''
+            );
+        }
         if ($durationCount < $medCount) {
             $dischargeData->med_duration = array_pad(
                 $dischargeData->med_duration,
@@ -276,13 +333,20 @@ class DischargeController extends Controller
         // -------------------------------
         // 🔹 Validation Rules (Form-based)
         // -------------------------------
+        // $request->merge([
+        //     'meds'         => array_values(array_filter($request->meds ?? [])),
+        //     'med_types'    => array_values(array_filter($request->med_types ?? [])),
+        //     'med_interval' => array_values(array_filter($request->med_interval ?? [])),
+        //     'med_duration' => array_values(array_filter($request->med_duration ?? [])),
+        // ]);
+
         // dd($request->all());
         $validated = $request->validate([
             'ipd_details_id'     => ['required', 'integer', 'exists:ipd_details,id'],
             'patient_name'       => ['required', 'string', 'max:255'],
             'patient_id'         => ['nullable', 'integer'],
             'admission_no'       => ['nullable', 'string'],
-            'discharge_contact'  => ['required', 'string'],
+            'discharge_contact'  => ['nullable', 'string'],
             'discharge_date'     => ['required', 'date'],
             'discharge_time'     => ['nullable'],
             'admission_date'     => ['nullable', 'date'],
@@ -317,13 +381,16 @@ class DischargeController extends Controller
             'present_complaints' => ['nullable', 'string'],
             'remarks'            => ['nullable', 'string'],
             'meds'               => ['nullable', 'array'],
-            'meds.*'             => ['string'],
+            'meds.*'             => ['nullable', 'string'],
             'med_types'          => ['nullable', 'array'],
-            'med_types.*'        => ['string'],
+            'med_types.*'        => ['nullable', 'string'],
             'med_interval'       => ['nullable', 'array'],
-            'med_interval.*'     => ['string'],
+            'med_interval.*'     => ['nullable', 'string'],
             'med_duration'       => ['nullable', 'array'],
-            'med_duration.*'     => ['string'],
+            'med_duration.*'     => ['nullable', 'string'],
+            'med_date'           => ['nullable', 'array'],
+            'med_date.*'         => ['nullable', 'date'],
+            'doctor_advice'      => ['nullable', 'string'],
             'discharged_by'      => ['nullable', 'string'],
             'current_user'       => ['nullable', 'string'],
         ]);
@@ -335,18 +402,46 @@ class DischargeController extends Controller
             // -------------------------------
             // 🔹 Update Discharge Card
             // -------------------------------
-            $meds      = array_filter((array) $request->meds, fn($med) => $med !== null && $med !== '');
-            $medTypes  = array_filter((array) $request->med_types, fn($type) => $type !== null && $type !== '');
-            $intervals = array_filter((array) $request->med_interval, fn($interval) => $interval !== null && $interval !== '');
-            $durations = array_filter((array) $request->med_duration, fn($duration) => $duration !== null && $duration !== '');
-
+            // $meds      = array_filter((array) $request->meds, fn($med) => $med !== null && $med !== '');
+            // $medTypes  = array_filter((array) $request->med_types, fn($type) => $type !== null && $type !== '');
+            // $intervals = array_filter((array) $request->med_interval, fn($interval) => $interval !== null && $interval !== '');
+            // $durations = array_filter((array) $request->med_duration, fn($duration) => $duration !== null && $duration !== '');
+            // dd($durations);
             // $durations         = array_filter((array) $request->med_duration, fn($d) => $d !== null && $d !== '');
-            $implodedMeds      = implode(", ", $meds);
-            $implodedMedTypes  = implode(", ", $medTypes);
-            $implodedIntervals = implode(", ", $intervals);
-            $implodedDurations = implode("||", $durations);
-            // $durationsJson     = json_encode(array_values($durations));
 
+            $meds      = $request->meds ?? [];
+            $types     = $request->med_types ?? [];
+            $intervals = $request->med_interval ?? [];
+            $durations = $request->med_duration ?? [];
+            $medDates  = $request->med_date ?? [];
+
+            $finalMeds      = [];
+            $finalTypes     = [];
+            $finalIntervals = [];
+            $finalDurations = [];
+            $finalDates     = [];
+
+            foreach ($meds as $i => $med) {
+
+                // skip completely empty row
+                if (empty($med)) {
+                    continue;
+                }
+
+                $finalMeds[]      = $med;
+                $finalTypes[]     = $types[$i] ?? "";
+                $finalIntervals[] = $intervals[$i] ?? "";
+                $finalDurations[] = $durations[$i] ?? "";
+                $finalDates[]     = $medDates[$i] ?? "";
+            }
+
+            $implodedMeds      = ! empty($finalMeds) ? implode(", ", $finalMeds) : null;
+            $implodedMedTypes  = ! empty($finalTypes) ? implode(", ", $finalTypes) : null;
+            $implodedIntervals = ! empty($finalIntervals) ? implode(", ", $finalIntervals) : null;
+            $implodedDurations = ! empty($finalDurations) ? implode("||", $finalDurations) : null;
+            $implodedDates     = ! empty($finalDates) ? implode("||", $finalDates) : null;
+            // $durationsJson     = json_encode(array_values($durations));
+            // dd($implodedMeds);
             $barcodePayload = [
                 'type'               => 'DISCHARGE',
                 'ipd_details_id'     => $validated['ipd_details_id'],
@@ -456,6 +551,8 @@ class DischargeController extends Controller
                 'medicine_types'     => $implodedMedTypes ?? null,
                 'intervals'          => $implodedIntervals ?? null,
                 'durations'          => $implodedDurations ?? null,
+                'med_dates'          => $implodedDates ?? null,
+                'doctor_advice'      => $validated['doctor_advice'] ?? null,
             ]);
 
             DB::commit();

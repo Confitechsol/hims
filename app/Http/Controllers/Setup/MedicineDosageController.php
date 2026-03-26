@@ -10,14 +10,37 @@ use Illuminate\Http\Request;
 
 class MedicineDosageController extends Controller
 {
-    public function index()
-    {
-        $dosages = MedicineDosage::with(['category', 'unit'])->orderBy('id', 'desc')->get();
-        $categories = MedicineCategory::all();
-        $units = MedicineUnit::all();
-        return view('admin.setup.medicine_dosage', compact('dosages', 'categories', 'units'));
+  public function index(Request $request)
+{
+    // Per page
+    $perPage = (int) $request->input('perPage', 10);
+    if ($perPage <= 0) {
+        $perPage = 10;
     }
 
+    $search = $request->input('search');
+
+    // Start query
+    $query = MedicineDosage::with(['category', 'unit'])
+
+->orWhereHas('category', function ($q2) use ($search) {
+    $q2->where('medicine_category', 'like', "%{$search}%");
+})
+
+->orWhereHas('unit', function ($q3) use ($search) {
+    $q3->where('unit_name', 'like', "%{$search}%");
+});
+
+ 
+   $dosages = $query->paginate($perPage);
+
+    $categories = MedicineCategory::all();
+    $units = MedicineUnit::all();
+    //     return response()->json([
+    //     "result" => $dosages
+    // ]);
+    return view('admin.setup.medicine_dosage', compact('dosages', 'categories', 'units', 'perPage', 'search'));
+}
     public function store(Request $request)
     {
         $request->validate([

@@ -65,6 +65,7 @@ class Patient extends Model
         'newspaper_preference',
         'occupation',
         'police_station',
+        'pin_code',
     ];
 
     protected $casts = [
