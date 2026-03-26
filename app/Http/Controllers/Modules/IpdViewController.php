@@ -218,7 +218,8 @@ class IpdViewController extends Controller
 
             }
 
-            if ($ipd->doctor->signature) {
+           
+            if ($ipd->doctor && $ipd->doctor->signature) {
                 $ipd->dischargeCard->signature = $ipd->doctor->signature;
             }
         }
