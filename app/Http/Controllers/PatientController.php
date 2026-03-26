@@ -42,6 +42,11 @@ class PatientController extends Controller
     $patients = $query->orderBy('id','desc')
                       ->paginate($perPage)
                       ->appends($request->all());
+    if ($request->has('search')) {
+      return response()->json([
+          'result' => $patients
+      ]);
+    }                      
         return view('admin.setup.patient', compact('patients','bloodGroups','perPage'));
     }
     // public function storeOld(Request $request)
