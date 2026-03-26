@@ -49,15 +49,17 @@ public function permissionsOld(Role $role)
     }
     public function savePermissions(Request $request)
     {
-        $roleId = $request->role_id;
-        $permissions = $request->permissions; // array from checkboxes
+        $roleId      = (int) $request->role_id;
+        $permissions = $request->permissions ?? []; // array from checkboxes, keyed by perm_cat_id
+        $hospitalId  = auth()->user()->hospital_id ?? null;
 
+        // 1) Save / update all categories that have at least one checked permission
         foreach ($permissions as $permCatId => $types) {
             RolesPermission::updateOrCreate(
                 [
-                    'role_id' => $roleId,
+                    'role_id'     => $roleId,
                     'perm_cat_id' => $permCatId,
-                    'hospital_id' => auth()->user()->hospital_id ?? null,
+                    'hospital_id' => $hospitalId,
                 ],
                 [
                     'can_view'   => in_array('can_view', $types),
@@ -66,6 +68,22 @@ public function permissionsOld(Role $role)
                     'can_delete' => in_array('can_delete', $types),
                 ]
             );
+        }
+
+        // 2) For any existing categories that are missing from the request
+        //    (all checkboxes unchecked), explicitly set all permissions to 0
+        $touchedPermCatIds = array_map('intval', array_keys($permissions));
+
+        if (!empty($touchedPermCatIds)) {
+            RolesPermission::where('role_id', $roleId)
+                ->where('hospital_id', $hospitalId)
+                ->whereNotIn('perm_cat_id', $touchedPermCatIds)
+                ->update([
+                    'can_view'   => 0,
+                    'can_add'    => 0,
+                    'can_edit'   => 0,
+                    'can_delete' => 0,
+                ]);
         }
 
         return response()->json([

@@ -433,6 +433,8 @@
                                       <h6 id="discharge_medicine_label">Discharge Advised Medicines:</h6>
                                       <div class="general_list" id="discharge_medicine_list"></div>
                                       <br />
+                                      <div class="general_list ps-4" id="dis_doctor_advice_html"></div>
+                                      <br />
                                       <h6 id="dis_investigation_label">Investigations:</h6>
                                       <div class="general_list" id="dis_investigation_html"></div>
                                       <br />
@@ -447,7 +449,7 @@
                                       <div class="general_list" id="dis_discharge_advice_html"></div>
                                       <br />
                                       <h6 id="dis_remarks_label">Follow Up:</h6>
-                                      <div class="general_list" id="dis_remarks_text"></div>
+                                      <div class="general_list" id="dis_remarks_html"></div>
                                       <br />
                                       <div class="end">
                                           {{-- <p>---- xxxx -- END -- xxxx ---</p> --}}
@@ -592,6 +594,11 @@
               } else {
                   setHTML('dis_investigation_html', data.investigation);
               }
+
+              if (data.doctor_advice !== "" || data.doctor_advice !== null) {
+                  setHTML('dis_doctor_advice_html', data.doctor_advice);
+              }
+
               if (data.urgent_care === "" || data.urgent_care === null) {
                   hideLabel('dis_urgent_care_label')
               } else {
@@ -618,7 +625,7 @@
               if (data.remarks === "" || data.remarks === null) {
                   hideLabel('dis_remarks_label')
               } else {
-                  setText('dis_remarks_text', data.remarks);
+                  setHTML('dis_remarks_html', data.remarks);
               }
 
               if (data.present_complaints === "" || data.present_complaints === null) {

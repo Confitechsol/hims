@@ -76,6 +76,8 @@ return new class extends Migration
             $table->text('medicine_types')->nullable();
             $table->text('intervals')->nullable();
             $table->text('durations')->nullable();
+            $table->string('med_dates', 255)->nullable();
+            $table->text('doctor_advice')->nullable();
 
             // 🔹 Meta
             $table->string('discharged_by', 255)->nullable()->index();

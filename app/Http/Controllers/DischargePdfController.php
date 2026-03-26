@@ -28,18 +28,23 @@ class DischargePdfController extends Controller
 
         }
         $medCombinations = [];
-        $meds            = array_filter(
-            explode(',', $ipd->medicines),
-            fn($med) => $med !== null && trim($med) !== ''
-        );
-        $medTypes = array_filter(
-            explode(',', $ipd->medicine_types),
-            fn($med) => $med !== null && trim($med) !== ''
-        );
-        $intervals = array_filter(
-            explode(',', $ipd->intervals),
-            fn($inv) => $inv !== null && trim($inv) !== ''
-        );
+        $meds            = array_map(function ($med) {
+            return trim($med) === '' ? '' : trim($med);
+        }, explode(',', $ipd->medicines ?? ''));
+
+        $medTypes = array_map(function ($types) {
+            return trim($types) === '' ? '' : trim($types);
+        }, explode(',', $ipd->medicine_types ?? ''));
+
+        $intervals = array_map(function ($inv) {
+            return trim($inv) === '' ? '' : trim($inv);
+        }, explode(',', $ipd->intervals ?? ''));
+
+        $medDates = array_map(function ($date) {
+            return trim($date) === '' ? '' : trim($date);
+        }, explode('||', $ipd->med_dates ?? ''));
+        $rawDurations = $ipd->durations ?? '';
+
         $rawDurations = $ipd->durations ?? '';
 
         if (str_contains($rawDurations, '||')) {
@@ -51,10 +56,9 @@ class DischargePdfController extends Controller
             $durations = preg_split('/,(?=[A-Z0-9])/', $rawDurations);
         }
 
-        $durations = array_filter(
-            array_map('trim', $durations),
-            fn($dur) => $dur !== ''
-        );
+        $durations = array_map(function ($dur) {
+            return trim($dur) === '' ? '' : trim($dur);
+        }, $durations);
         // $durations = array_filter(
         //     explode(',', $ipd->durations),
         //     fn($dur) => $dur !== null && trim($dur) !== ''
@@ -82,9 +86,32 @@ class DischargePdfController extends Controller
                 ''
             );
         }
+        if (count($medDates) < count($meds)) {
+            $medDates = array_pad(
+                $medDates,
+                count($meds),
+                ''
+            );
+        }
 
         for ($i = 0; $i < $count; $i++) {
-            $medCombinations[] = "{$meds[$i]} ({$medTypes[$i]}) {$intervals[$i]} x {$durations[$i]}";
+            $medText = "{$meds[$i]} ({$medTypes[$i]})";
+            if ($intervals[$i] != '') {
+                $medText .= " {$intervals[$i]}";
+            }
+
+// Add duration with "x" ONLY if both interval & duration exist
+            if ($durations[$i] != '') {
+                if ($intervals[$i] != '') {
+                    $medText .= " x {$durations[$i]}";
+                } else {
+                    $medText .= " x {$durations[$i]}";
+                }
+            }
+            if ($medDates[$i] != '') {
+                $medText .= " - {$medDates[$i]}";
+            }
+            $medCombinations[] = $medText;
         }
 
         $medListHtml = '<ol style="padding-left:2.5rem;margin:0;">';
@@ -97,8 +124,8 @@ class DischargePdfController extends Controller
         if (empty($medCombinations)) {
             $medListHtml = null;
         }
-        $ipd->discharge_medicines_html  = $medListHtml;
-        $showHeaderFooter               = $request->query('hf', 1);
+        $ipd->discharge_medicines_html = $medListHtml;
+        $showHeaderFooter              = $request->query('hf', 1);
 
         if ($idpDetails->doctor->signature) {
             $path = public_path('uploads/Doctor/signatures/' . $idpDetails->doctor->signature);

@@ -693,7 +693,7 @@
                                 <i class="bi bi-chat-left-text"></i>
                                 Remarks
                             </label>
-                            <textarea class="form-control" id="remarks_text" name="remarks" rows="3"></textarea>
+                            <textarea class="form-control" id="remarks_text" name="remarks" rows="6"></textarea>
                         </div>
                     </div>
 
@@ -715,14 +715,14 @@
                             </div>
 
                             <div class="row g-3 mt-2">
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <label class="form-label">Medicine Name</label>
                                     <select class="med-medicine" name="meds[]">
                                         <option value="">Select Medicine</option>
                                     </select>
                                 </div>
 
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <label class="form-label">Medicine Types</label>
                                     <select class="form-select med-types" name="med_types[]">
                                         <option value="">Select Medicine Type</option>
@@ -745,6 +745,10 @@
                                     <label class="form-label">Duration</label>
                                     <select class="med-duration" name="med_duration[]"></select>
                                 </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Date</label>
+                                    <input type="date" class="form-control med-date py-2" name="med_date[]" />
+                                </div>
                             </div>
                         </div>
                     </template>
@@ -763,14 +767,14 @@
                             </div>
 
                             <div class="row g-3">
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <label class="form-label">Medicine Name</label>
                                     <select class="med-medicine" name="meds[]" id="meds">
                                         <option value="">Select Medicine</option>
                                     </select>
                                 </div>
 
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <label class="form-label">Medicine Type</label>
                                     <select class="form-select med-types" name="med_types[]" id="med-types">
                                         <option value="">Select Medicine Type</option>
@@ -802,6 +806,10 @@
 
                                     </select>
                                 </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Date</label>
+                                    <input type="date" class="form-control med-date py-2" name="med_date[]" />
+                                </div>
                             </div>
                         </div>
 
@@ -812,6 +820,15 @@
                             <i class="bi bi-plus-circle"></i>
                             Add Medicine
                         </button>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label for="remarks" class="form-label">
+                                <i class="bi bi-chat-left-text"></i>
+                                Doctor Advice
+                            </label>
+                            <textarea class="form-control" id="doctor_advice_text" name="doctor_advice" rows="3"></textarea>
+                        </div>
                     </div>
 
 
@@ -911,11 +928,15 @@
                     </div>
                     <!-- Action Buttons -->
                     <div class="action-buttons mt-4">
-                        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal"
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
                             aria-label="Close">
                             <i class="bi bi-x-circle"></i>
                             Cancel
                         </button>
+                        {{-- <button type="submit" class="btn btn-outline-primary" id="as-draft">
+                            <i class="bi bi-check-circle"></i>
+                            Save As Draft
+                        </button> --}}
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-check-circle"></i>
                             Submit
@@ -935,6 +956,20 @@
         persist: false,
     });
 </script> --}}
+<script>
+    ClassicEditor
+        .create(document.querySelector('#remarks_text'))
+        .catch(error => {
+            console.error(error);
+        });
+</script>
+<script>
+    ClassicEditor
+        .create(document.querySelector('#doctor_advice_text'))
+        .catch(error => {
+            console.error(error);
+        });
+</script>
 <script>
     ClassicEditor
         .create(document.querySelector('#diagnosis_text'))
@@ -1161,7 +1196,8 @@
             setValue('patient_name_text', ipd.patient?.patient_name);
             setValue('admission_no_text', ipd.ipd_no);
             // setValue('admission_no', ipd.admission_no);
-            setValue('bed_text', `${ipd.bed_detail?.name} - ${ipd.bed_group?.name}`);
+            setValue('bed_text', `${ipd.bed_detail?.name}`);
+            setValue('discharge_contact_text', ipd.patient?.mobileno);
 
             // setValue('admission_date', ipd.admission_date);
             // setValue('admit_time', ipd.admit_time);
